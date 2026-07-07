@@ -1,6 +1,6 @@
 # Consistency Ripple Check & Impact Report
 
-**Ticket:** TBD
+**Ticket:** [#8](https://github.com/dzaffren/copa-hackathon/issues/8)
 
 When a policy drafter revises a clause, Rulebook Radar traces the ripple across
 every linked policy in the cluster and produces a plain-language impact report of

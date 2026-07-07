@@ -74,14 +74,16 @@ Institution / Credible Regulator and Engaged Employees.
 
 ## Story Index
 
-| Ticket | Story                                                 | Spec                                                             | Type        | Status      | Dependencies                    |
-| ------ | ----------------------------------------------------- | ---------------------------------------------------------------- | ----------- | ----------- | ------------------------------- |
-| TBD    | Policy ingestion & rulebook knowledge-graph engine    | [spec-knowledge-graph-engine.md](spec-knowledge-graph-engine.md) | Technical   | Not Started | —                               |
-| TBD    | Drafter rulebook workspace                            | [spec-drafter-workspace.md](spec-drafter-workspace.md)           | User-facing | Not Started | Knowledge-graph engine          |
-| TBD    | Consistency ripple check & impact report              | [spec-ripple-impact-report.md](spec-ripple-impact-report.md)     | User-facing | Not Started | Engine; Drafter workspace       |
-| TBD    | Drafting copilot with live write-back                 | [spec-drafting-copilot.md](spec-drafting-copilot.md)             | User-facing | Not Started | Engine; Ripple check            |
-| TBD    | Supervisor submission completeness & compliance check | [spec-supervisor-check.md](spec-supervisor-check.md)             | User-facing | Not Started | Knowledge-graph engine          |
-| TBD    | Reviewer & approval workflow                          | [spec-reviewer-approval.md](spec-reviewer-approval.md)           | User-facing | Not Started | Drafter workspace; Ripple check |
+Epic tracking issue: [#5](https://github.com/dzaffren/copa-hackathon/issues/5).
+
+| Ticket                                                      | Story                                                 | Spec                                                             | Type        | Status      | Dependencies                  |
+| ----------------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------------- | ----------- | ----------- | ----------------------------- |
+| [#6](https://github.com/dzaffren/copa-hackathon/issues/6)   | Policy ingestion & rulebook knowledge-graph engine    | [spec-knowledge-graph-engine.md](spec-knowledge-graph-engine.md) | Technical   | Not Started | —                             |
+| [#7](https://github.com/dzaffren/copa-hackathon/issues/7)   | Drafter rulebook workspace                            | [spec-drafter-workspace.md](spec-drafter-workspace.md)           | User-facing | Not Started | #6 Engine                     |
+| [#8](https://github.com/dzaffren/copa-hackathon/issues/8)   | Consistency ripple check & impact report              | [spec-ripple-impact-report.md](spec-ripple-impact-report.md)     | User-facing | Not Started | #6 Engine; #7 Workspace       |
+| [#9](https://github.com/dzaffren/copa-hackathon/issues/9)   | Drafting copilot with live write-back                 | [spec-drafting-copilot.md](spec-drafting-copilot.md)             | User-facing | Not Started | #6 Engine; #8 Ripple check    |
+| [#10](https://github.com/dzaffren/copa-hackathon/issues/10) | Supervisor submission completeness & compliance check | [spec-supervisor-check.md](spec-supervisor-check.md)             | User-facing | Not Started | #6 Engine                     |
+| [#11](https://github.com/dzaffren/copa-hackathon/issues/11) | Reviewer & approval workflow                          | [spec-reviewer-approval.md](spec-reviewer-approval.md)           | User-facing | Not Started | #7 Workspace; #8 Ripple check |
 
 ## Shared Business Rules
 

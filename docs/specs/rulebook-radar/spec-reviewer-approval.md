@@ -1,6 +1,6 @@
 # Reviewer & Approval Workflow
 
-**Ticket:** TBD
+**Ticket:** [#11](https://github.com/dzaffren/copa-hackathon/issues/11)
 
 After a policy drafter submits a consistency-checked draft, this feature lets the
 assigned reviewer read the draft, leave clause-anchored comments (but never change
