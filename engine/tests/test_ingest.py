@@ -23,3 +23,23 @@ def test_ingest_returns_non_empty_readable_markdown():
 
     assert isinstance(text, str)
     assert text.strip() != ""
+
+
+def test_ingest_rmit_pdf_produces_clean_readable_text_not_garbled():
+    """RMiT's custom font encoding produces gibberish under naive extraction
+    (validated in the discovery brief's dry-run). MarkItDown must still
+    produce clean, readable ASCII text with clause numbers intact."""
+    text = ingest_document(RMIT_PDF)
+
+    # No replacement characters from botched decoding.
+    assert "�" not in text
+
+    # Readable-ASCII heuristic: letters should dominate non-whitespace chars.
+    non_whitespace = re.sub(r"\s", "", text)
+    letters = re.findall(r"[A-Za-z]", text)
+    letter_ratio = len(letters) / len(non_whitespace)
+    assert letter_ratio > 0.5
+
+    # Clause numbers survive conversion.
+    assert "17.1" in text
+    assert "17.2" in text
