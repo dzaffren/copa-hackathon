@@ -1,0 +1,56 @@
+name: Confidentiality guard
+
+# Fails any PR that adds confidential material to a tracked path.
+# Enforces CONTRIBUTING.md golden rule #2 on this PUBLIC repo.
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Block confidential paths and oversized files
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+
+          # Files added or modified in this PR (exclude deletions).
+          changed=$(git diff --name-only --diff-filter=d "$BASE_SHA" "$HEAD_SHA")
+
+          fail=0
+
+          # Rule 1: nothing under docs/references/ may be tracked — it is internal.
+          confidential=$(echo "$changed" | grep -E '^docs/references/' || true)
+          if [ -n "$confidential" ]; then
+            echo "::error::Confidential files under docs/references/ must never be committed (see CONTRIBUTING.md). Offending files:"
+            echo "$confidential" | sed 's/^/  - /'
+            fail=1
+          fi
+
+          # Rule 2: no oversized files (>5 MB) — internal decks/PDFs are large; keep the public repo lean.
+          MAX_BYTES=$((5 * 1024 * 1024))
+          while IFS= read -r f; do
+            [ -z "$f" ] && continue
+            [ -f "$f" ] || continue
+            size=$(wc -c < "$f")
+            if [ "$size" -gt "$MAX_BYTES" ]; then
+              echo "::error::$f is $((size / 1024 / 1024)) MB (limit 5 MB). Large binaries usually signal confidential or unnecessary material."
+              fail=1
+            fi
+          done <<< "$changed"
+
+          if [ "$fail" -ne 0 ]; then
+            echo "Confidentiality guard failed. Remove the flagged files before merging."
+            exit 1
+          fi
+
+          echo "Confidentiality guard passed — no confidential or oversized files in this PR."
