@@ -74,6 +74,8 @@ docs/
 
 ## View the prototype
 
+**🔗 Live demo:** https://dzaffren.github.io/copa-hackathon/
+
 The POC is a self-contained, clickable HTML prototype (Tailwind via CDN — no build
 step). Open any page directly in a browser, starting with the drafter workspace:
 
