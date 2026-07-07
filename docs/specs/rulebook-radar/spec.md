@@ -183,9 +183,11 @@ Epic tracking issue: [#5](https://github.com/dzaffren/copa-hackathon/issues/5).
 
 ## Dependencies
 
-- **Locked demo cluster:** the final set of 5–10 related BNM policies (technology-
-  risk: RMiT + Operational Resilience + Outsourcing + Business Continuity + Cyber
-  Risk) must be confirmed before build.
+- **Locked demo cluster (confirmed):** a 6-document technology-risk cluster — RMiT
+  - Outsourcing + Business Continuity Management + Operational Resilience + Recovery
+    Planning + Management of Customer Information — plus a greyed AML/CFT cross-cluster
+    preview. All real published BNM documents. (No standalone "Cyber Risk" policy —
+    cyber lives inside RMiT — so it is not a node.)
 - **Published policy documents:** the corpus of current, published BNM policy PDFs
   for the chosen cluster (all public via bnm.gov.my).
 - **Sample bank submission:** a representative cloud outsourcing application (sample

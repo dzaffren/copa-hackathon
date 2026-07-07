@@ -44,9 +44,9 @@ operationalises that finding as the permanent foundation.
 
 - **In scope:**
   - Converting each published policy document in the demo cluster (RMiT,
-    Operational Resilience, Outsourcing, Business Continuity, Cyber Risk) into
-    clean, structured text with clause numbers preserved, including documents
-    that naive extraction would garble.
+    Outsourcing, Business Continuity Management, Operational Resilience, Recovery
+    Planning, Management of Customer Information) into clean, structured text with
+    clause numbers preserved, including documents that naive extraction would garble.
   - A clause index: every clause is individually addressable and quotable
     word-for-word by its clause number, faithful to the source document.
   - A knowledge graph: policy documents are the points on the map; the links
@@ -265,9 +265,12 @@ Then the engine reports that the document could not be read
 
 ## Dependencies
 
-- **Locked demo cluster:** the final set of 5–10 technology-risk policies (RMiT,
-  Operational Resilience, Outsourcing, Business Continuity, Cyber Risk) must be
-  confirmed before build.
+- **Locked demo cluster (confirmed):** the 6-document technology-risk cluster —
+  RMiT, Outsourcing, Business Continuity Management, Operational Resilience,
+  Recovery Planning, Management of Customer Information — plus a greyed AML/CFT
+  cross-cluster preview node. All are real published BNM documents (bnm.gov.my).
+  (There is no standalone "Cyber Risk" policy — cyber lives inside RMiT — so the
+  POC's Cyber node is dropped.)
 - **Published policy documents:** the current published BNM policy documents for
   the cluster (all public).
 - **Sample bank submission:** at least one representative cloud outsourcing
@@ -289,9 +292,11 @@ Then the engine reports that the document could not be read
       job of the ripple check story that consumes this engine. The engine must
       provide enough clause-anchored connection detail to make all three
       possible.
-- [ ] **What is the exact final cluster (which 5–10 policies)?** —
-      **Status:** awaiting confirmation from contacts. Blocks final content, not
-      the engine's design.
+- [x] ~~What is the exact final cluster (which policies)?~~ — **Resolved:** a
+      6-document technology-risk cluster — RMiT, Outsourcing, Business Continuity
+      Management, Operational Resilience, Recovery Planning, Management of Customer
+      Information — plus a greyed AML/CFT preview. All real published BNM docs. The
+      POC's "Cyber Risk" node is dropped (no standalone cyber PD; it lives in RMiT).
 - [ ] **What governance applies to uploaded bank submissions in a real
       deployment?** — **Deferred (non-blocking):** the demo uses sample data;
       the engine keeps submissions separate and access-restricted, and
@@ -316,12 +321,16 @@ Stack choices are grounded in the discovery brief's validated dry-run:
   gibberish on BNM's custom-font PDFs, and that MarkItDown preserves clause
   numbers on both RMiT (~204 KB) and Outsourcing (~52 KB). Do **not** substitute
   a naive extractor.
-- **Connection-finding:** the Claude API (`claude-opus-4-8` — highest reasoning
-  for the finder/critic task; `claude-sonnet-4-6` is an acceptable cheaper fallback
-  for iteration), run as a **two-agent finder + critic loop** with a deterministic
-  code verifier (see "Stage 4 is a two-agent loop"). The brief's blind test with a
-  Claude agent independently found the RMiT 17 ↔ Outsourcing 12.1 conflict and
-  cited every clause verbatim.
+- **Connection-finding:** a chat model served via **Azure AI Foundry** (the
+  deployment name is configurable in `config.py` — a high-reasoning model for the
+  finder/critic task), run as a **two-agent finder + critic loop** with a
+  deterministic code verifier (see "Stage 4 is a two-agent loop"). ⚠️ **Re-validate
+  the no-hallucination assumption on the chosen Foundry model:** the brief's blind
+  test that independently found the RMiT 17 ↔ Outsourcing 12.1 conflict (verbatim)
+  was run on Claude, so it does not transfer automatically to a different model
+  family. The **citation guardrail protects correctness regardless of model** (code
+  verifies every citation), but finding-quality and **recall** must be re-checked on
+  the deployed model before the demo — a named build action, not an assumption.
 - **Storage:** flat versioned JSON artifacts on disk — the corpus is 5–10
   documents, so a graph database is unwarranted. The graph is small enough to
   hold in memory.
@@ -466,15 +475,15 @@ artifact — an edge is an edge.
 
 Stage 4 (and `POST /connections/find`) operates on **a pair of documents at a
 time**, not on the whole cluster at once. The _graph_ is one-to-many (RMiT links
-to Outsourcing, Operational Resilience, Business Continuity, Cyber Risk — as the
-POC shows), but that fan-out is built by running the pairwise operation **once per
-candidate pair** and aggregating the resulting edges:
+to Outsourcing, Operational Resilience, Business Continuity, Customer Information —
+as the graph shows), but that fan-out is built by running the pairwise operation
+**once per candidate pair** and aggregating the resulting edges:
 
 ```
-RMiT ↔ Outsourcing  → edge (RMiT 17 ↔ Outsourcing 12.1)
-RMiT ↔ OpRes        → edge (RMiT 10 ↔ OpRes 6.11)
-RMiT ↔ BCM          → edge (…)
-RMiT ↔ Cyber        → edge (…)
+RMiT ↔ Outsourcing    → edge (RMiT 17 ↔ Outsourcing 12.1)
+RMiT ↔ OpRes          → edge (RMiT 10 ↔ OpRes 6.11)
+RMiT ↔ BCM            → edge (…)
+RMiT ↔ Customer Info  → edge (…)
    ⇒ RMiT ends up with 4 cross-policy edges = the one-to-many graph
 ```
 
@@ -511,7 +520,8 @@ that document against each _linked_ document and aggregates the findings.
 - `data/draft_registry.json` — the "live draft exists" signal for status derivation.
 - `engine/config.py` — cluster manifest (policies/versions, source paths incl.
   the frozen mock, effective dates, curated seed edges, per-document mock
-  provenance) and `ANTHROPIC_API_KEY` from env (never committed).
+  provenance), the Azure Foundry deployment name, and the Foundry endpoint/key
+  from env (never committed).
 - `.gitignore` — add `data/submissions/` so no submission is ever committed.
 
 ## Data Model
@@ -701,11 +711,13 @@ force"` for the current published version and `"Superseded"` for older
 
 ## Architecture Notes
 
-- **New dependencies:** `markitdown` (ingestion), `anthropic` (Claude API —
-  clause parsing + finder/critic connection-finding), `fastapi` + `uvicorn` (read
-  service), `pytest` (tests). None exist yet — this story introduces
-  `engine/requirements.txt`. `ANTHROPIC_API_KEY` is read from env (build-time only;
-  the served read API needs no model access; tests stub the model).
+- **New dependencies:** `markitdown` (ingestion), `azure-ai-inference` (Azure AI
+  Foundry chat model — clause parsing + finder/critic connection-finding),
+  `fastapi` + `uvicorn` (read service), `pytest` (tests). None exist yet — this
+  story introduces the `engine/` package managed with **`uv`** (`pyproject.toml` +
+  `uv.lock`). The Foundry **endpoint URL + API key** and **deployment name** are
+  read from env (build-time only; the served read API needs no model access; tests
+  stub the model).
 - **Dependencies & integration:** this is the foundation; the shape of
   `clause-index.json` and `graph.json` becomes a **frozen contract**, but frozen
   **per field when its first real consumer validates it**, not all-at-once when #7
@@ -847,12 +859,14 @@ documents genuinely must be read in full.)
 **Corpus composition.** The technology-risk cluster is real published PDFs _plus_
 one mock draft:
 
-- **RMiT v1 (2020)** — real published PDF. `source: published`, `Superseded`.
+- **RMiT v1** — real published PDF. `source: published`, `Superseded`.
 - **RMiT v2 (2026 draft)** — a **mock draft document** (the version Aisyah
   "edits"); its 17.1 reads "notify-after", producing the demo conflict against the
   real Outsourcing 12.1. `source: draft`, `In progress`.
-- **Outsourcing, Operational Resilience, Business Continuity, Cyber Risk** — real
-  published PDFs. `source: published`.
+- **Outsourcing (23 Oct 2019), Business Continuity Management (19 Dec 2022),
+  Operational Resilience (draft, backed by the 19 Dec 2025 Discussion Paper),
+  Recovery Planning (28 Jul 2021), Management of Customer Information (31 Oct 2025)** — real published PDFs. `source: published`. (No standalone Cyber Risk PD —
+  cyber lives inside RMiT — so the POC's Cyber node is dropped.)
 
 **The mock draft is LLM-generated once, then frozen as a committed fixture.** To
 get a complete, realistic v2 (so no clause 404s), the mock is produced by expanding
@@ -882,11 +896,13 @@ including reading the frozen mock) is **always offline/pre-baked** — the demo
 serves finished artifacts. Only **stage 4 / the ripple check** runs live against
 the model, with the recorded `connection-trace-*.json` as the mandatory backstop.
 
-**Model access & config.** `config.py` reads the Claude API key from an env var
-(`ANTHROPIC_API_KEY`), never committed. The parser (stage 2) and finder/critic
-(stage 4) call the model **at build time**; `build.py` therefore needs the key,
-but the served **read API needs no model access** (it serves pre-built artifacts).
-Tests stub the model (recorded responses), so CI runs without a key.
+**Model access & config.** `config.py` reads the Azure AI Foundry **endpoint URL**,
+**API key**, and **deployment name** from env vars (never committed); the model is
+provider-configurable so the deployment can change without code edits. The parser
+(stage 2) and finder/critic (stage 4) call the model **at build time**; `build.py`
+therefore needs Foundry access, but the served **read API needs no model access**
+(it serves pre-built artifacts). Tests stub the model (recorded responses), so CI
+runs without any credentials.
 
 **Determinism of the frozen contract.** Because #7–#11 freeze against the artifact
 shapes, the build must be **stably ordered**: clause-index keys and each `children`
@@ -1283,12 +1299,14 @@ SUBMISSION_ACCESS_DENIED`; unknown id → `404 SUBMISSION_NOT_FOUND`.
 **Task 1: Project scaffold + ingestion pipeline + mock draft fixture** — _medium_ (100–300 LOC)
 
 - Files: `engine/__init__.py`, `engine/config.py`, `engine/ingest.py`,
-  `engine/requirements.txt`, `data/corpus/` (real demo PDFs), `data/mock/` (frozen
-  mock RMiT v2 draft), `.gitignore` (add `data/submissions/`).
+  `pyproject.toml` + `uv.lock` (managed with **uv**), `data/corpus/` (real demo
+  PDFs), `data/mock/` (frozen mock RMiT v2 draft), `.gitignore` (add
+  `data/submissions/`).
 - MarkItDown PDF/DOCX → clean markdown; `UnreadableDocumentError` on empty output.
 - Generate the mock RMiT v2 once (LLM-expand v1; hand-pin 17.1/17.2/10.50 + 17.1
   sub-items), review, commit as a static file under `data/mock/`; record its
-  provenance in `config.py`. `config.py` reads `ANTHROPIC_API_KEY` from env.
+  provenance in `config.py`. `config.py` reads the Azure Foundry endpoint, API key,
+  and deployment name from env.
 - INDEPENDENT
 
 **Task 2: Clause parser (anchor-slice) + clause index + verbatim fetch** — _large_ (300+ LOC)
@@ -1553,14 +1571,21 @@ framework. User-facing flows are covered by the consuming stories (#7–#11)._
       `source: "published" | "draft"`; the primary index holds the **current**
       version by bare number (in-progress > in-force > superseded), older versions
       via `?version=`. Build invariant: exactly one active entry per clause number.
-- [x] ~~Where does the Claude API key live and does the demo need it live?~~ —
-      **Resolved:** `ANTHROPIC_API_KEY` from env, used **at build time only**
+- [x] ~~Which model, where do its credentials live, and does the demo need it
+      live?~~ — **Resolved:** a chat model served via **Azure AI Foundry**
+      (deployment name + endpoint + key from env), used **at build time only**
       (parser + finder/critic); the served read API needs no model access; tests
-      stub the model so CI needs no key. Only stage 4 / the ripple check calls the
-      model live during the demo.
-- [ ] **Exact final cluster (which 5–10 policies)?** — **Status:** awaiting
-      contact confirmation. Blocks corpus content in `data/corpus/`, not the
-      engine's design or interfaces.
+      stub the model so CI needs no credentials. Only stage 4 / the ripple check
+      calls the model live during the demo.
+- [ ] **Re-validate the no-hallucination result on the Foundry model.** The blind
+      test was on Claude; the citation guardrail keeps correctness safe on any
+      model, but finding-quality/recall must be re-checked on the deployed Foundry
+      model before the demo. **Non-blocking for build; blocking for the pitch claim.**
+- [x] ~~Exact final cluster (which policies)?~~ — **Resolved:** 6 real published
+      docs — RMiT, Outsourcing, Business Continuity Management, Operational
+      Resilience, Recovery Planning, Management of Customer Information — + AML/CFT
+      preview; Cyber node dropped (no standalone cyber PD). These are the
+      `data/corpus/` documents to fetch from bnm.gov.my.
 - [ ] **Production submission governance/auth?** — **Deferred (non-blocking):**
       demo uses an `X-Role` header + git-ignored store; production auth is a
       named post-hackathon concern.

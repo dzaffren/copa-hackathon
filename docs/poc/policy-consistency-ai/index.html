@@ -106,13 +106,13 @@ const nodes = [
   { id:"outsrc", label:["Outsourcing"], sub:"v2 · 2026 draft", x:570, y:175, r:34,
     status:"in-progress", rel:"review", open:"review-outsourcing.html",
     title:"Outsourcing", version:"v2 · 2026 draft",
-    links:["RMiT","Cyber Risk"],
+    links:["RMiT","Customer Information"],
     note:"Drafted by Farid M. You are the assigned reviewer — you can read and comment. Approval is a manager action." },
 
   { id:"rmit2", label:["RMiT"], sub:"v2 · 2026 draft", x:360, y:235, r:40,
     status:"in-progress", rel:"edit", open:"review.html",
     title:"Risk Management in Technology (RMiT)", version:"v2 · 2026 draft",
-    links:["Operational Resilience","Outsourcing","Business Continuity","Cyber Risk","AML/CFT (cross-cluster)"],
+    links:["Operational Resilience","Outsourcing","Business Continuity","Customer Information","AML/CFT (cross-cluster)"],
     note:"Live draft in SharePoint (RMiT_2026_draft.docx). Clause 17.1 changed from prior consultation to 14-day notification for first-time public-cloud adoption.",
     provenance:[
       { kind:"public", title:"Operational Resilience — Discussion Paper", date:"19 Dec 2025", detail:"Consultation raised that prior-consultation for every cloud adoption slows resilience investment." },
@@ -125,9 +125,9 @@ const nodes = [
     title:"Business Continuity Management", version:"v1 · 2022",
     links:["RMiT","Operational Resilience"], note:"In force. No draft open." },
 
-  { id:"cyber", label:["Cyber","Risk"], sub:"v2 · 2026 draft", x:570, y:400, r:34,
+  { id:"custinfo", label:["Customer","Information"], sub:"v2 · 2026 draft", x:570, y:400, r:34,
     status:"in-progress", rel:"none", open:null,
-    title:"Management of Cyber Risk", version:"v2 · 2026 draft",
+    title:"Management of Customer Information", version:"v2 · 2026 draft",
     links:["RMiT","Outsourcing"],
     note:"Drafted by another team. You are neither drafter nor reviewer — read-only and locked for you." },
 
@@ -142,9 +142,9 @@ const edges = [
   { a:"rmit2", b:"opres",  why:"Both govern the register of critical cloud/third-party services. RMiT clause 10 (cloud services) overlaps Operational Resilience 6.11 — a change in one can duplicate or contradict the other." },
   { a:"rmit2", b:"outsrc", why:"A public-cloud arrangement is often also a material outsourcing. RMiT clause 17 (cloud consultation/notification) interacts with Outsourcing 12.1 (written approval) — the core conflict in this cluster." },
   { a:"rmit2", b:"bcm",    why:"Cloud services supporting critical operations must have continuity arrangements. RMiT cloud requirements reference business-continuity expectations in the BCM policy." },
-  { a:"rmit2", b:"cyber",  why:"Cloud adoption for critical systems triggers cyber-risk controls. RMiT 17.1(c) (third-party review) and the Cyber Risk policy both apply to customer-data workloads." },
+  { a:"rmit2", b:"custinfo", why:"Cloud adoption for critical systems often processes customer data offshore. RMiT 17.1 (cloud adoption) engages the Management of Customer Information rules on disclosure and offshore storage of customer data." },
   { a:"opres", b:"bcm",    why:"Operational resilience and business continuity overlap on recovery of critical operations after disruption." },
-  { a:"outsrc", b:"cyber", why:"Outsourcing to third parties (incl. cloud) introduces cyber exposure the Cyber Risk policy governs." },
+  { a:"outsrc", b:"custinfo", why:"Outsourcing (incl. cloud) that involves a service provider handling customer data engages the Management of Customer Information disclosure requirements." },
 ];
 
 const statusStyle = {
