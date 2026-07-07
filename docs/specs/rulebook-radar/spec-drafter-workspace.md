@@ -118,8 +118,9 @@ Given I am Aisyah R., a policy drafter, signed in to Rulebook Radar
     | Risk Management in Technology     | v2 · 2026 draft | assigned — I edit    | in progress            |
     | Operational Resilience            | v2 · 2026 draft | assigned — I edit    | in progress            |
     | Outsourcing                       | v2 · 2026 draft | assigned — I review  | in progress            |
-    | Management of Cyber Risk          | v2 · 2026 draft | none — another team  | in progress (locked)   |
+    | Management of Customer Information| v2 · 2026 draft | none — another team  | in progress (locked)   |
     | Business Continuity Management    | v1 · 2022       | none                 | in force               |
+    | Recovery Planning                 | v1 · 2021       | none                 | in force               |
     | Risk Management in Technology     | v1 · 2020       | none                 | superseded             |
     | AML / CFT                         | in force        | none — other cluster | cross-cluster preview  |
 ```
@@ -156,7 +157,7 @@ Examples:
   | Risk Management in Technology v2| assigned — you edit              |
   | Operational Resilience v2       | assigned — you edit              |
   | Outsourcing v2                  | for your review — you comment    |
-  | Management of Cyber Risk v2     | in progress · others (locked)    |
+  | Management of Customer Information v2 | in progress · others (locked)  |
   | Business Continuity Management  | in force (read-only)             |
   | Risk Management in Technology v1| superseded (read-only history)   |
   | AML / CFT                       | other cluster (preview only)     |
@@ -168,7 +169,7 @@ Examples:
 Given my workspace has loaded
 When I select the Risk Management in Technology v2 draft
 Then the detail panel shows its status "in progress", version "v2 · 2026 draft", and a short note
-  And it lists the policies it is linked to, including Operational Resilience, Outsourcing, Business Continuity, and Cyber Risk
+  And it lists the policies it is linked to, including Operational Resilience, Outsourcing, Business Continuity, and Management of Customer Information
   And I see a single action labelled "Review & edit"
 ```
 
@@ -187,7 +188,7 @@ Then the detail panel shows a note saying it was drafted by Farid M. and that I 
 
 ```gherkin
 Given my workspace has loaded
-When I select the Management of Cyber Risk v2 draft
+When I select the Management of Customer Information v2 draft
 Then the detail panel shows that it is another team's draft and read-only for me
   And the only action shown is labelled "Locked" and cannot be selected
 ```
@@ -203,6 +204,7 @@ Then the detail panel shows it as read-only
 Examples:
   | policy                              |
   | Business Continuity Management v1   |
+  | Recovery Planning v1                |
   | Risk Management in Technology v1    |
 ```
 
