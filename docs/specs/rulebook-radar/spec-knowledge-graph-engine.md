@@ -317,9 +317,11 @@ Stack choices are grounded in the discovery brief's validated dry-run:
   numbers on both RMiT (~204 KB) and Outsourcing (~52 KB). Do **not** substitute
   a naive extractor.
 - **Connection-finding:** the Claude API (`claude-opus-4-8` — highest reasoning
-  for the blind-test task; `claude-sonnet-4-6` is an acceptable cheaper fallback
-  for iteration). The brief's blind test with a Claude agent independently found
-  the RMiT 17 ↔ Outsourcing 12.1 conflict and cited every clause verbatim.
+  for the finder/critic task; `claude-sonnet-4-6` is an acceptable cheaper fallback
+  for iteration), run as a **two-agent finder + critic loop** with a deterministic
+  code verifier (see "Stage 4 is a two-agent loop"). The brief's blind test with a
+  Claude agent independently found the RMiT 17 ↔ Outsourcing 12.1 conflict and
+  cited every clause verbatim.
 - **Storage:** flat versioned JSON artifacts on disk — the corpus is 5–10
   documents, so a graph database is unwarranted. The graph is small enough to
   hold in memory.
@@ -333,7 +335,11 @@ PDF/DOCX ─▶ [1] convert (MarkItDown) ─▶ clean markdown
                                             │
    draft_registry.json ─▶ [3] build graph ─┴─▶ graph.json          (nodes + edges + reasons + clause anchors + status)
                                             │
-                    [4] find connections ───┴─▶ LLM proposes ─▶ [5] citation validator ─▶ supported | unsupported
+                    [4] find connections ───┘
+                          │
+                          ├─▶ [4a] finder agent   ─▶ candidate connections
+                          ├─▶ [4b] critic agent   ─▶ refute weak + surface missed
+                          └─▶ [5]  citation validator (code) ─▶ supported | unsupported
 ```
 
 Stage 5 is the anti-hallucination guardrail: **every** clause number an LLM (or
@@ -342,9 +348,88 @@ absent, the connection is emitted with `"supported": false` and reason `"No
 matching clause found"` — never with an invented clause. A connection is only
 `"supported": true` when every clause it references resolves in the index.
 
+#### Stage 4 is a two-agent loop: finder → critic → verifier
+
+Connection-finding is not a single LLM call — it is a small **agentic loop** with
+a genuine division of labour, and the guardrail (stage 5) is deterministic **code**,
+not an agent:
+
+- **[4a] Finder agent** — reads the two documents' clause text and proposes
+  candidate connections, each citing clause number(s).
+- **[4b] Critic agent** — a second agent with a different lens that does two jobs:
+  (i) **refute** weak candidates ("is this really a conflict, or only where the
+  cloud service is a material outsourcing? cite the exemption") and (ii) **surface
+  what the finder missed** — re-read for connections the first pass didn't catch.
+  This directly targets **recall**, the dangerous failure for supervision (missing
+  a requirement). The discovery brief's blind test already exhibited this: beyond
+  the obvious 12.1↔17 conflict it found that 17.2 depends on a prior 17.1
+  consultation and correctly scoped the conflict using the 12.4 affiliate
+  exemption — exactly critic behaviour, now productised.
+- **[5] Verifier (code)** — validates every cited clause on whatever survives the
+  critic; unsupported candidates are dropped and reported, never invented.
+
+**Ownership vs. demonstration.** This whole loop is a **#6 engine capability**
+(`find_connections(doc_a, doc_b)` behind `POST /connections/find`) — the finder
+needs clause text, the critic needs both documents, and the verifier needs the
+clause index, all engine-owned, and the anti-hallucination guardrail must not be
+split into a UI story. The **#8 ripple check calls this endpoint live** on the
+amended RMiT 17.1 during the demo and classifies the results
+(Conflict/Duplication/Gap); it does not re-implement the loop. Engine emits raw
+clause-anchored connections; #8 classifies (per Negative Constraints).
+
+**Live in the demo, with a mandatory recorded-trace backstop.** The ripple moment
+runs the loop **live against the model** — this is the one place the product proves
+the AI is real (a judge watches the guardrail discard a hallucinated clause). Live
+means 2–3 sequential model round-trips on stage, so a **recorded real trace**
+(`data/artifacts/connection-trace-*.json`: model id, timestamp, raw finder output,
+raw critic output, and the full validation trace) is **required, not optional** —
+it both proves the connections were AI-found (not curated) and is the deterministic
+fallback if the API hiccups mid-pitch. The build is a _separate_ pipeline and is
+**always** pre-baked (never live); only stage 4 / the ripple check is live.
+
 Sensitive bank submissions run through **stage 1 only**, into a separate
 git-ignored store (`data/submissions/`), never into the public clause index or
 graph.
+
+#### Clause parsing (stage 2): LLM finds boundaries, code slices verbatim text
+
+BNM clause numbering is irregular (`17.1`, `17.1(a)`, `12.3(e)`, `10.50`,
+`Appendix 10`, numbers that wrap lines, items inside tables), so a pure regex over
+line starts is too brittle — a mis-split or dropped clause becomes a silent 404
+downstream, which reads as a false "no such requirement" on the supervisor
+checklist (#10). Parsing is therefore **LLM-assisted, but the LLM never produces
+clause text** — that would put the verbatim guarantee at the mercy of the model's
+transcription fidelity (a silently "cleaned" quote mark or dropped footnote would
+pass unnoticed). The two jobs are split:
+
+1. **LLM emits structure + anchors, not text.** Given the document markdown (with
+   a few-shot system prompt teaching BNM numbering), the LLM returns, in document
+   order, one record per clause: `{ clause_number, starts_with, heading, parent }`
+   — where `starts_with` is a short **verbatim opening phrase** the LLM quotes back.
+   Structural reasoning and quoting a short snippet are things LLMs do reliably;
+   counting characters is not, so it never returns offsets.
+2. **Code locates each anchor** by string-searching `starts_with` in the raw
+   markdown → a real, code-verified position.
+3. **Code slices each clause** as the span from its anchor to the **next** clause's
+   anchor. The stored `text` is therefore `markdown[start:end]` — a literal
+   substring of the source, **byte-for-byte verbatim by construction** (Test 1
+   passes mechanically, not on trust). For a parent with children, the parent's
+   span ends at its **first child's** anchor (parent `text` = stem only, per the
+   Option C data model).
+
+**Failure modes become loud build errors, never silent corruption:**
+
+- `starts_with` **not found** in the markdown (LLM hallucinated the phrase) or
+  **found more than once** (ambiguous anchor) → build fails on that clause; fix by
+  widening the anchor or re-emitting. Nothing bad is stored.
+- **Completeness reconciliation:** the emitted clause set is checked against the
+  clauses expected for that document (every clause number referenced by curated
+  edges, the demo's expected clauses, and a per-document expected-count in
+  `config.py`); a missing clause fails the build rather than shipping a 404.
+
+This runs **offline at build time** on 5–10 documents, so the extra LLM pass and
+its verification cost nothing at demo time and buy robustness on the gnarly
+numbering without ever risking the verbatim payload.
 
 #### Three kinds of link (do not conflate)
 
@@ -412,16 +497,21 @@ that document against each _linked_ document and aggregates the findings.
 - `engine/clauses.py` — clause parser + `ClauseIndex` (verbatim fetch by number).
 - `engine/graph.py` — node/edge model, graph builder (curated seed edges +
   LLM-found edges from stage 4), status derivation.
-- `engine/connections.py` — LLM connection-finding + `citation_validator`.
+- `engine/connections.py` — two-agent connection-finding (finder + critic) +
+  deterministic `citation_validator`; records a trace per pair.
 - `engine/submissions.py` — sensitive-submission ingest into the restricted store.
 - `engine/api.py` — FastAPI read service (clauses, graph, nodes, connections, submissions).
 - `engine/build.py` — CLI entrypoint that runs stages 1–3 and dumps artifacts.
-- `data/corpus/` — source PDFs of the demo cluster (public; tracked).
-- `data/artifacts/` — build output `clause-index.json`, `graph.json` (tracked; rebuildable).
+- `data/corpus/` — real published source PDFs of the demo cluster (public; tracked).
+- `data/mock/` — the frozen mock RMiT v2 draft (LLM-expanded once, hand-pinned
+  conflict clauses, reviewed; tracked, clearly non-real — never a real BNM doc).
+- `data/artifacts/` — build output `clause-index.json`, `graph.json`, and
+  `connection-trace-*.json` (finder+critic+validation traces; tracked, rebuildable).
 - `data/submissions/` — sensitive uploads (**git-ignored**, local only).
 - `data/draft_registry.json` — the "live draft exists" signal for status derivation.
-- `engine/config.py` — cluster manifest (which policies/versions, source paths,
-  effective dates, and the curated seed edges for the locked demo cluster).
+- `engine/config.py` — cluster manifest (policies/versions, source paths incl.
+  the frozen mock, effective dates, curated seed edges, per-document mock
+  provenance) and `ANTHROPIC_API_KEY` from env (never committed).
 - `.gitignore` — add `data/submissions/` so no submission is ever committed.
 
 ## Data Model
@@ -438,23 +528,72 @@ consuming story (#7–#11) reads.
     "policy_id": "outsourcing",
     "document_id": "outsourcing-v1-2019",
     "text": "A financial institution must obtain the Bank's written approval before entering into a new material outsourcing arrangement.",
-    "heading": "12 Approval for material outsourcing arrangements"
+    "heading": "12 Approval for material outsourcing arrangements",
+    "source": "published",
+    "parent": null,
+    "children": [],
+    "superseded_versions": []
   },
   "RMiT 17.1": {
     "clause_number": "RMiT 17.1",
     "policy_id": "rmit",
     "document_id": "rmit-v2-2026-draft",
-    "text": "<verbatim clause text as published>",
-    "heading": "17 Cloud services"
+    "text": "A financial institution shall notify the Bank within 14 days of the first-time adoption of a public cloud service for a critical system, having first:",
+    "heading": "17 Cloud services",
+    "source": "draft",
+    "parent": null,
+    "children": ["RMiT 17.1(a)", "RMiT 17.1(b)", "RMiT 17.1(c)"],
+    "superseded_versions": ["rmit-v1-2020"]
+  },
+  "RMiT 17.1(b)": {
+    "clause_number": "RMiT 17.1(b)",
+    "policy_id": "rmit",
+    "document_id": "rmit-v2-2026-draft",
+    "text": "a senior management and board readiness confirmation; and",
+    "heading": "17 Cloud services",
+    "source": "draft",
+    "parent": "RMiT 17.1",
+    "children": [],
+    "superseded_versions": []
   }
 }
 ```
 
 - `text` is byte-for-byte from the converted markdown — the basis of the citation
-  guardrail. Never normalised, summarised, or paraphrased.
+  guardrail. Never normalised, summarised, or paraphrased. See "Clause parsing"
+  in Solution Design for how the verbatim guarantee is enforced (the LLM emits
+  boundaries; code slices the text).
 - Clause numbers are canonicalised as `"{PolicyShortName} {number}"` (e.g.
   `"Outsourcing 12.1"`, `"RMiT 17.2"`), matching how the corpus labels them and
   how the POC and Acceptance Criteria quote them.
+- **`source` ∈ `published` | `draft`.** `published` = verbatim from a real BNM PDF
+  (Outsourcing 12.1, RMiT v1). `draft` = verbatim from an authored mock draft
+  (RMiT v2 — the version Aisyah "edits"). Both are byte-for-byte from _their_ source;
+  the label lets a consumer distinguish "conflict against a **real, published**
+  regulation" from "conflict against a draft", which is what makes the demo's pitch
+  honest. This is **distinct from node status**: `source` is about where a clause's
+  _text_ came from; node status (`In progress`/`In force`/`Superseded`) is about the
+  document _version_. A superseded RMiT v1 clause is still `source: "published"`.
+- **Sub-clauses are stored atomically (Option C).** Each clause — parent (`17.1`)
+  and each sub-item (`17.1(a)`, `17.1(b)`, …) — is its own entry mapping to exactly
+  **one non-overlapping span** of the source. A parent's `text` is the **stem only**
+  (up to its first sub-item); sub-item text is never duplicated inside the parent.
+  This keeps the "one clause = one source span" audit invariant and prevents
+  double-counting when retrieval or connection-finding consumes clauses.
+- `parent` / `children` link the hierarchy (free — the numbers already imply it).
+  Sub-items (`RMiT 17.1(b)`) are independently addressable because #10's checklist
+  cites them as distinct requirements. The **composed** view (parent stem + children
+  in document order) is assembled at read time by the API, not stored — see
+  `GET /clauses/{n}` `full_text`.
+- **Same clause number in two versions → current wins (keying rule).** When a policy
+  has both an in-progress draft and an older version, the **primary index holds only
+  the active version** keyed by bare clause number (in-progress > in-force >
+  superseded, per node-status derivation), so `RMiT 17.1` resolves to the draft — the
+  version consumers actually mean. Older versions are recorded in
+  `superseded_versions` (a list of `document_id`s) and their clause text is stored
+  under the node, reachable only via `?version=` (see clause API). **Build invariant:**
+  for any clause number, exactly one entry lands in the primary index; a collision
+  that would overwrite fails the build.
 
 **`graph.json`** — nodes and edges:
 
@@ -562,19 +701,56 @@ force"` for the current published version and `"Superseded"` for older
 
 ## Architecture Notes
 
-- **New dependencies:** `markitdown` (ingestion), `anthropic` (Claude API,
-  connection-finding), `fastapi` + `uvicorn` (read service), `pytest` (tests).
-  None exist yet — this story introduces `engine/requirements.txt`.
+- **New dependencies:** `markitdown` (ingestion), `anthropic` (Claude API —
+  clause parsing + finder/critic connection-finding), `fastapi` + `uvicorn` (read
+  service), `pytest` (tests). None exist yet — this story introduces
+  `engine/requirements.txt`. `ANTHROPIC_API_KEY` is read from env (build-time only;
+  the served read API needs no model access; tests stub the model).
 - **Dependencies & integration:** this is the foundation; the shape of
-  `clause-index.json` and `graph.json` becomes a **frozen contract** once the
-  drafter workspace (#7) is built against it (Constraints → Backwards
-  compatibility). Consuming stories: #7 reads `graph.json` for the workspace;
-  #8 reads clauses + edges for the ripple check; #9 the copilot cites clauses;
-  #10 reads submission text + graph for the checklist; #11 reads the graph.
+  `clause-index.json` and `graph.json` becomes a **frozen contract**, but frozen
+  **per field when its first real consumer validates it**, not all-at-once when #7
+  builds. #7 is the first consumer yet only exercises a fraction of the surface, so
+  freezing everything at #7 would lock fields that #8/#10 haven't tested. See
+  "Contract freeze surface" below. Consuming stories: #7 reads `graph.json` for the
+  workspace; #8 reads clauses + edges for the ripple check; #9 the copilot cites
+  clauses; #10 reads submission text + graph for the checklist; #11 reads the graph.
 - **Confidentiality (hard rule):** the read API exposes public clauses and graph
   freely; the submissions endpoint is access-restricted (see Permissions). No
   submission text is ever written to `data/artifacts/`, `clause-index.json`,
   `graph.json`, or any tracked path.
+
+### Contract freeze surface (per-field, by first consumer)
+
+The artifacts are a contract every downstream story reads, but a field can only be
+_validated_ by a story that actually exercises it — and the build order (#6 → #7 →
+#8 → #9 → #10 ∥ → #11) means #7 (the first consumer) touches only part of the
+surface. So each field is **provisional until its first real consumer builds green
+against it, then frozen** — not frozen wholesale at #7.
+
+| Field(s)                                              | Artifact            | First real consumer                  | Frozen after |
+| ----------------------------------------------------- | ------------------- | ------------------------------------ | ------------ |
+| node `id`, `title`, `version`, `status`, `cluster`    | `graph.json`        | #7 workspace                         | #7           |
+| edge `source`/`target`/`type`/`reason`/clause anchors | `graph.json`        | #7 (renders edges + why)             | #7           |
+| clause `text`, `clause_number`, `heading`, `source`   | `clause-index.json` | #7 (citations in edge explanations)  | #7           |
+| edge `confidence`, `provenance`                       | `graph.json`        | **#8** (ripple confidence indicator) | #8           |
+| clause `parent`/`children`, `full_text`               | clause API          | **#10** (checklist cites sub-items)  | #10          |
+| `superseded_versions`, `?version=`                    | clause API          | demo before/after (#7/#8)            | #7           |
+
+**Practical rule:** the two tiers are (1) the **graph-shape + citation** contract,
+safe to freeze at #7 (nodes, edges, `reason`, `status`, `source`, verbatim
+`text`); and (2) the **finding/sub-clause** contract (`confidence`, `provenance`,
+`full_text`, sub-item addressing), held provisional until #8 and #10 each read it
+once. Changing a tier-2 field before its consumer builds is free; changing it after
+is a contract break. This turns "frozen contract" from a date into a checkpoint.
+
+**`confidence` is per-connection = per-edge = per-finding (1:1).** The finder+critic
+emit atomic _connections_, each with its own `confidence`; the graph persists **one
+edge per connection**; #8 classifies **each connection as exactly one** finding
+(Conflict _or_ Duplication _or_ Gap) and inherits the edge's `confidence` 1:1. #8
+never invents a second confidence number. If #8 ever needs to split one connection
+into two findings, that is a signal the **finder should have emitted two
+connections** — granularity is pushed into the engine, keeping `confidence` #6's
+single source of truth (as the #8 engine-contract section states).
 
 ### Storage choice: JSON (+ networkx if needed), not a graph database
 
@@ -666,6 +842,59 @@ numbers first, then hydrate only the clauses in play — never the whole corpus.
 (The pairwise full-document dump is used _only_ for connection-finding, where both
 documents genuinely must be read in full.)
 
+### Build & operability (demo setup)
+
+**Corpus composition.** The technology-risk cluster is real published PDFs _plus_
+one mock draft:
+
+- **RMiT v1 (2020)** — real published PDF. `source: published`, `Superseded`.
+- **RMiT v2 (2026 draft)** — a **mock draft document** (the version Aisyah
+  "edits"); its 17.1 reads "notify-after", producing the demo conflict against the
+  real Outsourcing 12.1. `source: draft`, `In progress`.
+- **Outsourcing, Operational Resilience, Business Continuity, Cyber Risk** — real
+  published PDFs. `source: published`.
+
+**The mock draft is LLM-generated once, then frozen as a committed fixture.** To
+get a complete, realistic v2 (so no clause 404s), the mock is produced by expanding
+the real RMiT v1 markdown with the LLM — but this happens **offline, once**, is
+human-reviewed, and is committed as a static file under `data/mock/`. At build and
+demo time it is read as an ordinary source document (verbatim-from-the-frozen-mock),
+**never regenerated live**. This keeps the conflict clause stable across runs and
+keeps "the AI _found_ the conflict" cleanly separate from "a human authored the
+draft being checked" (which is exactly the real-world flow: Aisyah writes the
+draft, the AI checks it).
+
+- **The conflict-critical clauses are hand-pinned.** RMiT 17.1's "notify-after"
+  wording — and the other clauses the ripple/checklist quote (17.2, 10.50, the
+  17.1 sub-items) — are **hand-authored or hand-verified**, not left to LLM
+  improvisation, because the ripple finding, copilot redraft, and checklist all
+  cite them verbatim. The LLM fills only the surrounding, non-load-bearing draft
+  text.
+- **Provenance is recorded, not hidden.** `config.py` tags the mock document's
+  origin (e.g. `generation: "llm-expanded from rmit-v1-2020; 17.x hand-authored;
+reviewed <date>"`) and every clause carries `source: "draft"`, so nothing can be
+  mistaken for a real BNM document — important under this repo's confidentiality
+  rules. The mock lives under `data/mock/` (tracked, clearly non-real), never in
+  `docs/references/`.
+
+**Two pipelines, one live moment.** The **build** (MarkItDown → clauses → graph,
+including reading the frozen mock) is **always offline/pre-baked** — the demo
+serves finished artifacts. Only **stage 4 / the ripple check** runs live against
+the model, with the recorded `connection-trace-*.json` as the mandatory backstop.
+
+**Model access & config.** `config.py` reads the Claude API key from an env var
+(`ANTHROPIC_API_KEY`), never committed. The parser (stage 2) and finder/critic
+(stage 4) call the model **at build time**; `build.py` therefore needs the key,
+but the served **read API needs no model access** (it serves pre-built artifacts).
+Tests stub the model (recorded responses), so CI runs without a key.
+
+**Determinism of the frozen contract.** Because #7–#11 freeze against the artifact
+shapes, the build must be **stably ordered**: clause-index keys and each `children`
+list follow document order; `graph.json` edges sort by `(source, target, type)`;
+`full_text` is a deterministic concatenation. A rebuild from the same corpus +
+frozen mock produces byte-stable artifacts (LLM-dependent stages are frozen into
+committed fixtures/traces, not re-run at build unless explicitly regenerated).
+
 ### System architecture
 
 The engine has two planes: an **offline build** that turns the corpus into two
@@ -687,11 +916,12 @@ flowchart TB
         ING["[1] ingest.py<br/>MarkItDown PDF→markdown<br/>UnreadableDocumentError on empty"]
         CLS["[2] clauses.py<br/>parse → ClauseIndex<br/>(verbatim, keyed by clause no.)"]
         GRAPH["[3] graph.py<br/>build nodes/edges + reasons<br/>derive status from registry"]
-        CONN["[4] connections.py<br/>Claude finds candidate links"]
-        VAL["[5] citation_validator<br/>every cited clause ∈ index?"]
+        FIND["[4a] finder agent<br/>propose candidate connections"]
+        CRIT["[4b] critic agent<br/>refute weak + surface missed"]
+        VAL["[5] citation_validator (code)<br/>every cited clause ∈ index?"]
         ING --> CLS --> GRAPH
-        CLS --> CONN --> VAL
-        GRAPH --> CONN
+        CLS --> FIND --> CRIT --> VAL
+        GRAPH --> FIND
     end
 
     subgraph ART["💾 Artifacts — derived, rebuildable (data/artifacts/)"]
@@ -722,7 +952,7 @@ flowchart TB
 
     PDF --> ING
     REG --> GRAPH
-    VAL -->|supported / unsupported| CONN
+    VAL -->|supported edges| GJ
     GRAPH --> GJ
     CLS --> CI
     CI --> E1 & E4
@@ -738,41 +968,48 @@ flowchart TB
 ```
 
 **Reading the diagram:** the build plane (indigo) derives everything from public
-PDFs, so a bad build is fixed by re-running. The **citation validator** (amber)
-is the load-bearing guardrail — it sits between the LLM and any asserted
-connection, splitting candidates into `supported` (every cited clause resolves)
-and `unsupported` ("No matching clause found"), never inventing a clause. The
-**red boundary** is the confidentiality rule: bank submissions run through
-stage-1 conversion only, into the git-ignored store, and never touch the public
-artifacts or any tracked path.
+PDFs, so a bad build is fixed by re-running. Connection-finding is a two-agent
+loop — the **finder** proposes and the **critic** refutes weak findings and hunts
+for missed ones (recall) — but the **citation validator** (amber) is deterministic
+**code**, not an agent: it sits between the agents and any asserted connection,
+splitting candidates into `supported` (every cited clause resolves) and
+`unsupported` ("No matching clause found"), never inventing a clause. The **red
+boundary** is the confidentiality rule: bank submissions run through stage-1
+conversion only, into the git-ignored store, and never touch the public artifacts
+or any tracked path.
 
-### Sequence — connection-finding with the citation guardrail
+### Sequence — connection-finding: finder → critic → code verifier
 
-`POST /connections/find` (drives the ripple story #8). The validator is what
-makes the LLM's output trustworthy: nothing reaches `connections` unless every
-clause it cites exists verbatim in the index.
+`POST /connections/find` (called **live** by the ripple story #8). Two agents
+divide the work — a finder proposes, a critic refutes weak findings and hunts for
+missed ones (recall) — and a **deterministic code verifier** is the guardrail:
+nothing reaches `connections` unless every clause it cites exists verbatim in the
+index. A trace of both raw agent turns is recorded per run.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Caller as Caller (#8 ripple check)
+    participant Caller as Caller (#8 ripple check, live)
     participant API as api.py
     participant CF as connections.py
-    participant LLM as Claude API
+    participant FIND as Finder agent
+    participant CRIT as Critic agent
     participant CI as ClauseIndex
-    participant VAL as citation_validator
+    participant VAL as citation_validator (code)
 
     Caller->>API: POST /connections/find<br/>{document_ids:[rmit-v2, outsourcing-v1]}
-    API->>API: validate document_ids
-    alt unknown document id
+    API->>API: validate: exactly two known ids
+    alt unknown / not exactly two
         API-->>Caller: 400 INVALID_DOCUMENT_IDS
     else valid
-        API->>CF: find(rmit-v2, outsourcing-v1)
+        API->>CF: find_connections(rmit-v2, outsourcing-v1)
         CF->>CI: fetch clause text for both docs
         CI-->>CF: verbatim clauses
-        CF->>LLM: prompt with clause text →<br/>propose cross-policy connections
-        LLM-->>CF: candidates (each cites clause numbers)
-        loop each candidate
+        CF->>FIND: [4a] propose connections (clause text)
+        FIND-->>CF: candidates (each cites clause numbers)
+        CF->>CRIT: [4b] refute weak + surface missed
+        CRIT-->>CF: scoped/refuted set + newly-found connections
+        loop each surviving candidate
             CF->>VAL: validate cited clause numbers
             VAL->>CI: get(clause_number) for every citation
             alt all citations resolve
@@ -783,8 +1020,9 @@ sequenceDiagram
                 VAL-->>CF: supported = false<br/>"No matching clause found"
             end
         end
+        CF->>CF: write connection-trace-{pair}.json<br/>(raw finder + critic + validation)
         CF-->>API: {connections:[…supported…],<br/>unsupported:[…]}
-        API-->>Caller: 200 (RMiT 17.1 ↔ Outsourcing 12.1 conflict,<br/>verbatim-cited)
+        API-->>Caller: 200 (RMiT 17.1 ↔ Outsourcing 12.1 conflict<br/>+ critic-found 17.2→17.1 dependency, verbatim-cited)
     end
 ```
 
@@ -813,16 +1051,19 @@ sequenceDiagram
         SUB->>MD: convert to clean text (stage-1 only)
         alt conversion yields no usable text
             MD-->>SUB: empty
+            SUB->>SUB: finally: purge any temp bytes
             SUB-->>API: UnreadableDocumentError
-            API-->>Sup: 422 UNREADABLE_DOCUMENT (nothing stored)
+            API-->>Sup: 422 UNREADABLE_DOCUMENT (zero bytes persisted)
         else clean text
             MD-->>SUB: submission text
             SUB->>Store: write record<br/>sensitivity: supervised-entity-confidential
-            Note over Store: NEVER written to<br/>clause-index.json / graph.json /<br/>any tracked path
+            Note over Store: file kept ONLY here (git-ignored);<br/>NEVER in clause-index.json / graph.json /<br/>any tracked path
+            SUB->>SUB: finally: purge any temp bytes
             SUB-->>API: submission_id
             API-->>Sup: 201 {submission_id, sensitivity}
         end
     end
+    Note over API,SUB: every exit (201/415/422) leaves no submission<br/>bytes outside data/submissions/
 ```
 
 ## Permissions & Security
@@ -839,6 +1080,14 @@ sequenceDiagram
   `application/vnd.openxmlformats-officedocument.wordprocessingml.document`
   (DOCX); anything else → `415 UNSUPPORTED_FORMAT`. A file that converts to no
   usable text → `422 UNREADABLE_DOCUMENT` with nothing stored.
+- **Zero-residue guarantee (sensitive data).** "Nothing stored" means **no
+  persisted bytes anywhere**, not merely "no record written." The upload is
+  processed in memory (or an explicitly-cleaned temp path); on **every** exit —
+  success, `415`, or `422` — no copy of the submission persists outside
+  `data/submissions/`, and on the reject paths **no bytes persist at all** (any
+  spooled/temp file is removed in a `finally`). A successful ingest keeps the file
+  **only** under `data/submissions/` (git-ignored). This makes the isolation claim
+  true end-to-end, not just at the store boundary.
 
 ## API Design
 
@@ -847,19 +1096,61 @@ Thin read service over the built artifacts. Base path `/`.
 ### `GET /clauses/{clause_number}`
 
 Fetch one clause verbatim. `clause_number` is URL-encoded (e.g. `Outsourcing%2012.1`).
+Returns the **current version** (in-progress draft > in-force > superseded); an
+optional `?version={document_id}` fetches a specific historical version.
 
-**200** —
+**200** — a leaf or sub-item returns just its own verbatim `text`:
 
 ```json
 {
-  "clause_number": "Outsourcing 12.1",
-  "text": "A financial institution must obtain the Bank's written approval before entering into a new material outsourcing arrangement.",
-  "policy_id": "outsourcing",
-  "heading": "12 Approval for material outsourcing arrangements"
+  "clause_number": "RMiT 17.1(b)",
+  "text": "a senior management and board readiness confirmation; and",
+  "policy_id": "rmit",
+  "document_id": "rmit-v2-2026-draft",
+  "source": "draft",
+  "heading": "17 Cloud services",
+  "parent": "RMiT 17.1",
+  "children": [],
+  "superseded_versions": []
+}
+```
+
+**200** — a parent with children additionally returns `full_text`, the composed
+view (stem + children in document order), assembled at read time. `text` remains
+the stem-only verbatim slice; `full_text` is the contiguous source span covering
+the parent and all its children (also a clean substring of the source):
+
+```json
+{
+  "clause_number": "RMiT 17.1",
+  "text": "A financial institution shall notify the Bank within 14 days of the first-time adoption of a public cloud service for a critical system, having first:",
+  "policy_id": "rmit",
+  "document_id": "rmit-v2-2026-draft",
+  "source": "draft",
+  "heading": "17 Cloud services",
+  "parent": null,
+  "children": ["RMiT 17.1(a)", "RMiT 17.1(b)", "RMiT 17.1(c)"],
+  "full_text": "A financial institution shall notify the Bank within 14 days of the first-time adoption of a public cloud service for a critical system, having first:\n(a) completed the risk assessment under paragraph 10.50;\n(b) a senior management and board readiness confirmation; and\n(c) an independent third-party pre-implementation review.",
+  "superseded_versions": ["rmit-v1-2020"]
+}
+```
+
+**200** `GET /clauses/RMiT%2017.1?version=rmit-v1-2020` — the historical version
+(the published "consult before" wording), for the demo's before/after:
+
+```json
+{
+  "clause_number": "RMiT 17.1",
+  "text": "A financial institution shall consult the Bank prior to the first-time adoption of a public cloud service for a critical system.",
+  "policy_id": "rmit",
+  "document_id": "rmit-v1-2020",
+  "source": "published"
 }
 ```
 
 **404 CLAUSE_NOT_FOUND** — `{"error": "CLAUSE_NOT_FOUND", "message": "No matching clause found for 'Outsourcing 99.9'"}`
+
+**404 CLAUSE_VERSION_NOT_FOUND** — `{"error": "CLAUSE_VERSION_NOT_FOUND", "message": "No version 'rmit-v9' for clause 'RMiT 17.1'"}`
 
 ### `GET /graph`
 
@@ -961,6 +1252,7 @@ SUBMISSION_ACCESS_DENIED`; unknown id → `404 SUBMISSION_NOT_FOUND`.
 | Code                       | HTTP | Message example                                      |
 | -------------------------- | ---- | ---------------------------------------------------- |
 | `CLAUSE_NOT_FOUND`         | 404  | "No matching clause found for 'Outsourcing 99.9'"    |
+| `CLAUSE_VERSION_NOT_FOUND` | 404  | "No version 'rmit-v9' for clause 'RMiT 17.1'"        |
 | `NODE_NOT_FOUND`           | 404  | "No node with id 'rmit-v9'"                          |
 | `INVALID_DOCUMENT_IDS`     | 400  | "Unknown document id 'rmit-v9'"                      |
 | `SUBMISSION_ACCESS_DENIED` | 403  | "Supervisor role required to ingest submissions"     |
@@ -988,19 +1280,27 @@ SUBMISSION_ACCESS_DENIED`; unknown id → `404 SUBMISSION_NOT_FOUND`.
 
 ### Sub-tasks
 
-**Task 1: Project scaffold + ingestion pipeline** — _medium_ (100–300 LOC)
+**Task 1: Project scaffold + ingestion pipeline + mock draft fixture** — _medium_ (100–300 LOC)
 
 - Files: `engine/__init__.py`, `engine/config.py`, `engine/ingest.py`,
-  `engine/requirements.txt`, `data/corpus/` (place demo PDFs), `.gitignore`
-  (add `data/submissions/`).
+  `engine/requirements.txt`, `data/corpus/` (real demo PDFs), `data/mock/` (frozen
+  mock RMiT v2 draft), `.gitignore` (add `data/submissions/`).
 - MarkItDown PDF/DOCX → clean markdown; `UnreadableDocumentError` on empty output.
+- Generate the mock RMiT v2 once (LLM-expand v1; hand-pin 17.1/17.2/10.50 + 17.1
+  sub-items), review, commit as a static file under `data/mock/`; record its
+  provenance in `config.py`. `config.py` reads `ANTHROPIC_API_KEY` from env.
 - INDEPENDENT
 
-**Task 2: Clause parser + clause index + verbatim fetch** — _medium_ (100–300 LOC)
+**Task 2: Clause parser (anchor-slice) + clause index + verbatim fetch** — _large_ (300+ LOC)
 
 - Files: `engine/clauses.py`, `data/artifacts/clause-index.json` (generated).
-- Parse converted markdown into canonical clause numbers; `ClauseIndex.get()`
-  returns verbatim text or `None` (→ `CLAUSE_NOT_FOUND`).
+- LLM emits per-clause `{clause_number, starts_with, heading, parent}` (few-shot
+  BNM numbering); code locates each `starts_with` anchor in the markdown and
+  slices verbatim `text` between consecutive anchors (parent stem ends at first
+  child). Build fails on unfound/ambiguous anchors and on completeness-reconcile
+  mismatch. Store atomic entries with `parent`/`children` (Option C).
+- `ClauseIndex.get()` returns the verbatim entry or `None` (→ `CLAUSE_NOT_FOUND`);
+  parent fetch assembles `full_text` at read time.
 - SEQUENTIAL (depends on Task 1)
 
 **Task 3: Graph model + curated builder + status derivation** — _medium_ (100–300 LOC)
@@ -1012,20 +1312,26 @@ SUBMISSION_ACCESS_DENIED`; unknown id → `404 SUBMISSION_NOT_FOUND`.
   resolvable clause on each side.
 - SEQUENTIAL (depends on Task 2)
 
-**Task 4: Connection-finding + citation validator (guardrail)** — _large_ (300+ LOC)
+**Task 4: Two-agent connection-finding (finder + critic) + citation validator** — _large_ (300+ LOC)
 
 - Files: `engine/connections.py`.
-- Claude prompt over the two documents' clause text; `citation_validator` checks
-  every returned clause number against `ClauseIndex`, splitting results into
+- `find_connections(doc_a, doc_b)`: [4a] finder agent proposes candidates over the
+  two documents' clause text; [4b] critic agent refutes weak candidates and
+  surfaces missed connections (recall); [5] deterministic `citation_validator`
+  checks every cited clause number against `ClauseIndex`, splitting results into
   `connections` (all clauses resolve) and `unsupported` ("No matching clause
   found"). Must reproduce the brief's RMiT 17.1↔12.1 conflict on the amended pair.
+- Records a `connection-trace-{pair}.json` per run (model id, timestamp, raw finder
+  output, raw critic output, full validation trace) — proves AI-found + demo backstop.
 - SEQUENTIAL (depends on Tasks 2, 3)
 
 **Task 5: Sensitive submission ingestion** — _medium_ (100–300 LOC)
 
 - Files: `engine/submissions.py`.
 - Reuse Task 1 conversion into `data/submissions/`; tag sensitivity; reject
-  unreadable/unsupported uploads storing nothing.
+  unreadable/unsupported uploads. Process in memory / cleaned temp path; a
+  `finally` purge guarantees **zero residual bytes** on every exit (201/415/422) —
+  a successful file lives only under `data/submissions/`.
 - SEQUENTIAL (depends on Task 1)
 
 **Task 6: Read API service** — _medium_ (100–300 LOC)
@@ -1055,7 +1361,7 @@ SUBMISSION_ACCESS_DENIED`; unknown id → `404 SUBMISSION_NOT_FOUND`.
   obtain the Bank's written approval before entering into a new material
   outsourcing arrangement."; `clause_number` echoed.
 
-**Test 2: Clause parser handles BNM's nested numbering**
+**Test 2: Clause parser (anchor-slice) handles BNM's nested numbering, verbatim + Option C**
 
 The parser is load-bearing for the entire guardrail: if it mis-splits a clause,
 every downstream citation inherits the error. BNM numbering is irregular —
@@ -1063,13 +1369,27 @@ every downstream citation inherits the error. BNM numbering is irregular —
 non-numeric `Appendix 10` — all of which appear in real Acceptance Criteria and
 the supervisor checklist (#10).
 
-- Setup: parse a fixture covering `17.1`, `17.1(a)`, `12.3(e)`, `10.50`, and
-  `Appendix 10`.
-- Action: fetch each via `ClauseIndex.get()`.
-- Expected: each resolves to its own entry with the **correct boundaries** — the
-  text of `17.1` does not bleed into `17.1(a)`; `17.1(a)` and `17.1(b)` are
-  distinct; `10.50` is not confused with `10.5`; `Appendix 10` is addressable as a
-  non-decimal clause. A clause number the parser fails to split is a defect.
+- Setup: a markdown fixture covering `17.1` with children `(a)(b)(c)`, plus
+  `12.3(e)`, `10.50`, and `Appendix 10`; run the parser (LLM anchors stubbed with
+  a recorded response so the test is deterministic).
+- Action: fetch each via `ClauseIndex.get()` and `GET /clauses/{n}`.
+- Expected:
+  - **Boundaries correct:** `17.1` text does not bleed into `17.1(a)`; `17.1(a)`
+    and `17.1(b)` are distinct; `10.50` is not confused with `10.5`; `Appendix 10`
+    is addressable. A clause the parser fails to split is a defect.
+  - **Verbatim by slicing:** each entry's `text` is exactly `markdown[start:end]`
+    (byte-for-byte substring of the source) — assert `text` is a substring of the
+    source markdown.
+  - **Option C:** `17.1.text` is the **stem only** (ends before `(a)`);
+    `17.1.children == ["…(a)","…(b)","…(c)"]`; each child's `parent == "RMiT 17.1"`.
+    Sub-item text is **not** duplicated inside the parent (assert `(b)`'s text is
+    not a substring of `17.1.text`).
+  - **Composed view:** `GET /clauses/RMiT 17.1` returns `full_text` = the
+    contiguous source span covering the parent + all children (assert it is a
+    substring of the source and starts with the stem).
+  - **Loud failure:** an anchor `starts_with` that is absent from / duplicated in
+    the markdown fails the build; a fixture missing an expected clause fails the
+    completeness reconcile.
 
 **Test 3: Garbled-source document ingests cleanly**
 
@@ -1096,22 +1416,27 @@ the supervisor checklist (#10).
   `structural`/`curated` edges are exactly `1.0`; `llm-found` edges are `< 1.0`.
   Build fails otherwise.
 
-**Test 6: Connection-finding surfaces the real conflict**
+**Test 6: Two-agent connection-finding surfaces the real conflict + a critic-found miss**
 
-- Setup: ingest RMiT with 17.1 amended to notify-after; ingest Outsourcing.
-- Action: `POST /connections/find` with `["rmit-v2-2026-draft",
-"outsourcing-v1-2019"]`.
-- Expected: a `connections` entry with `target_clauses` including `Outsourcing
-12.1` quoted verbatim and `source_clauses` including `RMiT 17.1`,
-  `supported: true`, plus the `RMiT 17.2` → `RMiT 17.1` dependency.
+- Setup: ingest RMiT with 17.1 amended to notify-after; ingest Outsourcing. Stub
+  **both agent turns** with recorded responses: the finder returns the 12.1↔17.1
+  conflict; the critic scopes it (12.4 affiliate exemption) and adds the missed
+  `RMiT 17.2` → `RMiT 17.1` dependency.
+- Action: `POST /connections/find` with `["rmit-v2-2026-draft", "outsourcing-v1-2019"]`.
+- Expected: a `connections` entry whose `target_clauses` include `Outsourcing 12.1`
+  quoted verbatim and `source_clauses` include `RMiT 17.1`, `supported: true`, with
+  the critic's `scope_note`; **plus** the `RMiT 17.2` → `RMiT 17.1` dependency the
+  critic surfaced (proves the recall pass). A `connection-trace` is written with
+  both raw agent outputs.
 
 **Test 7: Unsupported candidate is flagged, not invented**
 
-- Setup: force the connection-finder to emit a candidate citing `Cyber 4.4`
-  (absent from the index) via a stubbed LLM response.
-- Action: run `citation_validator`.
-- Expected: the candidate lands in `unsupported` with message "No matching
-  clause found"; it never appears in `connections`; no fabricated clause text.
+- Setup: stub the **critic turn** to emit a candidate citing `Cyber 4.4` (absent
+  from the index).
+- Action: run `find_connections` / `citation_validator`.
+- Expected: the candidate lands in `unsupported` with message "No matching clause
+  found"; it never appears in `connections`; no fabricated clause text. (Confirms
+  the code verifier gates the critic's output too, not just the finder's.)
 
 **Test 8: Status derivation**
 
@@ -1121,7 +1446,22 @@ the supervisor checklist (#10).
 - Expected: `rmit-v2-2026-draft` → "In progress", `opres` node → "In progress",
   `bcm-v1-2022` → "In force", `rmit-v1-2020` → "Superseded".
 
-**Test 9: Sensitive submission ingest + isolation**
+**Test 9: Version keying + `source` — current wins, history via `?version=`**
+
+- Setup: corpus has RMiT v1 (2020, real, 17.1 "consult before", `source:
+published`) and RMiT v2 (2026, mock draft, 17.1 "notify-after", `source: draft`).
+- Action & expected:
+  - `GET /clauses/RMiT 17.1` → the **draft** ("notify-after"), `source: "draft"`,
+    `document_id: "rmit-v2-2026-draft"`, `superseded_versions: ["rmit-v1-2020"]`
+    (in-progress draft wins over superseded).
+  - `GET /clauses/RMiT 17.1?version=rmit-v1-2020` → the **published** v1 ("consult
+    before"), `source: "published"`.
+  - `GET /clauses/RMiT 17.1?version=rmit-v9` → `404 CLAUSE_VERSION_NOT_FOUND`.
+  - `GET /clauses/Outsourcing 12.1` → `source: "published"` (real PDF).
+  - **Build invariant:** exactly one primary-index entry exists for `RMiT 17.1`; a
+    fixture that would put two active versions under one key fails the build.
+
+**Test 10: Sensitive submission ingest + isolation**
 
 - Setup: supervisor uploads `meridian-cloud-outsourcing-application.pdf`.
 - Action: `POST /submissions` with `X-Role: supervisor`.
@@ -1129,11 +1469,14 @@ the supervisor checklist (#10).
   (git-ignored); assert no submission text appears in `clause-index.json` or
   `graph.json`. Without the header → `403 SUBMISSION_ACCESS_DENIED`.
 
-**Test 10: Unreadable upload rejected clearly**
+**Test 11: Unreadable upload rejected clearly, with zero residue**
 
-- Setup: upload a corrupt/scanned-image PDF that converts to empty text.
+- Setup: upload a corrupt/scanned-image PDF that converts to empty text; point the
+  temp/spool dir at a test-controlled path.
 - Action: `POST /submissions` with `X-Role: supervisor`.
-- Expected: `422 UNREADABLE_DOCUMENT`; nothing written to `data/submissions/`.
+- Expected: `422 UNREADABLE_DOCUMENT`; `data/submissions/` has no new record **and**
+  the temp/spool dir contains no residual submission bytes after the request (the
+  `finally` purge ran). Assert the same zero-residue on the `415` path.
 
 ## Acceptance Criteria (technical)
 
@@ -1149,6 +1492,8 @@ the supervisor checklist (#10).
 - [ ] Node statuses match the derivation rule; no status is hand-set.
 - [ ] Submission ingest is role-gated, stored git-ignored, and isolated from the
       public artifacts.
+- [ ] Rejected/unreadable uploads leave zero residual bytes (temp included); a
+      successful file lives only under `data/submissions/`.
 - [ ] All `pytest` tests pass; no lint/type errors.
 
 ## Verification
@@ -1157,13 +1502,15 @@ Run the `verifier` skill after each sub-task.
 
 ### Backend Tests
 
-- `engine/tests/test_clauses.py` — Tests 1, 2, 4 (verbatim fetch, nested-numbering
-  parser, missing clause).
-- `engine/tests/test_ingest.py` — Test 3 (garbled-source RMiT), Test 10 fixture.
+- `engine/tests/test_clauses.py` — Tests 1, 2, 4, 9 (verbatim fetch, nested-numbering
+  parser, missing clause, version keying + `source`).
+- `engine/tests/test_ingest.py` — Test 3 (garbled-source RMiT), Test 11 fixture.
 - `engine/tests/test_graph.py` — Tests 5, 8 (edge invariants, status derivation).
-- `engine/tests/test_connections.py` — Tests 6, 7 (real conflict, guardrail;
-  stub the Claude client for 7, use a recorded response for 6).
-- `engine/tests/test_submissions.py` — Tests 9, 10 (isolation, rejection).
+- `engine/tests/test_connections.py` — Tests 6, 7 (two-agent finder+critic; stub
+  **both** the finder and critic turns with recorded responses so the loop is
+  deterministic — Test 6 asserts the critic-found miss, Test 7 asserts the verifier
+  gates the critic's output too).
+- `engine/tests/test_submissions.py` — Tests 10, 11 (isolation, rejection).
 
 ### Manual Verification
 
@@ -1195,6 +1542,22 @@ framework. User-facing flows are covered by the consuming stories (#7–#11)._
       **Resolved:** hierarchical retrieval (per `ai_graphify`) — read `graph.json` + clause numbers first, hydrate full clause text by number on demand;
       full-document dump is reserved for pairwise connection-finding only. Semantic
       embeddings over clause entries are a named extension for scale, not MVP1.
+- [x] ~~Where does the amended RMiT 17.1 ("notify-after") come from?~~ —
+      **Resolved:** RMiT v1 (2020) is the **real** published doc; **RMiT v2 (2026)
+      is a mock draft** — LLM-expanded from v1 once, its conflict clauses (17.1,
+      17.2, 10.50, 17.1 sub-items) hand-pinned, reviewed, and **frozen as a
+      committed fixture** under `data/mock/` (never regenerated live). The conflict
+      is the draft's 17.1 vs. the real, unedited Outsourcing 12.1.
+- [x] ~~How are clauses distinguished as real vs. drafted, and how is the same
+      clause number in two versions keyed?~~ — **Resolved:** each clause carries
+      `source: "published" | "draft"`; the primary index holds the **current**
+      version by bare number (in-progress > in-force > superseded), older versions
+      via `?version=`. Build invariant: exactly one active entry per clause number.
+- [x] ~~Where does the Claude API key live and does the demo need it live?~~ —
+      **Resolved:** `ANTHROPIC_API_KEY` from env, used **at build time only**
+      (parser + finder/critic); the served read API needs no model access; tests
+      stub the model so CI needs no key. Only stage 4 / the ripple check calls the
+      model live during the demo.
 - [ ] **Exact final cluster (which 5–10 policies)?** — **Status:** awaiting
       contact confirmation. Blocks corpus content in `data/corpus/`, not the
       engine's design or interfaces.

@@ -351,6 +351,14 @@ the engine's `confidence` field on the corresponding edge. They are illustrative
 demo values; the engine supplies the actual score per edge and #8 renders it —
 neither spec invents a separate confidence number.
 
+**One connection = one edge = one finding (1:1).** Each engine connection maps to
+exactly one graph edge and #8 classifies it as exactly one finding
+(Conflict _or_ Duplication _or_ Gap), inheriting that edge's `confidence` directly.
+#8 never splits one connection into two findings and never derives a second
+confidence number. If a case genuinely needs two findings, the **engine's finder
+must emit two connections** — granularity belongs in #6, so `confidence` stays a
+single #6-owned value per finding.
+
 **Gap findings and the guardrail.** A Gap has no supporting clause by definition.
 It is **not** a low-confidence edge — the engine reports the absence honestly
 ("No matching clause found" + nearest related clause via the citation validator),
@@ -361,3 +369,16 @@ connections; it never rescues or represents an unsupported one.
 hydrates only the clauses a finding cites via `GET /clauses/{n}` — the
 hierarchical pattern in the engine spec, never dumping the whole cluster into the
 report.
+
+**Live connection-finding (the hero moment).** When the drafter runs the ripple
+check on the amended RMiT 17.1, #8 calls the engine's `POST /connections/find`
+**live** — this is the one place the product runs the model on stage to prove the
+AI is real. The engine's endpoint runs a **finder + critic + code-verifier** loop
+(the finder proposes, the critic refutes weak findings and hunts for missed ones —
+recall — and deterministic code validates every cited clause). #8 owns the _live
+call and the C/D/G classification_, not the loop itself (the loop is a #6 engine
+capability). Because live means 2–3 model round-trips, #8 must be able to fall
+back to the engine's recorded `connection-trace-*.json` if the API stalls
+mid-demo; the trace also lets the drafter (and a judge) see the raw agent output
+and the guardrail discarding any hallucinated clause. Full technical detail:
+"Stage 4 is a two-agent loop" in the engine spec.
