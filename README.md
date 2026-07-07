@@ -102,3 +102,15 @@ python3 -m http.server --directory docs/poc/policy-consistency-ai 8000
 Internal BNM reference documents used during discovery are **excluded** from this
 repository (see `.gitignore`). Everything published here is built on public policy
 documents.
+
+## Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the git strategy (GitHub Flow,
+Conventional Commits, PR process). AI agents pick up the rules automatically from
+[`CLAUDE.md`](CLAUDE.md).
+
+## License
+
+No license is set yet. Hackathon output may be subject to BNM's own IP and
+publication policy, so licensing is **to be confirmed** internally before reuse.
+Until then, treat this as "all rights reserved" by default.

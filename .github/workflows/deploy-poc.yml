@@ -1,0 +1,44 @@
+name: Deploy POC to GitHub Pages
+
+# Publishes the clickable HTML prototype (docs/poc/policy-consistency-ai)
+# as a live demo site. The site root is the POC, so the URL opens on index.html.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/poc/policy-consistency-ai/**"
+      - ".github/workflows/deploy-poc.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment; newer pushes supersede in-flight ones.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload POC as the site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/poc/policy-consistency-ai
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
