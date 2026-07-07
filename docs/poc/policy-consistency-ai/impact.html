@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rulebook Radar — Impact Report</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900">
+<nav class="bg-white border-b border-gray-200">
+  <div class="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="text-2xl">🛰️</span>
+      <span class="font-bold text-lg">Rulebook Radar</span>
+      <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium">COPA Hackathon 2026 · MW10 demo</span>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <a href="index.html" class="text-gray-500 hover:text-gray-900">Rulebook Graph</a>
+      <a id="navReview" href="review.html" class="text-gray-500 hover:text-gray-900">Review Change</a>
+      <a href="#" class="font-semibold text-indigo-600">Impact</a>
+      <a id="navChat" href="chat.html" class="text-gray-500 hover:text-gray-900">Drafting Copilot</a>
+    </div>
+  </div>
+</nav>
+
+<main class="max-w-screen-xl mx-auto px-4 py-8">
+  <nav class="text-sm text-gray-500 mb-4"><a href="index.html" class="hover:underline">Rulebook Graph</a> <span class="mx-1">/</span> <a id="backReview" href="review.html" class="hover:underline">Review change</a> <span class="mx-1">/</span> <span class="text-gray-900">Impact report</span></nav>
+
+  <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-6">
+    <div>
+      <h1 id="title" class="text-2xl font-bold">Ripple report</h1>
+      <p id="subtitle" class="text-gray-500 mt-1">Every finding cites the <span class="font-medium text-gray-700">exact clause</span> it is based on — no unsupported claims.</p>
+    </div>
+    <div class="bg-white rounded-lg border border-gray-200 px-4 py-2 text-center">
+      <div id="openCount" class="text-2xl font-bold text-indigo-600">0</div>
+      <div class="text-xs text-gray-500">open findings</div>
+    </div>
+  </div>
+
+  <!-- summary chips -->
+  <div id="chips" class="flex flex-wrap gap-3 mb-6 text-sm"></div>
+
+  <div id="findings" class="space-y-4"></div>
+
+  <div id="allClear" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl p-6 text-center">
+    <p class="text-emerald-800 font-semibold">✅ All findings resolved.</p>
+    <p id="allClearText" class="text-emerald-700 text-sm mt-1"></p>
+    <div class="mt-4">
+      <button id="submitBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-medium">Submit draft to reviewer / manager →</button>
+      <p id="submitMsg" class="hidden text-sm text-emerald-800 font-medium mt-2">✓ Draft submitted for review. Your reviewer (Farid M.) and approving manager have been notified.</p>
+    </div>
+  </div>
+
+  <div class="mt-8 flex items-center justify-between">
+    <a id="backLink" href="review.html" class="text-sm text-gray-500 hover:underline">← Back to change</a>
+    <a id="copilotLink" href="chat.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-medium">Open drafting copilot →</a>
+  </div>
+</main>
+
+<script>
+// Doc-aware scenarios. RMiT = deep (3 findings). OpRes = light (1 finding).
+const SCENARIOS = {
+  rmit: {
+    title: "Ripple report — RMiT clause 17",
+    subtitle: "Scanned 4 linked policies. Every finding cites the exact clause it is based on — no unsupported claims.",
+    review: "review.html",
+    allClear: "The RMiT v2 draft is now consistent across the technology-risk cluster.",
+    findings: [
+      {
+        id: 1, type: "Conflict", color: "red", policy: "Outsourcing (2019)",
+        summary: "If a cloud service is also a material outsourcing, this policy still requires the Bank's prior WRITTEN APPROVAL — which is stricter than RMiT's new 'notify within 14 days'. A drafter dropping consultation to notification leaves the two policies out of step.",
+        citation: "Outsourcing 12.1: \"A financial institution must obtain the Bank's written approval before entering into a new material outsourcing arrangement.\" (11.1 makes cloud arrangements subject to this policy.)",
+        action: "Reconcile: state clearly whether RMiT 17 notification satisfies Outsourcing 12.1 for cloud, or which policy governs when a cloud service is both critical and material.",
+        confidence: 93
+      },
+      {
+        id: 2, type: "Duplication", color: "amber", policy: "RMiT 17.1 vs 17.2 (same doc)",
+        summary: "First-time adoption (17.1) and subsequent adoption (17.2) now both use 'notify' — the information each requires overlaps heavily, risking two near-identical submission processes.",
+        citation: "RMiT 17.2: \"...submitting the notification together with the necessary updates to all the information required under paragraph 17.1...\"",
+        action: "Merge the shared submission content or cross-reference 17.1 from 17.2 to avoid divergence over time.",
+        confidence: 82
+      },
+      {
+        id: 3, type: "Gap", color: "sky", policy: "RMiT clause 17 (draft)",
+        summary: "Removing prior consultation drops the Bank's chance to raise concerns BEFORE go-live. The draft has no clause requiring the pre-adoption risk assessment (currently a precondition of 17.1) to still be completed first.",
+        citation: "No matching clause found in the draft. Nearest: 17.1(a) currently requires a comprehensive risk assessment per para 10.50 and Appendix 10 — but only in the consultation path being removed.",
+        action: "Add a clause requiring the 10.50 / Appendix 10 risk assessment to be completed before notification, so the control isn't lost with consultation.",
+        confidence: 74
+      }
+    ]
+  },
+  opres: {
+    title: "Ripple report — Operational Resilience clause 6.11",
+    subtitle: "Scanned linked policies for the register-of-critical-services change. Every finding cites the exact clause it is based on.",
+    review: "review-opres.html",
+    allClear: "The Operational Resilience v2 draft no longer duplicates the RMiT cloud register.",
+    findings: [
+      {
+        id: 1, type: "Duplication", color: "amber", policy: "RMiT (cloud services)",
+        summary: "Clause 6.11 restated the cloud/third-party register requirement that RMiT already owns. Two policies stating the same rule drift apart over time.",
+        citation: "Operational Resilience 6.11: \"The institution shall maintain a register of all cloud and third-party technology services supporting critical operations.\" — overlaps RMiT's cloud services requirements.",
+        action: "Reference RMiT as the single source of truth for the register instead of restating it (as done in the v2 draft).",
+        confidence: 86
+      }
+    ]
+  }
+};
+
+const params = new URLSearchParams(location.search);
+const docKey = SCENARIOS[params.get("doc")] ? params.get("doc") : "rmit";
+const scenario = SCENARIOS[docKey];
+
+// header + links
+document.getElementById("title").textContent = scenario.title;
+document.getElementById("subtitle").innerHTML = scenario.subtitle;
+document.getElementById("allClearText").textContent = scenario.allClear;
+document.getElementById("backReview").href = scenario.review;
+document.getElementById("backLink").href = scenario.review;
+document.getElementById("copilotLink").href = "chat.html?doc=" + docKey;
+// doc-aware top nav
+document.getElementById("navReview").href = scenario.review;
+document.getElementById("navChat").href = "chat.html?doc=" + docKey;
+
+const chipStyle = { Conflict:"bg-red-50 text-red-700 border-red-200", Duplication:"bg-amber-50 text-amber-700 border-amber-200", Gap:"bg-sky-50 text-sky-700 border-sky-200" };
+function renderChips() {
+  // count only still-OPEN findings, so chips update as findings are resolved/dismissed
+  const counts = items.filter(i => i.status === "open").reduce((m,f)=>{m[f.type]=(m[f.type]||0)+1;return m;},{});
+  const chips = ["Conflict","Duplication","Gap"].filter(t=>counts[t])
+    .map(t=>`<span class="${chipStyle[t]} border px-3 py-1 rounded-full font-medium">${counts[t]} ${t}</span>`).join("");
+  document.getElementById("chips").innerHTML = chips ||
+    `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full font-medium">0 open — all resolved</span>`;
+}
+
+// Close the loop with the copilot: findings resolved via an applied redraft come back as "accepted".
+const resolvedKey = "rr_resolved_" + docKey;
+function loadResolved() { try { return JSON.parse(localStorage.getItem(resolvedKey) || "[]"); } catch(e){ return []; } }
+let items = scenario.findings.map(f => ({...f, status: loadResolved().includes(f.id) ? "accepted" : "open"}));
+const container = document.getElementById("findings");
+
+const badge = {
+  Conflict: "bg-red-100 text-red-700",
+  Duplication: "bg-amber-100 text-amber-700",
+  Gap: "bg-sky-100 text-sky-700"
+};
+const bar = {
+  red: "bg-red-500",
+  amber: "bg-amber-500",
+  sky: "bg-sky-500"
+};
+
+function render() {
+  const open = items.filter(i => i.status === "open");
+  document.getElementById("openCount").textContent = open.length;
+  document.getElementById("allClear").classList.toggle("hidden", open.length !== 0);
+  renderChips();
+
+  container.innerHTML = items.map(i => `
+    <div class="bg-white rounded-xl shadow-sm border ${i.status === 'open' ? 'border-gray-100' : 'border-gray-100 opacity-60'} p-5">
+      <div class="flex items-start justify-between gap-4">
+        <div class="flex-1">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${badge[i.type]}">${i.type}</span>
+            <span class="font-semibold">${i.policy}</span>
+            ${i.status === 'accepted' ? '<span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">✓ accepted</span>' : ''}
+            ${i.status === 'dismissed' ? '<span class="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">dismissed</span>' : ''}
+          </div>
+          <p class="text-sm text-gray-700 mt-2">${i.summary}</p>
+          <div class="mt-3 bg-gray-50 border-l-4 border-gray-300 rounded p-3">
+            <p class="text-xs uppercase tracking-wide text-gray-400 font-semibold mb-1">Cited source</p>
+            <p class="text-sm font-serif text-gray-800">${i.citation}</p>
+          </div>
+          <p class="text-sm text-gray-600 mt-3"><span class="font-medium">Suggested fix:</span> ${i.action}</p>
+          <div class="mt-3 flex items-center gap-2">
+            <span class="text-xs text-gray-400">AI confidence</span>
+            <div class="w-32 h-2 bg-gray-200 rounded-full overflow-hidden"><div class="${bar[i.color]} h-full" style="width:${i.confidence}%"></div></div>
+            <span class="text-xs font-medium text-gray-600">${i.confidence}%</span>
+          </div>
+        </div>
+        <div class="flex flex-col gap-2 shrink-0">
+          <button data-accept="${i.id}" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-1.5 rounded-lg font-medium ${i.status !== 'open' ? 'opacity-40 pointer-events-none' : ''}">Accept fix</button>
+          <button data-dismiss="${i.id}" class="border border-gray-300 hover:bg-gray-50 text-gray-600 text-sm px-4 py-1.5 rounded-lg ${i.status !== 'open' ? 'opacity-40 pointer-events-none' : ''}">Dismiss</button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+
+  container.querySelectorAll("[data-accept]").forEach(b =>
+    b.addEventListener("click", () => setStatus(+b.dataset.accept, "accepted")));
+  container.querySelectorAll("[data-dismiss]").forEach(b =>
+    b.addEventListener("click", () => setStatus(+b.dataset.dismiss, "dismissed")));
+}
+
+function setStatus(id, status) {
+  items = items.map(i => i.id === id ? {...i, status} : i);
+  // persist accepted findings so the loop stays consistent across pages
+  try {
+    let resolved = loadResolved();
+    if (status === "accepted" && !resolved.includes(id)) resolved.push(id);
+    if (status !== "accepted") resolved = resolved.filter(x => x !== id);
+    localStorage.setItem(resolvedKey, JSON.stringify(resolved));
+  } catch(e) {}
+  render();
+}
+
+render();
+
+// Drafter's closing step: submit the now-consistent draft for review.
+document.getElementById("submitBtn").addEventListener("click", () => {
+  document.getElementById("submitMsg").classList.remove("hidden");
+  const b = document.getElementById("submitBtn");
+  b.disabled = true;
+  b.className = "bg-gray-200 text-gray-400 px-5 py-2.5 rounded-lg font-medium cursor-not-allowed";
+});
+</script>
+</body>
+</html>

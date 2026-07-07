@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rulebook Radar — Review (Outsourcing)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900">
+<nav class="bg-white border-b border-gray-200">
+  <div class="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="text-2xl">🛰️</span>
+      <span class="font-bold text-lg">Rulebook Radar</span>
+      <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium">COPA Hackathon 2026 · MW10 demo</span>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <a href="index.html" class="text-gray-500 hover:text-gray-900">Rulebook Graph</a>
+      <a href="review.html" class="text-gray-500 hover:text-gray-900">Review Change</a>
+      <a href="impact.html" class="text-gray-500 hover:text-gray-900">Impact</a>
+      <a href="chat.html" class="text-gray-500 hover:text-gray-900">Drafting Copilot</a>
+    </div>
+  </div>
+</nav>
+
+<main class="max-w-screen-xl mx-auto px-4 py-8">
+  <nav class="text-sm text-gray-500 mb-4"><a href="index.html" class="hover:underline">Rulebook Graph</a> <span class="mx-1">/</span> <span class="text-gray-900">Review · Outsourcing v2 draft</span></nav>
+
+  <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-2">
+    <div>
+      <div class="flex items-center gap-2 mb-1">
+        <h1 class="text-2xl font-bold">Outsourcing</h1>
+        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-teal-100 text-teal-700">For your review</span>
+      </div>
+      <p class="text-gray-500">v2 · 2026 draft · drafted by <span class="font-medium text-gray-700">Farid M.</span> — you are the assigned reviewer</p>
+    </div>
+  </div>
+
+  <!-- role banner: reviewer, not editor -->
+  <div class="mb-6 bg-teal-50 border border-teal-200 rounded-xl p-4 text-sm flex items-start gap-3">
+    <span class="text-lg">👁</span>
+    <div>
+      <p class="font-semibold text-teal-800">You're reviewing, not editing</p>
+      <p class="text-teal-700 mt-0.5">You can read the draft and leave comments. You cannot change the text — that's the drafter's job. <span class="font-medium">Approval is a manager action</span> and is disabled for your role.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- doc viewer -->
+    <div class="lg:col-span-2 bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden">
+      <div class="flex items-center justify-between bg-gray-100 border-b border-gray-300 px-3 py-2 text-xs text-gray-600">
+        <div class="flex items-center gap-2 min-w-0"><span>📄</span><span class="font-medium truncate">Outsourcing_2026_draft.pdf</span><span class="bg-teal-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">review</span></div>
+        <div class="flex items-center gap-2 shrink-0">
+          <button class="w-6 h-6 rounded hover:bg-gray-200" title="Previous page">‹</button><span>14 / 40</span><button class="w-6 h-6 rounded hover:bg-gray-200" title="Next page">›</button>
+          <span class="mx-1 text-gray-300">|</span>
+          <button class="w-6 h-6 rounded hover:bg-gray-200" title="Zoom out">−</button><span>100%</span><button class="w-6 h-6 rounded hover:bg-gray-200" title="Zoom in">+</button>
+        </div>
+      </div>
+      <div class="bg-gray-200 p-4 h-[430px] overflow-y-auto">
+        <div class="bg-white shadow-md mx-auto max-w-lg p-8 font-serif text-[13px] leading-relaxed text-gray-800">
+          <p class="text-center text-xs text-gray-400 mb-6 font-sans tracking-wide">BANK NEGARA MALAYSIA · Outsourcing (2026 draft)</p>
+          <p class="font-bold mb-2">11. Outsourcing involving cloud services · 12. Approval</p>
+          <p class="mb-3">11.1 Where the outsourcing arrangement involves a cloud service provider, the institution must comply with this policy and other cloud requirements specified by the Bank.</p>
+          <p class="mb-3 bg-red-50 border-l-4 border-red-300 pl-3 py-1">12.1 A financial institution <span class="font-semibold">must obtain the Bank's written approval</span> before entering into a new material outsourcing arrangement.</p>
+          <p class="mb-3">12.5 If the Bank views an arrangement as material, the institution shall comply with paragraph 12.1.</p>
+          <p class="text-gray-400 mt-8 font-sans text-xs">… continued …</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- comments panel -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col">
+      <h2 class="font-semibold text-sm mb-1">Comments</h2>
+      <p class="text-xs text-gray-500 mb-3">Rulebook Radar flagged clause 12.1 against your team's RMiT draft.</p>
+
+      <!-- AI flag -->
+      <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-3 text-sm">
+        <p class="text-xs font-semibold text-red-700 mb-1">⚠ Rulebook Radar</p>
+        <p class="text-gray-700">Clause 12.1 still requires the Bank's <b>written approval</b> for a material outsourcing (and 11.1 pulls cloud into this policy), but <b>RMiT v2 · 17.1</b> (in draft) moves first-time cloud to a 14-day <b>notification</b>. These disagree where a critical cloud service is also material.</p>
+      </div>
+
+      <div id="comments" class="space-y-3 flex-1 overflow-y-auto"></div>
+
+      <form id="commentForm" class="mt-3">
+        <textarea id="commentInput" rows="2" placeholder="Add a comment for the drafter…" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"></textarea>
+        <div class="flex items-center justify-between gap-2 mt-2">
+          <button type="submit" class="bg-teal-600 hover:bg-teal-700 text-white text-sm px-4 py-2 rounded-lg font-medium">Comment</button>
+          <button type="button" title="Only a manager (approver) can approve" class="border border-gray-200 text-gray-400 text-sm px-4 py-2 rounded-lg font-medium cursor-not-allowed" disabled>Approve 🔒 (manager)</button>
+        </div>
+      </form>
+
+      <!-- reviewer closes their loop -->
+      <div class="mt-3 border-t border-gray-100 pt-3">
+        <button id="completeBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white text-sm px-4 py-2 rounded-lg font-medium">Complete review — send comments to drafter →</button>
+        <p id="completeMsg" class="hidden text-xs text-emerald-700 font-medium mt-2">✓ Review complete. Your comments were sent to the drafter (Farid M.) and the document flagged for revision.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6">
+    <a href="index.html" class="text-sm text-gray-500 hover:underline">← Back to workspace</a>
+  </div>
+</main>
+
+<script>
+const comments = [
+  { who:"Aisyah R.", role:"Reviewer", text:"Agree with the flag — 12.1 should be reconciled with RMiT 17.1 before this goes forward.", initials:"AR", me:true },
+];
+const box = document.getElementById("comments");
+function render() {
+  box.innerHTML = comments.map(c => `
+    <div class="flex gap-2">
+      <span class="w-7 h-7 shrink-0 rounded-full ${c.me ? 'bg-indigo-600' : 'bg-gray-400'} text-white text-xs font-bold grid place-items-center">${c.initials}</span>
+      <div class="bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 text-sm flex-1">
+        <p class="text-xs text-gray-500 mb-0.5"><span class="font-semibold text-gray-700">${c.who}</span> · ${c.role}</p>
+        <p class="text-gray-800">${c.text}</p>
+      </div>
+    </div>`).join("");
+  box.scrollTop = box.scrollHeight;
+}
+document.getElementById("commentForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const t = document.getElementById("commentInput");
+  if (!t.value.trim()) return;
+  comments.push({ who:"Aisyah R.", role:"Reviewer", text:t.value.trim(), initials:"AR", me:true });
+  t.value = "";
+  render();
+});
+render();
+
+document.getElementById("completeBtn").addEventListener("click", () => {
+  document.getElementById("completeMsg").classList.remove("hidden");
+  const b = document.getElementById("completeBtn");
+  b.disabled = true;
+  b.className = "w-full bg-gray-200 text-gray-400 text-sm px-4 py-2 rounded-lg font-medium cursor-not-allowed";
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rulebook Radar — Supervisor Review</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900">
+<nav class="bg-white border-b border-gray-200">
+  <div class="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="text-2xl">🛰️</span>
+      <span class="font-bold text-lg">Rulebook Radar</span>
+      <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium">COPA Hackathon 2026 · MW10 demo</span>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <a href="index.html" class="text-gray-500 hover:text-gray-900">Rulebook Graph</a>
+      <a href="supervisor.html" class="font-semibold text-indigo-600">Supervisor Review</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Workspace strip: supervision persona -->
+<div class="bg-teal-700 text-white">
+  <div class="max-w-screen-xl mx-auto px-4 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-sm">
+    <div class="flex items-center gap-2">
+      <span class="w-7 h-7 rounded-full bg-white text-teal-700 font-bold grid place-items-center text-xs">JP</span>
+      <span>Supervision workspace · <span class="font-semibold">Jabatan Penyeliaan</span> (per Outsourcing 12.6)</span>
+    </div>
+    <div class="text-teal-100 text-xs">Assessing a bank submission against the rulebook</div>
+  </div>
+</div>
+
+<main class="max-w-screen-xl mx-auto px-4 py-8">
+  <nav class="text-sm text-gray-500 mb-4"><a href="index.html" class="hover:underline">Rulebook Graph</a> <span class="mx-1">/</span> <span class="text-gray-900">Supervisor review · cloud application</span></nav>
+
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold">Cloud outsourcing application — completeness &amp; compliance check</h1>
+    <p class="text-gray-500 mt-1 max-w-3xl">Upload a bank's application. Because Rulebook Radar already holds every policy and how they connect, it reads the submission and produces a cited compliance checklist automatically — flagging what is <span class="font-medium text-gray-700">missing</span>, so nothing slips through.</p>
+  </div>
+
+  <!-- STEP 1: upload / analyse -->
+  <div id="uploadStage" class="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+    <div id="dropzone" class="border-2 border-dashed border-gray-300 rounded-xl p-10 text-center cursor-pointer hover:border-teal-400 hover:bg-teal-50/40 transition">
+      <div class="text-4xl mb-2">📤</div>
+      <p class="font-medium text-gray-700">Upload the bank's application</p>
+      <p class="text-xs text-gray-400 mt-1">PDF / DOCX — drop here or click to select (demo: uses a sample submission)</p>
+      <div class="mt-4">
+        <button id="uploadBtn" class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-lg font-medium">Select sample application</button>
+      </div>
+    </div>
+
+    <!-- analysing state -->
+    <div id="analysing" class="hidden mt-6">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="w-8 h-8 shrink-0 rounded-full bg-teal-100 text-teal-700 grid place-items-center">📄</span>
+        <div class="min-w-0">
+          <p class="font-medium truncate">MeridianBank_CloudApplication.pdf</p>
+          <p class="text-xs text-gray-400">1.4 MB · uploaded</p>
+        </div>
+      </div>
+      <ul id="steps" class="space-y-2 text-sm text-gray-600"></ul>
+    </div>
+  </div>
+
+  <!-- STEP 2: results (hidden until analysis completes) -->
+  <div id="results" class="hidden">
+  <div class="mb-4 bg-teal-50 border border-teal-200 rounded-lg px-4 py-2 text-sm text-teal-800 flex items-center gap-2">
+    <span>✓</span><span>Application read. Classified as <span class="font-medium">public cloud · critical system · material outsourcing</span> → RMiT + Outsourcing requirements assembled automatically.</span>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- submission summary -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+      <h2 class="font-semibold text-sm mb-3">Submission</h2>
+      <dl class="text-sm space-y-2">
+        <div><dt class="text-gray-400 text-xs uppercase tracking-wide">Institution</dt><dd class="font-medium">Meridian Bank Berhad</dd></div>
+        <div><dt class="text-gray-400 text-xs uppercase tracking-wide">Arrangement</dt><dd>Public cloud (hyperscaler) for core banking — a <span class="font-medium">critical system</span></dd></div>
+        <div><dt class="text-gray-400 text-xs uppercase tracking-wide">Materiality</dt><dd><span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full text-xs font-medium">Material outsourcing</span></dd></div>
+        <div><dt class="text-gray-400 text-xs uppercase tracking-wide">Received</dt><dd>via Jabatan Penyeliaan (Outsourcing 12.6)</dd></div>
+      </dl>
+      <div class="mt-5 border-t border-gray-100 pt-4">
+        <div class="text-center">
+          <div id="score" class="text-3xl font-bold text-teal-600">—</div>
+          <div class="text-xs text-gray-500">requirements met</div>
+        </div>
+      </div>
+      <p class="text-xs text-gray-400 mt-4">Because this is a <span class="font-medium">critical + material</span> cloud arrangement, both RMiT and Outsourcing apply. The checklist below is assembled across both.</p>
+    </div>
+
+    <!-- checklist -->
+    <div class="lg:col-span-2 space-y-3">
+      <div id="checklist" class="space-y-3"></div>
+
+      <!-- ACTION BAR: the supervisor's decision -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mt-2">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div>
+            <p class="font-semibold text-sm">Decision</p>
+            <p id="decisionHint" class="text-xs text-gray-500 mt-0.5">2 requirements missing and 1 unclear — approval is blocked until resolved.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="approveBtn" class="bg-gray-200 text-gray-400 px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed" disabled title="Cannot approve while requirements are unmet">Approve</button>
+            <button id="returnBtn" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium">Return to bank — request missing items →</button>
+          </div>
+        </div>
+
+        <!-- generated cover note (revealed on Return) -->
+        <div id="returnNote" class="hidden mt-4 border-t border-gray-100 pt-4">
+          <p class="text-xs uppercase tracking-wide text-gray-400 font-semibold mb-2">Draft return letter — auto-generated from the gaps</p>
+          <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm font-serif text-gray-800">
+            <p class="mb-2">To: Meridian Bank Berhad · Re: Cloud outsourcing application (core banking)</p>
+            <p class="mb-2">Following our review against RMiT and the Outsourcing policy, the application cannot be approved in its current form. Please provide the following before resubmission:</p>
+            <ul id="gapList" class="list-disc ml-5 space-y-1"></ul>
+            <p class="mt-2 text-gray-500 text-xs">Each item cites the clause that requires it. Once received, the application will be re-assessed.</p>
+          </div>
+          <div class="mt-3 flex justify-end">
+            <button id="sendBtn" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium">Send to bank</button>
+          </div>
+          <p id="sentMsg" class="hidden text-sm text-emerald-700 font-medium mt-2 text-right">✓ Sent. Application marked "Returned — awaiting bank" and the requester notified.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6 bg-sky-50 border border-sky-200 rounded-xl p-4 text-sm flex items-start gap-3">
+    <span class="text-lg">🛡️</span>
+    <div>
+      <p class="font-semibold text-sky-800">Why this matters for supervision</p>
+      <p class="text-sky-700 mt-0.5">The risk in supervision isn't a wrong flag — it's a <span class="font-medium">missed</span> requirement. Rulebook Radar lists the full requirement set from the rulebook and marks each Met / Missing / Unclear, every line cited to its clause, so a supervisor can see the gaps at a glance rather than remembering them all.</p>
+    </div>
+  </div>
+  </div><!-- /results -->
+
+  <div class="mt-6">
+    <a href="index.html" class="text-sm text-gray-500 hover:underline">← Back to workspace</a>
+  </div>
+</main>
+
+<script>
+// Requirements assembled ACROSS the rulebook for a critical + material public-cloud arrangement.
+// status: met | missing | unclear
+// trace = the graph slice behind WHY this requirement is on the checklist (graph as engine, shown on demand)
+const reqs = [
+  { source:"Outsourcing 12.1", text:"Bank's written approval obtained before entering a material outsourcing arrangement.", status:"met",
+    note:"Application submitted for approval — satisfies the pre-approval requirement.",
+    trace:"Included because the arrangement is a MATERIAL OUTSOURCING → Outsourcing policy applies (12.1). Linked from RMiT via the cloud-services overlap.",
+    evidence:"Found in submission §1 (Cover) & §7 (Declarations): \"…hereby apply for the Bank's approval to enter into the arrangement described herein.\"" },
+  { source:"Outsourcing 12.3(e)", text:"Cloud deployment model, nature of data, and storage/back-up locations (city & country) disclosed.", status:"met",
+    note:"Locations and deployment model provided in section 4 of the submission.",
+    trace:"12.3 lists what an approval application under 12.1 must contain; (e) is the cloud-specific item.",
+    evidence:"Found in submission §4 (Architecture): deployment = public cloud; primary region Singapore, back-up Kuala Lumpur; data = customer + transaction records." },
+  { source:"RMiT 17.1", text:"Bank consulted prior to first-time adoption of public cloud for a critical system.", status:"met",
+    note:"First-time consultation record attached.",
+    trace:"Included because it is a PUBLIC CLOUD for a CRITICAL SYSTEM → RMiT clause 17 applies.",
+    evidence:"Found in submission §2 (Background): reference to consultation meeting held 12 Feb 2026 with the Bank; minutes attached as Annex C." },
+  { source:"RMiT 17.1(a) / 10.50 / App 10", text:"Comprehensive cloud risk assessment completed per para 10.50 and Appendix 10.", status:"unclear",
+    note:"A risk assessment is attached, but it does not reference the Appendix 10 control set — cannot confirm full coverage.",
+    trace:"17.1(a) requires the assessment; it points to 10.50 and Appendix 10 — a cross-clause dependency the graph follows.",
+    evidence:"Annex D contains a risk assessment, but scanned §D.2 controls list does NOT map to Appendix 10 headings — 6 of 14 control areas not evidenced." },
+  { source:"RMiT 17.1(b)", text:"CISO / senior management / board-level confirmation of readiness (Appendix 7 Part B).", status:"missing",
+    note:"No readiness confirmation found in the submission. Required before adoption.",
+    trace:"17.1(b) sub-requirement of the clause 17 consultation path; references Appendix 7 Part B.",
+    evidence:"Searched all annexes for a signed readiness confirmation (Appendix 7 Part B format). None found — no CISO/board sign-off attached." },
+  { source:"RMiT 17.1(c)", text:"Independent third-party pre-implementation review of the public cloud.", status:"missing",
+    note:"No third-party review attached — mandatory for higher-risk services handling customer data.",
+    trace:"17.1(c) applies MORE strictly here because the workload processes CUSTOMER INFORMATION — a conditional the graph carries.",
+    evidence:"No third-party review report in the submission. Note: §4 confirms customer data is processed, which makes this mandatory, not optional." },
+  { source:"Outsourcing 11.2", text:"Data confidentiality, integrity, sovereignty and recoverability measures addressed.", status:"met",
+    note:"Encryption and data-residency controls described.",
+    trace:"11.2 brings cloud services under the Outsourcing policy's data-risk requirements.",
+    evidence:"Found in submission §5 (Security): AES-256 at rest, data residency contractually pinned to approved regions, RPO/RTO stated." },
+];
+
+const styles = {
+  met:     { chip:"bg-emerald-100 text-emerald-700", icon:"✓", ring:"border-emerald-200" },
+  missing: { chip:"bg-red-100 text-red-700",         icon:"✕", ring:"border-red-200" },
+  unclear: { chip:"bg-amber-100 text-amber-700",     icon:"?", ring:"border-amber-200" },
+};
+const label = { met:"Met", missing:"Missing", unclear:"Unclear" };
+
+const box = document.getElementById("checklist");
+
+function renderChecklist() {
+  box.innerHTML = reqs.map((r, i) => `
+    <div class="bg-white rounded-xl shadow-sm border ${styles[r.status].ring} p-4">
+      <div class="flex items-start gap-3">
+        <span class="w-6 h-6 shrink-0 grid place-items-center rounded-full ${styles[r.status].chip} font-bold text-sm">${styles[r.status].icon}</span>
+        <div class="flex-1">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${styles[r.status].chip}">${label[r.status]}</span>
+            <span class="text-xs text-gray-400 font-medium">${r.source}</span>
+          </div>
+          <p class="text-sm text-gray-800 mt-1">${r.text}</p>
+          <p class="text-xs text-gray-500 mt-1">${r.note}</p>
+          <div class="flex items-center gap-3 mt-2">
+            <button class="trace-toggle text-xs text-indigo-600 hover:underline" data-i="${i}">Why is this required? ↴</button>
+            <button class="ev-toggle text-xs text-teal-600 hover:underline" data-ev="${i}">Show evidence ↴</button>
+          </div>
+          <div class="trace-panel hidden mt-2 bg-indigo-50 border border-indigo-100 rounded p-2 text-xs text-indigo-900" data-panel="${i}">
+            <span class="font-semibold">Traced via the rulebook graph:</span> ${r.trace}
+          </div>
+          <div class="ev-panel hidden mt-2 bg-gray-50 border border-gray-200 rounded p-2 text-xs text-gray-700" data-ev-panel="${i}">
+            <span class="font-semibold">Where the tool looked:</span> ${r.evidence}
+          </div>
+        </div>
+      </div>
+    </div>`).join("");
+
+  box.querySelectorAll(".trace-toggle").forEach(btn =>
+    btn.addEventListener("click", () => {
+      box.querySelector(`[data-panel="${btn.dataset.i}"]`).classList.toggle("hidden");
+    }));
+  box.querySelectorAll(".ev-toggle").forEach(btn =>
+    btn.addEventListener("click", () => {
+      box.querySelector(`[data-ev-panel="${btn.dataset.ev}"]`).classList.toggle("hidden");
+    }));
+
+  const met = reqs.filter(r => r.status === "met").length;
+  document.getElementById("score").textContent = met + " / " + reqs.length;
+  wireDecision();
+}
+
+// Supervisor decision: approve only if nothing outstanding; else return to bank with an auto letter.
+function wireDecision() {
+  const outstanding = reqs.filter(r => r.status !== "met");
+  const approveBtn = document.getElementById("approveBtn");
+  const canApprove = outstanding.length === 0;
+  if (canApprove) {
+    approveBtn.disabled = false;
+    approveBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium";
+    approveBtn.title = "";
+  }
+  // build the gap letter
+  document.getElementById("gapList").innerHTML = outstanding.map(r =>
+    `<li><span class="font-medium">${r.text}</span> <span class="text-gray-500">(${r.source} — currently ${r.status})</span></li>`).join("");
+
+  document.getElementById("returnBtn").addEventListener("click", () => {
+    document.getElementById("returnNote").classList.remove("hidden");
+    document.getElementById("returnNote").scrollIntoView({ behavior:"smooth", block:"nearest" });
+  });
+  document.getElementById("sendBtn").addEventListener("click", () => {
+    document.getElementById("sentMsg").classList.remove("hidden");
+    document.getElementById("sendBtn").disabled = true;
+    document.getElementById("sendBtn").className = "bg-gray-200 text-gray-400 px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed";
+    document.getElementById("returnBtn").disabled = true;
+    document.getElementById("returnBtn").className = "bg-gray-200 text-gray-400 px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed";
+  });
+}
+
+// Upload → analyse → reveal checklist. This is the supervisor's entry point:
+// upload the bank's application; the tool (already holding all policies + connections) does the rest.
+const analyseSteps = [
+  "Reading submission and extracting key facts…",
+  "Classifying: public cloud · critical system · material outsourcing",
+  "Matching against the rulebook graph (RMiT + Outsourcing + Cyber Risk)…",
+  "Assembling the applicable requirement set…",
+  "Checking each requirement against the submission…",
+];
+
+function startAnalysis() {
+  document.getElementById("dropzone").classList.add("hidden");
+  const analysing = document.getElementById("analysing");
+  analysing.classList.remove("hidden");
+  const stepsEl = document.getElementById("steps");
+  let i = 0;
+  function next() {
+    if (i < analyseSteps.length) {
+      const li = document.createElement("li");
+      li.className = "flex items-center gap-2";
+      li.innerHTML = `<span class="text-teal-600">⏳</span> <span>${analyseSteps[i]}</span>`;
+      stepsEl.appendChild(li);
+      // mark previous as done
+      if (i > 0) stepsEl.children[i-1].firstElementChild.textContent = "✓";
+      i++;
+      setTimeout(next, 650);
+    } else {
+      stepsEl.children[i-1].firstElementChild.textContent = "✓";
+      setTimeout(() => {
+        document.getElementById("uploadStage").classList.add("hidden");
+        document.getElementById("results").classList.remove("hidden");
+        renderChecklist();
+      }, 500);
+    }
+  }
+  next();
+}
+
+document.getElementById("uploadBtn").addEventListener("click", startAnalysis);
+document.getElementById("dropzone").addEventListener("click", (e) => {
+  if (e.target.id !== "uploadBtn") startAnalysis();
+});
+</script>
+</body>
+</html>

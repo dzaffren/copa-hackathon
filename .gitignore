@@ -1,0 +1,5 @@
+# Internal / confidential BNM reference documents — kept local, never published
+docs/references/
+
+# macOS
+.DS_Store
