@@ -1,6 +1,6 @@
 # Drafter Rulebook Workspace
 
-**Ticket:** TBD
+**Ticket:** [#7](https://github.com/dzaffren/copa-hackathon/issues/7)
 
 The drafter's home in Rulebook Radar: a single workspace that shows the whole
 technology-risk policy cluster as an interactive map, where what a drafter can

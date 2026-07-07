@@ -1,6 +1,6 @@
 # Supervisor Submission Completeness & Compliance Check
 
-**Ticket:** TBD
+**Ticket:** [#10](https://github.com/dzaffren/copa-hackathon/issues/10)
 
 A supervision officer uploads a bank's application (for example, a cloud
 outsourcing arrangement) and Rulebook Radar automatically assembles every

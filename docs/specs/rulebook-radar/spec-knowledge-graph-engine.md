@@ -1,6 +1,6 @@
 # Policy ingestion & rulebook knowledge-graph engine
 
-**Ticket:** TBD
+**Ticket:** [#6](https://github.com/dzaffren/copa-hackathon/issues/6)
 **Type:** Technical — Data pipeline / Infrastructure
 
 This is the foundational data layer for Rulebook Radar. It turns a cluster of

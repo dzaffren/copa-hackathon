@@ -1,6 +1,6 @@
 # Drafting Copilot with Live Write-Back
 
-**Ticket:** TBD
+**Ticket:** [#9](https://github.com/dzaffren/copa-hackathon/issues/9)
 
 A grounded drafting assistant that a policy drafter uses to understand and fix
 the consistency findings on their draft. It answers questions about the rulebook,
