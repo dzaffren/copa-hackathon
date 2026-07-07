@@ -60,8 +60,9 @@ Guidance:
 2. **Title** follows the Conventional Commit format.
 3. **Description** covers: what changed, why, and how to verify (for a POC page,
    which file to open).
-4. At least **one reviewer approval** before merge. On a solo hackathon push,
-   self-review the diff and confirm the confidentiality check below.
+4. **Self-review the diff** and confirm the pre-merge checklist below before
+   merging. Review approval is not required on `main`, so you can merge your own
+   PR — reviews are welcome but optional.
 5. Prefer **squash merge** to keep `main` history linear and readable.
 6. Delete the branch after merge.
 
