@@ -321,16 +321,18 @@ Stack choices are grounded in the discovery brief's validated dry-run:
   gibberish on BNM's custom-font PDFs, and that MarkItDown preserves clause
   numbers on both RMiT (~204 KB) and Outsourcing (~52 KB). Do **not** substitute
   a naive extractor.
-- **Connection-finding:** a chat model served via **Azure AI Foundry** (the
-  deployment name is configurable in `config.py` — a high-reasoning model for the
-  finder/critic task), run as a **two-agent finder + critic loop** with a
-  deterministic code verifier (see "Stage 4 is a two-agent loop"). ⚠️ **Re-validate
-  the no-hallucination assumption on the chosen Foundry model:** the brief's blind
-  test that independently found the RMiT 17 ↔ Outsourcing 12.1 conflict (verbatim)
-  was run on Claude, so it does not transfer automatically to a different model
-  family. The **citation guardrail protects correctness regardless of model** (code
-  verifies every citation), but finding-quality and **recall** must be re-checked on
-  the deployed model before the demo — a named build action, not an assumption.
+- **Connection-finding:** **Claude served via Azure AI Foundry** (resource
+  `aih-semantic-kernel-swc`, swedencentral) — deployment **`claude-opus-4-8`** for
+  the finder/critic (high reasoning + recall), run as a **two-agent finder + critic
+  loop** with a deterministic code verifier (see "Stage 4 is a two-agent loop").
+  Deployment names are configurable in `config.py`. Because the deployed model is
+  **Claude — the same family as the validated blind test** (which independently
+  found the RMiT 17 ↔ Outsourcing 12.1 conflict, verbatim) — the result transfers
+  directly; the earlier cross-family risk is retired. The **citation guardrail
+  protects correctness regardless of model** (code verifies every citation), and a
+  recall spot-check on `claude-opus-4-8` remains a light confidence step before the
+  demo (Opus 4-8 on Azure vs. whatever ran the blind test), not a re-validation from
+  scratch.
 - **Storage:** flat versioned JSON artifacts on disk — the corpus is 5–10
   documents, so a graph database is unwarranted. The graph is small enough to
   hold in memory.
@@ -896,13 +898,31 @@ including reading the frozen mock) is **always offline/pre-baked** — the demo
 serves finished artifacts. Only **stage 4 / the ripple check** runs live against
 the model, with the recorded `connection-trace-*.json` as the mandatory backstop.
 
-**Model access & config.** `config.py` reads the Azure AI Foundry **endpoint URL**,
-**API key**, and **deployment name** from env vars (never committed); the model is
-provider-configurable so the deployment can change without code edits. The parser
-(stage 2) and finder/critic (stage 4) call the model **at build time**; `build.py`
-therefore needs Foundry access, but the served **read API needs no model access**
-(it serves pre-built artifacts). Tests stub the model (recorded responses), so CI
-runs without any credentials.
+**Model access & config.** `config.py` reads the Azure AI Foundry **endpoint URL**
+and **API key** from env vars (never committed), plus two configurable **deployment
+names**: one for the parser (stage 2) and one for the finder/critic (stage 4). The
+confirmed deployments on resource `aih-semantic-kernel-swc` (swedencentral) are:
+
+| Stage           | Deployment        | Model           | Why                                  |
+| --------------- | ----------------- | --------------- | ------------------------------------ |
+| 2 parser        | `claude-sonnet-5` | Claude Sonnet 5 | Mechanical boundary-finding; cheaper |
+| 4 finder/critic | `claude-opus-4-8` | Claude Opus 4-8 | Hard cross-policy reasoning + recall |
+
+Both are called with the `azure-ai-inference` SDK (models are `format: Anthropic`).
+They run **at build time only**; `build.py` needs Foundry access, but the served
+**read API needs no model access** (it serves pre-built artifacts). Tests stub the
+model (recorded responses), so CI runs without any credentials.
+
+> **Deployment gotcha (Anthropic-on-Azure).** Creating a Claude deployment requires
+> a `modelProviderData` block (`organizationName`, `countryCode`, `industry`) — the
+> deployment fails server-side with `AnthropicOrganizationCreationFailed` if it is
+> missing **or malformed**. `industry` must be a **lowercase enum** value
+> (`finance`, not "Financial Services"); a free-text value is accepted by the schema
+> but fails during org creation. Confirmed values: `organizationName: "Bank Negara
+Malaysia"`, `countryCode: "MY"`, `industry: "finance"`. Deploy via the
+> `2025-10-01-preview`+ API (older versions don't expose `modelProviderData`); the
+> [`Azure-Samples/claude`](https://github.com/Azure-Samples/claude) azd/Terraform
+> template is the reference.
 
 **Determinism of the frozen contract.** Because #7–#11 freeze against the artifact
 shapes, the build must be **stably ordered**: clause-index keys and each `children`
@@ -1572,15 +1592,17 @@ framework. User-facing flows are covered by the consuming stories (#7–#11)._
       version by bare number (in-progress > in-force > superseded), older versions
       via `?version=`. Build invariant: exactly one active entry per clause number.
 - [x] ~~Which model, where do its credentials live, and does the demo need it
-      live?~~ — **Resolved:** a chat model served via **Azure AI Foundry**
-      (deployment name + endpoint + key from env), used **at build time only**
-      (parser + finder/critic); the served read API needs no model access; tests
-      stub the model so CI needs no credentials. Only stage 4 / the ripple check
-      calls the model live during the demo.
-- [ ] **Re-validate the no-hallucination result on the Foundry model.** The blind
-      test was on Claude; the citation guardrail keeps correctness safe on any
-      model, but finding-quality/recall must be re-checked on the deployed Foundry
-      model before the demo. **Non-blocking for build; blocking for the pitch claim.**
+      live?~~ — **Resolved:** **Claude on Azure AI Foundry** (resource
+      `aih-semantic-kernel-swc`, swedencentral) — `claude-opus-4-8` (finder/critic)
+      and `claude-sonnet-5` (parser), both deployed; endpoint + key + the two
+      deployment names from env. Used **at build time only**; the read API needs no
+      model access; tests stub the model so CI needs no credentials. Only stage 4 /
+      the ripple check calls the model live during the demo.
+- [ ] **Recall spot-check on `claude-opus-4-8`.** The blind test was on Claude and
+      the deployed model is Claude (same family), so the result transfers — this is
+      a light confidence check (Opus 4-8 on Azure), not a from-scratch
+      re-validation. The citation guardrail keeps correctness safe regardless.
+      **Non-blocking for build; do before leaning on the recall pitch claim.**
 - [x] ~~Exact final cluster (which policies)?~~ — **Resolved:** 6 real published
       docs — RMiT, Outsourcing, Business Continuity Management, Operational
       Resilience, Recovery Planning, Management of Customer Information — + AML/CFT
