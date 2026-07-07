@@ -247,6 +247,48 @@ per-story choices:
 - **Single cluster (MVP1).** All stories operate on one technology-risk cluster;
   cross-cluster reach is a single labelled preview node (#7), not built.
 
+## Tech stack (engine, #6)
+
+The engine (#6) is the only story with a fixed technical stack today. Consuming
+stories (#7–#11) add a UI layer TBD when refined. **Not yet installed** — `/build`
+creates the `engine/` package; the stack below is the target.
+
+**Language & tooling**
+
+- **Python 3.11+**, dependency-managed with **uv** (`pyproject.toml` + `uv.lock`).
+
+**Core libraries**
+
+| Library                    | Role                                                                               |
+| -------------------------- | ---------------------------------------------------------------------------------- |
+| **MarkItDown** (Microsoft) | PDF/DOCX → clean markdown (validated ingestion; naive extraction garbles BNM PDFs) |
+| **azure-ai-inference**     | Azure AI Foundry SDK — calls Claude for clause parsing + finder/critic             |
+| **FastAPI** + **uvicorn**  | Read API over the built artifacts                                                  |
+| **pytest**                 | Test suite (model stubbed; no credentials in CI)                                   |
+
+**Models — Azure AI Foundry** (`aih-semantic-kernel-swc`, swedencentral; Anthropic format, build-time only)
+
+| Stage             | Deployment        | Model           |
+| ----------------- | ----------------- | --------------- |
+| 2 · clause parser | `claude-sonnet-5` | Claude Sonnet 5 |
+| 4 · finder/critic | `claude-opus-4-8` | Claude Opus 4-8 |
+
+`text-embedding-3-large` is deployed but reserved for the future RAG extension (not MVP1).
+
+**Storage — no database.** Flat JSON artifacts (`clause-index.json`, `graph.json`,
+`connection-trace-*.json`); in-memory graph, optionally `networkx` for traversal if
+a consumer needs it. No Neo4j, no vector DB.
+
+**Config/secrets (env, build-time only).** Foundry endpoint URL + API key + the two
+deployment names; `modelProviderData` (org "Bank Negara Malaysia", country `MY`,
+industry `finance`). The served read API and CI need no model access.
+
+**Deliberately not in scope:** UI/frontend (#7/#10), graph database, vector store,
+live-service infra — the build is offline; only the #8 ripple check calls the model live.
+
+Full rationale and the deployment gotcha (lowercase `industry` enum) are in the
+engine spec's "Model access & config" and "Storage choice" sections.
+
 ## Where the detail lives
 
 - **Engine components, pipeline, data model, API, guardrail, and submission
