@@ -73,6 +73,45 @@ Guidance:
 - [ ] Specs stay internally consistent (personas, clause citations, story index).
 - [ ] Commit messages follow Conventional Commits.
 
+## Issue tracking
+
+We use **GitHub Issues + a Project board** as the tracker (no Jira). Everything
+lives in this repo.
+
+- **Milestone:** `Rulebook Radar MVP1 (Hackathon 3 Aug 2026)` — the delivery deadline.
+- **Epic issue [#5](https://github.com/dzaffren/copa-hackathon/issues/5)** — the
+  high-level checklist linking every story.
+- **Story issues [#6–#11]** — one per story spec in `docs/specs/rulebook-radar/`.
+  Each spec's `**Ticket:**` field links to its issue, and the epic
+  [Story Index](docs/specs/rulebook-radar/spec.md) lists them with dependencies.
+- **Project board:** _Rulebook Radar MVP1_ — a Todo / In Progress / Done view of
+  those issues (Projects tab → open the board).
+
+| Issue | Story                                                 | Build order / depends on |
+| ----- | ----------------------------------------------------- | ------------------------ |
+| #6    | Policy ingestion & knowledge-graph engine (technical) | build first — no deps    |
+| #7    | Drafter rulebook workspace                            | #6                       |
+| #8    | Consistency ripple check & impact report              | #6, #7                   |
+| #9    | Drafting copilot with live write-back                 | #6, #8                   |
+| #10   | Supervisor submission completeness & compliance check | #6 (parallel)            |
+| #11   | Reviewer & approval workflow                          | #7, #8                   |
+
+**How the tracking stays current automatically:**
+
+- Put `Closes #6` (or `Fixes #6`) in a PR description. Merging the PR **closes the
+  issue**, **ticks the epic checklist**, and the board's default workflows **move
+  the card to Done** — no manual dragging.
+- Move a card to **In Progress** when you start it; the board reflects live status.
+
+**Working an issue:**
+
+```bash
+gh issue list                 # see open tickets
+gh issue view 6               # read a ticket (links to its spec)
+git switch -c feat/graph-engine   # branch named for the work
+# ... commit, push, then in the PR body: "Closes #6"
+```
+
 ## Repository areas
 
 | Path               | What it holds                                           |

@@ -17,6 +17,19 @@ Full guideline: [`CONTRIBUTING.md`](CONTRIBUTING.md). Enforceable rules:
 - Prefer **squash merge**; delete the branch after merge.
 - **Only commit or push when the user explicitly asks.**
 
+## Issue tracking
+
+Tracker is **GitHub Issues + a Project board** (no Jira). Use the `gh` CLI.
+
+- Epic **#5** = high-level checklist. Stories **#6–#11**, one per spec in
+  `docs/specs/rulebook-radar/`; each spec's `**Ticket:**` field links to its issue.
+- Milestone: `Rulebook Radar MVP1 (Hackathon 3 Aug 2026)`.
+- Build order / deps: #6 engine (first) → #7 workspace (#6) → #8 ripple (#6,#7)
+  → #9 copilot (#6,#8); #10 supervisor (#6, parallel); #11 reviewer (#7,#8).
+- Read a ticket before working it: `gh issue view <n>` (links to its spec).
+- **Put `Closes #<n>` in the PR body** — merging auto-closes the issue, ticks the
+  epic checklist, and moves the board card to Done. Don't hand-edit issue state.
+
 ## Confidentiality (hard rule)
 
 This repo is **public**. `docs/references/` holds internal BNM documents and is
