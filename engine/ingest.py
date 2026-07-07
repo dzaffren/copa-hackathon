@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Union
 
 from markitdown import MarkItDown
+from markitdown._exceptions import MarkItDownException
 
 
 class UnreadableDocumentError(Exception):
@@ -21,10 +22,18 @@ def ingest_document(file_path: Union[str, Path]) -> str:
 
     Raises:
         UnreadableDocumentError: if conversion yields empty or
-            whitespace-only output.
+            whitespace-only output, or if the file cannot be converted
+            at all (e.g. corrupt/unrecognisable input).
     """
     converter = MarkItDown()
-    result = converter.convert(str(file_path))
+
+    try:
+        result = converter.convert(str(file_path))
+    except MarkItDownException as exc:
+        raise UnreadableDocumentError(
+            f"Conversion of '{file_path}' failed: {exc}"
+        ) from exc
+
     text = result.text_content
 
     if text is None or text.strip() == "":

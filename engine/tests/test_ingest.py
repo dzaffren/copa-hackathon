@@ -43,3 +43,14 @@ def test_ingest_rmit_pdf_produces_clean_readable_text_not_garbled():
     # Clause numbers survive conversion.
     assert "17.1" in text
     assert "17.2" in text
+
+
+def test_ingest_raises_unreadable_document_error_on_corrupt_input(tmp_path):
+    """A corrupt/unreadable file (random bytes with a .pdf extension) must
+    raise UnreadableDocumentError rather than return garbled or empty text.
+    This is the fixture Test 11 (submission rejection) relies on."""
+    corrupt_pdf = tmp_path / "corrupt.pdf"
+    corrupt_pdf.write_bytes(b"\x00\x01\x02not a real pdf\xff\xfe")
+
+    with pytest.raises(UnreadableDocumentError):
+        ingest_document(corrupt_pdf)
