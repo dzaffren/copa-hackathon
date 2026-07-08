@@ -195,3 +195,13 @@ def test_option_c_parent_stem_excludes_child_text_and_children_link_correctly():
 
     # Sub-item text is never duplicated inside the parent's stem-only text.
     assert child_b["text"] not in parent["text"]
+
+
+def test_full_text_composes_stem_and_children_as_a_contiguous_source_span():
+    entries, index = _build_rmit_nested_index()
+
+    full_text = index.full_text("RMiT 17.1")
+    stem = index.get("RMiT 17.1")["text"]
+
+    assert full_text.startswith(stem)
+    assert full_text in RMIT_NESTED_MARKDOWN

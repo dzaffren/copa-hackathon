@@ -163,6 +163,8 @@ def build_clause_index(
 
     entries: dict[str, ClauseEntry] = {}
     children_by_parent: dict[str, list[str]] = {}
+    raw_start_by_clause: dict[str, int] = {}
+    raw_end_by_clause: dict[str, int] = {}
 
     for i, anchor in enumerate(anchors):
         start = positions[i]
@@ -186,12 +188,24 @@ def build_clause_index(
             "children": [],
             "superseded_versions": [],
         }
+        raw_start_by_clause[clause_number] = start
+        raw_end_by_clause[clause_number] = raw_end
 
         if parent:
             children_by_parent.setdefault(parent, []).append(clause_number)
 
     for parent, children in children_by_parent.items():
         entries[parent]["children"] = children
+        # Composed view (Option C): the contiguous source span covering the
+        # parent's stem plus all its children, in document order — a real
+        # substring of `markdown` (including the children's numbering
+        # labels/whitespace that individual `text` fields exclude).
+        # Assembled once here from the anchor positions, not stored as part
+        # of the public clause-index contract (private key, leading `_`).
+        last_child = children[-1]
+        span_start = raw_start_by_clause[parent]
+        span_end = raw_end_by_clause[last_child]
+        entries[parent]["_full_text"] = markdown[span_start:span_end]
 
     if expected_clauses:
         missing = expected_clauses - set(entries.keys())
@@ -249,6 +263,24 @@ class ClauseIndex:
                 f"No version '{version}' for clause '{clause_number}'"
             )
         return versions_for_clause[version]
+
+    def full_text(self, clause_number: str, version: Optional[str] = None) -> Optional[str]:
+        """Composed view for a parent clause: stem text + all children's text,
+        concatenated in document order (assembled on demand, not stored).
+
+        This is a contiguous substring of the source markdown (it includes
+        the children's numbering labels/whitespace, unlike each child's own
+        `text`) and starts with the stem. For a leaf/sub-item (no children)
+        this is identical to its own `text`. Returns `None` if
+        `clause_number` is unknown.
+        """
+        entry = self.get(clause_number, version=version)
+        if entry is None:
+            return None
+
+        if not entry["children"]:
+            return entry["text"]
+        return entry["_full_text"]
 
 
 class ClauseVersionNotFoundError(Exception):
