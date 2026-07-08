@@ -34,6 +34,7 @@ engine emits raw clause-anchored connections only.
 """
 
 import json
+import logging
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Optional, TypedDict
@@ -41,6 +42,8 @@ from typing import Callable, Optional, TypedDict
 from engine.clauses import ClauseIndex
 from engine.config import FINDER_CRITIC_DEPLOYMENT
 from engine.llm import LLMResponseError, call_chat, parse_json_response
+
+logger = logging.getLogger(__name__)
 
 
 class ClauseCitation(TypedDict):
@@ -361,8 +364,7 @@ def _finder_turn(
     is the network seam — real callers use it; tests inject ``finder_fn``.
     """
     context = _format_clause_context(clause_index, doc_a_id, doc_b_id)
-    raw = call_chat(FINDER_CRITIC_DEPLOYMENT, FINDER_SYSTEM_PROMPT, context)
-    return _parse_candidate_list(raw)
+    return _call_candidates_with_retry(FINDER_SYSTEM_PROMPT, context)
 
 
 def _critic_turn(
@@ -384,5 +386,32 @@ def _critic_turn(
         f"{context}\n\n"
         f"Finder candidate connections (JSON):\n{json.dumps(candidates)}"
     )
-    raw = call_chat(FINDER_CRITIC_DEPLOYMENT, CRITIC_SYSTEM_PROMPT, user)
-    return _parse_candidate_list(raw)
+    return _call_candidates_with_retry(CRITIC_SYSTEM_PROMPT, user)
+
+
+def _call_candidates_with_retry(
+    system: str, user: str, attempts: int = 3
+) -> list[dict]:
+    """Call the finder/critic LLM and parse candidates, retrying on non-JSON.
+
+    Claude occasionally returns prose instead of the requested JSON array; the
+    failure is sporadic, so a re-ask usually succeeds. Call up to ``attempts``
+    times, returning the first reply `_parse_candidate_list` accepts, else
+    re-raise the last `LLMResponseError` so the run fails loudly rather than
+    silently losing connections.
+    """
+    last_error: LLMResponseError | None = None
+    for attempt in range(1, attempts + 1):
+        raw = call_chat(FINDER_CRITIC_DEPLOYMENT, system, user)
+        try:
+            return _parse_candidate_list(raw)
+        except LLMResponseError as exc:
+            last_error = exc
+            logger.warning(
+                "finder/critic returned non-JSON (attempt %d/%d): %s",
+                attempt,
+                attempts,
+                exc,
+            )
+    assert last_error is not None
+    raise last_error

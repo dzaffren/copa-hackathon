@@ -473,32 +473,84 @@ def _strip_noise(markdown: str) -> str:
     return "\n".join(kept)
 
 
+# A line that begins a new top-level clause or section — the boundaries a chunk
+# is allowed to START on, so a chunk never opens mid-clause (a headless fragment
+# confuses the parser LLM into echoing text instead of emitting JSON). Matches a
+# decimal clause number ("12.1", "10.50"), a section heading ("12 Approval…"),
+# or an appendix ("Appendix 4"). Sub-item labels ("(a)", "(f)") are deliberately
+# NOT boundaries — they stay inside their parent clause. The decimal-clause form
+# is the reliable signal (the demo corpus's N.M numbering is in-order and
+# ungarbled); heading/appendix forms are a bonus. Anchored per-line (MULTILINE).
+_CLAUSE_START_RE = re.compile(
+    r"^(?:\d+\.\d+\b|\d+\s+[A-Z]|Appendix\s+\d+\b)",
+    re.MULTILINE,
+)
+
+
 def _split_chunks(markdown: str, max_chars: int = _MAX_CHUNK_CHARS) -> list[str]:
-    """Split a document into size-bounded chunks for per-call LLM parsing.
+    """Split a document into clause-aware, size-bounded chunks for per-call LLM
+    parsing.
 
-    Strips page/TOC noise (`_strip_noise`), then accumulates blank-line-
-    separated paragraphs into chunks of at most ``max_chars`` characters,
-    breaking only at paragraph boundaries (never mid-line, so a clause is never
-    split across two calls). Size-based chunking bounds each parser LLM call's
-    output without depending on heading detection, which varies too much across
-    the real BNM documents to be reliable. Pure and network-free.
+    Strips page/TOC noise (`_strip_noise`), then cuts the body at **top-level
+    clause boundaries** (`_CLAUSE_START_RE`) so every chunk BEGINS at a real
+    clause or heading — never mid-clause. Consecutive clause blocks are packed
+    together up to ``max_chars``; a single clause larger than ``max_chars``
+    becomes its own chunk (a clause is never split across calls). This fixes the
+    headless-fragment failure that size-only chunking caused, where a chunk
+    starting in the middle of a clause made the parser LLM echo source text
+    instead of returning JSON. Pure and network-free.
 
-    Returns the non-empty chunks in document order (an all-noise document
-    yields an empty list).
+    Falls back to paragraph packing when the document has no detectable clause
+    boundaries (so a prose-only document still yields chunks). Returns the
+    non-empty chunks in document order (an all-noise document yields an empty
+    list).
     """
     body = _strip_noise(markdown).strip()
     if not body:
         return []
 
-    paragraphs = re.split(r"\n\s*\n", body)
+    boundaries = [m.start() for m in _CLAUSE_START_RE.finditer(body)]
+    if not boundaries:
+        return _split_paragraphs(body, max_chars)
+
+    # Blocks = spans between consecutive clause boundaries. Any preamble before
+    # the first boundary is kept as a leading block (the parser returns [] for a
+    # clause-less block, which is tolerated).
+    starts = ([0] + boundaries) if boundaries[0] != 0 else boundaries
+    blocks: list[str] = []
+    for i, start in enumerate(starts):
+        end = starts[i + 1] if i + 1 < len(starts) else len(body)
+        block = body[start:end].strip()
+        if block:
+            blocks.append(block)
+
+    # Pack whole clause blocks up to max_chars; never split a block.
     chunks: list[str] = []
     current: list[str] = []
     current_len = 0
-    for paragraph in paragraphs:
+    for block in blocks:
+        addition = len(block) + 2  # +2 for the "\n\n" re-join separator
+        if current and current_len + addition > max_chars:
+            chunks.append("\n\n".join(current))
+            current = []
+            current_len = 0
+        current.append(block)
+        current_len += addition
+    if current:
+        chunks.append("\n\n".join(current))
+    return chunks
+
+
+def _split_paragraphs(body: str, max_chars: int) -> list[str]:
+    """Fallback size-based packing on blank-line-separated paragraphs, for a
+    document with no detectable clause boundaries. Never splits mid-line."""
+    chunks: list[str] = []
+    current: list[str] = []
+    current_len = 0
+    for paragraph in re.split(r"\n\s*\n", body):
         paragraph = paragraph.strip()
         if not paragraph:
             continue
-        # +2 for the "\n\n" re-join separator.
         addition = len(paragraph) + 2
         if current and current_len + addition > max_chars:
             chunks.append("\n\n".join(current))
@@ -565,8 +617,38 @@ def find_clause_anchors(markdown: str, document_id: str) -> list[dict]:
     anchors: list[dict] = []
     for i, chunk in enumerate(chunks, start=1):
         logger.info("  [%s] parsing chunk %d/%d", document_id, i, len(chunks))
-        raw = call_chat(PARSER_DEPLOYMENT, PARSER_SYSTEM_PROMPT, chunk)
-        found = _parse_anchor_response(raw)
+        found = _parse_chunk_with_retry(chunk, document_id, i)
         anchors.extend(found)
         logger.info("  [%s] chunk %d → %d clauses", document_id, i, len(found))
     return anchors
+
+
+def _parse_chunk_with_retry(
+    chunk: str, document_id: str, chunk_index: int, attempts: int = 3
+) -> list[dict]:
+    """Call the parser LLM for one chunk, retrying on a non-JSON reply.
+
+    Claude occasionally echoes source text instead of emitting JSON (a
+    sporadic failure, most often on a confusing chunk). Since it's
+    non-deterministic, a re-ask usually succeeds — so call up to ``attempts``
+    times, returning the first reply `_parse_anchor_response` accepts. If every
+    attempt fails, re-raise the last `LLMResponseError` so the build fails
+    loudly (a dropped chunk would mean silently missing clauses).
+    """
+    last_error: LLMResponseError | None = None
+    for attempt in range(1, attempts + 1):
+        raw = call_chat(PARSER_DEPLOYMENT, PARSER_SYSTEM_PROMPT, chunk)
+        try:
+            return _parse_anchor_response(raw)
+        except LLMResponseError as exc:
+            last_error = exc
+            logger.warning(
+                "  [%s] chunk %d returned non-JSON (attempt %d/%d): %s",
+                document_id,
+                chunk_index,
+                attempt,
+                attempts,
+                exc,
+            )
+    assert last_error is not None
+    raise last_error

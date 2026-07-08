@@ -18,6 +18,7 @@ from engine.clauses import (
     ClauseIndex,
     ClausePrimaryIndexCollisionError,
     ClauseVersionNotFoundError,
+    _CLAUSE_START_RE,
     _parse_anchor_response,
     _split_chunks,
     _strip_noise,
@@ -541,6 +542,52 @@ def test_split_chunks_on_all_noise_returns_empty():
     assert _split_chunks(all_noise) == []
 
 
+# Clause-aware chunking: a chunk must never START in the middle of a clause
+# (a headless fragment made the parser LLM echo source text instead of JSON).
+# This fixture packs several clauses, each with sub-items, past a small budget.
+CLAUSE_BODY_MARKDOWN = (
+    "10.1  A financial institution must do the first thing.\n\n"
+    "10.2  A financial institution must do the second thing, having first:\n"
+    "(a)  completed step a;\n"
+    "(b)  completed step b; and\n"
+    "(c)  completed step c.\n\n"
+    "10.3  A financial institution must do the third thing.\n\n"
+    "11.1  Cloud services require notification.\n"
+)
+
+
+def test_split_chunks_every_chunk_starts_at_a_clause_boundary():
+    # Small budget forces multiple chunks; each must begin at an N.M clause.
+    chunks = _split_chunks(CLAUSE_BODY_MARKDOWN, max_chars=120)
+
+    assert len(chunks) > 1
+    for chunk in chunks:
+        assert _CLAUSE_START_RE.match(chunk), (
+            f"chunk starts mid-clause: {chunk[:50]!r}"
+        )
+
+
+def test_split_chunks_never_splits_a_clause_across_chunks():
+    chunks = _split_chunks(CLAUSE_BODY_MARKDOWN, max_chars=120)
+
+    # Clause 10.2's sub-items (a)(b)(c) must all live in the same chunk as 10.2.
+    chunk_with_102 = next(c for c in chunks if "10.2" in c)
+    assert "(a)  completed step a" in chunk_with_102
+    assert "(b)  completed step b" in chunk_with_102
+    assert "(c)  completed step c" in chunk_with_102
+
+
+def test_split_chunks_falls_back_to_paragraphs_without_clause_numbers():
+    # Prose with no clause numbers → paragraph packing still yields chunks.
+    prose = "\n\n".join(f"Paragraph number {i} of some prose." for i in range(1, 40))
+    chunks = _split_chunks(prose, max_chars=200)
+
+    assert len(chunks) > 1
+    rejoined = "\n\n".join(chunks)
+    assert "Paragraph number 1 of some prose." in rejoined
+    assert "Paragraph number 39 of some prose." in rejoined
+
+
 VALID_ANCHOR_JSON = """[
   {"clause_number": "12.1",
    "starts_with": "A financial institution must obtain the Bank's written approval",
@@ -639,6 +686,54 @@ def test_find_clause_anchors_calls_per_chunk_and_merges_in_order(
         set(a.keys()) == {"clause_number", "starts_with", "heading", "parent"}
         for a in anchors
     )
+
+
+def test_find_clause_anchors_retries_on_non_json_then_succeeds(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """A sporadic prose reply is retried; the second attempt's JSON is used,
+    so one flaky chunk does not kill the build."""
+    import engine.clauses as clauses
+
+    attempts: list[int] = [0]
+
+    def flaky_call_chat(deployment: str, system: str, user: str) -> str:
+        attempts[0] += 1
+        if attempts[0] == 1:
+            # First reply: the model echoes source prose instead of JSON.
+            return "necessary to perform the obligations under the agreement;"
+        return (
+            '[{"clause_number": "12.1", "starts_with": "A financial '
+            'institution must obtain the Bank\'s written approval", '
+            '"heading": "12", "parent": null}]'
+        )
+
+    monkeypatch.setattr(clauses, "call_chat", flaky_call_chat)
+
+    single_chunk = (
+        "12.1 A financial institution must obtain the Bank's written approval.\n"
+    )
+    anchors = find_clause_anchors(single_chunk, "outsourcing-v1-2019")
+
+    assert attempts[0] == 2  # retried once
+    assert [a["clause_number"] for a in anchors] == ["12.1"]
+
+
+def test_find_clause_anchors_raises_after_exhausting_retries(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """If every attempt returns non-JSON, the build fails loudly rather than
+    silently dropping the chunk (a dropped chunk = missing clauses)."""
+    import engine.clauses as clauses
+
+    monkeypatch.setattr(
+        clauses, "call_chat", lambda deployment, system, user: "still not json"
+    )
+
+    with pytest.raises(LLMResponseError):
+        find_clause_anchors("12.1 Some clause text.\n", "outsourcing-v1-2019")
+
+
 def test_entries_for_document_returns_that_documents_clauses_in_order():
     rmit_entries = build_clause_index(
         anchors=RMIT_NESTED_ANCHORS,
