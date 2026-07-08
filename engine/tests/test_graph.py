@@ -189,6 +189,32 @@ CURATED_EDGES = [
 ]
 
 
+def test_curated_edge_has_reason_clause_anchors_and_resolves_in_index():
+    clause_index = _build_fixture_clause_index()
+
+    graph = build_graph(
+        documents=DOCUMENTS,
+        curated_edges=CURATED_EDGES,
+        clause_index=clause_index,
+        draft_registry=DRAFT_REGISTRY,
+    )
+
+    non_lineage = [e for e in graph["edges"] if e["type"] != "version-lineage"]
+    assert len(non_lineage) == 1
+    edge = non_lineage[0]
+
+    assert edge["source"] == "rmit-v2-2026-draft"
+    assert edge["target"] == "opres-v1-2025"
+    assert edge["reason"]
+    assert len(edge["source_clauses"]) >= 1
+    assert len(edge["target_clauses"]) >= 1
+    for clause_number in edge["source_clauses"] + edge["target_clauses"]:
+        assert clause_index.get(clause_number) is not None
+    assert edge["provenance"] in {"structural", "curated", "llm-found"}
+    assert 0.0 <= edge["confidence"] <= 1.0
+    assert edge["confidence"] == 1.0
+
+
 def _node(graph: dict, document_id: str) -> dict:
     matches = [n for n in graph["nodes"] if n["id"] == document_id]
     assert matches, f"no node with id '{document_id}' in graph"

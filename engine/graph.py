@@ -112,6 +112,77 @@ def _build_version_lineage_edges(
     return edges
 
 
+_VALID_PROVENANCE = {"structural", "curated", "llm-found"}
+
+
+def _validate_non_lineage_edge(edge: dict, clause_index) -> None:
+    reason = edge.get("reason")
+    if not reason:
+        raise GraphBuildError(
+            f"Edge {edge.get('source')} -> {edge.get('target')} "
+            f"(type={edge.get('type')}) has no reason"
+        )
+
+    for side in ("source_clauses", "target_clauses"):
+        clauses = edge.get(side) or []
+        if not clauses:
+            raise GraphBuildError(
+                f"Edge {edge.get('source')} -> {edge.get('target')} "
+                f"(type={edge.get('type')}) has no {side}"
+            )
+        for clause_number in clauses:
+            if clause_index.get(clause_number) is None:
+                raise GraphBuildError(
+                    f"Edge {edge.get('source')} -> {edge.get('target')} "
+                    f"(type={edge.get('type')}) cites clause "
+                    f"'{clause_number}' which does not resolve in the "
+                    f"clause index"
+                )
+
+    provenance = edge.get("provenance")
+    if provenance not in _VALID_PROVENANCE:
+        raise GraphBuildError(
+            f"Edge {edge.get('source')} -> {edge.get('target')} has invalid "
+            f"provenance '{provenance}' (must be one of {_VALID_PROVENANCE})"
+        )
+
+    confidence = edge.get("confidence")
+    if confidence is None or not (0.0 <= confidence <= 1.0):
+        raise GraphBuildError(
+            f"Edge {edge.get('source')} -> {edge.get('target')} has invalid "
+            f"confidence '{confidence}' (must be in [0.0, 1.0])"
+        )
+    if provenance in ("structural", "curated") and confidence != 1.0:
+        raise GraphBuildError(
+            f"Edge {edge.get('source')} -> {edge.get('target')} has "
+            f"provenance '{provenance}' but confidence {confidence} != 1.0"
+        )
+
+
+def _build_curated_edges(
+    curated_edges: list[dict],
+    ids_by_policy: dict[str, list[str]],
+    clause_index,
+) -> list[GraphEdge]:
+    edges: list[GraphEdge] = []
+    for curated in curated_edges:
+        source_id = _current_document_id(ids_by_policy[curated["source_policy_id"]])
+        target_id = _current_document_id(ids_by_policy[curated["target_policy_id"]])
+        edge: GraphEdge = {
+            "source": source_id,
+            "target": target_id,
+            "type": curated["type"],
+            "reason": curated["reason"],
+            "source_clauses": curated["source_clauses"],
+            "target_clauses": curated["target_clauses"],
+            "provenance": curated["provenance"],
+            "confidence": curated["confidence"],
+        }
+        _validate_non_lineage_edge(edge, clause_index)
+        edges.append(edge)
+    return edges
+
+
 def build_graph(
     documents: dict,
     curated_edges: list[dict],
@@ -123,5 +194,6 @@ def build_graph(
     ids_by_policy = _ordered_document_ids_by_policy(documents)
     nodes = _build_nodes(documents, ids_by_policy, draft_registry)
     edges = _build_version_lineage_edges(ids_by_policy)
+    edges.extend(_build_curated_edges(curated_edges, ids_by_policy, clause_index))
 
     return {"nodes": nodes, "edges": edges}
