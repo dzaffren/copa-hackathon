@@ -419,6 +419,57 @@ def test_recurring_phrase_disambiguated_by_clause_label():
     assert "retains effective control" in entry["text"]
 
 
+def test_multi_level_nested_clause_disambiguated_by_deepest_label():
+    # A phrase appears under 9.6(b) and again under the deeper 9.6(c)(i). The
+    # in-text label for 9.6(c)(i) is its DEEPEST group "(i)", not "(c)(i)" — so
+    # disambiguation must match "(i)" to resolve the triple-nested clause.
+    markdown = (
+        "9.6  The agreement must address:\n"
+        "(b)  responsibilities of the service provider, with defined roles; and\n"
+        "(c)  conflict of interest issues, including:\n"
+        "(i)  responsibilities of the service provider with respect to disclosure.\n"
+    )
+    anchors = [
+        {
+            "clause_number": "9.6",
+            "starts_with": "The agreement must address",
+            "heading": None,
+            "parent": None,
+        },
+        {
+            "clause_number": "9.6(b)",
+            "starts_with": "responsibilities of the service provider, with defined roles",
+            "heading": None,
+            "parent": "9.6",
+        },
+        {
+            "clause_number": "9.6(c)",
+            "starts_with": "conflict of interest issues, including",
+            "heading": None,
+            "parent": "9.6",
+        },
+        {
+            "clause_number": "9.6(c)(i)",
+            "starts_with": "responsibilities of the service provider with respect to disclosure",
+            "heading": None,
+            "parent": "9.6(c)",
+        },
+    ]
+
+    entries = build_clause_index(
+        anchors=anchors,
+        markdown=markdown,
+        document_id="outsourcing-v1-2019",
+        policy_id="outsourcing",
+        source="published",
+    )
+
+    entry = entries["Outsourcing 9.6(c)(i)"]
+    assert entry["text"].startswith(
+        "responsibilities of the service provider with respect to disclosure"
+    )
+
+
 def test_completeness_check_raises_when_an_expected_clause_is_missing():
     anchors_missing_12_2 = [
         {

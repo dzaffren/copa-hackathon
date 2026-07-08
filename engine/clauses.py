@@ -101,14 +101,19 @@ def _in_text_label(bare_number: str) -> str:
     `starts_with` anchors are pure content (no leading label — see the
     module docstring), so the raw span between two anchors includes the
     *next* clause's label bleeding onto the end of the *current* clause's
-    text (e.g. "...arrangement.\\n\\n12.2 "). This is what gets trimmed off.
-    For nested sub-items (bare number "17.1(a)") the visible label is only
-    the parenthetical part ("(a)"); for a top-level number ("17.2",
-    "10.50") or a non-numeric clause ("Appendix 10") it's the literal
-    string itself.
+    text (e.g. "...arrangement.\\n\\n12.2 "). This is what gets trimmed off,
+    and the label is also used to disambiguate a recurring anchor phrase.
+
+    The visible label is the clause's **deepest** parenthetical group — the one
+    that actually appears immediately before its text in the source. For a
+    single-level sub-item ("17.1(a)") that is "(a)"; for a multi-level nesting
+    ("9.6(c)(i)") it is only the last group "(i)", NOT "(c)(i)". A top-level
+    number ("17.2", "10.50") or non-numeric clause ("Appendix 10") has no
+    parenthetical part, so the label is the literal string itself.
     """
-    if "(" in bare_number and bare_number.endswith(")"):
-        return "(" + bare_number.split("(", 1)[1]
+    groups = re.findall(r"\([^()]*\)", bare_number)
+    if groups:
+        return groups[-1]
     return bare_number
 
 
