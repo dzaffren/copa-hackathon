@@ -16,13 +16,11 @@ Failure modes (unfound/ambiguous anchor, incomplete clause set) are loud
 exceptions raised at build time — never silent corruption.
 """
 
+import re
 from typing import NotRequired, Optional, TypedDict, cast
 
-from engine.config import (
-    AZURE_FOUNDRY_API_KEY,
-    AZURE_FOUNDRY_ENDPOINT,
-    PARSER_DEPLOYMENT,
-)
+from engine.config import PARSER_DEPLOYMENT
+from engine.llm import LLMResponseError, call_chat, parse_json_response
 
 # Canonical clause numbers are "{PolicyShortName} {number}" — matching how the
 # corpus labels clauses and how the spec's Acceptance Criteria quote them.
@@ -372,33 +370,122 @@ class ClauseIndex:
         return entry["_full_text"]
 
 
+# Matches a BNM top-level section heading on its own line: a bare number
+# ("12", "17") or "Appendix N", followed by a space and a title. Anchored to
+# line start; the `re.MULTILINE` flag makes `^` match at each line.
+_SECTION_HEADING_RE = re.compile(
+    r"^(?:\d+|Appendix\s+\d+)\s+\S.*$",
+    re.MULTILINE,
+)
+
+PARSER_SYSTEM_PROMPT = """\
+You are a parser that finds clause boundaries in a Bank Negara Malaysia (BNM)
+policy document. You NEVER produce clause text — only boundary anchors.
+
+BNM clause numbering you must recognise, exactly as it appears in the source:
+- top-level decimals: "17.1", "17.2", "12.1"
+- deep decimals that are NOT sub-items: "10.50" (distinct from "10.5")
+- lettered sub-items: "17.1(a)", "17.1(b)"
+- deeper sub-items: "12.3(e)"
+- non-numeric clauses: "Appendix 10"
+
+Return, IN DOCUMENT ORDER, ONLY a JSON array (no prose, no markdown fence is
+required). Each element is an object with EXACTLY these four keys:
+- "clause_number": the bare clause number exactly as written in the source
+  (e.g. "17.1", "17.1(a)", "10.50", "Appendix 10"). Do NOT add the policy name.
+- "starts_with": a SHORT opening phrase of the clause's OWN text, quoted
+  VERBATIM from the source — copied character-for-character, long enough to be
+  unique within the document. NEVER the full clause text, NEVER paraphrased,
+  NEVER a character offset, and NEVER the leading clause-number label.
+- "heading": the enclosing section heading (e.g. "17 Cloud services").
+- "parent": the bare clause number of the parent clause (e.g. "17.1" for
+  "17.1(a)"), or null for a top-level clause.
+
+Example element:
+{"clause_number": "17.1(a)", "starts_with": "completed the risk assessment",
+ "heading": "17 Cloud services", "parent": "17.1"}
+
+Return ONLY the JSON array.
+"""
+
+_REQUIRED_ANCHOR_KEYS = {"clause_number", "starts_with", "heading", "parent"}
+
+
+def _split_sections(markdown: str) -> list[str]:
+    """Split `markdown` into chunks, one per top-level numbered heading.
+
+    BNM documents use top-level section headings of the form ``<number> Title``
+    (e.g. ``12 Approval for material outsourcing arrangements``, ``17 Cloud
+    services``) or ``Appendix N Title``, each on its own line. Each returned
+    chunk is a heading line plus its body up to (but excluding) the next
+    top-level heading, in document order. Chunking bounds per-call output size
+    for large documents (the parser LLM is called once per chunk).
+
+    Any preamble before the first heading is dropped. Pure and network-free.
+    """
+    matches = list(_SECTION_HEADING_RE.finditer(markdown))
+    if not matches:
+        return []
+
+    sections: list[str] = []
+    for i, match in enumerate(matches):
+        start = match.start()
+        end = matches[i + 1].start() if i + 1 < len(matches) else len(markdown)
+        sections.append(markdown[start:end].strip())
+    return sections
+
+
+def _parse_anchor_response(raw: str) -> list[dict]:
+    """Parse the parser LLM's raw reply into a validated list of anchor dicts.
+
+    Delegates JSON extraction to `engine.llm.parse_json_response` (handles code
+    fences + malformed output), then asserts the result is a list whose every
+    element is a dict carrying exactly the four required anchor keys
+    (``clause_number``, ``starts_with``, ``heading``, ``parent``). Raises
+    `LLMResponseError` if the overall shape is wrong. Pure and network-free.
+    """
+    parsed = parse_json_response(raw)
+    if not isinstance(parsed, list):
+        raise LLMResponseError(
+            f"Parser LLM must return a JSON array of anchors, got "
+            f"{type(parsed).__name__}"
+        )
+
+    anchors: list[dict] = []
+    for element in parsed:
+        if not isinstance(element, dict):
+            raise LLMResponseError(
+                f"Each anchor must be a JSON object, got "
+                f"{type(element).__name__}: {element!r}"
+            )
+        missing = _REQUIRED_ANCHOR_KEYS - element.keys()
+        if missing:
+            raise LLMResponseError(
+                f"Anchor is missing required key(s) {sorted(missing)}: "
+                f"{element!r}"
+            )
+        anchors.append(element)
+    return anchors
+
+
 def find_clause_anchors(markdown: str, document_id: str) -> list[dict]:
     """Call the parser LLM (Azure AI Foundry, Claude) to find clause anchors.
 
-    This is the network seam — real callers use this; tests never do (they
-    stub anchors by hand and call `build_clause_index` directly). Not
-    exercised in this task; wired for Task 3/6 to implement the prompt +
-    response parsing when Foundry access is available (`PARSER_DEPLOYMENT`
-    is the confirmed cheap deployment for this mechanical boundary-finding
-    stage — see spec Solution Design, "Model access & config").
+    Splits `markdown` into top-level sections (`_split_sections`), calls the
+    parser deployment once per section via `engine.llm.call_chat` with
+    `PARSER_SYSTEM_PROMPT`, parses each reply with `_parse_anchor_response`, and
+    concatenates the per-section anchor lists in document order. Returns one
+    ``{clause_number, starts_with, heading, parent}`` dict per clause (bare
+    numbers, not canonical) — exactly the shape `build_clause_index` consumes.
+
+    This is the network seam — real callers use it; tests never call it for
+    real (they stub anchors by hand and call `build_clause_index` directly, or
+    monkeypatch `call_chat`). `PARSER_DEPLOYMENT` is the confirmed cheap
+    deployment for this mechanical boundary-finding stage (see spec Solution
+    Design, "Model access & config").
     """
-    from azure.ai.inference import ChatCompletionsClient
-    from azure.core.credentials import AzureKeyCredential
-
-    if not AZURE_FOUNDRY_ENDPOINT or not AZURE_FOUNDRY_API_KEY:
-        raise RuntimeError(
-            "AZURE_FOUNDRY_ENDPOINT and AZURE_FOUNDRY_API_KEY must be set "
-            "in the environment to call find_clause_anchors"
-        )
-
-    ChatCompletionsClient(
-        endpoint=AZURE_FOUNDRY_ENDPOINT,
-        credential=AzureKeyCredential(AZURE_FOUNDRY_API_KEY),
-    )
-    raise NotImplementedError(
-        f"find_clause_anchors is wired to Azure AI Foundry (deployment "
-        f"'{PARSER_DEPLOYMENT}') but not implemented in this task — no live "
-        f"credentials in this environment. Task 3/6 should implement the "
-        f"prompt + response parsing for document '{document_id}' when "
-        f"Foundry access is available."
-    )
+    anchors: list[dict] = []
+    for section in _split_sections(markdown):
+        raw = call_chat(PARSER_DEPLOYMENT, PARSER_SYSTEM_PROMPT, section)
+        anchors.extend(_parse_anchor_response(raw))
+    return anchors
