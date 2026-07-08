@@ -223,3 +223,12 @@ PARSER_DEPLOYMENT = os.environ.get("AZURE_FOUNDRY_PARSER_DEPLOYMENT", "claude-so
 FINDER_CRITIC_DEPLOYMENT = os.environ.get(
     "AZURE_FOUNDRY_FINDER_CRITIC_DEPLOYMENT", "claude-opus-4-8"
 )
+
+# Azure AI Document Intelligence — optional PDF ingestion backend. When both the
+# endpoint and key are set, `engine.ingest` routes PDFs through the
+# `prebuilt-layout` model, which reconstructs reading order (columns, list
+# labels, headings) that the default MarkItDown extractor scrambles on BNM's
+# multi-column PDFs. Unset → the default extractor is used (no behaviour change,
+# no Azure dependency in CI). Read from env, never committed.
+DOCINTEL_ENDPOINT = os.environ.get("AZURE_DOCINTEL_ENDPOINT")
+DOCINTEL_API_KEY = os.environ.get("AZURE_DOCINTEL_API_KEY")
