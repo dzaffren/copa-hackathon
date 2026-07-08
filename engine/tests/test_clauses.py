@@ -73,6 +73,55 @@ def test_verbatim_clause_fetch_returns_exact_text_and_echoes_clause_number():
     )
 
 
+# Real MarkItDown output of BNM PDFs contains runs of doubled spaces and
+# mid-sentence newlines (a layout artifact). The parser LLM normalises those to
+# single spaces when it quotes `starts_with`, so an exact match would miss.
+DOUBLE_SPACED_MARKDOWN = (
+    "6\n\n"
+    "6.1\n\n"
+    "This  policy  document  must  be  read  together  with  other  relevant\n"
+    "legal  instruments.\n\n"
+    "6.2\n\n"
+    "The  Bank  may  issue  further  guidance.\n"
+)
+
+
+def test_anchor_located_despite_normalised_whitespace_text_stays_verbatim():
+    # `starts_with` is single-spaced (as the model quotes it); the source is
+    # double-spaced. The anchor must still be located, and the stored text must
+    # preserve the source's original spacing (verbatim by slicing).
+    anchors = [
+        {
+            "clause_number": "6.1",
+            "starts_with": "This policy document must be read together",
+            "heading": "6 Interpretation",
+            "parent": None,
+        },
+        {
+            "clause_number": "6.2",
+            "starts_with": "The Bank may issue further guidance",
+            "heading": "6 Interpretation",
+            "parent": None,
+        },
+    ]
+
+    entries = build_clause_index(
+        anchors=anchors,
+        markdown=DOUBLE_SPACED_MARKDOWN,
+        document_id="outsourcing-v1-2019",
+        policy_id="outsourcing",
+        source="published",
+    )
+    index = ClauseIndex(entries)
+
+    entry = index.get("Outsourcing 6.1")
+    assert entry is not None
+    # Verbatim: the stored text keeps the source's double spaces, not the
+    # single-spaced form the model quoted.
+    assert "This  policy  document  must  be  read  together" in entry["text"]
+    assert entry["text"] in DOUBLE_SPACED_MARKDOWN
+
+
 RMIT_NESTED_MARKDOWN = """RMiT
 
 10 Technology Operations Management

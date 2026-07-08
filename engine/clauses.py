@@ -141,6 +141,28 @@ def _trim_trailing_label(
     return end
 
 
+def _find_anchor_positions(markdown: str, snippet: str) -> list[int]:
+    """Return the start offsets in `markdown` where `snippet` occurs,
+    whitespace-insensitively.
+
+    The parser LLM quotes a verbatim opening phrase, but MarkItDown's PDF output
+    contains runs of doubled spaces and mid-sentence newlines (a layout artifact
+    — "This  policy  document  must  be  read" appears thousands of times in the
+    corpus). The model normalises those to single spaces when it quotes them, so
+    an exact `str.find` misses. Matching each whitespace run in the snippet
+    against one-or-more whitespace characters in the source recovers the real
+    position — and callers slice the raw source from that position, so the
+    stored clause `text` stays byte-for-byte verbatim (original spacing intact).
+
+    A snippet with no non-whitespace content matches nothing (returns []).
+    """
+    tokens = snippet.split()
+    if not tokens:
+        return []
+    pattern = re.compile(r"\s+".join(re.escape(token) for token in tokens))
+    return [match.start() for match in pattern.finditer(markdown)]
+
+
 def build_clause_index(
     anchors: list[dict],
     markdown: str,
@@ -172,20 +194,20 @@ def build_clause_index(
     positions: list[int] = []
     for anchor in anchors:
         snippet = anchor["starts_with"]
-        occurrences = markdown.count(snippet)
-        if occurrences == 0:
+        occurrences = _find_anchor_positions(markdown, snippet)
+        if len(occurrences) == 0:
             raise ClauseAnchorNotFoundError(
                 f"Anchor for clause '{anchor['clause_number']}' "
                 f"(starts_with={snippet!r}) not found in document "
                 f"'{document_id}'"
             )
-        if occurrences > 1:
+        if len(occurrences) > 1:
             raise ClauseAnchorAmbiguousError(
                 f"Anchor for clause '{anchor['clause_number']}' "
                 f"(starts_with={snippet!r}) is ambiguous — found "
-                f"{occurrences} times in document '{document_id}'"
+                f"{len(occurrences)} times in document '{document_id}'"
             )
-        positions.append(markdown.index(snippet))
+        positions.append(occurrences[0])
 
     entries: dict[str, ClauseEntry] = {}
     children_by_parent: dict[str, list[str]] = {}
