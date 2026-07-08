@@ -9,7 +9,14 @@ never called here — every test hand-writes its own anchor list and calls
 `build_clause_index` directly.
 """
 
-from engine.clauses import ClauseIndex, build_clause_index
+import pytest
+
+from engine.clauses import (
+    ClauseAnchorAmbiguousError,
+    ClauseAnchorNotFoundError,
+    ClauseIndex,
+    build_clause_index,
+)
 
 OUTSOURCING_MARKDOWN = """Outsourcing
 
@@ -205,3 +212,23 @@ def test_full_text_composes_stem_and_children_as_a_contiguous_source_span():
 
     assert full_text.startswith(stem)
     assert full_text in RMIT_NESTED_MARKDOWN
+
+
+def test_anchor_not_found_raises_clear_exception_naming_the_clause():
+    bad_anchors = [
+        {
+            "clause_number": "99.9",
+            "starts_with": "This phrase does not appear anywhere in the source",
+            "heading": None,
+            "parent": None,
+        }
+    ]
+
+    with pytest.raises(ClauseAnchorNotFoundError, match="99.9"):
+        build_clause_index(
+            anchors=bad_anchors,
+            markdown=OUTSOURCING_MARKDOWN,
+            document_id="outsourcing-v1-2019",
+            policy_id="outsourcing",
+            source="published",
+        )
