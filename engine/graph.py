@@ -196,4 +196,9 @@ def build_graph(
     edges = _build_version_lineage_edges(ids_by_policy)
     edges.extend(_build_curated_edges(curated_edges, ids_by_policy, clause_index))
 
+    # Determinism of the frozen contract (spec Solution Design, "Build &
+    # operability"): edges sort by (source, target, type) so a rebuild from
+    # the same corpus produces byte-stable artifacts.
+    edges.sort(key=lambda edge: (edge["source"], edge["target"], edge["type"]))
+
     return {"nodes": nodes, "edges": edges}

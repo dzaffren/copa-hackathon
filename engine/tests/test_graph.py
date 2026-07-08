@@ -289,6 +289,38 @@ def test_curated_edge_with_empty_clause_list_raises_graph_build_error():
         )
 
 
+def test_edges_are_sorted_by_source_target_type_for_determinism():
+    clause_index = _build_fixture_clause_index()
+    # A second curated edge whose source ("bcm-...") sorts alphabetically
+    # before both the version-lineage edge's source ("rmit-v1-2020") and
+    # the first curated edge's source ("rmit-v2-...") — so natural
+    # insertion order (lineage, then curated edges in list order) would
+    # NOT already be sorted; only an explicit sort makes this pass.
+    edges_out_of_natural_order = CURATED_EDGES + [
+        {
+            "source_policy_id": "bcm",
+            "target_policy_id": "opres",
+            "type": "overlaps",
+            "reason": "Both cover recovery of critical operations.",
+            "source_clauses": ["BCM 5.1"],
+            "target_clauses": ["Operational Resilience 6.11"],
+            "provenance": "curated",
+            "confidence": 1.0,
+        },
+    ]
+
+    graph = build_graph(
+        documents=DOCUMENTS,
+        curated_edges=edges_out_of_natural_order,
+        clause_index=clause_index,
+        draft_registry=DRAFT_REGISTRY,
+    )
+
+    sort_keys = [(e["source"], e["target"], e["type"]) for e in graph["edges"]]
+    assert sort_keys == sorted(sort_keys)
+    assert sort_keys[0][0] == "bcm-v1-2022"
+
+
 def _node(graph: dict, document_id: str) -> dict:
     matches = [n for n in graph["nodes"] if n["id"] == document_id]
     assert matches, f"no node with id '{document_id}' in graph"
