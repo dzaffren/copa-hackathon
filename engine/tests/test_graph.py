@@ -241,6 +241,54 @@ def test_curated_edge_citing_unknown_clause_raises_graph_build_error():
         )
 
 
+def test_curated_edge_with_empty_reason_raises_graph_build_error():
+    clause_index = _build_fixture_clause_index()
+    bad_edges = [
+        {
+            "source_policy_id": "rmit",
+            "target_policy_id": "opres",
+            "type": "overlaps",
+            "reason": "",
+            "source_clauses": ["RMiT 10.50"],
+            "target_clauses": ["Operational Resilience 6.11"],
+            "provenance": "curated",
+            "confidence": 1.0,
+        },
+    ]
+
+    with pytest.raises(GraphBuildError, match="no reason"):
+        build_graph(
+            documents=DOCUMENTS,
+            curated_edges=bad_edges,
+            clause_index=clause_index,
+            draft_registry=DRAFT_REGISTRY,
+        )
+
+
+def test_curated_edge_with_empty_clause_list_raises_graph_build_error():
+    clause_index = _build_fixture_clause_index()
+    bad_edges = [
+        {
+            "source_policy_id": "rmit",
+            "target_policy_id": "opres",
+            "type": "overlaps",
+            "reason": "A connection with no clause anchor on one side.",
+            "source_clauses": [],
+            "target_clauses": ["Operational Resilience 6.11"],
+            "provenance": "curated",
+            "confidence": 1.0,
+        },
+    ]
+
+    with pytest.raises(GraphBuildError, match="source_clauses"):
+        build_graph(
+            documents=DOCUMENTS,
+            curated_edges=bad_edges,
+            clause_index=clause_index,
+            draft_registry=DRAFT_REGISTRY,
+        )
+
+
 def _node(graph: dict, document_id: str) -> dict:
     matches = [n for n in graph["nodes"] if n["id"] == document_id]
     assert matches, f"no node with id '{document_id}' in graph"
