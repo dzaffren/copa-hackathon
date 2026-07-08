@@ -7,6 +7,9 @@ docs/references/
 # Sensitive bank submissions — never committed
 data/submissions/
 
+# Local secrets — copy .env.example to .env and fill in; never committed
+.env
+
 # Python
 __pycache__/
 *.pyc
