@@ -14,6 +14,7 @@ import pytest
 from engine.clauses import (
     ClauseAnchorAmbiguousError,
     ClauseAnchorNotFoundError,
+    ClauseCompletenessError,
     ClauseIndex,
     build_clause_index,
 )
@@ -261,4 +262,25 @@ def test_ambiguous_anchor_raises_clear_exception_naming_the_clause():
             document_id="outsourcing-v1-2019",
             policy_id="outsourcing",
             source="published",
+        )
+
+
+def test_completeness_check_raises_when_an_expected_clause_is_missing():
+    anchors_missing_12_2 = [
+        {
+            "clause_number": "12.1",
+            "starts_with": "A financial institution must obtain the Bank's written approval",
+            "heading": None,
+            "parent": None,
+        },
+    ]
+
+    with pytest.raises(ClauseCompletenessError, match="Outsourcing 12.2"):
+        build_clause_index(
+            anchors=anchors_missing_12_2,
+            markdown=OUTSOURCING_MARKDOWN,
+            document_id="outsourcing-v1-2019",
+            policy_id="outsourcing",
+            source="published",
+            expected_clauses={"Outsourcing 12.1", "Outsourcing 12.2"},
         )
