@@ -24,7 +24,11 @@ from typing import Any, Optional, Union
 from markitdown import MarkItDown
 from markitdown._exceptions import MarkItDownException
 
-from engine.config import DOCINTEL_API_KEY, DOCINTEL_ENDPOINT
+from engine.config import (
+    DOCINTEL_API_KEY,
+    DOCINTEL_API_VERSION,
+    DOCINTEL_ENDPOINT,
+)
 
 
 class UnreadableDocumentError(Exception):
@@ -34,12 +38,18 @@ class UnreadableDocumentError(Exception):
 def _build_converter(
     docintel_endpoint: Optional[str],
     docintel_api_key: Optional[str],
+    docintel_api_version: str = DOCINTEL_API_VERSION,
 ) -> MarkItDown:
     """Construct a MarkItDown converter.
 
     When both the Document Intelligence endpoint and key are provided, register
     the DI (`prebuilt-layout`) converter at the top of the stack so PDFs use it;
     otherwise return a plain MarkItDown that uses the default extractor.
+
+    The ``docintel_api_version`` override is load-bearing: MarkItDown hardcodes
+    an old preview api-version that GA DI resources reject with a 404 (which
+    MarkItDown then silently swallows, falling back to the default extractor —
+    masking the misconfiguration). Passing the GA version makes DI actually run.
     """
     if docintel_endpoint and docintel_api_key:
         from azure.core.credentials import AzureKeyCredential
@@ -47,6 +57,7 @@ def _build_converter(
         return MarkItDown(
             docintel_endpoint=docintel_endpoint,
             docintel_credential=AzureKeyCredential(docintel_api_key),
+            docintel_api_version=docintel_api_version,
         )
     return MarkItDown()
 

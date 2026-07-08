@@ -232,3 +232,8 @@ FINDER_CRITIC_DEPLOYMENT = os.environ.get(
 # no Azure dependency in CI). Read from env, never committed.
 DOCINTEL_ENDPOINT = os.environ.get("AZURE_DOCINTEL_ENDPOINT")
 DOCINTEL_API_KEY = os.environ.get("AZURE_DOCINTEL_API_KEY")
+# MarkItDown's DI converter hardcodes an old preview api-version
+# (2024-07-31-preview) that GA Document Intelligence resources reject with a
+# 404. Override with the GA version the installed SDK (1.x) speaks. Configurable
+# in case a resource pins a different version.
+DOCINTEL_API_VERSION = os.environ.get("AZURE_DOCINTEL_API_VERSION", "2024-11-30")
