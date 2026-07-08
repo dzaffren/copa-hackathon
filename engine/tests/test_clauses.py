@@ -169,3 +169,12 @@ def test_nested_numbering_boundaries_do_not_bleed_between_sibling_clauses():
     # Appendix 10 is addressable.
     assert appendix_10 is not None
     assert "Illustrative risk assessment checklist" in appendix_10["text"]
+
+
+def test_every_entry_text_is_a_verbatim_substring_of_the_source():
+    entries, _ = _build_rmit_nested_index()
+
+    for clause_number, entry in entries.items():
+        assert entry["text"] in RMIT_NESTED_MARKDOWN, (
+            f"{clause_number}'s text is not a substring of the source"
+        )
