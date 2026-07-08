@@ -3,3 +3,12 @@ docs/references/
 
 # macOS
 .DS_Store
+
+# Sensitive bank submissions — never committed
+data/submissions/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/

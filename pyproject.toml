@@ -1,0 +1,14 @@
+[project]
+name = "engine"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = [
+    "azure-ai-inference>=1.0.0b9",
+    "fastapi>=0.139.0",
+    "httpx>=0.28.1",
+    "markitdown[docx,pdf]>=0.1.6",
+    "pytest>=9.1.1",
+    "python-multipart>=0.0.20",
+    "uvicorn>=0.50.2",
+]

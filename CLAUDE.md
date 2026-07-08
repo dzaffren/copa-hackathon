@@ -58,3 +58,16 @@ matching clause found" — never invent one. Preserve this in any spec or POC ed
 - POC pages are self-contained HTML using Tailwind via CDN — no build step.
 - MVP1 scope is a single cluster (technology-risk); cross-cluster ripple is a
   labelled "what's next" preview, not built.
+
+## Learnings
+
+- **mypy third-party stub baseline** — the 4 mypy warnings in `engine/`
+  (`markitdown` + `azure.ai.inference` missing stubs) are an accepted baseline;
+  don't chase them or add `# type: ignore`. See
+  `docs/learnings/convention-mypy-third-party-stub-baseline.md`.
+- **FastAPI TestClient deps** — tests using `fastapi.testclient.TestClient` need
+  `httpx` and `python-multipart` as explicit `pyproject.toml` deps (not pulled in
+  by `fastapi` alone). See `docs/learnings/pattern-fastapi-testclient-deps.md`.
+- **/ship is GitLab — use gh** — the `/ship` skill targets GitLab; on this GitHub
+  repo override to `gh pr create --base main` with `Closes #<n>` in the PR body.
+  See `docs/learnings/skill-ship-is-gitlab-use-gh.md`.
