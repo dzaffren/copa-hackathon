@@ -178,3 +178,20 @@ def test_every_entry_text_is_a_verbatim_substring_of_the_source():
         assert entry["text"] in RMIT_NESTED_MARKDOWN, (
             f"{clause_number}'s text is not a substring of the source"
         )
+
+
+def test_option_c_parent_stem_excludes_child_text_and_children_link_correctly():
+    entries, index = _build_rmit_nested_index()
+
+    parent = index.get("RMiT 17.1")
+    child_a = index.get("RMiT 17.1(a)")
+    child_b = index.get("RMiT 17.1(b)")
+    child_c = index.get("RMiT 17.1(c)")
+
+    assert parent["children"] == ["RMiT 17.1(a)", "RMiT 17.1(b)", "RMiT 17.1(c)"]
+    assert child_a["parent"] == "RMiT 17.1"
+    assert child_b["parent"] == "RMiT 17.1"
+    assert child_c["parent"] == "RMiT 17.1"
+
+    # Sub-item text is never duplicated inside the parent's stem-only text.
+    assert child_b["text"] not in parent["text"]
