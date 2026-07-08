@@ -10,7 +10,15 @@ inferred from filenames.
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
+
+# Load a repo-root `.env` if present so a copied+filled template "just works"
+# with no manual `export`. This must run before the AZURE_FOUNDRY_* /
+# *_DEPLOYMENT reads below. `load_dotenv` no-ops when the file is absent (CI
+# has none) and does not override already-exported real env vars.
+load_dotenv(REPO_ROOT / ".env")
 CORPUS_DIR = REPO_ROOT / "data" / "corpus"
 MOCK_DIR = REPO_ROOT / "data" / "mock"
 
