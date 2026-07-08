@@ -294,26 +294,29 @@ def test_anchor_not_found_raises_clear_exception_naming_the_clause():
 
 
 def test_ambiguous_anchor_raises_clear_exception_naming_the_clause():
+    # The phrase recurs AND the clause's own label ("8.4") does not precede
+    # either occurrence — so label-based disambiguation cannot single one out,
+    # and the build must fail loudly rather than guess.
     ambiguous_markdown = (
-        "12.1 A financial institution must comply.\n\n"
-        "12.2 A financial institution must comply.\n"
+        "8.4  A financial institution must, including a repeated phrase, act.\n\n"
+        "9.1  See also a repeated phrase in a different clause entirely.\n"
     )
     ambiguous_anchors = [
         {
-            "clause_number": "12.1",
-            "starts_with": "A financial institution must comply",
+            "clause_number": "8.4",
+            "starts_with": "a repeated phrase",
             "heading": None,
             "parent": None,
         },
         {
-            "clause_number": "12.2",
-            "starts_with": "A financial institution must comply",
+            "clause_number": "9.1",
+            "starts_with": "See also",
             "heading": None,
             "parent": None,
         },
     ]
 
-    with pytest.raises(ClauseAnchorAmbiguousError, match="12.1"):
+    with pytest.raises(ClauseAnchorAmbiguousError, match="8.4"):
         build_clause_index(
             anchors=ambiguous_anchors,
             markdown=ambiguous_markdown,
@@ -321,6 +324,52 @@ def test_ambiguous_anchor_raises_clear_exception_naming_the_clause():
             policy_id="outsourcing",
             source="published",
         )
+
+
+def test_recurring_phrase_disambiguated_by_clause_label():
+    # The same phrase appears twice: once mid-sentence inside clause 8.3, and
+    # once as the real 8.4(c) start (preceded by its "(c)" label). The label
+    # disambiguates → 8.4(c) resolves to the correct, label-preceded span.
+    markdown = (
+        "8.3  The institution must retain oversight resources, including where "
+        "the outsourced activity is undertaken by an affiliate of the group; and\n\n"
+        "8.4  The institution must ensure that:\n"
+        "(c)  where the outsourced activity is undertaken by an affiliate, it "
+        "retains effective control.\n"
+    )
+    anchors = [
+        {
+            "clause_number": "8.3",
+            "starts_with": "The institution must retain oversight resources",
+            "heading": None,
+            "parent": None,
+        },
+        {
+            "clause_number": "8.4",
+            "starts_with": "The institution must ensure that",
+            "heading": None,
+            "parent": None,
+        },
+        {
+            "clause_number": "8.4(c)",
+            "starts_with": "where the outsourced activity is undertaken by an affiliate",
+            "heading": None,
+            "parent": "8.4",
+        },
+    ]
+
+    entries = build_clause_index(
+        anchors=anchors,
+        markdown=markdown,
+        document_id="outsourcing-v1-2019",
+        policy_id="outsourcing",
+        source="published",
+    )
+
+    entry = entries["Outsourcing 8.4(c)"]
+    # Resolved to the real (c) clause, not the mid-sentence repeat in 8.3.
+    assert entry["text"].startswith("where the outsourced activity is undertaken")
+    assert "retains effective control" in entry["text"]
 
 
 def test_completeness_check_raises_when_an_expected_clause_is_missing():

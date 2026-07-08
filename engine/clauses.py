@@ -163,6 +163,23 @@ def _find_anchor_positions(markdown: str, snippet: str) -> list[int]:
     return [match.start() for match in pattern.finditer(markdown)]
 
 
+def _preceded_by_label(markdown: str, position: int, label: str) -> bool:
+    """True if `label` sits immediately before `position` in `markdown`, allowing
+    whitespace between the label and the position.
+
+    Used to disambiguate a `starts_with` phrase that occurs more than once: the
+    real clause start is preceded by the clause's own label (e.g. "(c)" for a
+    sub-item, "8.4" for a top-level clause), whereas an incidental repeat of the
+    phrase inside another clause is not. Walks back past whitespace, then checks
+    the preceding characters equal `label`.
+    """
+    i = position
+    while i > 0 and markdown[i - 1] in " \n\t\r":
+        i -= 1
+    start = i - len(label)
+    return start >= 0 and markdown[start:i] == label
+
+
 def build_clause_index(
     anchors: list[dict],
     markdown: str,
@@ -202,10 +219,21 @@ def build_clause_index(
                 f"'{document_id}'"
             )
         if len(occurrences) > 1:
+            # A phrase can recur (e.g. a clause quoted mid-sentence elsewhere).
+            # The real clause start is the occurrence immediately preceded by
+            # this clause's own label ("(c)" for "8.4(c)", "8.4" for a
+            # top-level clause). Prefer it; only fail if the label can't
+            # single out one occurrence.
+            label = _in_text_label(anchor["clause_number"])
+            labelled = [p for p in occurrences if _preceded_by_label(markdown, p, label)]
+            if len(labelled) == 1:
+                positions.append(labelled[0])
+                continue
             raise ClauseAnchorAmbiguousError(
                 f"Anchor for clause '{anchor['clause_number']}' "
                 f"(starts_with={snippet!r}) is ambiguous — found "
                 f"{len(occurrences)} times in document '{document_id}'"
+                f"{f' and the label {label!r} matched {len(labelled)} of them' if labelled else ''}"
             )
         positions.append(occurrences[0])
 
