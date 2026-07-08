@@ -284,3 +284,24 @@ def test_completeness_check_raises_when_an_expected_clause_is_missing():
             source="published",
             expected_clauses={"Outsourcing 12.1", "Outsourcing 12.2"},
         )
+
+
+def test_missing_clause_returns_none_not_an_exception_or_fabricated_value():
+    anchors = [
+        {
+            "clause_number": "12.1",
+            "starts_with": "A financial institution must obtain the Bank's written approval",
+            "heading": None,
+            "parent": None,
+        },
+    ]
+    entries = build_clause_index(
+        anchors=anchors,
+        markdown=OUTSOURCING_MARKDOWN,
+        document_id="outsourcing-v1-2019",
+        policy_id="outsourcing",
+        source="published",
+    )
+    index = ClauseIndex(entries)
+
+    assert index.get("Outsourcing 99.9") is None
