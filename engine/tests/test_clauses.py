@@ -16,6 +16,7 @@ from engine.clauses import (
     ClauseAnchorNotFoundError,
     ClauseCompletenessError,
     ClauseIndex,
+    ClausePrimaryIndexCollisionError,
     ClauseVersionNotFoundError,
     build_clause_index,
     merge_clause_indexes,
@@ -417,3 +418,41 @@ def test_version_keying_raises_distinctly_for_unknown_version_of_known_clause():
 
     with pytest.raises(ClauseVersionNotFoundError, match="RMiT 17.1"):
         index.get("RMiT 17.1", version="rmit-v9-unknown")
+
+
+def test_ambiguous_primary_collision_raises_rather_than_silently_picking_one():
+    doc_a_markdown = "5.1 A financial institution must file an annual return.\n"
+    doc_b_markdown = "5.1 A financial institution must file a quarterly return.\n"
+    shared_anchor = [
+        {
+            "clause_number": "5.1",
+            "starts_with": "A financial institution must file",
+            "heading": None,
+            "parent": None,
+        },
+    ]
+
+    doc_a_entries = build_clause_index(
+        anchors=shared_anchor,
+        markdown=doc_a_markdown,
+        document_id="outsourcing-v1-2019",
+        policy_id="outsourcing",
+        source="published",
+    )
+    doc_b_entries = build_clause_index(
+        anchors=shared_anchor,
+        markdown=doc_b_markdown,
+        document_id="outsourcing-v0-hypothetical",
+        policy_id="outsourcing",
+        source="published",
+    )
+
+    with pytest.raises(ClausePrimaryIndexCollisionError, match="Outsourcing 5.1"):
+        merge_clause_indexes(
+            [
+                ("outsourcing-v1-2019", doc_a_entries),
+                ("outsourcing-v0-hypothetical", doc_b_entries),
+            ],
+            # Neither document is "current" -- an equal-precedence collision.
+            current_document_id="outsourcing-v9-not-in-corpus",
+        )
