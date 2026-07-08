@@ -2,6 +2,10 @@
 
 **Ticket:** [#21](https://github.com/dzaffren/copa-hackathon/issues/21) (follow-up to #6)
 **Date:** 2026-07-08
+**Status:** In progress — single-doc build works; full 6-doc build not yet
+complete. **The plan sections below are the original design; several parts are
+stale. Read "Implementation status" at the bottom first — it is the source of
+truth for the current state and next steps.**
 **Context:** Ticket #6 (knowledge-graph engine) built the pipeline with the Azure
 AI Foundry (Claude) call sites left as `NotImplementedError` stubs — by design,
 since #6's acceptance criteria are satisfiable with stubbed model responses and
@@ -164,3 +168,118 @@ follow-up step after the first successful parse — not part of this change.
 - `pyproject.toml` / `uv.lock` — add `python-dotenv`.
 - Tests: `engine/tests/test_llm.py` (new), additions to
   `test_clauses.py` / `test_connections.py` for the new parsing helpers.
+
+---
+
+## Implementation status (2026-07-08, end of session)
+
+The plan above is the original design; **reality diverged** as we ran the parser
+against the real BNM PDFs. This section is the source of truth for the current
+state — read it first when resuming.
+
+### What was built & works
+
+- **`engine/llm.py`** — shared LLM seam + `parse_json_response` + `LLMResponseError`.
+- **Parser (`find_clause_anchors`)**, **finder/critic turns**, **`.env` loading**
+  (`python-dotenv`), **`.env.example`** — all implemented.
+- **A single document (`--docs outsourcing-v1-2019`) builds end-to-end into a
+  clean, verbatim `clause-index.json`** — 173 clauses, 0 garbled, 0 marker
+  leakage, load-bearing `Outsourcing 12.1` byte-perfect, ~2–3% of anchors
+  dropped (non-load-bearing boilerplate, logged).
+- **96 tests pass, ruff clean, mypy = 4 (accepted third-party-stub baseline).**
+
+### Key deviations from the plan above (IMPORTANT — the plan is stale here)
+
+1. **Not `azure-ai-inference` — the `anthropic` SDK.** Claude on Foundry speaks
+   the **Anthropic Messages API**, not the generic chat-completions API (which
+   returns `api_not_supported`). `call_chat` uses
+   `anthropic.AnthropicFoundry(api_key, base_url=…/anthropic)` +
+   `client.messages.create(system=…, messages=[{user}], max_tokens=…)`. **Base
+   URL must end in `/anthropic`.**
+2. **No assistant-prefill.** Prefill 400s on the Claude 4.6+ family (incl. the
+   deployed `claude-opus-4-8` / `claude-sonnet-5`). JSON is forced by prompt +
+   defensive parsing only.
+3. **`parse_json_response` is much more tolerant than planned** — handles: code
+   fences, JSON Lines (object-per-line), a junk preamble object before the real
+   array + trailing prose (salvages top-level arrays via `raw_decode`).
+4. **Chunking is clause-aware + size-bounded, not `_split_sections`.**
+   `_split_chunks` cuts at top-level clause boundaries (`_CLAUSE_START_RE` =
+   `N.M` or `Appendix N` only — bare `N Capital` lines are footnotes, NOT
+   boundaries), packs whole clauses up to `_MAX_CHUNK_CHARS` (6000), and
+   sub-splits any oversized block via `_split_paragraphs` (hard char-split
+   fallback) so no LLM call overflows its output limit.
+5. **Retry on non-JSON** — `_parse_chunk_with_retry` (parser) and
+   `_call_candidates_with_retry` (finder/critic) re-ask up to 3× before failing.
+6. **Unresolvable anchors are DROPPED with a warning, NOT crashed on.** Empty /
+   not-found / still-ambiguous `starts_with` → logged + counted per document,
+   build continues. `ClauseCompletenessError` (when `expected_clauses` is
+   supplied) is the backstop for load-bearing clauses. This replaced the "loud
+   build failure" behaviour in the Error-handling table above.
+7. **Anchor location is whitespace-insensitive** (MarkItDown emits doubled
+   spaces; the model normalises them) and **disambiguates recurring phrases by
+   the clause's deepest label** (`(i)` for `9.6(c)(i)`, `(c)` for `8.4(c)`).
+8. **Trailing BNM `S`/`G` (Standard/Guidance) marker is trimmed** from both a
+   clause's `text` and the composed `full_text`.
+
+### THE ROOT-CAUSE FIX: Azure Document Intelligence backend
+
+Default MarkItDown **scrambles reading order** on BNM's multi-column PDFs
+(stranded list labels, lost clause bodies, page headers mid-clause) — this was
+the source of most parser failures. **`engine/ingest.py` now routes PDFs through
+Azure AI Document Intelligence (`prebuilt-layout`)** when
+`AZURE_DOCINTEL_ENDPOINT` + `AZURE_DOCINTEL_API_KEY` are set (unset → default
+extractor, no CI/Azure dependency). Output stays verbatim source text →
+citation guarantee intact.
+
+- **Gotcha (fixed):** MarkItDown hardcodes an old preview api-version that GA DI
+  resources reject with `404` and then **silently swallows**, falling back to
+  the default extractor. `AZURE_DOCINTEL_API_VERSION` (default `2024-11-30`) is
+  passed through — **required, not optional**.
+- Deps added: `markitdown[az-doc-intel]`, `anthropic`, `python-dotenv`.
+
+### Env vars now required for a live build (all in `.env`, git-ignored)
+
+```
+AZURE_FOUNDRY_ENDPOINT=https://<resource>.services.ai.azure.com/anthropic   # MUST end /anthropic
+AZURE_FOUNDRY_API_KEY=…
+AZURE_FOUNDRY_PARSER_DEPLOYMENT=claude-sonnet-5
+AZURE_FOUNDRY_FINDER_CRITIC_DEPLOYMENT=claude-opus-4-8
+AZURE_DOCINTEL_ENDPOINT=https://<resource>.cognitiveservices.azure.com/
+AZURE_DOCINTEL_API_KEY=…
+AZURE_DOCINTEL_API_VERSION=2024-11-30
+```
+
+### WHERE WE STOPPED — next steps, in order
+
+1. **Full 6-doc build (`python -m engine.build`, no `--docs`) has NOT completed.**
+   Single-doc works; the last failure was RMiT's oversized-chunk truncation,
+   now fixed (`f94288f`). Re-run the full build and see how far it gets.
+2. **Expected next failure — graph build on phantom curated anchors.**
+   `CURATED_SEED_EDGES` in `engine/config.py` cites clauses that don't exist in
+   the real parsed corpus — confirmed **`Operational Resilience 6.11` is NOT in
+   the OpRes Discussion Paper at all** (that doc uses single-digit `1.1…`
+   numbering; no clause 6.11). `BCM 5.1` / `Customer Info 8.1` are also
+   placeholders. `build_graph` will fail with `GraphBuildError` naming the
+   unresolvable clause. **Fix = correct the config's clause anchors to real
+   parsed clause numbers (or drop/relabel those edges)** — a config-data fix,
+   not a parser fix.
+3. **Non-determinism** — the model returns a slightly different anchor set each
+   run (anchor counts drift 172–217; different clauses drop each time). For a
+   **stable, frozen artifact** the plan (per #6 spec) is to generate once and
+   **commit `clause-index.json` / `graph.json` as fixtures**, not regenerate
+   live. Decide this before relying on artifact stability downstream.
+4. **Load-bearing clause audit** — once the full build completes, verify the
+   demo-critical clauses survived and are verbatim: Outsourcing 12.1 (✅ so far),
+   RMiT 17.1/17.2/10.50 (note RMiT v2 conflict text comes from the **mock draft**
+   `data/mock/`, not the PDF), the OpRes "register of critical services" clause
+   (its real number, since 6.11 is phantom).
+5. **Extraction quality is uneven per doc** (stranded-label diagnostic):
+   recovery/bcm clean, custinfo near-clean, opres/rmit moderate, outsourcing
+   worst. DI should improve all; re-measure if a doc parses poorly.
+
+### Branch / tracking
+
+Branch `feature/21-live-azure-llm-calls` off `main` (which has #6 merged). Many
+commits this session (`fix(llm)`, `fix(clauses)`, `feat(ingest)` DI backend,
+etc.), all local — **not yet pushed, no PR opened**. Ticket #21. `.env` is
+git-ignored and populated locally with working DI + Foundry creds.
