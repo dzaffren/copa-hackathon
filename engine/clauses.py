@@ -611,16 +611,18 @@ def _strip_noise(markdown: str) -> str:
     return "\n".join(kept)
 
 
-# A line that begins a new top-level clause or section — the boundaries a chunk
-# is allowed to START on, so a chunk never opens mid-clause (a headless fragment
-# confuses the parser LLM into echoing text instead of emitting JSON). Matches a
-# decimal clause number ("12.1", "10.50"), a section heading ("12 Approval…"),
-# or an appendix ("Appendix 4"). Sub-item labels ("(a)", "(f)") are deliberately
-# NOT boundaries — they stay inside their parent clause. The decimal-clause form
-# is the reliable signal (the demo corpus's N.M numbering is in-order and
-# ungarbled); heading/appendix forms are a bonus. Anchored per-line (MULTILINE).
+# A line that begins a new top-level clause — the boundaries a chunk is allowed
+# to START on, so a chunk never opens mid-clause (a headless fragment confuses
+# the parser LLM into echoing text instead of emitting JSON). Matches a decimal
+# clause number ("12.1", "10.50") or an appendix ("Appendix 4"). Deliberately
+# does NOT match a bare "<number> <Capital>" line: in the real corpus those are
+# footnotes ("44 This is also applicable…", "1 For the purposes of…"), not
+# section headings, and matching them mis-split RMiT badly (a footnote reference
+# was treated as a clause boundary, producing a 24 KB unsplit block). Sub-item
+# labels ("(a)", "(f)") are also not boundaries — they stay inside their parent.
+# N.M numbering is the reliable signal. Anchored per-line (MULTILINE).
 _CLAUSE_START_RE = re.compile(
-    r"^(?:\d+\.\d+\b|\d+\s+[A-Z]|Appendix\s+\d+\b)",
+    r"^(?:\d+\.\d+\b|Appendix\s+\d+\b)",
     re.MULTILINE,
 )
 
@@ -662,32 +664,62 @@ def _split_chunks(markdown: str, max_chars: int = _MAX_CHUNK_CHARS) -> list[str]
         if block:
             blocks.append(block)
 
-    # Pack whole clause blocks up to max_chars; never split a block.
+    # Pack clause blocks up to max_chars. A block that is itself larger than
+    # max_chars (a long clause, or a big appendix/table span with no interior
+    # N.M boundary) is flushed on its own and then sub-split by paragraphs — an
+    # unbounded chunk otherwise overflows the parser LLM's output limit and the
+    # JSON reply is truncated mid-string (observed on RMiT: a 24 KB / ~145-clause
+    # chunk). Sub-splitting keeps every LLM call's output bounded.
     chunks: list[str] = []
     current: list[str] = []
     current_len = 0
-    for block in blocks:
-        addition = len(block) + 2  # +2 for the "\n\n" re-join separator
-        if current and current_len + addition > max_chars:
+
+    def flush() -> None:
+        nonlocal current, current_len
+        if current:
             chunks.append("\n\n".join(current))
             current = []
             current_len = 0
+
+    for block in blocks:
+        if len(block) > max_chars:
+            flush()
+            chunks.extend(_split_paragraphs(block, max_chars))
+            continue
+        addition = len(block) + 2  # +2 for the "\n\n" re-join separator
+        if current and current_len + addition > max_chars:
+            flush()
         current.append(block)
         current_len += addition
-    if current:
-        chunks.append("\n\n".join(current))
+    flush()
     return chunks
 
 
 def _split_paragraphs(body: str, max_chars: int) -> list[str]:
     """Fallback size-based packing on blank-line-separated paragraphs, for a
-    document with no detectable clause boundaries. Never splits mid-line."""
+    document (or oversized clause block) with no usable clause boundaries.
+
+    Packs paragraphs up to ``max_chars``. A single paragraph longer than
+    ``max_chars`` (e.g. a giant appendix table with no blank lines) is split on
+    a hard character boundary so no returned chunk ever exceeds the budget —
+    the last line of defence against an unbounded parser LLM call. This can cut
+    mid-line, but such runaway paragraphs are non-clause boilerplate; a
+    clean-boundary split is not achievable and bounding the call matters more.
+    """
     chunks: list[str] = []
     current: list[str] = []
     current_len = 0
     for paragraph in re.split(r"\n\s*\n", body):
         paragraph = paragraph.strip()
         if not paragraph:
+            continue
+        if len(paragraph) > max_chars:
+            if current:
+                chunks.append("\n\n".join(current))
+                current = []
+                current_len = 0
+            for k in range(0, len(paragraph), max_chars):
+                chunks.append(paragraph[k : k + max_chars])
             continue
         addition = len(paragraph) + 2
         if current and current_len + addition > max_chars:

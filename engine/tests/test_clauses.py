@@ -872,8 +872,10 @@ CLAUSE_BODY_MARKDOWN = (
 
 
 def test_split_chunks_every_chunk_starts_at_a_clause_boundary():
-    # Small budget forces multiple chunks; each must begin at an N.M clause.
-    chunks = _split_chunks(CLAUSE_BODY_MARKDOWN, max_chars=120)
+    # Budget large enough that each clause block fits (so no oversized-block
+    # sub-split) but small enough to force multiple chunks: each chunk must
+    # begin at an N.M clause boundary, never mid-clause.
+    chunks = _split_chunks(CLAUSE_BODY_MARKDOWN, max_chars=250)
 
     assert len(chunks) > 1
     for chunk in chunks:
@@ -883,13 +885,39 @@ def test_split_chunks_every_chunk_starts_at_a_clause_boundary():
 
 
 def test_split_chunks_never_splits_a_clause_across_chunks():
-    chunks = _split_chunks(CLAUSE_BODY_MARKDOWN, max_chars=120)
+    chunks = _split_chunks(CLAUSE_BODY_MARKDOWN, max_chars=250)
 
     # Clause 10.2's sub-items (a)(b)(c) must all live in the same chunk as 10.2.
     chunk_with_102 = next(c for c in chunks if "10.2" in c)
     assert "(a)  completed step a" in chunk_with_102
     assert "(b)  completed step b" in chunk_with_102
     assert "(c)  completed step c" in chunk_with_102
+
+
+def test_split_chunks_bounds_an_oversized_single_clause_block():
+    # A single clause block larger than the budget (a long clause or an appendix
+    # span with no interior N.M boundary) must be sub-split so no chunk exceeds
+    # the budget — otherwise the parser LLM's output overflows and its JSON is
+    # truncated mid-string (observed on RMiT's 24 KB chunk).
+    giant = "10.1  " + " ".join(f"word{i}" for i in range(2000))  # >> budget
+    body = giant + "\n\n11.1  A short following clause.\n"
+
+    chunks = _split_chunks(body, max_chars=500)
+
+    assert all(len(c) <= 500 for c in chunks), [len(c) for c in chunks]
+    # The giant clause's content is fully preserved across the sub-split chunks.
+    rejoined = "".join(chunks)
+    assert "word0" in rejoined and "word1999" in rejoined
+
+
+def test_bare_number_capital_line_is_not_a_clause_boundary():
+    # Footnote-style "N Capital" lines (e.g. "44 This is also applicable…") must
+    # NOT be treated as clause boundaries — matching them mis-split RMiT into a
+    # 24 KB unsplit block. Only N.M / Appendix start a clause.
+    assert _CLAUSE_START_RE.match("44 This is also applicable to intermediaries") is None
+    assert _CLAUSE_START_RE.match("1 For the purposes of this policy") is None
+    assert _CLAUSE_START_RE.match("10.50 A financial institution must assess") is not None
+    assert _CLAUSE_START_RE.match("Appendix 4 Register of arrangements") is not None
 
 
 def test_split_chunks_falls_back_to_paragraphs_without_clause_numbers():
