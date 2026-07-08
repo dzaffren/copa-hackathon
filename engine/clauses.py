@@ -442,7 +442,10 @@ If this chunk contains NO numbered clauses at all — for example a table of
 contents, a cover page, a definitions/interpretation block with no numbered
 requirements, or a page fragment — return an empty JSON array: []
 
-Return ONLY the JSON array.
+CRITICAL OUTPUT RULE: respond with the JSON array and NOTHING else. Your entire
+reply must start with the character `[` and end with the character `]`. Do not
+write any explanation, preamble, or prose before or after the array — not even
+for a chunk with no clauses (return `[]`). Do not echo the source text back.
 """
 
 _REQUIRED_ANCHOR_KEYS = {"clause_number", "starts_with", "heading", "parent"}

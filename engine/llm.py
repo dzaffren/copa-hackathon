@@ -41,6 +41,12 @@ def call_chat(
     per the Microsoft Foundry Claude docs. `system` is passed as the top-level
     Messages-API `system` parameter (not a message with role "system").
 
+    NB: assistant-turn prefill is **not** used to coerce JSON — the deployed
+    models (`claude-opus-4-8`, `claude-sonnet-5`) are in the Claude 4.6+ family,
+    which returns a 400 on a last-assistant-turn prefill. JSON is instead forced
+    by the system prompt plus defensive parsing in `parse_json_response` (which
+    also tolerates JSON Lines).
+
     Constructs the client from the endpoint/key in `engine.config`, sends the
     system + user prompt to the named `deployment`, and returns the concatenated
     text of the response content blocks.
@@ -71,7 +77,9 @@ def call_chat(
     # Messages API returns a list of content blocks; concatenate the text of
     # every text block (tool/thinking blocks, if any, carry no `.text`).
     return "".join(
-        block.text for block in message.content if getattr(block, "type", None) == "text"
+        block.text
+        for block in message.content
+        if getattr(block, "type", None) == "text"
     )
 
 
