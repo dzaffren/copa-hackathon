@@ -19,7 +19,8 @@ from engine.clauses import (
     ClausePrimaryIndexCollisionError,
     ClauseVersionNotFoundError,
     _parse_anchor_response,
-    _split_sections,
+    _split_chunks,
+    _strip_noise,
     build_clause_index,
     find_clause_anchors,
     merge_clause_indexes,
@@ -465,53 +466,79 @@ def test_ambiguous_primary_collision_raises_rather_than_silently_picking_one():
 # ---------------------------------------------------------------------------
 # Stage-2 parser (find_clause_anchors) — split + parse + merge wiring.
 #
-# No network: `_split_sections` and `_parse_anchor_response` are pure, and the
-# `find_clause_anchors` orchestration test monkeypatches `call_chat` with a
-# fake returning canned per-section JSON.
+# No network: `_strip_noise`, `_split_chunks` and `_parse_anchor_response` are
+# pure, and the `find_clause_anchors` orchestration test monkeypatches
+# `call_chat` with a fake returning canned per-chunk JSON.
 # ---------------------------------------------------------------------------
 
-MULTI_SECTION_MARKDOWN = """Outsourcing — Exposure Draft
-
-Some preamble text before the first numbered heading.
-
-12 Approval for material outsourcing arrangements
-
-12.1 A financial institution must obtain the Bank's written approval.
-
-17 Cloud services
-
-17.1 A financial institution shall notify the Bank within 14 days.
-
-Appendix 10 Illustrative risk assessment checklist for cloud adoption.
-"""
-
-
-def test_split_sections_returns_one_chunk_per_top_level_heading_in_order():
-    sections = _split_sections(MULTI_SECTION_MARKDOWN)
-
-    assert len(sections) == 3
-    assert sections[0].startswith("12 Approval for material outsourcing")
-    assert sections[1].startswith("17 Cloud services")
-    assert sections[2].startswith("Appendix 10 Illustrative risk assessment")
+# Mimics real MarkItDown output of a BNM PDF: a table of contents with dotted
+# leaders, repeated "Issued on:" running headers, "N of M" page footers, a
+# form-feed page break (\x0c), and lone "PART X" dividers — all noise — around
+# the genuine numbered clauses.
+MARKITDOWN_STYLE_MARKDOWN = (
+    "Outsourcing\n\n"
+    "PART A  OVERVIEW ...................................... 2\n"
+    "Interpretation ....................................... 3\n"
+    "PART C  REGULATORY PROCESS ........................... 12\n\n"
+    "Issued on: 23 October 2019\n\n"
+    "\x0c"
+    "PART C  REGULATORY PROCESS\n\n"
+    "12\n\n"
+    "Approval for material outsourcing arrangements\n\n"
+    "12.1 A financial institution must obtain the Bank's written approval.\n\n"
+    "Issued on: 23 October 2019\n\n"
+    "3 of 20\n\n"
+    "17 Cloud services\n\n"
+    "17.1 A financial institution shall notify the Bank within 14 days.\n"
+)
 
 
-def test_split_sections_chunk_carries_its_body_up_to_the_next_heading():
-    sections = _split_sections(MULTI_SECTION_MARKDOWN)
+def test_strip_noise_removes_toc_headers_footers_and_page_breaks():
+    cleaned = _strip_noise(MARKITDOWN_STYLE_MARKDOWN)
 
-    assert "12.1 A financial institution must obtain" in sections[0]
-    # Section 12's chunk stops before the next top-level heading.
-    assert "17 Cloud services" not in sections[0]
-    assert "17.1 A financial institution shall notify" in sections[1]
+    # Table-of-contents dotted-leader lines are gone.
+    assert "......" not in cleaned
+    assert "PART A  OVERVIEW" not in cleaned
+    # Running header and page-number footer are gone.
+    assert "Issued on:" not in cleaned
+    assert "3 of 20" not in cleaned
+    # Lone "PART X" divider is gone; form-feed is normalised away.
+    assert "PART C  REGULATORY PROCESS" not in cleaned
+    assert "\x0c" not in cleaned
+    # The genuine clauses survive.
+    assert "12.1 A financial institution must obtain" in cleaned
+    assert "17.1 A financial institution shall notify" in cleaned
 
 
-def test_split_sections_drops_preamble_before_the_first_heading():
-    sections = _split_sections(MULTI_SECTION_MARKDOWN)
+def test_split_chunks_bounds_size_and_breaks_on_paragraphs():
+    # A body of many small paragraphs, well over one chunk's budget.
+    paragraphs = [f"{i}.1 Requirement paragraph number {i}." for i in range(1, 60)]
+    body = "\n\n".join(paragraphs)
 
-    assert not any("Some preamble text" in chunk for chunk in sections)
+    chunks = _split_chunks(body, max_chars=200)
+
+    assert len(chunks) > 1
+    # Never exceeds the budget except where a single paragraph already does.
+    assert all(len(c) <= 200 or "\n\n" not in c for c in chunks)
+    # No clause paragraph is split across a chunk boundary.
+    rejoined = "\n\n".join(chunks)
+    for p in paragraphs:
+        assert p in rejoined
 
 
-def test_split_sections_handles_markdown_with_no_headings_without_crashing():
-    assert _split_sections("just some text, no headings here\n") == []
+def test_split_chunks_returns_document_order():
+    chunks = _split_chunks(MARKITDOWN_STYLE_MARKDOWN, max_chars=120)
+    joined = "\n\n".join(chunks)
+    assert joined.index("12.1") < joined.index("17.1")
+
+
+def test_split_chunks_on_all_noise_returns_empty():
+    all_noise = (
+        "PART A  OVERVIEW ...................... 2\n"
+        "Issued on: 23 October 2019\n"
+        "3 of 20\n"
+    )
+    assert _split_chunks(all_noise) == []
 
 
 VALID_ANCHOR_JSON = """[
@@ -567,7 +594,12 @@ def test_parse_anchor_response_raises_when_element_is_not_a_dict():
         _parse_anchor_response('["12.1", "12.2"]')
 
 
-def test_find_clause_anchors_splits_calls_per_section_and_merges_in_order(
+def test_parse_anchor_response_accepts_empty_array_for_clauseless_chunk():
+    # A table-of-contents / definitions chunk legitimately has no clauses.
+    assert _parse_anchor_response("[]") == []
+
+
+def test_find_clause_anchors_calls_per_chunk_and_merges_in_order(
     monkeypatch: pytest.MonkeyPatch,
 ):
     import engine.clauses as clauses
@@ -576,34 +608,37 @@ def test_find_clause_anchors_splits_calls_per_section_and_merges_in_order(
 
     def fake_call_chat(deployment: str, system: str, user: str) -> str:
         calls.append(user)
-        if user.startswith("12 "):
+        # A noise/TOC chunk returns [] (tolerated); clause chunks return anchors
+        # keyed off which clause text the chunk contains.
+        if "12.1 A financial institution" in user:
             return (
                 '[{"clause_number": "12.1", "starts_with": "A financial '
                 'institution must obtain the Bank\'s written approval", '
                 '"heading": "12 Approval for material outsourcing '
                 'arrangements", "parent": null}]'
             )
-        if user.startswith("17 "):
+        if "17.1 A financial institution" in user:
             return (
                 '[{"clause_number": "17.1", "starts_with": "A financial '
                 'institution shall notify the Bank within 14 days", '
                 '"heading": "17 Cloud services", "parent": null}]'
             )
-        return (
-            '[{"clause_number": "Appendix 10", "starts_with": "Illustrative '
-            'risk assessment checklist for cloud adoption", "heading": '
-            '"Appendix 10", "parent": null}]'
-        )
+        return "[]"
 
     monkeypatch.setattr(clauses, "call_chat", fake_call_chat)
 
-    anchors = find_clause_anchors(MULTI_SECTION_MARKDOWN, "outsourcing-v2-draft")
+    # Small max_chars so the fixture splits into multiple chunks; noise is
+    # stripped first, so TOC/headers never reach the model.
+    monkeypatch.setattr(clauses, "_MAX_CHUNK_CHARS", 120)
+    anchors = find_clause_anchors(MARKITDOWN_STYLE_MARKDOWN, "outsourcing-v1-2019")
 
-    # One LLM call per section, in document order.
-    assert len(calls) == 3
-    # Merged anchor list preserves document order across sections.
-    assert [a["clause_number"] for a in anchors] == ["12.1", "17.1", "Appendix 10"]
-    assert all(set(a.keys()) == {"clause_number", "starts_with", "heading", "parent"} for a in anchors)
+    # Merged anchor list preserves document order across chunks; clause-less
+    # chunks contribute nothing without failing the run.
+    assert [a["clause_number"] for a in anchors] == ["12.1", "17.1"]
+    assert all(
+        set(a.keys()) == {"clause_number", "starts_with", "heading", "parent"}
+        for a in anchors
+    )
 def test_entries_for_document_returns_that_documents_clauses_in_order():
     rmit_entries = build_clause_index(
         anchors=RMIT_NESTED_ANCHORS,

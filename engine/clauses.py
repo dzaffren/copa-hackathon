@@ -392,10 +392,24 @@ class ClauseIndex:
 # Matches a BNM top-level section heading on its own line: a bare number
 # ("12", "17") or "Appendix N", followed by a space and a title. Anchored to
 # line start; the `re.MULTILINE` flag makes `^` match at each line.
-_SECTION_HEADING_RE = re.compile(
-    r"^(?:\d+|Appendix\s+\d+)\s+\S.*$",
-    re.MULTILINE,
-)
+# Lines that are page-header/footer or table-of-contents noise in the real
+# MarkItDown output of BNM PDFs (validated against the demo corpus), not clause
+# content. Stripped before chunking so the parser LLM never sees them.
+# - dotted leaders ("......") are table-of-contents entries;
+# - "Issued on: <date>" is the running page header repeated on every page;
+# - "<N> of <M>" is the page-number footer;
+# - a lone "PART A"/"PART B" marker is a structural divider, not a clause.
+_TOC_LEADER_RE = re.compile(r"\.{4,}")
+_NOISE_LINE_RES = [
+    re.compile(r"^\s*Issued on:.*$"),
+    re.compile(r"^\s*\d+\s+of\s+\d+\s*$"),
+    re.compile(r"^\s*PART\s+[A-Z]\b.*$"),
+]
+
+# Chunk size (characters) for splitting a document's body before each parser
+# LLM call. Bounds per-call output so the largest docs (RMiT ≈ 204 KB markdown)
+# don't risk a truncated response; chunks break on blank lines, never mid-line.
+_MAX_CHUNK_CHARS = 6000
 
 PARSER_SYSTEM_PROMPT = """\
 You are a parser that finds clause boundaries in a Bank Negara Malaysia (BNM)
@@ -424,34 +438,74 @@ Example element:
 {"clause_number": "17.1(a)", "starts_with": "completed the risk assessment",
  "heading": "17 Cloud services", "parent": "17.1"}
 
+If this chunk contains NO numbered clauses at all — for example a table of
+contents, a cover page, a definitions/interpretation block with no numbered
+requirements, or a page fragment — return an empty JSON array: []
+
 Return ONLY the JSON array.
 """
 
 _REQUIRED_ANCHOR_KEYS = {"clause_number", "starts_with", "heading", "parent"}
 
 
-def _split_sections(markdown: str) -> list[str]:
-    """Split `markdown` into chunks, one per top-level numbered heading.
+def _strip_noise(markdown: str) -> str:
+    """Remove table-of-contents and page-header/footer noise from a document's
+    MarkItDown output, leaving the clause body.
 
-    BNM documents use top-level section headings of the form ``<number> Title``
-    (e.g. ``12 Approval for material outsourcing arrangements``, ``17 Cloud
-    services``) or ``Appendix N Title``, each on its own line. Each returned
-    chunk is a heading line plus its body up to (but excluding) the next
-    top-level heading, in document order. Chunking bounds per-call output size
-    for large documents (the parser LLM is called once per chunk).
-
-    Any preamble before the first heading is dropped. Pure and network-free.
+    Real BNM PDFs convert with repeated running headers ("Issued on: <date>"),
+    page-number footers ("3 of 20"), form-feed page breaks, table-of-contents
+    entries (dotted leaders "......"), and lone "PART X" dividers — none of
+    which are clause content, and all of which confused the parser into
+    treating a definitions/TOC page as a clause section (see the demo corpus).
+    This drops those lines. Pure and network-free.
     """
-    matches = list(_SECTION_HEADING_RE.finditer(markdown))
-    if not matches:
+    kept: list[str] = []
+    for raw_line in markdown.replace("\x0c", "\n").split("\n"):
+        line = raw_line.rstrip()
+        if _TOC_LEADER_RE.search(line):
+            continue
+        if any(pattern.match(line) for pattern in _NOISE_LINE_RES):
+            continue
+        kept.append(line)
+    return "\n".join(kept)
+
+
+def _split_chunks(markdown: str, max_chars: int = _MAX_CHUNK_CHARS) -> list[str]:
+    """Split a document into size-bounded chunks for per-call LLM parsing.
+
+    Strips page/TOC noise (`_strip_noise`), then accumulates blank-line-
+    separated paragraphs into chunks of at most ``max_chars`` characters,
+    breaking only at paragraph boundaries (never mid-line, so a clause is never
+    split across two calls). Size-based chunking bounds each parser LLM call's
+    output without depending on heading detection, which varies too much across
+    the real BNM documents to be reliable. Pure and network-free.
+
+    Returns the non-empty chunks in document order (an all-noise document
+    yields an empty list).
+    """
+    body = _strip_noise(markdown).strip()
+    if not body:
         return []
 
-    sections: list[str] = []
-    for i, match in enumerate(matches):
-        start = match.start()
-        end = matches[i + 1].start() if i + 1 < len(matches) else len(markdown)
-        sections.append(markdown[start:end].strip())
-    return sections
+    paragraphs = re.split(r"\n\s*\n", body)
+    chunks: list[str] = []
+    current: list[str] = []
+    current_len = 0
+    for paragraph in paragraphs:
+        paragraph = paragraph.strip()
+        if not paragraph:
+            continue
+        # +2 for the "\n\n" re-join separator.
+        addition = len(paragraph) + 2
+        if current and current_len + addition > max_chars:
+            chunks.append("\n\n".join(current))
+            current = []
+            current_len = 0
+        current.append(paragraph)
+        current_len += addition
+    if current:
+        chunks.append("\n\n".join(current))
+    return chunks
 
 
 def _parse_anchor_response(raw: str) -> list[dict]:
@@ -490,10 +544,11 @@ def _parse_anchor_response(raw: str) -> list[dict]:
 def find_clause_anchors(markdown: str, document_id: str) -> list[dict]:
     """Call the parser LLM (Azure AI Foundry, Claude) to find clause anchors.
 
-    Splits `markdown` into top-level sections (`_split_sections`), calls the
-    parser deployment once per section via `engine.llm.call_chat` with
-    `PARSER_SYSTEM_PROMPT`, parses each reply with `_parse_anchor_response`, and
-    concatenates the per-section anchor lists in document order. Returns one
+    Strips page/TOC noise and splits `markdown` into size-bounded chunks
+    (`_split_chunks`), calls the parser deployment once per chunk via
+    `engine.llm.call_chat` with `PARSER_SYSTEM_PROMPT`, parses each reply with
+    `_parse_anchor_response` (a clause-less chunk legitimately yields `[]`), and
+    concatenates the per-chunk anchor lists in document order. Returns one
     ``{clause_number, starts_with, heading, parent}`` dict per clause (bare
     numbers, not canonical) — exactly the shape `build_clause_index` consumes.
 
@@ -503,19 +558,12 @@ def find_clause_anchors(markdown: str, document_id: str) -> list[dict]:
     deployment for this mechanical boundary-finding stage (see spec Solution
     Design, "Model access & config").
     """
-    sections = _split_sections(markdown)
+    chunks = _split_chunks(markdown, _MAX_CHUNK_CHARS)
     anchors: list[dict] = []
-    for i, section in enumerate(sections, start=1):
-        heading = section.splitlines()[0][:60] if section.strip() else ""
-        logger.info(
-            "  [%s] parsing section %d/%d: %s",
-            document_id,
-            i,
-            len(sections),
-            heading,
-        )
-        raw = call_chat(PARSER_DEPLOYMENT, PARSER_SYSTEM_PROMPT, section)
+    for i, chunk in enumerate(chunks, start=1):
+        logger.info("  [%s] parsing chunk %d/%d", document_id, i, len(chunks))
+        raw = call_chat(PARSER_DEPLOYMENT, PARSER_SYSTEM_PROMPT, chunk)
         found = _parse_anchor_response(raw)
         anchors.extend(found)
-        logger.info("  [%s] section %d → %d clauses", document_id, i, len(found))
+        logger.info("  [%s] chunk %d → %d clauses", document_id, i, len(found))
     return anchors
