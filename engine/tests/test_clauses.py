@@ -232,3 +232,33 @@ def test_anchor_not_found_raises_clear_exception_naming_the_clause():
             policy_id="outsourcing",
             source="published",
         )
+
+
+def test_ambiguous_anchor_raises_clear_exception_naming_the_clause():
+    ambiguous_markdown = (
+        "12.1 A financial institution must comply.\n\n"
+        "12.2 A financial institution must comply.\n"
+    )
+    ambiguous_anchors = [
+        {
+            "clause_number": "12.1",
+            "starts_with": "A financial institution must comply",
+            "heading": None,
+            "parent": None,
+        },
+        {
+            "clause_number": "12.2",
+            "starts_with": "A financial institution must comply",
+            "heading": None,
+            "parent": None,
+        },
+    ]
+
+    with pytest.raises(ClauseAnchorAmbiguousError, match="12.1"):
+        build_clause_index(
+            anchors=ambiguous_anchors,
+            markdown=ambiguous_markdown,
+            document_id="outsourcing-v1-2019",
+            policy_id="outsourcing",
+            source="published",
+        )
