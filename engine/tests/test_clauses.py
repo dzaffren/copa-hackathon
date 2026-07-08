@@ -18,9 +18,13 @@ from engine.clauses import (
     ClauseIndex,
     ClausePrimaryIndexCollisionError,
     ClauseVersionNotFoundError,
+    _parse_anchor_response,
+    _split_sections,
     build_clause_index,
+    find_clause_anchors,
     merge_clause_indexes,
 )
+from engine.llm import LLMResponseError
 
 OUTSOURCING_MARKDOWN = """Outsourcing
 
@@ -456,3 +460,147 @@ def test_ambiguous_primary_collision_raises_rather_than_silently_picking_one():
             # Neither document is "current" -- an equal-precedence collision.
             current_document_id="outsourcing-v9-not-in-corpus",
         )
+
+
+# ---------------------------------------------------------------------------
+# Stage-2 parser (find_clause_anchors) — split + parse + merge wiring.
+#
+# No network: `_split_sections` and `_parse_anchor_response` are pure, and the
+# `find_clause_anchors` orchestration test monkeypatches `call_chat` with a
+# fake returning canned per-section JSON.
+# ---------------------------------------------------------------------------
+
+MULTI_SECTION_MARKDOWN = """Outsourcing — Exposure Draft
+
+Some preamble text before the first numbered heading.
+
+12 Approval for material outsourcing arrangements
+
+12.1 A financial institution must obtain the Bank's written approval.
+
+17 Cloud services
+
+17.1 A financial institution shall notify the Bank within 14 days.
+
+Appendix 10 Illustrative risk assessment checklist for cloud adoption.
+"""
+
+
+def test_split_sections_returns_one_chunk_per_top_level_heading_in_order():
+    sections = _split_sections(MULTI_SECTION_MARKDOWN)
+
+    assert len(sections) == 3
+    assert sections[0].startswith("12 Approval for material outsourcing")
+    assert sections[1].startswith("17 Cloud services")
+    assert sections[2].startswith("Appendix 10 Illustrative risk assessment")
+
+
+def test_split_sections_chunk_carries_its_body_up_to_the_next_heading():
+    sections = _split_sections(MULTI_SECTION_MARKDOWN)
+
+    assert "12.1 A financial institution must obtain" in sections[0]
+    # Section 12's chunk stops before the next top-level heading.
+    assert "17 Cloud services" not in sections[0]
+    assert "17.1 A financial institution shall notify" in sections[1]
+
+
+def test_split_sections_drops_preamble_before_the_first_heading():
+    sections = _split_sections(MULTI_SECTION_MARKDOWN)
+
+    assert not any("Some preamble text" in chunk for chunk in sections)
+
+
+def test_split_sections_handles_markdown_with_no_headings_without_crashing():
+    assert _split_sections("just some text, no headings here\n") == []
+
+
+VALID_ANCHOR_JSON = """[
+  {"clause_number": "12.1",
+   "starts_with": "A financial institution must obtain the Bank's written approval",
+   "heading": "12 Approval for material outsourcing arrangements",
+   "parent": null}
+]"""
+
+
+def test_parse_anchor_response_parses_unfenced_json_array():
+    anchors = _parse_anchor_response(VALID_ANCHOR_JSON)
+
+    assert anchors == [
+        {
+            "clause_number": "12.1",
+            "starts_with": (
+                "A financial institution must obtain the Bank's written approval"
+            ),
+            "heading": "12 Approval for material outsourcing arrangements",
+            "parent": None,
+        }
+    ]
+
+
+def test_parse_anchor_response_parses_fenced_json_array():
+    fenced = f"```json\n{VALID_ANCHOR_JSON}\n```"
+
+    anchors = _parse_anchor_response(fenced)
+
+    assert anchors[0]["clause_number"] == "12.1"
+    assert anchors[0]["parent"] is None
+
+
+def test_parse_anchor_response_raises_on_non_list():
+    with pytest.raises(LLMResponseError):
+        _parse_anchor_response('{"clause_number": "12.1"}')
+
+
+def test_parse_anchor_response_raises_when_element_missing_required_key():
+    # Missing "parent".
+    bad = (
+        '[{"clause_number": "12.1", "starts_with": "A financial institution", '
+        '"heading": "12 Approval"}]'
+    )
+
+    with pytest.raises(LLMResponseError):
+        _parse_anchor_response(bad)
+
+
+def test_parse_anchor_response_raises_when_element_is_not_a_dict():
+    with pytest.raises(LLMResponseError):
+        _parse_anchor_response('["12.1", "12.2"]')
+
+
+def test_find_clause_anchors_splits_calls_per_section_and_merges_in_order(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    import engine.clauses as clauses
+
+    calls: list[str] = []
+
+    def fake_call_chat(deployment: str, system: str, user: str) -> str:
+        calls.append(user)
+        if user.startswith("12 "):
+            return (
+                '[{"clause_number": "12.1", "starts_with": "A financial '
+                'institution must obtain the Bank\'s written approval", '
+                '"heading": "12 Approval for material outsourcing '
+                'arrangements", "parent": null}]'
+            )
+        if user.startswith("17 "):
+            return (
+                '[{"clause_number": "17.1", "starts_with": "A financial '
+                'institution shall notify the Bank within 14 days", '
+                '"heading": "17 Cloud services", "parent": null}]'
+            )
+        return (
+            '[{"clause_number": "Appendix 10", "starts_with": "Illustrative '
+            'risk assessment checklist for cloud adoption", "heading": '
+            '"Appendix 10", "parent": null}]'
+        )
+
+    monkeypatch.setattr(clauses, "call_chat", fake_call_chat)
+
+    anchors = find_clause_anchors(MULTI_SECTION_MARKDOWN, "outsourcing-v2-draft")
+
+    # One LLM call per section, in document order.
+    assert len(calls) == 3
+    # Merged anchor list preserves document order across sections.
+    assert [a["clause_number"] for a in anchors] == ["12.1", "17.1", "Appendix 10"]
+    assert all(set(a.keys()) == {"clause_number", "starts_with", "heading", "parent"} for a in anchors)
