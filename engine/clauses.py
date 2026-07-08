@@ -205,62 +205,101 @@ def build_clause_index(
     document only (`superseded_versions` is left empty here — populated by
     `merge_clause_indexes` across documents).
 
+    Unresolvable anchors (empty / not-found / ambiguous `starts_with`) are
+    DROPPED with a logged warning and a per-document summary, not raised — the
+    real BNM corpus has a long tail of deeply-nested boilerplate sub-items the
+    LLM cannot anchor uniquely, and crashing on each defeats the build. The
+    `ClauseCompletenessError` reconcile is the backstop for *required* clauses.
+
     Raises:
-        ClauseAnchorNotFoundError: an anchor's `starts_with` is not present
-            in `markdown`.
-        ClauseAnchorAmbiguousError: an anchor's `starts_with` matches more
-            than one position in `markdown`.
         ClauseCompletenessError: `expected_clauses` is supplied and the
-            emitted canonical clause set does not cover it.
+            emitted canonical clause set does not cover it (a *load-bearing*
+            clause was dropped or never parsed).
     """
-    # Drop anchors with an empty `starts_with`: these are clause numbers the
-    # parser saw but had no quotable text for — a PDF-layout artifact where a
-    # clause's body was separated from its number in conversion (e.g.
-    # Outsourcing 8.2/8.3, whose text MarkItDown lost). We cannot fabricate the
-    # missing text, so we skip the anchor and log loudly rather than crash. The
-    # completeness reconcile (`expected_clauses`) is the backstop that fails the
-    # build if a *load-bearing* clause is among those dropped.
-    kept_anchors: list[dict] = []
+    # Resolve each anchor to a single source position, DROPPING (not crashing on)
+    # any anchor we cannot place unambiguously. Three drop reasons, all logged
+    # loudly and counted, all rooted in imperfect PDF extraction / LLM anchors:
+    #
+    #   1. empty `starts_with` — the parser saw a clause number but had no
+    #      quotable text (a clause body separated from its number in
+    #      conversion, e.g. Outsourcing 8.2/8.3);
+    #   2. not found — the quoted phrase isn't in the markdown (paraphrased or
+    #      from a garbled region);
+    #   3. ambiguous — the phrase recurs and the clause's own label can't single
+    #      one occurrence out (boilerplate sub-item phrasing, or a label variant
+    #      like "iii)" vs "(iii)").
+    #
+    # Dropping keeps the build converging on real BNM PDFs (deeply-nested
+    # boilerplate sub-items are the overwhelming majority of drops, not
+    # load-bearing clauses). The `expected_clauses` completeness reconcile is
+    # the backstop that still fails the build if a *required* clause is dropped.
+    resolved_anchors: list[dict] = []
+    positions: list[int] = []
+    dropped: list[str] = []
+
     for anchor in anchors:
-        if not anchor["starts_with"].strip():
+        snippet = anchor["starts_with"]
+        if not snippet.strip():
+            dropped.append(anchor["clause_number"])
             logger.warning(
-                "Dropping clause '%s' in document '%s': empty starts_with "
+                "Dropping clause '%s' in '%s': empty starts_with "
                 "(clause text not recoverable from the converted markdown)",
                 anchor["clause_number"],
                 document_id,
             )
             continue
-        kept_anchors.append(anchor)
-    anchors = kept_anchors
 
-    positions: list[int] = []
-    for anchor in anchors:
-        snippet = anchor["starts_with"]
         occurrences = _find_anchor_positions(markdown, snippet)
         if len(occurrences) == 0:
-            raise ClauseAnchorNotFoundError(
-                f"Anchor for clause '{anchor['clause_number']}' "
-                f"(starts_with={snippet!r}) not found in document "
-                f"'{document_id}'"
+            dropped.append(anchor["clause_number"])
+            logger.warning(
+                "Dropping clause '%s' in '%s': starts_with %r not found "
+                "(paraphrased or from a garbled region)",
+                anchor["clause_number"],
+                document_id,
+                snippet,
             )
+            continue
+
         if len(occurrences) > 1:
-            # A phrase can recur (e.g. a clause quoted mid-sentence elsewhere).
-            # The real clause start is the occurrence immediately preceded by
-            # this clause's own label ("(c)" for "8.4(c)", "8.4" for a
-            # top-level clause). Prefer it; only fail if the label can't
-            # single out one occurrence.
+            # A phrase can recur (a clause quoted elsewhere, or boilerplate
+            # sub-item text). The real start is the occurrence preceded by this
+            # clause's own label ("(c)" for "8.4(c)", "(iii)" for "9.6(c)(iii)",
+            # "8.4" for a top-level clause). Use it iff it singles out exactly
+            # one; otherwise the anchor is unresolvable — drop it.
             label = _in_text_label(anchor["clause_number"])
-            labelled = [p for p in occurrences if _preceded_by_label(markdown, p, label)]
+            labelled = [
+                p for p in occurrences if _preceded_by_label(markdown, p, label)
+            ]
             if len(labelled) == 1:
+                resolved_anchors.append(anchor)
                 positions.append(labelled[0])
                 continue
-            raise ClauseAnchorAmbiguousError(
-                f"Anchor for clause '{anchor['clause_number']}' "
-                f"(starts_with={snippet!r}) is ambiguous — found "
-                f"{len(occurrences)} times in document '{document_id}'"
-                f"{f' and the label {label!r} matched {len(labelled)} of them' if labelled else ''}"
+            dropped.append(anchor["clause_number"])
+            logger.warning(
+                "Dropping clause '%s' in '%s': starts_with %r is ambiguous "
+                "(found %d times, label %r matched %d)",
+                anchor["clause_number"],
+                document_id,
+                snippet,
+                len(occurrences),
+                label,
+                len(labelled),
             )
+            continue
+
+        resolved_anchors.append(anchor)
         positions.append(occurrences[0])
+
+    if dropped:
+        logger.warning(
+            "Document '%s': dropped %d of %d anchors (%s)",
+            document_id,
+            len(dropped),
+            len(anchors),
+            ", ".join(dropped),
+        )
+    anchors = resolved_anchors
 
     entries: dict[str, ClauseEntry] = {}
     children_by_parent: dict[str, list[str]] = {}

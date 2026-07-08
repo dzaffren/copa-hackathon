@@ -12,8 +12,6 @@ never called here — every test hand-writes its own anchor list and calls
 import pytest
 
 from engine.clauses import (
-    ClauseAnchorAmbiguousError,
-    ClauseAnchorNotFoundError,
     ClauseCompletenessError,
     ClauseIndex,
     ClausePrimaryIndexCollisionError,
@@ -273,30 +271,47 @@ def test_full_text_composes_stem_and_children_as_a_contiguous_source_span():
     assert full_text in RMIT_NESTED_MARKDOWN
 
 
-def test_anchor_not_found_raises_clear_exception_naming_the_clause():
-    bad_anchors = [
+def test_anchor_not_found_is_skipped_with_warning(caplog):
+    # A phrase absent from the source (paraphrased / from a garbled region) is
+    # dropped with a loud warning rather than crashing the whole build.
+    import logging
+
+    anchors = [
+        {
+            "clause_number": "12.1",
+            "starts_with": "A financial institution must obtain the Bank's written approval",
+            "heading": None,
+            "parent": None,
+        },
         {
             "clause_number": "99.9",
             "starts_with": "This phrase does not appear anywhere in the source",
             "heading": None,
             "parent": None,
-        }
+        },
     ]
 
-    with pytest.raises(ClauseAnchorNotFoundError, match="99.9"):
-        build_clause_index(
-            anchors=bad_anchors,
+    with caplog.at_level(logging.WARNING):
+        entries = build_clause_index(
+            anchors=anchors,
             markdown=OUTSOURCING_MARKDOWN,
             document_id="outsourcing-v1-2019",
             policy_id="outsourcing",
             source="published",
         )
 
+    # 99.9 dropped; the real 12.1 still built.
+    assert "Outsourcing 99.9" not in entries
+    assert "Outsourcing 12.1" in entries
+    assert any("99.9" in rec.message for rec in caplog.records)
 
-def test_ambiguous_anchor_raises_clear_exception_naming_the_clause():
-    # The phrase recurs AND the clause's own label ("8.4") does not precede
-    # either occurrence — so label-based disambiguation cannot single one out,
-    # and the build must fail loudly rather than guess.
+
+def test_ambiguous_anchor_is_skipped_with_warning(caplog):
+    # The phrase recurs AND the clause's own label ("8.4") precedes neither
+    # occurrence — label disambiguation can't single one out, so the anchor is
+    # dropped with a warning rather than crashing.
+    import logging
+
     ambiguous_markdown = (
         "8.4  A financial institution must, including a repeated phrase, act.\n\n"
         "9.1  See also a repeated phrase in a different clause entirely.\n"
@@ -316,14 +331,20 @@ def test_ambiguous_anchor_raises_clear_exception_naming_the_clause():
         },
     ]
 
-    with pytest.raises(ClauseAnchorAmbiguousError, match="8.4"):
-        build_clause_index(
+    with caplog.at_level(logging.WARNING):
+        entries = build_clause_index(
             anchors=ambiguous_anchors,
             markdown=ambiguous_markdown,
             document_id="outsourcing-v1-2019",
             policy_id="outsourcing",
             source="published",
         )
+
+    # 8.4 (ambiguous) dropped with a warning; 9.1 still built.
+    assert "Outsourcing 8.4" not in entries
+    assert "Outsourcing 9.1" in entries
+    assert any("8.4" in rec.message and "ambiguous" in rec.message.lower()
+               for rec in caplog.records)
 
 
 def test_empty_starts_with_anchor_is_skipped_not_fatal(caplog):
