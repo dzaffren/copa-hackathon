@@ -321,6 +321,58 @@ def test_edges_are_sorted_by_source_target_type_for_determinism():
     assert sort_keys[0][0] == "bcm-v1-2022"
 
 
+def test_llm_found_edge_is_included_and_may_carry_confidence_below_one():
+    clause_index = _build_fixture_clause_index()
+    llm_found_edges = [
+        {
+            "source": "rmit-v2-2026-draft",
+            "target": "opres-v1-2025",
+            "type": "depends-on",
+            "reason": "RMiT 17.1 depends on the OpRes register staying in sync.",
+            "source_clauses": ["RMiT 17.1"],
+            "target_clauses": ["Operational Resilience 6.11"],
+            "provenance": "llm-found",
+            "confidence": 0.82,
+        },
+    ]
+
+    graph = build_graph(
+        documents=DOCUMENTS,
+        curated_edges=[],
+        clause_index=clause_index,
+        draft_registry=DRAFT_REGISTRY,
+        llm_found_edges=llm_found_edges,
+    )
+
+    llm_edges = [e for e in graph["edges"] if e["provenance"] == "llm-found"]
+    assert len(llm_edges) == 1
+    assert llm_edges[0]["confidence"] == 0.82
+
+
+def test_curated_edge_with_confidence_not_one_raises_graph_build_error():
+    clause_index = _build_fixture_clause_index()
+    bad_edges = [
+        {
+            "source_policy_id": "rmit",
+            "target_policy_id": "opres",
+            "type": "overlaps",
+            "reason": "Both govern the cloud register.",
+            "source_clauses": ["RMiT 10.50"],
+            "target_clauses": ["Operational Resilience 6.11"],
+            "provenance": "curated",
+            "confidence": 0.9,
+        },
+    ]
+
+    with pytest.raises(GraphBuildError, match="confidence"):
+        build_graph(
+            documents=DOCUMENTS,
+            curated_edges=bad_edges,
+            clause_index=clause_index,
+            draft_registry=DRAFT_REGISTRY,
+        )
+
+
 def _node(graph: dict, document_id: str) -> dict:
     matches = [n for n in graph["nodes"] if n["id"] == document_id]
     assert matches, f"no node with id '{document_id}' in graph"
