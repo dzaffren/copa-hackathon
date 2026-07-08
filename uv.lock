@@ -379,6 +379,7 @@ dependencies = [
     { name = "httpx" },
     { name = "markitdown", extra = ["docx", "pdf"] },
     { name = "pytest" },
+    { name = "python-dotenv" },
     { name = "python-multipart" },
     { name = "uvicorn" },
 ]
@@ -390,6 +391,7 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "markitdown", extras = ["docx", "pdf"], specifier = ">=0.1.6" },
     { name = "pytest", specifier = ">=9.1.1" },
+    { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "python-multipart", specifier = ">=0.0.20" },
     { name = "uvicorn", specifier = ">=0.50.2" },
 ]
