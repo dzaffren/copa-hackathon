@@ -186,9 +186,9 @@ def test_every_entry_text_is_a_verbatim_substring_of_the_source():
     entries, _ = _build_rmit_nested_index()
 
     for clause_number, entry in entries.items():
-        assert entry["text"] in RMIT_NESTED_MARKDOWN, (
-            f"{clause_number}'s text is not a substring of the source"
-        )
+        assert (
+            entry["text"] in RMIT_NESTED_MARKDOWN
+        ), f"{clause_number}'s text is not a substring of the source"
 
 
 def test_option_c_parent_stem_excludes_child_text_and_children_link_correctly():

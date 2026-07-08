@@ -16,9 +16,13 @@ Failure modes (unfound/ambiguous anchor, incomplete clause set) are loud
 exceptions raised at build time — never silent corruption.
 """
 
-from typing import Optional, TypedDict
+from typing import NotRequired, Optional, TypedDict, cast
 
-from engine.config import AZURE_FOUNDRY_API_KEY, AZURE_FOUNDRY_ENDPOINT, PARSER_DEPLOYMENT
+from engine.config import (
+    AZURE_FOUNDRY_API_KEY,
+    AZURE_FOUNDRY_ENDPOINT,
+    PARSER_DEPLOYMENT,
+)
 
 # Canonical clause numbers are "{PolicyShortName} {number}" — matching how the
 # corpus labels clauses and how the spec's Acceptance Criteria quote them.
@@ -42,6 +46,10 @@ class ClauseEntry(TypedDict):
     parent: Optional[str]
     children: list[str]
     superseded_versions: list[str]
+    # Internal-only (leading `_`): the composed source span for a parent
+    # clause, used by `ClauseIndex.full_text`. Never part of the public
+    # clause-index contract; absent on leaf/sub-item entries.
+    _full_text: NotRequired[str]
 
 
 class ClauseAnchorNotFoundError(Exception):
@@ -103,7 +111,9 @@ def _in_text_label(bare_number: str) -> str:
     return bare_number
 
 
-def _trim_trailing_label(markdown: str, end: int, next_bare_number: Optional[str]) -> int:
+def _trim_trailing_label(
+    markdown: str, end: int, next_bare_number: Optional[str]
+) -> int:
     """Adjust a clause's slice end-point to exclude the next clause's label.
 
     `starts_with` anchors quote content only, never the numbering label
@@ -184,7 +194,9 @@ def build_clause_index(
     for i, anchor in enumerate(anchors):
         start = positions[i]
         raw_end = positions[i + 1] if i + 1 < len(anchors) else len(markdown)
-        next_bare_number = anchors[i + 1]["clause_number"] if i + 1 < len(anchors) else None
+        next_bare_number = (
+            anchors[i + 1]["clause_number"] if i + 1 < len(anchors) else None
+        )
         end = _trim_trailing_label(markdown, raw_end, next_bare_number)
         text = markdown[start:end]
 
@@ -281,7 +293,7 @@ def merge_clause_indexes(
                 )
             winner_document_id = other_document_ids[0]
 
-        winner_entry = dict(by_document[winner_document_id])
+        winner_entry = cast(ClauseEntry, dict(by_document[winner_document_id]))
         superseded = sorted(
             doc_id for doc_id in by_document if doc_id != winner_document_id
         )
@@ -315,7 +327,9 @@ class ClauseIndex:
                 for clause_number, entry in primary.items()
             }
 
-    def get(self, clause_number: str, version: Optional[str] = None) -> Optional[ClauseEntry]:
+    def get(
+        self, clause_number: str, version: Optional[str] = None
+    ) -> Optional[ClauseEntry]:
         """Fetch a clause entry verbatim.
 
         - `version=None` (default): the current/primary entry, or `None` if
@@ -337,7 +351,9 @@ class ClauseIndex:
             )
         return versions_for_clause[version]
 
-    def full_text(self, clause_number: str, version: Optional[str] = None) -> Optional[str]:
+    def full_text(
+        self, clause_number: str, version: Optional[str] = None
+    ) -> Optional[str]:
         """Composed view for a parent clause: stem text + all children's text,
         concatenated in document order (assembled on demand, not stored).
 
@@ -368,6 +384,12 @@ def find_clause_anchors(markdown: str, document_id: str) -> list[dict]:
     """
     from azure.ai.inference import ChatCompletionsClient
     from azure.core.credentials import AzureKeyCredential
+
+    if not AZURE_FOUNDRY_ENDPOINT or not AZURE_FOUNDRY_API_KEY:
+        raise RuntimeError(
+            "AZURE_FOUNDRY_ENDPOINT and AZURE_FOUNDRY_API_KEY must be set "
+            "in the environment to call find_clause_anchors"
+        )
 
     ChatCompletionsClient(
         endpoint=AZURE_FOUNDRY_ENDPOINT,
