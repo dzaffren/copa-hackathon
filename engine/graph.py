@@ -11,7 +11,7 @@ side, and every clause it cites must resolve in the supplied `ClauseIndex` —
 enforced here at build time, never trusted on faith.
 """
 
-from typing import Optional, TypedDict
+from typing import Any, Optional, TypedDict, cast
 
 
 class GraphNode(TypedDict):
@@ -115,7 +115,7 @@ def _build_version_lineage_edges(
 _VALID_PROVENANCE = {"structural", "curated", "llm-found"}
 
 
-def _validate_non_lineage_edge(edge: dict, clause_index) -> None:
+def _validate_non_lineage_edge(edge: dict[str, Any], clause_index: Any) -> None:
     reason = edge.get("reason")
     if not reason:
         raise GraphBuildError(
@@ -160,9 +160,9 @@ def _validate_non_lineage_edge(edge: dict, clause_index) -> None:
 
 
 def _build_curated_edges(
-    curated_edges: list[dict],
+    curated_edges: list[dict[str, Any]],
     ids_by_policy: dict[str, list[str]],
-    clause_index,
+    clause_index: Any,
 ) -> list[GraphEdge]:
     edges: list[GraphEdge] = []
     for curated in curated_edges:
@@ -178,17 +178,17 @@ def _build_curated_edges(
             "provenance": curated["provenance"],
             "confidence": curated["confidence"],
         }
-        _validate_non_lineage_edge(edge, clause_index)
+        _validate_non_lineage_edge(cast(dict[str, Any], edge), clause_index)
         edges.append(edge)
     return edges
 
 
 def build_graph(
     documents: dict,
-    curated_edges: list[dict],
-    clause_index,
+    curated_edges: list[dict[str, Any]],
+    clause_index: Any,
     draft_registry: dict,
-    llm_found_edges: Optional[list[dict]] = None,
+    llm_found_edges: Optional[list[dict[str, Any]]] = None,
 ) -> dict:
     """Assemble `graph.json`'s `{"nodes": [...], "edges": [...]}` shape."""
     ids_by_policy = _ordered_document_ids_by_policy(documents)
@@ -199,7 +199,7 @@ def build_graph(
     if llm_found_edges:
         for edge in llm_found_edges:
             _validate_non_lineage_edge(edge, clause_index)
-            edges.append(dict(edge))
+            edges.append(cast(GraphEdge, dict(edge)))
 
     # Determinism of the frozen contract (spec Solution Design, "Build &
     # operability"): edges sort by (source, target, type) so a rebuild from
