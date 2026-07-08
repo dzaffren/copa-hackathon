@@ -75,6 +75,29 @@ def test_json_lines_with_one_bad_line_raises() -> None:
         parse_json_response(raw)
 
 
+def test_salvages_array_after_junk_preamble_object() -> None:
+    """Claude sometimes prepends a wrapper object before the real array;
+    parse_json_response salvages the array and drops the wrapper."""
+    raw = '{\n  "clauses": []\n}\n\n[{"clause_number": "8.3(a)"}, {"clause_number": "8.3(b)"}]'
+    assert parse_json_response(raw) == [
+        {"clause_number": "8.3(a)"},
+        {"clause_number": "8.3(b)"},
+    ]
+
+
+def test_salvages_array_with_trailing_prose() -> None:
+    raw = '[{"clause_number": "1.1"}]\n\nThat completes the extraction.'
+    assert parse_json_response(raw) == [{"clause_number": "1.1"}]
+
+
+def test_multiline_wrapper_with_no_array_raises() -> None:
+    """A response whose only JSON is a (multi-line) wrapper object with no
+    array is not salvageable — raise rather than silently returning []."""
+    raw = '{\n  "clauses": []\n}\n\nNo numbered clauses in this chunk.'
+    with pytest.raises(LLMResponseError):
+        parse_json_response(raw)
+
+
 def test_call_chat_without_credentials_raises(monkeypatch: pytest.MonkeyPatch) -> None:
     """No network: with creds unset, call_chat raises a clear RuntimeError."""
     import engine.llm as llm

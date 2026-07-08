@@ -118,10 +118,61 @@ def parse_json_response(raw: str) -> list | dict:
         jsonl = _try_parse_jsonl(body)
         if jsonl is not None:
             return jsonl
+        # Fall back to salvaging multiple concatenated top-level JSON values —
+        # Claude sometimes prepends a junk wrapper object (e.g. `{"clauses":
+        # []}`) before the real array, or appends trailing prose. Extract every
+        # array the model emitted and concatenate them; non-array values are
+        # discarded. Only a faithful extraction of arrays actually present —
+        # never fabricated content.
+        arrays = _salvage_json_arrays(body)
+        if arrays is not None:
+            return arrays
         snippet = stripped[:200]
         raise LLMResponseError(
             f"LLM output was not valid JSON: {exc}. Raw (truncated): {snippet!r}"
         ) from exc
+
+
+def _salvage_json_arrays(body: str) -> list | None:
+    """Extract and concatenate every top-level JSON array in `body`.
+
+    Walks `body` with a raw JSON decoder, decoding one top-level value at a
+    time and skipping any non-JSON text between values. Returns the flattened
+    concatenation of all array-typed values found (dropping non-array values
+    such as a preamble ``{"clauses": []}`` wrapper), or `None` if no array is
+    present so the caller can report the original parse error.
+
+    Every consumer of a fallen-through response expects a list (anchor records
+    / connection candidates), so recovering the arrays the model emitted — and
+    only those — is faithful, not fabricated.
+    """
+    decoder = json.JSONDecoder()
+    arrays: list = []
+    found_array = False
+    i = 0
+    n = len(body)
+    while i < n:
+        # Skip whitespace / stray characters until a plausible JSON value start.
+        while i < n and body[i] not in "[{":
+            i += 1
+        if i >= n:
+            break
+        try:
+            value, end = decoder.raw_decode(body, i)
+        except (json.JSONDecodeError, ValueError):
+            # Not a valid value at this position; advance one char and retry.
+            i += 1
+            continue
+        if isinstance(value, list):
+            found_array = True
+            arrays.extend(value)
+        i = end
+    # Only salvage when at least one genuine array was recovered. If the body
+    # held no parseable array (e.g. a lone wrapper object, or a malformed line),
+    # return None so the caller raises rather than silently yielding [].
+    if not found_array:
+        return None
+    return arrays
 
 
 def _try_parse_jsonl(body: str) -> list | None:
