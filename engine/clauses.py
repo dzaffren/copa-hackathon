@@ -218,6 +218,70 @@ def build_clause_index(
     return entries
 
 
+class ClausePrimaryIndexCollisionError(Exception):
+    """Raised when two documents at equal precedence both claim the primary
+    (current) slot for the same clause_number — an ambiguous collision that
+    must never be silently resolved by picking one."""
+
+
+def merge_clause_indexes(
+    document_entries: list[tuple[str, dict[str, ClauseEntry]]],
+    current_document_id: str,
+) -> tuple[dict[str, ClauseEntry], dict[str, dict[str, ClauseEntry]]]:
+    """Merge several documents' per-document clause entries into the final
+    keyed primary index, applying the version-keying rule: the entry from
+    `current_document_id` wins the primary-index slot for any clause_number
+    it defines; entries from other documents for the same clause_number are
+    recorded in the winner's `superseded_versions` and kept reachable via the
+    returned `versions` map (for `ClauseIndex.get(..., version=document_id)`).
+
+    A clause_number that exists in only one document (no version conflict)
+    is simply carried through to the primary index as-is, `superseded_versions`
+    left empty.
+
+    Build invariant: exactly one entry lands in the primary index per
+    clause_number. If two *non-current* documents both define the same
+    clause_number (an ambiguous collision at equal, non-current precedence),
+    this raises `ClausePrimaryIndexCollisionError` rather than silently
+    picking one — this should not happen for the locked demo cluster (each
+    policy_id has at most one non-current version) but is guarded regardless.
+
+    Returns `(primary, versions)`:
+    - `primary`: canonical clause_number -> current ClauseEntry.
+    - `versions`: canonical clause_number -> {document_id -> ClauseEntry},
+      every version of that clause across all supplied documents.
+    """
+    versions: dict[str, dict[str, ClauseEntry]] = {}
+    for document_id, entries in document_entries:
+        for clause_number, entry in entries.items():
+            versions.setdefault(clause_number, {})[document_id] = entry
+
+    primary: dict[str, ClauseEntry] = {}
+    for clause_number, by_document in versions.items():
+        if current_document_id in by_document:
+            winner_document_id = current_document_id
+        else:
+            other_document_ids = list(by_document.keys())
+            if len(other_document_ids) > 1:
+                raise ClausePrimaryIndexCollisionError(
+                    f"Clause '{clause_number}' has {len(other_document_ids)} "
+                    f"non-current versions ({sorted(other_document_ids)}) and "
+                    f"none is the current document "
+                    f"'{current_document_id}' — ambiguous primary-index "
+                    f"collision, refusing to pick one"
+                )
+            winner_document_id = other_document_ids[0]
+
+        winner_entry = dict(by_document[winner_document_id])
+        superseded = sorted(
+            doc_id for doc_id in by_document if doc_id != winner_document_id
+        )
+        winner_entry["superseded_versions"] = superseded
+        primary[clause_number] = winner_entry
+
+    return primary, versions
+
+
 class ClauseIndex:
     """Read-only, verbatim clause lookup.
 

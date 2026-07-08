@@ -16,7 +16,9 @@ from engine.clauses import (
     ClauseAnchorNotFoundError,
     ClauseCompletenessError,
     ClauseIndex,
+    ClauseVersionNotFoundError,
     build_clause_index,
+    merge_clause_indexes,
 )
 
 OUTSOURCING_MARKDOWN = """Outsourcing
@@ -305,3 +307,113 @@ def test_missing_clause_returns_none_not_an_exception_or_fabricated_value():
     index = ClauseIndex(entries)
 
     assert index.get("Outsourcing 99.9") is None
+
+
+RMIT_V1_PUBLISHED_MARKDOWN = """Risk Management in Technology (RMiT)
+
+17 Cloud services
+
+17.1 A financial institution shall consult the Bank prior to the first-time adoption of a public cloud service for a critical system.
+
+17.2 A financial institution shall consult the Bank on any subsequent adoption of a public cloud service for a critical system.
+"""
+
+RMIT_V1_ANCHORS = [
+    {
+        "clause_number": "17.1",
+        "starts_with": "A financial institution shall consult the Bank prior to the first-time adoption",
+        "heading": "17 Cloud services",
+        "parent": None,
+    },
+    {
+        "clause_number": "17.2",
+        "starts_with": "A financial institution shall consult the Bank on any subsequent adoption",
+        "heading": "17 Cloud services",
+        "parent": None,
+    },
+]
+
+RMIT_V2_DRAFT_MARKDOWN = """Risk Management in Technology (RMiT) — Exposure Draft v2
+
+17 Cloud services
+
+17.1 A financial institution shall notify the Bank within 14 days of the first-time adoption of a public cloud service for a critical system, having first:
+(a) completed the risk assessment under paragraph 10.50;
+(b) a senior management and board readiness confirmation; and
+(c) an independent third-party pre-implementation review.
+"""
+
+RMIT_V2_ANCHORS = [
+    {
+        "clause_number": "17.1",
+        "starts_with": "A financial institution shall notify the Bank within 14 days",
+        "heading": "17 Cloud services",
+        "parent": None,
+    },
+    {
+        "clause_number": "17.1(a)",
+        "starts_with": "completed the risk assessment under paragraph 10.50",
+        "heading": "17 Cloud services",
+        "parent": "17.1",
+    },
+    {
+        "clause_number": "17.1(b)",
+        "starts_with": "a senior management and board readiness confirmation",
+        "heading": "17 Cloud services",
+        "parent": "17.1",
+    },
+    {
+        "clause_number": "17.1(c)",
+        "starts_with": "an independent third-party pre-implementation review",
+        "heading": "17 Cloud services",
+        "parent": "17.1",
+    },
+]
+
+
+def _build_rmit_versioned_index():
+    v1_entries = build_clause_index(
+        anchors=RMIT_V1_ANCHORS,
+        markdown=RMIT_V1_PUBLISHED_MARKDOWN,
+        document_id="rmit-v1-2020",
+        policy_id="rmit",
+        source="published",
+    )
+    v2_entries = build_clause_index(
+        anchors=RMIT_V2_ANCHORS,
+        markdown=RMIT_V2_DRAFT_MARKDOWN,
+        document_id="rmit-v2-2026-draft",
+        policy_id="rmit",
+        source="draft",
+    )
+    primary, versions = merge_clause_indexes(
+        [
+            ("rmit-v1-2020", v1_entries),
+            ("rmit-v2-2026-draft", v2_entries),
+        ],
+        current_document_id="rmit-v2-2026-draft",
+    )
+    return ClauseIndex(primary, versions)
+
+
+def test_version_keying_current_draft_wins_and_superseded_reachable_by_version():
+    index = _build_rmit_versioned_index()
+
+    current = index.get("RMiT 17.1")
+    assert current is not None
+    assert current["source"] == "draft"
+    assert current["document_id"] == "rmit-v2-2026-draft"
+    assert "notify the Bank within 14 days" in current["text"]
+    assert current["superseded_versions"] == ["rmit-v1-2020"]
+
+    historical = index.get("RMiT 17.1", version="rmit-v1-2020")
+    assert historical is not None
+    assert historical["source"] == "published"
+    assert "consult the Bank prior to" in historical["text"]
+
+
+def test_version_keying_raises_distinctly_for_unknown_version_of_known_clause():
+    index = _build_rmit_versioned_index()
+
+    with pytest.raises(ClauseVersionNotFoundError, match="RMiT 17.1"):
+        index.get("RMiT 17.1", version="rmit-v9-unknown")
