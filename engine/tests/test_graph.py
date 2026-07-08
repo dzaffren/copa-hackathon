@@ -8,6 +8,8 @@ No network access: fixtures are hand-built markdown + anchors (matching
 engine/tests/test_clauses.py's pattern), never the real corpus.
 """
 
+import pytest
+
 from engine.clauses import ClauseIndex, build_clause_index
 from engine.graph import GraphBuildError, build_graph
 
@@ -213,6 +215,30 @@ def test_curated_edge_has_reason_clause_anchors_and_resolves_in_index():
     assert edge["provenance"] in {"structural", "curated", "llm-found"}
     assert 0.0 <= edge["confidence"] <= 1.0
     assert edge["confidence"] == 1.0
+
+
+def test_curated_edge_citing_unknown_clause_raises_graph_build_error():
+    clause_index = _build_fixture_clause_index()
+    bad_edges = [
+        {
+            "source_policy_id": "rmit",
+            "target_policy_id": "opres",
+            "type": "overlaps",
+            "reason": "A made-up connection.",
+            "source_clauses": ["RMiT 99.9"],
+            "target_clauses": ["Operational Resilience 6.11"],
+            "provenance": "curated",
+            "confidence": 1.0,
+        },
+    ]
+
+    with pytest.raises(GraphBuildError, match="RMiT 99.9"):
+        build_graph(
+            documents=DOCUMENTS,
+            curated_edges=bad_edges,
+            clause_index=clause_index,
+            draft_registry=DRAFT_REGISTRY,
+        )
 
 
 def _node(graph: dict, document_id: str) -> dict:
