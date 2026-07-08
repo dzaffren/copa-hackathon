@@ -604,3 +604,54 @@ def test_find_clause_anchors_splits_calls_per_section_and_merges_in_order(
     # Merged anchor list preserves document order across sections.
     assert [a["clause_number"] for a in anchors] == ["12.1", "17.1", "Appendix 10"]
     assert all(set(a.keys()) == {"clause_number", "starts_with", "heading", "parent"} for a in anchors)
+def test_entries_for_document_returns_that_documents_clauses_in_order():
+    rmit_entries = build_clause_index(
+        anchors=RMIT_NESTED_ANCHORS,
+        markdown=RMIT_NESTED_MARKDOWN,
+        document_id="rmit-v2-2026-draft",
+        policy_id="rmit",
+        source="draft",
+    )
+    outsourcing_entries = build_clause_index(
+        anchors=[
+            {
+                "clause_number": "12.1",
+                "starts_with": "A financial institution must obtain the Bank's written approval",
+                "heading": "12 Approval for material outsourcing arrangements",
+                "parent": None,
+            },
+        ],
+        markdown=OUTSOURCING_MARKDOWN,
+        document_id="outsourcing-v1-2019",
+        policy_id="outsourcing",
+        source="published",
+    )
+    primary, versions = merge_clause_indexes(
+        [
+            ("rmit-v2-2026-draft", rmit_entries),
+            ("outsourcing-v1-2019", outsourcing_entries),
+        ],
+        current_document_id="rmit-v2-2026-draft",
+    )
+    index = ClauseIndex(primary, versions)
+
+    rmit = index.entries_for_document("rmit-v2-2026-draft")
+
+    # Only that document's clauses, in insertion (document) order.
+    assert [e["clause_number"] for e in rmit] == [
+        "RMiT 10.5",
+        "RMiT 10.50",
+        "RMiT 17.1",
+        "RMiT 17.1(a)",
+        "RMiT 17.1(b)",
+        "RMiT 17.1(c)",
+        "RMiT 12.3",
+        "RMiT 12.3(e)",
+        "RMiT Appendix 10",
+    ]
+    assert all(e["document_id"] == "rmit-v2-2026-draft" for e in rmit)
+
+    outsourcing = index.entries_for_document("outsourcing-v1-2019")
+    assert [e["clause_number"] for e in outsourcing] == ["Outsourcing 12.1"]
+
+    assert index.entries_for_document("no-such-document") == []
