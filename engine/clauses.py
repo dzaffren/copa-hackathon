@@ -351,6 +351,22 @@ class ClauseIndex:
             )
         return versions_for_clause[version]
 
+    def entries_for_document(self, document_id: str) -> list[ClauseEntry]:
+        """Return every primary clause entry belonging to `document_id`, in
+        insertion (document) order.
+
+        A read-only accessor for callers that need a whole document's clause
+        text at once (e.g. the finder/critic connection agents, which build a
+        per-document clause-context block). Only the primary/current entries
+        are returned — historical `?version=` entries are not included. An
+        unknown `document_id` yields an empty list.
+        """
+        return [
+            entry
+            for entry in self._primary.values()
+            if entry["document_id"] == document_id
+        ]
+
     def full_text(
         self, clause_number: str, version: Optional[str] = None
     ) -> Optional[str]:
