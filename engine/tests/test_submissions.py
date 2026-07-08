@@ -74,3 +74,30 @@ def test_supervisor_submission_is_ingested_isolated_and_tagged(tmp_path):
             assert CLEAN_SUBMISSION_TEXT not in path.read_text()
     # And the two stores are genuinely separate directories.
     assert submissions_dir.resolve() != artifacts_dir.resolve()
+
+
+def test_unreadable_upload_is_rejected_with_zero_residue(tmp_path):
+    """Test 11: an upload that converts to no usable text is rejected.
+
+    The converter raises UnreadableDocumentError, which propagates; the
+    (tmp) submissions dir gains no record, and the test-controlled temp/spool
+    dir holds no residual submission bytes afterward (the `finally` purge ran).
+    """
+    submissions_dir = tmp_path / "submissions"
+    spool_dir = tmp_path / "spool"
+
+    with pytest.raises(UnreadableDocumentError):
+        ingest_submission(
+            data=b"scanned image bytes, no extractable text",
+            source_filename="unreadable-scan.pdf",
+            submissions_dir=submissions_dir,
+            converter=_unreadable_converter,
+            temp_dir=spool_dir,
+        )
+
+    # No record was written on the reject path.
+    if submissions_dir.exists():
+        assert list(submissions_dir.iterdir()) == []
+
+    # Zero residue: the spool dir purged its temp file in the `finally` block.
+    assert list(spool_dir.iterdir()) == []
