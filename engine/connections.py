@@ -39,11 +39,8 @@ from pathlib import Path
 from typing import Callable, Optional, TypedDict
 
 from engine.clauses import ClauseIndex
-from engine.config import (
-    AZURE_FOUNDRY_API_KEY,
-    AZURE_FOUNDRY_ENDPOINT,
-    FINDER_CRITIC_DEPLOYMENT,
-)
+from engine.config import FINDER_CRITIC_DEPLOYMENT
+from engine.llm import LLMResponseError, call_chat, parse_json_response
 
 
 class ClauseCitation(TypedDict):
@@ -272,26 +269,100 @@ def _write_trace(
     return trace_path
 
 
+FINDER_SYSTEM_PROMPT = (
+    "You are a policy analyst finding cross-policy CONNECTIONS between two "
+    "Bank Negara Malaysia policy documents. You are given, for each document, "
+    "its full list of clauses as `{clause_number}: {text}` lines, grouped "
+    "under a document-id label.\n\n"
+    "Find connections where a clause in one document relates to a clause in "
+    "the other — e.g. a conflict, a dependency, a duplication, or a scoping "
+    "relationship. For each connection, return an object:\n"
+    '  {"summary": <one-sentence description>,\n'
+    '   "source_clauses": [<clause_number>, ...],\n'
+    '   "target_clauses": [<clause_number>, ...],\n'
+    '   "scope_note": <optional caveat/exemption, omit if none>}\n\n'
+    "CITATION RULE (strict): every clause_number in `source_clauses` and "
+    "`target_clauses` MUST be copied EXACTLY from the clause lists provided. "
+    "Never invent, guess, reformat, or paraphrase a clause number. Do not "
+    "cite a clause that is not in the lists.\n\n"
+    "Return ONLY a JSON array of these objects — no prose, no markdown, no "
+    "commentary. Return an empty array `[]` if there are no connections."
+)
+
+CRITIC_SYSTEM_PROMPT = (
+    "You are a senior policy reviewer critiquing a set of candidate "
+    "cross-policy connections proposed by a finder agent. You are given both "
+    "documents' full clause lists as `{clause_number}: {text}` lines grouped "
+    "by document-id, plus the finder's candidate connections as a JSON array.\n\n"
+    "Do two things:\n"
+    "1. REFUTE or SCOPE weak candidates — drop any that do not hold, and for "
+    "those that do, add or refine a `scope_note` capturing any exemption, "
+    "condition, or limit (e.g. an affiliate exemption clause).\n"
+    "2. SURFACE MISSED connections the finder did not propose (recall).\n\n"
+    "Return the scoped/refuted surviving candidates PLUS any newly-found "
+    "connections, all in the SAME object shape:\n"
+    '  {"summary": ..., "source_clauses": [...], "target_clauses": [...], '
+    '"scope_note": <optional>}\n\n'
+    "CITATION RULE (strict): every clause_number MUST be copied EXACTLY from "
+    "the provided clause lists. Never invent, guess, reformat, or paraphrase "
+    "a clause number.\n\n"
+    "Return ONLY a JSON array of these objects — no prose, no markdown."
+)
+
+
+def _format_clause_context(
+    clause_index: ClauseIndex, doc_a_id: str, doc_b_id: str
+) -> str:
+    """Build the clause-context text block the agents read.
+
+    Lists every clause of both documents as ``{clause_number}: {text}`` lines,
+    grouped under a per-document label. Pure given the index — the clause text
+    comes straight from ``ClauseIndex.entries_for_document`` (verbatim), never
+    the model. Used by both turns so the finder and critic see the same corpus.
+    """
+    blocks: list[str] = []
+    for document_id in (doc_a_id, doc_b_id):
+        lines = [f"Document: {document_id}"]
+        for entry in clause_index.entries_for_document(document_id):
+            lines.append(f"{entry['clause_number']}: {entry['text']}")
+        blocks.append("\n".join(lines))
+    return "\n\n".join(blocks)
+
+
+def _parse_candidate_list(raw: str) -> list[dict]:
+    """Parse an agent's raw reply into a candidate ``list[dict]``.
+
+    Delegates to ``parse_json_response`` (strips fences, ``json.loads``) then
+    enforces the raw candidate shape the citation validator consumes: a list of
+    dict objects. Raises ``LLMResponseError`` (not a silent coercion) if the
+    model returned a non-list or list items that are not objects.
+    """
+    parsed = parse_json_response(raw)
+    if not isinstance(parsed, list) or not all(
+        isinstance(item, dict) for item in parsed
+    ):
+        snippet = raw.strip()[:200]
+        raise LLMResponseError(
+            f"Expected a JSON array of connection objects; got "
+            f"{type(parsed).__name__}. Raw (truncated): {snippet!r}"
+        )
+    return parsed
+
+
 def _finder_turn(
     doc_a_id: str, doc_b_id: str, clause_index: ClauseIndex
 ) -> list[dict]:
-    """Call the finder LLM (Azure AI Foundry, Claude) to propose candidates.
+    """Call the finder LLM (Azure AI Foundry) to propose candidate connections.
 
-    This is the network seam — real callers use it; tests never do (they inject
-    ``finder_fn`` with a recorded/hand-written response). Not exercised in this
-    task; wired for the ripple story (#8) / Task 6 to implement the prompt +
-    response parsing when Foundry access is available. ``FINDER_CRITIC_DEPLOYMENT``
-    is the confirmed high-reasoning deployment for this stage (spec "Model
-    access & config").
+    Builds the two-document clause context, sends it with
+    ``FINDER_SYSTEM_PROMPT`` to ``FINDER_CRITIC_DEPLOYMENT`` (the confirmed
+    high-reasoning deployment for this stage), and parses the reply into the
+    raw candidate ``list[dict]`` shape ``_validate_candidates`` consumes. This
+    is the network seam — real callers use it; tests inject ``finder_fn``.
     """
-    _new_foundry_client()
-    raise NotImplementedError(
-        f"_finder_turn is wired to Azure AI Foundry (deployment "
-        f"'{FINDER_CRITIC_DEPLOYMENT}') but not implemented in this task — no "
-        f"live credentials in this environment. A caller should implement the "
-        f"finder prompt + response parsing for the '{doc_a_id}' <-> "
-        f"'{doc_b_id}' pair when Foundry access is available."
-    )
+    context = _format_clause_context(clause_index, doc_a_id, doc_b_id)
+    raw = call_chat(FINDER_CRITIC_DEPLOYMENT, FINDER_SYSTEM_PROMPT, context)
+    return _parse_candidate_list(raw)
 
 
 def _critic_turn(
@@ -300,36 +371,18 @@ def _critic_turn(
     clause_index: ClauseIndex,
     candidates: list[dict],
 ) -> list[dict]:
-    """Call the critic LLM (Azure AI Foundry, Claude) — refute/scope + surface
-    missed connections (recall).
+    """Call the critic LLM (Azure AI Foundry) — refute/scope + surface missed
+    connections (recall).
 
-    The network seam for stage 4b; real callers use it, tests inject
-    ``critic_fn``. Not exercised in this task (see ``_finder_turn``).
+    Sends the same two-document clause context PLUS the finder's ``candidates``
+    (serialised as JSON) with ``CRITIC_SYSTEM_PROMPT``, and parses the reply
+    into the raw candidate ``list[dict]`` shape. The network seam for stage 4b;
+    real callers use it, tests inject ``critic_fn``.
     """
-    _new_foundry_client()
-    raise NotImplementedError(
-        f"_critic_turn is wired to Azure AI Foundry (deployment "
-        f"'{FINDER_CRITIC_DEPLOYMENT}') but not implemented in this task — no "
-        f"live credentials in this environment. A caller should implement the "
-        f"critic prompt + response parsing for the '{doc_a_id}' <-> "
-        f"'{doc_b_id}' pair (given {len(candidates)} finder candidates) when "
-        f"Foundry access is available."
+    context = _format_clause_context(clause_index, doc_a_id, doc_b_id)
+    user = (
+        f"{context}\n\n"
+        f"Finder candidate connections (JSON):\n{json.dumps(candidates)}"
     )
-
-
-def _new_foundry_client():  # pragma: no cover - network seam, never run in tests
-    """Construct the Azure AI Foundry chat client (mirrors
-    ``engine.clauses.find_clause_anchors``). Kept as a thin, test-untouched
-    helper so both agent turns share one seam."""
-    from azure.ai.inference import ChatCompletionsClient
-    from azure.core.credentials import AzureKeyCredential
-
-    if not AZURE_FOUNDRY_ENDPOINT or not AZURE_FOUNDRY_API_KEY:
-        raise ConnectionFindError(
-            "AZURE_FOUNDRY_ENDPOINT and AZURE_FOUNDRY_API_KEY must be set in "
-            "the environment to call the finder/critic agents"
-        )
-    return ChatCompletionsClient(
-        endpoint=AZURE_FOUNDRY_ENDPOINT,
-        credential=AzureKeyCredential(AZURE_FOUNDRY_API_KEY),
-    )
+    raw = call_chat(FINDER_CRITIC_DEPLOYMENT, CRITIC_SYSTEM_PROMPT, user)
+    return _parse_candidate_list(raw)

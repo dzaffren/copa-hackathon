@@ -21,8 +21,16 @@ tracked `data/artifacts/`.
 import json
 from datetime import datetime, timezone
 
+import pytest
+
 from engine.clauses import ClauseIndex, build_clause_index, merge_clause_indexes
-from engine.connections import find_connections
+from engine.connections import (
+    _critic_turn,
+    _finder_turn,
+    _format_clause_context,
+    find_connections,
+)
+from engine.llm import LLMResponseError
 
 # --- Corpus fixtures (verbatim markdown + hand-written anchors) -------------
 
@@ -248,3 +256,118 @@ def test_unsupported_candidate_from_critic_is_flagged_not_invented(tmp_path):
     # No fabricated clause text is attached to an unsupported candidate.
     assert "source_clauses" not in unsupported
     assert "target_clauses" not in unsupported
+
+
+# --- Turn helpers (pure + parsing, no network) ------------------------------
+
+
+def test_format_clause_context_labels_both_documents_with_numbers_and_text():
+    clause_index = _build_fixture_clause_index()
+
+    context = _format_clause_context(
+        clause_index, "rmit-v2-2026-draft", "outsourcing-v1-2019"
+    )
+
+    # Both document ids appear as labels.
+    assert "rmit-v2-2026-draft" in context
+    assert "outsourcing-v1-2019" in context
+    # Every clause number of both documents appears...
+    assert "RMiT 17.1" in context
+    assert "RMiT 17.2" in context
+    assert "Outsourcing 12.1" in context
+    assert "Outsourcing 12.4" in context
+    # ...alongside its verbatim text.
+    assert "shall notify the Bank within 14 days" in context
+    assert OUTSOURCING_12_1_TEXT in context
+
+
+def test_finder_turn_parses_call_chat_json_array(monkeypatch):
+    clause_index = _build_fixture_clause_index()
+    canned = json.dumps(
+        [
+            {
+                "summary": "RMiT 17.1 conflicts with Outsourcing 12.1.",
+                "source_clauses": ["RMiT 17.1"],
+                "target_clauses": ["Outsourcing 12.1"],
+            }
+        ]
+    )
+    captured = {}
+
+    def fake_call_chat(deployment, system, user):
+        captured["deployment"] = deployment
+        captured["system"] = system
+        captured["user"] = user
+        return canned
+
+    monkeypatch.setattr("engine.connections.call_chat", fake_call_chat)
+
+    result = _finder_turn("rmit-v2-2026-draft", "outsourcing-v1-2019", clause_index)
+
+    assert result == json.loads(canned)
+    # The finder handed the model both documents' clause context.
+    assert "RMiT 17.1" in captured["user"]
+    assert "Outsourcing 12.1" in captured["user"]
+
+
+def test_critic_turn_includes_finder_candidates_in_prompt(monkeypatch):
+    clause_index = _build_fixture_clause_index()
+    finder_candidates = [
+        {
+            "summary": "RMiT 17.1 conflicts with Outsourcing 12.1.",
+            "source_clauses": ["RMiT 17.1"],
+            "target_clauses": ["Outsourcing 12.1"],
+        }
+    ]
+    canned = json.dumps(
+        finder_candidates
+        + [
+            {
+                "summary": "RMiT 17.2 depends on RMiT 17.1.",
+                "source_clauses": ["RMiT 17.2"],
+                "target_clauses": ["RMiT 17.1"],
+            }
+        ]
+    )
+    captured = {}
+
+    def fake_call_chat(deployment, system, user):
+        captured["user"] = user
+        return canned
+
+    monkeypatch.setattr("engine.connections.call_chat", fake_call_chat)
+
+    result = _critic_turn(
+        "rmit-v2-2026-draft",
+        "outsourcing-v1-2019",
+        clause_index,
+        finder_candidates,
+    )
+
+    assert result == json.loads(canned)
+    # The critic prompt carries the finder's candidates for it to scope/refute.
+    assert "RMiT 17.1 conflicts with Outsourcing 12.1." in captured["user"]
+    # ...and still the clause context.
+    assert "Outsourcing 12.4" in captured["user"]
+
+
+def test_finder_turn_raises_on_non_json(monkeypatch):
+    clause_index = _build_fixture_clause_index()
+    monkeypatch.setattr(
+        "engine.connections.call_chat",
+        lambda deployment, system, user: "sorry, no JSON here",
+    )
+    with pytest.raises(LLMResponseError):
+        _finder_turn("rmit-v2-2026-draft", "outsourcing-v1-2019", clause_index)
+
+
+def test_critic_turn_raises_on_non_list_json(monkeypatch):
+    clause_index = _build_fixture_clause_index()
+    monkeypatch.setattr(
+        "engine.connections.call_chat",
+        lambda deployment, system, user: json.dumps({"not": "a list"}),
+    )
+    with pytest.raises(LLMResponseError):
+        _critic_turn(
+            "rmit-v2-2026-draft", "outsourcing-v1-2019", clause_index, []
+        )
