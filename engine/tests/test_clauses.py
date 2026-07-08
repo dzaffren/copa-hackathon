@@ -326,6 +326,53 @@ def test_ambiguous_anchor_raises_clear_exception_naming_the_clause():
         )
 
 
+def test_empty_starts_with_anchor_is_skipped_not_fatal(caplog):
+    # 8.2 has no quotable text (PDF layout lost its body); its anchor has an
+    # empty starts_with. It is skipped with a warning; the other clauses build.
+    markdown = (
+        "8.1  Financial institutions shall have strong oversight.\n\n"
+        "8.4  The board and senior management shall be accountable.\n"
+    )
+    anchors = [
+        {
+            "clause_number": "8.1",
+            "starts_with": "Financial institutions shall have strong oversight",
+            "heading": None,
+            "parent": None,
+        },
+        {
+            "clause_number": "8.2",
+            "starts_with": "",  # body lost in conversion
+            "heading": None,
+            "parent": None,
+        },
+        {
+            "clause_number": "8.4",
+            "starts_with": "The board and senior management shall be accountable",
+            "heading": None,
+            "parent": None,
+        },
+    ]
+
+    import logging
+
+    with caplog.at_level(logging.WARNING):
+        entries = build_clause_index(
+            anchors=anchors,
+            markdown=markdown,
+            document_id="outsourcing-v1-2019",
+            policy_id="outsourcing",
+            source="published",
+        )
+
+    # 8.2 dropped; 8.1 and 8.4 present.
+    assert "Outsourcing 8.2" not in entries
+    assert "Outsourcing 8.1" in entries
+    assert "Outsourcing 8.4" in entries
+    # The drop was logged loudly, naming the clause.
+    assert any("8.2" in rec.message for rec in caplog.records)
+
+
 def test_recurring_phrase_disambiguated_by_clause_label():
     # The same phrase appears twice: once mid-sentence inside clause 8.3, and
     # once as the real 8.4(c) start (preceded by its "(c)" label). The label

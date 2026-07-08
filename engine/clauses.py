@@ -208,6 +208,26 @@ def build_clause_index(
         ClauseCompletenessError: `expected_clauses` is supplied and the
             emitted canonical clause set does not cover it.
     """
+    # Drop anchors with an empty `starts_with`: these are clause numbers the
+    # parser saw but had no quotable text for — a PDF-layout artifact where a
+    # clause's body was separated from its number in conversion (e.g.
+    # Outsourcing 8.2/8.3, whose text MarkItDown lost). We cannot fabricate the
+    # missing text, so we skip the anchor and log loudly rather than crash. The
+    # completeness reconcile (`expected_clauses`) is the backstop that fails the
+    # build if a *load-bearing* clause is among those dropped.
+    kept_anchors: list[dict] = []
+    for anchor in anchors:
+        if not anchor["starts_with"].strip():
+            logger.warning(
+                "Dropping clause '%s' in document '%s': empty starts_with "
+                "(clause text not recoverable from the converted markdown)",
+                anchor["clause_number"],
+                document_id,
+            )
+            continue
+        kept_anchors.append(anchor)
+    anchors = kept_anchors
+
     positions: list[int] = []
     for anchor in anchors:
         snippet = anchor["starts_with"]
