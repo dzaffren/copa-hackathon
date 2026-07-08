@@ -117,30 +117,52 @@ def _in_text_label(bare_number: str) -> str:
     return bare_number
 
 
+# BNM clauses are each preceded by a lone "S" (Standard) or "G" (Guidance)
+# marker on its own line. When slicing a clause up to the *next* clause's
+# anchor, that next clause's marker leaks onto the tail of the current clause's
+# text (e.g. "...arrangement.\n\nS\n\n12.2\n"). This matches a trailing marker.
+_TRAILING_MARKER_RE = re.compile(r"\s[SG]\s*$")
+
+
 def _trim_trailing_label(
     markdown: str, end: int, next_bare_number: Optional[str]
 ) -> int:
-    """Adjust a clause's slice end-point to exclude the next clause's label.
+    """Adjust a clause's slice end-point to exclude the next clause's label,
+    its BNM Standard/Guidance marker, and separator whitespace.
 
-    `starts_with` anchors quote content only, never the numbering label
-    (see module docstring), so a raw slice up to the next clause's anchor
-    position picks up that next clause's label + separator whitespace
-    bleeding onto the end of the current clause's text (e.g.
-    "...having first:\\n(a) "). This walks back from `end`, past the
-    optional single separator space and the label itself (if present
-    immediately before `end`), then past any further whitespace/newlines —
-    returning the true end of the current clause's own content.
+    `starts_with` anchors quote content only, never the numbering label (see
+    module docstring), so a raw slice up to the next clause's anchor position
+    picks up that next clause's leading scaffolding bleeding onto the end of the
+    current clause's text. In the real corpus that scaffolding is, in order from
+    the current clause's real end: whitespace, an optional lone "S"/"G" marker
+    line, whitespace, the next clause's label, whitespace. This strips all of
+    it, returning the true end of the current clause's own content.
     """
     if next_bare_number is None:
         return end
 
     label = _in_text_label(next_bare_number)
+
+    # 1. Walk back past trailing whitespace, then the next clause's label if it
+    #    sits immediately before `end` (allowing whitespace between).
     j = end
-    while j > 0 and markdown[j - 1] == " ":
+    while j > 0 and markdown[j - 1] in " \n\t\r":
         j -= 1
     label_start = j - len(label)
     if label_start >= 0 and markdown[label_start:j] == label:
         end = label_start
+    else:
+        # Label not where expected — leave `end` as the raw boundary but still
+        # trim trailing whitespace/marker below.
+        end = j if j < end else end
+
+    # 2. Trim trailing whitespace, then a lone "S"/"G" marker if present, then
+    #    any further whitespace — the next clause's Standard/Guidance indicator.
+    while end > 0 and markdown[end - 1] in " \n\t\r":
+        end -= 1
+    marker = _TRAILING_MARKER_RE.search(markdown, 0, end)
+    if marker and marker.end() == end:
+        end = marker.start()
         while end > 0 and markdown[end - 1] in " \n\t\r":
             end -= 1
     return end

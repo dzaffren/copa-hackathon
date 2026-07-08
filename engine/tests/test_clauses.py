@@ -71,6 +71,60 @@ def test_verbatim_clause_fetch_returns_exact_text_and_echoes_clause_number():
     )
 
 
+# BNM clauses are each preceded by a lone "S" (Standard) or "G" (Guidance)
+# marker line. Without trimming, the next clause's marker + number leak onto the
+# tail of the current clause's text (e.g. "...arrangement.\n\nS\n\n12.2").
+SG_MARKER_MARKDOWN = (
+    "12 Approval\n\n"
+    "S\n\n"
+    "12.1  A financial institution must obtain approval before making a\n"
+    "material outsourcing arrangement.\n\n"
+    "S\n\n"
+    "12.2  An application must be submitted ninety days in advance.\n\n"
+    "G\n\n"
+    "12.3  The Bank may request further information.\n"
+)
+
+
+def test_trailing_standard_guidance_marker_is_trimmed():
+    anchors = [
+        {
+            "clause_number": "12.1",
+            "starts_with": "A financial institution must obtain approval",
+            "heading": "12 Approval",
+            "parent": None,
+        },
+        {
+            "clause_number": "12.2",
+            "starts_with": "An application must be submitted",
+            "heading": "12 Approval",
+            "parent": None,
+        },
+        {
+            "clause_number": "12.3",
+            "starts_with": "The Bank may request further information",
+            "heading": "12 Approval",
+            "parent": None,
+        },
+    ]
+
+    entries = build_clause_index(
+        anchors=anchors,
+        markdown=SG_MARKER_MARKDOWN,
+        document_id="outsourcing-v1-2019",
+        policy_id="outsourcing",
+        source="published",
+    )
+
+    # No clause text carries the next clause's S/G marker or number.
+    for cn in ("Outsourcing 12.1", "Outsourcing 12.2"):
+        text = entries[cn]["text"]
+        assert not text.rstrip().endswith(("S", "G")), text
+        assert "12.2" not in text and "12.3" not in text, text
+    # 12.1 ends cleanly at its own content.
+    assert entries["Outsourcing 12.1"]["text"].endswith("outsourcing arrangement.")
+
+
 # Real MarkItDown output of BNM PDFs contains runs of doubled spaces and
 # mid-sentence newlines (a layout artifact). The parser LLM normalises those to
 # single spaces when it quotes `starts_with`, so an exact match would miss.
