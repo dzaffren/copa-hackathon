@@ -326,7 +326,7 @@ def build_clause_index(
     entries: dict[str, ClauseEntry] = {}
     children_by_parent: dict[str, list[str]] = {}
     raw_start_by_clause: dict[str, int] = {}
-    raw_end_by_clause: dict[str, int] = {}
+    trimmed_end_by_clause: dict[str, int] = {}
 
     for i, anchor in enumerate(anchors):
         start = positions[i]
@@ -353,7 +353,9 @@ def build_clause_index(
             "superseded_versions": [],
         }
         raw_start_by_clause[clause_number] = start
-        raw_end_by_clause[clause_number] = raw_end
+        # Store the *trimmed* end (label + S/G marker stripped), so the composed
+        # parent full_text ends as cleanly as each child's own text does.
+        trimmed_end_by_clause[clause_number] = end
 
         if parent:
             children_by_parent.setdefault(parent, []).append(clause_number)
@@ -368,7 +370,7 @@ def build_clause_index(
         # of the public clause-index contract (private key, leading `_`).
         last_child = children[-1]
         span_start = raw_start_by_clause[parent]
-        span_end = raw_end_by_clause[last_child]
+        span_end = trimmed_end_by_clause[last_child]
         entries[parent]["_full_text"] = markdown[span_start:span_end]
 
     if expected_clauses:

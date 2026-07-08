@@ -125,6 +125,50 @@ def test_trailing_standard_guidance_marker_is_trimmed():
     assert entries["Outsourcing 12.1"]["text"].endswith("outsourcing arrangement.")
 
 
+def test_composed_full_text_also_trims_trailing_marker():
+    # The parent's composed full_text (stem + children) must end as cleanly as
+    # each child's own text — no trailing S/G marker or next-clause number.
+    anchors = [
+        {
+            "clause_number": "12.1",
+            "starts_with": "A financial institution must obtain approval",
+            "heading": "12 Approval",
+            "parent": None,
+        },
+        {
+            "clause_number": "12.1(a)",
+            "starts_with": "the first condition",
+            "heading": "12 Approval",
+            "parent": "12.1",
+        },
+        {
+            "clause_number": "12.2",
+            "starts_with": "An application must be submitted",
+            "heading": "12 Approval",
+            "parent": None,
+        },
+    ]
+    markdown = (
+        "S\n\n"
+        "12.1  A financial institution must obtain approval subject to:\n"
+        "(a)  the first condition being met.\n\n"
+        "S\n\n"
+        "12.2  An application must be submitted ninety days in advance.\n"
+    )
+
+    entries = build_clause_index(
+        anchors=anchors,
+        markdown=markdown,
+        document_id="outsourcing-v1-2019",
+        policy_id="outsourcing",
+        source="published",
+    )
+
+    full = entries["Outsourcing 12.1"]["_full_text"]
+    assert "12.2" not in full, full
+    assert not full.rstrip().endswith(("S", "G")), full
+
+
 # Real MarkItDown output of BNM PDFs contains runs of doubled spaces and
 # mid-sentence newlines (a layout artifact). The parser LLM normalises those to
 # single spaces when it quotes `starts_with`, so an exact match would miss.
