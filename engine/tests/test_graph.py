@@ -189,6 +189,28 @@ CURATED_EDGES = [
 ]
 
 
+def _node(graph: dict, document_id: str) -> dict:
+    matches = [n for n in graph["nodes"] if n["id"] == document_id]
+    assert matches, f"no node with id '{document_id}' in graph"
+    return matches[0]
+
+
+def test_status_is_derived_from_draft_registry_never_hand_set():
+    clause_index = _build_fixture_clause_index()
+
+    graph = build_graph(
+        documents=DOCUMENTS,
+        curated_edges=[],
+        clause_index=clause_index,
+        draft_registry=DRAFT_REGISTRY,
+    )
+
+    assert _node(graph, "rmit-v2-2026-draft")["status"] == "In progress"
+    assert _node(graph, "opres-v1-2025")["status"] == "In progress"
+    assert _node(graph, "bcm-v1-2022")["status"] == "In force"
+    assert _node(graph, "rmit-v1-2020")["status"] == "Superseded"
+
+
 def test_version_lineage_edge_links_older_document_to_newer_of_same_policy():
     clause_index = _build_fixture_clause_index()
 

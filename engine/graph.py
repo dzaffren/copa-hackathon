@@ -50,6 +50,44 @@ def _ordered_document_ids_by_policy(documents: dict) -> dict[str, list[str]]:
     return by_policy
 
 
+def _current_document_id(document_ids: list[str]) -> str:
+    """The current (non-superseded) version is the last-declared one."""
+    return document_ids[-1]
+
+
+def _build_nodes(
+    documents: dict,
+    ids_by_policy: dict[str, list[str]],
+    draft_registry: dict,
+) -> list[GraphNode]:
+    live_drafts = set(draft_registry.get("live_drafts", []))
+    nodes: list[GraphNode] = []
+
+    for policy_id, document_ids in ids_by_policy.items():
+        current_id = _current_document_id(document_ids)
+        for document_id in document_ids:
+            doc = documents[document_id]
+            if document_id != current_id:
+                status = "Superseded"
+            elif policy_id in live_drafts:
+                status = "In progress"
+            else:
+                status = "In force"
+
+            nodes.append(
+                {
+                    "id": document_id,
+                    "policy_id": policy_id,
+                    "title": doc["title"],
+                    "version": doc["version"],
+                    "status": status,
+                    "cluster": doc["cluster"],
+                }
+            )
+
+    return nodes
+
+
 def _build_version_lineage_edges(
     ids_by_policy: dict[str, list[str]],
 ) -> list[GraphEdge]:
@@ -83,6 +121,7 @@ def build_graph(
 ) -> dict:
     """Assemble `graph.json`'s `{"nodes": [...], "edges": [...]}` shape."""
     ids_by_policy = _ordered_document_ids_by_policy(documents)
+    nodes = _build_nodes(documents, ids_by_policy, draft_registry)
     edges = _build_version_lineage_edges(ids_by_policy)
 
-    return {"nodes": [], "edges": edges}
+    return {"nodes": nodes, "edges": edges}
