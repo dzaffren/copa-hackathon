@@ -56,6 +56,21 @@ class ClauseCompletenessError(Exception):
     """Raised when the emitted clause set does not cover the expected clauses."""
 
 
+class ClauseVersionNotFoundError(Exception):
+    """Raised when a clause_number is known but the requested version is not.
+
+    Distinct from an unknown `clause_number` (which `ClauseIndex.get` reports
+    as `None`) so the API layer (#6 Task 6) can tell `404 CLAUSE_NOT_FOUND`
+    apart from `404 CLAUSE_VERSION_NOT_FOUND`.
+    """
+
+
+class ClausePrimaryIndexCollisionError(Exception):
+    """Raised when two documents at equal precedence both claim the primary
+    (current) slot for the same clause_number — an ambiguous collision that
+    must never be silently resolved by picking one."""
+
+
 def _short_name(policy_id: str) -> str:
     try:
         return POLICY_SHORT_NAMES[policy_id]
@@ -218,12 +233,6 @@ def build_clause_index(
     return entries
 
 
-class ClausePrimaryIndexCollisionError(Exception):
-    """Raised when two documents at equal precedence both claim the primary
-    (current) slot for the same clause_number — an ambiguous collision that
-    must never be silently resolved by picking one."""
-
-
 def merge_clause_indexes(
     document_entries: list[tuple[str, dict[str, ClauseEntry]]],
     current_document_id: str,
@@ -347,32 +356,27 @@ class ClauseIndex:
         return entry["_full_text"]
 
 
-class ClauseVersionNotFoundError(Exception):
-    """Raised when a clause_number is known but the requested version is not.
-
-    Distinct from an unknown `clause_number` (which `ClauseIndex.get` reports
-    as `None`) so the API layer (#6 Task 6) can tell `404 CLAUSE_NOT_FOUND`
-    apart from `404 CLAUSE_VERSION_NOT_FOUND`.
-    """
-
-
 def find_clause_anchors(markdown: str, document_id: str) -> list[dict]:
     """Call the parser LLM (Azure AI Foundry, Claude) to find clause anchors.
 
     This is the network seam — real callers use this; tests never do (they
     stub anchors by hand and call `build_clause_index` directly). Not
-    exercised in this task; wired for Task 3/6 to call at real build time.
+    exercised in this task; wired for Task 3/6 to implement the prompt +
+    response parsing when Foundry access is available (`PARSER_DEPLOYMENT`
+    is the confirmed cheap deployment for this mechanical boundary-finding
+    stage — see spec Solution Design, "Model access & config").
     """
     from azure.ai.inference import ChatCompletionsClient
     from azure.core.credentials import AzureKeyCredential
 
-    client = ChatCompletionsClient(
+    ChatCompletionsClient(
         endpoint=AZURE_FOUNDRY_ENDPOINT,
         credential=AzureKeyCredential(AZURE_FOUNDRY_API_KEY),
     )
     raise NotImplementedError(
-        "find_clause_anchors is wired to Azure AI Foundry but not implemented "
-        "in this task — no live credentials in this environment. Task 3/6 "
-        "should implement the prompt + response parsing when Foundry access "
-        "is available."
+        f"find_clause_anchors is wired to Azure AI Foundry (deployment "
+        f"'{PARSER_DEPLOYMENT}') but not implemented in this task — no live "
+        f"credentials in this environment. Task 3/6 should implement the "
+        f"prompt + response parsing for document '{document_id}' when "
+        f"Foundry access is available."
     )
