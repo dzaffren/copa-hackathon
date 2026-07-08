@@ -16,11 +16,14 @@ Failure modes (unfound/ambiguous anchor, incomplete clause set) are loud
 exceptions raised at build time — never silent corruption.
 """
 
+import logging
 import re
 from typing import NotRequired, Optional, TypedDict, cast
 
 from engine.config import PARSER_DEPLOYMENT
 from engine.llm import LLMResponseError, call_chat, parse_json_response
+
+logger = logging.getLogger(__name__)
 
 # Canonical clause numbers are "{PolicyShortName} {number}" — matching how the
 # corpus labels clauses and how the spec's Acceptance Criteria quote them.
@@ -500,8 +503,19 @@ def find_clause_anchors(markdown: str, document_id: str) -> list[dict]:
     deployment for this mechanical boundary-finding stage (see spec Solution
     Design, "Model access & config").
     """
+    sections = _split_sections(markdown)
     anchors: list[dict] = []
-    for section in _split_sections(markdown):
+    for i, section in enumerate(sections, start=1):
+        heading = section.splitlines()[0][:60] if section.strip() else ""
+        logger.info(
+            "  [%s] parsing section %d/%d: %s",
+            document_id,
+            i,
+            len(sections),
+            heading,
+        )
         raw = call_chat(PARSER_DEPLOYMENT, PARSER_SYSTEM_PROMPT, section)
-        anchors.extend(_parse_anchor_response(raw))
+        found = _parse_anchor_response(raw)
+        anchors.extend(found)
+        logger.info("  [%s] section %d → %d clauses", document_id, i, len(found))
     return anchors

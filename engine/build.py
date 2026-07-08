@@ -17,6 +17,7 @@ double directly.
 """
 
 import json
+import logging
 from pathlib import Path
 from typing import Any, Callable, Union, cast
 
@@ -28,6 +29,8 @@ from engine.clauses import (
 )
 from engine.graph import build_graph
 from engine.ingest import ingest_document
+
+logger = logging.getLogger(__name__)
 
 IngestFn = Callable[[Union[str, Path]], str]
 FindAnchorsFn = Callable[[str, str], list[dict[str, Any]]]
@@ -63,9 +66,20 @@ def run_build(
         current_document_id_by_policy[doc["policy_id"]] = document_id
 
     document_entries: list[tuple[str, dict]] = []
-    for document_id, doc in documents.items():
+    for n, (document_id, doc) in enumerate(documents.items(), start=1):
+        logger.info(
+            "[%d/%d] ingesting %s (%s)",
+            n,
+            len(documents),
+            document_id,
+            doc["source_path"],
+        )
         markdown = ingest_fn(doc["source_path"])
+        logger.info("[%d/%d] parsing clauses for %s", n, len(documents), document_id)
         anchors = find_anchors_fn(markdown, document_id)
+        logger.info(
+            "[%d/%d] %s → %d anchors", n, len(documents), document_id, len(anchors)
+        )
         entries = build_clause_index(
             anchors=anchors,
             markdown=markdown,
@@ -107,17 +121,61 @@ def run_build(
 
 
 def main() -> None:
+    import argparse
+
     from engine.config import CURATED_SEED_EDGES, DOCUMENTS, REPO_ROOT
+
+    parser = argparse.ArgumentParser(
+        description="Build the clause index + knowledge graph from the corpus."
+    )
+    parser.add_argument(
+        "--docs",
+        nargs="+",
+        metavar="DOCUMENT_ID",
+        help=(
+            "Build only these document ids (space-separated). Useful for "
+            "testing one document end-to-end before the full corpus. Curated "
+            "edges referencing an excluded policy are dropped for the run."
+        ),
+    )
+    args = parser.parse_args()
+
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s"
+    )
+
+    documents: dict[str, Any] = dict(DOCUMENTS)
+    curated_edges: list[dict[str, Any]] = list(
+        cast(list[dict[str, Any]], CURATED_SEED_EDGES)
+    )
+
+    if args.docs:
+        unknown = [d for d in args.docs if d not in documents]
+        if unknown:
+            parser.error(f"unknown document id(s): {unknown}")
+        documents = {d: documents[d] for d in args.docs}
+        # Drop curated edges whose endpoints reference an excluded policy, so
+        # a partial build doesn't KeyError / fail graph validation on absent
+        # documents. The full-corpus run keeps every curated edge.
+        kept_policies = {doc["policy_id"] for doc in documents.values()}
+        curated_edges = [
+            e
+            for e in curated_edges
+            if e["source_policy_id"] in kept_policies
+            and e["target_policy_id"] in kept_policies
+        ]
+        logger.info("building subset: %s", ", ".join(documents))
 
     draft_registry_path = REPO_ROOT / "data" / "draft_registry.json"
     draft_registry = json.loads(draft_registry_path.read_text())
 
     run_build(
-        documents=cast(dict[str, dict[str, Any]], DOCUMENTS),
-        curated_edges=cast(list[dict[str, Any]], CURATED_SEED_EDGES),
+        documents=cast(dict[str, dict[str, Any]], documents),
+        curated_edges=curated_edges,
         draft_registry=draft_registry,
         output_dir=REPO_ROOT / "data" / "artifacts",
     )
+    logger.info("build complete → %s", REPO_ROOT / "data" / "artifacts")
 
 
 if __name__ == "__main__":
