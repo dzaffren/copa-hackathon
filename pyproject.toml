@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.11"
 dependencies = [
+    "anthropic>=0.116.0",
     "azure-ai-inference>=1.0.0b9",
     "fastapi>=0.139.0",
     "httpx>=0.28.1",

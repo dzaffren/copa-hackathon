@@ -49,6 +49,32 @@ def test_malformed_json_raises() -> None:
         parse_json_response("{not json")
 
 
+def test_parses_json_lines_into_list() -> None:
+    """Claude sometimes returns one JSON object per line instead of an array;
+    parse_json_response collects those into a list."""
+    raw = (
+        '{"clause_number": "11.1", "parent": null}\n'
+        '{"clause_number": "11.2", "parent": null}'
+    )
+    assert parse_json_response(raw) == [
+        {"clause_number": "11.1", "parent": None},
+        {"clause_number": "11.2", "parent": None},
+    ]
+
+
+def test_parses_fenced_json_lines_into_list() -> None:
+    raw = '```json\n{"a": 1}\n{"a": 2}\n```'
+    assert parse_json_response(raw) == [{"a": 1}, {"a": 2}]
+
+
+def test_json_lines_with_one_bad_line_raises() -> None:
+    """JSONL is all-or-nothing — a single unparseable line fails the whole
+    response rather than returning a partial parse."""
+    raw = '{"a": 1}\n{not json}'
+    with pytest.raises(LLMResponseError):
+        parse_json_response(raw)
+
+
 def test_call_chat_without_credentials_raises(monkeypatch: pytest.MonkeyPatch) -> None:
     """No network: with creds unset, call_chat raises a clear RuntimeError."""
     import engine.llm as llm
