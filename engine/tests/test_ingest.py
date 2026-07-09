@@ -45,6 +45,57 @@ def test_ingest_rmit_pdf_produces_clean_readable_text_not_garbled():
     assert "17.2" in text
 
 
+class _FakeResult:
+    def __init__(self, text: str) -> None:
+        self.text_content = text
+
+
+class _FakeConverter:
+    def __init__(self, text: str) -> None:
+        self._text = text
+        self.converted: list[str] = []
+
+    def convert(self, path: str) -> _FakeResult:
+        self.converted.append(path)
+        return _FakeResult(self._text)
+
+
+def test_ingest_uses_injected_converter_no_network():
+    """An explicit converter overrides the built-in one — tests need no
+    Azure/MarkItDown network path."""
+    fake = _FakeConverter("clean clause text")
+
+    text = ingest_document("/some/doc.pdf", converter=fake)
+
+    assert text == "clean clause text"
+    assert fake.converted == ["/some/doc.pdf"]
+
+
+def test_build_converter_uses_document_intelligence_when_configured(monkeypatch):
+    """When the DI endpoint + key are set, the converter is built with the
+    docintel backend; unset → plain MarkItDown. No network: we capture the
+    kwargs MarkItDown is constructed with."""
+    import engine.ingest as ingest
+
+    captured: dict = {}
+
+    class _SpyMarkItDown:
+        def __init__(self, **kwargs):
+            captured.update(kwargs)
+
+    monkeypatch.setattr(ingest, "MarkItDown", _SpyMarkItDown)
+
+    # Configured → docintel_endpoint passed through.
+    ingest._build_converter("https://di.example/", "secret-key")
+    assert captured.get("docintel_endpoint") == "https://di.example/"
+    assert "docintel_credential" in captured
+
+    # Unset → plain MarkItDown, no docintel kwargs.
+    captured.clear()
+    ingest._build_converter(None, None)
+    assert "docintel_endpoint" not in captured
+
+
 def test_ingest_raises_unreadable_document_error_on_corrupt_input(tmp_path):
     """A corrupt/unreadable file (random bytes with a .pdf extension) must
     raise UnreadableDocumentError rather than return garbled or empty text.

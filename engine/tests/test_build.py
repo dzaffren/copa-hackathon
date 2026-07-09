@@ -1,17 +1,17 @@
 """Tests for engine.build — CLI wiring of stages 1-3 (ingest -> clauses -> graph).
 
-No network access: `ingest_fn` and `find_anchors_fn` are stubbed (matching
-the pattern in test_clauses.py / test_graph.py of hand-written fixtures) so
-the pipeline is exercised end-to-end without MarkItDown or the parser LLM.
-This proves `build.py` is wired correctly; it is not run against the real
-corpus in this environment (Task 2's `find_clause_anchors` remains a
-NotImplementedError stub without live Foundry credentials).
+No network access: `ingest_fn` is stubbed with hand-written markdown; stage 2
+uses the REAL deterministic `segment_clauses` (network-free, so no stub is
+needed — this exercises the true segmentation path end-to-end). This proves
+`build.py` is wired correctly and can run without any Foundry credentials.
 """
 
 import json
 
 from engine.build import run_build
 
+# Hand-written markdown in the real BNM line-start format the segmenter expects:
+# a section heading ("12 Approval…"), then its numbered clause ("12.1 …").
 OUTSOURCING_MARKDOWN = (
     "Outsourcing\n\n"
     "12 Approval for material outsourcing arrangements\n\n"
@@ -19,30 +19,12 @@ OUTSOURCING_MARKDOWN = (
     "before entering into a new material outsourcing arrangement.\n"
 )
 
-OUTSOURCING_ANCHORS = [
-    {
-        "clause_number": "12.1",
-        "starts_with": "A financial institution must obtain the Bank's written approval",
-        "heading": "12 Approval for material outsourcing arrangements",
-        "parent": None,
-    },
-]
-
 OPRES_MARKDOWN = (
     "Operational Resilience\n\n"
     "6 Critical operations\n\n"
     "6.11 A financial institution must maintain a register of critical "
     "cloud and third-party services.\n"
 )
-
-OPRES_ANCHORS = [
-    {
-        "clause_number": "6.11",
-        "starts_with": "A financial institution must maintain a register",
-        "heading": "6 Critical operations",
-        "parent": None,
-    },
-]
 
 FIXTURE_DOCUMENTS = {
     "outsourcing-v1-2019": {
@@ -83,18 +65,9 @@ FIXTURE_MARKDOWN_BY_PATH = {
     "opres.pdf": OPRES_MARKDOWN,
 }
 
-FIXTURE_ANCHORS_BY_DOCUMENT_ID = {
-    "outsourcing-v1-2019": OUTSOURCING_ANCHORS,
-    "opres-v1-2025": OPRES_ANCHORS,
-}
-
 
 def _stub_ingest_fn(path):
     return FIXTURE_MARKDOWN_BY_PATH[str(path)]
-
-
-def _stub_find_anchors_fn(markdown, document_id):
-    return FIXTURE_ANCHORS_BY_DOCUMENT_ID[document_id]
 
 
 def test_run_build_writes_clause_index_and_graph_artifacts(tmp_path):
@@ -106,7 +79,6 @@ def test_run_build_writes_clause_index_and_graph_artifacts(tmp_path):
         draft_registry={"live_drafts": ["opres"]},
         output_dir=output_dir,
         ingest_fn=_stub_ingest_fn,
-        find_anchors_fn=_stub_find_anchors_fn,
     )
 
     clause_index_path = output_dir / "clause-index.json"

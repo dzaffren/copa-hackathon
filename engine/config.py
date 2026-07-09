@@ -10,7 +10,15 @@ inferred from filenames.
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
+
+# Load a repo-root `.env` if present so a copied+filled template "just works"
+# with no manual `export`. This must run before the AZURE_FOUNDRY_* /
+# *_DEPLOYMENT reads below. `load_dotenv` no-ops when the file is absent (CI
+# has none) and does not override already-exported real env vars.
+load_dotenv(REPO_ROOT / ".env")
 CORPUS_DIR = REPO_ROOT / "data" / "corpus"
 MOCK_DIR = REPO_ROOT / "data" / "mock"
 
@@ -98,29 +106,30 @@ DOCUMENTS = {
 # Curated seed edges — the deterministic baseline "which policies connect at
 # all" for the locked demo cluster, matching the POC's hand-written edges
 # (docs/poc/policy-consistency-ai/index.html lines 141-148). Clause anchors
-# below are the specific clause numbers each `reason` text already names.
-# The rmit<->outsourcing and rmit<->opres anchors are the pair validated by
-# the discovery brief's blind test (RMiT 17 vs. Outsourcing 12.1; RMiT 10.50
-# vs. Operational Resilience 6.11) and are exact. The remaining pairs
-# (rmit<->bcm, rmit<->customer-info, opres<->bcm, outsourcing<->customer-info)
-# are curated at the *policy* level only — a plausible, illustrative clause
-# number is given on each side pending validation against the real,
-# LLM-parsed clause index (Task 2's `find_clause_anchors`, not available in
-# this environment); `graph.build_graph`'s validation against the supplied
-# `ClauseIndex` is what actually enforces "every anchor resolves", not these
-# hardcoded numbers.
+# below are the specific clause numbers each `reason` text names, and every one
+# has been validated against the REAL parsed clause index (data/artifacts/
+# clause-index.json) — the earlier placeholder anchors (Operational Resilience
+# 6.11, BCM 5.1, Customer Info 8.1) did not exist in the corpus and were
+# corrected to the real clauses whose text supports each edge's reason. The
+# rmit<->outsourcing pair (RMiT 17 vs. Outsourcing 12.1) is the hero conflict
+# validated by the discovery brief's blind test. `graph.build_graph`'s
+# validation against the supplied `ClauseIndex` enforces "every anchor
+# resolves", so any future corpus change that drops one of these clauses fails
+# the build loudly rather than shipping a dangling citation.
 CURATED_SEED_EDGES = [
     {
         "source_policy_id": "rmit",
         "target_policy_id": "opres",
         "type": "overlaps",
         "reason": (
-            "Both govern the register of critical cloud/third-party services. "
-            "RMiT clause 10 (cloud services) overlaps Operational Resilience "
-            "6.11 — a change in one can duplicate or contradict the other."
+            "Both govern the continuity of critical services that depend on "
+            "cloud/third parties. RMiT 10.50 (cloud risk assessment) overlaps "
+            "Operational Resilience 1.1 (continuity of critical financial "
+            "services amid deeper third-party dependencies) — a change in one "
+            "can duplicate or contradict the other."
         ),
         "source_clauses": ["RMiT 10.50"],
-        "target_clauses": ["Operational Resilience 6.11"],
+        "target_clauses": ["Operational Resilience 1.1"],
         "provenance": "curated",
         "confidence": 1.0,
     },
@@ -145,13 +154,12 @@ CURATED_SEED_EDGES = [
         "type": "overlaps",
         "reason": (
             "Cloud services supporting critical operations must have "
-            "continuity arrangements. RMiT cloud requirements reference "
-            "business-continuity expectations in the BCM policy."
+            "continuity arrangements. RMiT 17.1 (cloud adoption for critical "
+            "systems) engages BCM 9.17 (documenting essential services and the "
+            "systems that support them)."
         ),
-        # Placeholder clause anchors pending validation against the real,
-        # LLM-parsed BCM clause index — see module-level comment above.
         "source_clauses": ["RMiT 17.1"],
-        "target_clauses": ["BCM 5.1"],
+        "target_clauses": ["BCM 9.17"],
         "provenance": "curated",
         "confidence": 1.0,
     },
@@ -161,14 +169,11 @@ CURATED_SEED_EDGES = [
         "type": "overlaps",
         "reason": (
             "Cloud adoption for critical systems often processes customer data "
-            "offshore. RMiT 17.1 (cloud adoption) engages the Management of "
-            "Customer Information rules on disclosure and offshore storage of "
-            "customer data."
+            "offshore. RMiT 17.1 (cloud adoption) engages Customer Info 13.3 "
+            "(control measures over the disclosure of customer information)."
         ),
-        # Placeholder clause anchor pending validation against the real,
-        # LLM-parsed Customer Info clause index — see module-level comment above.
         "source_clauses": ["RMiT 17.1"],
-        "target_clauses": ["Customer Info 8.1"],
+        "target_clauses": ["Customer Info 13.3"],
         "provenance": "curated",
         "confidence": 1.0,
     },
@@ -177,13 +182,14 @@ CURATED_SEED_EDGES = [
         "target_policy_id": "bcm",
         "type": "overlaps",
         "reason": (
-            "Operational resilience and business continuity overlap on "
-            "recovery of critical operations after disruption."
+            "Operational resilience and business continuity overlap on the "
+            "continuity of critical/essential services after disruption. "
+            "Operational Resilience 1.1 (continuity of critical financial "
+            "services) overlaps BCM 9.17 (identified essential services and "
+            "their supporting systems)."
         ),
-        # Placeholder clause anchors pending validation against the real,
-        # LLM-parsed clause indexes — see module-level comment above.
-        "source_clauses": ["Operational Resilience 6.11"],
-        "target_clauses": ["BCM 5.1"],
+        "source_clauses": ["Operational Resilience 1.1"],
+        "target_clauses": ["BCM 9.17"],
         "provenance": "curated",
         "confidence": 1.0,
     },
@@ -194,12 +200,12 @@ CURATED_SEED_EDGES = [
         "reason": (
             "Outsourcing (incl. cloud) that involves a service provider "
             "handling customer data engages the Management of Customer "
-            "Information disclosure requirements."
+            "Information rules. Outsourcing 12.1 (approval for material "
+            "outsourcing) engages Customer Info 10.35 (engaging an outsourced "
+            "service provider that handles customer information)."
         ),
-        # Placeholder clause anchors pending validation against the real,
-        # LLM-parsed clause indexes — see module-level comment above.
         "source_clauses": ["Outsourcing 12.1"],
-        "target_clauses": ["Customer Info 8.1"],
+        "target_clauses": ["Customer Info 10.35"],
         "provenance": "curated",
         "confidence": 1.0,
     },
@@ -215,3 +221,17 @@ PARSER_DEPLOYMENT = os.environ.get("AZURE_FOUNDRY_PARSER_DEPLOYMENT", "claude-so
 FINDER_CRITIC_DEPLOYMENT = os.environ.get(
     "AZURE_FOUNDRY_FINDER_CRITIC_DEPLOYMENT", "claude-opus-4-8"
 )
+
+# Azure AI Document Intelligence — optional PDF ingestion backend. When both the
+# endpoint and key are set, `engine.ingest` routes PDFs through the
+# `prebuilt-layout` model, which reconstructs reading order (columns, list
+# labels, headings) that the default MarkItDown extractor scrambles on BNM's
+# multi-column PDFs. Unset → the default extractor is used (no behaviour change,
+# no Azure dependency in CI). Read from env, never committed.
+DOCINTEL_ENDPOINT = os.environ.get("AZURE_DOCINTEL_ENDPOINT")
+DOCINTEL_API_KEY = os.environ.get("AZURE_DOCINTEL_API_KEY")
+# MarkItDown's DI converter hardcodes an old preview api-version
+# (2024-07-31-preview) that GA Document Intelligence resources reject with a
+# 404. Override with the GA version the installed SDK (1.x) speaks. Configurable
+# in case a resource pins a different version.
+DOCINTEL_API_VERSION = os.environ.get("AZURE_DOCINTEL_API_VERSION", "2024-11-30")

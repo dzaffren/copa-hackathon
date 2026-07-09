@@ -402,7 +402,45 @@ Sensitive bank submissions run through **stage 1 only**, into a separate
 git-ignored store (`data/submissions/`), never into the public clause index or
 graph.
 
-#### Clause parsing (stage 2): LLM finds boundaries, code slices verbatim text
+#### Clause parsing (stage 2): deterministic code segmentation, verbatim slicing
+
+> **⚠️ SUPERSEDED (2026-07-09).** Stage 2 was **redesigned** from the
+> LLM-anchor approach described below to a **deterministic, code-only
+> segmenter** (`engine.clauses.segment_clauses`). The LLM-anchor design (kept
+> below for history) proved fragile in practice — the "LLM quotes a phrase,
+> code re-finds it" round-trip produced a cascade of failures on the real
+> corpus: anchors not-found / ambiguous / empty, per-chunk JSON parse crashes,
+> a different clause set every run (non-deterministic), and an orphaned-parent
+> crash. Root cause: the LLM was asked to _report_ boundaries it could not
+> report reliably.
+>
+> **What stage 2 is now:** once Azure Document Intelligence gives clean,
+> correctly-ordered markdown (the #21 ingestion fix), BNM's clause grammar is
+> **regular at the line start** — so code finds every boundary directly:
+>
+> - numbered clauses (`8.1`, `10.50`), whether the number is inline
+>   (`8.1 The board…`) or **alone on its own line** (`12.1\nA financial…`);
+> - lettered/roman sub-items (`(a)`, `(i)`) — parent derived _structurally_
+>   from the number (`8.1(a)`'s parent is `8.1`), never guessed by a model;
+> - appendix clauses (`Appendix 7`);
+> - section headings (`8 Governance`) — recognised as boundaries, not clauses,
+>   with a monotonic-successor / counter-restart rule that skips the table of
+>   contents and rejects footnotes, all deterministically.
+>
+> Code then slices each clause's `text` as a byte-for-byte substring **of the
+> original markdown** between boundaries. This is **fully deterministic** (same
+> bytes in → same clauses out, so artifacts freeze cleanly), **network-free and
+> $0** at build time, and preserves the verbatim guarantee by construction. An
+> unplaceable clause is flagged for human review in `dropped-clauses.json`, not
+> silently lost. On the locked corpus this parses **1035 clauses across the 6
+> documents with zero non-verbatim text**. The old LLM parser
+> (`find_clause_anchors`) is removed from the build path. The rest of this
+> section describes the superseded design.
+>
+> **Prior art note:** this matches what the deep-research report found legal-KG
+> teams do — deterministic/rule-based extraction for structured statutory text,
+> reserving the LLM for judgement (the finder/critic connection step), not for
+> transcription. See `docs/discovery/policy-consistency-ai/doc-to-kg-research.md`.
 
 BNM clause numbering is irregular (`17.1`, `17.1(a)`, `12.3(e)`, `10.50`,
 `Appendix 10`, numbers that wrap lines, items inside tables), so a pure regex over
@@ -713,13 +751,17 @@ force"` for the current published version and `"Superseded"` for older
 
 ## Architecture Notes
 
-- **New dependencies:** `markitdown` (ingestion), `azure-ai-inference` (Azure AI
-  Foundry chat model — clause parsing + finder/critic connection-finding),
-  `fastapi` + `uvicorn` (read service), `pytest` (tests). None exist yet — this
-  story introduces the `engine/` package managed with **`uv`** (`pyproject.toml` +
-  `uv.lock`). The Foundry **endpoint URL + API key** and **deployment name** are
-  read from env (build-time only; the served read API needs no model access; tests
-  stub the model).
+- **New dependencies:** `markitdown[az-doc-intel]` (ingestion + Azure Document
+  Intelligence backend), `anthropic` (Azure AI Foundry Claude via
+  `AnthropicFoundry` — used by the finder/critic connection-finding; **NOT**
+  `azure-ai-inference`, which returns `api_not_supported` for Claude-on-Foundry —
+  see Findings & Gaps G4), `python-dotenv` (`.env` loading), `fastapi` +
+  `uvicorn` (read service), `pytest` (tests). Managed with **`uv`**
+  (`pyproject.toml` + `uv.lock`). The Foundry **endpoint URL + API key** and
+  **deployment name** are read from env. **Clause parsing no longer uses a
+  model at all** — stage 2 is the deterministic `segment_clauses` (see the
+  superseded-parsing note above), so build-time model access is needed only for
+  the live finder/critic; the served read API needs none; tests stub the model.
 - **Dependencies & integration:** this is the foundation; the shape of
   `clause-index.json` and `graph.json` becomes a **frozen contract**, but frozen
   **per field when its first real consumer validates it**, not all-at-once when #7
@@ -899,16 +941,20 @@ serves finished artifacts. Only **stage 4 / the ripple check** runs live against
 the model, with the recorded `connection-trace-*.json` as the mandatory backstop.
 
 **Model access & config.** `config.py` reads the Azure AI Foundry **endpoint URL**
-and **API key** from env vars (never committed), plus two configurable **deployment
-names**: one for the parser (stage 2) and one for the finder/critic (stage 4). The
-confirmed deployments on resource `aih-semantic-kernel-swc` (swedencentral) are:
+and **API key** from env vars (never committed), plus the configurable **deployment
+name** for the finder/critic (stage 4). (A parser deployment env var still exists
+for back-compat but is **no longer used** — stage 2 is the deterministic
+`segment_clauses`, which calls no model; see the superseded-parsing note.) The
+deployments on resource `aih-semantic-kernel-swc` (swedencentral):
 
-| Stage           | Deployment        | Model           | Why                                  |
-| --------------- | ----------------- | --------------- | ------------------------------------ |
-| 2 parser        | `claude-sonnet-5` | Claude Sonnet 5 | Mechanical boundary-finding; cheaper |
-| 4 finder/critic | `claude-opus-4-8` | Claude Opus 4-8 | Hard cross-policy reasoning + recall |
+| Stage           | Deployment        | Model           | Why                                           |
+| --------------- | ----------------- | --------------- | --------------------------------------------- |
+| 2 parser        | — (none)          | —               | **Deterministic code**, no model (redesigned) |
+| 4 finder/critic | `claude-opus-4-8` | Claude Opus 4-8 | Hard cross-policy reasoning + recall          |
 
-Both are called with the `azure-ai-inference` SDK (models are `format: Anthropic`).
+The finder/critic is called with the **`anthropic` SDK** (`AnthropicFoundry`,
+base URL ending `/anthropic`) — **not** `azure-ai-inference`, which rejects
+Claude-on-Foundry with `api_not_supported` (see Findings & Gaps G4).
 They run **at build time only**; `build.py` needs Foundry access, but the served
 **read API needs no model access** (it serves pre-built artifacts). Tests stub the
 model (recorded responses), so CI runs without any credentials.
@@ -1611,3 +1657,230 @@ framework. User-facing flows are covered by the consuming stories (#7–#11)._
 - [ ] **Production submission governance/auth?** — **Deferred (non-blocking):**
       demo uses an `X-Role` header + git-ignored store; production auth is a
       named post-hackathon concern.
+
+---
+
+## Prior Art — how others extract documents into a knowledge graph
+
+This engine is one point in a well-populated design space. The table maps the
+canonical doc→KG systems against the choices this engine makes, so every
+decision is defensible as "we know what the alternatives do, and here is why
+ours differs for a **regulatory-citation** product." Sources were read directly
+(links below); claims not verifiable from the primary source are marked.
+
+> **Fuller cited report:** a deep, adversarially-verified research report (22
+> sources, 23 confirmed claims) lives at
+> [`docs/discovery/policy-consistency-ai/doc-to-kg-research.md`](../../discovery/policy-consistency-ai/doc-to-kg-research.md).
+> It confirms this engine's clause-atomic unit and anti-hallucination goal against
+> legal-KG literature (COMPACT, GraphCompliance, Hairurahman et al.), flags that
+> the exact "LLM emits boundaries → code slices verbatim" mechanism is largely
+> unprecedented, and surfaces three techniques worth adding: an ALCE-style
+> attribution-evaluation harness, a drop-vs-flag decision for unresolvable
+> citations (cross-reference resolution is unsolved — CRAwLeR best Recall@10
+> 55–59%), and grounding layers (`verbatim-rag`, Anthropic Citations API) for the
+> copilot answer path.
+
+| System                                                                                            | Ingestion                                                           | Chunk unit                               | Extraction                                                                                                    | Provenance to source                                                                                                  | Store                                                                      | Retrieval                                                                                                                 |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **Microsoft GraphRAG** ([docs](https://microsoft.github.io/graphrag/))                            | generic loaders                                                     | **TextUnits** (fixed-size passages)      | LLM entities + relationships + claims                                                                         | TextUnits are "fine-grained references"; **community summaries are LLM-generated abstractions**, not verbatim         | Parquet/tabular                                                            | global (community summaries) + local                                                                                      |
+| **LightRAG** ([HKUDS](https://github.com/HKUDS/LightRAG))                                         | generic                                                             | Fix / Recursive / Vector / **Paragraph** | LLM entities + relations, dedup/merge, incremental                                                            | chunk-linked; no verbatim-citation guarantee                                                                          | KV + vector + graph + doc-status (PostgreSQL/Neo4j/…)                      | dual-level local/global; **no community reports** (cheaper than GraphRAG)                                                 |
+| **Neo4j LLM Graph Builder** ([genai](https://neo4j.com/labs/genai-ecosystem/llm-graph-builder/))  | PDF/doc/web/YouTube                                                 | chunk nodes (kNN-linked, embedded)       | `llm-graph-transformer` (LangChain) entities+rels                                                             | **entities stay `(:Chunk)`-linked** → answers trace to source chunk                                                   | **Neo4j** (graph DB)                                                       | GraphRAG + vector + Text2Cypher                                                                                           |
+| **BIS Project Gaia** ([bis.org](https://www.bis.org/about/bisih/topics/suptech_regtech/gaia.htm)) | corporate/regulatory disclosures, multi-jurisdiction                | per-indicator                            | LLM extracts specific indicators across non-standard disclosures                                              | audit trail to source doc is the _point_ (supervisory use); exact mechanism not in the public overview                | —                                                                          | indicator search across filings                                                                                           |
+| **`ai_graphify`** (collabsoft — cited elsewhere in this spec)                                     | tree-sitter / whisper                                               | file/symbol                              | LLM EXTRACTED/INFERRED                                                                                        | edge provenance + confidence                                                                                          | **`graph.json` + NetworkX + Leiden, no vector DB**                         | hierarchical summary-first ("71.5× fewer tokens")                                                                         |
+| **`graphify`** (safishamsi `graphifyy` — the tool used on _this repo_)                            | AST + LLM subagents; native PDF text reader                         | file/symbol/concept                      | EXTRACTED / INFERRED / AMBIGUOUS + confidence                                                                 | `source_file` + `source_location` per node/edge                                                                       | `graph.json` + NetworkX + Leiden                                           | BFS/DFS query, god-nodes, communities                                                                                     |
+| **Rulebook Radar engine (this spec)**                                                             | **MarkItDown + Azure Document Intelligence** (custom-font BNM PDFs) | **the clause** (numbered, verbatim)      | code slices verbatim text; **LLM emits boundaries/numbers only**; finder+critic+code-verifier for connections | **verbatim clause text keyed by number; every asserted edge cites a clause that resolves in the index or is dropped** | `graph.json` + clause-index.json (in-memory; NetworkX if traversal needed) | O(1) clause lookup + hierarchical (graph first, hydrate clause text on demand) + full-doc pairwise for connection-finding |
+
+**What is genuinely conventional here** (reassuring, not novel): JSON + NetworkX
+
+- Leiden at small scale (`ai_graphify`, `graphify`); LLM entity/relationship
+  extraction (all of them); hierarchical summary-first retrieval (GraphRAG
+  communities, `ai_graphify`); chunk→source provenance links (Neo4j, GraphRAG
+  TextUnits).
+
+**Where this engine deliberately departs, and why the product forces it:**
+
+1. **Chunk unit = the clause, not a passage.** Every other system chunks by
+   size/paragraph/file. For a compliance tool the atomic, addressable, quotable
+   unit is the numbered clause ("Outsourcing 12.1"), so the clause index _is_ the
+   chunking. This is the single biggest divergence and it is dictated by the
+   verbatim-citation product rule.
+2. **The LLM never emits the payload text.** GraphRAG's community summaries and
+   most systems' node descriptions are LLM prose. Here the LLM emits only
+   _boundaries_ (parser) and _clause numbers_ (finder/critic); code slices the
+   verbatim substring. This is what makes "quote the exact clause" a
+   _construction guarantee_, not a model-fidelity hope.
+3. **Provenance is a hard gate, not a soft link.** Neo4j keeps entities
+   chunk-linked so you _can_ trace back; here a connection that cites a clause
+   which does not resolve in the index is **dropped and reported unsupported** —
+   the citation validator (stage 5) refuses to persist it. Traceability is
+   enforced, not merely available.
+4. **Supervisory framing matches Project Gaia, not consumer GraphRAG.** Gaia is
+   the closest peer in _intent_ (a central-bank/BIS tool extracting structured,
+   auditable facts from regulatory disclosures at scale). The engine's
+   recall-focused critic pass and audit trail (`connection-trace-*.json`) are the
+   same instinct: in supervision a missed requirement is the dangerous error, and
+   every claim must survive audit.
+
+**Net:** the storage and clustering are proven-conventional (de-risks the build);
+the clause-unit + no-LLM-payload + hard-gated-citation stack is the compliance-
+specific part, and it is exactly the part the discovery brief's blind test
+validated. Nothing in the surveyed systems offers verbatim clause-anchored
+citation out of the box — which is why the engine is purpose-built rather than a
+GraphRAG library drop-in.
+
+## graphify Reuse Evaluation — can the code-graph tool build the policy graph?
+
+The `graphify` skill (`~/.claude/skills/graphify`, PyPI `graphifyy`) already ran
+on **this repository** (`graphify-out/`: 402 nodes / 829 edges over the engine
+code, specs, and POC — a developer-navigation map). The natural question: since it
+turns "any folder of files into a knowledge graph," can it _be_ the ingestion +
+graph engine for the BNM policy corpus, replacing stages 1–4? **It was run on the
+real corpus (`data/corpus`, `--mode deep`) to answer this empirically rather than
+by assertion.** Verdict: **no as a replacement, yes in three specific supporting
+roles.**
+
+### The experiment (2026-07-08, `graphify data/corpus --mode deep`)
+
+Output preserved at `graphify-out-corpus/` (the code-repo graph remains the
+default `graphify-out/`). Result: **56 nodes · 91 edges · 10 communities**, 78%
+EXTRACTED / 19% INFERRED / 3% AMBIGUOUS, 156 k input tokens.
+
+**Finding 1 — graphify's native PDF reader extracts ~0 usable text from BNM PDFs.**
+`graphify detect` reported the entire six-PDF corpus as **279 words** (essentially
+just `data/corpus/README.md`); a direct extraction attempt returned **0 words per
+PDF**. This is precisely the custom-font-encoding gibberish the discovery brief
+documented — and the reason the engine routes PDFs through **MarkItDown + Azure
+Document Intelligence**. graphify has no equivalent; its text path is blind on this
+corpus. (Content only surfaced at all because graphify's _semantic_ step dispatches
+LLM subagents that render PDFs natively — see Finding 2.)
+
+**Finding 2 — even via LLM subagents, 2 of 6 PDFs read poorly and the load-bearing
+clause did not survive verbatim.** The subagent read RMiT, BCM, OpRes, and MCIPD
+cleanly, but **Outsourcing (23 Oct 2019) and Recovery Planning rendered as boxes
+(custom font)** — only English fragments leaked. Critically, **`Outsourcing 12.1`
+verbatim text could not be recovered** from the render; its node was reconstructed
+from the README table and other policies' cross-references. For a product whose
+entire pitch is quoting 12.1 word-for-word, that is a disqualifying gap — the
+engine's DI backend + verbatim slicing exists specifically to close it.
+
+**Finding 3 — graphify surfaced the right connections but at the wrong altitude and
+without citations.** It _did_ independently cluster the corpus sensibly (the
+"Critical-service continuity across BCM/OpRes/Recovery" and "Third-party governance
+across RMiT/Outsourcing/MCIPD/OpRes" hyperedges match the curated seed edges) and it
+_did_ flag the hero tension — `RMiT 17.1 consult` vs `Outsourcing 12.1 prior written
+approval` — but tagged it **AMBIGUOUS (0.3)** / INFERRED (0.75 hyperedge), and its
+nodes are document- and concept-level, not clause-level with verbatim text. It found
+the _shape_ of the conflict; it cannot produce the _verbatim-cited finding_ the
+ripple check needs. Its edges also carry no `source_clauses`/`target_clauses` that
+resolve in a clause index, so they would fail the engine's citation gate.
+
+### Where the two tools genuinely differ
+
+| Dimension            | graphify                                          | Rulebook Radar engine                                         |
+| -------------------- | ------------------------------------------------- | ------------------------------------------------------------- |
+| Node =               | file / symbol / concept                           | **clause** (verbatim, numbered)                               |
+| BNM-PDF ingestion    | native reader ≈ 0 words; subagent render 2/6 poor | **MarkItDown + Azure DI**, verbatim                           |
+| Verbatim clause text | ✗ (concept labels, LLM prose)                     | ✓ (code-sliced substring, the product rule)                   |
+| Citation guarantee   | ✗ (`source_file` + `source_location` only)        | ✓ (unresolved citation → dropped/unsupported)                 |
+| Edge honesty         | EXTRACTED/INFERRED/AMBIGUOUS + confidence         | curated/structural/llm-found + confidence + **code-verified** |
+| Recall discipline    | single-pass extraction                            | **finder → critic (recall pass) → verifier**                  |
+| Clustering           | **Leiden community detection** (built-in)         | not in MVP1 (named cross-cluster future phase)                |
+| Cross-cluster map    | one command                                       | the future-phase capability                                   |
+
+### Verdict — three supporting roles, not a replacement
+
+graphify is **not** a drop-in for stages 1–4: it cannot read the PDFs verbatim, its
+atomic unit is not the clause, and it offers no citation gate — the three things
+that define this product. But it earns its place in three ways:
+
+1. **Independent validation / red-team of the graph shape.** Run graphify on the
+   corpus and confirm its communities and hyperedges match the engine's curated seed
+   edges (they did — BCM/OpRes/Recovery continuity, RMiT/Outsourcing/MCIPD third-party
+   governance, the 17.1↔12.1 cloud tension). A cheap, independent second opinion that
+   the curated cluster is not missing an obvious connection — a **recall spot-check
+   aid** for the open recall question above.
+2. **Candidate-connection generator for a wider corpus.** At full-rulebook scale where
+   the pairwise "dump both documents" strategy stops fitting, graphify's cross-document
+   INFERRED edges are a _candidate_ source — but every candidate must still pass the
+   engine's citation validator against the clause index before it is a finding. graphify
+   proposes; the engine's guardrail disposes.
+3. **The concrete blueprint for the cross-cluster future phase.** graphify's Leiden
+   community detection over `graph.json` + NetworkX is exactly the technique this spec
+   already names for the cross-cluster map (alongside `ai_graphify`). The future phase
+   is not hypothetical tooling — `graphify` is a working reference implementation of it.
+
+**Confidentiality note.** A graphify corpus run writes clause-level policy content
+into `graphify-out-corpus/`. BNM policy PDFs are public, so this is fine — but the
+same must **never** be run over `data/submissions/` (sensitive) or `docs/references/`
+(git-ignored internal). Keep graphify pointed at the public corpus only.
+
+## Findings & Gaps — current state of the #6/#21 implementation
+
+The engine is **built** (`engine/` package, 96 tests green, ruff clean, mypy at the
+accepted 4-warning stub baseline). #21 wired the three live Azure/Claude call sites
+(parser, finder, critic). What follows is the honest gap list as of 2026-07-08 — the
+detail lives in [`spec-llm-parser-connection-finder.md`](./spec-llm-parser-connection-finder.md)
+("Implementation status"); this is the engine-spec-level summary so #6's status is
+not silently overstated.
+
+**G1 — The full 6-doc build has not completed; current artifacts are partial.**
+`data/artifacts/clause-index.json` currently holds **only Outsourcing (171 clauses)**
+and `graph.json` is a stub (**1 node, 0 edges**). A single-document build works
+end-to-end and verbatim (`Outsourcing 12.1` byte-perfect); the full-cluster build is
+the next step. **Until it completes, no downstream story (#7–#11) can build against
+real artifacts** — this is the critical-path gap.
+
+**G2 — `CURATED_SEED_EDGES` cite clauses that do not exist in the real corpus.**
+`engine/config.py` seeds edges against **`Operational Resilience 6.11`, `BCM 5.1`,
+`Customer Info 8.1`** — placeholders from before the corpus was parsed. Confirmed:
+the OpRes Discussion Paper uses single-digit `1.1…` numbering and **has no clause
+6.11** (the graphify run corroborates — OpRes concepts cluster around impact
+tolerances and critical operations, no 6.11). `build_graph` hard-fails
+(`GraphBuildError`) on any edge whose clause does not resolve — so the first full
+build will fail here **by design** (the guardrail working). _Fix: correct the config
+anchors to real parsed clause numbers, or drop/relabel those edges — a config-data
+fix, not a code fix, and it requires the G1 parse output first._
+
+**G3 — Parser output is non-deterministic; artifacts are not yet frozen.** Anchor
+counts drift run-to-run (172–217; different non-load-bearing clauses drop each time),
+and ~2–3% of anchors are dropped as unresolvable (logged, mostly deeply-nested
+boilerplate). The spec's determinism requirement ("generate once, commit
+`clause-index.json`/`graph.json` as fixtures") is **not yet satisfied** — the decision
+to freeze must happen before any consumer relies on artifact stability.
+
+**G4 — Behaviour diverged from the #6 spec in ways this spec should reflect.** The
+#21 build made four changes that contradict text still above in this document; the
+authoritative behaviour is now:
+
+- **SDK: `anthropic` (AnthropicFoundry), not `azure-ai-inference`.** Claude on Foundry
+  speaks the Anthropic Messages API; the generic chat-completions path returns
+  `api_not_supported`. Base URL must end in `/anthropic`. (The Architecture Notes and
+  "Model access & config" sections above name `azure-ai-inference` — stale.)
+- **Ingestion gained an Azure Document Intelligence backend** (`prebuilt-layout`) for
+  PDFs, because default MarkItDown scrambles reading order on BNM's multi-column
+  layout. Gated on `AZURE_DOCINTEL_*` env; unset → default extractor (keeps CI/Azure
+  dependency-free). This is the root-cause fix for most parser failures and the direct
+  answer to graphify Finding 1/2 above.
+- **Unresolvable anchors are DROPPED with a warning, not raised as loud build
+  failures** (the real BNM corpus has a long boilerplate tail). `ClauseCompletenessError`
+  against `expected_clauses` is the backstop for _load-bearing_ clauses. (Contradicts
+  the "loud build errors, never silent corruption" phrasing in Solution Design — the
+  guarantee now holds only for _required_ clauses, enforced by the completeness
+  reconcile, not for every boilerplate sub-item.)
+- **No assistant-prefill** (400s on Claude 4.6+); JSON is forced by prompt +
+  tolerant defensive parsing (fences, JSON-Lines, junk-preamble salvage) + retry.
+
+**G5 — Extraction quality is uneven per document.** recovery/BCM parse clean,
+customer-info near-clean, opres/rmit moderate, **outsourcing worst** — matching
+graphify Finding 2 (Outsourcing + Recovery Planning are the custom-font pair). DI
+should lift all; re-measure per document after the full build.
+
+**G6 — Recall spot-check on `claude-opus-4-8` still open (non-blocking).** Same as the
+open question above: the blind test was on Claude and the deployment is Claude, so the
+result transfers; a light confidence check remains before leaning on the recall pitch
+claim. The graphify run is now a cheap independent corroborant (Finding 3).
+
+**Next steps, in priority order:** (1) complete the full 6-doc build [G1]; (2) fix the
+phantom curated anchors from real parsed numbers [G2]; (3) decide freeze-as-fixtures and
+commit artifacts [G3]; (4) reconcile the stale SDK/ingestion/error-handling text in the
+sections above with G4; (5) audit load-bearing clauses survived verbatim after DI [G5].
