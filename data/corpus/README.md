@@ -25,3 +25,31 @@ labelled "what's next" placeholder in the graph).
 **Note:** the authoritative filename → `document_id` mapping is defined in
 `engine/config.py` (the build does not infer it from filenames). This table is the
 human-readable reference.
+
+## Testing another cluster (bring your own documents)
+
+The engine is not hard-wired to these six files — they are the _default demo
+cluster_, but the pipeline works on any set of clause-numbered policy PDFs. To
+try a different cluster (e.g. a payments or AML/CFT cluster):
+
+1. **Drop the PDFs here** in `data/corpus/` (public documents only — never place
+   anything sensitive here; that belongs in the git-ignored `docs/references/`).
+2. **Point `engine/config.py` at them.** Edit `DOCUMENTS` so each entry's
+   `source_path` names your file and set its `policy_id`, `document_id`,
+   `title`, `version`, and `source`. Add each new `policy_id` to
+   `POLICY_SHORT_NAMES` in `engine/clauses.py` (the canonical clause-number
+   prefix, e.g. `"payments": "Payments"`).
+3. **Update `CURATED_SEED_EDGES`** (also in `config.py`) to the connections you
+   want as the baseline graph — every clause an edge cites must resolve in the
+   parsed index, or `build_graph` fails loudly (by design).
+4. **Run `python -m engine.build`.** Clause parsing is deterministic and
+   network-free; only PDF ingestion needs the Azure Document Intelligence
+   credentials in `.env` (see `.env.example`). Inspect
+   `data/artifacts/_ingest/<document_id>.md` (git-ignored debug dump) if a
+   document parses poorly, and `data/artifacts/dropped-clauses.json` for any
+   clause the segmenter could not place.
+
+The clause grammar the segmenter recognises (numbered clauses inline or
+label-alone, `(a)`/`(i)` sub-items, `Appendix N`, section headings) matches BNM
+conventions; a corpus with very different numbering may need the regexes in
+`engine/clauses.py` extended. Nothing else about the cluster is hard-coded.
