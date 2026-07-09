@@ -7,6 +7,11 @@ docs/references/
 # Sensitive bank submissions — never committed
 data/submissions/
 
+# Raw ingested markdown — a per-build debug dump of what Document Intelligence
+# produced (used to diagnose extraction issues). Rebuildable, not a frozen
+# artifact; the committed contract is clause-index.json / graph.json only.
+data/artifacts/_ingest/
+
 # Local secrets — copy .env.example to .env and fill in; never committed
 .env
 
@@ -15,3 +20,10 @@ __pycache__/
 *.pyc
 .venv/
 .pytest_cache/
+
+# Claude Code local settings + agent worktrees (machine-specific)
+.claude/
+
+# graphify generated graphs (exploration artifacts, rebuildable, not source)
+graphify-out/
+graphify-out-corpus/

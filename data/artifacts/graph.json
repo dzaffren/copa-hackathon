@@ -1,0 +1,157 @@
+{
+  "nodes": [
+    {
+      "id": "rmit-v1-2020",
+      "policy_id": "rmit",
+      "title": "Risk Management in Technology (RMiT)",
+      "version": "v1 \u00b7 2020",
+      "status": "Superseded",
+      "cluster": "technology-risk"
+    },
+    {
+      "id": "rmit-v2-2026-draft",
+      "policy_id": "rmit",
+      "title": "Risk Management in Technology (RMiT)",
+      "version": "v2 \u00b7 2026 draft",
+      "status": "In progress",
+      "cluster": "technology-risk"
+    },
+    {
+      "id": "outsourcing-v1-2019",
+      "policy_id": "outsourcing",
+      "title": "Outsourcing",
+      "version": "v1 \u00b7 2019",
+      "status": "In force",
+      "cluster": "technology-risk"
+    },
+    {
+      "id": "bcm-v1-2022",
+      "policy_id": "bcm",
+      "title": "Business Continuity Management",
+      "version": "v1 \u00b7 2022",
+      "status": "In force",
+      "cluster": "technology-risk"
+    },
+    {
+      "id": "opres-v1-2025-draft",
+      "policy_id": "opres",
+      "title": "Operational Resilience",
+      "version": "draft \u00b7 Discussion Paper 2025",
+      "status": "In progress",
+      "cluster": "technology-risk"
+    },
+    {
+      "id": "recovery-planning-v1-2021",
+      "policy_id": "recovery-planning",
+      "title": "Recovery Planning",
+      "version": "v1 \u00b7 2021",
+      "status": "In force",
+      "cluster": "technology-risk"
+    },
+    {
+      "id": "customer-info-v1-2025",
+      "policy_id": "customer-info",
+      "title": "Management of Customer Information",
+      "version": "v1 \u00b7 2025",
+      "status": "In force",
+      "cluster": "technology-risk"
+    }
+  ],
+  "edges": [
+    {
+      "source": "opres-v1-2025-draft",
+      "target": "bcm-v1-2022",
+      "type": "overlaps",
+      "reason": "Operational resilience and business continuity overlap on the continuity of critical/essential services after disruption. Operational Resilience 1.1 (continuity of critical financial services) overlaps BCM 9.17 (identified essential services and their supporting systems).",
+      "source_clauses": [
+        "Operational Resilience 1.1"
+      ],
+      "target_clauses": [
+        "BCM 9.17"
+      ],
+      "provenance": "curated",
+      "confidence": 1.0
+    },
+    {
+      "source": "outsourcing-v1-2019",
+      "target": "customer-info-v1-2025",
+      "type": "overlaps",
+      "reason": "Outsourcing (incl. cloud) that involves a service provider handling customer data engages the Management of Customer Information rules. Outsourcing 12.1 (approval for material outsourcing) engages Customer Info 10.35 (engaging an outsourced service provider that handles customer information).",
+      "source_clauses": [
+        "Outsourcing 12.1"
+      ],
+      "target_clauses": [
+        "Customer Info 10.35"
+      ],
+      "provenance": "curated",
+      "confidence": 1.0
+    },
+    {
+      "source": "rmit-v1-2020",
+      "target": "rmit-v2-2026-draft",
+      "type": "version-lineage",
+      "reason": "rmit-v1-2020 is superseded by rmit-v2-2026-draft of the same policy.",
+      "source_clauses": [],
+      "target_clauses": [],
+      "provenance": "structural",
+      "confidence": 1.0
+    },
+    {
+      "source": "rmit-v2-2026-draft",
+      "target": "bcm-v1-2022",
+      "type": "overlaps",
+      "reason": "Cloud services supporting critical operations must have continuity arrangements. RMiT 17.1 (cloud adoption for critical systems) engages BCM 9.17 (documenting essential services and the systems that support them).",
+      "source_clauses": [
+        "RMiT 17.1"
+      ],
+      "target_clauses": [
+        "BCM 9.17"
+      ],
+      "provenance": "curated",
+      "confidence": 1.0
+    },
+    {
+      "source": "rmit-v2-2026-draft",
+      "target": "customer-info-v1-2025",
+      "type": "overlaps",
+      "reason": "Cloud adoption for critical systems often processes customer data offshore. RMiT 17.1 (cloud adoption) engages Customer Info 13.3 (control measures over the disclosure of customer information).",
+      "source_clauses": [
+        "RMiT 17.1"
+      ],
+      "target_clauses": [
+        "Customer Info 13.3"
+      ],
+      "provenance": "curated",
+      "confidence": 1.0
+    },
+    {
+      "source": "rmit-v2-2026-draft",
+      "target": "opres-v1-2025-draft",
+      "type": "overlaps",
+      "reason": "Both govern the continuity of critical services that depend on cloud/third parties. RMiT 10.50 (cloud risk assessment) overlaps Operational Resilience 1.1 (continuity of critical financial services amid deeper third-party dependencies) \u2014 a change in one can duplicate or contradict the other.",
+      "source_clauses": [
+        "RMiT 10.50"
+      ],
+      "target_clauses": [
+        "Operational Resilience 1.1"
+      ],
+      "provenance": "curated",
+      "confidence": 1.0
+    },
+    {
+      "source": "rmit-v2-2026-draft",
+      "target": "outsourcing-v1-2019",
+      "type": "overlaps",
+      "reason": "A public-cloud arrangement is often also a material outsourcing. RMiT clause 17 (cloud consultation/notification) interacts with Outsourcing 12.1 (written approval) \u2014 the core conflict in this cluster.",
+      "source_clauses": [
+        "RMiT 17.1",
+        "RMiT 17.2"
+      ],
+      "target_clauses": [
+        "Outsourcing 12.1"
+      ],
+      "provenance": "curated",
+      "confidence": 1.0
+    }
+  ]
+}
