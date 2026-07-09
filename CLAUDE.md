@@ -52,9 +52,16 @@ matching clause found" — never invent one. Preserve this in any spec or POC ed
 ## Conventions
 
 - Specs are non-technical and grounded in real clauses (RMiT 17.1/17.2,
-  Outsourcing 12.1, OpRes 6.11). Keep personas consistent: Aisyah R. drafts RMiT v2
-  and Operational Resilience v2 and reviews Outsourcing v2; Farid M. drafts
-  Outsourcing v2 and reviews Aisyah's RMiT v2; a manager approves.
+  Outsourcing 12.1, Operational Resilience 1.1 — note "OpRes 6.11" is a phantom
+  clause, not in the parsed corpus). Keep personas consistent (single-draft MVP1, per
+  the 9 Jul 2026 pivot): Aisyah R. drafts **RMiT v2** — the sole editable draft;
+  every other BNM policy is published, read-only context; an approving manager gives
+  the final sign-off. There is **no separate reviewer persona** in MVP1 — the
+  reviewer / multi-draft model (incl. Farid M.) is deferred to a future phase.
+- Drafter value leads with the **Reference Radar** (external references — peer
+  regulators, acts like PDPA, standards — cited verbatim); internal Conflict /
+  Duplication / Gap consistency is the secondary "good to know" layer and the
+  supervisor-checklist engine.
 - POC pages are self-contained HTML using Tailwind via CDN — no build step.
 - MVP1 scope is a single cluster (technology-risk); cross-cluster ripple is a
   labelled "what's next" preview, not built.
