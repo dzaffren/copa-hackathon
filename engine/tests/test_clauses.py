@@ -1,12 +1,13 @@
-"""Tests for engine.clauses — clause parser (anchor-slice) + ClauseIndex.
+"""Tests for engine.clauses — clause segmentation + ClauseIndex.
 
 Covers spec Test Scenarios 1, 2, 4, 9 (docs/specs/rulebook-radar/
 spec-knowledge-graph-engine.md) plus the loud-failure and collision
 invariants called out in Task 2 of the implementation plan.
 
-No network access: the LLM anchor-finding seam (`find_clause_anchors`) is
-never called here — every test hand-writes its own anchor list and calls
-`build_clause_index` directly.
+No network access and no model: stage 2 is the deterministic `segment_clauses`
+(rule-primary). Lower-level tests hand-write anchor lists and call
+`build_clause_index` directly (the phrase-anchor helper that shares the same
+verbatim-slicing assembly).
 """
 
 import pytest
@@ -16,15 +17,10 @@ from engine.clauses import (
     ClauseIndex,
     ClausePrimaryIndexCollisionError,
     ClauseVersionNotFoundError,
-    _CLAUSE_START_RE,
-    _parse_anchor_response,
-    _split_chunks,
-    _strip_noise,
     build_clause_index,
-    find_clause_anchors,
     merge_clause_indexes,
+    segment_clauses,
 )
-from engine.llm import LLMResponseError
 
 OUTSOURCING_MARKDOWN = """Outsourcing
 
@@ -404,6 +400,114 @@ def test_anchor_not_found_is_skipped_with_warning(caplog):
     assert any("99.9" in rec.message for rec in caplog.records)
 
 
+def test_dropped_report_captures_dropped_clause_for_human_review():
+    # "Flag for human review": when a dropped_report list is supplied, every
+    # dropped anchor is appended as a structured {document_id, clause_number,
+    # reason, ...} record — a reviewable artifact, not just a log line. The
+    # supported clause is NOT reported (only genuine drops are).
+    anchors = [
+        {
+            "clause_number": "12.1",
+            "starts_with": "A financial institution must obtain the Bank's written approval",
+            "heading": None,
+            "parent": None,
+        },
+        {
+            "clause_number": "99.9",
+            "starts_with": "This phrase does not appear anywhere in the source",
+            "heading": "9 Nonexistent",
+            "parent": None,
+        },
+    ]
+    dropped_report: list[dict] = []
+
+    entries = build_clause_index(
+        anchors=anchors,
+        markdown=OUTSOURCING_MARKDOWN,
+        document_id="outsourcing-v1-2019",
+        policy_id="outsourcing",
+        source="published",
+        dropped_report=dropped_report,
+    )
+
+    assert "Outsourcing 12.1" in entries  # supported clause still built
+    assert len(dropped_report) == 1
+    record = dropped_report[0]
+    assert record["document_id"] == "outsourcing-v1-2019"
+    assert record["clause_number"] == "99.9"  # bare number as emitted by the LLM
+    assert record["reason"] == "not_found"
+    assert record["heading"] == "9 Nonexistent"
+
+
+def test_orphaned_child_parent_missing_is_promoted_not_crashed():
+    # A child clause whose declared parent was never emitted (a bare section
+    # heading, or a parent whose own anchor was dropped) must NOT crash the
+    # build. The child is promoted to top-level (parent -> None) and flagged for
+    # review — the "flag for human, don't crash" principle.
+    markdown = (
+        "10.1  The first requirement under section ten applies to all firms.\n\n"
+        "10.2  The second requirement under section ten applies as well.\n"
+    )
+    anchors = [
+        # Both children point at parent "10", which is never emitted as a clause.
+        {
+            "clause_number": "10.1",
+            "starts_with": "The first requirement under section ten",
+            "heading": "10 Section Ten",
+            "parent": "10",
+        },
+        {
+            "clause_number": "10.2",
+            "starts_with": "The second requirement under section ten",
+            "heading": "10 Section Ten",
+            "parent": "10",
+        },
+    ]
+    dropped_report: list[dict] = []
+
+    entries = build_clause_index(
+        anchors=anchors,
+        markdown=markdown,
+        document_id="rmit-v1-2020",
+        policy_id="rmit",
+        source="published",
+        dropped_report=dropped_report,
+    )
+
+    # Both children built and were promoted to top-level (no KeyError).
+    assert entries["RMiT 10.1"]["parent"] is None
+    assert entries["RMiT 10.2"]["parent"] is None
+    assert "RMiT 10" not in entries  # the phantom parent was never invented
+    # Both flagged for review with the orphaned-parent reason.
+    assert len(dropped_report) == 2
+    assert all(r["reason"] == "orphaned_parent:RMiT 10" for r in dropped_report)
+
+
+def test_dropped_report_none_keeps_warn_only_default(caplog):
+    # Passing no dropped_report (the default) must not change behaviour — the
+    # clause is still dropped and warned, nothing raised.
+    import logging
+
+    anchors = [
+        {
+            "clause_number": "99.9",
+            "starts_with": "This phrase does not appear anywhere in the source",
+            "heading": None,
+            "parent": None,
+        },
+    ]
+    with caplog.at_level(logging.WARNING):
+        entries = build_clause_index(
+            anchors=anchors,
+            markdown=OUTSOURCING_MARKDOWN,
+            document_id="outsourcing-v1-2019",
+            policy_id="outsourcing",
+            source="published",
+        )
+    assert "Outsourcing 99.9" not in entries
+    assert any("99.9" in rec.message for rec in caplog.records)
+
+
 def test_ambiguous_anchor_is_skipped_with_warning(caplog):
     # The phrase recurs AND the clause's own label ("8.4") precedes neither
     # occurrence — label disambiguation can't single one out, so the anchor is
@@ -779,304 +883,6 @@ def test_ambiguous_primary_collision_raises_rather_than_silently_picking_one():
         )
 
 
-# ---------------------------------------------------------------------------
-# Stage-2 parser (find_clause_anchors) — split + parse + merge wiring.
-#
-# No network: `_strip_noise`, `_split_chunks` and `_parse_anchor_response` are
-# pure, and the `find_clause_anchors` orchestration test monkeypatches
-# `call_chat` with a fake returning canned per-chunk JSON.
-# ---------------------------------------------------------------------------
-
-# Mimics real MarkItDown output of a BNM PDF: a table of contents with dotted
-# leaders, repeated "Issued on:" running headers, "N of M" page footers, a
-# form-feed page break (\x0c), and lone "PART X" dividers — all noise — around
-# the genuine numbered clauses.
-MARKITDOWN_STYLE_MARKDOWN = (
-    "Outsourcing\n\n"
-    "PART A  OVERVIEW ...................................... 2\n"
-    "Interpretation ....................................... 3\n"
-    "PART C  REGULATORY PROCESS ........................... 12\n\n"
-    "Issued on: 23 October 2019\n\n"
-    "\x0c"
-    "PART C  REGULATORY PROCESS\n\n"
-    "12\n\n"
-    "Approval for material outsourcing arrangements\n\n"
-    "12.1 A financial institution must obtain the Bank's written approval.\n\n"
-    "Issued on: 23 October 2019\n\n"
-    "3 of 20\n\n"
-    "17 Cloud services\n\n"
-    "17.1 A financial institution shall notify the Bank within 14 days.\n"
-)
-
-
-def test_strip_noise_removes_toc_headers_footers_and_page_breaks():
-    cleaned = _strip_noise(MARKITDOWN_STYLE_MARKDOWN)
-
-    # Table-of-contents dotted-leader lines are gone.
-    assert "......" not in cleaned
-    assert "PART A  OVERVIEW" not in cleaned
-    # Running header and page-number footer are gone.
-    assert "Issued on:" not in cleaned
-    assert "3 of 20" not in cleaned
-    # Lone "PART X" divider is gone; form-feed is normalised away.
-    assert "PART C  REGULATORY PROCESS" not in cleaned
-    assert "\x0c" not in cleaned
-    # The genuine clauses survive.
-    assert "12.1 A financial institution must obtain" in cleaned
-    assert "17.1 A financial institution shall notify" in cleaned
-
-
-def test_split_chunks_bounds_size_and_breaks_on_paragraphs():
-    # A body of many small paragraphs, well over one chunk's budget.
-    paragraphs = [f"{i}.1 Requirement paragraph number {i}." for i in range(1, 60)]
-    body = "\n\n".join(paragraphs)
-
-    chunks = _split_chunks(body, max_chars=200)
-
-    assert len(chunks) > 1
-    # Never exceeds the budget except where a single paragraph already does.
-    assert all(len(c) <= 200 or "\n\n" not in c for c in chunks)
-    # No clause paragraph is split across a chunk boundary.
-    rejoined = "\n\n".join(chunks)
-    for p in paragraphs:
-        assert p in rejoined
-
-
-def test_split_chunks_returns_document_order():
-    chunks = _split_chunks(MARKITDOWN_STYLE_MARKDOWN, max_chars=120)
-    joined = "\n\n".join(chunks)
-    assert joined.index("12.1") < joined.index("17.1")
-
-
-def test_split_chunks_on_all_noise_returns_empty():
-    all_noise = (
-        "PART A  OVERVIEW ...................... 2\n"
-        "Issued on: 23 October 2019\n"
-        "3 of 20\n"
-    )
-    assert _split_chunks(all_noise) == []
-
-
-# Clause-aware chunking: a chunk must never START in the middle of a clause
-# (a headless fragment made the parser LLM echo source text instead of JSON).
-# This fixture packs several clauses, each with sub-items, past a small budget.
-CLAUSE_BODY_MARKDOWN = (
-    "10.1  A financial institution must do the first thing.\n\n"
-    "10.2  A financial institution must do the second thing, having first:\n"
-    "(a)  completed step a;\n"
-    "(b)  completed step b; and\n"
-    "(c)  completed step c.\n\n"
-    "10.3  A financial institution must do the third thing.\n\n"
-    "11.1  Cloud services require notification.\n"
-)
-
-
-def test_split_chunks_every_chunk_starts_at_a_clause_boundary():
-    # Budget large enough that each clause block fits (so no oversized-block
-    # sub-split) but small enough to force multiple chunks: each chunk must
-    # begin at an N.M clause boundary, never mid-clause.
-    chunks = _split_chunks(CLAUSE_BODY_MARKDOWN, max_chars=250)
-
-    assert len(chunks) > 1
-    for chunk in chunks:
-        assert _CLAUSE_START_RE.match(chunk), (
-            f"chunk starts mid-clause: {chunk[:50]!r}"
-        )
-
-
-def test_split_chunks_never_splits_a_clause_across_chunks():
-    chunks = _split_chunks(CLAUSE_BODY_MARKDOWN, max_chars=250)
-
-    # Clause 10.2's sub-items (a)(b)(c) must all live in the same chunk as 10.2.
-    chunk_with_102 = next(c for c in chunks if "10.2" in c)
-    assert "(a)  completed step a" in chunk_with_102
-    assert "(b)  completed step b" in chunk_with_102
-    assert "(c)  completed step c" in chunk_with_102
-
-
-def test_split_chunks_bounds_an_oversized_single_clause_block():
-    # A single clause block larger than the budget (a long clause or an appendix
-    # span with no interior N.M boundary) must be sub-split so no chunk exceeds
-    # the budget — otherwise the parser LLM's output overflows and its JSON is
-    # truncated mid-string (observed on RMiT's 24 KB chunk).
-    giant = "10.1  " + " ".join(f"word{i}" for i in range(2000))  # >> budget
-    body = giant + "\n\n11.1  A short following clause.\n"
-
-    chunks = _split_chunks(body, max_chars=500)
-
-    assert all(len(c) <= 500 for c in chunks), [len(c) for c in chunks]
-    # The giant clause's content is fully preserved across the sub-split chunks.
-    rejoined = "".join(chunks)
-    assert "word0" in rejoined and "word1999" in rejoined
-
-
-def test_bare_number_capital_line_is_not_a_clause_boundary():
-    # Footnote-style "N Capital" lines (e.g. "44 This is also applicable…") must
-    # NOT be treated as clause boundaries — matching them mis-split RMiT into a
-    # 24 KB unsplit block. Only N.M / Appendix start a clause.
-    assert _CLAUSE_START_RE.match("44 This is also applicable to intermediaries") is None
-    assert _CLAUSE_START_RE.match("1 For the purposes of this policy") is None
-    assert _CLAUSE_START_RE.match("10.50 A financial institution must assess") is not None
-    assert _CLAUSE_START_RE.match("Appendix 4 Register of arrangements") is not None
-
-
-def test_split_chunks_falls_back_to_paragraphs_without_clause_numbers():
-    # Prose with no clause numbers → paragraph packing still yields chunks.
-    prose = "\n\n".join(f"Paragraph number {i} of some prose." for i in range(1, 40))
-    chunks = _split_chunks(prose, max_chars=200)
-
-    assert len(chunks) > 1
-    rejoined = "\n\n".join(chunks)
-    assert "Paragraph number 1 of some prose." in rejoined
-    assert "Paragraph number 39 of some prose." in rejoined
-
-
-VALID_ANCHOR_JSON = """[
-  {"clause_number": "12.1",
-   "starts_with": "A financial institution must obtain the Bank's written approval",
-   "heading": "12 Approval for material outsourcing arrangements",
-   "parent": null}
-]"""
-
-
-def test_parse_anchor_response_parses_unfenced_json_array():
-    anchors = _parse_anchor_response(VALID_ANCHOR_JSON)
-
-    assert anchors == [
-        {
-            "clause_number": "12.1",
-            "starts_with": (
-                "A financial institution must obtain the Bank's written approval"
-            ),
-            "heading": "12 Approval for material outsourcing arrangements",
-            "parent": None,
-        }
-    ]
-
-
-def test_parse_anchor_response_parses_fenced_json_array():
-    fenced = f"```json\n{VALID_ANCHOR_JSON}\n```"
-
-    anchors = _parse_anchor_response(fenced)
-
-    assert anchors[0]["clause_number"] == "12.1"
-    assert anchors[0]["parent"] is None
-
-
-def test_parse_anchor_response_raises_on_non_list():
-    with pytest.raises(LLMResponseError):
-        _parse_anchor_response('{"clause_number": "12.1"}')
-
-
-def test_parse_anchor_response_raises_when_element_missing_required_key():
-    # Missing "parent".
-    bad = (
-        '[{"clause_number": "12.1", "starts_with": "A financial institution", '
-        '"heading": "12 Approval"}]'
-    )
-
-    with pytest.raises(LLMResponseError):
-        _parse_anchor_response(bad)
-
-
-def test_parse_anchor_response_raises_when_element_is_not_a_dict():
-    with pytest.raises(LLMResponseError):
-        _parse_anchor_response('["12.1", "12.2"]')
-
-
-def test_parse_anchor_response_accepts_empty_array_for_clauseless_chunk():
-    # A table-of-contents / definitions chunk legitimately has no clauses.
-    assert _parse_anchor_response("[]") == []
-
-
-def test_find_clause_anchors_calls_per_chunk_and_merges_in_order(
-    monkeypatch: pytest.MonkeyPatch,
-):
-    import engine.clauses as clauses
-
-    calls: list[str] = []
-
-    def fake_call_chat(deployment: str, system: str, user: str) -> str:
-        calls.append(user)
-        # A noise/TOC chunk returns [] (tolerated); clause chunks return anchors
-        # keyed off which clause text the chunk contains.
-        if "12.1 A financial institution" in user:
-            return (
-                '[{"clause_number": "12.1", "starts_with": "A financial '
-                'institution must obtain the Bank\'s written approval", '
-                '"heading": "12 Approval for material outsourcing '
-                'arrangements", "parent": null}]'
-            )
-        if "17.1 A financial institution" in user:
-            return (
-                '[{"clause_number": "17.1", "starts_with": "A financial '
-                'institution shall notify the Bank within 14 days", '
-                '"heading": "17 Cloud services", "parent": null}]'
-            )
-        return "[]"
-
-    monkeypatch.setattr(clauses, "call_chat", fake_call_chat)
-
-    # Small max_chars so the fixture splits into multiple chunks; noise is
-    # stripped first, so TOC/headers never reach the model.
-    monkeypatch.setattr(clauses, "_MAX_CHUNK_CHARS", 120)
-    anchors = find_clause_anchors(MARKITDOWN_STYLE_MARKDOWN, "outsourcing-v1-2019")
-
-    # Merged anchor list preserves document order across chunks; clause-less
-    # chunks contribute nothing without failing the run.
-    assert [a["clause_number"] for a in anchors] == ["12.1", "17.1"]
-    assert all(
-        set(a.keys()) == {"clause_number", "starts_with", "heading", "parent"}
-        for a in anchors
-    )
-
-
-def test_find_clause_anchors_retries_on_non_json_then_succeeds(
-    monkeypatch: pytest.MonkeyPatch,
-):
-    """A sporadic prose reply is retried; the second attempt's JSON is used,
-    so one flaky chunk does not kill the build."""
-    import engine.clauses as clauses
-
-    attempts: list[int] = [0]
-
-    def flaky_call_chat(deployment: str, system: str, user: str) -> str:
-        attempts[0] += 1
-        if attempts[0] == 1:
-            # First reply: the model echoes source prose instead of JSON.
-            return "necessary to perform the obligations under the agreement;"
-        return (
-            '[{"clause_number": "12.1", "starts_with": "A financial '
-            'institution must obtain the Bank\'s written approval", '
-            '"heading": "12", "parent": null}]'
-        )
-
-    monkeypatch.setattr(clauses, "call_chat", flaky_call_chat)
-
-    single_chunk = (
-        "12.1 A financial institution must obtain the Bank's written approval.\n"
-    )
-    anchors = find_clause_anchors(single_chunk, "outsourcing-v1-2019")
-
-    assert attempts[0] == 2  # retried once
-    assert [a["clause_number"] for a in anchors] == ["12.1"]
-
-
-def test_find_clause_anchors_raises_after_exhausting_retries(
-    monkeypatch: pytest.MonkeyPatch,
-):
-    """If every attempt returns non-JSON, the build fails loudly rather than
-    silently dropping the chunk (a dropped chunk = missing clauses)."""
-    import engine.clauses as clauses
-
-    monkeypatch.setattr(
-        clauses, "call_chat", lambda deployment, system, user: "still not json"
-    )
-
-    with pytest.raises(LLMResponseError):
-        find_clause_anchors("12.1 Some clause text.\n", "outsourcing-v1-2019")
-
-
 def test_entries_for_document_returns_that_documents_clauses_in_order():
     rmit_entries = build_clause_index(
         anchors=RMIT_NESTED_ANCHORS,
@@ -1128,3 +934,121 @@ def test_entries_for_document_returns_that_documents_clauses_in_order():
     assert [e["clause_number"] for e in outsourcing] == ["Outsourcing 12.1"]
 
     assert index.entries_for_document("no-such-document") == []
+
+
+# ---------------------------------------------------------------------------
+# Deterministic clause segmentation (`segment_clauses`) — the rule-primary
+# stage-2 that supersedes the LLM anchor parser. These exercise the real BNM
+# line-start grammar; all network-free.
+
+# A compact document in real BNM format: a table of contents (which must be
+# skipped), PART dividers, section headings, numbered clauses, sub-items,
+# a deep decimal (10.50, distinct from 10.5), a footnote (out-of-sequence bare
+# number, must NOT become a heading), and an appendix.
+_BNM_DOC = """Risk Management in Technology
+
+TABLE OF CONTENTS
+
+PART A OVERVIEW
+
+1 Introduction
+2 Cloud services
+
+PART A
+
+OVERVIEW
+
+1 Introduction
+
+1.1 A financial institution must manage technology risk, and must-
+(a) invest in controls; and
+(b) maintain oversight.
+
+1.2 This paragraph refers to footnote 44 for detail.
+
+44 This is an explanatory footnote, not a clause heading.
+
+2 Cloud services
+
+2.1 A financial institution shall consult the Bank before adopting cloud.
+
+10.50 A financial institution must fully understand cloud risk.
+
+Appendix 1
+
+The appendix provides supplementary guidance.
+"""
+
+
+def test_segment_clauses_basic_grammar_and_hierarchy():
+    entries = segment_clauses(_BNM_DOC, "rmit-v1", "rmit", "published")
+    index = ClauseIndex(entries)
+
+    # Numbered clauses, sub-items, deep decimal and appendix all present.
+    for number in [
+        "RMiT 1.1",
+        "RMiT 1.1(a)",
+        "RMiT 1.1(b)",
+        "RMiT 1.2",
+        "RMiT 2.1",
+        "RMiT 10.50",
+        "RMiT Appendix 1",
+    ]:
+        assert index.get(number) is not None, f"{number} missing"
+
+    # Sub-items attach structurally to their parent.
+    assert index.get("RMiT 1.1(a)")["parent"] == "RMiT 1.1"
+    assert index.get("RMiT 1.1")["children"] == ["RMiT 1.1(a)", "RMiT 1.1(b)"]
+    # Top-level clause has no parent.
+    assert index.get("RMiT 2.1")["parent"] is None
+    # Heading assigned from the enclosing section.
+    assert index.get("RMiT 2.1")["heading"] == "2 Cloud services"
+
+
+def test_segment_clauses_text_is_verbatim_substring_of_source():
+    entries = segment_clauses(_BNM_DOC, "rmit-v1", "rmit", "published")
+    # The core guarantee: every stored text is a byte-for-byte slice of the
+    # ORIGINAL markdown (never a mutated/stripped copy).
+    for entry in entries.values():
+        assert entry["text"] in _BNM_DOC
+
+
+def test_segment_clauses_deep_decimal_not_confused_with_shallow():
+    entries = segment_clauses(_BNM_DOC, "rmit-v1", "rmit", "published")
+    # 10.50 is its own clause; there is no phantom "10.5".
+    assert "RMiT 10.50" in entries
+    assert "RMiT 10.5" not in entries
+
+
+def test_segment_clauses_skips_table_of_contents_and_footnote():
+    entries = segment_clauses(_BNM_DOC, "rmit-v1", "rmit", "published")
+    # The TOC lists "1 Introduction"/"2 Cloud services" before the body; the
+    # body's real "1 Introduction" restarts the section counter, so 2.1 is
+    # found (would be missed if the TOC had run the counter past 2).
+    assert index_has(entries, "RMiT 2.1")
+    # The footnote "44 ..." is out of sequence → not a heading, not a clause.
+    assert "RMiT 44" not in entries
+    # 1.2's text must not swallow the footnote line as a heading boundary bug;
+    # it stays verbatim and stops at its own content.
+    assert "explanatory footnote" not in entries["RMiT 1.2"]["text"]
+
+
+def index_has(entries, number):
+    return number in entries
+
+
+def test_segment_clauses_heading_does_not_bleed_into_previous_clause():
+    entries = segment_clauses(_BNM_DOC, "rmit-v1", "rmit", "published")
+    # 1.2 is the last clause under section 1; the "2 Cloud services" heading
+    # (and the PART divider) must not bleed into its text.
+    text = entries["RMiT 1.2"]["text"]
+    assert "Cloud services" not in text
+    assert "PART" not in text
+
+
+def test_segment_clauses_is_deterministic():
+    a = segment_clauses(_BNM_DOC, "rmit-v1", "rmit", "published")
+    b = segment_clauses(_BNM_DOC, "rmit-v1", "rmit", "published")
+    # Same bytes in -> identical entries out (freeze-as-fixtures relies on this).
+    assert list(a.keys()) == list(b.keys())
+    assert all(a[k]["text"] == b[k]["text"] for k in a)

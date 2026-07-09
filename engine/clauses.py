@@ -20,8 +20,6 @@ import logging
 import re
 from typing import NotRequired, Optional, TypedDict, cast
 
-from engine.config import PARSER_DEPLOYMENT
-from engine.llm import LLMResponseError, call_chat, parse_json_response
 
 logger = logging.getLogger(__name__)
 
@@ -207,6 +205,30 @@ def _preceded_by_label(markdown: str, position: int, label: str) -> bool:
     return start >= 0 and markdown[start:i] == label
 
 
+def _record_drop(
+    dropped_report: Optional[list[dict]],
+    document_id: str,
+    anchor: dict,
+    reason: str,
+) -> None:
+    """Append one dropped-anchor record to `dropped_report` if a report list was
+    supplied (the "flag for human review" surface). No-op when `None`, so the
+    warn-only default path is unchanged. Captures the anchor's `heading` and
+    `starts_with` alongside the reason so a reviewer can locate the clause in the
+    source without re-running the parser."""
+    if dropped_report is None:
+        return
+    dropped_report.append(
+        {
+            "document_id": document_id,
+            "clause_number": anchor.get("clause_number"),
+            "reason": reason,
+            "heading": anchor.get("heading"),
+            "starts_with": anchor.get("starts_with"),
+        }
+    )
+
+
 def build_clause_index(
     anchors: list[dict],
     markdown: str,
@@ -214,6 +236,7 @@ def build_clause_index(
     policy_id: str,
     source: str,
     expected_clauses: Optional[set[str]] = None,
+    dropped_report: Optional[list[dict]] = None,
 ) -> dict[str, ClauseEntry]:
     """Locate anchors, slice verbatim text, and build one document's clause entries.
 
@@ -232,6 +255,13 @@ def build_clause_index(
     real BNM corpus has a long tail of deeply-nested boilerplate sub-items the
     LLM cannot anchor uniquely, and crashing on each defeats the build. The
     `ClauseCompletenessError` reconcile is the backstop for *required* clauses.
+
+    `dropped_report`, when supplied, is appended to (never replaced) with one
+    ``{document_id, clause_number, reason}`` record per dropped anchor — the
+    "flag for human review" surface, so a dropped clause becomes a reviewable
+    artifact (`data/artifacts/dropped-clauses.json`) rather than a log line that
+    scrolls away. `reason` is one of ``empty_starts_with`` / ``not_found`` /
+    ``ambiguous``. Passing ``None`` keeps the old behaviour (warn-only).
 
     Raises:
         ClauseCompletenessError: `expected_clauses` is supplied and the
@@ -263,6 +293,7 @@ def build_clause_index(
         snippet = anchor["starts_with"]
         if not snippet.strip():
             dropped.append(anchor["clause_number"])
+            _record_drop(dropped_report, document_id, anchor, "empty_starts_with")
             logger.warning(
                 "Dropping clause '%s' in '%s': empty starts_with "
                 "(clause text not recoverable from the converted markdown)",
@@ -274,6 +305,7 @@ def build_clause_index(
         occurrences = _find_anchor_positions(markdown, snippet)
         if len(occurrences) == 0:
             dropped.append(anchor["clause_number"])
+            _record_drop(dropped_report, document_id, anchor, "not_found")
             logger.warning(
                 "Dropping clause '%s' in '%s': starts_with %r not found "
                 "(paraphrased or from a garbled region)",
@@ -298,6 +330,7 @@ def build_clause_index(
                 positions.append(labelled[0])
                 continue
             dropped.append(anchor["clause_number"])
+            _record_drop(dropped_report, document_id, anchor, "ambiguous")
             logger.warning(
                 "Dropping clause '%s' in '%s': starts_with %r is ambiguous "
                 "(found %d times, label %r matched %d)",
@@ -321,8 +354,51 @@ def build_clause_index(
             len(anchors),
             ", ".join(dropped),
         )
-    anchors = resolved_anchors
 
+    return _assemble_entries(
+        anchors=resolved_anchors,
+        positions=positions,
+        markdown=markdown,
+        document_id=document_id,
+        policy_id=policy_id,
+        source=source,
+        expected_clauses=expected_clauses,
+        dropped_report=dropped_report,
+    )
+
+
+def _assemble_entries(
+    anchors: list[dict],
+    positions: list[int],
+    markdown: str,
+    document_id: str,
+    policy_id: str,
+    source: str,
+    expected_clauses: Optional[set[str]],
+    dropped_report: Optional[list[dict]],
+    raw_ends: Optional[list[int]] = None,
+) -> dict[str, ClauseEntry]:
+    """Slice verbatim clause text between consecutive anchor positions and build
+    the per-document clause entries. Shared by both the phrase-locating
+    `build_clause_index` and the deterministic `segment_clauses` — everything
+    downstream of "we know each clause's start offset" lives here.
+
+    `anchors[i]` starts at `positions[i]` (a real offset in `markdown`); each
+    clause's `text` is the byte-for-byte slice up to its raw end, with the next
+    clause's leading label + S/G marker trimmed. `parent` is taken from the
+    anchor (each caller supplies it — the LLM path from the model, the segmenter
+    from structural derivation).
+
+    `raw_ends`, when supplied (the segmenter path), gives each clause's raw end
+    offset explicitly — needed because a clause can be terminated by a *section
+    heading* ("9 Governance"), not only by the next clause, and the heading must
+    not bleed into the clause's text. When ``None`` (the phrase-locator path) the
+    raw end is the next anchor's position, exactly as before — so that path is
+    byte-for-byte unchanged.
+
+    A child whose parent is not itself an emitted clause is promoted to
+    top-level and flagged, never crashed on (KeyError).
+    """
     entries: dict[str, ClauseEntry] = {}
     children_by_parent: dict[str, list[str]] = {}
     raw_start_by_clause: dict[str, int] = {}
@@ -330,7 +406,10 @@ def build_clause_index(
 
     for i, anchor in enumerate(anchors):
         start = positions[i]
-        raw_end = positions[i + 1] if i + 1 < len(anchors) else len(markdown)
+        if raw_ends is not None:
+            raw_end = raw_ends[i]
+        else:
+            raw_end = positions[i + 1] if i + 1 < len(anchors) else len(markdown)
         next_bare_number = (
             anchors[i + 1]["clause_number"] if i + 1 < len(anchors) else None
         )
@@ -361,6 +440,32 @@ def build_clause_index(
             children_by_parent.setdefault(parent, []).append(clause_number)
 
     for parent, children in children_by_parent.items():
+        if parent not in entries:
+            # The child's parent is not itself an emitted clause — a bare section
+            # heading (e.g. "10 Cloud services") or a parent whose anchor was
+            # dropped. Rather than KeyError-crash the build, PROMOTE the orphaned
+            # children to top-level (parent -> None) and FLAG each for review.
+            for child in children:
+                entries[child]["parent"] = None
+                _record_drop(
+                    dropped_report,
+                    document_id,
+                    {
+                        "clause_number": entries[child]["clause_number"],
+                        "heading": entries[child]["heading"],
+                        "starts_with": None,
+                    },
+                    f"orphaned_parent:{parent}",
+                )
+            logger.warning(
+                "Document '%s': parent clause '%s' missing for %d child(ren) "
+                "(%s) — promoting them to top-level and flagging for review",
+                document_id,
+                parent,
+                len(children),
+                ", ".join(children),
+            )
+            continue
         entries[parent]["children"] = children
         # Composed view (Option C): the contiguous source span covering the
         # parent's stem plus all its children, in document order — a real
@@ -544,281 +649,290 @@ _NOISE_LINE_RES = [
     re.compile(r"^\s*PART\s+[A-Z]\b.*$"),
 ]
 
-# Chunk size (characters) for splitting a document's body before each parser
-# LLM call. Bounds per-call output so the largest docs (RMiT ≈ 204 KB markdown)
-# don't risk a truncated response; chunks break on blank lines, never mid-line.
-_MAX_CHUNK_CHARS = 6000
-
-PARSER_SYSTEM_PROMPT = """\
-You are a parser that finds clause boundaries in a Bank Negara Malaysia (BNM)
-policy document. You NEVER produce clause text — only boundary anchors.
-
-BNM clause numbering you must recognise, exactly as it appears in the source:
-- top-level decimals: "17.1", "17.2", "12.1"
-- deep decimals that are NOT sub-items: "10.50" (distinct from "10.5")
-- lettered sub-items: "17.1(a)", "17.1(b)"
-- deeper sub-items: "12.3(e)"
-- non-numeric clauses: "Appendix 10"
-
-Return, IN DOCUMENT ORDER, ONLY a JSON array (no prose, no markdown fence is
-required). Each element is an object with EXACTLY these four keys:
-- "clause_number": the bare clause number exactly as written in the source
-  (e.g. "17.1", "17.1(a)", "10.50", "Appendix 10"). Do NOT add the policy name.
-- "starts_with": a SHORT opening phrase of the clause's OWN text, quoted
-  VERBATIM from the source — copied character-for-character, long enough to be
-  unique within the document. NEVER the full clause text, NEVER paraphrased,
-  NEVER a character offset, and NEVER the leading clause-number label.
-- "heading": the enclosing section heading (e.g. "17 Cloud services").
-- "parent": the bare clause number of the parent clause (e.g. "17.1" for
-  "17.1(a)"), or null for a top-level clause.
-
-Example element:
-{"clause_number": "17.1(a)", "starts_with": "completed the risk assessment",
- "heading": "17 Cloud services", "parent": "17.1"}
-
-If this chunk contains NO numbered clauses at all — for example a table of
-contents, a cover page, a definitions/interpretation block with no numbered
-requirements, or a page fragment — return an empty JSON array: []
-
-CRITICAL OUTPUT RULE: respond with the JSON array and NOTHING else. Your entire
-reply must start with the character `[` and end with the character `]`. Do not
-write any explanation, preamble, or prose before or after the array — not even
-for a chunk with no clauses (return `[]`). Do not echo the source text back.
-"""
-
-_REQUIRED_ANCHOR_KEYS = {"clause_number", "starts_with", "heading", "parent"}
+# ---------------------------------------------------------------------------
+# Deterministic clause segmentation (rule-primary; supersedes the LLM parser).
+#
+# BNM policy documents have a REGULAR line-start grammar once ingested cleanly
+# (Azure Document Intelligence fixes the reading-order scramble). Rather than
+# ask an LLM to quote an anchor phrase and then re-locate it — the round-trip
+# that produced not-found / ambiguous / empty / non-JSON / non-deterministic
+# failures — `segment_clauses` finds every clause boundary directly with these
+# anchored regexes, derives the hierarchy from the numbers themselves, and slices
+# verbatim text between boundaries. Fully deterministic (same bytes every run,
+# so artifacts freeze cleanly) and network-free.
+#
+# The grammar, each anchored at line start (MULTILINE):
+#   - a numbered clause:   "8.1 ...", "10.50 ..." (N.M, decimals, any depth)
+#   - a lettered sub-item: "(a) ...", "(b) ...", "(i) ..." — belongs to the
+#     nearest preceding numbered clause; parent derived structurally
+#   - an appendix clause:  "Appendix 7"
+#   - a SECTION HEADING:   "8 Governance" (bare N + Title) — NOT a clause; it
+#     sets the `heading` for the clauses that follow and bounds the previous
+#     clause's text. Distinguished from a footnote ("44 This is also...") by
+#     sequence: headings form the low monotonic run 1..N of the document's parts.
+# The clause-number label may be followed by its text on the SAME line
+# ("6.1 This policy...") OR stand ALONE on its own line ("12.1\nA financial...")
+# — the real BNM+Document-Intelligence output uses both forms, so the trailing
+# `(?:\s|$)` accepts either. A bare-label line's actual content is then picked up
+# from the following line(s) via `_skip_ws` (which skips newlines) + the
+# continuation-line accumulation in the main loop.
+_NUMBERED_CLAUSE_RE = re.compile(r"^(\d+(?:\.\d+)+)(?:\s|$)")
+_SUBITEM_RE = re.compile(r"^\(([a-z]{1,3}|[ivxl]{1,4})\)(?:\s|$)")
+_APPENDIX_RE = re.compile(r"^(Appendix\s+\d+)\b")
+_SECTION_HEADING_RE = re.compile(r"^(\d+)\s+([A-Z].*)$")
 
 
-def _strip_noise(markdown: str) -> str:
-    """Remove table-of-contents and page-header/footer noise from a document's
-    MarkItDown output, leaving the clause body.
+class _Boundary(TypedDict):
+    line_start: int  # offset of the line in the markdown
+    content_start: int  # offset where the clause's OWN text begins (after label)
+    content_end: int  # offset where the clause's own text ends (before next
+    # boundary / any intervening non-clause lines like a section heading)
+    bare_number: str  # e.g. "8.1", "8.1(a)", "Appendix 7"
+    parent: Optional[str]  # bare number of structural parent, or None
+    heading: Optional[str]  # enclosing section heading at this point
 
-    Real BNM PDFs convert with repeated running headers ("Issued on: <date>"),
-    page-number footers ("3 of 20"), form-feed page breaks, table-of-contents
-    entries (dotted leaders "......"), and lone "PART X" dividers — none of
-    which are clause content, and all of which confused the parser into
-    treating a definitions/TOC page as a clause section (see the demo corpus).
-    This drops those lines. Pure and network-free.
+
+# Structural divider lines that sit between clauses in BNM documents (e.g.
+# "PART B", "POLICY REQUIREMENTS", "OVERVIEW"). They are NOT clauses and must not
+# bleed into the preceding clause's text, but — unlike page/TOC noise — we keep
+# them in the source string so every clause slice stays byte-for-byte verbatim
+# against the ORIGINAL markdown. They are recognised only to end a clause early.
+_DIVIDER_LINE_RE = re.compile(r"^(?:PART\s+[A-Z]\b.*|[A-Z][A-Z ]{2,})$")
+# A page/TOC noise line (see `_strip_noise`) — recognised inline here so the
+# segmenter can skip it as a boundary WITHOUT removing it from the source (which
+# would break verbatim-against-source slicing). Note: the "PART X" pattern from
+# `_NOISE_LINE_RES` is deliberately EXCLUDED — a "PART B" line is a structural
+# DIVIDER that must CLOSE the preceding clause (via `_DIVIDER_LINE_RE`), not be
+# silently skipped (which would let the previous clause absorb it).
+_INLINE_NOISE_RES = [
+    re.compile(r"^\s*Issued on:.*$"),
+    re.compile(r"^\s*\d+\s+of\s+\d+\s*$"),
+]
+
+
+def _iter_lines_with_offsets(text: str) -> list[tuple[int, str]]:
+    """Yield ``(offset, line)`` for each line in `text`, where `offset` is the
+    line's start position in `text`. Line content excludes the trailing newline.
     """
-    kept: list[str] = []
-    for raw_line in markdown.replace("\x0c", "\n").split("\n"):
-        line = raw_line.rstrip()
-        if _TOC_LEADER_RE.search(line):
-            continue
-        if any(pattern.match(line) for pattern in _NOISE_LINE_RES):
-            continue
-        kept.append(line)
-    return "\n".join(kept)
+    result: list[tuple[int, str]] = []
+    pos = 0
+    for line in text.splitlines(keepends=True):
+        result.append((pos, line.rstrip("\n")))
+        pos += len(line)
+    return result
 
 
-# A line that begins a new top-level clause — the boundaries a chunk is allowed
-# to START on, so a chunk never opens mid-clause (a headless fragment confuses
-# the parser LLM into echoing text instead of emitting JSON). Matches a decimal
-# clause number ("12.1", "10.50") or an appendix ("Appendix 4"). Deliberately
-# does NOT match a bare "<number> <Capital>" line: in the real corpus those are
-# footnotes ("44 This is also applicable…", "1 For the purposes of…"), not
-# section headings, and matching them mis-split RMiT badly (a footnote reference
-# was treated as a clause boundary, producing a 24 KB unsplit block). Sub-item
-# labels ("(a)", "(f)") are also not boundaries — they stay inside their parent.
-# N.M numbering is the reliable signal. Anchored per-line (MULTILINE).
-_CLAUSE_START_RE = re.compile(
-    r"^(?:\d+\.\d+\b|Appendix\s+\d+\b)",
-    re.MULTILINE,
-)
+def segment_clauses(
+    markdown: str,
+    document_id: str,
+    policy_id: str,
+    source: str,
+    expected_clauses: Optional[set[str]] = None,
+    dropped_report: Optional[list[dict]] = None,
+) -> dict[str, ClauseEntry]:
+    """Deterministically segment a document's clean markdown into clause entries.
 
+    The rule-primary replacement for the LLM parser (`find_clause_anchors` +
+    `build_clause_index`). Single stateful pass over lines:
 
-def _split_chunks(markdown: str, max_chars: int = _MAX_CHUNK_CHARS) -> list[str]:
-    """Split a document into clause-aware, size-bounded chunks for per-call LLM
-    parsing.
+    1. Classify each line by anchored regex: a numbered clause (``N.M``…), a
+       lettered/roman sub-item (``(a)``, ``(i)``), an appendix (``Appendix N``),
+       or a bare section heading (``8 Governance``).
+    2. Track the current section heading and the current numbered clause so a
+       sub-item's parent is derived *structurally* from the numbers (``8.1(a)``'s
+       parent is ``8.1``) — never guessed by a model.
+    3. Record each clause's line-start, content-start (after its label), and the
+       raw end (the next boundary of any kind, including a section heading).
+    4. Hand the boundaries to `_assemble_entries`, which slices verbatim text and
+       builds the same `ClauseEntry` dict the LLM path produced — so the artifact
+       contract, `ClauseIndex`, API and graph are all unchanged.
 
-    Strips page/TOC noise (`_strip_noise`), then cuts the body at **top-level
-    clause boundaries** (`_CLAUSE_START_RE`) so every chunk BEGINS at a real
-    clause or heading — never mid-clause. Consecutive clause blocks are packed
-    together up to ``max_chars``; a single clause larger than ``max_chars``
-    becomes its own chunk (a clause is never split across calls). This fixes the
-    headless-fragment failure that size-only chunking caused, where a chunk
-    starting in the middle of a clause made the parser LLM echo source text
-    instead of returning JSON. Pure and network-free.
+    A bare-integer line is a section heading only when its number is the monotonic
+    successor of the previous heading (1, 2, 3, …) — this rejects footnotes
+    ("44 This is also applicable…"), which are out of sequence, without an LLM.
 
-    Falls back to paragraph packing when the document has no detectable clause
-    boundaries (so a prose-only document still yields chunks). Returns the
-    non-empty chunks in document order (an all-noise document yields an empty
-    list).
+    Fully deterministic and network-free: same bytes in → same entries out (so
+    artifacts freeze cleanly). `expected_clauses` / `dropped_report` behave as in
+    `build_clause_index`.
+
+    Segmentation runs over the ORIGINAL `markdown` (offsets true to source), so
+    every sliced `text` is byte-for-byte verbatim against the source. Page/TOC
+    noise and structural dividers ("PART B", "POLICY REQUIREMENTS") are skipped
+    as boundaries but never removed; a clause's text ends at the last line of its
+    own content, before any following divider/heading (`content_end`).
     """
-    body = _strip_noise(markdown).strip()
-    if not body:
-        return []
+    boundaries: list[_Boundary] = []
+    current_heading: Optional[str] = None
+    current_numbered: Optional[str] = None  # nearest preceding N.M clause
+    last_section_number = 0  # for the monotonic-successor heading test
+    # Index of the clause whose text is still being accumulated. A continuation
+    # line extends it; the FIRST divider/heading/new-clause after it CLOSES it
+    # (set to None) so later dividers cannot push its end further (the 7.1-eats-
+    # PART-B bug). Only a new clause/sub-item/appendix opens a fresh one.
+    open_index: Optional[int] = None
 
-    boundaries = [m.start() for m in _CLAUSE_START_RE.finditer(body)]
+    def _skip_ws(pos: int) -> int:
+        # Skip ALL whitespace incl. newlines, so a bare-label line ("12.1" alone)
+        # advances content_start to the next line's real text. For an inline
+        # label ("6.1 The board…") there is no leading whitespace to skip beyond
+        # the single space, so behaviour is unchanged.
+        while pos < len(markdown) and markdown[pos] in " \t\r\n":
+            pos += 1
+        return pos
+
+    def _close_open(end: int) -> None:
+        nonlocal open_index
+        if open_index is not None and end > boundaries[open_index]["content_end"]:
+            boundaries[open_index]["content_end"] = end
+        open_index = None
+
+    for offset, line in _iter_lines_with_offsets(markdown):
+        stripped = line.strip()
+        if not stripped:
+            continue
+
+        # Skip page/TOC noise and TOC-leader lines inline (do not treat as a
+        # boundary, do not end the current clause on them, and — crucially — do
+        # not remove them, so offsets stay true to the source).
+        if _TOC_LEADER_RE.search(stripped) or any(
+            p.match(line) for p in _INLINE_NOISE_RES
+        ):
+            continue
+
+        line_end = offset + len(line)
+
+        # 1. Numbered clause: "8.1 ...", "10.50 ...", "8.1.2 ..."
+        m = _NUMBERED_CLAUSE_RE.match(stripped)
+        if m:
+            bare = m.group(1)
+            content_start = _skip_ws(offset + line.index(bare) + len(bare))
+            # parent is the number with its last ".K" removed, iff that exists
+            parent = bare.rsplit(".", 1)[0] if bare.count(".") >= 2 else None
+            _close_open(offset)
+            boundaries.append(
+                {
+                    "line_start": offset,
+                    "content_start": content_start,
+                    # For a bare-label line, content_start jumped past line_end to
+                    # the next line; never let content_end precede it.
+                    "content_end": max(line_end, content_start),
+                    "bare_number": bare,
+                    "parent": parent,
+                    "heading": current_heading,
+                }
+            )
+            open_index = len(boundaries) - 1
+            current_numbered = bare
+            continue
+
+        # 2. Lettered / roman sub-item: "(a) ...", "(i) ..." — attaches to the
+        #    nearest preceding numbered clause as "{N.M}({letter})".
+        m = _SUBITEM_RE.match(stripped)
+        if m and current_numbered is not None:
+            letter = m.group(1)
+            bare = f"{current_numbered}({letter})"
+            label = f"({letter})"
+            content_start = _skip_ws(offset + line.index(label) + len(label))
+            _close_open(offset)
+            boundaries.append(
+                {
+                    "line_start": offset,
+                    "content_start": content_start,
+                    "content_end": max(line_end, content_start),
+                    "bare_number": bare,
+                    "parent": current_numbered,
+                    "heading": current_heading,
+                }
+            )
+            open_index = len(boundaries) - 1
+            continue
+
+        # 3. Appendix clause: "Appendix 7"
+        m = _APPENDIX_RE.match(stripped)
+        if m:
+            bare = m.group(1)
+            _close_open(offset)
+            boundaries.append(
+                {
+                    "line_start": offset,
+                    "content_start": offset + line.index("Appendix"),
+                    "content_end": line_end,
+                    "bare_number": bare,
+                    "parent": None,
+                    "heading": bare,
+                }
+            )
+            open_index = len(boundaries) - 1
+            current_heading = bare
+            current_numbered = None
+            continue
+
+        # 4. Section heading: "8 Governance". Accepted as a real section boundary
+        #    when its number is the monotonic SUCCESSOR of the last (…7 → 8) OR a
+        #    RESTART to 1 — the body's "1 Introduction" after a table of contents
+        #    has already run the counter up to the last section (e.g. 18). The
+        #    restart re-syncs the counter on the real body and skips the TOC
+        #    deterministically, with no LLM. Any other number (44, 12 out of
+        #    sequence) is a footnote / cross-reference, ignored as a boundary.
+        #    A heading is NOT a clause; it CLOSES the previous clause so the
+        #    heading text never bleeds into it.
+        m = _SECTION_HEADING_RE.match(stripped)
+        if m:
+            number = int(m.group(1))
+            is_successor = number == last_section_number + 1
+            is_restart = number == 1 and last_section_number >= 1
+            if is_successor or is_restart:
+                _close_open(offset)
+                current_heading = stripped
+                current_numbered = None
+                last_section_number = number
+            else:
+                # A footnote or out-of-sequence bare number ("44 This is …") —
+                # NOT a heading and NOT a clause, but it must not extend the
+                # current clause's text either (it is page-bottom footnote
+                # matter). Close the open clause so the footnote line is
+                # excluded, without starting a new boundary.
+                _close_open(offset)
+            continue
+
+        # 5. A structural divider ("PART B", "POLICY REQUIREMENTS") — not a
+        #    clause; closes the previous clause so it never absorbs the divider.
+        if _DIVIDER_LINE_RE.match(stripped):
+            _close_open(offset)
+            current_numbered = None
+            continue
+
+        # 6. A plain continuation line of the still-open clause — extend its end.
+        if open_index is not None:
+            boundaries[open_index]["content_end"] = line_end
+
     if not boundaries:
-        return _split_paragraphs(body, max_chars)
+        return {}
 
-    # Blocks = spans between consecutive clause boundaries. Any preamble before
-    # the first boundary is kept as a leading block (the parser returns [] for a
-    # clause-less block, which is tolerated).
-    starts = ([0] + boundaries) if boundaries[0] != 0 else boundaries
-    blocks: list[str] = []
-    for i, start in enumerate(starts):
-        end = starts[i + 1] if i + 1 < len(starts) else len(body)
-        block = body[start:end].strip()
-        if block:
-            blocks.append(block)
+    # Build the parallel arrays _assemble_entries consumes. Each clause's raw end
+    # is its own recorded content_end (the last line of its content, before any
+    # divider/heading), which _assemble_entries then right-trims of the next
+    # clause's label + S/G marker.
+    anchors: list[dict] = [
+        {
+            "clause_number": b["bare_number"],
+            "starts_with": None,
+            "heading": b["heading"],
+            "parent": b["parent"],
+        }
+        for b in boundaries
+    ]
+    positions = [b["content_start"] for b in boundaries]
+    raw_ends = [b["content_end"] for b in boundaries]
 
-    # Pack clause blocks up to max_chars. A block that is itself larger than
-    # max_chars (a long clause, or a big appendix/table span with no interior
-    # N.M boundary) is flushed on its own and then sub-split by paragraphs — an
-    # unbounded chunk otherwise overflows the parser LLM's output limit and the
-    # JSON reply is truncated mid-string (observed on RMiT: a 24 KB / ~145-clause
-    # chunk). Sub-splitting keeps every LLM call's output bounded.
-    chunks: list[str] = []
-    current: list[str] = []
-    current_len = 0
-
-    def flush() -> None:
-        nonlocal current, current_len
-        if current:
-            chunks.append("\n\n".join(current))
-            current = []
-            current_len = 0
-
-    for block in blocks:
-        if len(block) > max_chars:
-            flush()
-            chunks.extend(_split_paragraphs(block, max_chars))
-            continue
-        addition = len(block) + 2  # +2 for the "\n\n" re-join separator
-        if current and current_len + addition > max_chars:
-            flush()
-        current.append(block)
-        current_len += addition
-    flush()
-    return chunks
-
-
-def _split_paragraphs(body: str, max_chars: int) -> list[str]:
-    """Fallback size-based packing on blank-line-separated paragraphs, for a
-    document (or oversized clause block) with no usable clause boundaries.
-
-    Packs paragraphs up to ``max_chars``. A single paragraph longer than
-    ``max_chars`` (e.g. a giant appendix table with no blank lines) is split on
-    a hard character boundary so no returned chunk ever exceeds the budget —
-    the last line of defence against an unbounded parser LLM call. This can cut
-    mid-line, but such runaway paragraphs are non-clause boilerplate; a
-    clean-boundary split is not achievable and bounding the call matters more.
-    """
-    chunks: list[str] = []
-    current: list[str] = []
-    current_len = 0
-    for paragraph in re.split(r"\n\s*\n", body):
-        paragraph = paragraph.strip()
-        if not paragraph:
-            continue
-        if len(paragraph) > max_chars:
-            if current:
-                chunks.append("\n\n".join(current))
-                current = []
-                current_len = 0
-            for k in range(0, len(paragraph), max_chars):
-                chunks.append(paragraph[k : k + max_chars])
-            continue
-        addition = len(paragraph) + 2
-        if current and current_len + addition > max_chars:
-            chunks.append("\n\n".join(current))
-            current = []
-            current_len = 0
-        current.append(paragraph)
-        current_len += addition
-    if current:
-        chunks.append("\n\n".join(current))
-    return chunks
-
-
-def _parse_anchor_response(raw: str) -> list[dict]:
-    """Parse the parser LLM's raw reply into a validated list of anchor dicts.
-
-    Delegates JSON extraction to `engine.llm.parse_json_response` (handles code
-    fences + malformed output), then asserts the result is a list whose every
-    element is a dict carrying exactly the four required anchor keys
-    (``clause_number``, ``starts_with``, ``heading``, ``parent``). Raises
-    `LLMResponseError` if the overall shape is wrong. Pure and network-free.
-    """
-    parsed = parse_json_response(raw)
-    if not isinstance(parsed, list):
-        raise LLMResponseError(
-            f"Parser LLM must return a JSON array of anchors, got "
-            f"{type(parsed).__name__}"
-        )
-
-    anchors: list[dict] = []
-    for element in parsed:
-        if not isinstance(element, dict):
-            raise LLMResponseError(
-                f"Each anchor must be a JSON object, got "
-                f"{type(element).__name__}: {element!r}"
-            )
-        missing = _REQUIRED_ANCHOR_KEYS - element.keys()
-        if missing:
-            raise LLMResponseError(
-                f"Anchor is missing required key(s) {sorted(missing)}: "
-                f"{element!r}"
-            )
-        anchors.append(element)
-    return anchors
-
-
-def find_clause_anchors(markdown: str, document_id: str) -> list[dict]:
-    """Call the parser LLM (Azure AI Foundry, Claude) to find clause anchors.
-
-    Strips page/TOC noise and splits `markdown` into size-bounded chunks
-    (`_split_chunks`), calls the parser deployment once per chunk via
-    `engine.llm.call_chat` with `PARSER_SYSTEM_PROMPT`, parses each reply with
-    `_parse_anchor_response` (a clause-less chunk legitimately yields `[]`), and
-    concatenates the per-chunk anchor lists in document order. Returns one
-    ``{clause_number, starts_with, heading, parent}`` dict per clause (bare
-    numbers, not canonical) — exactly the shape `build_clause_index` consumes.
-
-    This is the network seam — real callers use it; tests never call it for
-    real (they stub anchors by hand and call `build_clause_index` directly, or
-    monkeypatch `call_chat`). `PARSER_DEPLOYMENT` is the confirmed cheap
-    deployment for this mechanical boundary-finding stage (see spec Solution
-    Design, "Model access & config").
-    """
-    chunks = _split_chunks(markdown, _MAX_CHUNK_CHARS)
-    anchors: list[dict] = []
-    for i, chunk in enumerate(chunks, start=1):
-        logger.info("  [%s] parsing chunk %d/%d", document_id, i, len(chunks))
-        found = _parse_chunk_with_retry(chunk, document_id, i)
-        anchors.extend(found)
-        logger.info("  [%s] chunk %d → %d clauses", document_id, i, len(found))
-    return anchors
-
-
-def _parse_chunk_with_retry(
-    chunk: str, document_id: str, chunk_index: int, attempts: int = 3
-) -> list[dict]:
-    """Call the parser LLM for one chunk, retrying on a non-JSON reply.
-
-    Claude occasionally echoes source text instead of emitting JSON (a
-    sporadic failure, most often on a confusing chunk). Since it's
-    non-deterministic, a re-ask usually succeeds — so call up to ``attempts``
-    times, returning the first reply `_parse_anchor_response` accepts. If every
-    attempt fails, re-raise the last `LLMResponseError` so the build fails
-    loudly (a dropped chunk would mean silently missing clauses).
-    """
-    last_error: LLMResponseError | None = None
-    for attempt in range(1, attempts + 1):
-        raw = call_chat(PARSER_DEPLOYMENT, PARSER_SYSTEM_PROMPT, chunk)
-        try:
-            return _parse_anchor_response(raw)
-        except LLMResponseError as exc:
-            last_error = exc
-            logger.warning(
-                "  [%s] chunk %d returned non-JSON (attempt %d/%d): %s",
-                document_id,
-                chunk_index,
-                attempt,
-                attempts,
-                exc,
-            )
-    assert last_error is not None
-    raise last_error
+    return _assemble_entries(
+        anchors=anchors,
+        positions=positions,
+        markdown=markdown,
+        document_id=document_id,
+        policy_id=policy_id,
+        source=source,
+        expected_clauses=expected_clauses,
+        dropped_report=dropped_report,
+        raw_ends=raw_ends,
+    )

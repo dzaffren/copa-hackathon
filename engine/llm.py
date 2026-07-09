@@ -51,10 +51,11 @@ def call_chat(
     system + user prompt to the named `deployment`, and returns the concatenated
     text of the response content blocks.
 
-    This is the network seam — real callers (Tasks B/C/D) use it; tests never
-    call it for real (no credentials in CI). Raises a clear `RuntimeError` when
-    the endpoint or key is unset, mirroring
-    `engine.clauses.find_clause_anchors`.
+    This is the network seam — the finder/critic connection-finding
+    (`engine.connections`) uses it; tests never call it for real (no credentials
+    in CI). Raises a clear `RuntimeError` when the endpoint or key is unset.
+    (Stage-2 clause parsing no longer uses a model — it is the deterministic
+    `engine.clauses.segment_clauses` — so this seam is now finder/critic only.)
     """
     from anthropic import AnthropicFoundry
 

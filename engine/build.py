@@ -1,19 +1,20 @@
-"""CLI entrypoint wiring stages 1-3: ingest -> parse clauses -> build graph.
+"""CLI entrypoint wiring stages 1-3: ingest -> segment clauses -> build graph.
 
 Run as ``python -m engine.build``. Reads the locked demo cluster from
-`engine.config.DOCUMENTS`, converts each document to clean markdown (stage
-1, `engine.ingest.ingest_document`), parses it into a clause index (stage 2,
-`engine.clauses.find_clause_anchors` + `build_clause_index`/
-`merge_clause_indexes`), then assembles the knowledge graph (stage 3,
-`engine.graph.build_graph`) and writes both artifacts to
-`data/artifacts/`.
+`engine.config.DOCUMENTS`, converts each document to clean markdown (stage 1,
+`engine.ingest.ingest_document`), segments it into a clause index (stage 2,
+`engine.clauses.segment_clauses` + `merge_clause_indexes`), then assembles the
+knowledge graph (stage 3, `engine.graph.build_graph`) and writes the artifacts
+to `data/artifacts/` (`clause-index.json`, `graph.json`, and the
+human-review `dropped-clauses.json`).
 
-Stage 2's LLM anchor-finding (`find_clause_anchors`) requires live Azure
-Foundry credentials that are not available in every environment; `run_build`
-takes `ingest_fn`/`find_anchors_fn` as injectable seams so tests can stub
-them (matching the no-network discipline in engine/tests/test_clauses.py
-and engine/tests/test_graph.py) without this module depending on a test
-double directly.
+Stage 2 is now the **deterministic** rule-primary segmenter (`segment_clauses`)
+— it finds clause boundaries directly by regex over the clean markdown and
+needs no LLM or credentials, so a full build runs offline and produces
+byte-stable artifacts (freeze-as-fixtures). `run_build` still exposes
+`ingest_fn`/`segment_fn` as injectable seams for tests (matching the no-network
+discipline in engine/tests/), and stage 1 (MarkItDown + Azure Document
+Intelligence) is the only part that reaches the network, at ingest time.
 """
 
 import json
@@ -22,10 +23,10 @@ from pathlib import Path
 from typing import Any, Callable, Union, cast
 
 from engine.clauses import (
+    ClauseEntry,
     ClauseIndex,
-    build_clause_index,
-    find_clause_anchors,
     merge_clause_indexes,
+    segment_clauses,
 )
 from engine.graph import build_graph
 from engine.ingest import ingest_document
@@ -33,7 +34,9 @@ from engine.ingest import ingest_document
 logger = logging.getLogger(__name__)
 
 IngestFn = Callable[[Union[str, Path]], str]
-FindAnchorsFn = Callable[[str, str], list[dict[str, Any]]]
+# Stage 2 seam: (markdown, document_id, policy_id, source, dropped_report)
+# -> per-document clause entries. Defaults to the deterministic segmenter.
+SegmentFn = Callable[..., dict[str, ClauseEntry]]
 
 
 def run_build(
@@ -42,7 +45,7 @@ def run_build(
     draft_registry: dict[str, Any],
     output_dir: Path,
     ingest_fn: IngestFn = ingest_document,
-    find_anchors_fn: FindAnchorsFn = find_clause_anchors,
+    segment_fn: SegmentFn = segment_clauses,
 ) -> None:
     """Run stages 1-3 and write `clause-index.json` + `graph.json`.
 
@@ -54,9 +57,10 @@ def run_build(
             it does not exist).
         ingest_fn: stage 1 — converts a source path to markdown. Defaults
             to `engine.ingest.ingest_document`; tests inject a stub.
-        find_anchors_fn: stage 2 — finds clause anchors in a document's
-            markdown. Defaults to `engine.clauses.find_clause_anchors`
-            (requires live Azure Foundry credentials); tests inject a stub.
+        segment_fn: stage 2 — deterministically segments a document's clean
+            markdown into clause entries. Defaults to
+            `engine.clauses.segment_clauses` (rule-primary, network-free — no
+            Azure Foundry credentials needed); tests may inject a stub.
     """
     # The last document declared for a policy_id is its current version —
     # the version_lineage/status rules in graph.py rely on this same
@@ -66,6 +70,10 @@ def run_build(
         current_document_id_by_policy[doc["policy_id"]] = document_id
 
     document_entries: list[tuple[str, dict]] = []
+    # "Flag for human review": every anchor the parser cannot place is collected
+    # here (rather than only logged) and written to dropped-clauses.json, so a
+    # reviewer sees exactly which clauses fell out and why.
+    dropped_report: list[dict[str, Any]] = []
     for n, (document_id, doc) in enumerate(documents.items(), start=1):
         logger.info(
             "[%d/%d] ingesting %s (%s)",
@@ -75,17 +83,25 @@ def run_build(
             doc["source_path"],
         )
         markdown = ingest_fn(doc["source_path"])
+        # Diagnostic: dump the raw ingested markdown so we can inspect exactly
+        # what stage-1 (Document Intelligence / MarkItDown) produced for each
+        # document — the ground truth for any "clause X is missing" question
+        # (is it garbled, renumbered, or absent from the source text?). Written
+        # under _ingest/ so it is clearly a debug artifact, not part of the
+        # frozen contract.
+        ingest_debug_dir = output_dir / "_ingest"
+        ingest_debug_dir.mkdir(parents=True, exist_ok=True)
+        (ingest_debug_dir / f"{document_id}.md").write_text(markdown)
         logger.info("[%d/%d] parsing clauses for %s", n, len(documents), document_id)
-        anchors = find_anchors_fn(markdown, document_id)
-        logger.info(
-            "[%d/%d] %s → %d anchors", n, len(documents), document_id, len(anchors)
+        entries = segment_fn(
+            markdown,
+            document_id,
+            doc["policy_id"],
+            doc["source"],
+            dropped_report=dropped_report,
         )
-        entries = build_clause_index(
-            anchors=anchors,
-            markdown=markdown,
-            document_id=document_id,
-            policy_id=doc["policy_id"],
-            source=doc["source"],
+        logger.info(
+            "[%d/%d] %s → %d clauses", n, len(documents), document_id, len(entries)
         )
         document_entries.append((document_id, entries))
 
@@ -106,16 +122,36 @@ def run_build(
 
     clause_index = ClauseIndex(primary, versions)
 
+    # Persist the clause index (and the human-review drop list) BEFORE building
+    # the graph. Parsing and graph-assembly are separate concerns: a graph-config
+    # error (e.g. a curated edge citing a clause that does not resolve) must not
+    # discard the successfully-parsed clauses — they are needed both downstream
+    # and to look up the real clause numbers when correcting such a config error.
+    output_dir.mkdir(parents=True, exist_ok=True)
+    (output_dir / "clause-index.json").write_text(
+        json.dumps(primary, indent=2, sort_keys=True)
+    )
+    # The human-review flag list: which anchors the parser dropped and why.
+    # Sorted for a deterministic, diffable artifact (freeze-as-fixtures).
+    dropped_report.sort(
+        key=lambda d: (d.get("document_id") or "", d.get("clause_number") or "")
+    )
+    (output_dir / "dropped-clauses.json").write_text(
+        json.dumps(dropped_report, indent=2)
+    )
+    logger.info(
+        "%d clause(s) parsed → %s; %d dropped for review → %s",
+        len(primary),
+        output_dir / "clause-index.json",
+        len(dropped_report),
+        output_dir / "dropped-clauses.json",
+    )
+
     graph = build_graph(
         documents=documents,
         curated_edges=curated_edges,
         clause_index=clause_index,
         draft_registry=draft_registry,
-    )
-
-    output_dir.mkdir(parents=True, exist_ok=True)
-    (output_dir / "clause-index.json").write_text(
-        json.dumps(primary, indent=2, sort_keys=True)
     )
     (output_dir / "graph.json").write_text(json.dumps(graph, indent=2))
 
