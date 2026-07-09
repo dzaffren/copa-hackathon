@@ -32,6 +32,11 @@ POLICY_SHORT_NAMES = {
     "opres": "Operational Resilience",
     "recovery-planning": "Recovery Planning",
     "customer-info": "Customer Info",
+    # External references (#26) — each contributes a single hand-anchored passage
+    # clause (e.g. "PDPA 129"); kept distinct from the internal cluster policies.
+    "mas-trm": "MAS TRM",
+    "pdpa": "PDPA",
+    "basel-por": "Basel POR",
 }
 
 
@@ -545,6 +550,43 @@ def merge_clause_indexes(
         primary[clause_number] = winner_entry
 
     return primary, versions
+
+
+def build_reference_clause(
+    document_id: str,
+    policy_id: str,
+    anchor: str,
+    heading: Optional[str],
+    text: str,
+    source: str = "reference",
+) -> dict[str, ClauseEntry]:
+    """Build the single verbatim passage clause for an external reference (#26).
+
+    External references (MAS TRM, PDPA, Basel POR) are not BNM-numbered, so the
+    deterministic `segment_clauses` grammar does not apply. Each public reference
+    instead contributes exactly ONE clause, keyed by the canonical
+    "{PolicyShortName} {anchor}" (e.g. ``"PDPA 129"``), whose ``text`` is the
+    exact verbatim excerpt from the real source (see
+    ``engine.config.REFERENCE_DOCUMENTS``). Restricted/preview references have no
+    passage and never call this.
+
+    Returns a one-entry dict shaped exactly like a `build_clause_index` /
+    `segment_clauses` result, so `merge_clause_indexes`, `ClauseIndex`, the API,
+    and the graph treat a reference clause identically to a policy clause.
+    """
+    clause_number = _canonical(policy_id, anchor)
+    entry: ClauseEntry = {
+        "clause_number": clause_number,
+        "policy_id": policy_id,
+        "document_id": document_id,
+        "text": text,
+        "heading": heading,
+        "source": source,
+        "parent": None,
+        "children": [],
+        "superseded_versions": [],
+    }
+    return {clause_number: entry}
 
 
 class ClauseIndex:

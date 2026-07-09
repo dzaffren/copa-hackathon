@@ -211,6 +211,198 @@ CURATED_SEED_EDGES = [
     },
 ]
 
+REFERENCES_DIR = REPO_ROOT / "data" / "references"
+
+# External reference documents (#26 Reference Radar). The external analogue of
+# DOCUMENTS: each becomes a `kind:"reference"` graph node rather than a policy
+# node. A PUBLIC reference carries a single hand-anchored `passage` — the exact
+# verbatim excerpt, extracted from the real public source (the provenance file
+# named in `source_path`, and its sibling PDF, live in data/references/) — that
+# enters the clause index as ONE clause keyed by `{PolicyShortName} {anchor}`
+# (e.g. "PDPA 129"). RESTRICTED (the BNM handbook) and PREVIEW (the trend band)
+# references are node-only: no `passage`, no `source_path`, nothing ingested —
+# defence in depth for the one confidential item (there is no handbook text in
+# any artifact to leak). See data/references/README.md for the source URLs and
+# the PDPA §129 amendment-reconstruction note.
+REFERENCE_DOCUMENTS = {
+    "mas-trm-2021": {
+        "policy_id": "mas-trm",
+        "document_id": "mas-trm-2021",
+        "title": "Technology Risk Management Guidelines (MAS, Singapore)",
+        "version": "2021",
+        "cluster": CLUSTER,
+        "kind": "reference",
+        "source_type": "peer_regulator",
+        "access": "public",
+        "preview": False,
+        "source_url": (
+            "https://www.mas.gov.sg/regulation/guidelines/"
+            "technology-risk-management-guidelines"
+        ),
+        "source_path": REFERENCES_DIR / "mas-trm-2021.md",
+        "anchor": "Cloud",  # → "MAS TRM Cloud"
+        "heading": "Section 3.4.2 — Management of Third Party Services (2021)",
+        "passage": (
+            "The FI should assess and manage its exposure to technology risks "
+            "that may affect the confidentiality, integrity and availability of "
+            "the IT systems and data at the third party before entering into a "
+            "contractual agreement or partnership."
+        ),
+    },
+    "pdpa-2010": {
+        "policy_id": "pdpa",
+        "document_id": "pdpa-2010",
+        "title": "Personal Data Protection Act 2010 (Malaysia)",
+        "version": "2010 · Act 709 (as amended by Act A1727)",
+        "cluster": CLUSTER,
+        "kind": "reference",
+        "source_type": "act",
+        "access": "public",
+        "preview": False,
+        "source_url": "https://www.pdp.gov.my/ppdpv1/en/akta/pdp-act-2010-en/",
+        "source_path": REFERENCES_DIR / "pdpa-2010.md",
+        "anchor": "129",  # → "PDPA 129"
+        "heading": (
+            "Section 129(2) — transfer of personal data outside Malaysia "
+            "(as amended by Act A1727)"
+        ),
+        "passage": (
+            "A data controller may transfer any personal data of a data subject "
+            "to any place outside Malaysia if— (a) there is in that place in "
+            "force any law which is substantially similar to this Act; or (b) "
+            "that place ensures an adequate level of protection in relation to "
+            "the processing of personal data which is at least equivalent to the "
+            "level of protection afforded by this Act."
+        ),
+    },
+    "basel-por-2021": {
+        "policy_id": "basel-por",
+        "document_id": "basel-por-2021",
+        "title": "Principles for Operational Resilience (Basel Committee)",
+        "version": "2021",
+        "cluster": CLUSTER,
+        "kind": "reference",
+        "source_type": "standard",
+        "access": "public",
+        "preview": False,
+        "source_url": "https://www.bis.org/bcbs/publ/d516.htm",
+        "source_path": REFERENCES_DIR / "basel-por-2021.md",
+        "anchor": "TP-1",  # → "Basel POR TP-1"
+        "heading": "Principle 5 — Third-party dependency management (2021)",
+        "passage": (
+            "Banks should manage their dependencies on relationships, including "
+            "those of, but not limited to, third parties or intragroup entities, "
+            "for the delivery of critical operations."
+        ),
+    },
+    # Node-only references (no passage, never ingested) ----------------------
+    "bnm-handbook": {
+        "policy_id": "bnm-handbook",
+        "document_id": "bnm-handbook",
+        "title": "Regulatory Handbook (BNM)",
+        "version": "internal",
+        "cluster": CLUSTER,
+        "kind": "reference",
+        "source_type": "handbook",
+        "access": "restricted",  # confidential → passages never ingested
+        "preview": False,
+    },
+    "trend-cloud-signals": {
+        "policy_id": "trend-cloud-signals",
+        "document_id": "trend-cloud-signals",
+        "title": "Trends · News · foreign policies",
+        "version": "preview",
+        "cluster": CLUSTER,
+        "kind": "reference",
+        "source_type": "trend",
+        "access": "public",
+        "preview": True,  # labelled preview → no verbatim excerpt
+    },
+}
+
+# Reference↔clause edges (`type:"references"`, #26). All originate from the
+# single editable draft (rmit-v2-2026-draft, the current `rmit` version). Public
+# reference edges are `provenance:"llm-found"` with a frozen per-edge confidence
+# (the output of a one-off finder pass, frozen-as-fixture) — this both satisfies
+# the engine invariant (a `curated` edge MUST be confidence 1.0, so a sub-1.0
+# demo confidence cannot be curated) and gives #8 the real per-edge score it
+# renders. The restricted-handbook and preview-trend edges carry no model score
+# and are `curated`, confidence 1.0 placeholders; their `target_clauses` is a
+# provenance LABEL, not an ingested clause — `build_graph`'s validator exempts a
+# restricted/preview target from the "every target clause resolves" check.
+REFERENCE_SEED_EDGES = [
+    {
+        "source_policy_id": "rmit",
+        "target_policy_id": "mas-trm",
+        "type": "references",
+        "reason": (
+            "MAS governs cloud through third-party risk management — assess "
+            "technology risk before contracting, manage it on an ongoing basis "
+            "— not pre-approval. The peer benchmark for 17.1's shift from "
+            "consultation to 14-day notification."
+        ),
+        "source_clauses": ["RMiT 17.1"],
+        "target_clauses": ["MAS TRM Cloud"],
+        "provenance": "llm-found",
+        "confidence": 0.88,
+    },
+    {
+        "source_policy_id": "rmit",
+        "target_policy_id": "pdpa",
+        "type": "references",
+        "reason": (
+            "A cloud region outside Malaysia engages the PDPA's cross-border "
+            "transfer test (substantially similar law or adequate protection), "
+            "so the 17.1 notification should still capture data residency once "
+            "the requirement to consult the Bank is removed."
+        ),
+        "source_clauses": ["RMiT 17.1"],
+        "target_clauses": ["PDPA 129"],
+        "provenance": "llm-found",
+        "confidence": 0.90,
+    },
+    {
+        "source_policy_id": "rmit",
+        "target_policy_id": "basel-por",
+        "type": "references",
+        "reason": (
+            "The international baseline keeps responsibility for third-party "
+            "(incl. cloud) dependencies with the bank whatever the approval "
+            "model — 17.1 must preserve that."
+        ),
+        "source_clauses": ["RMiT 17.1"],
+        "target_clauses": ["Basel POR TP-1"],
+        "provenance": "llm-found",
+        "confidence": 0.84,
+    },
+    {
+        "source_policy_id": "rmit",
+        "target_policy_id": "bnm-handbook",
+        "type": "references",
+        "reason": (
+            "Listed so the drafter knows the handbook connects to this clause; "
+            "its content is confidential and deferred from MVP1."
+        ),
+        "source_clauses": ["RMiT 17.1"],
+        "target_clauses": ["BNM Handbook — Cloud & Outsourcing Manual"],
+        "provenance": "curated",
+        "confidence": 1.0,
+    },
+    {
+        "source_policy_id": "rmit",
+        "target_policy_id": "trend-cloud-signals",
+        "type": "references",
+        "reason": (
+            "Signals such as in-country cloud regions and EU DORA — a "
+            "what's-next preview, not a committed reference."
+        ),
+        "source_clauses": ["RMiT 17.1"],
+        "target_clauses": ["Trend — in-country cloud regions"],
+        "provenance": "curated",
+        "confidence": 1.0,
+    },
+]
+
 # Azure AI Foundry access — read from env, never hardcoded/committed.
 AZURE_FOUNDRY_ENDPOINT = os.environ.get("AZURE_FOUNDRY_ENDPOINT")
 AZURE_FOUNDRY_API_KEY = os.environ.get("AZURE_FOUNDRY_API_KEY")

@@ -20,11 +20,12 @@ Intelligence) is the only part that reaches the network, at ingest time.
 import json
 import logging
 from pathlib import Path
-from typing import Any, Callable, Union, cast
+from typing import Any, Callable, Optional, Union, cast
 
 from engine.clauses import (
     ClauseEntry,
     ClauseIndex,
+    build_reference_clause,
     merge_clause_indexes,
     segment_clauses,
 )
@@ -46,6 +47,8 @@ def run_build(
     output_dir: Path,
     ingest_fn: IngestFn = ingest_document,
     segment_fn: SegmentFn = segment_clauses,
+    reference_documents: Optional[dict[str, dict[str, Any]]] = None,
+    reference_edges: Optional[list[dict[str, Any]]] = None,
 ) -> None:
     """Run stages 1-3 and write `clause-index.json` + `graph.json`.
 
@@ -120,6 +123,27 @@ def run_build(
         primary.update(policy_primary)
         versions.update(policy_versions)
 
+    # External reference passages (#26): each PUBLIC reference contributes ONE
+    # verbatim clause (keyed like "PDPA 129") into the same index; restricted
+    # (handbook) and preview (trend) references have no passage and are node-only
+    # — nothing is ingested for them, so there is no confidential text to serve.
+    # A reference clause is looked up by GET /clauses/{n} identically to a policy
+    # clause.
+    reference_documents = reference_documents or {}
+    for ref_id, ref in reference_documents.items():
+        if "passage" not in ref:
+            continue  # node-only (restricted handbook / preview trend)
+        ref_clause = build_reference_clause(
+            document_id=ref_id,
+            policy_id=ref["policy_id"],
+            anchor=ref["anchor"],
+            heading=ref.get("heading"),
+            text=ref["passage"],
+        )
+        for clause_number, entry in ref_clause.items():
+            primary[clause_number] = entry
+            versions.setdefault(clause_number, {})[ref_id] = entry
+
     clause_index = ClauseIndex(primary, versions)
 
     # Persist the clause index (and the human-review drop list) BEFORE building
@@ -148,10 +172,11 @@ def run_build(
     )
 
     graph = build_graph(
-        documents=documents,
+        documents={**documents, **reference_documents},
         curated_edges=curated_edges,
         clause_index=clause_index,
         draft_registry=draft_registry,
+        reference_edges=reference_edges,
     )
     (output_dir / "graph.json").write_text(json.dumps(graph, indent=2))
 
@@ -159,7 +184,13 @@ def run_build(
 def main() -> None:
     import argparse
 
-    from engine.config import CURATED_SEED_EDGES, DOCUMENTS, REPO_ROOT
+    from engine.config import (
+        CURATED_SEED_EDGES,
+        DOCUMENTS,
+        REFERENCE_DOCUMENTS,
+        REFERENCE_SEED_EDGES,
+        REPO_ROOT,
+    )
 
     parser = argparse.ArgumentParser(
         description="Build the clause index + knowledge graph from the corpus."
@@ -184,6 +215,10 @@ def main() -> None:
     curated_edges: list[dict[str, Any]] = list(
         cast(list[dict[str, Any]], CURATED_SEED_EDGES)
     )
+    reference_documents: dict[str, Any] = dict(REFERENCE_DOCUMENTS)
+    reference_edges: list[dict[str, Any]] = list(
+        cast(list[dict[str, Any]], REFERENCE_SEED_EDGES)
+    )
 
     if args.docs:
         unknown = [d for d in args.docs if d not in documents]
@@ -201,6 +236,10 @@ def main() -> None:
             and e["target_policy_id"] in kept_policies
         ]
         logger.info("building subset: %s", ", ".join(documents))
+        # A subset build omits the external references — their edges originate
+        # from the rmit draft and would dangle if rmit or a target is excluded.
+        reference_documents = {}
+        reference_edges = []
 
     draft_registry_path = REPO_ROOT / "data" / "draft_registry.json"
     draft_registry = json.loads(draft_registry_path.read_text())
@@ -210,6 +249,10 @@ def main() -> None:
         curated_edges=curated_edges,
         draft_registry=draft_registry,
         output_dir=REPO_ROOT / "data" / "artifacts",
+        reference_documents=cast(
+            dict[str, dict[str, Any]], reference_documents
+        ),
+        reference_edges=reference_edges,
     )
     logger.info("build complete → %s", REPO_ROOT / "data" / "artifacts")
 
