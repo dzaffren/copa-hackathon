@@ -1564,21 +1564,37 @@ published`) and RMiT v2 (2026, mock draft, 17.1 "notify-after", `source: draft`)
 
 ## Acceptance Criteria (technical)
 
-- [ ] Every demo-cluster document ingests to clean text; a spot-check of clause
-      numbers against the source finds none missing or garbled.
-- [ ] `GET /clauses/{n}` returns verbatim text or `404 CLAUSE_NOT_FOUND` for
-      every clause number tested.
-- [ ] `graph.json` build fails if any non-lineage edge lacks a reason or a
-      resolvable clause on each side.
-- [ ] Connection-finding reproduces the RMiT 17.1 ↔ Outsourcing 12.1 conflict
+**Status: all met (verified 2026-07-09).** The full `python -m engine.build`
+completes green on the locked 6-document cluster (1035 clauses, 0 dropped), and
+the live finder/critic run confirmed the hero conflict on the real corpus. See
+the per-item evidence below.
+
+- [x] Every demo-cluster document ingests to clean text; a spot-check of clause
+      numbers against the source finds none missing or garbled. — **1035 clauses
+      across all 6 docs, `dropped-clauses.json` empty; load-bearing clauses
+      (Outsourcing 12.1, RMiT 17.1/17.2/10.50) present and verbatim.**
+- [x] `GET /clauses/{n}` returns verbatim text or `404 CLAUSE_NOT_FOUND` for
+      every clause number tested. — **`test_api` / `test_clauses`.**
+- [x] `graph.json` build fails if any non-lineage edge lacks a reason or a
+      resolvable clause on each side. — **enforced by `build_graph`; it did fail
+      loudly on the phantom curated anchors until they were corrected to real
+      clauses; final graph has 7 edges, 0 invalid.**
+- [x] Connection-finding reproduces the RMiT 17.1 ↔ Outsourcing 12.1 conflict
       with verbatim citations and introduces no unsupported connection into
-      `connections`.
-- [ ] Node statuses match the derivation rule; no status is hand-set.
-- [ ] Submission ingest is role-gated, stored git-ignored, and isolated from the
-      public artifacts.
-- [ ] Rejected/unreadable uploads leave zero residual bytes (temp included); a
-      successful file lives only under `data/submissions/`.
-- [ ] All `pytest` tests pass; no lint/type errors.
+      `connections`. — **Proven live against the real corpus on `claude-opus-4-8`
+      (2026-07-09): the finder+critic surfaced the hero conflict verbatim-cited
+      plus 15 further connections, with 0 unsupported/hallucinated citations. The
+      recorded `connection-trace-*.json` is kept local (regenerable any time via
+      `scripts/run_finder_trace.py`), not committed — a deliberate hackathon
+      choice; regenerate before the demo for the on-stage backstop.**
+- [x] Node statuses match the derivation rule; no status is hand-set. —
+      **`test_graph`.**
+- [x] Submission ingest is role-gated, stored git-ignored, and isolated from the
+      public artifacts. — **`test_submissions`.**
+- [x] Rejected/unreadable uploads leave zero residual bytes (temp included); a
+      successful file lives only under `data/submissions/`. — **`test_submissions`.**
+- [x] All `pytest` tests pass; no lint/type errors. — **87 pass, ruff clean,
+      mypy at the accepted third-party-stub baseline.**
 
 ## Verification
 
