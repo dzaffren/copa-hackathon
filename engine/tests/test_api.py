@@ -224,6 +224,130 @@ def _build_fixture_graph(clause_index: ClauseIndex) -> dict:
     )
 
 
+# --- External reference fixtures (#26 Reference Radar) ----------------------
+
+REFERENCE_PDPA_PASSAGE = (
+    "A data controller may transfer any personal data of a data subject to any "
+    "place outside Malaysia if— (a) there is in that place in force any law which "
+    "is substantially similar to this Act..."
+)
+
+REFERENCE_DOCUMENTS = {
+    "pdpa-2010": {
+        "policy_id": "pdpa",
+        "document_id": "pdpa-2010",
+        "title": "Personal Data Protection Act 2010 (Malaysia)",
+        "version": "2010 · Act 709",
+        "cluster": "technology-risk",
+        "kind": "reference",
+        "source_type": "act",
+        "access": "public",
+        "preview": False,
+        "source_url": "https://example.test/pdpa",
+    },
+    "bnm-handbook": {
+        "policy_id": "bnm-handbook",
+        "document_id": "bnm-handbook",
+        "title": "Regulatory Handbook (BNM)",
+        "version": "internal",
+        "cluster": "technology-risk",
+        "kind": "reference",
+        "source_type": "handbook",
+        "access": "restricted",
+        "preview": False,
+    },
+}
+
+REFERENCE_EDGES = [
+    {
+        "source_policy_id": "rmit",
+        "target_policy_id": "pdpa",
+        "type": "references",
+        "reason": "A cloud region outside Malaysia engages the PDPA transfer test.",
+        "source_clauses": ["RMiT 17.1"],
+        "target_clauses": ["PDPA 129"],
+        "provenance": "llm-found",
+        "confidence": 0.9,
+    },
+    {
+        "source_policy_id": "rmit",
+        "target_policy_id": "bnm-handbook",
+        "type": "references",
+        "reason": "The handbook connects to this clause; content is confidential.",
+        "source_clauses": ["RMiT 17.1"],
+        "target_clauses": ["BNM Handbook — Cloud & Outsourcing Manual"],
+        "provenance": "curated",
+        "confidence": 1.0,
+    },
+]
+
+
+def _build_reference_app() -> TestClient:
+    """A TestClient whose graph carries reference nodes/edges and whose index
+    carries the public PDPA reference passage (RMiT 17.1 + PDPA 129 resolve)."""
+    from engine.clauses import build_reference_clause
+
+    clause_index = _build_fixture_clause_index()
+    primary = {
+        entry["clause_number"]: entry
+        for entry in [
+            clause_index.get("RMiT 17.1"),
+            clause_index.get("Outsourcing 12.1"),
+        ]
+        if entry is not None
+    }
+    versions = {cn: {e["document_id"]: e} for cn, e in primary.items()}
+    for clause_number, entry in build_reference_clause(
+        "pdpa-2010", "pdpa", "129", "Section 129(2)", REFERENCE_PDPA_PASSAGE
+    ).items():
+        primary[clause_number] = entry
+        versions.setdefault(clause_number, {})[entry["document_id"]] = entry
+    ref_index = ClauseIndex(primary, versions)
+
+    graph = build_graph(
+        documents={**DOCUMENTS, **REFERENCE_DOCUMENTS},
+        curated_edges=[],
+        clause_index=ref_index,
+        draft_registry=DRAFT_REGISTRY,
+        reference_edges=REFERENCE_EDGES,
+    )
+    return TestClient(create_app(clause_index=ref_index, graph=graph))
+
+
+def test_get_graph_includes_reference_nodes_and_edges():
+    client = _build_reference_app()
+
+    response = client.get("/graph")
+    assert response.status_code == 200
+    body = response.json()
+
+    nodes = {n["id"]: n for n in body["nodes"]}
+    assert nodes["pdpa-2010"]["kind"] == "reference"
+    assert nodes["pdpa-2010"]["source_type"] == "act"
+    assert nodes["pdpa-2010"]["access"] == "public"
+    assert nodes["pdpa-2010"]["source_url"] == "https://example.test/pdpa"
+    assert nodes["bnm-handbook"]["access"] == "restricted"
+
+    ref_edges = [e for e in body["edges"] if e["type"] == "references"]
+    assert {e["target"] for e in ref_edges} == {"pdpa-2010", "bnm-handbook"}
+
+
+def test_get_clause_returns_reference_passage_verbatim():
+    client = _build_reference_app()
+
+    response = client.get("/clauses/PDPA 129")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["clause_number"] == "PDPA 129"
+    assert body["source"] == "reference"
+    assert body["text"].startswith("A data controller may transfer")
+
+    # The restricted handbook has no ingested passage — GET /clauses 404s for it.
+    missing = client.get("/clauses/BNM Handbook — Cloud & Outsourcing Manual")
+    assert missing.status_code == 404
+    assert missing.json()["error"] == "CLAUSE_NOT_FOUND"
+
+
 # --- Stub finder / critic / converter --------------------------------------
 
 

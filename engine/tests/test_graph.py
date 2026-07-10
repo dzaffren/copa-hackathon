@@ -415,3 +415,189 @@ def test_version_lineage_edge_links_older_document_to_newer_of_same_policy():
     assert edge["confidence"] == 1.0
     assert edge["source_clauses"] == []
     assert edge["target_clauses"] == []
+
+
+# --- External reference nodes/edges (#26 Reference Radar) -------------------
+
+PDPA_PASSAGE = (
+    "A data controller may transfer any personal data of a data subject to any "
+    "place outside Malaysia if— (a) there is in that place in force any law which "
+    "is substantially similar to this Act; or (b) that place ensures an adequate "
+    "level of protection..."
+)
+
+REFERENCE_DOCUMENTS = {
+    "pdpa-2010": {
+        "policy_id": "pdpa",
+        "document_id": "pdpa-2010",
+        "title": "Personal Data Protection Act 2010 (Malaysia)",
+        "version": "2010 · Act 709",
+        "cluster": "technology-risk",
+        "kind": "reference",
+        "source_type": "act",
+        "access": "public",
+        "preview": False,
+        "source_url": "https://example.test/pdpa",
+    },
+    "bnm-handbook": {
+        "policy_id": "bnm-handbook",
+        "document_id": "bnm-handbook",
+        "title": "Regulatory Handbook (BNM)",
+        "version": "internal",
+        "cluster": "technology-risk",
+        "kind": "reference",
+        "source_type": "handbook",
+        "access": "restricted",
+        "preview": False,
+    },
+    "trend-cloud-signals": {
+        "policy_id": "trend-cloud-signals",
+        "document_id": "trend-cloud-signals",
+        "title": "Trends · News · foreign policies",
+        "version": "preview",
+        "cluster": "technology-risk",
+        "kind": "reference",
+        "source_type": "trend",
+        "access": "public",
+        "preview": True,
+    },
+}
+
+REFERENCE_EDGES = [
+    {
+        "source_policy_id": "rmit",
+        "target_policy_id": "pdpa",
+        "type": "references",
+        "reason": "A cloud region outside Malaysia engages the PDPA transfer test.",
+        "source_clauses": ["RMiT 17.1"],
+        "target_clauses": ["PDPA 129"],
+        "provenance": "llm-found",
+        "confidence": 0.9,
+    },
+    {
+        "source_policy_id": "rmit",
+        "target_policy_id": "bnm-handbook",
+        "type": "references",
+        "reason": "The handbook connects to this clause; content confidential.",
+        "source_clauses": ["RMiT 17.1"],
+        "target_clauses": ["BNM Handbook — Cloud & Outsourcing Manual"],
+        "provenance": "curated",
+        "confidence": 1.0,
+    },
+    {
+        "source_policy_id": "rmit",
+        "target_policy_id": "trend-cloud-signals",
+        "type": "references",
+        "reason": "In-country cloud regions and EU DORA — a preview, not committed.",
+        "source_clauses": ["RMiT 17.1"],
+        "target_clauses": ["Trend — in-country cloud regions"],
+        "provenance": "curated",
+        "confidence": 1.0,
+    },
+]
+
+
+def _clause_index_with_pdpa_reference() -> ClauseIndex:
+    """Fixture index: the RMiT v2 clauses (so `RMiT 17.1` resolves as the edge
+    source) plus the single PDPA public reference passage (`PDPA 129`)."""
+    from engine.clauses import build_reference_clause, merge_clause_indexes
+
+    rmit_v2 = build_clause_index(
+        anchors=RMIT_V2_ANCHORS,
+        markdown=RMIT_V2_MARKDOWN,
+        document_id="rmit-v2-2026-draft",
+        policy_id="rmit",
+        source="draft",
+    )
+    primary, versions = merge_clause_indexes(
+        [("rmit-v2-2026-draft", rmit_v2)],
+        current_document_id="rmit-v2-2026-draft",
+    )
+    for clause_number, entry in build_reference_clause(
+        "pdpa-2010", "pdpa", "129", "Section 129(2)", PDPA_PASSAGE
+    ).items():
+        primary[clause_number] = entry
+        versions.setdefault(clause_number, {})[entry["document_id"]] = entry
+    return ClauseIndex(primary, versions)
+
+
+def test_reference_nodes_carry_kind_source_type_access_preview():
+    clause_index = _clause_index_with_pdpa_reference()
+
+    graph = build_graph(
+        documents={**DOCUMENTS, **REFERENCE_DOCUMENTS},
+        curated_edges=[],
+        clause_index=clause_index,
+        draft_registry=DRAFT_REGISTRY,
+        reference_edges=REFERENCE_EDGES,
+    )
+
+    pdpa = _node(graph, "pdpa-2010")
+    assert pdpa["kind"] == "reference"
+    assert pdpa["source_type"] == "act"
+    assert pdpa["access"] == "public"
+    assert pdpa["preview"] is False
+    assert pdpa["source_url"] == "https://example.test/pdpa"
+
+    # Policy nodes default to kind "policy" (backward compatible).
+    assert _node(graph, "rmit-v2-2026-draft")["kind"] == "policy"
+
+    # The restricted handbook carries no source_url; the trend node is preview.
+    handbook = _node(graph, "bnm-handbook")
+    assert handbook["access"] == "restricted"
+    assert "source_url" not in handbook
+    assert _node(graph, "trend-cloud-signals")["preview"] is True
+
+
+def test_reference_edges_build_with_restricted_and_preview_carveout():
+    clause_index = _clause_index_with_pdpa_reference()
+
+    graph = build_graph(
+        documents={**DOCUMENTS, **REFERENCE_DOCUMENTS},
+        curated_edges=[],
+        clause_index=clause_index,
+        draft_registry=DRAFT_REGISTRY,
+        reference_edges=REFERENCE_EDGES,
+    )
+
+    ref_edges = [e for e in graph["edges"] if e["type"] == "references"]
+    assert {e["target"] for e in ref_edges} == {
+        "pdpa-2010",
+        "bnm-handbook",
+        "trend-cloud-signals",
+    }
+    assert all(e["source"] == "rmit-v2-2026-draft" for e in ref_edges)
+
+    by_target = {e["target"]: e for e in ref_edges}
+    assert by_target["pdpa-2010"]["provenance"] == "llm-found"
+    assert by_target["pdpa-2010"]["confidence"] == 0.9
+    assert by_target["bnm-handbook"]["provenance"] == "curated"
+    # The carve-out let the handbook/trend edges build even though their target
+    # labels never resolve in the index (their passages are never ingested).
+    assert clause_index.get("BNM Handbook — Cloud & Outsourcing Manual") is None
+    assert clause_index.get("Trend — in-country cloud regions") is None
+
+
+def test_public_reference_edge_with_unresolved_passage_raises():
+    clause_index = _clause_index_with_pdpa_reference()
+    bad_edges = [
+        {
+            "source_policy_id": "rmit",
+            "target_policy_id": "pdpa",
+            "type": "references",
+            "reason": "Cites a PDPA passage that is not in the index.",
+            "source_clauses": ["RMiT 17.1"],
+            "target_clauses": ["PDPA 999"],
+            "provenance": "llm-found",
+            "confidence": 0.9,
+        },
+    ]
+
+    with pytest.raises(GraphBuildError, match="PDPA 999"):
+        build_graph(
+            documents={**DOCUMENTS, **REFERENCE_DOCUMENTS},
+            curated_edges=[],
+            clause_index=clause_index,
+            draft_registry=DRAFT_REGISTRY,
+            reference_edges=bad_edges,
+        )

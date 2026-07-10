@@ -11,7 +11,7 @@ side, and every clause it cites must resolve in the supplied `ClauseIndex` —
 enforced here at build time, never trusted on faith.
 """
 
-from typing import Any, Optional, TypedDict, cast
+from typing import Any, NotRequired, Optional, TypedDict, cast
 
 
 class GraphNode(TypedDict):
@@ -21,6 +21,15 @@ class GraphNode(TypedDict):
     version: str
     status: str
     cluster: str
+    # `kind` distinguishes internal policy nodes from external reference nodes
+    # (#26). Every node carries it ("policy" by default — backward compatible:
+    # a consumer that ignores `kind` is unaffected). The four fields below are
+    # present ONLY on reference nodes (`kind == "reference"`).
+    kind: NotRequired[str]
+    source_type: NotRequired[str]  # peer_regulator|act|standard|handbook|trend
+    access: NotRequired[str]  # public | restricted
+    preview: NotRequired[bool]  # true → labelled preview band, no verbatim excerpt
+    source_url: NotRequired[str]  # public references only
 
 
 class GraphEdge(TypedDict):
@@ -74,16 +83,22 @@ def _build_nodes(
             else:
                 status = "In force"
 
-            nodes.append(
-                {
-                    "id": document_id,
-                    "policy_id": policy_id,
-                    "title": doc["title"],
-                    "version": doc["version"],
-                    "status": status,
-                    "cluster": doc["cluster"],
-                }
-            )
+            node: GraphNode = {
+                "id": document_id,
+                "policy_id": policy_id,
+                "title": doc["title"],
+                "version": doc["version"],
+                "status": status,
+                "cluster": doc["cluster"],
+                "kind": doc.get("kind", "policy"),
+            }
+            if node["kind"] == "reference":
+                node["source_type"] = doc["source_type"]
+                node["access"] = doc["access"]
+                node["preview"] = doc["preview"]
+                if doc.get("source_url"):
+                    node["source_url"] = doc["source_url"]
+            nodes.append(node)
 
     return nodes
 
@@ -115,7 +130,11 @@ def _build_version_lineage_edges(
 _VALID_PROVENANCE = {"structural", "curated", "llm-found"}
 
 
-def _validate_non_lineage_edge(edge: dict[str, Any], clause_index: Any) -> None:
+def _validate_non_lineage_edge(
+    edge: dict[str, Any],
+    clause_index: Any,
+    skip_target_clause_resolution: bool = False,
+) -> None:
     reason = edge.get("reason")
     if not reason:
         raise GraphBuildError(
@@ -130,6 +149,14 @@ def _validate_non_lineage_edge(edge: dict[str, Any], clause_index: Any) -> None:
                 f"Edge {edge.get('source')} -> {edge.get('target')} "
                 f"(type={edge.get('type')}) has no {side}"
             )
+        # Reference-edge carve-out (#26): a restricted (handbook) or preview
+        # (trend) target's `target_clauses` is a provenance LABEL, not an
+        # ingested clause — its passage is intentionally never in the index, so
+        # skip the resolution check for it (still required: non-empty + reason).
+        # Source clauses, and every PUBLIC target clause, are always resolved —
+        # an unresolved public reference passage still fails the build loudly.
+        if side == "target_clauses" and skip_target_clause_resolution:
+            continue
         for clause_number in clauses:
             if clause_index.get(clause_number) is None:
                 raise GraphBuildError(
@@ -183,18 +210,76 @@ def _build_curated_edges(
     return edges
 
 
+def _build_reference_edges(
+    reference_edges: list[dict[str, Any]],
+    ids_by_policy: dict[str, list[str]],
+    documents: dict,
+    clause_index: Any,
+) -> list[GraphEdge]:
+    """Assemble `type:"references"` edges (#26) from the draft to each external
+    reference node.
+
+    Endpoints resolve from `source_policy_id`/`target_policy_id` to that policy's
+    current document, exactly like a curated edge. Validation applies the
+    restricted/preview carve-out: when the target node is `access=="restricted"`
+    or `preview is True`, its `target_clauses` label is not required to resolve
+    (its passage is never ingested); every public reference target is fully
+    resolved, so an unresolved public passage still raises `GraphBuildError`.
+    """
+    edges: list[GraphEdge] = []
+    for ref in reference_edges:
+        source_id = _current_document_id(ids_by_policy[ref["source_policy_id"]])
+        target_id = _current_document_id(ids_by_policy[ref["target_policy_id"]])
+        edge: GraphEdge = {
+            "source": source_id,
+            "target": target_id,
+            "type": ref["type"],
+            "reason": ref["reason"],
+            "source_clauses": ref["source_clauses"],
+            "target_clauses": ref["target_clauses"],
+            "provenance": ref["provenance"],
+            "confidence": ref["confidence"],
+        }
+        target_doc = documents[target_id]
+        skip = (
+            target_doc.get("access") == "restricted"
+            or bool(target_doc.get("preview"))
+        )
+        _validate_non_lineage_edge(
+            cast(dict[str, Any], edge),
+            clause_index,
+            skip_target_clause_resolution=skip,
+        )
+        edges.append(edge)
+    return edges
+
+
 def build_graph(
     documents: dict,
     curated_edges: list[dict[str, Any]],
     clause_index: Any,
     draft_registry: dict,
     llm_found_edges: Optional[list[dict[str, Any]]] = None,
+    reference_edges: Optional[list[dict[str, Any]]] = None,
 ) -> dict:
-    """Assemble `graph.json`'s `{"nodes": [...], "edges": [...]}` shape."""
+    """Assemble `graph.json`'s `{"nodes": [...], "edges": [...]}` shape.
+
+    `documents` may include external reference entries (`kind:"reference"`, #26)
+    alongside the internal policy documents — reference nodes are emitted with
+    their `source_type`/`access`/`preview`/`source_url`, and `reference_edges`
+    (`type:"references"`) connect the draft to them.
+    """
     ids_by_policy = _ordered_document_ids_by_policy(documents)
     nodes = _build_nodes(documents, ids_by_policy, draft_registry)
     edges = _build_version_lineage_edges(ids_by_policy)
     edges.extend(_build_curated_edges(curated_edges, ids_by_policy, clause_index))
+
+    if reference_edges:
+        edges.extend(
+            _build_reference_edges(
+                reference_edges, ids_by_policy, documents, clause_index
+            )
+        )
 
     if llm_found_edges:
         for edge in llm_found_edges:
