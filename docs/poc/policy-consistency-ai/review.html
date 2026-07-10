@@ -17,7 +17,7 @@
     <div class="flex items-center gap-4 text-sm">
       <a href="index.html" class="text-gray-500 hover:text-gray-900">Rulebook Graph</a>
       <a href="review.html" class="font-semibold text-indigo-600">Review Change</a>
-      <a href="impact.html?doc=rmit" class="text-gray-500 hover:text-gray-900">Impact</a>
+      <a href="impact.html?doc=rmit" class="text-gray-500 hover:text-gray-900">Alignment</a>
       <a href="chat.html?doc=rmit" class="text-gray-500 hover:text-gray-900">Drafting Copilot</a>
     </div>
   </div>
@@ -29,7 +29,7 @@
   <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-6">
     <div>
       <h1 class="text-2xl font-bold">Risk Management in Technology (RMiT)</h1>
-      <p class="text-gray-500 mt-1">Comparing <span class="font-medium text-gray-700">v1 · 2023 (in force)</span> with <span class="font-medium text-indigo-700">v2 · 2026 draft</span> — clause 17 (consultation &amp; notification for cloud services)</p>
+      <p class="text-gray-500 mt-1">Comparing <span class="font-medium text-gray-700">v1 · 2020 (in force)</span> with <span class="font-medium text-indigo-700">v2 · 2026 draft</span> — every change, navigable side by side</p>
     </div>
     <div class="flex items-center gap-3 text-xs">
       <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 bg-red-100 border border-red-300"></span> removed</span>
@@ -37,11 +37,23 @@
     </div>
   </div>
 
-  <!-- Side by side document VIEWERS -->
+  <!-- Change list: every change in this draft, click to jump -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
+    <div class="flex items-center justify-between flex-wrap gap-2 mb-2">
+      <h2 class="font-semibold flex items-center gap-2">🔍 Changes in this draft <span id="changeCount" class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium"></span></h2>
+      <div class="flex items-center gap-2 text-sm">
+        <button id="prevChange" class="border border-gray-300 hover:bg-gray-50 rounded-lg px-3 py-1">‹ Prev</button>
+        <span id="changePos" class="text-gray-500 text-xs w-24 text-center"></span>
+        <button id="nextChange" class="border border-gray-300 hover:bg-gray-50 rounded-lg px-3 py-1">Next ›</button>
+      </div>
+    </div>
+    <ul id="changeList" class="divide-y divide-gray-100"></ul>
+  </div>
+
+  <!-- Side by side document VIEWERS (driven by the selected change) -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <!-- v1 viewer -->
     <div class="bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden">
-      <!-- viewer toolbar -->
       <div class="flex items-center justify-between bg-gray-100 border-b border-gray-300 px-3 py-2 text-xs text-gray-600">
         <div class="flex items-center gap-2 min-w-0">
           <span>📄</span>
@@ -49,7 +61,7 @@
         </div>
         <div class="flex items-center gap-2 shrink-0">
           <button class="w-6 h-6 rounded hover:bg-gray-200" title="Previous page">‹</button>
-          <span>47 / 112</span>
+          <span id="v1Page">47 / 112</span>
           <button class="w-6 h-6 rounded hover:bg-gray-200" title="Next page">›</button>
           <span class="mx-1 text-gray-300">|</span>
           <button class="w-6 h-6 rounded hover:bg-gray-200" title="Zoom out">−</button>
@@ -57,15 +69,8 @@
           <button class="w-6 h-6 rounded hover:bg-gray-200" title="Zoom in">+</button>
         </div>
       </div>
-      <!-- page -->
       <div class="bg-gray-200 p-4 h-[440px] overflow-y-auto">
-        <div class="bg-white shadow-md mx-auto max-w-md p-8 font-serif text-[13px] leading-relaxed text-gray-800">
-          <p class="text-center text-xs text-gray-400 mb-6 font-sans tracking-wide">BANK NEGARA MALAYSIA · RMiT (2023)</p>
-          <p class="font-bold mb-2">17 Consultation and notification related to cloud services</p>
-          <p class="mb-3 bg-red-50 border-l-4 border-red-300 pl-3 py-1">17.1 A financial institution is required to <span class="font-semibold">consult the Bank prior to the first-time adoption</span> of a public cloud for critical systems.</p>
-          <p class="mb-3">17.2 A financial institution shall <span class="font-semibold">notify the Bank</span> on any subsequent adoption of a public cloud for a critical system.</p>
-          <p class="text-gray-400 mt-8 font-sans text-xs">… continued …</p>
-        </div>
+        <div id="v1Doc" class="bg-white shadow-md mx-auto max-w-md p-8 font-serif text-[13px] leading-relaxed text-gray-800"></div>
       </div>
     </div>
 
@@ -79,7 +84,7 @@
         </div>
         <div class="flex items-center gap-2 shrink-0">
           <button class="w-6 h-6 rounded hover:bg-indigo-100" title="Previous page">‹</button>
-          <span>51 / 118</span>
+          <span id="v2Page">51 / 118</span>
           <button class="w-6 h-6 rounded hover:bg-indigo-100" title="Next page">›</button>
           <span class="mx-1 text-indigo-200">|</span>
           <button class="w-6 h-6 rounded hover:bg-indigo-100" title="Zoom out">−</button>
@@ -88,27 +93,169 @@
         </div>
       </div>
       <div class="bg-gray-200 p-4 h-[440px] overflow-y-auto">
-        <div class="bg-white shadow-md mx-auto max-w-md p-8 font-serif text-[13px] leading-relaxed text-gray-800">
-          <p class="text-center text-xs text-indigo-400 mb-6 font-sans tracking-wide">BANK NEGARA MALAYSIA · RMiT (2026 draft)</p>
-          <p class="font-bold mb-2">17 Consultation and notification related to cloud services</p>
-          <p class="mb-3 bg-emerald-50 border-l-4 border-emerald-400 pl-3 py-1">17.1 A financial institution shall <span class="font-semibold">notify the Bank within 14 days</span> of the first-time adoption of a public cloud for critical systems. <span class="italic text-emerald-700">(Prior consultation replaced with post-adoption notification to speed up cloud adoption.)</span></p>
-          <p class="mb-3">17.2 A financial institution shall notify the Bank on any subsequent adoption of a public cloud for a critical system.</p>
-          <p class="text-gray-400 mt-8 font-sans text-xs">… continued …</p>
-        </div>
+        <div id="v2Doc" class="bg-white shadow-md mx-auto max-w-md p-8 font-serif text-[13px] leading-relaxed text-gray-800"></div>
       </div>
     </div>
   </div>
-  <p class="text-xs text-gray-400 mt-2">Prototype note: these are mock document viewers. The real build embeds the actual PDF pages side by side.</p>
+  <p class="text-xs text-gray-400 mt-2">Prototype note: these are mock document viewers. The real build embeds the actual PDF pages side by side and jumps both to the selected change.</p>
 
-  <!-- Change summary -->
+  <!-- Reference radar — the drafter's primary aid -->
+  <section id="references" class="mt-6">
+    <div class="flex items-center gap-2 flex-wrap mb-1">
+      <h2 class="font-semibold text-lg flex items-center gap-2">📡 Reference Radar</h2>
+      <span class="text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full font-medium">what external sources say about this topic</span>
+    </div>
+    <p class="text-sm text-gray-500 mb-4 max-w-3xl">For the clause you are drafting — <span class="font-medium text-gray-700">17.1, public-cloud adoption</span> — Rulebook Radar surfaces the sources that <span class="font-medium text-gray-700">lead the draft</span>: peer regulators, national acts, international bodies, the regulatory handbook, and technology trends. Each entry cites its source.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Peer regulator -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700">Peer regulator · Singapore</span>
+        </div>
+        <h3 class="font-semibold mt-2">Technology Risk Management Guidelines (MAS, 2021)</h3>
+        <div class="mt-3 bg-violet-50 border-l-4 border-violet-300 rounded p-3">
+          <p class="text-xs uppercase tracking-wide text-gray-400 font-semibold mb-1">Cited source · sample excerpt</p>
+          <p class="text-sm font-serif text-gray-800">"…the FI does not require the Authority's prior approval to adopt public cloud services; the FI remains responsible for carrying out due diligence and managing the technology risks on an ongoing basis…"</p>
+        </div>
+        <p class="text-sm text-gray-600 mt-3"><span class="font-medium">Why it matters:</span> a peer central bank already governs cloud adoption through risk management and outsourcing controls, not pre-approval — the benchmark for 17.1's shift from consultation to notification.</p>
+      </div>
+
+      <!-- National act -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700">National act · Malaysia</span>
+        </div>
+        <h3 class="font-semibold mt-2">Personal Data Protection Act 2010 — s.129 (transfer outside Malaysia)</h3>
+        <div class="mt-3 bg-violet-50 border-l-4 border-violet-300 rounded p-3">
+          <p class="text-xs uppercase tracking-wide text-gray-400 font-semibold mb-1">Cited source · sample excerpt</p>
+          <p class="text-sm font-serif text-gray-800">"A data user shall not transfer any personal data of a data subject to a place outside Malaysia unless to such place as specified by the Minister…"</p>
+        </div>
+        <p class="text-sm text-gray-600 mt-3"><span class="font-medium">Why it matters:</span> a cloud region outside Malaysia engages the PDPA's transfer limits — the 17.1 notification should capture data residency so this check is not lost when consultation goes.</p>
+      </div>
+
+      <!-- International body -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700">International body</span>
+        </div>
+        <h3 class="font-semibold mt-2">Principles for Operational Resilience (Basel Committee, 2021)</h3>
+        <div class="mt-3 bg-violet-50 border-l-4 border-violet-300 rounded p-3">
+          <p class="text-xs uppercase tracking-wide text-gray-400 font-semibold mb-1">Cited source · sample excerpt</p>
+          <p class="text-sm font-serif text-gray-800">"Banks should manage their dependencies on relationships, including those of, but not limited to, third parties or intragroup entities, for the delivery of critical operations."</p>
+        </div>
+        <p class="text-sm text-gray-600 mt-3"><span class="font-medium">Why it matters:</span> the international baseline keeps responsibility for third-party (incl. cloud) dependencies with the bank regardless of the approval model — 17.1 must preserve that expectation.</p>
+      </div>
+
+      <!-- Regulatory handbook (restricted) -->
+      <div class="bg-violet-50/60 rounded-xl border-2 border-dashed border-violet-200 p-5">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700">🔒 Regulatory handbook · restricted</span>
+        </div>
+        <h3 class="font-semibold mt-2 text-gray-600">Regulatory Handbook (BNM)</h3>
+        <p class="text-sm text-gray-500 mt-3">Guidance on cloud submission expectations, shared between policy staff and financial institutions. <span class="italic">Restricted — access-controlled; content not shown in this demo</span> (same treatment as internal committee minutes).</p>
+        <p class="text-xs text-gray-400 mt-3">The connection is visible so the trail is complete; the text stays behind access control.</p>
+      </div>
+
+      <!-- Tech trends / news (preview) -->
+      <div class="bg-white rounded-xl border-2 border-dashed border-violet-200 p-5 md:col-span-2">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-violet-50 text-violet-500">Trends · news · policies — preview</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3 text-sm text-gray-600">
+          <div><span class="font-medium text-gray-700">📈 In-country cloud regions</span><br>Hyperscalers now run Malaysian regions (2024–26) — changes the data-residency picture behind the old consultation rule.</div>
+          <div><span class="font-medium text-gray-700">🇪🇺 EU DORA (in force 2025)</span><br>How another jurisdiction hard-wired ICT third-party risk into law — a benchmark for future revisions.</div>
+          <div><span class="font-medium text-gray-700">📰 Cloud outage coverage</span><br>A widely-reported regional outage raised concentration-risk questions — the kind of news that triggers a policy look-back.</div>
+        </div>
+        <p class="text-xs text-gray-400 mt-3">Trend/news signals came from the RMiT drafter interview — a labelled preview for now; they join the MVP if other policy drafters confirm the same near-real-time need.</p>
+      </div>
+    </div>
+    <p class="text-xs text-gray-400 mt-2">Prototype note: excerpts are illustrative samples for the demo. The real build quotes verified source text — the verbatim-citation rule applies to external sources too.</p>
+  </section>
+
+  <!-- Draft alignment check -->
   <div class="mt-6 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-    <h2 class="font-semibold mb-2 flex items-center gap-2">🔍 What changed</h2>
-    <p class="text-sm text-gray-700">Clause 17.1 shifts first-time public-cloud adoption from <span class="font-medium">prior consultation with the Bank</span> to <span class="font-medium">14-day post-adoption notification</span>. This is a substantive control change, not just wording.</p>
-    <p class="text-sm text-gray-500 mt-3">Rulebook Radar will now scan the linked policies for any clause that assumes the old "consult before adopting" rule — starting with the Outsourcing policy's approval requirement.</p>
+    <h2 class="font-semibold mb-2 flex items-center gap-2">🧭 Draft alignment check</h2>
+    <p class="text-sm text-gray-700">Check every change above against <span class="font-medium">the reference sources first</span> — peer regulators, acts, international standards — then the published BNM rulebook (overlaps are good to know). Every finding cites the exact source it relies on.</p>
     <div class="mt-4 flex justify-end">
-      <a href="impact.html?doc=rmit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-medium">Run consistency check →</a>
+      <a href="impact.html?doc=rmit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-medium">Check draft alignment →</a>
     </div>
   </div>
 </main>
+
+<script>
+const kindBadge = { Modified:"bg-amber-100 text-amber-700", Removed:"bg-red-100 text-red-700", Added:"bg-emerald-100 text-emerald-700" };
+const V1H = `<p class="text-center text-xs text-gray-400 mb-6 font-sans tracking-wide">BANK NEGARA MALAYSIA · RMiT (2020)</p>`;
+const V2H = `<p class="text-center text-xs text-indigo-400 mb-6 font-sans tracking-wide">BANK NEGARA MALAYSIA · RMiT (2026 draft)</p>`;
+
+const CHANGES = [
+  { clause:"17.1", kind:"Modified", summary:"Prior consultation replaced with 14-day post-adoption notification.",
+    v1Page:"47 / 112", v2Page:"51 / 118",
+    v1:`${V1H}<p class="font-bold mb-2">17 Consultation and notification related to cloud services</p>
+      <p class="mb-3 bg-red-50 border-l-4 border-red-300 pl-3 py-1">17.1 A financial institution is required to <span class="font-semibold">consult the Bank prior to the first-time adoption</span> of a public cloud for critical systems.</p>
+      <p class="mb-3">17.2 A financial institution shall notify the Bank on any subsequent adoption of a public cloud for a critical system.</p>
+      <p class="text-gray-400 mt-8 font-sans text-xs">… continued …</p>`,
+    v2:`${V2H}<p class="font-bold mb-2">17 Consultation and notification related to cloud services</p>
+      <p class="mb-3 bg-emerald-50 border-l-4 border-emerald-400 pl-3 py-1">17.1 A financial institution shall <span class="font-semibold">notify the Bank within 14 days</span> of the first-time adoption of a public cloud for critical systems.</p>
+      <p class="mb-3">17.2 A financial institution shall notify the Bank on any subsequent adoption of a public cloud for a critical system, submitting the notification together with the necessary updates to all the information required under paragraph 17.1.</p>
+      <p class="text-gray-400 mt-8 font-sans text-xs">… continued …</p>` },
+
+  { clause:"17.2", kind:"Modified", summary:"Subsequent adoptions must now resubmit the full 17.1 information set.",
+    v1Page:"47 / 112", v2Page:"52 / 118",
+    v1:`${V1H}<p class="font-bold mb-2">17 Consultation and notification related to cloud services</p>
+      <p class="mb-3 text-gray-400">17.1 … (see change 1) …</p>
+      <p class="mb-3 bg-red-50 border-l-4 border-red-300 pl-3 py-1">17.2 A financial institution shall notify the Bank on any subsequent adoption of a public cloud for a critical system.</p>
+      <p class="text-gray-400 mt-8 font-sans text-xs">… continued …</p>`,
+    v2:`${V2H}<p class="font-bold mb-2">17 Consultation and notification related to cloud services</p>
+      <p class="mb-3 text-gray-400">17.1 … (see change 1) …</p>
+      <p class="mb-3 bg-emerald-50 border-l-4 border-emerald-400 pl-3 py-1">17.2 A financial institution shall notify the Bank on any subsequent adoption of a public cloud for a critical system, <span class="font-semibold">submitting the notification together with the necessary updates to all the information required under paragraph 17.1</span>.</p>
+      <p class="text-gray-400 mt-8 font-sans text-xs">… continued …</p>` },
+
+  { clause:"17.4", kind:"Removed", summary:"Bank's power to impose conditions after consultation — removed with the consultation step.",
+    v1Page:"48 / 112", v2Page:"52 / 118",
+    v1:`${V1H}<p class="font-bold mb-2">17 Consultation and notification related to cloud services</p>
+      <p class="mb-3 text-gray-400">17.3 … (unchanged) …</p>
+      <p class="mb-3 bg-red-50 border-l-4 border-red-300 pl-3 py-1">17.4 The Bank may, following a consultation under paragraph 17.1, <span class="font-semibold">impose conditions on the use of the public cloud</span> for critical systems.</p>
+      <p class="text-gray-400 mt-8 font-sans text-xs">… continued …</p>`,
+    v2:`${V2H}<p class="font-bold mb-2">17 Consultation and notification related to cloud services</p>
+      <p class="mb-3 text-gray-400">17.3 … (unchanged) …</p>
+      <p class="mb-3 bg-red-50 border-l-4 border-red-300 pl-3 py-1 text-gray-400 italic">17.4 — removed in this draft (the consultation step it depended on no longer exists).</p>
+      <p class="text-gray-400 mt-8 font-sans text-xs">… continued …</p>` },
+
+  { clause:"Appendix 10", kind:"Modified", summary:"Submission form reworded for notification; full 10.50 risk-assessment attachment reduced to a self-confirmation.",
+    v1Page:"104 / 112", v2Page:"109 / 118",
+    v1:`${V1H}<p class="font-bold mb-2">Appendix 10 — Consultation and notification for cloud services (extract)</p>
+      <p class="mb-3 bg-red-50 border-l-4 border-red-300 pl-3 py-1">Information to accompany a <span class="font-semibold">consultation</span> under paragraph 17.1: (a) description of the critical system; (b) <span class="font-semibold">the comprehensive risk assessment under paragraph 10.50</span>; (c) the outsourcing arrangements involved.</p>
+      <p class="text-gray-400 mt-8 font-sans text-xs">… continued …</p>`,
+    v2:`${V2H}<p class="font-bold mb-2">Appendix 10 — Notification for cloud services (extract)</p>
+      <p class="mb-3 bg-emerald-50 border-l-4 border-emerald-400 pl-3 py-1">Information to accompany a <span class="font-semibold">notification</span> under paragraph 17.1: (a) description of the critical system; (b) <span class="font-semibold">confirmation that an internal risk assessment has been completed</span>; (c) the outsourcing arrangements involved.</p>
+      <p class="text-gray-400 mt-8 font-sans text-xs">… continued …</p>` },
+];
+
+let current = 0;
+function renderChange() {
+  const c = CHANGES[current];
+  document.getElementById("v1Doc").innerHTML = c.v1;
+  document.getElementById("v2Doc").innerHTML = c.v2;
+  document.getElementById("v1Page").textContent = c.v1Page;
+  document.getElementById("v2Page").textContent = c.v2Page;
+  document.getElementById("changePos").textContent = "Change " + (current + 1) + " of " + CHANGES.length;
+  document.getElementById("changeCount").textContent = CHANGES.length + " changes";
+  document.getElementById("changeList").innerHTML = CHANGES.map((x, i) => `
+    <li><button data-i="${i}" class="w-full text-left py-2.5 px-2 flex items-start gap-3 ${i === current ? 'bg-indigo-50' : 'hover:bg-gray-50'}">
+      <span class="text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 mt-0.5 ${kindBadge[x.kind]}">${x.kind}</span>
+      <span class="text-sm"><span class="font-semibold">${x.clause}</span> — <span class="text-gray-600">${x.summary}</span></span>
+    </button></li>`).join("");
+  document.getElementById("changeList").querySelectorAll("button[data-i]").forEach(b =>
+    b.addEventListener("click", () => { current = +b.dataset.i; renderChange(); }));
+  const prev = document.getElementById("prevChange"), next = document.getElementById("nextChange");
+  prev.disabled = current === 0; next.disabled = current === CHANGES.length - 1;
+  prev.classList.toggle("opacity-40", prev.disabled);
+  next.classList.toggle("opacity-40", next.disabled);
+}
+document.getElementById("prevChange").addEventListener("click", () => { if (current > 0) { current--; renderChange(); } });
+document.getElementById("nextChange").addEventListener("click", () => { if (current < CHANGES.length - 1) { current++; renderChange(); } });
+renderChange();
+</script>
 </body>
 </html>

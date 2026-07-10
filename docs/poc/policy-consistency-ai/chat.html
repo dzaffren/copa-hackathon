@@ -17,20 +17,25 @@
     <div class="flex items-center gap-4 text-sm">
       <a href="index.html" class="text-gray-500 hover:text-gray-900">Rulebook Graph</a>
       <a id="navReview" href="review.html" class="text-gray-500 hover:text-gray-900">Review Change</a>
-      <a id="navImpact" href="impact.html" class="text-gray-500 hover:text-gray-900">Impact</a>
+      <a id="navImpact" href="impact.html" class="text-gray-500 hover:text-gray-900">Alignment</a>
       <a href="#" class="font-semibold text-indigo-600">Drafting Copilot</a>
     </div>
   </div>
 </nav>
 
 <main class="max-w-screen-xl mx-auto px-4 py-8">
-  <nav class="text-sm text-gray-500 mb-4"><a href="impact.html" class="hover:underline">Impact report</a> <span class="mx-1">/</span> <span class="text-gray-900">Drafting copilot</span></nav>
+  <nav class="text-sm text-gray-500 mb-4"><a href="impact.html" class="hover:underline">Alignment report</a> <span class="mx-1">/</span> <span class="text-gray-900">Drafting copilot</span></nav>
   <h1 class="text-2xl font-bold mb-1">Drafting Copilot</h1>
-  <p class="text-gray-500 mb-6 max-w-3xl">Ask questions, redraft clause 17, or have the copilot <span class="font-medium text-gray-700">grill your draft</span>. Accepted edits are written straight into the <span class="font-medium text-gray-700">living Word document on SharePoint</span> as tracked changes — <span class="font-medium text-gray-700">AI proposes, a human approves</span>.</p>
+  <p class="text-gray-500 mb-6 max-w-3xl">A drafting partner grounded in your sources: it <span class="font-medium text-gray-700">retrieves from the connected reference nodes</span> (MAS TRM, PDPA, Basel — the handbook is restricted) and can <span class="font-medium text-gray-700">search the web grounded to approved sources</span> for trends and news. Accepted edits are written straight into the <span class="font-medium text-gray-700">living Word document on SharePoint</span> as tracked changes — <span class="font-medium text-gray-700">AI proposes, a human approves</span>.</p>
 
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- chat -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col h-[600px]">
+      <!-- live alignment status: shared state with the Alignment report, no page-bouncing needed -->
+      <div class="border-b border-gray-100 px-4 py-2 text-xs flex items-center justify-between gap-2 bg-gray-50 rounded-t-xl">
+        <span id="alignStatus" class="text-gray-600"></span>
+        <a href="impact.html?doc=rmit" class="text-indigo-600 hover:underline font-medium shrink-0">Alignment report →</a>
+      </div>
       <div id="log" class="flex-1 overflow-y-auto p-5 space-y-4"></div>
       <div class="border-t border-gray-100 p-3">
         <div class="flex flex-wrap gap-2 mb-2" id="quick"></div>
@@ -57,7 +62,9 @@
       <div class="bg-gray-100 border-b border-gray-200 px-3 py-1.5 text-xs text-gray-600 flex items-center gap-3">
         <span class="font-medium text-gray-700">Track changes: ON</span>
         <span class="text-gray-400">|</span>
-        <span>Reviewing · Aisyah R. (drafter)</span>
+        <span>Editing · Aisyah R. (drafter)</span>
+        <span class="text-gray-400">|</span>
+        <span id="trackCount" class="text-emerald-700"></span>
       </div>
       <!-- doc body (filled by JS per selected document) -->
       <div class="flex-1 overflow-y-auto bg-gray-200 p-4">
@@ -72,77 +79,68 @@
 const syncDot = document.getElementById("syncDot");
 const syncText = document.getElementById("syncText");
 
-// Doc-aware copilot. RMiT = deep, OpRes = light (single duplication thread).
+// Single-draft copilot: RMiT v2 is the only working draft.
+// Shared model with the Alignment report (same finding ids, same localStorage key):
+// accepting a fix on EITHER page inserts it into the draft as a tracked change.
+const TOTAL_FINDINGS = 5; // mirrors the Alignment report scenario
+const FIX_LABELS = { 1:"PDPA data residency", 2:"pre-adoption risk assessment", 3:"MAS peer benchmark (justification memo)", 4:"Outsourcing 12.1 cross-reference", 5:"17.2 submission cross-reference" };
+const DRAFT_FIXES = { // tracked-change insertions per accepted finding (finding 3 changes the memo, not the draft)
+  1: { target:"17.1", text:"The notification shall state the cloud regions used and confirm compliance with section 129 of the Personal Data Protection Act 2010 in respect of any transfer of personal data outside Malaysia." },
+  2: { target:"17.1", text:"Prior to adoption, the financial institution shall complete the risk assessment required under paragraph 10.50 and Appendix 10." },
+  4: { target:"17.1", text:"Where the cloud service is also a material outsourcing arrangement, paragraph 12.1 of the Outsourcing policy continues to apply." },
+  5: { target:"17.2", text:"Subsequent notifications shall use the submission set in paragraph 17.1 rather than restating it." },
+};
+
 const DOCS = {
   rmit: {
     file: "RMiT_2026_draft.docx",
     header: "BANK NEGARA MALAYSIA · RMiT (2026 draft)",
-    bodyHtml: `<p class="text-center text-xs text-gray-400 mb-6 font-sans tracking-wide">BANK NEGARA MALAYSIA · RMiT (2026 draft)</p>
-      <p class="font-bold mb-2">17 Consultation and notification related to cloud services</p>
-      <p class="font-semibold mb-1">17.1</p>
-      <div id="clause" class="mb-3 pl-2 border-l-2 border-gray-200">A financial institution shall notify the Bank within 14 days of the first-time adoption of a public cloud for critical systems.</div>
-      <p class="mb-3">17.2 A financial institution shall notify the Bank on any subsequent adoption of a public cloud for a critical system.</p>`,
-    oldClause: "A financial institution shall notify the Bank within 14 days of the first-time adoption of a public cloud for critical systems.",
-    newClause: "A financial institution shall, prior to the first-time adoption of a public cloud for critical systems, complete the risk assessment required under paragraph 10.50 and Appendix 10, and shall notify the Bank within 14 days of adoption. Where the cloud service is also a material outsourcing arrangement, paragraph 12.1 of the Outsourcing policy continues to apply.",
-    greeting: `<p>Hi 👋 I'm the Rulebook Radar copilot, grounded in the technology-risk cluster and connected to the live <b>RMiT</b> draft on SharePoint. Try a chip below, or ask me to <b>grill your draft</b>.</p>`,
+    base171: "A financial institution shall notify the Bank within 14 days of the first-time adoption of a public cloud for critical systems.",
+    base172: "A financial institution shall notify the Bank on any subsequent adoption of a public cloud for a critical system, submitting the notification together with the necessary updates to all the information required under paragraph 17.1.",
+    greeting: `<p>Hi 👋 I'm the Rulebook Radar copilot, connected to the live <b>RMiT</b> draft on SharePoint. I can <b>retrieve from your reference nodes</b> (MAS TRM, PDPA, Basel — the handbook is restricted), <b>search the web grounded to approved sources</b>, redraft, or <b>grill your draft</b>. Try a chip below.</p>`,
     quickPrompts: [
-      { label: "Does anything conflict with 17.1?", key: "conflict" },
+      { label: "What do external references say about 17.1?", key: "refs" },
+      { label: "Search the web: cloud policy trends", key: "web" },
+      { label: "Does anything overlap 17.1?", key: "conflict" },
       { label: "Redraft the clause", key: "redraft" },
       { label: "Grill my draft", key: "grill" }
     ],
     responses: {
-      conflict: { html: `<p>Yes — there is a conflict with the <b>Outsourcing (2019)</b> policy, which still requires the Bank's <b>prior written approval</b>:</p>
+      refs: { html: `<p class="text-xs text-gray-400 mb-1">📥 Retrieved from 3 connected reference nodes · 1 restricted</p>
+        <p>Three references speak to public-cloud adoption (see the full <a href="review.html#references" class="underline font-medium">Reference Radar</a>):</p>
+        <ul class="mt-2 space-y-2 text-sm">
+          <li>🏛️ <b>MAS TRM Guidelines (Singapore, 2021)</b> — a peer regulator with no pre-approval for public cloud; risk-management based. <span class="text-gray-500">Supports the shift to notification.</span></li>
+          <li>⚖️ <b>PDPA 2010 s.129</b> — limits transferring personal data outside Malaysia. <span class="text-gray-500">Your notification form should capture data residency.</span></li>
+          <li>🌐 <b>Basel operational-resilience principles (2021)</b> — banks manage third-party (incl. cloud) dependencies for critical operations. <span class="text-gray-500">Keep that responsibility explicit in 17.1.</span></li>
+        </ul>
+        <p class="mt-2 text-sm">🔒 The <b>regulatory handbook</b> also covers cloud submissions — restricted, ask your policy lead. <span class="text-gray-400">(Excerpts are illustrative samples in this demo.)</span></p>` },
+      web: { html: `<p class="text-xs text-gray-400 mb-1">🌐 Web search · grounded to approved sources (central banks · standard-setters · major wires) · 3 results</p>
+        <ul class="mt-1 space-y-2 text-sm">
+          <li><b>BIS Bulletin — cloud concentration in financial services</b> <span class="text-gray-400">· bis.org · 2026</span><br><span class="text-gray-600">A handful of providers host a growing share of critical workloads — argues supervisors need visibility of which regions/providers FIs adopt. Relevant to what 17.1's notification should capture.</span></li>
+          <li><b>MAS consultation — shared responsibility in cloud arrangements</b> <span class="text-gray-400">· mas.gov.sg · 2025</span><br><span class="text-gray-600">Peer regulator refining post-adoption expectations rather than reinstating pre-approval — consistent with your notification approach.</span></li>
+          <li><b>Regional cloud outage disrupts payment services</b> <span class="text-gray-400">· major wire · Jun 2026</span><br><span class="text-gray-600">Concentration-risk coverage — the kind of news signal that may justify keeping a pre-adoption risk assessment in the draft.</span></li>
+        </ul>
+        <p class="mt-2 text-[11px] text-gray-400">Grounded search: only an approved source allowlist is queried; every result links to its source in the real build. (Illustrative samples in this demo.)</p>` },
+      conflict: { html: `<p>Good to know — one overlap in the published rulebook is worth stating explicitly. The <b>Outsourcing (2019)</b> policy still requires the Bank's <b>prior written approval</b>:</p>
         <div class="mt-2 bg-gray-50 border-l-4 border-gray-300 rounded p-2 font-serif text-[13px]">Outsourcing 12.1: “A financial institution must obtain the Bank's written approval before entering into a new material outsourcing arrangement.”</div>
-        <p class="mt-2">A public cloud service for a critical system is often also a <i>material outsourcing</i>. Your draft moves RMiT to notify-after, but 12.1 still says approve-before — so the two policies disagree on the same decision.</p>` },
-      redraft: { html: `<p>Here is a redraft that preserves the pre-adoption risk assessment and cross-references the Outsourcing rule:</p>
-        <div class="mt-2 bg-emerald-50 border-l-4 border-emerald-400 rounded p-2 font-serif text-[13px]">{{NEW}}</div>
-        <p class="mt-2 text-sm">Grounded on RMiT 17.1, 10.50 + Outsourcing 12.1.</p>
-        <button id="applyDraft" class="mt-2 bg-[#2b579a] hover:bg-[#1e3f70] text-white text-xs px-3 py-1.5 rounded-lg font-medium">✎ Apply to SharePoint draft →</button>
-        <p class="mt-1 text-[11px] text-gray-500">Inserted as a tracked change for the drafter to accept.</p>` },
-      grill: { html: `<p class="font-medium">Pushing back on your draft — 3 challenges:</p>
+        <p class="mt-2">A public cloud service for a critical system is often also a <i>material outsourcing</i>. Not a blocker for your draft — but 17.1 should state which process governs so FIs don't read two different answers.</p>` },
+      redraft: { html: `<p>Two tracked-change insertions for 17.1 that close both reference gaps:</p>
+        <div class="mt-2 bg-emerald-50 border-l-4 border-emerald-400 rounded p-2 font-serif text-[13px] space-y-2">
+          <p><b>17.1 +</b> ${DRAFT_FIXES[2].text}</p>
+          <p><b>17.1 +</b> ${DRAFT_FIXES[1].text}</p>
+        </div>
+        <p class="mt-2 text-sm">Grounded on RMiT 10.50 + Appendix 10 and PDPA s.129.</p>
+        <button id="applyDraft" class="mt-2 bg-[#2b579a] hover:bg-[#1e3f70] text-white text-xs px-3 py-1.5 rounded-lg font-medium">✎ Apply both to SharePoint draft →</button>
+        <p class="mt-1 text-[11px] text-gray-500">Inserted as tracked changes for the drafter to accept — the Alignment report updates automatically.</p>` },
+      grill: { html: `<p class="font-medium">Pushing back on your draft — 3 challenges, sources first:</p>
         <ol class="list-decimal ml-5 mt-2 space-y-1 text-sm">
-          <li><b>Does notification satisfy Outsourcing 12.1?</b> That clause still demands prior <i>written approval</i> for a material outsourcing. If a critical cloud service is material, "notify within 14 days" doesn't meet it.</li>
-          <li><b>You dropped the pre-adoption checkpoint.</b> Old 17.1 let the Bank raise concerns <i>before</i> go-live. Notify-after removes that.</li>
-          <li><b>Where did the risk assessment go?</b> The 10.50 / Appendix 10 assessment was a precondition of consultation. If consultation is removed, nothing requires it first.</li>
+          <li><b>Where's the data-residency field?</b> PDPA s.129 restricts transferring personal data outside Malaysia — your notification never asks which cloud region is used.</li>
+          <li><b>You dropped the pre-adoption checkpoint.</b> Old 17.4 (conditions power) is removed and Appendix 10 now takes a self-confirmation instead of the 10.50 risk assessment. Basel's principles keep third-party dependency management with the bank — what control survives before go-live?</li>
+          <li><b>Which process governs a material cloud arrangement?</b> Outsourcing 12.1 still says approve-before; your 17.1 says notify-after. State the interaction explicitly.</li>
         </ol>
         <p class="mt-2 text-sm">Want me to redraft to address these? Type "redraft".</p>` },
-      fallback: { html: `<p>I can help three ways, all grounded in this cluster:</p>
-        <ul class="list-disc ml-5 mt-1 text-sm space-y-1"><li>Ask about conflicts</li><li>Ask me to "redraft" the clause</li><li>Ask me to "grill" your draft</li></ul>` }
-    }
-  },
-  opres: {
-    file: "OpResilience_2026_draft.docx",
-    header: "BANK NEGARA MALAYSIA · Operational Resilience (2026 draft)",
-    bodyHtml: `<p class="text-center text-xs text-gray-400 mb-6 font-sans tracking-wide">BANK NEGARA MALAYSIA · Operational Resilience (2026 draft)</p>
-      <p class="font-bold mb-2">6.1 Mapping of critical operations</p>
-      <p class="font-semibold mb-1">6.11</p>
-      <div id="clause" class="mb-3 pl-2 border-l-2 border-gray-200">The institution shall maintain a register of all cloud and third-party technology services supporting critical operations.</div>
-      <p class="mb-3">6.12 The register shall be reviewed at least annually.</p>`,
-    oldClause: "The institution shall maintain a register of all cloud and third-party technology services supporting critical operations.",
-    newClause: "The institution shall maintain the register of cloud and third-party technology services in accordance with the cloud services requirements in RMiT (clause 10), which is the single source of truth for the register.",
-    greeting: `<p>Hi 👋 I'm the Rulebook Radar copilot, connected to the live <b>Operational Resilience</b> draft. The ripple check flagged one duplication with RMiT — ask about it, or type <b>redraft</b>.</p>`,
-    quickPrompts: [
-      { label: "Does 6.11 duplicate RMiT?", key: "conflict" },
-      { label: "Redraft the clause", key: "redraft" },
-      { label: "Grill my draft", key: "grill" }
-    ],
-    responses: {
-      conflict: { html: `<p>Yes — clause 6.11 <b>duplicates</b> a requirement RMiT already owns:</p>
-        <div class="mt-2 bg-gray-50 border-l-4 border-gray-300 rounded p-2 font-serif text-[13px]">RMiT (cloud services) already requires a register of cloud/third-party services for critical systems.</div>
-        <p class="mt-2">Two policies stating the same rule drift apart over time. Better to reference RMiT as the single source of truth.</p>` },
-      redraft: { html: `<p>Here is a redraft that references RMiT instead of restating the register requirement:</p>
-        <div class="mt-2 bg-emerald-50 border-l-4 border-emerald-400 rounded p-2 font-serif text-[13px]">{{NEW}}</div>
-        <p class="mt-2 text-sm">Grounded on Operational Resilience 6.11 + RMiT clause 10.</p>
-        <button id="applyDraft" class="mt-2 bg-[#2b579a] hover:bg-[#1e3f70] text-white text-xs px-3 py-1.5 rounded-lg font-medium">✎ Apply to SharePoint draft →</button>
-        <p class="mt-1 text-[11px] text-gray-500">Inserted as a tracked change for the drafter to accept.</p>` },
-      grill: { html: `<p class="font-medium">Pushing back on your draft — 2 challenges:</p>
-        <ol class="list-decimal ml-5 mt-2 space-y-1 text-sm">
-          <li><b>Which policy owns the register?</b> If both 6.11 and RMiT define it, a future edit to one silently diverges from the other. Pick one owner.</li>
-          <li><b>Does "annually" (6.12) match RMiT's review cycle?</b> If RMiT sets a different frequency, you've created a second conflict. Check before finalising.</li>
-        </ol>
-        <p class="mt-2 text-sm">Want me to redraft to reference RMiT? Type "redraft".</p>` },
-      fallback: { html: `<p>I can help three ways, grounded in this cluster:</p>
-        <ul class="list-disc ml-5 mt-1 text-sm space-y-1"><li>Ask about the duplication with RMiT</li><li>Ask me to "redraft" the clause</li><li>Ask me to "grill" your draft</li></ul>` }
+      fallback: { html: `<p>I can help five ways, all grounded in your sources:</p>
+        <ul class="list-disc ml-5 mt-1 text-sm space-y-1"><li>Ask what the "external references" say</li><li>Ask me to "search the web" for trends/news (approved sources only)</li><li>Ask about overlaps with published policies</li><li>Ask me to "redraft" the clause</li><li>Ask me to "grill" your draft</li></ul>` }
     }
   }
 };
@@ -152,18 +150,52 @@ const docKey = DOCS[params.get("doc")] ? params.get("doc") : "rmit";
 const DOC = DOCS[docKey];
 
 // doc-aware top nav
-const reviewUrl = docKey === "opres" ? "review-opres.html" : "review.html";
-document.getElementById("navReview").href = reviewUrl;
+document.getElementById("navReview").href = "review.html";
 document.getElementById("navImpact").href = "impact.html?doc=" + docKey;
 
-// paint the selected document
-document.getElementById("docFile").textContent = DOC.file;
-document.getElementById("docBody").innerHTML = DOC.bodyHtml;
-let clauseEl = document.getElementById("clause");
+// shared alignment state (same key the Alignment report writes)
+const resolvedKey = "rr_resolved_" + docKey;
+function loadResolvedIds() { try { return JSON.parse(localStorage.getItem(resolvedKey) || "[]"); } catch (e) { return []; } }
+function addResolved(ids) {
+  try {
+    const resolved = loadResolvedIds();
+    ids.forEach(id => { if (!resolved.includes(id)) resolved.push(id); });
+    localStorage.setItem(resolvedKey, JSON.stringify(resolved));
+  } catch (e) {}
+}
 
-// build responses with the doc's new clause injected
-const responses = {};
-for (const k in DOC.responses) responses[k] = { html: DOC.responses[k].html.replace("{{NEW}}", DOC.newClause) };
+// paint the live document: base clauses + a tracked-change insertion per accepted fix
+document.getElementById("docFile").textContent = DOC.file;
+function renderDoc() {
+  const resolved = loadResolvedIds();
+  const frag = id => ` <span class="bg-emerald-50 text-emerald-700 underline decoration-emerald-400">${DRAFT_FIXES[id].text}</span>`;
+  const c171 = DOC.base171 + [2, 1, 4].filter(id => resolved.includes(id)).map(frag).join("");
+  const c172 = DOC.base172 + [5].filter(id => resolved.includes(id)).map(frag).join("");
+  document.getElementById("docBody").innerHTML = `
+    <p class="text-center text-xs text-gray-400 mb-6 font-sans tracking-wide">${DOC.header}</p>
+    <p class="font-bold mb-2">17 Consultation and notification related to cloud services</p>
+    <p class="font-semibold mb-1">17.1</p>
+    <div class="mb-3 pl-2 border-l-2 border-gray-200">${c171}</div>
+    <p class="font-semibold mb-1">17.2</p>
+    <div class="mb-3 pl-2 border-l-2 border-gray-200">${c172}</div>`;
+  const n = resolved.filter(id => DRAFT_FIXES[id]).length;
+  document.getElementById("trackCount").textContent = n ? n + " insertion" + (n > 1 ? "s" : "") + " pending accept" : "no pending insertions";
+}
+
+function updateAlignBar() {
+  const resolved = loadResolvedIds();
+  const open = Math.max(0, TOTAL_FINDINGS - resolved.length);
+  document.getElementById("alignStatus").innerHTML = open
+    ? `🧭 Alignment: <b>${open} open</b> · ${resolved.length} resolved — fixes accepted on either page appear in the draft as tracked changes`
+    : `🧭 Alignment: <b>all ${TOTAL_FINDINGS} findings resolved</b> — draft ready to submit for approval`;
+}
+
+// live sync: if a fix is accepted on the Alignment page (other tab), reflect it here immediately
+window.addEventListener("storage", (e) => {
+  if (e.key === resolvedKey) { renderDoc(); updateAlignBar(); }
+});
+
+const responses = DOC.responses;
 const quickPrompts = DOC.quickPrompts;
 
 const log = document.getElementById("log");
@@ -179,28 +211,26 @@ function bubble(role, html) {
 }
 
 function applyToDoc() {
-  // simulate writing a tracked change into the live SharePoint Word doc
+  // simulate writing tracked changes into the live SharePoint Word doc
   syncDot.className = "w-2 h-2 rounded-full bg-amber-300 animate-pulse";
   syncText.textContent = "SharePoint · saving…";
-  clauseEl.innerHTML = `<span class="line-through text-red-500 bg-red-50">${DOC.oldClause}</span> <span class="text-emerald-700 bg-emerald-50 underline">${DOC.newClause}</span>`;
-  bubble("bot", `✎ Inserted into <b>${DOC.file}</b> as a tracked change. The drafter can Accept or Reject it in the document — nothing is committed without a human.`);
-  // Close the loop: mark the conflict finding resolved so the Impact report reflects it.
-  try {
-    const key = "rr_resolved_" + docKey;
-    const resolved = JSON.parse(localStorage.getItem(key) || "[]");
-    if (!resolved.includes(1)) resolved.push(1); // the redraft addresses finding #1
-    localStorage.setItem(key, JSON.stringify(resolved));
-  } catch (e) {}
+  // Close the loop: the redraft addresses both reference gaps (findings #1 PDPA, #2 risk assessment).
+  addResolved([1, 2]);
+  renderDoc();
+  updateAlignBar();
+  bubble("bot", `✎ Inserted <b>2 tracked changes</b> into <b>${DOC.file}</b> (${FIX_LABELS[1]} · ${FIX_LABELS[2]}). The drafter can Accept or Reject each in the document — nothing is committed without a human.`);
   setTimeout(() => {
     syncDot.className = "w-2 h-2 rounded-full bg-emerald-300";
     syncText.textContent = "SharePoint · synced";
-    bubble("bot", `The Impact report now shows this conflict as <b>resolved</b>. <a href="impact.html?doc=${docKey}" class="underline font-medium">Re-run the consistency check →</a>`);
+    bubble("bot", `The Alignment report already shows both <b>reference gaps</b> as <b>resolved</b> — no need to go back and re-run anything. <a href="impact.html?doc=${docKey}" class="underline font-medium">View the report →</a>`);
   }, 1200);
 }
 
 function classify(text) {
   const t = text.toLowerCase();
-  if (t.includes("conflict") || t.includes("contradict") || t.includes("duplicat")) return "conflict";
+  if (t.includes("search") || t.includes("web") || t.includes("trend") || t.includes("news") || t.includes("latest")) return "web";
+  if (t.includes("reference") || t.includes("external") || t.includes("mas") || t.includes("pdpa") || t.includes("basel") || t.includes("peer") || t.includes("other regulator") || t.includes("handbook")) return "refs";
+  if (t.includes("conflict") || t.includes("contradict") || t.includes("duplicat") || t.includes("overlap")) return "conflict";
   if (t.includes("redraft") || t.includes("rephrase") || t.includes("rewrite")) return "redraft";
   if (t.includes("grill") || t.includes("push back") || t.includes("challenge") || t.includes("critique")) return "grill";
   return "fallback";
@@ -229,7 +259,14 @@ quickPrompts.forEach(q => {
   quick.appendChild(b);
 });
 
+renderDoc();
+updateAlignBar();
 bubble("bot", DOC.greeting);
+// If fixes were accepted on the Alignment page before opening the copilot, say so up front.
+const alreadyInDraft = loadResolvedIds().filter(id => DRAFT_FIXES[id]);
+if (alreadyInDraft.length) {
+  bubble("bot", `ℹ️ ${alreadyInDraft.length} alignment fix${alreadyInDraft.length > 1 ? "es are" : " is"} already in the draft as tracked changes: <b>${alreadyInDraft.map(id => FIX_LABELS[id]).join(" · ")}</b>. You can see them highlighted in the document on the right.`);
+}
 </script>
 </body>
 </html>
