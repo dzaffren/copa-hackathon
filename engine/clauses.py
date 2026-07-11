@@ -32,6 +32,7 @@ POLICY_SHORT_NAMES = {
     "opres": "Operational Resilience",
     "recovery-planning": "Recovery Planning",
     "customer-info": "Customer Info",
+    "open-finance": "Open Finance",
 }
 
 
@@ -676,7 +677,13 @@ _NOISE_LINE_RES = [
 # `(?:\s|$)` accepts either. A bare-label line's actual content is then picked up
 # from the following line(s) via `_skip_ws` (which skips newlines) + the
 # continuation-line accumulation in the main loop.
-_NUMBERED_CLAUSE_RE = re.compile(r"^(\d+(?:\.\d+)+)(?:\s|$)")
+# The optional ``[SG]\s+`` prefix accepts BNM's Exposure Draft / Discussion
+# Paper convention where each clause is tagged ``S`` (Standard) or ``G``
+# (Guidance) at line start — e.g. ``S 7.1 The board shall...``. The prefix is
+# only recognised, never captured; the resulting bare_number is the pure
+# numeric label (``7.1``), so downstream clause-numbering stays uniform across
+# PD, ED, and DP documents.
+_NUMBERED_CLAUSE_RE = re.compile(r"^(?:[SG]\s+)?(\d+(?:\.\d+)+)(?:\s|$)")
 _SUBITEM_RE = re.compile(r"^\(([a-z]{1,3}|[ivxl]{1,4})\)(?:\s|$)")
 _APPENDIX_RE = re.compile(r"^(Appendix\s+\d+)\b")
 _SECTION_HEADING_RE = re.compile(r"^(\d+)\s+([A-Z].*)$")
