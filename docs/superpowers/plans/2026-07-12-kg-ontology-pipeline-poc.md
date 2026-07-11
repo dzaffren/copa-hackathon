@@ -2046,7 +2046,7 @@ Normalises span surfaces, applies class-gated merging, and writes `entities.json
 - Produces:
   - `pipeline.resolve.Entity` — TypedDict: `entity_id, class_, canonical_label, aliases, mention_count, docs_appearing_in`.
   - `pipeline.resolve.Mention` — TypedDict: `entity_id, doc_id, chunk_id, char_start, char_end`.
-  - `pipeline.resolve.normalise_surface(surface: str) -> str` — lowercase, strip leading article `the `, strip trailing `s`. Pure.
+  - `pipeline.resolve.normalise_surface(surface: str) -> str` — lowercase, strip leading article `the `, strip trailing `s` **only when the original word is not an all-uppercase acronym** (so `BCBS` stays `bcbs`, but `boards` → `board`). Pure.
   - `pipeline.resolve.build_alias_map(seeds: list[SeedEntry]) -> dict[tuple[str, str], str]` — maps `(normalised_alias, class_)` → canonical.
   - `pipeline.resolve.entity_id_for(class_: str, canonical: str) -> str` — `f"{class_.lower()}:{normalise_surface(canonical)}"`.
   - `pipeline.resolve.run_stage_4(spans_path: Path, seeds: list[SeedEntry], output_dir: Path) -> tuple[Path, Path]` — reads spans, writes `entities.jsonl` and `mentions.jsonl`.
@@ -2080,6 +2080,12 @@ def test_normalise_strips_leading_article():
 
 def test_normalise_strips_trailing_plural_s():
     assert normalise_surface("boards") == "board"
+
+
+def test_normalise_preserves_acronym_trailing_s():
+    """All-uppercase acronyms keep their trailing s (BCBS, TPSPs)."""
+    assert normalise_surface("BCBS") == "bcbs"
+    assert normalise_surface("TPSPs") == "tpsps"
 
 
 def test_normalise_preserves_multi_word():
@@ -2155,9 +2161,8 @@ def test_same_string_different_class_stays_separate(tmp_path: Path):
     )
     entities = [json.loads(l) for l in ent_path.read_text().splitlines()]
     ids = {e["entity_id"] for e in entities}
-    assert ids == {"regulatorybody:bcm", "reference:bcm"}  # trailing "s" stripped
-    # tighten if surprising: BCBS normalises to "bcm" (drops trailing s). We
-    # accept this — the entity id doesn't need to match the display label.
+    # BCBS is an acronym → normalisation preserves the trailing 's'.
+    assert ids == {"regulatorybody:bcbs", "reference:bcbs"}
 
 
 def test_alias_collapses_to_canonical(tmp_path: Path):
@@ -2238,18 +2243,37 @@ class Mention(TypedDict):
     char_end: int
 
 
+def _is_acronym(word: str) -> bool:
+    """Heuristic: an all-uppercase word of at least two letters, ignoring a
+    trailing lowercase 's' (so `BCBS` and `TPSPs` both count).
+
+    Used by `normalise_surface` to avoid stripping the plural-`s` off an
+    acronym like `BCBS` (turning it into `bcb`) or `TPSPs` (into `tpsp`).
+    """
+    if not word:
+        return False
+    body = word[:-1] if word.endswith("s") and len(word) > 1 else word
+    return len(body) >= 2 and body.isupper() and body.isalpha()
+
+
 def normalise_surface(surface: str) -> str:
-    """Lowercase → strip leading article → strip a single trailing 's'.
+    """Lowercase → strip leading article → strip trailing 's' EXCEPT when
+    the original surface is an all-uppercase acronym.
 
     Deterministic. Not linguistically clever; the interview and audit
     surface most cases where cleverness would be needed as seed aliases.
+    The acronym carve-out is what keeps `BCBS` and `TPSPs` recognisable
+    (without it, `BCBS` would normalise to `bcb`, a nonsense token).
     """
-    s = surface.lower().strip()
+    stripped = surface.strip()
+    acronym = _is_acronym(stripped.split()[-1]) if stripped else False
+
+    s = stripped.lower()
     for article in _ARTICLES:
         if s.startswith(article):
             s = s[len(article):]
             break
-    if len(s) > 3 and s.endswith(_PLURAL_SUFFIX):
+    if not acronym and len(s) > 3 and s.endswith(_PLURAL_SUFFIX):
         s = s[:-1]
     return s
 
@@ -2285,10 +2309,8 @@ def resolve_spans(
 
     for span in spans:
         normalised = normalise_surface(span["surface"])
-        # Alias → canonical if declared, else the normalised surface is
-        # the canonical.
-        canonical = alias_map.get((normalised, span["class_"]), span["surface"] if normalised == normalise_surface(span["surface"]) else span["surface"])
-        # Simpler: prefer declared alias mapping; otherwise use surface.
+        # Prefer a seed-declared canonical for this (normalised, class) pair;
+        # otherwise the span's own surface stands in as its canonical.
         canonical = alias_map.get((normalised, span["class_"]), span["surface"])
 
         eid = entity_id_for(span["class_"], canonical)
