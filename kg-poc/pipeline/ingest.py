@@ -75,16 +75,21 @@ def run_stage_1(
 ) -> dict[str, Path]:
     """Ingest every document, write `{doc_id}.md` under `output_dir`.
 
-    Returns `{doc_id: output_path}`. Fails loudly on the first unreadable
-    document — no partial success.
+    Two-pass: convert all documents first, then write files only if every
+    conversion succeeded. Fails loudly on the first unreadable document with
+    zero on-disk residue from this run.
     """
+    # Pass 1: convert everything in memory. If any doc fails, this raises
+    # before any file is written.
+    results: dict[str, str] = {}
+    for doc_id, entry in documents.items():
+        results[doc_id] = ingest_document(entry["source_path"], converter=converter)
+
+    # Pass 2: only reached if every conversion succeeded — now materialise.
     output_dir.mkdir(parents=True, exist_ok=True)
     outputs: dict[str, Path] = {}
-
-    for doc_id, entry in documents.items():
-        markdown = ingest_document(entry["source_path"], converter=converter)
+    for doc_id, markdown in results.items():
         out_path = output_dir / f"{doc_id}.md"
         out_path.write_text(markdown)
         outputs[doc_id] = out_path
-
     return outputs

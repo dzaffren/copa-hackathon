@@ -75,3 +75,34 @@ def test_run_stage_1_writes_markdown_per_doc(tmp_path: Path):
     assert outputs["b"].read_text() == "B body"
     assert outputs["a"].name == "a.md"
     assert outputs["b"].name == "b.md"
+
+
+def test_run_stage_1_no_partial_write_on_mid_batch_failure(tmp_path: Path):
+    pdf_a = tmp_path / "a.pdf"
+    pdf_b = tmp_path / "b.pdf"
+    pdf_a.write_bytes(b"a")
+    pdf_b.write_bytes(b"b")
+
+    class HalfBroken:
+        """Succeeds on `a`, raises on `b`."""
+        def convert(self, path: str):
+            if path.endswith("a.pdf"):
+                return StubResult("A body")
+            raise RuntimeError("second doc fails")
+
+    documents = {
+        "a": {"doc_id": "a", "source_path": pdf_a, "title": "A",
+              "doc_type": "PD", "jurisdiction": "MY", "issuer": "BNM",
+              "issued_date": "2025-01-01"},
+        "b": {"doc_id": "b", "source_path": pdf_b, "title": "B",
+              "doc_type": "PD", "jurisdiction": "MY", "issuer": "BNM",
+              "issued_date": "2025-01-01"},
+    }
+    out_dir = tmp_path / "text"
+
+    with pytest.raises(UnreadableDocumentError):
+        run_stage_1(documents=documents, output_dir=out_dir, converter=HalfBroken())
+
+    # No partial residue: neither a.md nor b.md exists.
+    assert not (out_dir / "a.md").exists()
+    assert not (out_dir / "b.md").exists()
