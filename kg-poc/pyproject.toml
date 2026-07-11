@@ -7,6 +7,7 @@ dependencies = [
     "spacy>=3.7,<4",
     "gliner>=0.2.13,<0.3",
     "networkx>=3.2,<4",
+    "scipy>=1.10",
     "pyvis>=0.3.2,<0.4",
     "markitdown>=0.0.1",
     "azure-ai-documentintelligence>=1.0.0",
