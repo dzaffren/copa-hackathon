@@ -101,6 +101,16 @@ DOCUMENTS = {
         "source": "published",
         "cluster": CLUSTER,
     },
+    "open-finance-v1-2025-ed": {
+        "policy_id": "open-finance",
+        "document_id": "open-finance-v1-2025-ed",
+        "title": "Open Finance",
+        "version": "ED · 18 Nov 2025",
+        "effective_date": "2025-11-18",
+        "source_path": CORPUS_DIR / "ED_Open_Finance_2025.pdf",
+        "source": "draft",
+        "cluster": "open-finance",
+    },
 }
 
 # Curated seed edges — the deterministic baseline "which policies connect at

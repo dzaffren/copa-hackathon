@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New workstream — Workstream Brain</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .fade-in { animation: fi 0.35s ease forwards; }
+  @keyframes fi { from { opacity:0; transform: translateY(4px) } to { opacity:1; transform: translateY(0) } }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+<nav class="bg-white border-b border-gray-200">
+  <div class="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="text-2xl">🧠</span>
+      <span class="font-bold text-lg">Workstream Brain</span>
+      <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium">COPA Hackathon 2026 · MW6/9/10 demo</span>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <a href="index.html" class="text-gray-500 hover:text-gray-900">Institution</a>
+      <a href="workstream.html" class="text-gray-500 hover:text-gray-900">My workstreams</a>
+      <a href="new-workstream.html" class="font-semibold text-indigo-600">+ New</a>
+    </div>
+  </div>
+</nav>
+
+<div class="bg-indigo-600 text-white">
+  <div class="max-w-screen-xl mx-auto px-4 py-2.5 flex items-center justify-between text-sm">
+    <div class="flex items-center gap-3">
+      <a href="index.html" class="text-indigo-100 hover:text-white">← Institution</a>
+      <span class="text-indigo-200">/</span>
+      <span class="font-semibold">Start a new workstream</span>
+    </div>
+    <span class="text-xs text-indigo-100">Aisyah R.</span>
+  </div>
+</div>
+
+<main class="max-w-screen-lg mx-auto px-4 py-8">
+  <!-- Progress -->
+  <ol class="flex items-center gap-6 text-sm mb-8">
+    <li class="flex items-center gap-2">
+      <span class="w-6 h-6 rounded-full bg-indigo-600 text-white text-xs font-bold grid place-items-center">1</span>
+      <span class="text-gray-900 font-semibold">Details</span>
+    </li>
+    <span class="h-px w-10 bg-gray-300"></span>
+    <li class="flex items-center gap-2">
+      <span class="w-6 h-6 rounded-full bg-indigo-600 text-white text-xs font-bold grid place-items-center">2</span>
+      <span class="text-gray-900 font-semibold">Anchoring sources</span>
+    </li>
+    <span class="h-px w-10 bg-gray-300"></span>
+    <li class="flex items-center gap-2">
+      <span class="w-6 h-6 rounded-full bg-white border border-gray-300 text-gray-400 text-xs font-bold grid place-items-center">3</span>
+      <span class="text-gray-400">Review initial graph</span>
+    </li>
+  </ol>
+
+  <h1 class="text-2xl font-bold">Kick off a new workstream</h1>
+  <p class="text-gray-500 mt-1 max-w-2xl mb-6">Anchor your workstream on the sources that shape it. When you commit, the tool builds the initial knowledge graph and detects linkages between the sources and any existing corpus content.</p>
+
+  <!-- Step 1 · Details -->
+  <section class="bg-white rounded-xl shadow-sm border border-gray-100 mb-5">
+    <div class="px-4 py-3 border-b border-gray-100">
+      <h2 class="font-semibold text-sm">1️⃣ Details</h2>
+    </div>
+    <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <label class="block">
+        <span class="text-xs uppercase tracking-wide text-gray-400 font-semibold">Workstream name</span>
+        <input type="text" value="Fraud Response PD 2027" class="mt-1 w-full text-sm px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"/>
+      </label>
+      <label class="block">
+        <span class="text-xs uppercase tracking-wide text-gray-400 font-semibold">Type</span>
+        <select class="mt-1 w-full text-sm px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500">
+          <option>Policy Document (PD)</option>
+          <option>Exposure Draft (ED)</option>
+          <option>Discussion Paper (DP)</option>
+          <option>Roadmap / strategy paper</option>
+        </select>
+      </label>
+      <label class="block">
+        <span class="text-xs uppercase tracking-wide text-gray-400 font-semibold">Owner</span>
+        <input type="text" value="Aisyah R." class="mt-1 w-full text-sm px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"/>
+      </label>
+      <label class="block">
+        <span class="text-xs uppercase tracking-wide text-gray-400 font-semibold">Target completion</span>
+        <input type="text" value="Q2 2027" class="mt-1 w-full text-sm px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"/>
+      </label>
+      <label class="block md:col-span-2">
+        <span class="text-xs uppercase tracking-wide text-gray-400 font-semibold">Scope note</span>
+        <textarea rows="2" class="mt-1 w-full text-sm px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500">Continuation of the 2025 Fraud Response ED. Focus areas: mule-account response, cross-border fraud, and consumer-facing amaran channels.</textarea>
+      </label>
+    </div>
+  </section>
+
+  <!-- Step 2 · Sources -->
+  <section class="bg-white rounded-xl shadow-sm border border-gray-100 mb-5">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+      <div>
+        <h2 class="font-semibold text-sm">2️⃣ Anchoring sources <span class="text-xs text-gray-400 font-normal">· one file = one node · six node types</span></h2>
+      </div>
+      <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium"><span id="src-count">4</span> added</span>
+    </div>
+
+    <!-- Add source options -->
+    <div class="p-4 border-b border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-3">
+      <button id="add-upload" class="text-left p-3 rounded-lg border border-gray-200 hover:border-indigo-400 hover:bg-indigo-50 flex items-start gap-3 transition">
+        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 grid place-items-center shrink-0">📎</div>
+        <div>
+          <div class="text-sm font-semibold text-gray-900">Upload file</div>
+          <div class="text-xs text-gray-500 mt-0.5">PDF, DOCX or Markdown from your laptop.</div>
+        </div>
+      </button>
+      <button id="add-url" class="text-left p-3 rounded-lg border border-gray-200 hover:border-indigo-400 hover:bg-indigo-50 flex items-start gap-3 transition">
+        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 grid place-items-center shrink-0">🔗</div>
+        <div>
+          <div class="text-sm font-semibold text-gray-900">Fetch URL</div>
+          <div class="text-xs text-gray-500 mt-0.5">BCBS, MAS, HKMA, FSB, an Act — ingested from the page.</div>
+        </div>
+      </button>
+      <button id="add-sp" class="text-left p-3 rounded-lg border border-gray-200 hover:border-indigo-400 hover:bg-indigo-50 flex items-start gap-3 transition">
+        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 grid place-items-center shrink-0">📁</div>
+        <div>
+          <div class="text-sm font-semibold text-gray-900">SharePoint folder</div>
+          <div class="text-xs text-gray-500 mt-0.5">Watch a folder — new files auto-added as nodes.</div>
+        </div>
+      </button>
+    </div>
+
+    <!-- Sources list -->
+    <ul id="sources" class="divide-y divide-gray-100">
+      <li class="px-4 py-3 flex items-center gap-3">
+        <span class="text-xs font-bold uppercase tracking-wide px-2 py-1 rounded-full bg-indigo-100 text-indigo-700">Internal</span>
+        <div class="min-w-0 flex-1">
+          <div class="text-sm font-semibold text-gray-900 truncate">Fraud Response Exposure Draft (2025)</div>
+          <div class="text-xs text-gray-500">bnm.gov.my · issued 22 Oct 2025 · 34 pages</div>
+        </div>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">prior version</span>
+      </li>
+      <li class="px-4 py-3 flex items-center gap-3">
+        <span class="text-xs font-bold uppercase tracking-wide px-2 py-1 rounded-full bg-fuchsia-100 text-fuchsia-700">International</span>
+        <div class="min-w-0 flex-1">
+          <div class="text-sm font-semibold text-gray-900 truncate">FSB Cyber Incident Response and Recovery Toolkit (2020)</div>
+          <div class="text-xs text-gray-500">fsb.org · fetched via URL</div>
+        </div>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">anchor</span>
+      </li>
+      <li class="px-4 py-3 flex items-center gap-3">
+        <span class="text-xs font-bold uppercase tracking-wide px-2 py-1 rounded-full bg-teal-100 text-teal-700">Peer</span>
+        <div class="min-w-0 flex-1">
+          <div class="text-sm font-semibold text-gray-900 truncate">MAS Notice PSN04 · Fraud Surveillance</div>
+          <div class="text-xs text-gray-500">mas.gov.sg · fetched via URL</div>
+        </div>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">benchmark</span>
+      </li>
+      <li class="px-4 py-3 flex items-center gap-3">
+        <span class="text-xs font-bold uppercase tracking-wide px-2 py-1 rounded-full bg-amber-100 text-amber-700">Act</span>
+        <div class="min-w-0 flex-1">
+          <div class="text-sm font-semibold text-gray-900 truncate">Consumer Credit Act 2025</div>
+          <div class="text-xs text-gray-500">agc.gov.my · uploaded PDF · 118 pages</div>
+        </div>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">constraint</span>
+      </li>
+    </ul>
+
+    <!-- Suggestions -->
+    <div class="border-t border-gray-100 p-4 bg-indigo-50/40">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs uppercase tracking-wide text-indigo-700 font-semibold">✨ Suggested by tool</span>
+        <span class="text-xs text-gray-500">based on scope note and prior ED</span>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button class="text-xs px-3 py-1 rounded-full border border-teal-300 bg-white text-teal-700 hover:bg-teal-50 font-medium transition" onclick="addSuggestion(this,'Peer','HKMA · Fraud & Scam Guidance (2024)')">+ HKMA Fraud & Scam Guidance 2024</button>
+        <button class="text-xs px-3 py-1 rounded-full border border-emerald-300 bg-white text-emerald-700 hover:bg-emerald-50 font-medium transition" onclick="addSuggestion(this,'Industry','ABM position paper on mule accounts (Mar 2026)')">+ ABM position paper on mule accounts</button>
+        <button class="text-xs px-3 py-1 rounded-full border border-indigo-300 bg-white text-indigo-700 hover:bg-indigo-50 font-medium transition" onclick="addSuggestion(this,'Internal','NSRC · 2025 report')">+ NSRC 2025 report</button>
+        <button class="text-xs px-3 py-1 rounded-full border border-teal-300 bg-white text-teal-700 hover:bg-teal-50 font-medium transition" onclick="addSuggestion(this,'Peer','FCA · UK APP Fraud Reimbursement rules (2024)')">+ FCA UK APP Fraud rules</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Commit -->
+  <div class="flex items-center justify-between">
+    <a href="index.html" class="text-sm text-gray-500 hover:text-gray-900">← Cancel</a>
+    <div class="flex items-center gap-2">
+      <button class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg font-medium text-sm">Save as draft</button>
+      <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg font-medium text-sm inline-flex items-center gap-2" onclick="location.href='workstream.html'">🧠 Build initial graph →</button>
+    </div>
+  </div>
+
+  <p class="text-xs text-gray-400 mt-8 text-center">Next: the tool ingests each source, extracts clauses, and detects linkages to your existing corpus using the finder + critic + citation validator.</p>
+</main>
+
+<script>
+  const list = document.getElementById("sources");
+  const count = document.getElementById("src-count");
+  const badgeColors = {
+    "Internal": "bg-indigo-100 text-indigo-700",
+    "International": "bg-fuchsia-100 text-fuchsia-700",
+    "Peer": "bg-teal-100 text-teal-700",
+    "Act": "bg-amber-100 text-amber-700",
+    "Industry": "bg-emerald-100 text-emerald-700",
+  };
+
+  function addSuggestion(button, kind, title) {
+    const cls = badgeColors[kind] || "bg-gray-100 text-gray-700";
+    const li = document.createElement("li");
+    li.className = "px-4 py-3 flex items-center gap-3 fade-in";
+    li.innerHTML =
+      '<span class="text-xs font-bold uppercase tracking-wide px-2 py-1 rounded-full ' + cls + '">' + kind + '</span>' +
+      '<div class="min-w-0 flex-1">' +
+        '<div class="text-sm font-semibold text-gray-900 truncate">' + title + '</div>' +
+        '<div class="text-xs text-gray-500">added via suggestion · click to configure</div>' +
+      '</div>' +
+      '<span class="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium">new</span>';
+    list.appendChild(li);
+    count.textContent = String(list.children.length);
+    if (button && button.remove) button.remove();
+  }
+
+  document.getElementById("add-upload").addEventListener("click", () =>
+    addSuggestion(null, "Internal", "Draft outline — Fraud Response PD (empty)")
+  );
+  document.getElementById("add-url").addEventListener("click", () =>
+    addSuggestion(null, "International", "BCBS Principles for Fraud Risk Management (draft URL)")
+  );
+  document.getElementById("add-sp").addEventListener("click", () =>
+    addSuggestion(null, "Industry", "SharePoint · /Policy/Fraud/2026-consultations")
+  );
+</script>
+
+</body>
+</html>

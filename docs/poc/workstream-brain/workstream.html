@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpRes Roadmap 2026 — Workstream Brain</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .task-item { transition: background-color .12s ease; }
+  .task-item:hover { background-color: #f9fafb; }
+  .node-hover { transition: transform .15s ease; }
+  .node-hover:hover { transform: scale(1.08); }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+<nav class="bg-white border-b border-gray-200">
+  <div class="max-w-screen-2xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="text-2xl">🧠</span>
+      <span class="font-bold text-lg">Workstream Brain</span>
+      <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium">COPA Hackathon 2026 · MW6/9/10 demo</span>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <a href="index.html" class="text-gray-500 hover:text-gray-900">Institution</a>
+      <a href="workstream.html" class="font-semibold text-indigo-600">My workstreams</a>
+      <a href="new-workstream.html" class="text-gray-500 hover:text-gray-900">+ New</a>
+    </div>
+  </div>
+</nav>
+
+<div class="bg-indigo-600 text-white">
+  <div class="max-w-screen-2xl mx-auto px-4 py-2.5 flex items-center justify-between text-sm">
+    <div class="flex items-center gap-3">
+      <a href="index.html" class="text-indigo-100 hover:text-white">← Institution</a>
+      <span class="text-indigo-200">/</span>
+      <span class="font-semibold">Operational Resilience Roadmap 2026</span>
+      <span class="text-xs bg-emerald-400/30 border border-emerald-300/50 text-emerald-50 px-2 py-0.5 rounded-full font-medium ml-2">✎ you own</span>
+    </div>
+    <div class="flex items-center gap-2 text-xs text-indigo-100">
+      <span>Aisyah R.</span>
+      <span>·</span>
+      <span>Farid M., Priya S. review</span>
+      <span>·</span>
+      <span>3 AI agents</span>
+    </div>
+  </div>
+</div>
+
+<main class="max-w-screen-2xl mx-auto px-4 py-6">
+  <div class="flex items-start justify-between gap-4 mb-5">
+    <div>
+      <h1 class="text-2xl font-bold">Operational Resilience · Roadmap 2026</h1>
+      <p class="text-gray-500 mt-1">Continuation of the 2025 Discussion Paper · Draft PD target Q4 2026 · <span class="font-medium text-gray-700">72 clauses</span> · <span class="font-medium text-gray-700">5 external anchors</span></p>
+    </div>
+    <div class="inline-flex items-center bg-white rounded-lg shadow-sm border border-gray-100 p-1 text-sm">
+      <button class="px-3 py-1.5 rounded-md text-gray-500 hover:bg-gray-50 font-medium">Roadmap</button>
+      <button class="px-3 py-1.5 rounded-md bg-indigo-600 text-white font-medium">Graph</button>
+      <button class="px-3 py-1.5 rounded-md text-gray-500 hover:bg-gray-50 font-medium">Timeline</button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-12 gap-5">
+    <!-- LEFT: Sources -->
+    <aside class="col-span-12 lg:col-span-3">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+          <h2 class="font-semibold text-sm">📚 Sources</h2>
+          <button class="text-xs text-indigo-600 hover:text-indigo-700 font-semibold" onclick="document.getElementById('addsrc').classList.toggle('hidden')">+ Add</button>
+        </div>
+
+        <div id="addsrc" class="hidden px-4 py-3 border-b border-gray-100 bg-indigo-50">
+          <div class="text-xs uppercase tracking-wide text-indigo-700 font-semibold mb-2">Add source</div>
+          <div class="flex flex-col gap-1.5 text-xs">
+            <button class="text-left px-2.5 py-1.5 rounded bg-white border border-indigo-200 hover:bg-indigo-100 text-gray-700 font-medium" onclick="document.getElementById('addsrc').classList.add('hidden')">📎 Upload file (PDF, DOCX, MD)</button>
+            <button class="text-left px-2.5 py-1.5 rounded bg-white border border-indigo-200 hover:bg-indigo-100 text-gray-700 font-medium" onclick="document.getElementById('addsrc').classList.add('hidden')">🔗 Fetch from URL</button>
+            <button class="text-left px-2.5 py-1.5 rounded bg-white border border-indigo-200 hover:bg-indigo-100 text-gray-700 font-medium" onclick="document.getElementById('addsrc').classList.add('hidden')">📁 Link SharePoint folder</button>
+          </div>
+        </div>
+
+        <div class="p-4 space-y-4 text-sm">
+          <div>
+            <div class="text-xs uppercase tracking-wide text-indigo-700 font-semibold mb-1.5 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-indigo-500"></span> Internal BNM
+            </div>
+            <ul class="space-y-1 pl-4">
+              <li>OpRes DP <span class="text-xs text-gray-400">· Dec 2025</span></li>
+              <li>Working draft v0.3 <span class="text-xs text-emerald-600 font-medium">· today</span></li>
+              <li>RMiT PD <span class="text-xs text-gray-400">· Nov 2025</span></li>
+              <li>BCM PD <span class="text-xs text-gray-400">· Dec 2022</span></li>
+            </ul>
+          </div>
+
+          <div>
+            <div class="text-xs uppercase tracking-wide text-teal-700 font-semibold mb-1.5 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-teal-500"></span> Peer regulator
+            </div>
+            <ul class="space-y-1 pl-4">
+              <li>MAS <span class="text-xs text-gray-400">BCM Notice</span></li>
+              <li>HKMA SPM OR-1 <span class="text-xs text-gray-400">· Sep 2024</span></li>
+              <li>APRA CPS 230 <span class="text-xs text-gray-400">· eff. Jul 2025</span></li>
+            </ul>
+          </div>
+
+          <div>
+            <div class="text-xs uppercase tracking-wide text-fuchsia-700 font-semibold mb-1.5 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-fuchsia-500"></span> International standards
+            </div>
+            <ul class="space-y-1 pl-4">
+              <li>BCBS <span class="text-xs text-gray-400">Op. Res. 2021</span></li>
+              <li>FSB <span class="text-xs text-gray-400">3rd-Party Toolkit</span></li>
+            </ul>
+          </div>
+
+          <div>
+            <div class="text-xs uppercase tracking-wide text-amber-700 font-semibold mb-1.5 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-amber-500"></span> Act / law
+            </div>
+            <ul class="space-y-1 pl-4">
+              <li>FSA 2013 <span class="text-xs text-gray-400">· §143</span></li>
+              <li>IFSA 2013 <span class="text-xs text-gray-400">· §155</span></li>
+            </ul>
+          </div>
+
+          <div>
+            <div class="text-xs uppercase tracking-wide text-emerald-700 font-semibold mb-1.5 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Industry input
+            </div>
+            <ul class="space-y-1 pl-4">
+              <li>DP feedback <span class="text-xs text-gray-400">· 14 submissions</span></li>
+              <li>ABM position paper <span class="text-xs text-gray-400">· May 2026</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTRE: Graph -->
+    <section class="col-span-12 lg:col-span-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="font-semibold text-sm">Workstream graph <span class="text-xs text-gray-400 font-normal ml-1">· click an edge for detail</span></h2>
+          <div class="flex items-center gap-3 text-xs text-gray-600">
+            <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 bg-indigo-400"></span>anchor</span>
+            <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-red-400"></span>cross-workstream</span>
+          </div>
+        </div>
+
+        <svg viewBox="0 0 720 520" class="w-full h-auto select-none">
+          <!-- Edges to anchors -->
+          <line x1="360" y1="260" x2="140" y2="120" stroke="#a5b4fc" stroke-width="2"/>
+          <line x1="360" y1="260" x2="600" y2="120" stroke="#a5b4fc" stroke-width="2"/>
+          <line x1="360" y1="260" x2="130" y2="380" stroke="#a5b4fc" stroke-width="2"/>
+          <line x1="360" y1="260" x2="600" y2="380" stroke="#a5b4fc" stroke-width="2"/>
+          <line x1="360" y1="260" x2="360" y2="440" stroke="#a5b4fc" stroke-width="2"/>
+          <line x1="360" y1="260" x2="360" y2="80" stroke="#4f46e5" stroke-width="2.5"/>
+
+          <!-- Cross-workstream flagged edge -->
+          <g style="cursor:pointer" onclick="location.href='linkage.html'">
+            <line x1="360" y1="260" x2="700" y2="260" stroke="#dc2626" stroke-width="2.5" stroke-dasharray="6 4"/>
+            <rect x="510" y="240" width="150" height="34" rx="10" fill="#fef2f2" stroke="#fecaca"/>
+            <text x="585" y="258" font-size="10.5" fill="#7f1d1d" text-anchor="middle" font-weight="700">🚩 → Open Finance §7</text>
+            <text x="585" y="270" font-size="9" fill="#991b1b" text-anchor="middle">silent-on</text>
+          </g>
+
+          <!-- Centre node (working draft) -->
+          <g class="node-hover" style="cursor:pointer">
+            <circle cx="360" cy="260" r="56" fill="#4f46e5" stroke="#312e81" stroke-width="3"/>
+            <text x="360" y="256" text-anchor="middle" font-size="12" fill="#ffffff" font-weight="700">OpRes v0.3</text>
+            <text x="360" y="273" text-anchor="middle" font-size="10" fill="#c7d2fe">working draft</text>
+          </g>
+
+          <!-- BCBS anchor -->
+          <g class="node-hover" style="cursor:pointer">
+            <circle cx="360" cy="70" r="30" fill="#fdf4ff" stroke="#c026d3" stroke-width="2.5"/>
+            <text x="360" y="64" text-anchor="middle" font-size="10" fill="#86198f" font-weight="700">BCBS</text>
+            <text x="360" y="78" text-anchor="middle" font-size="9" fill="#701a75">Op. Res.</text>
+            <text x="360" y="90" text-anchor="middle" font-size="8" fill="#a21caf">2021</text>
+          </g>
+
+          <!-- HKMA anchor -->
+          <g class="node-hover" style="cursor:pointer" onclick="location.href='task.html'">
+            <circle cx="130" cy="110" r="30" fill="#ecfeff" stroke="#0d9488" stroke-width="2.5"/>
+            <text x="130" y="105" text-anchor="middle" font-size="10" fill="#134e4a" font-weight="700">HKMA</text>
+            <text x="130" y="119" text-anchor="middle" font-size="9" fill="#115e59">SPM OR-1</text>
+          </g>
+
+          <!-- FSB anchor -->
+          <g class="node-hover" style="cursor:pointer">
+            <circle cx="590" cy="110" r="30" fill="#fdf4ff" stroke="#c026d3" stroke-width="2.5"/>
+            <text x="590" y="105" text-anchor="middle" font-size="10" fill="#86198f" font-weight="700">FSB</text>
+            <text x="590" y="119" text-anchor="middle" font-size="9" fill="#701a75">3rd-Party</text>
+          </g>
+
+          <!-- MAS anchor -->
+          <g class="node-hover" style="cursor:pointer">
+            <circle cx="120" cy="390" r="30" fill="#ecfeff" stroke="#0d9488" stroke-width="2.5"/>
+            <text x="120" y="385" text-anchor="middle" font-size="10" fill="#134e4a" font-weight="700">MAS</text>
+            <text x="120" y="399" text-anchor="middle" font-size="9" fill="#115e59">BCM</text>
+          </g>
+
+          <!-- FSA anchor -->
+          <g class="node-hover" style="cursor:pointer">
+            <circle cx="610" cy="390" r="30" fill="#fef3c7" stroke="#d97706" stroke-width="2.5"/>
+            <text x="610" y="385" text-anchor="middle" font-size="10" fill="#78350f" font-weight="700">FSA</text>
+            <text x="610" y="399" text-anchor="middle" font-size="9" fill="#92400e">§143</text>
+          </g>
+
+          <!-- ABM feedback anchor -->
+          <g class="node-hover" style="cursor:pointer">
+            <circle cx="360" cy="460" r="30" fill="#ecfdf5" stroke="#10b981" stroke-width="2.5"/>
+            <text x="360" y="455" text-anchor="middle" font-size="10" fill="#065f46" font-weight="700">ABM</text>
+            <text x="360" y="469" text-anchor="middle" font-size="9" fill="#047857">feedback</text>
+          </g>
+        </svg>
+
+        <p class="text-xs text-gray-400 mt-2">Anchor colours match the sources panel · <span class="text-red-500">dashed red</span> is a flagged cross-workstream linkage · <a href="linkage.html" class="text-indigo-500 hover:text-indigo-700 font-medium">open the accountability-gap finding →</a></p>
+      </div>
+    </section>
+
+    <!-- RIGHT: Tasks -->
+    <aside class="col-span-12 lg:col-span-3">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+          <h2 class="font-semibold text-sm">📋 Tasks <span class="text-xs text-gray-400 font-normal">attached to graph</span></h2>
+          <button class="text-xs text-indigo-600 hover:text-indigo-700 font-semibold">+ Task</button>
+        </div>
+
+        <div class="p-3 space-y-4">
+          <div>
+            <div class="text-xs uppercase tracking-wide text-gray-400 font-semibold mb-2 px-1">In progress</div>
+            <ul class="space-y-2">
+              <li class="task-item p-3 border border-gray-200 rounded-lg cursor-pointer" onclick="location.href='task.html'">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="font-medium text-sm">Benchmark HKMA on cyber resilience</div>
+                  <span class="text-xs px-1.5 py-0.5 rounded-full bg-teal-100 text-teal-700 font-semibold shrink-0">HKMA</span>
+                </div>
+                <div class="text-xs text-gray-500 mt-1">covers §3.3, §3.4 · Aisyah R.</div>
+                <div class="flex items-center gap-1.5 mt-2">
+                  <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold grid place-items-center">AR</span>
+                  <span class="w-6 h-6 rounded-full bg-gray-100 text-gray-500 text-xs grid place-items-center" title="AI agent">🤖</span>
+                  <span class="text-xs text-gray-400 ml-auto">3 open</span>
+                </div>
+              </li>
+
+              <li class="task-item p-3 border border-gray-200 rounded-lg">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="font-medium text-sm">Outline board of directors' role</div>
+                  <span class="text-xs px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 font-semibold shrink-0">§6</span>
+                </div>
+                <div class="text-xs text-gray-500 mt-1">Responsibility Mapping alignment</div>
+                <div class="flex items-center gap-1.5 mt-2">
+                  <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-700 text-xs font-bold grid place-items-center">PS</span>
+                  <span class="text-xs text-gray-400 ml-auto">1 open</span>
+                </div>
+              </li>
+
+              <li class="task-item p-3 border border-gray-200 rounded-lg">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="font-medium text-sm">Draft industry FAQ</div>
+                  <span class="text-xs px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-semibold shrink-0">FAQ</span>
+                </div>
+                <div class="text-xs text-gray-500 mt-1">synthesise DP feedback · AI drafting</div>
+                <div class="flex items-center gap-1.5 mt-2">
+                  <span class="w-6 h-6 rounded-full bg-gray-100 text-gray-500 text-xs grid place-items-center">🤖</span>
+                  <span class="text-xs text-gray-400 ml-auto">AI · 6 ready</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <div class="text-xs uppercase tracking-wide text-red-700 font-semibold mb-2 px-1 flex items-center gap-1.5">🚩 Flagged</div>
+            <ul class="space-y-2">
+              <li class="task-item p-3 border border-red-200 bg-red-50 rounded-lg cursor-pointer" onclick="location.href='linkage.html'">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="font-medium text-sm">Resolve accountability gap</div>
+                  <span class="text-xs px-1.5 py-0.5 rounded-full bg-red-200 text-red-800 font-semibold shrink-0">silent-on</span>
+                </div>
+                <div class="text-xs text-red-700 mt-1">OF §7 does not name accountable person cf. OpRes 6.3</div>
+                <div class="text-xs text-gray-500 mt-1.5">cross-workstream · Farid M. tagged</div>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <div class="text-xs uppercase tracking-wide text-gray-400 font-semibold mb-2 px-1">Done</div>
+            <ul class="space-y-2">
+              <li class="task-item p-3 border border-gray-200 rounded-lg opacity-60">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="font-medium text-sm text-gray-500 line-through">BCBS 2021 delta scan</div>
+                  <span class="text-xs px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 font-semibold shrink-0">BCBS</span>
+                </div>
+                <div class="text-xs text-gray-500 mt-1">merged into working draft · 4 Jul</div>
+              </li>
+              <li class="task-item p-3 border border-gray-200 rounded-lg opacity-60">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="font-medium text-sm text-gray-500 line-through">Triage DP feedback (14 subs.)</div>
+                  <span class="text-xs px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 font-semibold shrink-0">feedback</span>
+                </div>
+                <div class="text-xs text-gray-500 mt-1">categorised · 26 Jun</div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <p class="text-xs text-gray-400 mt-8 text-center"><a href="index.html" class="hover:text-indigo-600">← Back to institution view</a></p>
+</main>
+
+</body>
+</html>
