@@ -6,10 +6,13 @@ byte offsets within the parent markdown (chunk-relative offsets added to
 chunk.char_start) so downstream `markdown[start:end] == surface` holds.
 """
 
+import json
 import logging
-from typing import Any, Optional, TypedDict
+from pathlib import Path
+from typing import Any, Optional, Protocol, TypedDict
 
 from pipeline.chunk import Chunk
+from pipeline.config import DATA_DIR, GLINER_CONFIDENCE_THRESHOLD
 from pipeline.ontology import SeedEntry
 
 logger = logging.getLogger(__name__)
@@ -114,3 +117,157 @@ def extract_gazetteer_spans(
                 }
             )
     return spans
+
+
+# Descriptive labels boost zero-shot precision — GLiNER hasn't seen the
+# terse MECE-7 names as training data, but understands the phrases.
+_GLINER_LABELS: list[str] = [
+    "regulatory body",
+    "regulated actor or third party",
+    "external rule or standard",
+    "regulatory document",
+    "regulatory requirement or duty",
+    "domain topic",
+    "activity or process",
+]
+_LABEL_TO_CLASS: dict[str, str] = {
+    "regulatory body": "RegulatoryBody",
+    "regulated actor or third party": "Party",
+    "external rule or standard": "Reference",
+    "regulatory document": "Instrument",
+    "regulatory requirement or duty": "Requirement",
+    "domain topic": "Topic",
+    "activity or process": "Process",
+}
+
+
+class GlinerLike(Protocol):
+    """Duck-typed GLiNER interface — matches the real
+    `gliner.GLiNER.predict_entities` signature so tests can inject a stub.
+    """
+
+    def predict_entities(
+        self, text: str, labels: list[str]
+    ) -> list[dict]: ...
+
+
+def mask_chunk_text(
+    text: str,
+    chunk_char_start: int,
+    gazetteer_spans_in_chunk: list[Span],
+) -> str:
+    """Replace character ranges covered by gazetteer spans with equal-length
+    spaces so GLiNER doesn't re-find them.
+
+    Length is preserved so any offsets GLiNER returns still map back to the
+    original markdown via chunk_char_start.
+    """
+    if not gazetteer_spans_in_chunk:
+        return text
+    buf = list(text)
+    for span in gazetteer_spans_in_chunk:
+        local_start = span["char_start"] - chunk_char_start
+        local_end = span["char_end"] - chunk_char_start
+        for i in range(local_start, local_end):
+            if 0 <= i < len(buf):
+                buf[i] = " "
+    return "".join(buf)
+
+
+def extract_gliner_spans(
+    chunks: list[Chunk],
+    gazetteer_spans: list[Span],
+    gliner: GlinerLike,
+    threshold: float = GLINER_CONFIDENCE_THRESHOLD,
+) -> tuple[list[Span], list[Span]]:
+    """Run GLiNER zero-shot over each chunk (with gazetteer hits masked).
+
+    Returns `(kept, dropped)`. `kept` are spans with score >= threshold,
+    class mapped from the descriptive label back to the canonical MECE-7
+    name. Absolute offsets computed as `chunk.char_start + local`.
+    """
+    by_chunk: dict[str, list[Span]] = {}
+    for span in gazetteer_spans:
+        by_chunk.setdefault(span["chunk_id"], []).append(span)
+
+    kept: list[Span] = []
+    dropped: list[Span] = []
+
+    for chunk in chunks:
+        masked = mask_chunk_text(
+            chunk["text"], chunk["char_start"], by_chunk.get(chunk["chunk_id"], [])
+        )
+        predictions = gliner.predict_entities(masked, _GLINER_LABELS)
+        for pred in predictions:
+            label = pred["label"]
+            if label not in _LABEL_TO_CLASS:
+                # GLiNER shouldn't invent labels, but be defensive.
+                continue
+            span: Span = {
+                "doc_id": chunk["doc_id"],
+                "chunk_id": chunk["chunk_id"],
+                "char_start": chunk["char_start"] + pred["start"],
+                "char_end": chunk["char_start"] + pred["end"],
+                "surface": pred["text"],
+                "class_": _LABEL_TO_CLASS[label],
+                "source": "gliner",
+                "confidence": float(pred["score"]),
+            }
+            if span["confidence"] >= threshold:
+                kept.append(span)
+            else:
+                dropped.append(span)
+
+    return kept, dropped
+
+
+def _load_gliner() -> GlinerLike:
+    """Lazy GLiNER load — pinned checkpoint. Only called when caller passes
+    `gliner=None` in production; tests always inject a stub.
+    """
+    from gliner import GLiNER
+
+    return GLiNER.from_pretrained("urchade/gliner_medium-v2.1")
+
+
+def run_stage_3(
+    chunks_path: Path = DATA_DIR / "chunks.jsonl",
+    seeds: Optional[list[SeedEntry]] = None,
+    output_dir: Path = DATA_DIR,
+    gliner: Optional[GlinerLike] = None,
+    nlp: Optional[Any] = None,
+) -> tuple[Path, Path]:
+    """End-to-end Stage 3 driver: read chunks, run gazetteer + GLiNER,
+    write `spans.jsonl` (kept) + `spans_dropped.jsonl` (below threshold).
+    """
+    if seeds is None:
+        from pipeline.ontology import load_seeds
+
+        seeds = load_seeds()
+    if gliner is None:
+        gliner = _load_gliner()
+
+    chunks: list[Chunk] = [json.loads(line) for line in chunks_path.read_text().splitlines() if line.strip()]
+
+    gazetteer_spans = extract_gazetteer_spans(chunks, seeds, nlp=nlp)
+    kept_gliner, dropped_gliner = extract_gliner_spans(
+        chunks, gazetteer_spans, gliner
+    )
+
+    all_kept = gazetteer_spans + kept_gliner
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    kept_path = output_dir / "spans.jsonl"
+    dropped_path = output_dir / "spans_dropped.jsonl"
+    with kept_path.open("w") as fh:
+        for s in all_kept:
+            fh.write(json.dumps(s) + "\n")
+    with dropped_path.open("w") as fh:
+        for s in dropped_gliner:
+            fh.write(json.dumps(s) + "\n")
+
+    logger.info(
+        "Stage 3: %d spans kept (%d gazetteer, %d gliner), %d dropped",
+        len(all_kept), len(gazetteer_spans), len(kept_gliner), len(dropped_gliner),
+    )
+    return kept_path, dropped_path

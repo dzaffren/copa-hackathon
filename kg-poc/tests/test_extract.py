@@ -106,3 +106,116 @@ def test_gazetteer_absolute_offsets_slice_back(tmp_path):
     spans = extract_gazetteer_spans(chunks, seeds)
     for s in spans:
         assert markdown[s["char_start"]:s["char_end"]] == s["surface"]
+
+
+import json
+from pathlib import Path
+
+from pipeline.extract import (
+    extract_gliner_spans,
+    mask_chunk_text,
+    run_stage_3,
+)
+
+
+class FakeGliner:
+    """Injectable stub matching the GLiNER predict_entities signature."""
+
+    def __init__(self, canned: dict[str, list[dict]]) -> None:
+        # canned maps chunk text (after masking) → predictions
+        self._canned = canned
+        self.calls: list[str] = []
+
+    def predict_entities(self, text: str, labels: list[str]) -> list[dict]:
+        self.calls.append(text)
+        return self._canned.get(text, [])
+
+
+def test_mask_chunk_text_replaces_gazetteer_hits_with_spaces():
+    chunk_text = "The board shall ensure recovery."
+    span = {
+        "char_start": 4, "char_end": 9,  # "board"
+        "surface": "board", "class_": "Party", "source": "gazetteer",
+        "confidence": 1.0, "doc_id": "d", "chunk_id": "d:0000",
+    }
+    masked = mask_chunk_text(chunk_text, chunk_char_start=0, gazetteer_spans_in_chunk=[span])
+    assert len(masked) == len(chunk_text)
+    assert masked[4:9] == "     "
+    assert masked.startswith("The       shall")
+
+
+def test_extract_gliner_spans_returns_kept_and_dropped():
+    chunks = [_chunk("d", "d:0000", 0, "Board ensures recovery.")]
+    canned = {
+        "Board ensures recovery.": [
+            {"start": 0, "end": 5, "text": "Board",
+             "label": "regulated actor or third party", "score": 0.9},
+            {"start": 15, "end": 23, "text": "recovery",
+             "label": "activity or process", "score": 0.4},  # below 0.7
+        ]
+    }
+    gliner = FakeGliner(canned)
+    kept, dropped = extract_gliner_spans(chunks, gazetteer_spans=[], gliner=gliner)
+    assert len(kept) == 1
+    assert kept[0]["surface"] == "Board"
+    assert kept[0]["class_"] == "Party"
+    assert kept[0]["source"] == "gliner"
+    assert kept[0]["confidence"] == 0.9
+    assert len(dropped) == 1
+    assert dropped[0]["surface"] == "recovery"
+    assert dropped[0]["confidence"] == 0.4
+
+
+def test_extract_gliner_offsets_are_absolute_within_markdown():
+    chunks = [_chunk("d", "d:0000", 100, "The board ensures.")]
+    canned = {
+        "The board ensures.": [
+            {"start": 4, "end": 9, "text": "board",
+             "label": "regulated actor or third party", "score": 0.9},
+        ]
+    }
+    kept, _ = extract_gliner_spans(chunks, gazetteer_spans=[], gliner=FakeGliner(canned))
+    assert kept[0]["char_start"] == 104
+    assert kept[0]["char_end"] == 109
+
+
+def test_run_stage_3_writes_spans_and_dropped(tmp_path: Path):
+    chunks_path = tmp_path / "chunks.jsonl"
+    chunks = [_chunk("d", "d:0000", 0, "The board ensures recovery.")]
+    with chunks_path.open("w") as fh:
+        for c in chunks:
+            fh.write(json.dumps(c) + "\n")
+
+    seeds = [
+        {"canonical": "board", "class_": "Party", "aliases": [],
+         "left_forbidden": [], "right_forbidden": []},
+    ]
+    canned = {
+        # gazetteer masks "board" → "     ", so GLiNER sees this exact string
+        "The       ensures recovery.": [
+            {"start": 18, "end": 26, "text": "recovery",
+             "label": "activity or process", "score": 0.85},
+            {"start": 18, "end": 26, "text": "recovery",
+             "label": "domain topic", "score": 0.5},
+        ]
+    }
+    gliner = FakeGliner(canned)
+    out_dir = tmp_path / "out"
+
+    kept_path, dropped_path = run_stage_3(
+        chunks_path=chunks_path,
+        seeds=seeds,
+        output_dir=out_dir,
+        gliner=gliner,
+    )
+
+    kept = [json.loads(l) for l in kept_path.read_text().splitlines()]
+    dropped = [json.loads(l) for l in dropped_path.read_text().splitlines()]
+
+    # gazetteer hit for "board" + one gliner span above threshold
+    surfaces_kept = {s["surface"] for s in kept}
+    assert "board" in surfaces_kept
+    assert "recovery" in surfaces_kept
+    # one gliner span below threshold
+    assert len(dropped) == 1
+    assert dropped[0]["surface"] == "recovery"
