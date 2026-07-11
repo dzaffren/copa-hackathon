@@ -30,3 +30,5 @@ graphify-out-corpus/
 
 .agents
 skills-lock.json
+# subagent-driven-development scratch
+.superpowers/

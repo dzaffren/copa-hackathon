@@ -9,11 +9,15 @@ NetworkX knowledge graph grounded in a MECE-7 ontology.
 
 ```bash
 cd kg-poc
-pip install -e ".[dev]"
-python -m spacy download en_core_web_sm
-python -m kg_poc.run --stage=all
+uv sync --extra dev
+uv run python -m spacy download en_core_web_sm
+uv run pytest -v               # full unit suite
+uv run python -m pipeline.run --stage=all
 open data/graph.html
 ```
+
+Everything runs via `uv run`, which resolves the project's pinned venv
+(`uv.lock`) automatically — no manual `source .venv/bin/activate` needed.
 
 ## Stages
 
@@ -25,4 +29,4 @@ open data/graph.html
 6. `analyze.py` — graph → `analysis.md` + figures
 7. `viz.py` — graph → interactive HTML
 
-Run a single stage: `python -m kg_poc.run --stage=3`.
+Run a single stage: `uv run python -m pipeline.run --stage=3`.

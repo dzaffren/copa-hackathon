@@ -19,6 +19,7 @@
 - **Loud failure:** empty PDF conversion → `UnreadableDocumentError`, halt. Missing seed class → halt. Missing chunk offset field → halt. No silent corruption.
 - Class-gated entity resolution: same normalised surface + same class → merge. Same surface + different class → separate entities. **Never fuzzy-match** in v1 (aliases only via `seeds.yaml`).
 - Unit tests: pytest, <5s total, no network, no model download. GLiNER + MarkItDown are stubbed in tests via injectable seams.
+- **Package manager: `uv`** (not pip). Every command in the tasks that says `pytest ...` runs as `uv run pytest ...` from `kg-poc/`; every `pip install -e ".[dev]"` becomes `uv sync --extra dev`. `uv.lock` is committed to git for reproducibility. Never create a bare `.venv` with pip — `uv sync` manages the venv automatically. Runner: `uv run python -m pipeline.run --stage={all,1..7}`.
 - MECE-7 classes (exact spellings): `RegulatoryBody`, `Party`, `Reference`, `Instrument`, `Requirement`, `Topic`, `Process`.
 - GLiNER confidence threshold: `0.7` (configurable in `pipeline/config.py`); below-threshold spans → `data/spans_dropped.jsonl`, never silently kept.
 - Graph filter: drop `Entity` nodes with `mention_count < 2` at Stage 5. Kept in `entities.jsonl`.
