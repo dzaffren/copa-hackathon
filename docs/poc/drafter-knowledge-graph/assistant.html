@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grounded Redraft Assistant — Rulebook Radar</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+<header class="bg-white border-b border-gray-200 sticky top-0 z-10">
+  <div class="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <a href="workspace.html" class="text-gray-400 hover:text-gray-600 text-sm">← Workspace</a>
+      <span class="text-gray-300">/</span>
+      <h1 class="font-semibold">✍️ Grounded redraft assistant</h1>
+    </div>
+    <div class="flex items-center gap-3 text-sm">
+      <a href="monitor.html" class="text-amber-600 hover:text-amber-800 font-medium">🔔 Drift</a>
+      <a href="insights.html" class="text-indigo-600 hover:text-indigo-800 font-medium">✨ Missed</a>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-screen-xl mx-auto px-4 py-5">
+  <!-- positioning banner -->
+  <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 mb-5">
+    <p class="text-sm text-indigo-900"><b>You keep drafting in Microsoft Word</b> (on SharePoint, with Microsoft Copilot). This assistant is <b>not</b> another editor or a general writer — it only proposes wording it can back with the <b>exact source clause</b>, and writes what you accept back into your Word document as a <b>tracked change</b>. <b>Microsoft writes; we cite.</b></p>
+    <p class="text-[11px] text-indigo-500 mt-1">Prototype: the Word document + write-back are mocked here; the live Microsoft Graph read/write to SharePoint is the documented production path.</p>
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-5">
+    <!-- LEFT: the Word document (paragraphs) -->
+    <section class="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm">
+      <div class="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
+        <h3 class="font-semibold flex items-center gap-2"><span class="text-blue-600">📄 W</span> Your Word document</h3>
+        <span class="text-xs text-gray-400">read from SharePoint · tracked changes on</span>
+      </div>
+      <div id="doc" class="p-5 space-y-1 max-h-[62vh] overflow-y-auto"></div>
+      <div class="px-5 py-3 border-t border-gray-100">
+        <button id="submitBtn" onclick="submitDraft()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">Submit draft for manager approval →</button>
+        <p id="submitNote" class="text-[11px] text-gray-400 mt-2 text-center"></p>
+      </div>
+    </section>
+
+    <!-- RIGHT: the assistant -->
+    <aside class="bg-white rounded-xl border border-gray-200 shadow-sm">
+      <div class="px-5 py-3 border-b border-gray-100">
+        <h3 class="font-semibold">Source-grounded suggestion</h3>
+        <p id="selLabel" class="text-xs text-gray-400 mt-0.5">Select a paragraph with an open finding.</p>
+      </div>
+      <div id="panel" class="p-4 space-y-3 max-h-[64vh] overflow-y-auto">
+        <p class="text-sm text-gray-400">Nothing selected yet.</p>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<script>
+const qs = new URLSearchParams(location.search);
+
+// paragraphs with an open finding the assistant can help fix (grounded in real connected sources)
+const paras = [
+  { id:"4.6", title:"Data & personal information", finding:"Conflict · PDPA §129",
+    text:"As AI applications increasingly rely on large volumes of data, FSPs are expected to ensure responsible handling of data, especially personally identifiable information (PII) — including transparency in data sourcing, obtaining informed consent and sound data management practices.",
+    suggestion:"…including transparency in data sourcing, obtaining informed consent, and sound data management practices. Where personal data is transferred outside Malaysia, FSPs must satisfy the cross-border transfer test in PDPA §129 — ensuring the destination has a substantially similar law or an adequate level of protection — before AI training or processing proceeds.",
+    src:"Personal Data Protection Act 2010 (amended 2024) §129", verified:true,
+    quote:"A data controller may transfer any personal data of a data subject to any place outside Malaysia if— (a) there is in that place in force any law which is substantially similar to this Act; or (b) that place ensures an adequate level of protection…" },
+  { id:"3.5", title:"Fair usage & bias", finding:"Consensus · OECD 1.2",
+    text:"A major challenge of AI revolves around ensuring fair usage of the technology. AI models could exacerbate biases and discrimination, especially when the underlying input data is flawed or of low quality. Strong data governance and explainable models are therefore crucial.",
+    suggestion:"…Strong data governance and explainable models are therefore crucial. FSPs should also implement mechanisms for human agency and oversight over AI systems, including the capacity to address risks arising from uses outside the intended purpose.",
+    src:"OECD AI Principles 1.2", verified:true,
+    quote:"AI actors should implement mechanisms and safeguards, such as capacity for human agency and oversight, including to address risks arising from uses outside of intended purpose." },
+];
+
+// insight carry-in (from insights.html): pre-load context
+const fromInsight = qs.get("from")==="insight";
+let selected = paras[0].id;
+if(fromInsight) selected = "3.5"; // the cross-source implication touches 3.5 & 4.6
+
+function getResolved(){ return JSON.parse(localStorage.getItem("rr_asst_resolved")||"[]"); }
+function setResolved(a){ localStorage.setItem("rr_asst_resolved", JSON.stringify(a)); }
+
+const docEl = document.getElementById("doc");
+function renderDoc(){
+  const resolved = getResolved();
+  docEl.innerHTML = paras.map(p=>{
+    const done = resolved.includes(p.id);
+    const active = selected===p.id;
+    return `<button onclick="selectPara('${p.id}')" class="w-full text-left rounded-lg px-3 py-2 transition ${active?'bg-indigo-50 ring-1 ring-indigo-300':'hover:bg-gray-50'}">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-semibold text-indigo-600">${p.id}</span>
+        <span class="text-xs text-gray-400">${p.title}</span>
+        ${done
+          ? `<span class="ml-auto text-[10px] bg-emerald-100 text-emerald-700 rounded-full px-2 py-0.5">✓ resolved (tracked change)</span>`
+          : `<span class="ml-auto text-[10px] bg-red-100 text-red-700 rounded-full px-2 py-0.5">${p.finding}</span>`}
+      </div>
+      <p class="text-sm mt-1 leading-relaxed ${done?'text-gray-400 line-through decoration-emerald-400/60':'text-gray-700'}">${p.text}</p>
+      ${done?`<p class="text-sm mt-1 leading-relaxed text-emerald-800 bg-emerald-50 rounded px-2 py-1"><span class="text-[10px] font-semibold uppercase">inserted · tracked change</span><br>${p.suggestion}</p>`:``}
+    </button>`;
+  }).join("");
+}
+
+const panel = document.getElementById("panel");
+function selectPara(id){ selected=id; render(); }
+window.selectPara = selectPara;
+
+function render(){
+  renderDoc();
+  const p = paras.find(x=>x.id===selected);
+  document.getElementById("selLabel").textContent = `Paragraph ${p.id} — ${p.finding}`;
+  const resolved = getResolved();
+  const done = resolved.includes(p.id);
+  const insightBanner = (fromInsight)
+    ? `<div class="rounded-lg bg-violet-50 border border-violet-200 p-3 text-xs text-violet-800">Carried from a cross-source insight — paragraphs 3.5 &amp; 4.6 and the sources OECD 1.2 · NIST MEASURE 2.11 · BCBS 239 are pre-loaded. Ask for a redraft that adds the missing pre-deployment data bias assessment.</div>`
+    : ``;
+
+  if(done){
+    panel.innerHTML = insightBanner + `<div class="rounded-lg border border-emerald-300 bg-emerald-50/60 p-4 text-center">
+      <p class="text-2xl">✓</p>
+      <p class="text-sm font-medium mt-1">Written to your Word document as a tracked change.</p>
+      <p class="text-xs text-emerald-700 mt-1">The ${p.finding} finding is resolved everywhere, and the verbatim citation is in your decision trail. You (or a reviewer) can still accept or reject the tracked change in Word.</p>
+    </div>`;
+    return;
+  }
+
+  panel.innerHTML = insightBanner + `
+    <div>
+      <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wide">Proposed wording — grounded, not invented</p>
+      <p class="text-sm text-gray-800 mt-1 bg-indigo-50/60 border-l-2 border-indigo-300 pl-2 py-1 rounded-r">${p.suggestion}</p>
+    </div>
+    <div class="rounded-lg border border-gray-200 p-3">
+      <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wide">Backed by</p>
+      <p class="text-sm font-medium mt-0.5">${p.src}</p>
+      <blockquote class="mt-1 text-xs text-gray-700 border-l-2 ${p.verified?'border-emerald-400':'border-amber-300'} pl-2 italic">“${p.quote}”
+        <span class="not-italic block mt-0.5 text-[10px] ${p.verified?'text-emerald-600':'text-amber-600'}">${p.verified?'✓ verbatim — verified against source':'◦ illustrative — not yet verified'}</span>
+      </blockquote>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="accept()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-medium">Accept → write tracked change to Word</button>
+      <button onclick="reject()" class="px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100">Reject</button>
+    </div>
+    <button onclick="noGround()" class="w-full text-xs text-gray-400 hover:text-gray-600 underline">Ask for something not in the sources →</button>
+    <p class="text-[10px] text-gray-400">AI proposes; you commit. Accepting inserts a tracked change you can still review in Word — it never silently overwrites your draft.</p>`;
+}
+
+function accept(){
+  const r = getResolved();
+  if(!r.includes(selected)){ r.push(selected); setResolved(r); }
+  render();
+}
+function reject(){ alert("Rejected — your Word document is unchanged, and the finding stays open. You can ask the assistant for a different proposal."); }
+function noGround(){ alert("\"No matching clause found.\" This assistant only proposes wording it can back with a verbatim source clause — ungrounded free-text drafting belongs in Word / Microsoft Copilot, not here. (That grounding is exactly what a general copilot can't do.)"); }
+window.accept = accept; window.reject = reject; window.noGround = noGround;
+
+function submitDraft(){
+  const open = paras.filter(p=>!getResolved().includes(p.id));
+  const note = document.getElementById("submitNote");
+  if(open.length){
+    note.className = "text-[11px] text-red-500 mt-2 text-center";
+    note.textContent = `Blocked — ${open.length} finding${open.length>1?'s':''} still open (${open.map(p=>p.id).join(', ')}). Resolve by an accepted grounded edit or a reasoned dismissal first.`;
+    return;
+  }
+  note.className = "text-[11px] text-emerald-600 mt-2 text-center";
+  note.textContent = "✓ Submitted for manager approval — the verbatim-cited decision trail is attached as the justification pack. (No separate reviewer in MVP1.)";
+}
+window.submitDraft = submitDraft;
+
+render();
+window.addEventListener("storage", render);
+</script>
+</body>
+</html>

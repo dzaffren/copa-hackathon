@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connection & Impact — Rulebook Radar</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+<header class="bg-white border-b border-gray-200">
+  <div class="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <a href="workspace.html" class="text-gray-400 hover:text-gray-600 text-sm">← Workspace</a>
+      <span class="text-gray-300">/</span>
+      <h1 class="font-semibold">Connection &amp; impact</h1>
+    </div>
+    <a href="insights.html" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">✨ Missed insights</a>
+  </div>
+</header>
+
+<main class="max-w-screen-lg mx-auto px-4 py-6">
+  <div class="grid md:grid-cols-2 gap-5">
+    <!-- your paragraph -->
+    <section class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+      <p class="text-xs text-gray-400 uppercase tracking-wide">Your paragraph</p>
+      <p id="paraNum" class="font-semibold"></p>
+      <p id="paraText" class="text-sm text-gray-700 mt-2 leading-relaxed"></p>
+      <div id="pulledInto" class="mt-3"></div>
+    </section>
+
+    <!-- the connected source -->
+    <section class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span id="srcTypeDot" class="w-2.5 h-2.5 rounded-full inline-block"></span>
+        <span id="srcType" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"></span>
+        <span id="srcVerdict" class="text-xs font-semibold px-2 py-0.5 rounded-full"></span>
+        <span id="srcConf" class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500"></span>
+      </div>
+      <p id="srcName" class="font-semibold mt-2"></p>
+      <blockquote id="srcQuote" class="mt-2 text-sm text-gray-800 border-l-2 border-indigo-300 pl-3 italic"></blockquote>
+      <div class="mt-4 bg-gray-50 rounded-lg p-3">
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">AI's read — how this affects your paragraph</p>
+        <p id="srcImpact" class="text-sm text-gray-700 mt-1"></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- verdict: AI proposes, human confirms or overrides -->
+  <div class="mt-5 bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+    <div class="flex items-start justify-between flex-wrap gap-3">
+      <div>
+        <h3 class="font-semibold">The AI proposes this verdict — you decide</h3>
+        <p id="verdictDesc" class="text-sm text-gray-500 mt-0.5">Confirm it, or override it if you read the source differently. Your call — not the AI's — is what enters the trail.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <label class="text-xs text-gray-500">Verdict in force:</label>
+        <select id="verdictSel" onchange="onVerdictChange()" class="text-sm border border-gray-300 rounded-md px-2 py-1">
+          <option value="consensus">Consensus</option>
+          <option value="conflict">Conflict</option>
+          <option value="gap">Gap</option>
+          <option value="duplicate">Duplicate</option>
+          <option value="partial">Partial</option>
+          <option value="deviates">Deviates (deliberate) — nuance on Gap</option>
+        </select>
+      </div>
+    </div>
+    <div id="whyWrap" class="hidden mt-3">
+      <label class="text-xs font-semibold text-gray-600">Why this call? <span class="text-gray-400 font-normal">(required for a deliberate deviation or a partial — this is your IMF-defensible justification)</span></label>
+      <textarea id="whyNote" rows="2" class="mt-1 w-full text-sm border border-gray-300 rounded-md px-2 py-1" placeholder="e.g. BNM deliberately departs from the Basel output floor because…"></textarea>
+    </div>
+  </div>
+
+  <!-- action: adapts to the verdict -->
+  <div class="mt-5 bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+    <div class="flex items-center justify-between flex-wrap gap-3">
+      <div>
+        <h3 class="font-semibold">Act on this connection</h3>
+        <p id="actDesc" class="text-sm text-gray-500"></p>
+      </div>
+      <div class="flex gap-2">
+        <button id="dismissBtn" onclick="dismiss()" class="px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100">Not relevant</button>
+        <button id="pullBtn" onclick="pull()" class="px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white"></button>
+      </div>
+    </div>
+    <div id="pullResult" class="hidden mt-4 bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+      <p id="pullResultHead" class="text-sm text-emerald-800 font-medium"></p>
+      <p class="text-xs text-emerald-700 mt-1" id="pullEcho"></p>
+      <a href="workspace.html" class="text-xs text-indigo-700 underline mt-1 inline-block">← Back to the document</a>
+    </div>
+  </div>
+</main>
+
+<script>
+// mirror of index.html data (self-contained per file)
+const paras = {
+  "3.5": { num:"Paragraph 3.5 — Fair usage & bias", text:"A major challenge of AI revolves around ensuring fair usage of the technology. AI models could exacerbate biases and discrimination, especially when the underlying input data is flawed or of low quality… Strong data governance and management as well as explainable models are therefore crucial when embarking on AI projects." },
+  "3.11": { num:"Paragraph 3.11 — GenAI hallucinations", text:"A major risk in the use of GenAI is “hallucinations”… hallucinations could lead to incorrect instructions or improper advice being delivered to customers." },
+  "4.6": { num:"Paragraph 4.6 — Data & personal information", text:"As AI applications increasingly rely on large volumes of data… FSPs are expected to ensure the responsible handling of data, especially personally identifiable information (PII)… ensuring transparency in data sourcing, obtaining informed consent and implementing sound data management practices." },
+};
+const conns = {
+  c1:{p:"3.5",type:"standard",src:"OECD AI Principles · 1.2 human agency & oversight",verdict:"consensus",quote:"AI actors should implement mechanisms and safeguards, such as capacity for human agency and oversight, including to address risks arising from uses outside of intended purpose.",impact:"OECD backs your fairness stance and adds a concrete mechanism (human agency & oversight) your 3.5 doesn't yet name."},
+  c2:{p:"3.5",type:"standard",src:"NIST — AI RMF · MEASURE 2.11",verdict:"gap",quote:"Fairness and bias – as identified in the MAP function – are evaluated and results are documented.",impact:"NIST makes fairness a measured, documented control. Your 3.5 states the outcome but not the evaluate-and-document obligation — a gap to consider."},
+  c3:{p:"3.5",type:"internal",src:"BNM — Fair Treatment of Financial Consumers · 8.1",verdict:"duplicate",quote:"A financial service provider must ensure that financial consumers are treated fairly at all stages of their relationship with the financial service provider.",impact:"An existing BNM fairness duty already applies. Anchor 3.5 to FTFC rather than a parallel AI-specific standard.",unverified:true},
+  c4:{p:"3.11",type:"standard",src:"BCBS 239 · Principle 3 data architecture",verdict:"consensus",quote:"A bank should establish integrated data taxonomies and architecture across the banking group, which includes information on the characteristics of the data (metadata).",impact:"BCBS 239 (cited in your DP) supports treating GenAI output reliability as a data-governance question — a documented control 3.11 can point to."},
+  c5:{p:"3.11",type:"peer",src:"EU AI Act (Regulation 2024/1689)",verdict:"gap",quote:"…the quality and relevance of data sets used, technical documentation and record-keeping, transparency and the provision of information to deployers, human oversight, and robustness, accuracy and cybersecurity.",impact:"A peer development your draft doesn't cite: the EU frames GenAI transparency as mandated technical documentation. 3.11 flags the risk but not a documentation expectation — surfaced from the library."},
+  c6:{p:"4.6",type:"act",src:"PDPA 2010 (amended 2024) · §129",verdict:"conflict",quote:"A data controller may transfer any personal data of a data subject to any place outside Malaysia if— (a) there is in that place in force any law which is substantially similar to this Act; or (b) that place ensures an adequate level of protection…",impact:"CONFLICT risk: 4.6 says 'informed consent' broadly, but §129 sets a specific cross-border test. If AI training data leaves Malaysia, your wording must not undercut it."},
+  c7:{p:"4.6",type:"standard",src:"BCBS 239 · Principle 3(d) data accuracy",verdict:"consensus",quote:"A bank should strive towards a single authoritative source for risk data per each type of risk.",impact:"BCBS 239 reinforces 4.6's data-governance expectation — a single authoritative data source is an established supervisory standard you can cite directly."},
+  fb1:{p:"3.11",type:"feedback",src:"Industry feedback — Association of Banks (agree)",verdict:"consensus",unverified:true,quote:"Members strongly support explicit treatment of GenAI hallucination risk, particularly for customer-facing chatbots.",impact:"The sector agrees with 3.11's direction — supporting weight when this moves to Exposure Draft."},
+  fb2:{p:"4.6",type:"feedback",src:"Industry feedback — 3 FSP respondents (partial)",verdict:"partial",unverified:true,quote:"The requirement to obtain informed consent is unworkable for models already trained on legacy datasets collected before AI use was contemplated.",impact:"Partial: the sector supports responsible data handling but rejects the informed-consent mechanism for legacy data. Note which part to keep and which to resolve before the Exposure Draft."},
+};
+const typeColor={standard:"#8b5cf6",peer:"#6366f1",act:"#14b8a6",internal:"#64748b",feedback:"#f43f5e"};
+const typeLabel={standard:"Int'l standard",peer:"Peer regulator",act:"Act / law",internal:"Internal BNM",feedback:"Industry feedback"};
+const verdictBadge={consensus:{t:"Consensus",c:"bg-emerald-100 text-emerald-700"},conflict:{t:"Conflict",c:"bg-red-100 text-red-700"},gap:{t:"Gap",c:"bg-orange-100 text-orange-700"},duplicate:{t:"Duplicate",c:"bg-sky-100 text-sky-700"},partial:{t:"Partial",c:"bg-amber-100 text-amber-700"}};
+
+const qs = new URLSearchParams(location.search);
+const cid = qs.get("c") || "c6";
+const c = conns[cid];
+// guard: unknown / stale / blocked connection id → don't crash, send back to workspace
+if(!c){
+  document.querySelector("main").innerHTML = `<div class="bg-white rounded-xl border border-gray-200 shadow-sm p-8 text-center">
+    <p class="text-3xl">🔍</p>
+    <p class="font-medium mt-2">That connection isn't available.</p>
+    <p class="text-sm text-gray-500 mt-1">It may have been a source the tool couldn't retrieve, or the link is out of date.</p>
+    <a href="workspace.html" class="mt-4 inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium">← Back to the workspace</a>
+  </div>`;
+  throw new Error("unknown connection id: "+cid);
+}
+const p = paras[c.p];
+
+document.getElementById("paraNum").textContent = p.num;
+document.getElementById("paraText").textContent = "“"+p.text+"”";
+document.getElementById("srcTypeDot").style.background = typeColor[c.type];
+document.getElementById("srcType").textContent = typeLabel[c.type];
+const vb = verdictBadge[c.verdict];
+const sv = document.getElementById("srcVerdict"); sv.textContent = "AI proposes: "+vb.t; sv.className = "text-xs font-semibold px-2 py-0.5 rounded-full "+vb.c;
+// confidence band (High/Medium/Low) — a triage signal, still a proposal to confirm
+const CONF = { c1:"High", c2:"Medium", c3:"Medium", c4:"High", c5:"Medium", c6:"High", c7:"High", fb1:"Medium", fb2:"Medium" };
+(function(){ const el=document.getElementById("srcConf"); el.textContent = "confidence: "+(CONF[cid]||"Medium"); })();
+document.getElementById("srcName").textContent = c.src;
+document.getElementById("srcQuote").textContent = "“"+c.quote+"”";
+document.getElementById("srcImpact").textContent = c.impact;
+// verbatim-integrity marker
+(function(){
+  const q = document.getElementById("srcQuote");
+  const m = document.createElement("p");
+  m.className = "not-italic mt-1 text-[11px] " + (c.unverified ? "text-amber-600" : "text-emerald-600");
+  m.textContent = c.unverified ? "◦ illustrative quote — not yet verified against the source document" : "✓ verbatim — verified word-for-word against the source document";
+  q.className = q.className.replace("border-indigo-300", c.unverified ? "border-amber-300" : "border-emerald-400");
+  q.insertAdjacentElement("afterend", m);
+})();
+
+// action adapts to the verdict — you don't "adopt" a conflict as a principle
+const ACTION = {
+  consensus:{ desc:"This source supports your paragraph. Pull it in as a cited guiding principle — inserted as a tracked note. AI proposes; you commit.", btn:"Pull in as guiding principle →", head:"✓ Added as a tracked guiding-principle note.", noteLabel:"＋ guiding principle", verb:"cited in" },
+  duplicate:{ desc:"An existing rule already covers this. Anchor your paragraph to it instead of restating — inserted as a cross-reference. AI proposes; you commit.", btn:"Anchor to this rule →", head:"✓ Anchored — cross-reference added.", noteLabel:"↪ cross-reference", verb:"cross-referenced in" },
+  gap:{ desc:"This source raises something your paragraph doesn't cover. Note it as an open gap to address — added to your draft's action list. AI proposes; you commit.", btn:"Note as a gap to address →", head:"✓ Logged as an open gap on this paragraph.", noteLabel:"⚠ gap to address", verb:"flagged on" },
+  conflict:{ desc:"This source conflicts with your paragraph. Flag it for resolution before the Exposure Draft — recorded with the conflicting text. AI proposes; you commit.", btn:"Flag conflict for resolution →", head:"✓ Flagged for resolution before the Exposure Draft.", noteLabel:"⛔ conflict to resolve", verb:"flagged on" },
+  partial:{ desc:"This source agrees in part and diverges in part. Note which part to keep and which to resolve — recorded on the paragraph. AI proposes; you commit.", btn:"Note what to reconcile →", head:"✓ Noted what to reconcile on this paragraph.", noteLabel:"◐ partial to reconcile", verb:"flagged on", needsWhy:true },
+  deviates:{ desc:"You judge this a deliberate, justified departure from the benchmark. Record why — this becomes your IMF-defensible justification. AI proposes; you commit.", btn:"Record deliberate deviation →", head:"✓ Recorded as a deliberate, justified deviation.", noteLabel:"⤳ deliberate deviation", verb:"flagged on", needsWhy:true },
+};
+
+// the verdict currently IN FORCE (starts at the AI's proposal; the human can override)
+let verdict = c.verdict;
+let act = ACTION[verdict] || ACTION.consensus;
+document.getElementById("verdictSel").value = verdict;
+
+function renderAct(){
+  act = ACTION[verdict] || ACTION.consensus;
+  document.getElementById("actDesc").textContent = act.desc;
+  document.getElementById("pullBtn").textContent = act.btn;
+  document.getElementById("whyWrap").classList.toggle("hidden", !act.needsWhy);
+}
+function onVerdictChange(){
+  verdict = document.getElementById("verdictSel").value;
+  renderAct();
+}
+window.onVerdictChange = onVerdictChange;
+renderAct();
+
+function getPulled(){ return JSON.parse(localStorage.getItem("rr_pulled")||"[]"); }
+function setPulled(a){ localStorage.setItem("rr_pulled", JSON.stringify(a)); }
+
+function showState(){
+  const pulled = getPulled();
+  const done = pulled.find(x=>x.id===cid);
+  const into = document.getElementById("pulledInto");
+  if(done){
+    document.getElementById("pullResult").classList.remove("hidden");
+    document.getElementById("pullResultHead").textContent = act.head;
+    document.getElementById("pullEcho").textContent = `“${c.src}” now ${act.verb} ${p.num}.`;
+    const btn = document.getElementById("pullBtn");
+    btn.disabled = true;
+    btn.className = "px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-500 cursor-default";
+    btn.textContent = "✓ Done";
+    into.innerHTML = `<div class="border-l-2 border-emerald-400 bg-emerald-50 pl-3 py-2 rounded-r"><p class="text-[11px] text-emerald-700 font-medium uppercase tracking-wide">${act.noteLabel}</p><p class="text-xs text-gray-700 mt-1 italic">${c.src}: “${c.quote.slice(0,90)}…”</p></div>`;
+  }
+}
+function pull(){
+  const why = document.getElementById("whyNote").value.trim();
+  if(act.needsWhy && !why){
+    alert("A deliberate deviation or a partial must record a \"why this call\" note before it can be saved — this is what makes the trail IMF-defensible.");
+    document.getElementById("whyNote").focus();
+    return;
+  }
+  const pulled = getPulled();
+  if(!pulled.some(x=>x.id===cid)){ pulled.push({id:cid, para:c.p, src:c.src, verdict:verdict, quote:c.quote, unverified:!!c.unverified, why:why||null}); setPulled(pulled); }
+  showState();
+}
+function dismiss(){
+  const reason = prompt("Dismiss as \"not relevant\" — record why (kept in the audit trail so a reviewer can see what was considered and set aside):");
+  if(!reason){ alert("A dismissal needs a recorded reason before it counts as resolved."); return; }
+  alert("Recorded: considered and set aside — “"+reason+"”. In the real build this drops the connection off the paragraph and keeps the reason in the trail. Prototype: reason captured.");
+}
+window.pull = pull; window.dismiss = dismiss;
+showState();
+</script>
+</body>
+</html>
