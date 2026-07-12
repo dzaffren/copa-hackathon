@@ -78,3 +78,15 @@ matching clause found" — never invent one. Preserve this in any spec or POC ed
 - **/ship is GitLab — use gh** — the `/ship` skill targets GitLab; on this GitHub
   repo override to `gh pr create --base main` with `Closes #<n>` in the PR body.
   See `docs/learnings/skill-ship-is-gitlab-use-gh.md`.
+- **Vitest/Playwright spec collision** — in `web/`, scope Vitest `test.include`
+  to `src/**` so `npm test` never collects the Playwright `*.spec.ts` files under
+  `tests/e2e/` (they throw under Vitest). See
+  `docs/learnings/convention-vitest-playwright-spec-collision.md`.
+- **React Flow edge-click chip** — make cluster-map edges reliably E2E-clickable
+  with a compact midpoint chip carrying `data-testid="edge-{source}__{target}"`
+  and a narrow `interactionWidth` (~10), not a wide transparent hit path. See
+  `docs/learnings/pattern-react-flow-edge-click-chip.md`.
+- **Editable draft by id** — identify the single editable draft by node id
+  (`EDITABLE_DRAFT_ID = "rmit-v2-2026-draft"`), never by `status`: two corpus
+  nodes are `In progress` (RMiT v2 + OpRes Discussion Paper). See
+  `docs/learnings/pattern-editable-draft-by-id.md`.
