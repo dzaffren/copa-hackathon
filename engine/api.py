@@ -37,7 +37,25 @@ from engine.clauses import (
 )
 from engine.connections import CriticFn, FinderFn, find_connections
 from engine.ingest import UnreadableDocumentError, ingest_document
+from engine.read_model import (
+    paragraph_entry,
+    public_nodes,
+    render_connection,
+    render_paragraph_connections,
+    render_paragraphs_index,
+)
 from engine.submissions import SUBMISSIONS_DIR, ingest_submission
+from engine.verdicts import VerdictFn, propose_verdicts
+
+# The live two-branch analysis seam for `POST …/analyse`: given a document id, a
+# paragraph number, the paragraph's verbatim text, and the clause index, it
+# returns branch-tagged candidate specs (shaped like
+# `engine.config.AI_DP_CONNECTIONS`) which the verdict stage then classifies.
+# Real callers wire `engine.connections.analyse_paragraph` (which reaches the
+# model at request time); tests inject a stub, so no network is touched. This is
+# the ONE route that opts into a live model call — the rest of the API is
+# model-free (served from the build artifacts held in memory).
+AnalyseFn = Callable[[str, str, str, ClauseIndex], list[dict[str, Any]]]
 
 # Supported submission upload MIME types (spec Permissions & Security / API
 # Design): PDF and DOCX only; anything else is 415 UNSUPPORTED_FORMAT.
@@ -93,6 +111,9 @@ def create_app(
     critic_fn: Optional[CriticFn] = None,
     trace_output_dir: Optional[Path] = None,
     submission_converter: Callable[[Path], str] = ingest_document,
+    verdicts: Optional[dict[str, Any]] = None,
+    analyse_fn: Optional[AnalyseFn] = None,
+    verdict_fn: Optional[VerdictFn] = None,
 ) -> FastAPI:
     """Construct the read API against injected dependencies.
 
@@ -110,16 +131,56 @@ def create_app(
             the tracked `data/artifacts/`.
         submission_converter: the stage-1 conversion seam for submission
             ingest; default `ingest_document` (MarkItDown). Tests stub it.
+        verdicts: the loaded `verdicts.json` dict (per-connection verdict
+            records keyed by connection id) that the paragraph routes join onto
+            the graph + clause index at read time. Defaults to `{}` (a fresh
+            checkout with no verdicts built yet → every paragraph `not_analysed`).
+        analyse_fn: the live two-branch analysis seam for `POST …/analyse`. Left
+            `None` in the real app until credentials are wired — a `None` seam
+            makes the route report `503 ANALYSE_UNAVAILABLE`, so the pre-baked
+            paragraphs are unaffected. Tests inject a stub.
+        verdict_fn: injectable verdict seam passed to `propose_verdicts` on the
+            live analyse path; `None` in the demo (candidates carry frozen
+            verdicts). Tests stub it.
 
     Returns:
         A configured `FastAPI` app. No network or credentials are required to
         build it — the model seams are only exercised on `POST /connections/find`
-        and only with whatever `finder_fn`/`critic_fn` are supplied.
+        and `POST …/analyse`, and only with whatever seams are supplied.
     """
     app = FastAPI(title="Rulebook Radar — read API")
 
     submissions_dir = Path(submissions_dir)
     known_document_ids = {node["id"] for node in graph.get("nodes", [])}
+    verdicts = verdicts or {}
+
+    # The curated source library (branch ②) is the graph's public reference
+    # nodes — the un-cited sources a live `POST …/analyse` matches a paragraph
+    # against. An app built with none (an empty library) reports `409
+    # SOURCE_LIBRARY_EMPTY` rather than pretending a live analysis could run.
+    # Restricted node-only references (the handbook) are excluded — they carry
+    # no ingested passage and are never analysable.
+    curated_source_ids = [
+        node["id"]
+        for node in graph.get("nodes", [])
+        if node.get("kind") == "reference" and node.get("access") != "restricted"
+    ]
+
+    def _is_known_document(document_id: str) -> bool:
+        """A document is "known" if it has a graph node OR any clause-index
+        entry — either is enough to address its paragraphs / report 404 for."""
+        if document_id in known_document_ids:
+            return True
+        return bool(clause_index.entries_for_document(document_id))
+
+    def _analysed_paragraph_numbers() -> set[str]:
+        """The set of paragraph numbers that already have a verdict record —
+        i.e. paragraphs the build (or a prior `analyse`) has analysed."""
+        return {
+            record["paragraph"]
+            for record in verdicts.values()
+            if record.get("paragraph") is not None
+        }
 
     @app.get("/clauses/{clause_number:path}")
     def get_clause(clause_number: str, version: Optional[str] = None) -> Any:
@@ -198,6 +259,128 @@ def create_app(
             output_dir=trace_output_dir,
         )
         return result
+
+    @app.get("/documents/{document_id}/paragraphs")
+    def get_paragraphs(document_id: str) -> Any:
+        # The uploaded document's paragraphs + per-paragraph analysis state
+        # (drives the workspace canvas + badges). Model-free — served from the
+        # clause index (paragraph text) joined onto verdicts.json (state +
+        # rendered connection count, restricted nodes excluded).
+        if not _is_known_document(document_id):
+            return _error(
+                404, "DOCUMENT_NOT_FOUND", f"No document with id '{document_id}'"
+            )
+        return render_paragraphs_index(document_id, clause_index, verdicts, graph)
+
+    @app.get("/documents/{document_id}/paragraphs/{number}/connections")
+    def get_paragraph_connections(document_id: str, number: str) -> Any:
+        # Everything a downstream UI needs to render the right rail for one
+        # paragraph. Model-free — verdicts + graph + clause-index join only.
+        # Restricted sources never surface (dropped by `public_nodes`); every
+        # quote comes verbatim from the clause index (or is null for a blocked /
+        # pending-extraction source — never approximated).
+        if not _is_known_document(document_id):
+            return _error(
+                404, "DOCUMENT_NOT_FOUND", f"No document with id '{document_id}'"
+            )
+        payload = render_paragraph_connections(
+            document_id, number, verdicts, graph, clause_index
+        )
+        if payload is None:
+            return _error(
+                404,
+                "PARAGRAPH_NOT_FOUND",
+                f"No paragraph '{number}' in document '{document_id}'",
+            )
+        return payload
+
+    @app.post("/documents/{document_id}/paragraphs/{number}/analyse")
+    def analyse_paragraph_route(
+        document_id: str, number: str, force: bool = False
+    ) -> Any:
+        # The ONE route that reaches the model at request time (live "Analyse
+        # this paragraph"). It runs branch-①+② over a not-yet-analysed paragraph
+        # and returns the SAME shape as `GET …/connections`. Everything else in
+        # the API is model-free, so a live hiccup here degrades to `503` and
+        # leaves the pre-baked paragraphs untouched.
+        if not _is_known_document(document_id):
+            return _error(
+                404, "DOCUMENT_NOT_FOUND", f"No document with id '{document_id}'"
+            )
+        # The paragraph must exist as a clause of the document, even if it has
+        # never been analysed (a `not_analysed` paragraph is still analysable).
+        entry = paragraph_entry(clause_index, document_id, number)
+        if entry is None:
+            return _error(
+                404,
+                "PARAGRAPH_NOT_FOUND",
+                f"No paragraph '{number}' in document '{document_id}'",
+            )
+        # Already analysed → re-analysis is an explicit opt-in (`?force=true`),
+        # so the demo's frozen showcase paragraphs are not silently recomputed.
+        if number in _analysed_paragraph_numbers() and not force:
+            return _error(
+                400,
+                "INVALID_ANALYSE_REQUEST",
+                f"Paragraph '{number}' is already analysed; re-analysis "
+                f"requires ?force=true",
+            )
+        # No curated library configured → nothing for branch ② to match against.
+        if not curated_source_ids:
+            return _error(
+                409,
+                "SOURCE_LIBRARY_EMPTY",
+                "No curated source library is loaded; cannot analyse",
+            )
+        # No live seam wired (or a mid-pitch Azure hiccup) → graceful 503; the
+        # pre-analysed paragraphs served by `GET …/connections` are unaffected.
+        if analyse_fn is None:
+            return _error(
+                503,
+                "ANALYSE_UNAVAILABLE",
+                "Live analysis is temporarily unavailable; pre-analysed "
+                "paragraphs are unaffected",
+            )
+
+        paragraph_text = entry.get("text", "")
+        try:
+            candidates = analyse_fn(document_id, number, paragraph_text, clause_index)
+            # Classify the branch-①+② candidates into verdict records (the same
+            # deterministic guardrail as the build), then render each through the
+            # shared read model. This is kept INSIDE the try so a live
+            # verdict-stage failure (a model hiccup, or a verdict outside the
+            # five values) degrades to the SAME graceful 503 as a finder failure
+            # — never a raw 500 — honouring the documented backstop.
+            records = propose_verdicts(candidates, clause_index, verdict_fn=verdict_fn)
+            nodes = public_nodes(graph)
+            connections = [
+                connection
+                for connection in (
+                    render_connection(record, nodes, clause_index)
+                    for record in records.values()
+                )
+                if connection is not None
+            ]
+        except Exception:  # noqa: BLE001 — any live failure degrades to 503
+            return _error(
+                503,
+                "ANALYSE_UNAVAILABLE",
+                "Live analysis is temporarily unavailable; pre-analysed "
+                "paragraphs are unaffected",
+            )
+
+        # An empty result is `no_matching_source: true` (a 200 success, NOT an
+        # error) — never a fabricated connection.
+        return {
+            "paragraph": {
+                "number": number,
+                "title": entry.get("heading") or "",
+                "text": paragraph_text,
+            },
+            "state": "analysed",
+            "no_matching_source": len(connections) == 0,
+            "connections": connections,
+        }
 
     @app.post("/submissions")
     async def post_submission(
@@ -285,11 +468,25 @@ def _load_graph(artifacts_dir: Path) -> dict[str, Any]:
     return json.loads(path.read_text())
 
 
+def _load_verdicts(artifacts_dir: Path) -> dict[str, Any]:
+    """Load `verdicts.json`, tolerating its absence in a fresh checkout.
+
+    Mirrors `_load_graph`: a missing artifact (the verdict stage not built yet)
+    yields `{}`, so the paragraph routes still start and simply report every
+    paragraph as `not_analysed` rather than crashing at startup.
+    """
+    path = artifacts_dir / "verdicts.json"
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text())
+
+
 def _build_default_app() -> FastAPI:
     """Lazily construct the real app from `data/artifacts/` for uvicorn.
 
     Never fails at import if the artifacts are absent — loads an empty index /
-    graph instead, so `uvicorn engine.api:app` starts on a fresh checkout.
+    graph / verdicts instead, so `uvicorn engine.api:app` starts on a fresh
+    checkout.
     """
     from engine.config import REPO_ROOT
 
@@ -297,6 +494,7 @@ def _build_default_app() -> FastAPI:
     return create_app(
         clause_index=_load_clause_index(artifacts_dir),
         graph=_load_graph(artifacts_dir),
+        verdicts=_load_verdicts(artifacts_dir),
     )
 
 

@@ -32,11 +32,29 @@ POLICY_SHORT_NAMES = {
     "opres": "Operational Resilience",
     "recovery-planning": "Recovery Planning",
     "customer-info": "Customer Info",
+    # The analysed vehicle document — its numbered paragraphs (1.1 … 5.10) enter
+    # the index keyed "AI-DP {number}" (e.g. "AI-DP 3.5"), so a paragraph number
+    # round-trips as clause_number.split(" ", 1)[-1] for the read API.
+    "ai-dp": "AI-DP",
     # External references (#26) — each contributes a single hand-anchored passage
     # clause (e.g. "PDPA 129"); kept distinct from the internal cluster policies.
     "mas-trm": "MAS TRM",
     "pdpa": "PDPA",
     "basel-por": "Basel POR",
+    # AI source library (source-connection engine) — the curated sources the
+    # workbench connects the AI DP's paragraphs to. Each passage clause is keyed
+    # "{short} {anchor}" (e.g. "BCBS 239 P4", "OECD 1.2", "EU AI Act Art 50").
+    "bcbs-239": "BCBS 239",
+    "oecd-ai": "OECD",
+    "nist-ai-rmf": "NIST",
+    "bnm-ftfc": "FTFC",
+    "eu-ai-act": "EU AI Act",
+    "mas-feat": "MAS FEAT",
+    # Industry-feedback sources — the sector's consultation responses. Each maps
+    # to the short name "Industry" so its passage clause keys as "Industry FSP-3"
+    # / "Industry AoB" (distinct keys under distinct document_ids).
+    "industry-fsp-3": "Industry",
+    "industry-aob": "Industry",
 }
 
 

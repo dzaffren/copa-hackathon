@@ -26,10 +26,24 @@ class GraphNode(TypedDict):
     # a consumer that ignores `kind` is unaffected). The four fields below are
     # present ONLY on reference nodes (`kind == "reference"`).
     kind: NotRequired[str]
-    source_type: NotRequired[str]  # peer_regulator|act|standard|handbook|trend
+    # source_type vocabulary (free string; widened for the source-connection
+    # engine): peer_regulator | act | international_standard | internal_bnm |
+    # industry_feedback | standard | handbook | trend
+    source_type: NotRequired[str]
     access: NotRequired[str]  # public | restricted
     preview: NotRequired[bool]  # true → labelled preview band, no verbatim excerpt
     source_url: NotRequired[str]  # public references only
+    # Structural metadata (source-connection engine) — optional, present on
+    # reference/source nodes so a downstream UI can weigh a source: its parent
+    # instrument, where it sits in the precedence order, whether it is legislated,
+    # who set it, and whether it is a technical or a principle-level instrument.
+    mother_document: NotRequired[Optional[str]]
+    precedence: NotRequired[str]
+    legislated: NotRequired[bool]
+    standard_setting_party: NotRequired[str]
+    doc_class: NotRequired[str]  # "technical" | "principle"
+    # Industry-feedback sources (Task 3): the sector's stance on the paragraph.
+    stance: NotRequired[str]  # "agree" | "partial" | "disagree"
 
 
 class GraphEdge(TypedDict):
@@ -98,6 +112,21 @@ def _build_nodes(
                 node["preview"] = doc["preview"]
                 if doc.get("source_url"):
                     node["source_url"] = doc["source_url"]
+                # Structural metadata (optional per source; literal keys keep the
+                # TypedDict type-checkable — no dynamic-key assignment).
+                if "mother_document" in doc:
+                    node["mother_document"] = doc["mother_document"]
+                if "precedence" in doc:
+                    node["precedence"] = doc["precedence"]
+                if "legislated" in doc:
+                    node["legislated"] = doc["legislated"]
+                if "standard_setting_party" in doc:
+                    node["standard_setting_party"] = doc["standard_setting_party"]
+                if "doc_class" in doc:
+                    node["doc_class"] = doc["doc_class"]
+                # Industry-feedback sources carry the sector's stance (Task 3).
+                if "stance" in doc:
+                    node["stance"] = doc["stance"]
             nodes.append(node)
 
     return nodes

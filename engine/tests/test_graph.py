@@ -549,6 +549,93 @@ def test_reference_nodes_carry_kind_source_type_access_preview():
     assert _node(graph, "trend-cloud-signals")["preview"] is True
 
 
+def test_reference_nodes_carry_structural_metadata():
+    """Structural-metadata fields surface on a source node when the manifest
+    declares them, and stay absent on a source that does not (they are optional)."""
+    clause_index = _clause_index_with_pdpa_reference()
+
+    reference_documents = {
+        "bcbs-239": {
+            "policy_id": "bcbs-239",
+            "document_id": "bcbs-239",
+            "title": "BCBS 239 — Principles for effective risk data aggregation",
+            "version": "2013",
+            "cluster": "ai-financial-sector",
+            "kind": "reference",
+            "source_type": "international_standard",
+            "access": "public",
+            "preview": False,
+            "mother_document": "Basel Committee on Banking Supervision",
+            "precedence": "international standard",
+            "legislated": False,
+            "standard_setting_party": "Basel Committee on Banking Supervision",
+            "doc_class": "principle",
+        },
+        # A source with no structural metadata declared (control).
+        "trend-cloud-signals": REFERENCE_DOCUMENTS["trend-cloud-signals"],
+    }
+
+    graph = build_graph(
+        documents={**DOCUMENTS, **reference_documents},
+        curated_edges=[],
+        clause_index=clause_index,
+        draft_registry=DRAFT_REGISTRY,
+        reference_edges=[],
+    )
+
+    bcbs = _node(graph, "bcbs-239")
+    assert bcbs["source_type"] == "international_standard"
+    assert bcbs["mother_document"] == "Basel Committee on Banking Supervision"
+    assert bcbs["precedence"] == "international standard"
+    assert bcbs["legislated"] is False
+    assert bcbs["standard_setting_party"] == (
+        "Basel Committee on Banking Supervision"
+    )
+    assert bcbs["doc_class"] == "principle"
+
+    # A source that declares no structural metadata does not gain the fields.
+    trend = _node(graph, "trend-cloud-signals")
+    assert "precedence" not in trend
+    assert "doc_class" not in trend
+
+
+def test_industry_feedback_nodes_carry_source_type_and_stance():
+    """An industry_feedback source node carries the widened source_type and the
+    sector's stance; a non-feedback node carries no stance."""
+    clause_index = _clause_index_with_pdpa_reference()
+
+    reference_documents = {
+        "industry-fsp-3": {
+            "policy_id": "industry-fsp-3",
+            "document_id": "industry-fsp-3",
+            "title": "Industry feedback — 3 FSP respondents",
+            "version": "consultation response",
+            "cluster": "ai-financial-sector",
+            "kind": "reference",
+            "source_type": "industry_feedback",
+            "access": "public",
+            "preview": False,
+            "stance": "partial",
+        },
+    }
+
+    graph = build_graph(
+        documents={**DOCUMENTS, **reference_documents},
+        curated_edges=[],
+        clause_index=clause_index,
+        draft_registry=DRAFT_REGISTRY,
+        reference_edges=[],
+    )
+
+    fsp = _node(graph, "industry-fsp-3")
+    assert fsp["kind"] == "reference"
+    assert fsp["source_type"] == "industry_feedback"
+    assert fsp["stance"] == "partial"
+
+    # A policy node (not a reference) never carries a stance.
+    assert "stance" not in _node(graph, "rmit-v2-2026-draft")
+
+
 def test_reference_edges_build_with_restricted_and_preview_carveout():
     clause_index = _clause_index_with_pdpa_reference()
 

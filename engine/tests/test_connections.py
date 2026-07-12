@@ -23,11 +23,18 @@ from datetime import datetime, timezone
 
 import pytest
 
-from engine.clauses import ClauseIndex, build_clause_index, merge_clause_indexes
+from engine.clauses import (
+    ClauseIndex,
+    build_clause_index,
+    build_reference_clause,
+    merge_clause_indexes,
+)
 from engine.connections import (
     _critic_turn,
     _finder_turn,
     _format_clause_context,
+    analyse_paragraph,
+    connections_for_paragraph,
     find_connections,
 )
 from engine.llm import LLMResponseError
@@ -371,3 +378,171 @@ def test_critic_turn_raises_on_non_list_json(monkeypatch):
         _critic_turn(
             "rmit-v2-2026-draft", "outsourcing-v1-2019", clause_index, []
         )
+
+
+# --- Two-branch paragraph orchestration (spec Task 5) -----------------------
+
+# A source-clause fixture index for the two-branch tests: BCBS 239 P4 (a cited
+# source) + PDPA 129 (an un-cited library source). Built with
+# `build_reference_clause`, mirroring test_verdicts.py's no-network discipline.
+PDPA_129_TEXT = (
+    "A data controller may transfer any personal data of a data subject to any "
+    "place outside Malaysia if— (a) there is in that place in force any law "
+    "which is substantially similar to this Act."
+)
+BCBS_239_P4_TEXT = (
+    "A bank should be able to capture and aggregate all material risk data "
+    "across the banking group."
+)
+
+
+def _build_source_index() -> ClauseIndex:
+    primary: dict = {}
+    versions: dict = {}
+    refs = {
+        **build_reference_clause(
+            "pdpa-2010", "pdpa", "129", "Section 129(2)", PDPA_129_TEXT
+        ),
+        **build_reference_clause(
+            "bcbs-239", "bcbs-239", "P4", "Principle 4", BCBS_239_P4_TEXT
+        ),
+    }
+    for clause_number, entry in refs.items():
+        primary[clause_number] = entry
+        versions.setdefault(clause_number, {})[entry["document_id"]] = entry
+    return ClauseIndex(primary, versions)
+
+
+def test_connections_for_paragraph_filters_by_paragraph():
+    connections = [
+        {"id": "a", "paragraph": "3.5"},
+        {"id": "b", "paragraph": "4.6"},
+        {"id": "c", "paragraph": "3.5"},
+    ]
+    result = connections_for_paragraph(connections, "3.5")
+    assert [c["id"] for c in result] == ["a", "c"]
+    # A paragraph with no matching connection yields an empty list (the caller
+    # turns that into no_matching_source / not_analysed).
+    assert connections_for_paragraph(connections, "9.9") == []
+
+
+def test_analyse_paragraph_combines_and_tags_both_branches(tmp_path):
+    """Branch ① (cited) + branch ② (uncited) candidates are combined and each is
+    branch-tagged; the stub finder returns a different candidate per branch."""
+    index = _build_source_index()
+
+    def stub_finder(paragraph_number, paragraph_text, clause_index, branch, source_ids):
+        if branch == "cited":
+            return [
+                {
+                    "source_document_id": "bcbs-239",
+                    "clause_number": "BCBS 239 P4",
+                    "confidence_score": 0.88,
+                    "verification": "verified",
+                    "verdict": "Consensus",
+                }
+            ]
+        return [
+            {
+                "source_document_id": "pdpa-2010",
+                "clause_number": "PDPA 129",
+                "confidence_score": 0.90,
+                "verification": "verified",
+                "verdict": "Conflict",
+            }
+        ]
+
+    result = analyse_paragraph(
+        "4.6",
+        "As AI applications process personal data...",
+        index,
+        cited_source_ids=["bcbs-239"],
+        curated_source_ids=["pdpa-2010"],
+        finder_fn=stub_finder,
+        now=FIXED_NOW,
+        output_dir=tmp_path,
+    )
+
+    assert len(result) == 2
+    by_source = {c["source_document_id"]: c for c in result}
+    assert by_source["bcbs-239"]["branch"] == "cited"
+    assert by_source["pdpa-2010"]["branch"] == "uncited"
+    # Each candidate carries the paragraph and a deterministic AI_DP-style id.
+    assert all(c["paragraph"] == "4.6" for c in result)
+    assert by_source["pdpa-2010"]["id"] == "ai-dp-2025:4.6::pdpa-2010:PDPA 129"
+    assert by_source["bcbs-239"]["id"] == "ai-dp-2025:4.6::bcbs-239:BCBS 239 P4"
+
+    # A trace backstop was written for the analysed paragraph.
+    traces = list(tmp_path.glob("analyse-trace-*.json"))
+    assert len(traces) == 1
+
+
+def test_analyse_paragraph_empty_both_branches_returns_empty():
+    """When both branches surface nothing, the result is [] — the signal the API
+    turns into no_matching_source (never a fabricated connection)."""
+    index = _build_source_index()
+
+    def empty_finder(paragraph_number, paragraph_text, clause_index, branch, source_ids):
+        return []
+
+    result = analyse_paragraph(
+        "3.2",
+        "The board and senior management...",
+        index,
+        cited_source_ids=["bcbs-239"],
+        curated_source_ids=["pdpa-2010"],
+        finder_fn=empty_finder,
+    )
+    assert result == []
+
+
+def test_analyse_paragraph_guardrail_drops_unresolved_keeps_blocked_and_pending():
+    """The guardrail drops a candidate citing an unresolved clause, but KEEPS a
+    blocked (could_not_retrieve) candidate and a pending_extraction candidate."""
+    index = _build_source_index()  # resolves PDPA 129 + BCBS 239 P4, NOT others
+
+    def stub_finder(paragraph_number, paragraph_text, clause_index, branch, source_ids):
+        if branch == "cited":
+            return [
+                # Unresolved clause → dropped by the guardrail.
+                {
+                    "source_document_id": "cyber-x",
+                    "clause_number": "Cyber 4.4",
+                    "confidence_score": 0.9,
+                    "verdict": "Gap",
+                },
+                # Blocked source, no clause → KEPT (honest could_not_retrieve).
+                {
+                    "source_document_id": "mas-feat",
+                    "status": "could_not_retrieve",
+                    "reason": "The MAS site blocks automated access.",
+                },
+            ]
+        return [
+            # Pending extraction, clause not in the index → KEPT.
+            {
+                "source_document_id": "basel-osfi",
+                "clause_number": "Basel RBC20",
+                "confidence_score": 0.84,
+                "verification": "pending_extraction",
+                "verdict": "Consensus",
+            }
+        ]
+
+    result = analyse_paragraph(
+        "3.5",
+        "A major challenge of AI...",
+        index,
+        cited_source_ids=["cyber-x", "mas-feat"],
+        curated_source_ids=["basel-osfi"],
+        finder_fn=stub_finder,
+    )
+
+    kept_sources = {c["source_document_id"] for c in result}
+    assert kept_sources == {"mas-feat", "basel-osfi"}
+    # The unresolved-clause candidate never survives to the verdict stage.
+    assert "cyber-x" not in kept_sources
+    blocked = next(c for c in result if c["source_document_id"] == "mas-feat")
+    assert blocked["status"] == "could_not_retrieve"
+    pending = next(c for c in result if c["source_document_id"] == "basel-osfi")
+    assert pending["verification"] == "pending_extraction"
