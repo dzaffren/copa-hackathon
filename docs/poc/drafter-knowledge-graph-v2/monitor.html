@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Source Drift Monitor — Rulebook Radar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: { sans:['Inter','system-ui','sans-serif'], mono:['JetBrains Mono','monospace'] },
+  colors: {
+    bg:'#191919', sidebar:'#1c1c1c', panel:'#212121', elevated:'#262626', hover:'#2b2b2b',
+    subtle:'rgba(255,255,255,0.06)', line:'rgba(255,255,255,0.09)',
+    ink:'#d6d6d6', muted:'#8e8e8e', faint:'#6b6b6b',
+    accent:'#a882ff', 'accent-soft':'rgba(168,130,255,0.12)',
+    consensus:'#6ee7b7', conflict:'#fca5a5', gap:'#fdba74', duplicate:'#7dd3fc', partial:'#fcd34d',
+  }
+}}}
+</script>
+<link rel="stylesheet" href="theme.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<div class="app">
+  <!-- ribbon -->
+  <nav class="ribbon">
+    <a href="index.html" class="ribbon-brand" title="Rulebook Radar"><i data-lucide="radar" class="w-5 h-5"></i></a>
+    <div class="ribbon-group">
+      <a href="workspace.html" class="ribbon-item" title="Workspace"><i data-lucide="panel-left" class="w-[18px] h-[18px]"></i></a>
+      <a href="workspace.html?view=graph" class="ribbon-item" title="Knowledge graph"><i data-lucide="waypoints" class="w-[18px] h-[18px]"></i></a>
+      <a href="insights.html" class="ribbon-item" title="Insights"><i data-lucide="sparkles" class="w-[18px] h-[18px]"></i></a>
+      <a href="monitor.html" class="ribbon-item active" title="Source drift"><i data-lucide="bell" class="w-[18px] h-[18px]"></i></a>
+      <a href="assistant.html" class="ribbon-item" title="Redraft assistant"><i data-lucide="pen-line" class="w-[18px] h-[18px]"></i></a>
+    </div>
+    <div class="ribbon-foot"><span class="ribbon-avatar" title="Aisyah R.">AR</span></div>
+  </nav>
+
+  <!-- work area -->
+  <div class="workarea">
+    <div class="topbar">
+      <span class="crumb"><a href="workspace.html">Workspace</a> / Source drift monitor</span>
+    </div>
+
+    <div class="flex-1 overflow-y-auto scroll px-6 py-8">
+      <div class="max-w-3xl mx-auto">
+        <div class="mb-8">
+          <div class="flex items-center gap-2 mb-2">
+            <i data-lucide="bell-ring" class="w-5 h-5 text-accent"></i>
+            <h2 class="text-xl font-semibold tracking-tight text-ink">A source you benchmark against changed — so we came to you.</h2>
+          </div>
+          <p class="text-[13px] text-muted mt-1 leading-relaxed">Nobody announces when a benchmark moves — <i>"BCBS never declares what changed."</i> The monitor watches your source universe and pushes you the drift: what changed, and exactly which of your draft clauses are now out of sync. Only BNM sits where it can watch the whole source web against its own in-flight drafts — an FI only sees published output.</p>
+          <div class="callout-amber mt-4">Prototype: these are <b>two prepared, dated drift events</b> shown as if pushed — not a live internet watcher. The continuously-running monitor is the roadmap north star.</div>
+        </div>
+
+        <div id="queue" class="space-y-5"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Two prepared drift events. PDPA §129 is the PROVEN-GREEN blind-test case; Basel is the headline (IMF story).
+const events = [
+  {
+    id:"pdpa",
+    source:"Personal Data Protection Act §129",
+    date:"amended 2024",
+    headline:"Personal Data Protection Act §129 amended (2024) — 3 clauses in your draft are now out of sync",
+    material:"The whitelist regime was removed and replaced by a self-assessed test — the destination must have a substantially similar law OR an adequate level of protection. The default was flipped, and \"data user\" was renamed \"data controller.\"",
+    passage:"A data controller may transfer any personal data of a data subject to any place outside Malaysia if— (a) there is in that place in force any law which is substantially similar to this Act; or (b) that place ensures an adequate level of protection…",
+    verified:true,
+    affected:[
+      { clause:"RMiT 10.50(c)", why:"Relies on the cross-border transfer test the amendment rewrote" },
+      { clause:"RMiT 10.50(j)", why:"Relies on the cross-border transfer test the amendment rewrote" },
+      { clause:"RMiT 17.1", why:"Governs data handling the amendment's default-flip now affects" },
+    ],
+    notAffected:["RMiT 8.1","RMiT 11.1","RMiT 17.1(b)","RMiT 17.1(c)"],
+    caveat:"No RMiT clause literally cites the PDPA, so the link is a topical inference for you to confirm — not an automatic change.",
+  },
+  {
+    id:"basel",
+    source:"Basel III output floor (BCBS)",
+    date:"finalised",
+    headline:"Basel III output-floor standard finalised — 1 clause in your draft is now out of sync",
+    material:"The aggregate output floor is set at 72.5% of risk-weighted assets calculated under the standardised approaches. This carries the IMF deviation-justification story: if BNM departs from the floor, the deviation must be justified for IMF validation.",
+    passage:"[Basel III 72.5% aggregate output floor — exact wording pending verbatim extraction from BCBS d424 / Basel Framework RBC20]",
+    verified:false,
+    affected:[
+      { clause:"Draft capital-treatment clause", why:"Relies on the earlier output-floor position the standard now fixes at 72.5%" },
+    ],
+    notAffected:["Credit-risk disclosure clause","Liquidity coverage clause"],
+    caveat:"The exact Basel wording is not yet verified word-for-word, so it is shown pending verification — never approximated.",
+  },
+];
+
+document.getElementById("queue").innerHTML = events.map(e=>`
+  <div class="panel overflow-hidden">
+    <div class="callout-amber flex items-start gap-3 rounded-none border-0 border-b" style="border-bottom:1px solid rgba(245,158,11,.25); border-radius:0;">
+      <span class="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style="background:rgba(245,158,11,.13);"><i data-lucide="bell-ring" class="w-4 h-4"></i></span>
+      <div>
+        <p class="font-semibold text-[13px] text-ink leading-snug">${e.headline}</p>
+        <p class="text-[11px] text-faint mt-0.5">${e.source} · ${e.date} · prepared drift event</p>
+      </div>
+    </div>
+    <div class="p-5 space-y-5">
+      <div>
+        <p class="text-[11px] font-semibold text-faint uppercase tracking-wide">What materially changed</p>
+        <p class="text-[13px] text-muted mt-1.5 leading-relaxed">${e.material}</p>
+        <blockquote class="quote ${e.verified?'verified':'illustrative'} mt-2.5">“${e.passage}”
+          <span class="mark ${e.verified?'verified':'illustrative'}">${e.verified?'verbatim — verified against source':'pending verification — not approximated'}</span>
+        </blockquote>
+      </div>
+      <div>
+        <p class="text-[11px] font-semibold text-faint uppercase tracking-wide">Your clauses now out of sync</p>
+        <div class="mt-2 space-y-2">
+          ${e.affected.map(a=>`<div class="flex items-start gap-2.5 rounded-lg p-2.5" style="border:1px solid rgba(239,68,68,.25); background:rgba(239,68,68,.06);">
+            <span class="text-[12px] font-semibold text-conflict mono shrink-0">${a.clause}</span>
+            <span class="text-[12px] text-muted">${a.why}</span>
+            <a href="connections.html?p=4.6&c=c6" class="btn btn-ghost btn-sm ml-auto shrink-0 text-accent">Reconcile <i data-lucide="arrow-right" class="w-3 h-3"></i></a>
+          </div>`).join("")}
+        </div>
+      </div>
+      <div>
+        <p class="text-[11px] font-semibold text-faint uppercase tracking-wide">Considered &amp; ruled out — no false links</p>
+        <p class="text-[12px] text-faint mt-1.5">${e.notAffected.join(" · ")}</p>
+      </div>
+      <div class="callout"><b class="text-ink">You confirm — this is a prompt, not an applied change.</b> ${e.caveat} Nothing in your draft changes until you open a clause and reconcile it.</div>
+    </div>
+  </div>
+`).join("");
+if(window.lucide) lucide.createIcons();
+</script>
+</body>
+</html>
