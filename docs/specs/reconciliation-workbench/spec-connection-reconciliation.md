@@ -444,3 +444,361 @@ Then she sees a message that the connection is not available, with a plain expla
       verdict. The canonical set stays Consensus / Conflict / Gap / Duplicate; "Deviates" is a
       flag plus a required "why this call" justification the drafter records when a Gap is in
       fact a deliberate, justified deviation from a benchmark. No fifth badge is built.
+
+---
+
+> **Technical refinement (added by `/prd-refine`; re-platformed to Next.js on 2026-07-11).**
+> Everything above is the approved product content and is unchanged. This story is the
+> **second** UI surface; it reuses the **Shared Technical Spine** defined in
+> `spec-upload-and-workspace.md` (the Next.js + React + Tailwind + shadcn/ui app under `web/`,
+> the read-API/snapshot contract via `web/lib/data.ts`, and the Zustand store
+> `web/lib/store.ts` used via a `useStore` hook). That spine is not repeated here. This story
+> **owns** two store slices — the **`verdicts`** slice (the in-force verdict per connection)
+> and the **`trail`** slice (the decision trail) — which the insights and grounded-redraft
+> stories read.
+
+## Functional Requirements
+
+- **The connection view reads one connection from the shared spine.** `web/app/connections/[id]/page.tsx`
+  opens on the `[id]` route param and renders the paragraph text (left) beside the connected
+  source (right) from `useStore.connectionsFor(paragraph)` — the same snapshot/API payload the
+  workspace uses. It never re-fetches or re-derives the verdict; the engine's proposed
+  verdict is the starting point.
+- **Verdict lifecycle: proposed → in-force → committed.** The engine payload carries
+  `verdict` + `verdict_status:"proposed"`. The view shows the proposal, then the drafter
+  **confirms** (in-force = proposed) or **overrides** (in-force = her choice). The in-force
+  verdict is written to the `verdicts` slice under `connection_id` only when the act is
+  committed — never the AI's unconfirmed proposal. The four canonical verdicts (Consensus /
+  Conflict / Gap / Duplicate / Partial) plus the **Deviates nuance** (a flag on a Gap, not a
+  badge) are the only permitted in-force values.
+- **The offered act is a pure function of the in-force verdict** (`actFor(verdict)`), and it
+  re-computes live when the drafter overrides:
+  | In-force verdict                                                                             | Offered act                                  | `note_type`         | trail relationship  |
+  | -------------------------------------------------------------------------------------------- | -------------------------------------------- | ------------------- | ------------------- |
+  | Consensus                                                                                    | Pull in as guiding principle                 | `guiding_principle` | cited in            |
+  | Duplicate                                                                                    | Anchor to this rule                          | `cross_reference`   | cross-referenced in |
+  | Gap                                                                                          | Note as a gap to address                     | `gap`               | flagged on          |
+  | Conflict                                                                                     | Flag conflict for resolution                 | `conflict`          | flagged on          |
+  | Partial                                                                                      | Note what to reconcile                       | `partial`           | flagged on          |
+  | Gap → Deviates                                                                               | Note as a deliberate deviation (needs "why") | `deviation`         | flagged on          |
+  | "Pull in as guiding principle" is **never** rendered when the in-force verdict is Conflict — |
+  | the act list is derived, so a nonsensical act is structurally impossible, not merely hidden. |
+- **Justification gate.** Committing a **Deviates** override or **any act on a Partial**
+  requires a non-empty "why this call" note; the commit button stays disabled and the field
+  is flagged until a reason is entered. The note is stored on the trail entry.
+- **Dismissal gate.** Dismissing a connection as "not relevant" requires a non-empty reason;
+  an empty reason blocks the dismissal. A dismissal writes the `verdicts` slice entry for that
+  `connection_id` as `{status:"dismissed", reason}` and counts as resolved for submission
+  (read by the grounded-redraft story), but does **not** create a `trail` entry (the trail
+  records only references that shaped the text; dismissals live in the audit log — the
+  `verdicts`-slice record is that log).
+- **Committing an act appends a verbatim-cited trail entry** to the `trail` slice:
+  `{connection_id, paragraph, verdict, source, quote:{clause_number, text, verification},
+note_type, why?}`. The `quote` is copied from the connection payload unchanged — including
+  its `verification` marker (`verified` / `illustrative` / `pending_extraction`), which carries
+  through to the trail entry and may never be upgraded.
+- **Done state and idempotency.** A connection with a record in the `verdicts` slice renders as
+  "Done" with its note echoed onto the paragraph and does **not** re-offer the act.
+  Re-committing the same connection is a no-op (no duplicate trail entry).
+- **Live shared state.** Committing writes through `useStore`, whose `persist` middleware
+  fires the cross-tab `storage` event so the workspace (connection reads resolved) and the
+  insights trail update live without a reload.
+- **No supporting passage / pending extraction.** When the connection payload has
+  `quote:null` or `verification:"pending_extraction"`, the quote area renders "No matching
+  clause found" or a labelled "pending extraction" placeholder respectively — never a
+  fabricated or approximated passage. A connection may still be dismissed but cannot be
+  "pulled in" as a verified principle.
+- **Missing/stale connection.** If the `[id]` route param resolves to no known connection
+  (unknown, stale, or `could_not_retrieve`), the view renders an explanatory message and a
+  "Back to workspace" link — never a crash, blank page, or fabricated connection.
+
+### Validation & Business Rules
+
+- The "why this call" and dismissal reason fields are trimmed and length-capped (≤1000
+  chars); whitespace-only is treated as empty and blocks the commit/dismissal.
+- The in-force verdict written to the `verdicts` slice must be one of the six permitted
+  values; any other value is a defect.
+- A trail entry's `verification` must equal the source connection's `verification` — no
+  upgrade path exists in the writer.
+
+## Permissions & Security
+
+- **Scope:** public — the connection view renders only public source passages already in the
+  snapshot; no auth. No restricted-node text is ever reachable (the exporter skips it).
+- **Input validation:** the `[id]` route param is matched against known connection ids; the
+  reason/why fields are the only free-text inputs and are capped and stored verbatim in the
+  Zustand store (persisted to `localStorage`) — no server, no injection surface beyond the
+  drafter's own browser.
+- **No new write routes** — all verdict/trail state is client-side in the `verdicts` and
+  `trail` store slices.
+
+## API Design (consumed — owned by the engine story)
+
+Defines **no new engine routes**. Reads the same `GET …/paragraphs/{n}/connections` payload as
+the workspace (via `useStore.connectionsFor`). All verdict/trail mutations are writes into the
+Zustand store (persisted to `localStorage`) through `web/lib/store.ts`; the new `useStore`
+helpers this story adds to `web/lib/store.ts`:
+
+```ts
+useStore.verdictFor(connId); // → {status, verdict?, reason?, why?} | proposed-from-payload
+useStore.commitAct(connId, { verdict, note_type, why }); // writes verdicts slice + appends trail slice
+useStore.dismiss(connId, reason); // writes verdicts slice {status:"dismissed", reason}
+useStore.trail(); // → trail slice array (read by insights)
+useStore.isResolved(connId); // committed act OR dismissal (read by grounded-redraft submit gate)
+```
+
+Example `trail`-slice entry after pulling in OECD on 3.5:
+
+```json
+{
+  "connection_id": "ai-dp-2025:3.5::oecd:OECD 1.2",
+  "paragraph": "3.5",
+  "verdict": "Consensus",
+  "source": "OECD AI Principles 1.2",
+  "quote": {
+    "clause_number": "OECD 1.2",
+    "text": "AI actors should implement mechanisms and safeguards, such as capacity for human agency and oversight, including to address risks arising from uses outside of intended purpose.",
+    "verification": "verified"
+  },
+  "note_type": "guiding_principle",
+  "why": null
+}
+```
+
+Example `verdicts`-slice entries (a committed conflict flag and a dismissal):
+
+```json
+{
+  "ai-dp-2025:4.6::pdpa-2010:PDPA 129": {
+    "status": "confirmed",
+    "verdict": "Conflict"
+  },
+  "ai-dp-2025:3.11::some-offtopic": {
+    "status": "dismissed",
+    "reason": "Covers market-conduct reporting, not hallucination controls."
+  }
+}
+```
+
+## Data Model & Artifacts
+
+No database. This story writes two named slices of the Zustand store (persisted to
+`localStorage` via `persist`) through `web/lib/store.ts`:
+
+- **`verdicts`** — `{ "<connection_id>": {status:"confirmed"|"dismissed", verdict?, reason?} }`.
+  The in-force verdict and the audit record of considered-and-set-aside connections.
+- **`trail`** — the append-only decision trail (shape above). Read by the cross-source
+  insights view ("Pulled into your draft so far") and attached as the justification pack at
+  submission (grounded-redraft story).
+
+Both survive reload and reflect across pages via the spine's `persist` cross-tab
+`storage`-event sync.
+
+## UI/Frontend Requirements
+
+- **`web/app/connections/[id]/page.tsx`** (new) — the paragraph-beside-source connection view:
+  source-type label, proposed-verdict badge with confirm/override control, verbatim quote
+  with its verification marker (or "No matching clause found" / "pending extraction"), the
+  AI's plain-language read, the derived act control, the dismissal control, and — on a
+  resolved connection — the "Done" state with the echoed note. It reuses the shared
+  `web/components/` primitives from the workspace story (`VerdictBadge`, `QuoteBlock`,
+  `SourceTypeDot`, etc.). A "Decision trail" panel (or a link to the insights view that renders
+  the `trail` slice) shows accumulated entries.
+- **User interactions:** confirm verdict → act unchanged; override verdict → act re-derives;
+  commit act → "Done" + trail entry + live reflection; dismiss (with reason) → resolved, no
+  trail entry; revisit resolved connection → "Done", no re-offer.
+- **States:** _Proposed_ — verdict badge + confirm/override. _Justification-required_ —
+  commit disabled until "why" entered (Deviates/Partial). _Dismiss_ — reason required.
+  _Done_ — resolved, note echoed, act not re-offered. _No passage_ — "No matching clause
+  found." _Pending extraction_ — labelled placeholder. _Missing/stale_ — explanatory message
+  - back-to-workspace.
+
+## Architecture Notes
+
+- **New dependencies:** none beyond the shared `web/` stack (Next.js + React + Tailwind +
+  shadcn/ui + Zustand) established by the workspace story.
+- **Integration points:** reached via "Open connection & act" from the workspace at the route
+  `/connections/<id>`; extends `web/lib/store.ts` (spine) with the verdict/trail helpers above;
+  the `verdicts`/`trail` slices are read by the insights view (trail display) and the
+  grounded-redraft view (submission gate). The tracked note this story records is what the
+  grounded-redraft story later turns into body-text.
+- **Shared-state discipline:** all mutation goes through `useStore` so `persist` fires the
+  cross-tab `storage` event and every open page re-renders — the honest MVP1 realisation of
+  "one shared state."
+
+## Exemplar Files
+
+- `docs/poc/drafter-knowledge-graph/connections.html` — the legacy connection view is the
+  read-only **UX reference** for the derived-act + trail-entry layout, not the build target.
+- `spec-upload-and-workspace.md` → "Shared Technical Spine" and its `web/lib/store.ts` /
+  `web/lib/data.ts` contract — the migrated store and read seam this story extends.
+- `engine/api.py` `GET …/connections` shape — the connection payload (verdict, quote,
+  verification) this view consumes unchanged.
+
+## Implementation Plan
+
+### Sub-tasks
+
+**Task 1: Verdict/trail slices + helpers in `web/lib/store.ts`** — _medium_
+
+- Add the `verdicts` and `trail` slices plus `verdictFor`, `commitAct`, `dismiss`, `trail`,
+  `isResolved`; rely on `persist` for the cross-tab re-render. Depends on the spine
+  `web/lib/store.ts` scaffold existing.
+- Files: `web/lib/store.ts`
+- SEQUENTIAL (depends on the workspace story's store scaffold)
+
+**Task 2: Connection view — proposal, confirm/override, derived act** — _large_
+
+- Render paragraph-beside-source; confirm/override control; `actFor(verdict)` derivation;
+  quote with verification marker / no-passage / pending-extraction states.
+- Files: `web/app/connections/[id]/page.tsx`
+- SEQUENTIAL (depends on Task 1)
+
+**Task 3: Commit, justification gate, dismissal gate, Done state** — _medium_
+
+- Commit writes the `verdicts` + `trail` slices; enforce "why" for Deviates/Partial and reason
+  for dismissal; render Done + echoed note; idempotent re-commit.
+- Files: `web/app/connections/[id]/page.tsx`, `web/lib/store.ts`
+- SEQUENTIAL (depends on Task 2)
+
+**Task 4: Decision-trail render + missing-connection handling** — _small_
+
+- Render `trail`-slice entries with their verification markers; graceful missing/stale-`[id]`
+  message with a route back to the workspace.
+- Files: `web/app/connections/[id]/page.tsx`
+- SEQUENTIAL (depends on Task 3)
+
+### Negative Constraints
+
+- Do NOT write a verdict to the `verdicts` slice before the drafter confirms/overrides — no
+  auto-commit of the AI proposal.
+- Do NOT render "Pull in as guiding principle" for a Conflict, or any act not returned by
+  `actFor(verdict)`.
+- Do NOT upgrade an `illustrative`/`pending_extraction` quote to `verified` in the trail
+  entry.
+- Do NOT create a trail entry for a dismissal (dismissals live in the `verdicts` slice only).
+- Do NOT add engine write routes or a server store.
+- Do NOT extend the legacy `*.html` pages — they are the read-only UX reference.
+
+## Test Scenarios
+
+**Test 1: Override re-derives the offered act**
+
+- Setup: render `<ConnectionPage>` (RTL) at route `/connections/ai-dp-2025:3.5::nist:NIST
+MEASURE 2.11`, payload verdict `Gap`, offered act "Note as a gap to address."
+- Action: override the in-force verdict to `Consensus`.
+- Expected: the offered act becomes "Pull in as guiding principle"; the `verdicts` slice is
+  still unwritten (nothing committed yet).
+
+**Test 2: Conflict never offers "pull in as principle"**
+
+- Setup: render `<ConnectionPage>` at the route for the PDPA §129 conflict on 4.6, in-force
+  verdict `Conflict`.
+- Action: read the act control.
+- Expected: only "Flag conflict for resolution" is offered; "Pull in as guiding principle" is
+  absent from the derived act list.
+
+**Test 3: Deviates commit is blocked without a "why" note**
+
+- Setup: override the Basel output-floor Gap to `Deviates`.
+- Action: attempt to commit with an empty "why this call" field.
+- Expected: commit disabled; nothing written to the `verdicts`/`trail` slices; entering a
+  reason enables commit and writes the trail entry with `note_type:"deviation"` and the `why`
+  text.
+
+**Test 4: Committing appends a verbatim trail entry with its verification marker preserved**
+
+- Setup: render `<ConnectionPage>` at the route for OECD Consensus on 3.5 (payload
+  `verification:"verified"`); and the BNM Fair Treatment Duplicate on 3.5
+  (`verification:"illustrative"`).
+- Action: pull in OECD as a guiding principle; anchor the BNM duplicate.
+- Expected: two `trail`-slice entries; OECD entry `verification:"verified"`, BNM entry
+  `verification:"illustrative"` — neither upgraded; each `quote.text` equals the payload
+  byte-for-byte.
+
+**Test 5: Dismissal requires a reason, resolves without a trail entry**
+
+- Setup: an off-topic connection on 3.11.
+- Action: dismiss with empty reason (blocked), then with a reason.
+- Expected: empty reason blocks; a reason writes the `verdicts` slice entry
+  `{status:"dismissed",reason}` for that id; `useStore.isResolved(id)` is true; the `trail`
+  slice gains no entry; the workspace shows the connection resolved.
+
+**Test 6: Resolved connection revisits as Done, idempotent**
+
+- Setup: OECD on 3.5 already pulled in.
+- Action: re-render `<ConnectionPage>` at that connection's route; attempt to commit again.
+- Expected: renders "Done" with the echoed note, does not re-offer the act, and creates no
+  second `trail`-slice entry.
+
+**Test 7: Missing/stale connection routes back to the workspace**
+
+- Setup: render `<ConnectionPage>` at route `/connections/ai-dp-2025:9.9::nonexistent`.
+- Action: load the view.
+- Expected: an explanatory "connection not available" message and a "Back to workspace" link;
+  no crash, blank page, or fabricated connection.
+
+## Verification
+
+Run the `verifier` skill (Vitest/RTL for the frontend; no backend changes in this story
+unless a snapshot fixture is extended for the demo connections).
+
+### Component / Unit Tests (Vitest + React Testing Library — the gate)
+
+- `web/lib/store.test.ts` — Tests 1–6: `actFor(verdict)` derivation and override re-derivation
+  (Tests 1–2), the justification gate for Deviates/Partial (Test 3), `commitAct` appending a
+  verbatim trail entry with its `verification` marker preserved and never upgraded (Test 4),
+  `dismiss` requiring a reason and resolving without a trail entry (Test 5), and Done-state
+  idempotency (Test 6).
+- `web/app/connections/*.test.tsx` — a component test rendering `<ConnectionPage>` for the
+  proposal → confirm/override → derived-act states, the verified vs illustrative vs
+  pending-extraction / "No matching clause found" quote states, and the missing/stale-`[id]`
+  routing back to the workspace (Test 7).
+
+### E2E Tests (Playwright — optional, non-blocking)
+
+| Key Scenario                                                | Test file                        | Assigned sub-task |
+| ----------------------------------------------------------- | -------------------------------- | ----------------- |
+| Reconcile a connection (override → justify → commit → Done) | `web/e2e/reconciliation.spec.ts` | Task 3            |
+| Dismiss an off-topic connection with a recorded reason      | `web/e2e/reconciliation.spec.ts` | Task 3            |
+
+**Locator strategy:** `data-testid` on the verdict control (`verdict-<id>`), the act button
+(`act-<id>`), and the trail entries (`trail-entry-<id>`). Flagged non-blocking — a red E2E
+never blocks the demo; the Vitest gate above is authoritative.
+
+### Next.js dev-server walkthrough
+
+Run the Next.js dev server (`npm run dev` in `web/`) and walk through:
+
+1. Open `/connections/<id>` for the OECD/3.5 Consensus → paragraph beside source, verified
+   quote, proposed "Consensus", act "Pull in as guiding principle." (Opening + verified-quote
+   scenarios.)
+2. Override the NIST/3.5 Gap to Consensus → act changes to "Pull in as guiding principle."
+   (Override-changes-act scenario.)
+3. Open the PDPA §129/4.6 Conflict → only "Flag conflict for resolution" offered. (Cannot
+   adopt a conflict as a principle.)
+4. Override the Basel Gap to Deviates → commit blocked until "why" entered → trail entry
+   carries the justification. (Deviates justification-gate scenarios.)
+5. Dismiss an off-topic connection with/without a reason → reason required; dismissal resolves
+   without a trail entry. (Dismissal scenarios.)
+6. Pull in OECD (verified) and anchor the BNM duplicate (illustrative) → open the trail →
+   verified vs illustrative markers distinct. (Trail + illustrative-carry-through scenarios.)
+7. Return to the workspace → the acted connections read resolved without a reload; reopen a
+   resolved connection → "Done", no re-offer. (Live-shared-state + revisit scenarios.)
+8. Load a bad `/connections/<id>` → graceful back-to-workspace message. (Missing/stale
+   scenario.)
+
+## Open Questions (technical)
+
+- [x] ~~Where do the in-force verdict and the decision trail live without a backend?~~ —
+      **Resolved:** the Zustand store slices `verdicts` (in-force verdict + dismissal audit)
+      and `trail` (append-only trail), written through `useStore` in `web/lib/store.ts`,
+      persisted to `localStorage` via `persist`, and reflected live via `persist`'s cross-tab
+      `storage` sync. The read seam is `web/lib/data.ts` selected by `NEXT_PUBLIC_API_BASE`.
+- [x] ~~How is a nonsensical act (e.g. "adopt a conflict as a principle") prevented?~~ —
+      **Resolved:** the offered act is a pure derivation `actFor(verdict)`; unlisted acts are
+      structurally unrenderable, not merely hidden.
+- [ ] Should a dismissal ever appear in the visible trail (not just the audit record)? —
+      **Deferred (non-blocking):** MVP1 keeps dismissals in the `verdicts` slice only; a
+      "considered & set aside" view is a roadmap item per the epic and does not block this
+      story.

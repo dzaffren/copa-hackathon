@@ -475,3 +475,548 @@ Then it is shown as a tracked change in a browser-held working copy for the demo
       (non-blocking):** MVP1 resolves findings on an accepted suggestion or a reasoned
       dismissal, and relies on re-analysis to reflect a direct manual edit; auto-resolving on
       manual edits is deferred.
+
+---
+
+> **Technical refinement (added by `/prd-refine`; re-platformed to Next.js on 2026-07-11).**
+> Everything above is the approved product content and is unchanged. This story is the
+> **fourth** UI surface; it reuses the **Shared Technical Spine** defined in
+> `spec-upload-and-workspace.md` (the Next.js + React + Tailwind + shadcn/ui app under `web/`,
+> the read-API/snapshot contract via `web/lib/data.ts`, and the Zustand store
+> `web/lib/store.ts` accessed through a `useStore` hook) and the reconciliation story's
+> `verdicts`/`trail`/`useStore.isResolved` contract from `spec-connection-reconciliation.md`.
+> That spine is not repeated here. This story **owns** three store slices — `resolved` (how
+> each finding was resolved: an accepted edit or a reasoned dismissal), `draft` (the
+> browser-held working copy of the Word document with its mock tracked changes), and
+> `submitted` (the submission record + attached trail) — and **reads** `verdicts` / `trail`
+> (the findings it resolves and the verbatim-cited justification pack) and
+> `useStore.isResolved(connId)` (the submission gate). It MUST NOT write `verdicts`/`trail`.
+> **Microsoft Graph / Word / SharePoint is the documented production path, MOCKED in the
+> demo** — the write-back is a mock tracked change into the `draft` slice, honestly labelled;
+> no live Graph round-trip runs.
+
+## Functional Requirements
+
+- **Paragraph text is read from the working copy, not re-typed.** `web/app/assistant/page.tsx`
+  reads the paragraph's current text from the `draft` slice (`draft["<para>"].text`) if a
+  working copy exists, else from the snapshot paragraph body (`useStore.paragraphText(para)` —
+  added here, reads `web/public/data/paragraphs.json` bodies / `GET …/paragraphs` via
+  `web/lib/data.ts`). In the demo the "Word document" is this browser-held working copy; the
+  live Microsoft Graph **read document body** call is the production path, labelled and not run.
+- **Grounded-redraft proposal draws only on connected sources + the allowlist grounded
+  search.** For a paragraph, `useStore.propose(para, ask)` assembles a proposal from (a) that
+  paragraph's connections (`useStore.connectionsFor(para)`, quotes + verifications copied
+  unchanged) and (b) a mocked allowlist grounded search over the curated/approved source list.
+  It returns `{wording, sources:[{clause_number, text, verification, source}]}` where every
+  `text` is a verbatim passage carried from the connection/allowlist payload — never
+  paraphrased. The proposal is a **constructed what-if**; the verifiable content is the cited
+  `sources`.
+- **Verbatim citation + per-source verification markers.** Every source in the proposal renders
+  its `verification` marker from data (`verified` → "✓ verbatim — verified", `illustrative` →
+  "◦ illustrative — not yet verified", `pending_extraction` → labelled placeholder). A page may
+  **never** upgrade `illustrative`/`pending_extraction` to `verified`. No passage is shown as a
+  quote unless it is copied byte-for-byte from the payload.
+- **"No matching clause found" for ungrounded asks.** If neither the connected sources nor the
+  allowlist search yields a supporting verbatim passage, `useStore.propose` returns `{no_match:
+true}` and the view renders "No matching clause found" plus the reminder that ungrounded
+  free-text drafting belongs in Word — never plausible-but-uncited prose, never a fabricated
+  figure or source.
+- **Accept → tracked change + resolve + live reflection.** `useStore.accept(findingId, para,
+wording)` (a) appends a mock tracked-change entry to the `draft` slice
+  (`draft["<para>"].tracked_changes`) and updates `draft["<para>"].text`, (b) writes
+  `resolved["<findingId>"] = {kind:"edit"}`, and (c) — because the store is reactive and
+  cross-tab-synced via `persist` — the workspace, reconciliation view, and trail all read the
+  finding resolved live. The demo shows the tracked change in the working copy; the live Graph
+  **append tracked change (insertion)** to SharePoint is the labelled production path, not run.
+- **Reject → unchanged.** `useStore.reject()` discards the proposal: the `draft` slice is
+  untouched, no `resolved` entry is written, no finding is resolved, and the drafter can ask
+  for a different proposal.
+- **Re-analyse an edited paragraph.** "Analyse this paragraph" calls the workspace spine helper
+  (`data.analyse(para)` → `POST …/paragraphs/{n}/analyse` when `NEXT_PUBLIC_API_BASE` is set,
+  else the snapshot `web/public/data/connections/{n}.json`), rendering the re-found connections
+  through the shared renderer — a finding the edit addressed is no longer shown as an open
+  connection. Never a fabricated card.
+- **Dismissal with a recorded reason.** `useStore.dismissFinding(findingId, reason)` writes
+  `resolved["<findingId>"] = {kind:"dismissal", reason}`; the reason is preserved so it flows
+  into the trail a reviewer can read. A dismissed finding counts as resolved for the submission
+  gate.
+- **Resolve requires a real edit or a reasoned dismissal (guardrail).** There is **no** bare
+  "mark resolved" path — the only two writers into the `resolved` slice are `accept`
+  (kind:"edit") and `dismissFinding` (kind:"dismissal"). A finding whose conflicting text still
+  stands with no recorded reason can never enter `resolved`, so a draft cannot be certified
+  consistent while the conflict remains.
+- **Submission gate.** Submit is blocked while **any** finding is unresolved: the view computes
+  the open set as every finding on the draft (the `verdicts`/connection universe) for which
+  `useStore.isResolved(findingId)` is false, and disables submit while that set is non-empty,
+  listing each open finding with a link to resolve it. When the open set is empty,
+  `useStore.submit()` writes `submitted = {submitted:true, trail: useStore.trail()}` —
+  attaching the `trail` slice's verbatim-cited decision trail as the justification pack — and
+  renders the "notified the manager" confirmation. There is no separate reviewer persona in
+  MVP1.
+- **Honest demo labelling.** The Graph write-back, the allowlist grounded search, and the
+  manager notification are all rendered with an explicit "demonstration — the live Microsoft
+  Graph write-back to SharePoint is the documented production path" banner; nothing prepared is
+  presented as if it ran live.
+- **Pre-loaded from a carried insight.** When opened as `/assistant?para=3.5,4.6&insight=<id>`
+  (the entry point from the cross-source insights view), the assistant pre-loads the insight's
+  paragraphs and cited sources from the query params, ready for an ask — but writes nothing to
+  the `draft` slice until the drafter accepts.
+
+### Validation & Business Rules
+
+- An **empty grounded ask** (whitespace-only) is rejected inline ("Describe the change you
+  want grounded") and no proposal is requested.
+- A **whitespace-only dismissal reason** is treated as empty and blocks the dismissal — no
+  `resolved` entry is written.
+- The **verification marker is never upgraded**: a proposal source's `verification` must equal
+  the source connection's `verification`; a mismatch is a defect (asserted in the walkthrough).
+- **Grounded search is allowlist-only**: any candidate whose source is not on the curated
+  approved list is dropped, and if that leaves no verbatim support the result is `{no_match:
+true}` — an unapproved source is never presented as evidence.
+- The redraft ask and the dismissal reason are trimmed and length-capped (ask ≤500 chars,
+  reason ≤1000 chars) before use/storage.
+
+## Permissions & Security
+
+- **Scope:** public. Every proposal quotes public source passages already in the snapshot
+  (connected sources + the public approved list); no auth on the drafter surface. No
+  restricted-node text is reachable — the exporter skips `access:"restricted"` nodes (the
+  confidentiality guard), so no confidential handbook text lands in `web/public/data/`.
+- **Microsoft Graph is production-only, mocked in the demo.** The OAuth 2.0 authorization-code
+  flow and the Graph delegated scopes needed for the live path (`Files.ReadWrite`,
+  `Sites.ReadWrite.All` for the SharePoint-hosted document) are **named as the production
+  contract only** — no token, client secret, or Graph call exists in the demo, and none is
+  required to run it. The write-back is a client-side mock into the `draft` store slice.
+- **Input validation:** the redraft ask (≤500 chars) and dismissal reason (≤1000 chars) are the
+  only free-text inputs; both are trimmed, length-capped, and stored verbatim in the persisted
+  Zustand store (no server, no injection surface beyond the drafter's own browser).
+  `para`/`insight`/`finding` query params are matched against known ids; an unknown id renders
+  the empty/parse-error state rather than throwing.
+- **No new engine write routes.** All resolve/draft/submission state is client-side in the
+  `resolved`/`draft`/`submitted` store slices; the engine stays read-only (per its negative
+  constraints).
+
+## API Design
+
+### (a) Consumed engine routes (no new routes)
+
+Reuses the same read contract the workspace defines (see
+`spec-upload-and-workspace.md` → "API Design"), consumed through `web/lib/data.ts`; this story
+adds **no** engine routes:
+
+- `GET /documents/{document_id}/paragraphs` → paragraph bodies + `state` + `connection_count`
+  (source for `useStore.paragraphText`).
+- `GET /documents/{document_id}/paragraphs/{number}/connections` → the connections a proposal
+  grounds on (source, verdict, `quote:{clause_number, text, verification}`).
+- `POST /documents/{document_id}/paragraphs/{number}/analyse` → the re-analyse call;
+  `503 ANALYSE_UNAVAILABLE` is caught and rendered as "live analysis is temporarily unavailable
+  — pre-analysed paragraphs are unaffected."
+
+### (b) Microsoft Graph — DOCUMENTED PRODUCTION PATH, MOCKED IN THE DEMO
+
+> **PRODUCTION-ONLY / MOCKED-IN-DEMO.** The calls below describe the live Word-on-SharePoint
+> integration for a future production build. **None of these run in the hackathon demo** — the
+> demo substitutes a mock tracked change in the `draft` store slice. Word documents are edited
+> through the Graph **Word/OOXML document model**, not the workbook (Excel) endpoints — reading
+> the document body and appending a tracked-change **insertion**, not a `/workbook` call.
+
+Read the document body (illustrative):
+
+```
+GET https://graph.microsoft.com/v1.0/drives/{driveId}/items/{itemId}/content?format=text
+Authorization: Bearer {delegated token, scope Files.ReadWrite / Sites.ReadWrite.All}
+→ 200  (the document's paragraph text; parsed into 4.6, 3.5, 3.11, …)
+```
+
+Append a tracked change (insertion) — illustrative, production-only:
+
+```
+PATCH https://graph.microsoft.com/v1.0/drives/{driveId}/items/{itemId}/workbook  ← WRONG (Excel)
+```
+
+The correct production shape appends an OOXML tracked **insertion** to the document body
+(range-anchored to the paragraph), which Word renders as a reviewable tracked change:
+
+```
+POST https://graph.microsoft.com/v1.0/drives/{driveId}/items/{itemId}/createUploadSession   (or Word add-in Office.js insertText with trackedChanges on)
+Body: OOXML fragment  <w:ins w:author="Rulebook Radar" w:date="2026-07-12T…">…grounded wording…</w:ins>
+→ 200/201  the insertion appears as a tracked change the drafter accepts/rejects inside Word
+```
+
+**In the demo, both calls are replaced** by a `useStore.accept` write into the `draft` slice
+and a visible "mock tracked change — live Graph write-back is the production path" banner.
+
+### (c) `useStore` helpers this story adds
+
+```ts
+useStore.paragraphText(para); // → working-copy text (draft slice) or snapshot body
+useStore.propose(para, ask); // mocked grounded redraft → {wording, sources:[…]} | {no_match:true}
+useStore.accept(findingId, para, wording); // draft tracked change + resolved kind:"edit"
+useStore.reject(); // discard proposal — no state written
+useStore.dismissFinding(findingId, reason); // resolved kind:"dismissal" (reason required)
+useStore.openFindings(); // findings where !useStore.isResolved(id) — the submission-gate open set
+useStore.submit(); // if openFindings()==[] → submitted {submitted:true, trail: useStore.trail()}
+```
+
+Example `useStore.propose("4.6", "resolve the cross-border transfer conflict")` (PDPA §129,
+verbatim quote):
+
+```json
+{
+  "wording": "Personal data may be transferred outside Malaysia only where the destination is subject to a law substantially similar to the PDPA, or otherwise ensures an adequate level of protection, consistent with the cross-border transfer test in PDPA §129.",
+  "sources": [
+    {
+      "clause_number": "PDPA 129",
+      "text": "A data controller may transfer any personal data of a data subject to any place outside Malaysia if— (a) there is in that place in force any law which is substantially similar to this Act; or (b) that place ensures an adequate level of protection…",
+      "verification": "verified",
+      "source": "Personal Data Protection Act 2010 (amended 2024) §129"
+    }
+  ]
+}
+```
+
+Example `resolved` slice after accepting that proposal, and a dismissal:
+
+```json
+{
+  "ai-dp-2025:4.6::pdpa-2010:PDPA 129": { "kind": "edit" },
+  "ai-dp-2025:4.6::fsp-feedback": {
+    "kind": "dismissal",
+    "reason": "Industry point on legacy datasets is out of scope for this paragraph; addressed in the transition provisions."
+  }
+}
+```
+
+Example `submitted` slice after all findings resolve (trail copied from `useStore.trail()`):
+
+```json
+{
+  "submitted": true,
+  "trail": [
+    {
+      "connection_id": "ai-dp-2025:3.5::oecd:OECD 1.2",
+      "paragraph": "3.5",
+      "verdict": "Consensus",
+      "source": "OECD AI Principles 1.2",
+      "quote": {
+        "clause_number": "OECD 1.2",
+        "text": "AI actors should implement mechanisms and safeguards, such as capacity for human agency and oversight, including to address risks arising from uses outside of intended purpose.",
+        "verification": "verified"
+      },
+      "note_type": "guiding_principle",
+      "why": null
+    }
+  ]
+}
+```
+
+## Data Model & Artifacts
+
+No database. This story writes three store slices through `useStore` and reads two:
+
+- **`draft`** (mutable, this story) — the browser-held working copy of the Word document:
+  `{ "<para>": {text, tracked_changes:[…]} }`. The mock tracked-change shape inside
+  `tracked_changes`:
+
+  ```json
+  {
+    "para": "4.6",
+    "type": "insertion",
+    "author": "Rulebook Radar (assistant)",
+    "at": "2026-07-12T10:32:00Z",
+    "wording": "Personal data may be transferred outside Malaysia only where…",
+    "finding_id": "ai-dp-2025:4.6::pdpa-2010:PDPA 129",
+    "status": "tracked",
+    "mock": true
+  }
+  ```
+
+  `mock:true` is the honest label that this is a demo tracked change, not a live Graph write.
+
+- **`resolved`** (mutable, this story) — `{ "<finding_id>": {kind:"edit"|"dismissal",
+reason?} }`; the only two writers are `accept` (edit) and `dismissFinding` (dismissal).
+- **`submitted`** (mutable, this story) — `{ submitted:true, trail:[…] }` | null; written
+  once the gate passes, with the `trail` slice copied in as the justification pack.
+- **`verdicts` / `trail`** (read-only here — owned by reconciliation) — the finding
+  universe/status and the verbatim-cited trail. This story **never writes** them.
+
+All slices survive reload (Zustand `persist`) and reflect across pages/tabs via the store's
+reactivity and cross-tab `storage` sync.
+
+## UI/Frontend Requirements
+
+- **`web/app/assistant/page.tsx`** (new) — the grounded-redraft surface, reusing the shared
+  `web/components/` (`QuoteBlock`, `VerdictBadge`) from the workspace story:
+  - a **proposal-beside-current-text** view (the paragraph's working-copy text on one side, the
+    proposed wording on the other, not yet written);
+  - each supporting quote rendered **verbatim** through `QuoteBlock` with its per-source
+    `verification` marker;
+  - **Accept** / **Reject** controls (accept → tracked change + resolve; reject → unchanged);
+  - the **"No matching clause found"** state for an ungrounded ask, with the "drafting belongs
+    in Word" reminder;
+  - a **"Analyse this paragraph"** re-analyse control (calls `data.analyse`);
+  - a **dismissal-with-reason** control (reason required);
+  - a **Submit** button with the gate: disabled + blocked-list while any finding is open,
+    enabled when all resolved;
+  - an honest **Graph-mock label** on every write-back / notification affordance;
+  - a **pre-loaded-from-carried-insight** entry that reads the insight's paragraphs + cited
+    sources from the `/assistant?para=…&insight=…` query params.
+- **States:** _Loading_ — skeleton while the snapshot/API and the `draft` slice resolve.
+  _Proposal_ —
+  proposed wording beside current text with verbatim, marked quotes. _No-match_ — "No matching
+  clause found" + Word reminder. _Accepted_ — the mock tracked change is shown in the working
+  copy and the finding reads resolved. _Rejected_ — original text kept, no change. _Submission-
+  blocked_ — the list of open findings with resolve links, submit disabled. _Submitted_ — the
+  confirmation that the draft was submitted and the manager notified, trail attached.
+  _Demo-mock-label_ — the honest "live Graph write-back is the production path" banner on the
+  write-back/notify affordances. _Error_ — snapshot/API/`503` failure shows a retry message,
+  never a blank surface or a fabricated proposal.
+
+## Architecture Notes
+
+- **New dependencies:** none beyond the shared spine — this story adds a route and store
+  helpers to the existing `web/` Next.js + React + Tailwind + shadcn/ui app; no new package.
+- **Microsoft Graph is a production integration, mocked in the demo.** The Word/SharePoint
+  read/write-back is documented as the production path (see API Design (b)) and honestly
+  labelled; the demo runs entirely on the `draft`-slice mock — no Graph token or call exists in
+  the shipped app.
+- **Integration points:** reached from the workspace (a flagged paragraph), from the
+  reconciliation view (after a conflict is flagged), and from the cross-source insights view
+  (the "carry into the assistant" entry point, via `/assistant?para=…&insight=…`). It
+  **extends** the spine store `web/lib/store.ts` with the helpers in API Design (c) and
+  **reads** the reconciliation story's `verdicts`/`trail`/`useStore.isResolved`. The
+  **body-text write-back is THIS story**; the per-verdict **tracked notes** (guiding-principle
+  / cross-reference / gap / conflict) are the reconciliation story's — this story turns a
+  flagged conflict into replacement body text, it does not re-record the note.
+
+## Exemplar Files
+
+- `docs/poc/drafter-knowledge-graph/assistant.html` — the legacy grounded-redraft page and its
+  proposal/accept UI is the read-only **UX reference** the `web/app/assistant/page.tsx` build
+  follows.
+- `spec-upload-and-workspace.md` → "Shared Technical Spine" and its `web/lib/store.ts` /
+  `web/lib/data.ts` contract — the store and read seam this story extends
+  (`NEXT_PUBLIC_API_BASE`, `fetchConnections`/`connectionsFor`, `analyse`, the shared
+  `web/components/` such as `QuoteBlock`/`VerdictBadge`, `reset`).
+- `spec-connection-reconciliation.md` — the `trail` (decision trail) / `verdicts` (finding
+  status) slice shapes and `useStore.isResolved(connId)` this story reads for the submission
+  gate and the attached justification pack.
+
+## Implementation Plan
+
+### Sub-tasks
+
+**Task 1: Redraft/resolve/submit helpers in `web/lib/store.ts`** — _medium_
+
+- Add the `resolved`/`draft`/`submitted` slices + `propose`/`accept`/`reject`/`dismissFinding`
+  /`submit` (plus `paragraphText`, `openFindings`) to `web/lib/store.ts`; the `propose` grounded
+  redraft draws over connected sources + allowlist; read `verdicts`/`trail`/`isResolved`. Store
+  reactivity + `persist` cross-tab sync drive the live re-render.
+- Files: `web/lib/store.ts`
+- SEQUENTIAL (depends on the workspace store scaffold + reconciliation's verdict/trail slices)
+
+**Task 2: Proposal view — grounded redraft, verbatim quotes, no-match** — _large_
+
+- Render proposal-beside-current-text; verbatim quotes through the shared `QuoteBlock` with
+  per-source `verification` markers; the "No matching clause found" state; the empty-ask guard.
+- Files: `web/app/assistant/page.tsx`, `web/components/*`
+- SEQUENTIAL (depends on Task 1)
+
+**Task 3: Accept (mock tracked change + resolve), reject, re-analyse** — _medium_
+
+- Accept → `draft` slice tracked change + `resolved` kind:"edit" + live reflection; reject →
+  unchanged; "Analyse this paragraph" → `data.analyse`; honest Graph-mock label on the
+  write-back.
+- Files: `web/app/assistant/page.tsx`, `web/lib/store.ts`
+- SEQUENTIAL (depends on Task 2)
+
+**Task 4: Dismissal-with-reason + resolve guardrail** — _small_
+
+- Dismissal control writing `resolved` kind:"dismissal" (reason required, whitespace-only
+  blocked); enforce that the only resolve paths are accept/dismiss.
+- Files: `web/app/assistant/page.tsx`, `web/lib/store.ts`
+- SEQUENTIAL (depends on Task 3)
+
+**Task 5: Submission gate + trail attach + confirmation** — _medium_
+
+- Submit disabled + open-findings list while any finding is unresolved
+  (`useStore.openFindings`); on all-resolved, `useStore.submit` writes the `submitted` slice
+  with `useStore.trail()` attached and shows the "manager notified" confirmation.
+- Files: `web/app/assistant/page.tsx`, `web/lib/store.ts`
+- SEQUENTIAL (depends on Task 4)
+
+**Task 6: Carried-insight entry point** — _small_
+
+- Read `/assistant?para=…&insight=…` query params to pre-load the insight's paragraphs + cited
+  sources; write nothing until accept.
+- Files: `web/app/assistant/page.tsx`
+- INDEPENDENT (needs Task 2's renderer, but not the submission chain)
+
+### Negative Constraints
+
+- Do NOT rebuild Microsoft Word or a general text editor — the assistant only proposes
+  source-grounded wording beside the current text.
+- Do NOT produce ungrounded wording — no proposal without a verbatim supporting passage; an
+  ungrounded ask returns `{no_match:true}`.
+- Do NOT resolve a finding without an accepted edit or a reasoned dismissal — there is no bare
+  "mark resolved" path.
+- Do NOT claim the Microsoft Graph write-back runs live in the demo — it is a mock tracked
+  change in the `draft` slice, honestly labelled; live Graph is the documented production path.
+- Do NOT add engine write routes — the engine stays read-only; all resolve/draft/submission
+  state is client-side in the store slices.
+- Do NOT write to the `trail` or `verdicts` slices — those are the reconciliation story's; this
+  story reads them only.
+- Do NOT extend the legacy `docs/poc/drafter-knowledge-graph/*.html` pages — they are the
+  read-only UX reference only.
+- Do NOT upgrade an `illustrative`/`pending_extraction` quote to `verified`; do NOT return a
+  source outside the approved allowlist.
+
+## Test Scenarios
+
+**Test 1: Grounded proposal for the PDPA §129 conflict on 4.6 quotes verbatim**
+
+- Setup: `/assistant?para=4.6&finding=ai-dp-2025:4.6::pdpa-2010:PDPA 129`; the connection
+  payload carries the PDPA §129 quote with `verification:"verified"`.
+- Action: ask for a fix for the cross-border transfer conflict.
+- Expected: the proposal names the cross-border transfer test and quotes PDPA §129 byte-for-byte
+  ("A data controller may transfer any personal data…"), marked "✓ verbatim — verified", shown
+  beside the current 4.6 text; nothing written to the `draft` slice yet.
+
+**Test 2: An ungrounded ask returns no_match, never uncited prose**
+
+- Setup: 4.6 selected; ask to add a numeric capital-buffer percentage no connected/allowlist
+  source supports.
+- Action: request the proposal.
+- Expected: `useStore.propose` returns `{no_match:true}`; the view shows "No matching clause
+  found" and the "drafting belongs in Word" reminder; no wording with an unsupported figure and
+  no fabricated source is shown.
+
+**Test 3: Accept writes a tracked change to the `draft` slice + `resolved` kind:"edit" + live reflection**
+
+- Setup: the PDPA §129 proposal from Test 1 on screen.
+- Action: accept the proposal.
+- Expected: `draft["4.6"].tracked_changes` gains a `{type:"insertion", mock:true, finding_id:
+…}` entry and `draft["4.6"].text` updates; `resolved["ai-dp-2025:4.6::pdpa-2010:PDPA
+129"] = {kind:"edit"}`; the open workspace/reconciliation tab reads the finding resolved via
+  the store's cross-tab sync without a reload; the tracked change carries the honest mock label.
+
+**Test 4: Reject leaves the `draft` slice unchanged**
+
+- Setup: a proposal for 3.5 on screen; `draft["3.5"]` unset (or unchanged).
+- Action: reject.
+- Expected: `draft["3.5"]` is unchanged (no tracked change written), no `resolved` entry
+  for any 3.5 finding, and the drafter can request a different proposal.
+
+**Test 5: Grounded search is allowlist-only**
+
+- Setup: an ask whose only apparent support sits on an unapproved website; the approved list
+  holds no verbatim support.
+- Action: request the proposal.
+- Expected: the unapproved source is never returned; the result is either an approved-list
+  verbatim passage or `{no_match:true}` — no unapproved source appears as evidence.
+
+**Test 6: Re-analyse re-finds connections on the edited paragraph**
+
+- Setup: 4.6 edited (working-copy text now names the PDPA cross-border transfer test).
+- Action: "Analyse this paragraph."
+- Expected: `data.analyse("4.6")` returns the re-found connections through the shared renderer;
+  the addressed finding is no longer shown as an open connection; no fabricated card.
+
+**Test 7: Submit is blocked with an open finding, succeeds when all resolved (trail attached)**
+
+- Setup: the PDPA §129 finding on 4.6 still open (not in the `resolved` slice).
+- Action: attempt to submit; then resolve every finding (accept edits + one reasoned dismissal)
+  and submit again.
+- Expected: first submit is disabled and lists the open PDPA §129 finding with a resolve link,
+  the `submitted` slice null, nothing sent; after all findings resolve, `useStore.submit` writes
+  `submitted = {submitted:true, trail: useStore.trail()}` (the `trail` slice copied in), and
+  the "manager notified" confirmation renders.
+
+**Test 8: Dismissal-with-reason resolves; whitespace-only reason blocks**
+
+- Setup: the industry-feedback finding on 4.6 open.
+- Action: attempt to dismiss with a whitespace-only reason, then with a real reason.
+- Expected: the whitespace-only reason blocks the dismissal (no `resolved` entry); a real
+  reason writes `resolved["<finding_id>"] = {kind:"dismissal", reason}`; `useStore.isResolved`
+  becomes true and the finding counts toward the submission gate.
+
+## Verification
+
+Run the `verifier` skill. **Vitest + React Testing Library is the gate** for this surface
+(backend `pytest` only if the snapshot exporter/fixtures are extended for the demo paragraphs
+this story reads).
+
+### Component / Unit Tests (Vitest + React Testing Library — the gate)
+
+- `web/lib/store.test.ts` — `propose` (grounded vs `{no_match:true}`), `accept` (writes the
+  `draft` tracked change + `resolved` kind:"edit"), `reject` (no state written), the
+  submission gate via `openFindings`/`isResolved` → `submit` writing the `submitted` slice with
+  `trail()` attached, and `dismissFinding` (reason required, whitespace-only blocked). Covers
+  Tests 1–8's state transitions.
+- `web/app/assistant/*.test.tsx` — a component test asserting the **"No matching clause found"**
+  state renders (with the "drafting belongs in Word" reminder) for an ungrounded ask, and that
+  the honest **mock-Graph label** ("live Graph write-back is the documented production path")
+  is visible on the write-back / notify affordances.
+
+### E2E Tests (Playwright — optional, non-blocking)
+
+| Key Scenario                                    | Test file                   | Assigned sub-task |
+| ----------------------------------------------- | --------------------------- | ----------------- |
+| Ask → accept the PDPA §129 fix → tracked change | `web/e2e/assistant.spec.ts` | Task 3            |
+| Submit blocked until all findings resolved      | `web/e2e/assistant.spec.ts` | Task 5            |
+
+**Locator strategy:** `data-testid` on the proposal panel (`proposal`), the accept/reject
+controls (`accept`/`reject`), and the submit button (`submit`). Flagged non-blocking — a red
+E2E never blocks the demo; the Vitest gate above is authoritative.
+
+### Dev-server walkthrough
+
+Run the Next.js dev server (`npm run dev` in `web/`) and walk through:
+
+1. Open `/assistant?para=4.6` → ask for the PDPA §129 fix → proposal beside the current 4.6
+   text, PDPA §129 quoted verbatim and marked "✓ verbatim — verified." (Grounded-proposal +
+   verbatim-citation scenarios.)
+2. Ask for an unsupported capital-buffer figure → "No matching clause found" + the Word
+   reminder; no uncited prose. (No-ungrounded-wording scenario.)
+3. Accept the PDPA proposal → the mock tracked change appears in the working copy (honest label
+   visible), the finding reads resolved, and an open workspace/reconciliation tab reflects it
+   live. (Accept-writes-tracked-change + shared-state scenarios.)
+4. Reject a 3.5 proposal → 3.5 keeps its wording, no finding resolved. (Reject scenario.)
+5. Strengthen 3.5 with OECD 1.2 → the proposal quotes the OECD human-oversight passage verbatim
+   and, on accept, resolves the OECD Consensus finding as a real edit. (OECD-strengthen
+   scenario.)
+6. Edit 4.6 and "Analyse this paragraph" → the re-found connections render; the addressed
+   finding drops off the open list. (Re-analyse scenario.)
+7. Attempt submit with an open finding → blocked, open-findings list shown; resolve all (edits +
+   one reasoned dismissal) → submit succeeds, manager-notified confirmation, `trail` slice
+   attached. (Submission-gate + dismissal scenarios.)
+8. Confirm the honest "live Graph write-back is the documented production path — mocked here"
+   banner is visible on every write-back / notify affordance. (Honest-labelling scenario.)
+
+## Open Questions (technical)
+
+- [x] ~~Where is the mock/live Microsoft Graph line drawn technically?~~ — **Resolved:** the
+      demo write-back is a **mock tracked change written into the `draft` store slice**
+      (`mock:true`, honestly labelled); the live Microsoft Graph **read document body** +
+      **append tracked change (insertion)** against the Word document on SharePoint is the
+      **documented production path only**, named with its OAuth/Graph scopes and never run in
+      the shipped app.
+- [x] ~~Where do the resolve state, the working copy, and the submission live without a
+      backend?~~ — **Resolved:** the persisted Zustand store slices `resolved` (how each finding
+      resolved), `draft` (the working copy + mock tracked changes), and `submitted` (the
+      submission + attached `trail` slice), written through `useStore` and reflected live via
+      the store's reactivity + cross-tab `storage` sync; no engine write routes.
+- [ ] **Should the assistant re-analyse an edited paragraph automatically on accept, or only
+      when the drafter runs "Analyse this paragraph"?** — **Deferred (non-blocking):** MVP1
+      exposes re-analysis as an explicit drafter action; automatic re-analysis on accept is a
+      later convenience that does not change the acting loop.
+- [ ] **When the drafter edits a paragraph directly in Word (not via the assistant), which
+      findings, if any, should auto-resolve before she re-analyses?** — **Deferred
+      (non-blocking):** MVP1 resolves on an accepted suggestion or a reasoned dismissal and
+      relies on re-analysis to reflect a direct manual edit; auto-resolving on manual edits is
+      deferred.
+- [ ] **Should the tool run as a native Word add-in (task pane) using Office.js instead of a
+      companion web app in a later phase?** — **Deferred (non-blocking):** MVP1 is the companion
+      web app with the mock write-back; a native Word task pane (Office.js `insertText` with
+      tracked changes on) is a stronger in-context experience and a natural roadmap step, but
+      does not change the MVP behaviour.

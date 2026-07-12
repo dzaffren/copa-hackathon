@@ -304,3 +304,439 @@ Then the added source is still listed for paragraph 3.11
 - [x] ~~Should analysed paragraphs be visually distinguished on the canvas?~~ — **Resolved:** yes. Analysed paragraphs carry a distinct marker with their connected-source count; not-yet-analysed paragraphs are visibly marked as such, so a viewer instantly sees where the depth is and that the rest can be analysed on demand.
 - [x] ~~What happens when the drafter analyses a not-yet-analysed paragraph in the demo?~~ — **Resolved:** it runs **live** — the tool matches that paragraph against the preloaded curated library and returns real connections (or "No matching clause found"), for any of the 54 paragraphs. **Risk flagged:** live branch-② matching is proven on known pairs but not at scale across a large source universe; this is the acknowledged live-demo risk, mitigated by the verbatim-citation guardrail (no fabricated connections) and the curated library keeping the demo's universe bounded.
 - [x] ~~What is the default-selected paragraph?~~ — **Resolved:** paragraph 4.6 (Data & personal information), because its PDPA §129 Conflict is the strongest opening hook for the demo.
+
+---
+
+> **Technical refinement (added by `/prd-refine`; re-platformed to Next.js on 2026-07-11).**
+> Everything above is the approved product content and is unchanged. The sections below add
+> the buildable detail. This is the **first** UI story to be refined, so it establishes the
+> **shared technical spine** — the Next.js frontend, the read-API/snapshot contract, and the
+> Zustand shared-state store — that the other four UI stories (reconciliation, insights,
+> grounded redraft assistant, drift monitor) reuse verbatim. Read this spine there rather
+> than re-deriving it. The stack decision and its rationale live in
+> `frontend-nextjs-migration-design.md`.
+
+## Shared Technical Spine (all UI stories)
+
+- **Frontend = a Next.js + React app under `web/`.** Every drafter surface is a route in one
+  **Next.js (App Router) + React + Tailwind + shadcn/ui** application at the repo-root `web/`
+  directory, deployed to **Vercel** (per `CLAUDE.md`, updated 11 Jul 2026 — this supersedes
+  the earlier "self-contained HTML, no build step" convention). The six legacy prototype
+  pages under `docs/poc/drafter-knowledge-graph/` (`index.html`, `workspace.html`,
+  `connections.html`, `insights.html`, `assistant.html`, `monitor.html`) are kept as the
+  read-only **UX reference** the `web/` build follows — they are not extended as the live
+  demo. Routes: `web/app/page.tsx` (upload), `web/app/workspace/page.tsx`,
+  `web/app/connections/[id]/page.tsx`, `web/app/insights/page.tsx`,
+  `web/app/assistant/page.tsx`, `web/app/monitor/page.tsx`.
+- **Data source = the engine read API, with a bundled snapshot default.** Pages read
+  connections/verdicts/paragraphs through one seam, `web/lib/data.ts`, which wraps the
+  Two-Branch Source Connection Engine's routes (`GET /documents/{id}/paragraphs`,
+  `GET …/paragraphs/{n}/connections`, `POST …/paragraphs/{n}/analyse`). A build-time exporter
+  writes a JSON **snapshot** of those responses into `web/public/data/` so the demo runs with
+  **no backend** (deploy-safe on Vercel/any static host). The `NEXT_PUBLIC_API_BASE` env var
+  selects the source: unset → `fetch()` the bundled snapshot (default); a URL → call the live
+  FastAPI engine (enables the live "analyse any paragraph" moment). Honestly labelled either
+  way.
+- **"One shared finding state" = a Zustand store (`web/lib/store.ts`) with `persist` to
+  `localStorage`.** One store, imported as a `useStore` hook by every route/component, holds
+  all drafter state in named slices. Zustand's `persist` middleware keeps it in
+  `localStorage` (so state survives reload) and its cross-tab `storage` sync keeps every open
+  tab live — the honest MVP1 realisation of "one shared state." **No backend write routes**
+  (the engine is read-only, per its negative constraints); all drafter actions are
+  client-side.
+- **Store slices** (extended across stories; each story owns the ones it writes). These
+  replace the earlier `rr_*` `localStorage` keys 1:1; the `persist` key namespace stays
+  `rr` so the mental model carries over:
+  | Slice       | Owner story            | Shape                                                                                                  |
+  | ----------- | ---------------------- | ------------------------------------------------------------------------------------------------------ |
+  | `sources`   | this story             | `{ "<para>": [ {title, source_type, added_by:"drafter"} ] }`                                           |
+  | `blocked`   | this story             | `["<connection_id>", …]` (blocked sources the drafter supplied)                                        |
+  | `verdicts`  | reconciliation         | `{ "<connection_id>": {verdict, status:"confirmed", why?} }`                                           |
+  | `trail`     | reconciliation         | `[ {connection_id, paragraph, verdict, source, quote, verification, note_type} ]` (the decision trail) |
+  | `resolved`  | grounded redraft asst. | `{ "<finding_id>": {kind:"edit"\|"dismissal", reason?} }`                                              |
+  | `draft`     | grounded redraft asst. | `{ "<para>": {text, tracked_changes:[…]} }` (browser-held working copy)                                |
+  | `watch`     | insights               | `[ {insight_id, source, added_at} ]` ("track this" watch-items)                                        |
+  | `setAside`  | insights               | `["<insight_id>", …]`                                                                                  |
+  | `submitted` | grounded redraft asst. | `{ submitted:true, trail:[…] }` \| null                                                                |
+- **Testing.** **Vitest + React Testing Library** is the gate (store slices + guarantee-bearing
+  components); **Playwright** hero flows are **optional/non-blocking**; backend `pytest`
+  covers any engine/exporter change. (No E2E test may block the demo.)
+- **Honesty labelling is a build requirement, not decoration:** every page renders the
+  real-vs-prepared and verified-vs-illustrative markers from the data, never hard-codes a
+  "verified" badge.
+
+## Functional Requirements
+
+- **Analyse sequence is scripted, not fetched.** The six-step sequence (`app/page.tsx`) is a
+  timed client-side animation over a fixed step list; each step marks done before the next
+  starts. It does **not** call the model — the "real" claim it makes is only about
+  upload+extraction. The completion summary counts are read from the snapshot
+  (`data/paragraphs.json` + `data/connections/*.json`) via `lib/data.ts`, never hard-coded,
+  so they cannot drift from the data actually shown in the workspace.
+- **Canvas renders all 54 paragraphs; 8–10 carry analysis.** `app/workspace/page.tsx` renders
+  every paragraph from `data.fetchParagraphs()`. A paragraph with `state: "analysed"` shows
+  its `connection_count` badge; `state: "not_analysed"` renders the muted "not yet analysed"
+  marker and, on selection, the "Analyse this paragraph" affordance. Paragraph 4.6 is
+  selected on first load.
+- **Right rail renders connections verbatim from the engine payload.** For the selected
+  paragraph, the rail (a `ConnectionRail` component) lists each connection with: source-type
+  dot, verdict badge (`VerdictBadge`), branch tag (`cited` → "cited in your doc", `uncited` →
+  "surfaced — not cited", `feedback` → "industry feedback"), the `quote.text` with its
+  `verification` marker (`verified` → "✓ verbatim", `illustrative` → "◦ illustrative",
+  `pending_extraction` → "pending extraction" placeholder — rendered by a shared `QuoteBlock`
+  component), the `rationale` as the "how it affects this paragraph" read, and an "Open
+  connection & act" link to `/connections/<connection_id>`. A connection with
+  `status: "could_not_retrieve"` renders the blocked card (no verdict, no quote) plus "Upload
+  this source"; `no_matching_source: true` renders "No matching source found"; `state:
+"not_analysed"` renders the analyse prompt. These four states are mutually exclusive and
+  visually distinct.
+- **Live analyse of a bare paragraph.** "Analyse this paragraph" calls `data.analyse(n)`,
+  which hits `POST …/paragraphs/{n}/analyse` when `NEXT_PUBLIC_API_BASE` is set; in snapshot
+  mode it reads `data/connections/{n}.json` if present, else renders "No matching clause
+  found." Either path renders returned connections through the same `ConnectionRail` — never
+  a fabricated card.
+- **Supply a blocked source (client-side).** Choosing "Upload this source" on a blocked
+  connection calls `useStore.supplyBlocked(connId)` (appends to the `blocked` slice) and
+  re-renders the card as "you supplied it — the tool can now quote it verbatim and analyse
+  this connection." The demo does not actually retrieve the source; the state flip is honest
+  MVP1 behaviour, labelled.
+- **Add a missing source (client-side).** Adding a source to the selected paragraph calls
+  `useStore.addSource(para, {title, source_type})` (appends `{…, added_by:"drafter"}` under
+  that paragraph key in the `sources` slice), renders an "added by you" connection, and
+  increments the running connected-source count.
+- **Running count = engine connections + supplied + added, from the store.** The count and
+  the added/supplied cards survive navigation to another paragraph and back (they read from
+  the persisted store, not component memory).
+- **A fresh upload clears the session.** Taking the upload/demo-shortcut on `app/page.tsx`
+  calls `useStore.reset()` so every slice starts clean.
+- **Idempotency.** Re-selecting a paragraph, re-adding an already-added source (same title +
+  paragraph), or re-supplying an already-supplied blocked connection causes no duplicate card
+  and no double-count.
+
+### Validation & Business Rules
+
+- Adding a source with an empty title is rejected inline ("Give the source a title"); no
+  `sources` entry is written.
+- The verification marker shown must equal the payload's `verification` field — a component
+  may never upgrade `illustrative`/`pending_extraction` to `verified`. A mismatch is a defect
+  (asserted by a `QuoteBlock` unit test).
+
+## Permissions & Security
+
+- **Scope:** public. Every byte derives from public BNM documents and public references; the
+  read routes are public (unchanged from `engine/api.py`). No auth on the drafter surface.
+- **No sensitive data:** the confidential handbook and any "own past positions" never appear
+  with real content — the snapshot exporter must **skip** any node with
+  `access: "restricted"` (reuse the engine's carve-out) so no restricted text lands in the
+  tracked `web/public/data/` path. This is enforced by the confidentiality guard.
+- **Input validation:** the added-source title is trimmed and length-capped (≤200 chars)
+  before storage; the `[id]` route param is matched against known ids, and an unknown id
+  renders the empty-rail prompt rather than throwing.
+
+## API Design (consumed — owned by the engine story)
+
+This story **consumes** the engine's read API through `web/lib/data.ts`; it defines no new
+engine routes. The contract it relies on (see `spec-source-connection-engine.md` → "API
+Design"):
+
+- `GET /documents/{document_id}/paragraphs` → canvas paragraphs + `state` + `connection_count`.
+- `GET /documents/{document_id}/paragraphs/{number}/connections` → the right-rail payload
+  (connections with `branch`, `source`, `verdict`, `confidence`, `rationale`, `quote`;
+  `no_matching_source`; `could_not_retrieve`/`pending_extraction` shapes).
+- `POST /documents/{document_id}/paragraphs/{number}/analyse` → live analyse; returns the
+  same shape as the `connections` route; `503 ANALYSE_UNAVAILABLE` is caught and rendered as
+  "live analysis is temporarily unavailable — pre-analysed paragraphs are unaffected."
+
+**New (owned here): the static snapshot exporter.** A script serialises the engine's built
+artifacts into the Next.js app's `public/data/` directory so the deployed app needs no
+server:
+
+```
+scripts/export_poc_snapshot.py
+  reads  data/artifacts/{clause-index,graph,verdicts}.json
+  writes web/public/data/paragraphs.json
+         web/public/data/connections/{number}.json   (one per analysed paragraph)
+  skips  any node with access == "restricted"
+```
+
+Example `data/paragraphs.json` (excerpt) — byte-shape mirrors `GET …/paragraphs`:
+
+```json
+{
+  "document_id": "ai-dp-2025",
+  "total_paragraphs": 54,
+  "paragraphs": [
+    {
+      "number": "4.6",
+      "title": "Data & personal information",
+      "state": "analysed",
+      "connection_count": 3
+    },
+    {
+      "number": "3.5",
+      "title": "Fair usage & bias",
+      "state": "analysed",
+      "connection_count": 4
+    },
+    {
+      "number": "3.2",
+      "title": "Board & senior management oversight",
+      "state": "not_analysed",
+      "connection_count": 0
+    }
+  ]
+}
+```
+
+Example `data/connections/3.5.json` (excerpt) — mirrors `GET …/connections`, including a
+blocked and an illustrative connection:
+
+```json
+{
+  "paragraph": { "number": "3.5", "title": "Fair usage & bias" },
+  "state": "analysed",
+  "no_matching_source": false,
+  "connections": [
+    {
+      "id": "ai-dp-2025:3.5::oecd:OECD 1.2",
+      "branch": "cited",
+      "source": {
+        "document_id": "oecd-ai",
+        "title": "OECD AI Principles",
+        "source_type": "international_standard"
+      },
+      "verdict": "Consensus",
+      "confidence": "High",
+      "rationale": "OECD backs the fairness stance and adds a human-agency & oversight mechanism 3.5 does not yet name.",
+      "quote": {
+        "clause_number": "OECD 1.2",
+        "text": "AI actors should implement mechanisms and safeguards, such as capacity for human agency and oversight, including to address risks arising from uses outside of intended purpose.",
+        "verification": "verified"
+      }
+    },
+    {
+      "id": "ai-dp-2025:3.5::mas-feat",
+      "branch": "uncited",
+      "source": {
+        "document_id": "mas-feat",
+        "title": "MAS — FEAT Principles (Fairness)",
+        "source_type": "peer_regulator"
+      },
+      "status": "could_not_retrieve",
+      "reason": "The MAS site blocks automated access; upload the source to analyse this connection.",
+      "verdict": null,
+      "quote": null
+    }
+  ]
+}
+```
+
+## Data Model & Artifacts
+
+No database. State lives in two places:
+
+- **Static snapshot** (read-only, produced by the exporter): `web/public/data/paragraphs.json`
+  and `web/public/data/connections/{number}.json` above. Immutable per build; committed to the
+  tracked `web/public/data/` path (public content only).
+- **Zustand store (mutable, per browser, persisted to `localStorage`):** this story writes the
+  `sources` and `blocked` slices (shapes in the spine table). All access goes through the
+  `useStore` hook in `web/lib/store.ts` (`addSource(para, {title, source_type})`,
+  `supplyBlocked(connId)`, `connectionsFor(para)` which merges snapshot + added, `reset()`).
+
+## UI/Frontend Requirements
+
+- **`web/app/page.tsx`** (new) — upload zone + demo shortcut; on start, `useStore.reset()`
+  then run the scripted six-step analyse sequence; completion summary counts computed from the
+  snapshot via `lib/data.ts`; "Open the workspace →" links to `/workspace`.
+- **`web/app/workspace/page.tsx`** (new) — two-pane layout: left canvas of 54 paragraphs
+  (analysed badge vs "not yet analysed"), right rail (`ConnectionRail`) of connections for the
+  selected paragraph. Includes the source-type legend, running connected-source count,
+  "Analyse this paragraph", "Upload this source" (blocked), "Add a source", and per-connection
+  "Open connection & act". Default selection 4.6.
+- **`web/lib/store.ts`** (new) — the shared Zustand store (`persist` to `localStorage`),
+  exposing the `sources`/`blocked` slices plus `addSource`, `supplyBlocked`, `connectionsFor`,
+  and `reset`. **Every** UI story extends this one store.
+- **`web/lib/data.ts`** (new) — the read seam: `fetchParagraphs()`, `fetchConnections(para)`,
+  `analyse(para)`; snapshot-vs-live selected by `NEXT_PUBLIC_API_BASE`.
+- **Shared components** (`web/components/`): `ConnectionRail`, `VerdictBadge`, `QuoteBlock`
+  (renders the verification marker), `SourceTypeDot` — reused by the reconciliation and
+  insights stories.
+- **States:** _Loading_ — skeleton rows while the snapshot/API resolves. _Empty (nothing
+  selected)_ — right rail shows "Select a paragraph on the left." _Empty (analysed, no
+  source)_ — "No matching source found." _Not analysed_ — muted marker + analyse prompt.
+  _Blocked_ — "couldn't retrieve" card. _Error_ — snapshot/API failure shows "couldn't load
+  the analysis — retry," never a blank canvas.
+
+## Architecture Notes
+
+- **New dependencies:** the frontend introduces the repo's first `package.json` — Next.js,
+  React, Tailwind, shadcn/ui, and Zustand (dev: Vitest, React Testing Library, optional
+  Playwright), all isolated under `web/`. The exporter uses the standard library plus the
+  existing `engine` package — no new Python deps.
+- **Integration points:** consumes the engine read API / snapshot via `lib/data.ts`;
+  `lib/store.ts` is the shared store the other four UI stories extend; `components/` are shared;
+  the "Open connection & act" link is the hand-off into the reconciliation story.
+- **Deploy:** the Next.js app deploys to **Vercel** (the exporter runs in CI before the build
+  so the bundled snapshot is fresh). The existing `.github/workflows/deploy-poc.yml`
+  (GitHub Pages of the legacy HTML) is retained until `web/` reaches parity, then retired or
+  repurposed — settled at parity (see `frontend-nextjs-migration-design.md`).
+
+## Exemplar Files
+
+- `docs/poc/drafter-knowledge-graph/workspace.html` — the legacy two-pane workspace and its
+  `localStorage` helpers are the **UX reference** the `web/` workspace re-implements (layout,
+  the four connection states, the running count).
+- `docs/poc/drafter-knowledge-graph/index.html` — the legacy scripted analyse sequence, the
+  reference for `app/page.tsx`.
+- `engine/api.py` `create_app(...)` + `engine/tests/test_api.py` — the exact response shapes
+  the snapshot must mirror and the fixture pattern the exporter test follows.
+
+## Implementation Plan
+
+### Sub-tasks
+
+**Task 1: Scaffold the `web/` Next.js app + shared store/data seams** — _medium_
+
+- Scaffold Next.js (App Router) + Tailwind + shadcn/ui under `web/`; add `lib/store.ts`
+  (Zustand + persist, `sources`/`blocked` slices, `addSource`/`supplyBlocked`/`connectionsFor`/
+  `reset`) and `lib/data.ts` (`fetchParagraphs`/`fetchConnections`/`analyse`, snapshot-or-live
+  via `NEXT_PUBLIC_API_BASE`).
+- Files: `web/package.json`, `web/app/layout.tsx`, `web/lib/store.ts`, `web/lib/data.ts`,
+  `web/tailwind.config.ts` (+ scaffold defaults)
+- SEQUENTIAL (foundation for every UI story)
+
+**Task 2: Static snapshot exporter** — _medium_
+
+- Serialise `data/artifacts/*` → `web/public/data/paragraphs.json` +
+  `web/public/data/connections/{n}.json`; skip `access:"restricted"` nodes.
+- Files: `scripts/export_poc_snapshot.py` (new),
+  `engine/tests/test_export_poc_snapshot.py` (new)
+- INDEPENDENT (needs the engine artifacts, but not the `web/` scaffold)
+
+**Task 3: Upload + analyse sequence** — _small_
+
+- `app/page.tsx`: `useStore.reset()`, run the scripted six-step sequence, compute summary
+  counts from the snapshot, route to `/workspace`.
+- Files: `web/app/page.tsx`
+- SEQUENTIAL (depends on Tasks 1, 2)
+
+**Task 4: Workspace canvas + right-rail renderer** — _large_
+
+- `app/workspace/page.tsx` + `components/ConnectionRail`, `VerdictBadge`, `QuoteBlock`,
+  `SourceTypeDot`: render 54 paragraphs with analysed/not-analysed markers; render the four
+  connection states; legend + running count; default 4.6.
+- Files: `web/app/workspace/page.tsx`, `web/components/*.tsx`
+- SEQUENTIAL (depends on Tasks 1, 2)
+
+**Task 5: Analyse-on-demand, supply-blocked, add-source** — _medium_
+
+- "Analyse this paragraph" (live/snapshot), supply-blocked flip, add-source with count
+  update, all through the store and reflected live.
+- Files: `web/app/workspace/page.tsx`, `web/lib/store.ts`
+- SEQUENTIAL (depends on Task 4)
+
+**Task 6: Vercel deploy + CI snapshot step** — _small_
+
+- Add Vercel config (or project settings) for the `web/` app; run the exporter in CI before
+  build so `web/public/data/` ships fresh.
+- Files: `web/vercel.json` (or CI workflow), `.github/workflows/*`
+- INDEPENDENT
+
+### Negative Constraints
+
+- Do NOT add engine write routes or a server-side session store — shared state is the Zustand
+  store persisted to `localStorage`.
+- Do NOT export or commit any `access:"restricted"` node text into `web/public/data/`.
+- Do NOT hard-code connection counts, verdicts, or "verified" badges — every marker renders
+  from the data.
+- Do NOT change the engine's `GET …/paragraphs` / `…/connections` contracts (owned by the
+  engine story).
+- Do NOT extend the legacy `docs/poc/drafter-knowledge-graph/*.html` pages as the live demo —
+  they are the read-only UX reference only.
+
+## Test Scenarios
+
+**Test 1: Snapshot exporter mirrors the API shape and skips restricted nodes**
+
+- Setup: a fixture `graph.json` with one `access:"public"` reference node and one
+  `access:"restricted"` handbook node; a `verdicts.json` with a Consensus record for 3.5.
+- Action: run `export_poc_snapshot.py` against a tmp artifacts dir.
+- Expected: `data/connections/3.5.json` contains the public OECD connection with
+  `verification:"verified"`; **no** field anywhere contains the restricted node's title or
+  text; `paragraphs.json` `total_paragraphs == 54`.
+
+**Test 2: Workspace renders the four connection states distinctly**
+
+- Setup: `data/connections/3.5.json` with a verified OECD (Consensus), an illustrative BNM
+  (Duplicate), and a `could_not_retrieve` MAS card; `3.2` `not_analysed`; a paragraph with
+  `no_matching_source:true`.
+- Action: render `<WorkspacePage>` (RTL), select 3.5, then 3.2, then the empty paragraph.
+- Expected: 3.5 shows verified vs illustrative markers distinctly and a blocked card with no
+  verdict/quote; 3.2 shows the analyse prompt; the empty paragraph shows "No matching source
+  found" — four visually distinct states, no fabricated card.
+
+**Test 3: Add-source persists and survives navigation (idempotent)**
+
+- Setup: `<WorkspacePage>`, paragraph 3.11 selected, running count 10.
+- Action: add "IOSCO — AI in capital markets (2025)"; select 4.6; return to 3.11; add the
+  same source again.
+- Expected: count reads 11 on first add, the IOSCO card is still present after navigating
+  back (store persistence), and the second identical add does not create a duplicate or move
+  the count to 12.
+
+**Test 4: Supply-blocked flips the card without fabricating a quote**
+
+- Setup: 3.5 selected, MAS FEAT `could_not_retrieve`.
+- Action: choose "Upload this source."
+- Expected: card re-renders as "you supplied it," is no longer offered to upload, and shows
+  no fabricated verdict or quote; the store's `blocked` slice contains the connection id.
+
+**Test 5: Fresh upload clears the whole store**
+
+- Setup: `sources`, `trail`, `resolved` slices all populated.
+- Action: take the demo shortcut on `app/page.tsx` (calls `useStore.reset()`).
+- Expected: every slice is emptied; the workspace opens with only the snapshot connections and
+  the running count matching the snapshot.
+
+## Verification
+
+Run the `verifier` skill (Python/pytest for the exporter; Vitest/RTL for the frontend).
+
+### Backend Tests
+
+- `engine/tests/test_export_poc_snapshot.py` (new) — Test 1 (shape parity + restricted-node
+  skip; asserts `verification` markers pass through unchanged).
+
+### Component / Unit Tests (Vitest + React Testing Library — the gate)
+
+- `web/lib/store.test.ts` — Tests 3–5 (add-source idempotency + persistence, supply-blocked,
+  `reset()`).
+- `web/components/QuoteBlock.test.tsx` — the verification marker equals the payload field and
+  is never upgraded (Validation rule).
+- `web/app/workspace/*.test.tsx` — Test 2 (four connection states render distinctly).
+
+### E2E Tests (Playwright — optional, non-blocking)
+
+| Key Scenario                                         | Test file                          | Assigned sub-task |
+| ---------------------------------------------------- | ---------------------------------- | ----------------- |
+| Uploading the open document starts the analysis seq. | `web/e2e/upload-workspace.spec.ts` | Task 3            |
+| The workspace opens with 4.6 selected + its sources  | `web/e2e/upload-workspace.spec.ts` | Task 4            |
+| Adding a source the library missed                   | `web/e2e/upload-workspace.spec.ts` | Task 5            |
+
+**Locator strategy:** `data-testid` on the paragraph rows (`para-<number>`), the connection
+cards (`conn-<id>`), and the running count (`connected-count`). Flagged non-blocking — a red
+E2E never blocks the demo; the Vitest gate above is authoritative.
+
+## Open Questions (technical)
+
+- [x] ~~Where does the deployed app get its data with no backend?~~ — **Resolved:** a
+      build-time exporter (`scripts/export_poc_snapshot.py`) writes a JSON snapshot of the
+      engine's read-API responses into `web/public/data/`; `lib/data.ts` +
+      `NEXT_PUBLIC_API_BASE` switch between the bundled snapshot (default, deploy-safe) and a
+      live engine.
+- [x] ~~How is "one shared state" realised without a server?~~ — **Resolved:** a Zustand
+      store (`web/lib/store.ts`) persisted to `localStorage`, imported as a `useStore` hook by
+      every route; Zustand's cross-tab sync keeps open tabs live. No engine write routes.
+- [ ] Should the analyse sequence's per-step timing be fixed or data-driven? — **Deferred
+      (non-blocking):** MVP1 uses fixed timings; deriving them from real extraction time is a
+      later polish that does not change the steps shown.

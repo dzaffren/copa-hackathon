@@ -7,3 +7,4 @@ file in this directory. The active ruleset is synced into the repo's
 - [mypy third-party stub baseline](convention-mypy-third-party-stub-baseline.md) — the 4 mypy stub warnings in engine/ are accepted baseline, not a regression
 - [FastAPI TestClient deps](pattern-fastapi-testclient-deps.md) — TestClient tests need httpx + python-multipart as explicit deps
 - [/ship is GitLab, use gh](skill-ship-is-gitlab-use-gh.md) — override /ship's glab with gh + "Closes #<n>" on this GitHub repo
+- [Frontend is Next.js, not static HTML](convention-frontend-nextjs-not-static-html.md) — the demo frontend is a Next.js app under web/; don't flag the build step as a mistake
