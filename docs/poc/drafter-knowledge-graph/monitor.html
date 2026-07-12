@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Source Drift Monitor — Rulebook Radar</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+<header class="bg-white border-b border-gray-200 sticky top-0 z-10">
+  <div class="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <a href="workspace.html" class="text-gray-400 hover:text-gray-600 text-sm">← Workspace</a>
+      <span class="text-gray-300">/</span>
+      <h1 class="font-semibold">🔔 Source drift monitor</h1>
+    </div>
+    <div class="flex items-center gap-3 text-sm">
+      <a href="insights.html" class="text-indigo-600 hover:text-indigo-800 font-medium">✨ Missed</a>
+      <a href="assistant.html" class="text-indigo-600 hover:text-indigo-800 font-medium">✍️ Redraft assistant</a>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-screen-lg mx-auto px-4 py-6">
+  <div class="mb-5">
+    <h2 class="text-xl font-semibold">A source you benchmark against changed — so we came to you.</h2>
+    <p class="text-sm text-gray-500 mt-1">Nobody announces when a benchmark moves — <i>"BCBS never declares what changed."</i> The monitor watches your source universe and pushes you the drift: what changed, and exactly which of your draft clauses are now out of sync. Only BNM sits where it can watch the whole source web against its own in-flight drafts — an FI only sees published output.</p>
+    <p class="text-[11px] text-amber-600 mt-2 bg-amber-50 border border-amber-200 rounded px-3 py-1.5 inline-block">Prototype: these are <b>two prepared, dated drift events</b> shown as if pushed — not a live internet watcher. The continuously-running monitor is the roadmap north star.</p>
+  </div>
+
+  <div id="queue" class="space-y-4"></div>
+</main>
+
+<script>
+// Two prepared drift events. PDPA §129 is the PROVEN-GREEN blind-test case; Basel is the headline (IMF story).
+const events = [
+  {
+    id:"pdpa",
+    source:"Personal Data Protection Act §129",
+    date:"amended 2024",
+    headline:"Personal Data Protection Act §129 amended (2024) — 3 clauses in your draft are now out of sync",
+    material:"The whitelist regime was removed and replaced by a self-assessed test — the destination must have a substantially similar law OR an adequate level of protection. The default was flipped, and \"data user\" was renamed \"data controller.\"",
+    passage:"A data controller may transfer any personal data of a data subject to any place outside Malaysia if— (a) there is in that place in force any law which is substantially similar to this Act; or (b) that place ensures an adequate level of protection…",
+    verified:true,
+    affected:[
+      { clause:"RMiT 10.50(c)", why:"Relies on the cross-border transfer test the amendment rewrote" },
+      { clause:"RMiT 10.50(j)", why:"Relies on the cross-border transfer test the amendment rewrote" },
+      { clause:"RMiT 17.1", why:"Governs data handling the amendment's default-flip now affects" },
+    ],
+    notAffected:["RMiT 8.1","RMiT 11.1","RMiT 17.1(b)","RMiT 17.1(c)"],
+    caveat:"No RMiT clause literally cites the PDPA, so the link is a topical inference for you to confirm — not an automatic change.",
+  },
+  {
+    id:"basel",
+    source:"Basel III output floor (BCBS)",
+    date:"finalised",
+    headline:"Basel III output-floor standard finalised — 1 clause in your draft is now out of sync",
+    material:"The aggregate output floor is set at 72.5% of risk-weighted assets calculated under the standardised approaches. This carries the IMF deviation-justification story: if BNM departs from the floor, the deviation must be justified for IMF validation.",
+    passage:"[Basel III 72.5% aggregate output floor — exact wording pending verbatim extraction from BCBS d424 / Basel Framework RBC20]",
+    verified:false,
+    affected:[
+      { clause:"Draft capital-treatment clause", why:"Relies on the earlier output-floor position the standard now fixes at 72.5%" },
+    ],
+    notAffected:["Credit-risk disclosure clause","Liquidity coverage clause"],
+    caveat:"The exact Basel wording is not yet verified word-for-word, so it is shown pending verification — never approximated.",
+  },
+];
+
+document.getElementById("queue").innerHTML = events.map(e=>`
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+    <div class="bg-amber-50 border-b border-amber-100 px-5 py-3 flex items-start gap-3">
+      <span class="text-xl">🔔</span>
+      <div>
+        <p class="font-semibold text-sm">${e.headline}</p>
+        <p class="text-[11px] text-gray-500">${e.source} · ${e.date} · prepared drift event</p>
+      </div>
+    </div>
+    <div class="p-5 space-y-4">
+      <div>
+        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wide">What materially changed</p>
+        <p class="text-sm text-gray-700 mt-1">${e.material}</p>
+        <blockquote class="mt-2 text-xs text-gray-700 border-l-2 ${e.verified?'border-emerald-400':'border-amber-300'} pl-2 italic">“${e.passage}”
+          <span class="not-italic block mt-0.5 text-[10px] ${e.verified?'text-emerald-600':'text-amber-600'}">${e.verified?'✓ verbatim — verified against source':'◦ pending verification — not approximated'}</span>
+        </blockquote>
+      </div>
+      <div>
+        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wide">Your clauses now out of sync</p>
+        <div class="mt-1 space-y-1.5">
+          ${e.affected.map(a=>`<div class="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50/50 p-2">
+            <span class="text-xs font-semibold text-red-700 shrink-0">${a.clause}</span>
+            <span class="text-xs text-gray-600">${a.why}</span>
+            <a href="connections.html?p=4.6&c=c6" class="ml-auto text-[11px] text-indigo-600 hover:underline shrink-0">Reconcile →</a>
+          </div>`).join("")}
+        </div>
+      </div>
+      <div>
+        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wide">Considered &amp; ruled out — no false links</p>
+        <p class="text-xs text-gray-500 mt-1">${e.notAffected.join(" · ")}</p>
+      </div>
+      <p class="text-[11px] text-gray-500 bg-gray-50 rounded px-3 py-2"><b>You confirm — this is a prompt, not an applied change.</b> ${e.caveat} Nothing in your draft changes until you open a clause and reconcile it.</p>
+    </div>
+  </div>
+`).join("");
+</script>
+</body>
+</html>

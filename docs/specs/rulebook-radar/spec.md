@@ -1,5 +1,13 @@
 # Rulebook Radar — Overview
 
+> **⚠️ SUPERSEDED (11 Jul 2026).** This two-persona (drafter + supervisor),
+> RMiT-cluster design is the historical record of the 9–10 Jul era. It is
+> superseded by **[`../reconciliation-workbench/spec.md`](../reconciliation-workbench/spec.md)**,
+> the greenfield re-issue built on the 11 Jul reconciliation pivot
+> (`docs/discovery/reconciliation-workbench/brief.md`) and the prototype at
+> `docs/poc/drafter-knowledge-graph/`. The supervisor persona is deferred to a
+> roadmap slide there. Retained for history; do not build from this file.
+
 **Discovery Brief:** docs/discovery/policy-consistency-ai/brief.md
 
 ## Summary

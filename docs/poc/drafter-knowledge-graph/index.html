@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rulebook Radar — Upload your open document</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+<header class="bg-white border-b border-gray-200">
+  <div class="max-w-screen-xl mx-auto px-4 py-3 flex items-center gap-2">
+    <span class="text-indigo-600 text-2xl">◎</span>
+    <div>
+      <h1 class="font-semibold text-lg leading-tight">Rulebook Radar</h1>
+      <p class="text-xs text-gray-500 leading-tight">Due diligence for policy drafters · MVP1 prototype</p>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-screen-md mx-auto px-4 py-10">
+  <div class="text-center mb-8">
+    <h2 class="text-2xl font-semibold">Start with your open document.</h2>
+    <p class="text-gray-500 mt-2 max-w-lg mx-auto">Upload the policy you're drafting. Rulebook Radar reads it, pulls in the sources that bear on it — the ones it cites <b>and</b> the ones it should — and shows you how each one affects your draft.</p>
+    <p class="text-xs text-indigo-600 mt-3 max-w-lg mx-auto font-medium">You keep drafting in Word — <b>Microsoft writes; we cite.</b> Every suggestion is backed by the exact source clause, or we say "no matching clause found."</p>
+  </div>
+
+  <!-- Upload zone -->
+  <div id="dropzone" class="bg-white rounded-xl border-2 border-dashed border-gray-300 hover:border-indigo-400 transition p-10 text-center cursor-pointer" onclick="startAnalyse()">
+    <p class="text-4xl">📄⬆️</p>
+    <p class="font-medium mt-3">Drop your document here, or click to select</p>
+    <p class="text-xs text-gray-400 mt-1">PDF or Word · your draft stays private</p>
+    <button class="mt-5 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-medium">Upload a document</button>
+    <p class="text-xs text-gray-400 mt-4">Demo shortcut → uses the real, public <b>BNM Discussion Paper on AI in the Financial Sector</b> (Aug 2025).</p>
+    <p class="text-[11px] text-gray-400 mt-1">Prototype: upload &amp; extraction are real; the analyse sequence replays a pre-prepared result over a curated source set. Quotes are marked ✓ verified or ◦ illustrative.</p>
+  </div>
+
+  <!-- Analyse sequence (hidden until upload) -->
+  <div id="analyse" class="hidden bg-white rounded-xl border border-gray-200 shadow-sm p-8">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="text-2xl">📄</span>
+      <div>
+        <p class="font-semibold">AI in the Malaysian Financial Sector (Discussion Paper)</p>
+        <p class="text-xs text-gray-500">BNM · August 2025 · <span id="charCount">699 KB</span> · reading…</p>
+      </div>
+    </div>
+    <ol id="steps" class="space-y-3"></ol>
+    <div id="doneBar" class="hidden mt-7 text-center">
+      <p class="text-sm text-emerald-700 font-medium mb-3">✓ Analysis complete — <span id="connSummary"></span></p>
+      <a href="workspace.html" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium">Open the workspace →</a>
+    </div>
+  </div>
+
+  <!-- What the analysis does (transparency) -->
+  <div class="mt-8 grid sm:grid-cols-2 gap-4 text-sm">
+    <div class="bg-white rounded-xl border border-gray-200 p-4">
+      <p class="font-medium">① Sources it <span class="text-indigo-600">cites</span></p>
+      <p class="text-gray-500 mt-1 text-xs">The document names its own references (OECD, BCBS 239, FSB, NIST, MAS…). We parse them out, retrieve them, and link each to the paragraph that leans on it. → consensus / duplicate.</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 p-4">
+      <p class="font-medium">② Sources it <span class="text-indigo-600">should</span> consider</p>
+      <p class="text-gray-500 mt-1 text-xs">We match each paragraph's topic against a curated library of BNM benchmarks — surfacing relevant sources the draft did <b>not</b> cite. → gap / conflict / partial / what you might have missed.</p>
+    </div>
+  </div>
+</main>
+
+<script>
+const STEPS = [
+  { label:"Extracting the document — paragraphs & structure", detail:"73,601 characters · 54 numbered paragraphs" },
+  { label:"Branch ① — parsing the sources it cites", detail:"found: OECD (×14), BCBS 239, FSB, NIST, MAS, PDPA…" },
+  { label:"Retrieving those cited sources", detail:"9 retrieved · 1 blocked (MAS site blocks automated access — you can supply it)" },
+  { label:"Branch ② — matching paragraph topics to un-cited sources", detail:"fairness · hallucination · personal data · cross-border transfer" },
+  { label:"Pulling in industry feedback on this published paper", detail:"Association of Banks + 3 FSP respondents (agree / disagree)" },
+  { label:"Analysing every connection — consensus / conflict / gap / duplicate / partial", detail:"3 paragraphs analysed in depth (analyse any other on demand) · + surfacing cross-source insights you might have missed" },
+];
+
+function startAnalyse(){
+  // a new upload is a fresh session — clear any state left from a prior run/rehearsal
+  ["rr_pulled","rr_resolved_blocked","rr_user_srcs"].forEach(k=>localStorage.removeItem(k));
+  document.getElementById("dropzone").classList.add("hidden");
+  const a = document.getElementById("analyse");
+  a.classList.remove("hidden");
+  const ol = document.getElementById("steps");
+  ol.innerHTML = STEPS.map((s,i)=>`
+    <li id="step${i}" class="flex items-start gap-3 opacity-30 transition">
+      <span id="spin${i}" class="mt-0.5 w-5 h-5 shrink-0 rounded-full border-2 border-gray-300"></span>
+      <div>
+        <p class="text-sm font-medium">${s.label}</p>
+        <p class="text-xs text-gray-400">${s.detail}</p>
+      </div>
+    </li>`).join("");
+  step(0);
+}
+function step(i){
+  if(i>0){
+    const prev=document.getElementById("spin"+(i-1));
+    prev.className="mt-0.5 w-5 h-5 shrink-0 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs";
+    prev.textContent="✓";
+  }
+  if(i>=STEPS.length){
+    document.getElementById("doneBar").classList.remove("hidden");
+    document.getElementById("connSummary").textContent = "10 connections across 3 paragraphs analysed in depth · 6 more ready to analyse · 5 source types · 1 source it couldn't retrieve (you can supply it)";
+    return;
+  }
+  const li=document.getElementById("step"+i);
+  li.classList.remove("opacity-30");
+  const sp=document.getElementById("spin"+i);
+  sp.className="mt-0.5 w-5 h-5 shrink-0 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin";
+  setTimeout(()=>step(i+1), 850);
+}
+window.startAnalyse = startAnalyse;
+</script>
+</body>
+</html>

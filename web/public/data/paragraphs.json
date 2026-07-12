@@ -1,0 +1,62 @@
+{
+  "document_id": "ai-dp-2025",
+  "total_paragraphs": 54,
+  "paragraphs": [
+    {
+      "number": "3.5",
+      "title": "Fair usage & bias",
+      "text": "A major challenge of AI is the risk of unfair bias in outcomes, where AI systems may systematically disadvantage certain groups of financial consumers. Financial service providers should implement appropriate governance and controls to identify, measure and mitigate the risk of unfair bias throughout the AI lifecycle.",
+      "state": "analysed",
+      "connection_count": 4
+    },
+    {
+      "number": "3.11",
+      "title": "GenAI hallucinations",
+      "text": "Generative AI systems may produce outputs that are factually incorrect or fabricated, commonly referred to as hallucinations. Where such outputs inform financial decisions or customer communications, financial service providers should establish controls to detect and manage the risk of erroneous or misleading outputs.",
+      "state": "analysed",
+      "connection_count": 3
+    },
+    {
+      "number": "4.6",
+      "title": "Data & personal information",
+      "text": "As AI applications rely on large volumes of data, including personal data, financial service providers should ensure that the collection, use and processing of such data is undertaken with appropriate consent and in compliance with applicable data protection requirements.",
+      "state": "analysed",
+      "connection_count": 3
+    },
+    {
+      "number": "3.2",
+      "title": "Board & senior management oversight",
+      "text": "The board and senior management are responsible for establishing an appropriate governance framework for the adoption and use of AI, including clear accountability for AI-related risks.",
+      "state": "not_analysed",
+      "connection_count": 0
+    },
+    {
+      "number": "3.6",
+      "title": "Explainability & transparency",
+      "text": "Financial service providers should be able to explain, in a manner appropriate to the audience, the decisions and outcomes produced by AI systems that materially affect financial consumers.",
+      "state": "not_analysed",
+      "connection_count": 0
+    },
+    {
+      "number": "4.1",
+      "title": "Model risk management",
+      "text": "AI models should be subject to model risk management commensurate with their materiality, including validation, ongoing monitoring and periodic review.",
+      "state": "not_analysed",
+      "connection_count": 0
+    },
+    {
+      "number": "4.2",
+      "title": "Third-party AI providers",
+      "text": "Where financial service providers rely on third-party AI solutions, they remain responsible for the associated risks and should undertake appropriate due diligence and oversight.",
+      "state": "not_analysed",
+      "connection_count": 0
+    },
+    {
+      "number": "5.2",
+      "title": "Capital treatment",
+      "text": "The capital treatment of exposures should reflect the risks arising from the use of AI in credit and operational processes, consistent with applicable prudential standards.",
+      "state": "not_analysed",
+      "connection_count": 0
+    }
+  ]
+}

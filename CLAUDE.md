@@ -62,7 +62,13 @@ matching clause found" — never invent one. Preserve this in any spec or POC ed
   regulators, acts like PDPA, standards — cited verbatim); internal Conflict /
   Duplication / Gap consistency is the secondary "good to know" layer and the
   supervisor-checklist engine.
-- POC pages are self-contained HTML using Tailwind via CDN — no build step.
+- The demo frontend is a **Next.js + React + Tailwind + shadcn/ui** app under `web/`
+  (deployed to Vercel), with **Zustand + persist** for the shared finding state and a
+  bundled JSON snapshot (`web/public/data/`) that `NEXT_PUBLIC_API_BASE` can swap for the
+  live FastAPI engine. This **supersedes** the earlier "self-contained HTML, no build step"
+  convention (11 Jul 2026 re-platform — see
+  `docs/specs/reconciliation-workbench/frontend-nextjs-migration-design.md`). The old
+  `docs/poc/drafter-knowledge-graph/*.html` pages are kept as the read-only UX reference.
 - MVP1 scope is a single cluster (technology-risk); cross-cluster ripple is a
   labelled "what's next" preview, not built.
 
@@ -78,3 +84,7 @@ matching clause found" — never invent one. Preserve this in any spec or POC ed
 - **/ship is GitLab — use gh** — the `/ship` skill targets GitLab; on this GitHub
   repo override to `gh pr create --base main` with `Closes #<n>` in the PR body.
   See `docs/learnings/skill-ship-is-gitlab-use-gh.md`.
+- **Frontend is Next.js under `web/`, not static HTML** — the 11 Jul 2026 re-platform
+  replaced the "self-contained HTML, no build step" convention with a Next.js + React app.
+  Don't flag the framework/`package.json`/build step as a mistake. See
+  `docs/learnings/convention-frontend-nextjs-not-static-html.md`.
