@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rulebook Radar — Due-Diligence Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: { sans:['Inter','system-ui','sans-serif'], mono:['JetBrains Mono','monospace'] },
+  colors: {
+    bg:'#191919', sidebar:'#1c1c1c', panel:'#212121', elevated:'#262626', hover:'#2b2b2b',
+    subtle:'rgba(255,255,255,0.06)', line:'rgba(255,255,255,0.09)',
+    ink:'#d6d6d6', muted:'#8e8e8e', faint:'#6b6b6b',
+    accent:'#a882ff', 'accent-soft':'rgba(168,130,255,0.12)',
+    consensus:'#6ee7b7', conflict:'#fca5a5', gap:'#fdba74', duplicate:'#7dd3fc', partial:'#fcd34d',
+  }
+}}}
+</script>
+<link rel="stylesheet" href="theme.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="graph.js"></script>
+</head>
+<body>
+<div class="app">
+  <!-- ribbon -->
+  <nav class="ribbon">
+    <a href="index.html" class="ribbon-brand" title="Rulebook Radar"><i data-lucide="radar" class="w-5 h-5"></i></a>
+    <div class="ribbon-group">
+      <a href="workspace.html" class="ribbon-item active" title="Workspace"><i data-lucide="panel-left" class="w-[18px] h-[18px]"></i></a>
+      <a href="workspace.html?view=graph" class="ribbon-item" title="Knowledge graph"><i data-lucide="waypoints" class="w-[18px] h-[18px]"></i></a>
+      <a href="insights.html" class="ribbon-item" title="Insights"><i data-lucide="sparkles" class="w-[18px] h-[18px]"></i></a>
+      <a href="monitor.html" class="ribbon-item" title="Source drift"><i data-lucide="bell" class="w-[18px] h-[18px]"></i></a>
+      <a href="assistant.html" class="ribbon-item" title="Redraft assistant"><i data-lucide="pen-line" class="w-[18px] h-[18px]"></i></a>
+    </div>
+    <div class="ribbon-foot">
+      <button onclick="resetDemo()" class="ribbon-item" title="Reset demo"><i data-lucide="rotate-ccw" class="w-[18px] h-[18px]"></i></button>
+      <span class="ribbon-avatar" title="Aisyah R.">AR</span>
+    </div>
+  </nav>
+
+  <!-- work area -->
+  <div class="workarea">
+    <div class="topbar">
+      <span class="topbar-title">Due-Diligence Workspace</span>
+      <span class="crumb">·  RMiT v2 draft context</span>
+      <div class="ml-auto flex items-center gap-2 text-xs">
+        <a href="monitor.html" class="badge b-amber"><i data-lucide="bell" class="w-3 h-3"></i> Drift <span>2</span></a>
+        <a href="insights.html" class="badge b-accent"><i data-lucide="sparkles" class="w-3 h-3"></i> Missed <span id="insightCountNav">4</span></a>
+      </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto scroll px-6 py-5">
+      <!-- document banner -->
+      <div class="panel p-4 mb-5">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="dot" style="background:#10b981"></span>
+              <span class="text-[11px] font-semibold text-consensus uppercase tracking-wide">Open · in-progress draft · analysed</span>
+            </div>
+            <h2 class="text-lg font-semibold tracking-tight">Discussion Paper — Artificial Intelligence in the Malaysian Financial Sector</h2>
+            <p class="text-[13px] text-muted mt-1">Bank Negara Malaysia · August 2025 · published for feedback — you are enhancing it</p>
+          </div>
+          <div class="text-right">
+            <p class="text-muted text-[13px]"><span id="totalConn" class="font-semibold text-ink">0</span> sources connected</p>
+            <p class="text-faint text-[11px] mt-0.5">Select a paragraph to see what bears on it.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid lg:grid-cols-3 lg:grid-rows-1 gap-5 h-[calc(100vh-230px)] min-h-[460px]">
+        <!-- LEFT: document / graph -->
+        <section class="lg:col-span-2 pane">
+          <div class="pane-header">
+            <h3 class="pane-title">Your document</h3>
+            <div class="flex items-center gap-1 bg-bg rounded-lg p-0.5 border border-subtle">
+              <button id="tabDoc" onclick="showDocView()" class="btn btn-sm btn-accent"><i data-lucide="align-left" class="w-3.5 h-3.5"></i> Document</button>
+              <button id="tabGraph" onclick="showGraphView()" class="btn btn-sm btn-ghost"><i data-lucide="waypoints" class="w-3.5 h-3.5"></i> Graph</button>
+            </div>
+          </div>
+          <div class="pane-body scroll flex-1" id="docWrap">
+            <div id="doc" class="space-y-1"></div>
+          </div>
+          <div id="graphWrap" class="hidden flex-1 p-3">
+            <div class="kg-wrap w-full h-full">
+              <div id="kgGraph" class="kg-canvas"></div>
+              <div class="kg-hint">Drag to pan · scroll to zoom · click a node to focus</div>
+              <div class="kg-legend">
+                <span class="flex items-center gap-1.5"><span class="dot" style="background:#a882ff"></span>Document</span>
+                <span class="flex items-center gap-1.5"><span class="dot" style="background:#c4b5fd"></span>Paragraph</span>
+                <span class="flex items-center gap-1.5"><span class="dot" style="background:#a78bfa"></span>Standard</span>
+                <span class="flex items-center gap-1.5"><span class="dot" style="background:#818cf8"></span>Peer</span>
+                <span class="flex items-center gap-1.5"><span class="dot" style="background:#2dd4bf"></span>Act</span>
+                <span class="flex items-center gap-1.5"><span class="dot" style="background:#fb7185"></span>Feedback</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- RIGHT: connected sources -->
+        <aside class="pane">
+          <div class="pane-header flex-col items-start gap-0.5">
+            <h3 class="pane-title">Sources connected to this paragraph</h3>
+            <p id="selLabel" class="text-[11px] text-faint">Select a paragraph on the left.</p>
+          </div>
+          <div id="rail" class="pane-body scroll flex-1 space-y-2.5">
+            <p class="text-[13px] text-faint">Nothing selected yet.</p>
+          </div>
+        </aside>
+      </div>
+
+      <!-- legend -->
+      <div class="panel p-3 mt-5">
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px]">
+          <span class="font-semibold text-faint uppercase tracking-wide">Source types</span>
+          <span class="flex items-center gap-1.5"><span class="dot" style="background:#8b5cf6"></span>International standard / principle</span>
+          <span class="flex items-center gap-1.5"><span class="dot" style="background:#6366f1"></span>Peer regulator</span>
+          <span class="flex items-center gap-1.5"><span class="dot" style="background:#14b8a6"></span>Act / law</span>
+          <span class="flex items-center gap-1.5"><span class="dot" style="background:#64748b"></span>Internal BNM</span>
+          <span class="flex items-center gap-1.5"><span class="dot" style="background:#f43f5e"></span>Industry feedback (bottom-up)</span>
+        </div>
+        <p class="text-[11px] text-faint mt-2 leading-relaxed">Connections come from two branches: sources this document <b class="text-muted">cites</b> (consensus/duplicate) and relevant sources it did <b class="text-muted">not</b> cite, matched by topic against the curated library (gap/conflict/partial/missed). Industry feedback is what the sector sent back on this published paper. An analysed paragraph with nothing bearing on it shows "No matching source found."</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- real DP paragraphs (verbatim excerpts from the Aug 2025 DP) ----
+const paras = [
+  { id:"3.5", title:"Fair usage & bias", analysed:true, text:"A major challenge of AI revolves around ensuring fair usage of the technology. AI models could exacerbate biases and discrimination, especially when the underlying input data is flawed or of low quality… Strong data governance and management as well as explainable models are therefore crucial when embarking on AI projects." },
+  { id:"3.11", title:"GenAI hallucinations", analysed:true, text:"A major risk in the use of GenAI is “hallucinations”, where GenAI applications perceive patterns or objects that are non-existent, and create outputs that are nonsensical or altogether inaccurate. For example, where GenAI is used to augment or replace customer service chatbots, hallucinations could lead to incorrect instructions or improper advice being delivered to customers." },
+  { id:"4.6", title:"Data & personal information", analysed:true, text:"As AI applications increasingly rely on large volumes of data… FSPs are expected to ensure that the responsible handling of data, especially personally identifiable information (PII) continues to remain a critical area of focus… This includes but is not limited to ensuring transparency in data sourcing, obtaining informed consent and implementing sound data management practices." },
+  // browsable but not yet analysed — real DP paragraph topics; the drafter can analyse any on demand
+  { id:"3.2", title:"Board & senior management oversight", analysed:false, text:"The board and senior management are expected to maintain effective oversight of AI adoption, including clear accountability for AI-related risks and outcomes across the institution." },
+  { id:"3.8", title:"Model risk management", analysed:false, text:"FSPs should apply sound model risk management practices to AI models, commensurate with the materiality and complexity of the model and its use case." },
+  { id:"4.2", title:"Third-party & cloud dependency", analysed:false, text:"Where AI capabilities are sourced from third parties or deployed on cloud infrastructure, FSPs remain responsible for managing the associated concentration and outsourcing risks." },
+  { id:"4.9", title:"Explainability & disclosure", analysed:false, text:"FSPs are expected to be able to explain, to an appropriate degree, the outcomes produced by AI systems that materially affect customers." },
+  { id:"5.1", title:"Human-in-the-loop controls", analysed:false, text:"Appropriate human oversight should be maintained over AI-driven decisions, with the ability to intervene, override, or escalate where warranted." },
+  { id:"5.4", title:"Monitoring & post-deployment review", analysed:false, text:"AI systems should be monitored on an ongoing basis after deployment to detect drift, degradation, or unintended outcomes." },
+];
+
+// ---- connections per paragraph. branch: "cited" (in the doc's refs) vs "uncited" (topic-matched from library) vs "feedback" ----
+const connections = {
+  "3.5": [
+    { id:"c1", type:"standard", branch:"cited", src:"OECD AI Principles", sub:"1.2 — human agency & oversight", verdict:"consensus",
+      quote:"AI actors should implement mechanisms and safeguards, such as capacity for human agency and oversight, including to address risks arising from uses outside of intended purpose.",
+      impact:"OECD backs your fairness stance and adds a concrete mechanism (human agency & oversight) your 3.5 doesn't yet name." },
+    { id:"c2", type:"standard", branch:"uncited", src:"NIST — AI Risk Management Framework", sub:"MEASURE 2.11",
+      verdict:"gap", quote:"Fairness and bias – as identified in the MAP function – are evaluated and results are documented.",
+      impact:"NIST makes fairness a measured, documented control. Your 3.5 states the outcome but not the evaluate-and-document obligation — a gap to consider." },
+    { id:"c3", type:"internal", branch:"uncited", src:"BNM — Fair Treatment of Financial Consumers", sub:"Para 8.1", unverified:true,
+      verdict:"duplicate", quote:"A financial service provider must ensure that financial consumers are treated fairly at all stages of their relationship with the financial service provider.",
+      impact:"An existing BNM fairness duty already applies. Anchor 3.5 to FTFC rather than creating a parallel AI-specific standard." },
+    { id:"c8", type:"peer", branch:"uncited", src:"MAS — FEAT Principles (Fairness)", sub:"identified, could not retrieve", blocked:true,
+      impact:"The AI identified this as a likely peer benchmark for 3.5, but the MAS source could not be retrieved automatically (the site blocks automated access). Upload it and the tool will quote it verbatim and analyse the connection." },
+  ],
+  "3.11": [
+    { id:"c4", type:"standard", branch:"cited", src:"BCBS 239", sub:"Principle 3 — data architecture",
+      verdict:"consensus", quote:"A bank should establish integrated data taxonomies and architecture across the banking group, which includes information on the characteristics of the data (metadata).",
+      impact:"BCBS 239 (cited in your DP) supports treating GenAI output reliability as a data-governance question — a documented control 3.11 can point to." },
+    { id:"c5", type:"peer", branch:"uncited", src:"EU AI Act (Regulation 2024/1689)", sub:"GPAI transparency",
+      verdict:"gap", quote:"…the quality and relevance of data sets used, technical documentation and record-keeping, transparency and the provision of information to deployers, human oversight, and robustness, accuracy and cybersecurity.",
+      impact:"A peer development your draft doesn't cite: the EU frames GenAI transparency as mandated technical documentation. 3.11 flags the risk but not a documentation expectation — surfaced from the library." },
+    { id:"fb1", type:"feedback", branch:"feedback", src:"Industry feedback — Association of Banks (AoB)", sub:"agree", verdict:"consensus", unverified:true,
+      quote:"Members strongly support explicit treatment of GenAI hallucination risk, particularly for customer-facing chatbots.",
+      impact:"The sector agrees with 3.11's direction — useful supporting weight when this moves to Exposure Draft." },
+  ],
+  "4.6": [
+    { id:"c6", type:"act", branch:"uncited", src:"PDPA 2010 (as amended 2024)", sub:"§129 — cross-border transfer",
+      verdict:"conflict", quote:"A data controller may transfer any personal data of a data subject to any place outside Malaysia if— (a) there is in that place in force any law which is substantially similar to this Act; or (b) that place ensures an adequate level of protection…",
+      impact:"CONFLICT risk: 4.6 says 'informed consent' broadly, but PDPA §129 sets a specific cross-border test your draft doesn't cite. If AI training data leaves Malaysia, your wording must not undercut the statute." },
+    { id:"c7", type:"standard", branch:"cited", src:"BCBS 239", sub:"Principle 3(d) — data accuracy",
+      verdict:"consensus", quote:"A bank should strive towards a single authoritative source for risk data per each type of risk.",
+      impact:"BCBS 239 (cited in your DP) reinforces 4.6's data-governance expectation — a single authoritative data source is an established supervisory standard you can point to." },
+    { id:"fb2", type:"feedback", branch:"feedback", src:"Industry feedback — 3 respondents (FSPs)", sub:"partial", verdict:"partial", unverified:true,
+      quote:"The requirement to obtain informed consent is unworkable for models already trained on legacy datasets collected before AI use was contemplated.",
+      impact:"Partial: the sector supports responsible data handling but rejects the informed-consent mechanism for legacy data. Note which part to keep and which to resolve before the Exposure Draft." },
+  ],
+};
+
+const typeColor = { standard:"#8b5cf6", peer:"#6366f1", act:"#14b8a6", internal:"#64748b", feedback:"#f43f5e" };
+const typeLabel = { standard:"Int'l standard", peer:"Peer regulator", act:"Act / law", internal:"Internal BNM", feedback:"Industry feedback" };
+const branchTag = { cited:"cited in your doc", uncited:"surfaced — not cited", feedback:"industry feedback" };
+const verdictBadge = {
+  consensus:{ t:"Consensus", c:"b-consensus" },
+  conflict:{ t:"Conflict", c:"b-conflict" },
+  gap:{ t:"Gap", c:"b-gap" },
+  duplicate:{ t:"Duplicate", c:"b-duplicate" },
+  partial:{ t:"Partial", c:"b-partial" },
+};
+
+let selected = null;
+function getPulled(){ return JSON.parse(localStorage.getItem("rr_pulled")||"[]"); }
+
+const docEl = document.getElementById("doc");
+function renderDoc(){
+  docEl.innerHTML = paras.map(p=>{
+    const userN = (getUserSrcs()[p.id]||[]).length;
+    const n = (connections[p.id]||[]).length + userN;
+    const active = selected===p.id;
+    const analysed = p.analysed || n>0;
+    const badge = analysed
+      ? `<span class="ml-auto text-[10px] badge b-emerald">${n} source${n===1?'':'s'}</span>`
+      : `<span class="ml-auto text-[10px] badge badge-soft">not yet analysed</span>`;
+    return `<button onclick="selectPara('${p.id}')" class="row block ${active?'active':''} ${analysed?'':'opacity-55'}">
+      <div class="flex items-center gap-2">
+        <span class="text-[11px] font-semibold text-accent mono">${p.id}</span>
+        <span class="text-[11px] text-faint">${p.title}</span>
+        ${badge}
+      </div>
+      <p class="text-[13px] text-ink/90 mt-1 leading-relaxed">${p.text}</p>
+    </button>`;
+  }).join("");
+  if(window.lucide) lucide.createIcons();
+}
+
+function selectPara(id){ selected=id; renderDoc(); renderRail(); }
+window.selectPara = selectPara;
+
+// user-supplied sources the SME adds (persisted) — keyed by paragraph
+function getUserSrcs(){ return JSON.parse(localStorage.getItem("rr_user_srcs")||"{}"); }
+function setUserSrcs(o){ localStorage.setItem("rr_user_srcs", JSON.stringify(o)); }
+// which blocked sources the user has resolved by uploading (persisted)
+function getResolvedBlocked(){ return JSON.parse(localStorage.getItem("rr_resolved_blocked")||"[]"); }
+
+const railEl = document.getElementById("rail");
+function renderRail(){
+  const p = paras.find(x=>x.id===selected);
+  document.getElementById("selLabel").textContent = `Paragraph ${p.id} — ${p.title}`;
+  const conns = connections[selected]||[];
+  const userSrcsHere = (getUserSrcs()[selected]||[]);
+  const resolvedBlocked = getResolvedBlocked();
+
+  // --- not-yet-analysed paragraph: no fabricated connections; offer live analysis ---
+  if(!p.analysed && conns.length===0 && userSrcsHere.length===0){
+    railEl.innerHTML = `<div class="card p-4 text-center border-dashed" style="border-color:var(--accent-border)">
+      <i data-lucide="search" class="w-6 h-6 mx-auto text-accent"></i>
+      <p class="text-[13px] font-medium mt-2">This paragraph hasn't been analysed yet.</p>
+      <p class="text-[11px] text-muted mt-1">The whole 54-paragraph document is browsable; 3 paragraphs are analysed in depth. You choose what to analyse next — the tool matches this paragraph's topic against the source library and quotes what it finds, verbatim.</p>
+      <button onclick="analysePara()" class="btn btn-accent btn-sm mt-3 mx-auto"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Analyse this paragraph</button>
+      <p class="text-[10px] text-faint mt-2">Prototype: live analysis runs against the curated library. If nothing bears on it, you'll see "No matching source found" — never an invented connection.</p>
+    </div>`;
+    if(window.lucide) lucide.createIcons();
+    return;
+  }
+
+  const cardsHtml = conns.map(c=>{
+    // --- blocked-retrieval card: tool found it but couldn't fetch it ---
+    if(c.blocked){
+      const resolved = resolvedBlocked.includes(c.id);
+      if(resolved){
+        return `<div class="card p-3" style="border-color:rgba(16,185,129,.25)">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="dot" style="background:${typeColor[c.type]}"></span>
+            <span class="badge badge-soft">${typeLabel[c.type]}</span>
+            <span class="badge b-emerald"><i data-lucide="check" class="w-3 h-3"></i> you supplied it</span>
+          </div>
+          <p class="text-[13px] font-medium mt-1.5">${c.src}</p>
+          <p class="text-[11px] text-consensus mt-1">Uploaded by you — the tool can now quote it verbatim and analyse this connection like any other source.</p>
+        </div>`;
+      }
+      return `<div class="card p-3" style="border-color:rgba(245,158,11,.28)">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="dot" style="background:${typeColor[c.type]}"></span>
+          <span class="badge badge-soft">${typeLabel[c.type]}</span>
+          <span class="badge b-amber"><i data-lucide="alert-triangle" class="w-3 h-3"></i> couldn't retrieve</span>
+        </div>
+        <p class="text-[13px] font-medium mt-1.5">${c.src}</p>
+        <p class="text-[11px] text-muted mt-1.5">${c.impact}</p>
+        <button onclick="uploadBlocked('${c.id}')" class="btn btn-amber btn-sm mt-2"><i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload this source</button>
+      </div>`;
+    }
+    // --- normal connection card ---
+    const v = verdictBadge[c.verdict];
+    return `<div class="card p-3">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="dot" style="background:${typeColor[c.type]}"></span>
+        <span class="badge badge-soft">${typeLabel[c.type]}</span>
+        <span class="badge ${v.c}">${v.t}</span>
+        <span class="text-[10px] text-faint ml-auto">${branchTag[c.branch]}</span>
+      </div>
+      <p class="text-[13px] font-medium mt-1.5">${c.src} <span class="text-faint font-normal">· ${c.sub}</span></p>
+      <blockquote class="quote ${c.unverified?'illustrative':'verified'} mt-1.5">“${c.quote}”
+        <span class="mark ${c.unverified?'illustrative':'verified'}">${c.unverified?'illustrative quote — not yet verified against source':'verbatim — verified against source document'}</span>
+      </blockquote>
+      <p class="text-[11px] text-muted mt-1.5"><b class="text-ink">How it affects this paragraph:</b> ${c.impact}</p>
+      <a href="connections.html?p=${selected}&c=${c.id}" class="inline-flex items-center gap-1 mt-2 text-[11px] text-accent hover:underline">Open connection & act <i data-lucide="arrow-right" class="w-3 h-3"></i></a>
+    </div>`;
+  }).join("");
+
+  // --- user-added sources for this paragraph ---
+  const userSrcs = (getUserSrcs()[selected]||[]);
+  const userHtml = userSrcs.map(u=>`
+    <div class="card p-3" style="border-color:var(--accent-border)">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="badge b-accent"><i data-lucide="plus" class="w-3 h-3"></i> added by you (SME)</span>
+      </div>
+      <p class="text-[13px] font-medium mt-1.5">${u.name}</p>
+      <p class="text-[11px] text-muted mt-1">${u.note||'Queued — the tool will link it to this paragraph and analyse the connection.'}</p>
+    </div>`).join("");
+
+  // --- add-a-source affordance (the SME knows sources the library doesn't) ---
+  const addHtml = `
+    <div class="card p-3 text-center border-dashed">
+      <p class="text-[11px] text-muted">Know a source the tool missed? You're the expert.</p>
+      <button onclick="addSource()" class="btn btn-sm mt-2 mx-auto"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add a source to this paragraph</button>
+    </div>`;
+
+  railEl.innerHTML = cardsHtml + userHtml + addHtml;
+  if(window.lucide) lucide.createIcons();
+}
+
+function uploadBlocked(id){
+  const rb = getResolvedBlocked();
+  if(!rb.includes(id)){ rb.push(id); localStorage.setItem("rr_resolved_blocked", JSON.stringify(rb)); }
+  alert("In the real build: you pick the file, the tool extracts it (same pipeline that read your draft), verifies the quote word-for-word, and links it to this paragraph. Prototype: marking it as supplied.");
+  renderRail();
+}
+function analysePara(){
+  const p = paras.find(x=>x.id===selected);
+  railEl.innerHTML = `<div class="card p-4 text-center">
+    <span class="inline-block w-5 h-5 rounded-full border-2 border-accent border-t-transparent spin"></span>
+    <p class="text-[13px] text-muted mt-2">Analysing paragraph ${p.id} against the source library…</p>
+  </div>`;
+  setTimeout(()=>{
+    // Honest prototype: only 3.5 / 3.11 / 4.6 have verbatim-verified prepared connections.
+    // For any other paragraph we do NOT invent sources — we show the guardrail outcome.
+    railEl.innerHTML = `<div class="card p-4 text-center">
+      <i data-lucide="shield-check" class="w-6 h-6 mx-auto text-muted"></i>
+      <p class="text-[13px] font-medium mt-1.5">Analysed — no matching source found in the demo library.</p>
+      <p class="text-[11px] text-muted mt-1">In production this runs live against the full source library and returns verbatim-cited connections. In this prototype only paragraphs 3.5, 3.11 and 4.6 have a prepared, verified source set — so rather than invent a connection, the tool honestly reports none. You can still add a source you know of.</p>
+      <button onclick="addSource()" class="btn btn-sm mt-3 mx-auto"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add a source to this paragraph</button>
+    </div>`;
+    if(window.lucide) lucide.createIcons();
+  }, 900);
+}
+function addSource(){
+  const name = prompt("Add a source the tool missed (title / reference). It'll be linked to this paragraph and analysed like any other.\n\ne.g. “IOSCO — AI in capital markets (2025)”");
+  if(!name) return;
+  const all = getUserSrcs();
+  (all[selected] = all[selected]||[]).push({ name, note:"Queued — the tool will link it to this paragraph and analyse the connection (prototype: recorded)." });
+  setUserSrcs(all);
+  renderRail();
+  refreshCounts();
+}
+window.uploadBlocked = uploadBlocked; window.addSource = addSource; window.analysePara = analysePara;
+function resetDemo(){
+  ["rr_pulled","rr_resolved_blocked","rr_user_srcs"].forEach(k=>localStorage.removeItem(k));
+  renderRail(); refreshCounts();
+}
+window.resetDemo = resetDemo;
+
+function refreshCounts(){
+  const base = Object.values(connections).flat().length;
+  const added = Object.values(getUserSrcs()).flat().length;
+  document.getElementById("totalConn").textContent = base + added;
+}
+
+// ---- document / graph view toggle (additive; does not alter data or logic) ----
+let kgInstance = null;
+function showDocView(){
+  document.getElementById("docWrap").classList.remove("hidden");
+  document.getElementById("graphWrap").classList.add("hidden");
+  document.getElementById("tabDoc").className = "btn btn-sm btn-accent";
+  document.getElementById("tabGraph").className = "btn btn-sm btn-ghost";
+  if(window.lucide) lucide.createIcons();
+}
+function showGraphView(){
+  document.getElementById("docWrap").classList.add("hidden");
+  document.getElementById("graphWrap").classList.remove("hidden");
+  document.getElementById("tabDoc").className = "btn btn-sm btn-ghost";
+  document.getElementById("tabGraph").className = "btn btn-sm btn-accent";
+  const kgEl = document.getElementById("kgGraph");
+  if(!kgInstance){
+    const data = RR.buildGraphFromConnections(paras, connections);
+    kgInstance = RR.initGraph(kgEl, data);
+  } else {
+    // already built while possibly hidden — nudge it to re-measure now that it's visible
+    setTimeout(function(){ try { kgInstance.refresh(); } catch(e){} }, 60);
+  }
+  if(window.lucide) lucide.createIcons();
+}
+window.showDocView = showDocView; window.showGraphView = showGraphView;
+
+refreshCounts();
+renderDoc();
+selectPara("4.6");
+if(window.lucide) lucide.createIcons();
+if(new URLSearchParams(location.search).get("view")==="graph") showGraphView();
+window.addEventListener("storage", ()=>{ if(selected) renderRail(); });
+</script>
+</body>
+</html>
