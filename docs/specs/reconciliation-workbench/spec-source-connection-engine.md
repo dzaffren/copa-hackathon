@@ -1,6 +1,6 @@
 # Two-Branch Source Connection Engine
 
-**Ticket:** TBD
+**Ticket:** #32
 **Type:** Technical — Infrastructure / Platform
 
 This is the core engine behind the Reconciliation Workbench. It ingests an uploaded
