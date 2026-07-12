@@ -1,21 +1,32 @@
 {
   "nodes": [
     {
-      "id": "opres-v1-2025-draft",
-      "policy_id": "opres",
-      "title": "Operational Resilience",
-      "version": "draft \u00b7 Discussion Paper 2025",
-      "status": "In progress",
+      "id": "rmit-v1-2023",
+      "policy_id": "rmit",
+      "title": "Risk Management in Technology (RMiT)",
+      "version": "v1 \u00b7 2023",
+      "status": "Superseded",
       "cluster": "technology-risk"
     },
     {
-      "id": "open-finance-v1-2025-ed",
-      "policy_id": "open-finance",
-      "title": "Open Finance",
-      "version": "ED \u00b7 18 Nov 2025",
-      "status": "In force",
-      "cluster": "open-finance"
+      "id": "rmit-v2-2025",
+      "policy_id": "rmit",
+      "title": "Risk Management in Technology (RMiT)",
+      "version": "v2 \u00b7 2025",
+      "status": "In progress",
+      "cluster": "technology-risk"
     }
   ],
-  "edges": []
+  "edges": [
+    {
+      "source": "rmit-v1-2023",
+      "target": "rmit-v2-2025",
+      "type": "version-lineage",
+      "reason": "rmit-v1-2023 is superseded by rmit-v2-2025 of the same policy.",
+      "source_clauses": [],
+      "target_clauses": [],
+      "provenance": "structural",
+      "confidence": 1.0
+    }
+  ]
 }

@@ -8,6 +8,7 @@ the latter isn't declared as an alias) are logged for the audit queue.
 
 import json
 import logging
+import re
 from pathlib import Path
 from typing import Optional, TypedDict
 
@@ -19,6 +20,8 @@ logger = logging.getLogger(__name__)
 
 _ARTICLES = ("the ",)
 _PLURAL_SUFFIX = "s"
+_VOWELS = "aeiou"
+_WHITESPACE_RUN = re.compile(r"\s+")
 
 
 class Entity(TypedDict):
@@ -52,23 +55,35 @@ def _is_acronym(word: str) -> bool:
 
 
 def normalise_surface(surface: str) -> str:
-    """Lowercase → strip leading article → strip trailing 's' EXCEPT when
-    the original surface is an all-uppercase acronym.
+    """Lowercase → collapse whitespace → strip leading article → strip
+    trailing 's' EXCEPT for acronyms and vowel-before-s singulars.
 
     Deterministic. Not linguistically clever; the interview and audit
     surface most cases where cleverness would be needed as seed aliases.
-    The acronym carve-out is what keeps `BCBS` and `TPSPs` recognisable
-    (without it, `BCBS` would normalise to `bcb`, a nonsense token).
-    """
-    stripped = surface.strip()
-    acronym = _is_acronym(stripped.split()[-1]) if stripped else False
 
-    s = stripped.lower()
+    Carve-outs on the plural-s strip:
+    - all-uppercase acronyms (`BCBS` → `bcbs`, not `bcb`)
+    - vowel-before-s singulars (`analysis` → `analysis`, not `analysi`;
+      also `focus`, `bias`, `chaos`)
+
+    Whitespace collapse: `"financial  institution"` and
+    `"financial institution"` normalise identically. PDF extraction routinely
+    injects double spaces around clause boundaries.
+    """
+    s = _WHITESPACE_RUN.sub(" ", surface).strip()
+    acronym = _is_acronym(s.split()[-1]) if s else False
+
+    s = s.lower()
     for article in _ARTICLES:
         if s.startswith(article):
-            s = s[len(article):]
+            s = s[len(article) :]
             break
-    if not acronym and len(s) > 3 and s.endswith(_PLURAL_SUFFIX):
+    if (
+        not acronym
+        and len(s) > 3
+        and s.endswith(_PLURAL_SUFFIX)
+        and s[-2] not in _VOWELS
+    ):
         s = s[:-1]
     return s
 
@@ -169,6 +184,8 @@ def run_stage_4(
 
     logger.info(
         "Stage 4: %d spans → %d entities, %d mentions",
-        len(spans), len(entities), len(mentions),
+        len(spans),
+        len(entities),
+        len(mentions),
     )
     return ent_path, men_path

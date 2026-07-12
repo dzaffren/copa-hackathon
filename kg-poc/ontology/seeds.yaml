@@ -63,6 +63,23 @@ seeds:
     }
   - { canonical: cloud service provider, class: Party, aliases: [CSP] }
   - {
+      canonical: financial institution,
+      class: Party,
+      aliases: [financial institutions, FI, FIs],
+    }
+  - {
+      canonical: FSP,
+      class: Party,
+      aliases: [FSPs, financial service provider, financial service providers],
+    }
+  - {
+      canonical: OSP,
+      class: Party,
+      aliases: [outsourced service provider, outsourced service providers],
+    }
+  - { canonical: CMT, class: Party, aliases: [Crisis Management Team] }
+  - { canonical: data consumer, class: Party, aliases: [data consumers] }
+  - {
       canonical: AKPK,
       class: Party,
       aliases: [Agensi Kaunseling dan Pengurusan Kredit],
@@ -104,7 +121,7 @@ seeds:
   - {
       canonical: BCM PD,
       class: Instrument,
-      aliases: [Business Continuity Management],
+      aliases: [BCM, Business Continuity Management],
     }
   - { canonical: Outsourcing PD, class: Instrument, aliases: [] }
   - {
@@ -112,6 +129,9 @@ seeds:
       class: Instrument,
       aliases: [Management of Customer Information],
     }
+  - { canonical: BCP, class: Instrument, aliases: [Business Continuity Plan] }
+  - { canonical: DRP, class: Instrument, aliases: [Disaster Recovery Plan] }
+  - { canonical: CMP, class: Instrument, aliases: [Crisis Management Plan] }
 
   # Requirement (the interview's thresholds and duties)
   - { canonical: RTO, class: Requirement, aliases: [Recovery Time Objective] }
@@ -156,3 +176,10 @@ seeds:
   - { canonical: scenario analysis, class: Process, aliases: [] }
   - { canonical: incident, class: Process, aliases: [] }
   - { canonical: disruption, class: Process, aliases: [] }
+  - { canonical: CIRP, class: Process, aliases: [Cyber Incident Response Plan] }
+  - {
+      canonical: recovery planning,
+      class: Process,
+      aliases: [Recovery Planning],
+    }
+  - { canonical: disclosure, class: Process, aliases: [disclosures] }

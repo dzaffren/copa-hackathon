@@ -34,6 +34,33 @@ def test_normalise_preserves_multi_word():
     assert normalise_surface("Bank Negara Malaysia") == "bank negara malaysia"
 
 
+def test_normalise_preserves_vowel_before_s():
+    """Vowel + s is a real singular ending, not a plural suffix.
+
+    "analysis", "focus", "bias", "chaos" must survive intact — the plural-s
+    strip was mangling "analysis" into "analysi".
+    """
+    assert normalise_surface("analysis") == "analysis"
+    assert normalise_surface("business impact analysis") == "business impact analysis"
+    assert normalise_surface("focus") == "focus"
+
+
+def test_normalise_collapses_internal_whitespace():
+    """PDF extraction leaves double-spaces; treat 'financial  institution' and
+    'financial institution' as the same surface (both normalise identically).
+    """
+    assert normalise_surface("financial  institution") == "financial institution"
+    assert normalise_surface("financial institution") == "financial institution"
+
+
+def test_normalise_strips_leading_space_from_class_prefix():
+    """Guard against leading spaces sneaking through — the resolver's entity_id
+    should never gain a stray space from a mis-tokenised span.
+    """
+    assert normalise_surface(" bank") == "bank"
+    assert normalise_surface("  bank  ") == "bank"
+
+
 def test_entity_id_is_stable():
     assert entity_id_for("Party", "board") == "party:board"
     assert entity_id_for("RegulatoryBody", "BNM") == "regulatorybody:bnm"
@@ -41,11 +68,20 @@ def test_entity_id_is_stable():
 
 def test_build_alias_map_keys_by_class():
     seeds = [
-        {"canonical": "BNM", "class_": "RegulatoryBody",
-         "aliases": ["Bank Negara Malaysia"],
-         "left_forbidden": [], "right_forbidden": []},
-        {"canonical": "board", "class_": "Party", "aliases": ["the board"],
-         "left_forbidden": [], "right_forbidden": []},
+        {
+            "canonical": "BNM",
+            "class_": "RegulatoryBody",
+            "aliases": ["Bank Negara Malaysia"],
+            "left_forbidden": [],
+            "right_forbidden": [],
+        },
+        {
+            "canonical": "board",
+            "class_": "Party",
+            "aliases": ["the board"],
+            "left_forbidden": [],
+            "right_forbidden": [],
+        },
     ]
     m = build_alias_map(seeds)
     assert m[("bank negara malaysia", "RegulatoryBody")] == "BNM"
@@ -56,15 +92,36 @@ def test_build_alias_map_keys_by_class():
 def test_same_string_same_class_merges(tmp_path: Path):
     spans_path = tmp_path / "spans.jsonl"
     spans = [
-        {"doc_id": "a", "chunk_id": "a:0000", "char_start": 0, "char_end": 5,
-         "surface": "board", "class_": "Party", "source": "gazetteer",
-         "confidence": 1.0},
-        {"doc_id": "a", "chunk_id": "a:0001", "char_start": 20, "char_end": 25,
-         "surface": "Board", "class_": "Party", "source": "gliner",
-         "confidence": 0.9},
-        {"doc_id": "b", "chunk_id": "b:0000", "char_start": 0, "char_end": 5,
-         "surface": "boards", "class_": "Party", "source": "gliner",
-         "confidence": 0.8},
+        {
+            "doc_id": "a",
+            "chunk_id": "a:0000",
+            "char_start": 0,
+            "char_end": 5,
+            "surface": "board",
+            "class_": "Party",
+            "source": "gazetteer",
+            "confidence": 1.0,
+        },
+        {
+            "doc_id": "a",
+            "chunk_id": "a:0001",
+            "char_start": 20,
+            "char_end": 25,
+            "surface": "Board",
+            "class_": "Party",
+            "source": "gliner",
+            "confidence": 0.9,
+        },
+        {
+            "doc_id": "b",
+            "chunk_id": "b:0000",
+            "char_start": 0,
+            "char_end": 5,
+            "surface": "boards",
+            "class_": "Party",
+            "source": "gliner",
+            "confidence": 0.8,
+        },
     ]
     with spans_path.open("w") as fh:
         for s in spans:
@@ -87,20 +144,32 @@ def test_same_string_same_class_merges(tmp_path: Path):
 def test_same_string_different_class_stays_separate(tmp_path: Path):
     spans_path = tmp_path / "spans.jsonl"
     spans = [
-        {"doc_id": "a", "chunk_id": "a:0000", "char_start": 0, "char_end": 4,
-         "surface": "BCBS", "class_": "RegulatoryBody", "source": "gazetteer",
-         "confidence": 1.0},
-        {"doc_id": "a", "chunk_id": "a:0001", "char_start": 10, "char_end": 14,
-         "surface": "BCBS", "class_": "Reference", "source": "gazetteer",
-         "confidence": 1.0},
+        {
+            "doc_id": "a",
+            "chunk_id": "a:0000",
+            "char_start": 0,
+            "char_end": 4,
+            "surface": "BCBS",
+            "class_": "RegulatoryBody",
+            "source": "gazetteer",
+            "confidence": 1.0,
+        },
+        {
+            "doc_id": "a",
+            "chunk_id": "a:0001",
+            "char_start": 10,
+            "char_end": 14,
+            "surface": "BCBS",
+            "class_": "Reference",
+            "source": "gazetteer",
+            "confidence": 1.0,
+        },
     ]
     with spans_path.open("w") as fh:
         for s in spans:
             fh.write(json.dumps(s) + "\n")
 
-    ent_path, _ = run_stage_4(
-        spans_path=spans_path, seeds=[], output_dir=tmp_path
-    )
+    ent_path, _ = run_stage_4(spans_path=spans_path, seeds=[], output_dir=tmp_path)
     entities = [json.loads(l) for l in ent_path.read_text().splitlines()]
     ids = {e["entity_id"] for e in entities}
     # BCBS is an acronym → normalisation preserves the trailing 's'.
@@ -110,21 +179,39 @@ def test_same_string_different_class_stays_separate(tmp_path: Path):
 def test_alias_collapses_to_canonical(tmp_path: Path):
     spans_path = tmp_path / "spans.jsonl"
     spans = [
-        {"doc_id": "a", "chunk_id": "a:0000", "char_start": 0, "char_end": 4,
-         "surface": "BNM", "class_": "RegulatoryBody", "source": "gazetteer",
-         "confidence": 1.0},
-        {"doc_id": "a", "chunk_id": "a:0001", "char_start": 10, "char_end": 30,
-         "surface": "Bank Negara Malaysia", "class_": "RegulatoryBody",
-         "source": "gliner", "confidence": 0.9},
+        {
+            "doc_id": "a",
+            "chunk_id": "a:0000",
+            "char_start": 0,
+            "char_end": 4,
+            "surface": "BNM",
+            "class_": "RegulatoryBody",
+            "source": "gazetteer",
+            "confidence": 1.0,
+        },
+        {
+            "doc_id": "a",
+            "chunk_id": "a:0001",
+            "char_start": 10,
+            "char_end": 30,
+            "surface": "Bank Negara Malaysia",
+            "class_": "RegulatoryBody",
+            "source": "gliner",
+            "confidence": 0.9,
+        },
     ]
     with spans_path.open("w") as fh:
         for s in spans:
             fh.write(json.dumps(s) + "\n")
 
     seeds = [
-        {"canonical": "BNM", "class_": "RegulatoryBody",
-         "aliases": ["Bank Negara Malaysia"],
-         "left_forbidden": [], "right_forbidden": []},
+        {
+            "canonical": "BNM",
+            "class_": "RegulatoryBody",
+            "aliases": ["Bank Negara Malaysia"],
+            "left_forbidden": [],
+            "right_forbidden": [],
+        },
     ]
     ent_path, men_path = run_stage_4(
         spans_path=spans_path, seeds=seeds, output_dir=tmp_path
