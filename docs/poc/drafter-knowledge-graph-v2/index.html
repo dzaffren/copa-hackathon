@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rulebook Radar — Upload your open document</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: { sans:['Inter','system-ui','sans-serif'], mono:['JetBrains Mono','monospace'] },
+  colors: {
+    bg:'#191919', sidebar:'#1c1c1c', panel:'#212121', elevated:'#262626', hover:'#2b2b2b',
+    subtle:'rgba(255,255,255,0.06)', line:'rgba(255,255,255,0.09)',
+    ink:'#d6d6d6', muted:'#8e8e8e', faint:'#6b6b6b',
+    accent:'#a882ff', 'accent-soft':'rgba(168,130,255,0.12)',
+    consensus:'#6ee7b7', conflict:'#fca5a5', gap:'#fdba74', duplicate:'#7dd3fc', partial:'#fcd34d',
+  }
+}}}
+</script>
+<link rel="stylesheet" href="theme.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<div class="app">
+  <!-- ribbon -->
+  <nav class="ribbon">
+    <a href="index.html" class="ribbon-brand" title="Rulebook Radar"><i data-lucide="radar" class="w-5 h-5"></i></a>
+    <div class="ribbon-group">
+      <a href="workspace.html" class="ribbon-item" title="Workspace"><i data-lucide="panel-left" class="w-[18px] h-[18px]"></i></a>
+      <a href="workspace.html?view=graph" class="ribbon-item" title="Knowledge graph"><i data-lucide="waypoints" class="w-[18px] h-[18px]"></i></a>
+      <a href="insights.html" class="ribbon-item" title="Insights"><i data-lucide="sparkles" class="w-[18px] h-[18px]"></i></a>
+      <a href="monitor.html" class="ribbon-item" title="Source drift"><i data-lucide="bell" class="w-[18px] h-[18px]"></i></a>
+      <a href="assistant.html" class="ribbon-item" title="Redraft assistant"><i data-lucide="pen-line" class="w-[18px] h-[18px]"></i></a>
+    </div>
+    <div class="ribbon-foot">
+      <span class="ribbon-avatar" title="Aisyah R.">AR</span>
+    </div>
+  </nav>
+
+  <!-- work area -->
+  <div class="workarea">
+    <div class="topbar">
+      <span class="topbar-title">Rulebook Radar</span>
+      <span class="crumb">·  Due diligence for policy drafters · MVP1 prototype</span>
+    </div>
+
+    <div class="flex-1 overflow-y-auto scroll px-6 py-8">
+      <main class="max-w-screen-md mx-auto">
+        <div class="text-center mb-8">
+          <h2 class="text-2xl font-semibold tracking-tight text-ink">Start with your open document.</h2>
+          <p class="text-muted mt-2 max-w-lg mx-auto">Upload the policy you're drafting. Rulebook Radar reads it, pulls in the sources that bear on it — the ones it cites <b class="text-ink">and</b> the ones it should — and shows you how each one affects your draft.</p>
+          <p class="text-xs text-accent mt-3 max-w-lg mx-auto font-medium">You keep drafting in Word — <b>Microsoft writes; we cite.</b> Every suggestion is backed by the exact source clause, or we say "no matching clause found."</p>
+        </div>
+
+        <!-- Upload zone -->
+        <div id="dropzone" class="card border-dashed border-line hover:border-accent transition p-10 text-center cursor-pointer" onclick="startAnalyse()">
+          <i data-lucide="upload-cloud" class="w-10 h-10 mx-auto text-accent"></i>
+          <p class="font-medium mt-3 text-ink">Drop your document here, or click to select</p>
+          <p class="text-xs text-faint mt-1">PDF or Word · your draft stays private</p>
+          <button class="btn btn-accent mt-5 mx-auto">Upload a document</button>
+          <p class="text-xs text-faint mt-4">Demo shortcut → uses the real, public <b class="text-muted">BNM Discussion Paper on AI in the Financial Sector</b> (Aug 2025).</p>
+          <p class="text-[11px] text-faint mt-1">Prototype: upload &amp; extraction are real; the analyse sequence replays a pre-prepared result over a curated source set. Quotes are marked ✓ verified or ◦ illustrative.</p>
+        </div>
+
+        <!-- Analyse sequence (hidden until upload) -->
+        <div id="analyse" class="hidden panel p-8">
+          <div class="flex items-center gap-3 mb-6">
+            <i data-lucide="file-text" class="w-6 h-6 text-accent"></i>
+            <div>
+              <p class="font-semibold text-ink">AI in the Malaysian Financial Sector (Discussion Paper)</p>
+              <p class="text-xs text-muted">BNM · August 2025 · <span id="charCount">699 KB</span> · reading…</p>
+            </div>
+          </div>
+          <ol id="steps" class="space-y-3"></ol>
+          <div id="doneBar" class="hidden mt-7 text-center">
+            <p class="text-sm text-consensus font-medium mb-3 flex items-center justify-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Analysis complete — <span id="connSummary"></span></p>
+            <a href="workspace.html" class="btn btn-accent mx-auto">Open the workspace <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+          </div>
+        </div>
+
+        <!-- What the analysis does (transparency) -->
+        <div class="mt-8 grid sm:grid-cols-2 gap-4 text-sm">
+          <div class="card p-4">
+            <p class="font-medium text-ink flex items-center gap-2"><span class="badge b-accent">1</span> Sources it <span class="text-accent">cites</span></p>
+            <p class="text-muted mt-2 text-xs">The document names its own references (OECD, BCBS 239, FSB, NIST, MAS…). We parse them out, retrieve them, and link each to the paragraph that leans on it. → consensus / duplicate.</p>
+          </div>
+          <div class="card p-4">
+            <p class="font-medium text-ink flex items-center gap-2"><span class="badge b-accent">2</span> Sources it <span class="text-accent">should</span> consider</p>
+            <p class="text-muted mt-2 text-xs">We match each paragraph's topic against a curated library of BNM benchmarks — surfacing relevant sources the draft did <b class="text-ink">not</b> cite. → gap / conflict / partial / what you might have missed.</p>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<script>
+const STEPS = [
+  { label:"Extracting the document — paragraphs & structure", detail:"73,601 characters · 54 numbered paragraphs" },
+  { label:"Branch ① — parsing the sources it cites", detail:"found: OECD (×14), BCBS 239, FSB, NIST, MAS, PDPA…" },
+  { label:"Retrieving those cited sources", detail:"9 retrieved · 1 blocked (MAS site blocks automated access — you can supply it)" },
+  { label:"Branch ② — matching paragraph topics to un-cited sources", detail:"fairness · hallucination · personal data · cross-border transfer" },
+  { label:"Pulling in industry feedback on this published paper", detail:"Association of Banks + 3 FSP respondents (agree / disagree)" },
+  { label:"Analysing every connection — consensus / conflict / gap / duplicate / partial", detail:"3 paragraphs analysed in depth (analyse any other on demand) · + surfacing cross-source insights you might have missed" },
+];
+
+function startAnalyse(){
+  // a new upload is a fresh session — clear any state left from a prior run/rehearsal
+  ["rr_pulled","rr_resolved_blocked","rr_user_srcs"].forEach(k=>localStorage.removeItem(k));
+  document.getElementById("dropzone").classList.add("hidden");
+  const a = document.getElementById("analyse");
+  a.classList.remove("hidden");
+  const ol = document.getElementById("steps");
+  ol.innerHTML = STEPS.map((s,i)=>`
+    <li id="step${i}" class="flex items-start gap-3 opacity-30 transition">
+      <span id="spin${i}" class="mt-0.5 w-5 h-5 shrink-0 rounded-full border-2 border-line"></span>
+      <div>
+        <p class="text-sm font-medium text-ink">${s.label}</p>
+        <p class="text-xs text-faint">${s.detail}</p>
+      </div>
+    </li>`).join("");
+  if(window.lucide) lucide.createIcons();
+  step(0);
+}
+function step(i){
+  if(i>0){
+    const prev=document.getElementById("spin"+(i-1));
+    prev.className="mt-0.5 w-5 h-5 shrink-0 rounded-full bg-emerald-500 flex items-center justify-center text-white";
+    prev.innerHTML='<i data-lucide="check" class="w-3 h-3"></i>';
+  }
+  if(i>=STEPS.length){
+    document.getElementById("doneBar").classList.remove("hidden");
+    document.getElementById("connSummary").textContent = "10 connections across 3 paragraphs analysed in depth · 6 more ready to analyse · 5 source types · 1 source it couldn't retrieve (you can supply it)";
+    if(window.lucide) lucide.createIcons();
+    return;
+  }
+  const li=document.getElementById("step"+i);
+  li.classList.remove("opacity-30");
+  const sp=document.getElementById("spin"+i);
+  sp.className="mt-0.5 w-5 h-5 shrink-0 rounded-full border-2 border-accent border-t-transparent spin";
+  if(window.lucide) lucide.createIcons();
+  setTimeout(()=>step(i+1), 850);
+}
+window.startAnalyse = startAnalyse;
+</script>
+<script>lucide.createIcons();</script>
+</body>
+</html>
