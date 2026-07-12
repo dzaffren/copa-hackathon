@@ -88,3 +88,13 @@ matching clause found" — never invent one. Preserve this in any spec or POC ed
   replaced the "self-contained HTML, no build step" convention with a Next.js + React app.
   Don't flag the framework/`package.json`/build step as a mistake. See
   `docs/learnings/convention-frontend-nextjs-not-static-html.md`.
+- **Offline build needs Azure Document Intelligence** — a full `python -m engine.build`
+  fails offline on the legacy tech-risk PDFs (`BCM 9.17` won't resolve → `GraphBuildError`)
+  because the default extractor scrambles multi-column PDFs; the committed artifacts were
+  DI-built. The AI DP + references + `verdicts.json` DO build offline — don't read that
+  `GraphBuildError` as a regression. See
+  `docs/learnings/convention-offline-build-needs-docintel.md`.
+- **Engine artifact writes must be UTF-8** — pass `encoding="utf-8"` to any `write_text`
+  of document/markdown text in `engine/`; the AI DP's Unicode glyphs (U+2212) crash the
+  cp1252 platform default on Windows. See
+  `docs/learnings/pattern-engine-artifact-writes-utf8.md`.

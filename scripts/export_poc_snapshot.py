@@ -11,17 +11,13 @@ build artifacts, mirroring the engine read-API response shapes byte-for-byte:
            web/public/data/connections/{number}.json   (one per analysed paragraph)
     skips  any graph node with access == "restricted"   (confidentiality hard rule)
 
-The exporter is intentionally thin and deterministic — no network, no model. It
-joins three inputs:
-
-  * verdicts.json  — per-connection records (verdict, rationale, confidence,
-                     branch, verification, source ref, and blocked-source status).
-                     This is the spine of a connection.
-  * clause-index   — the ONLY source of verbatim quote text and paragraph text
-                     (fetched by clause number; never model-authored).
-  * graph nodes    — source metadata (title, source_type, access). A node marked
-                     access == "restricted" is dropped entirely: neither its text
-                     nor its title reaches the tracked snapshot path.
+The exporter is intentionally thin and deterministic — no network, no model. The
+render/join logic (public-node filtering, verbatim-quote join, connection
+rendering, and the per-paragraph / paragraphs-index payloads) now lives in
+`engine.read_model`, which the read API (`engine.api`) ALSO uses — so the static
+snapshot and the live API can never diverge. This script is a thin writer around
+that shared model: it loads the three artifacts, delegates to `engine.read_model`,
+and writes the JSON files.
 
 Because the AI DP's real verdict artifacts are produced by the engine story
 (spec-source-connection-engine.md, Tasks 4-6) and may not exist yet, this script
@@ -34,7 +30,13 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
+
+from engine.clauses import ClauseIndex
+from engine.read_model import (
+    render_paragraph_connections,
+    render_paragraphs_index,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ARTIFACTS_DIR = REPO_ROOT / "data" / "artifacts"
@@ -51,90 +53,6 @@ def _load(path: Path, default: Any) -> Any:
     return json.loads(path.read_text())
 
 
-def _public_nodes(graph: dict[str, Any]) -> dict[str, dict[str, Any]]:
-    """Index graph nodes by id, DROPPING any with access == "restricted".
-
-    This is the confidentiality guarantee: a restricted node (e.g. the internal
-    handbook) is excluded here, so neither its title nor any derived text can
-    appear in the tracked snapshot. Preview nodes are kept (they are public) but
-    carry no verbatim passage from the engine, so they simply never gain a quote.
-    """
-    return {
-        node["id"]: node
-        for node in graph.get("nodes", [])
-        if node.get("access") != "restricted"
-    }
-
-
-def _quote_for(
-    clause_number: Optional[str],
-    verification: str,
-    clause_index: dict[str, Any],
-) -> Optional[dict[str, Any]]:
-    """Build a quote block, fetching verbatim text from the clause index by number.
-
-    Never returns model-authored text. `pending_extraction` yields text: null
-    (a labelled placeholder downstream); a clause number absent from the index
-    also yields null text rather than an invented string.
-    """
-    if clause_number is None:
-        return None
-    if verification == "pending_extraction":
-        return {"clause_number": clause_number, "text": None, "verification": "pending_extraction"}
-    entry = clause_index.get(clause_number)
-    text = entry.get("text") if isinstance(entry, dict) else None
-    return {"clause_number": clause_number, "text": text, "verification": verification}
-
-
-def _connection_from_verdict(
-    record: dict[str, Any],
-    nodes: dict[str, dict[str, Any]],
-    clause_index: dict[str, Any],
-) -> Optional[dict[str, Any]]:
-    """Turn one verdicts.json record into a read-API connection object.
-
-    Returns None when the record's source node is restricted/absent (dropped),
-    so restricted connections never surface.
-    """
-    source_id = record.get("source_document_id")
-    node = nodes.get(source_id)
-    if node is None:
-        return None  # restricted (dropped from `nodes`) or unknown → omit entirely
-
-    source: dict[str, Any] = {
-        "document_id": source_id,
-        "title": node.get("title", source_id),
-        "source_type": node.get("source_type", "international_standard"),
-    }
-    if "stance" in record:
-        source["stance"] = record["stance"]
-
-    base = {"id": record["id"], "branch": record.get("branch", "uncited"), "source": source}
-
-    # A blocked (un-retrieved) source: no verdict, no quote.
-    if record.get("status") == "could_not_retrieve":
-        return {
-            **base,
-            "status": "could_not_retrieve",
-            "reason": record.get("reason", "This source could not be retrieved automatically."),
-            "verdict": None,
-            "quote": None,
-        }
-
-    return {
-        **base,
-        "verdict": record["verdict"],
-        "verdict_status": "proposed",
-        "confidence": record.get("confidence", "Medium"),
-        "rationale": record.get("rationale", ""),
-        "quote": _quote_for(
-            record.get("clause_number"),
-            record.get("verification", "illustrative"),
-            clause_index,
-        ),
-    }
-
-
 def build_snapshot(
     clause_index: dict[str, Any],
     graph: dict[str, Any],
@@ -143,64 +61,35 @@ def build_snapshot(
 ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
     """Pure builder → (paragraphs.json payload, {paragraph_number: connections.json}).
 
-    Kept side-effect-free so tests can assert on the shapes without touching disk.
+    Delegates entirely to `engine.read_model` so the snapshot mirrors the live
+    read API byte-for-byte. `clause_index` arrives as a raw JSON dict (the loaded
+    `clause-index.json`); it is wrapped in a `ClauseIndex` (dropping any non-dict
+    value, preserving the old tolerance) so the shared render model — which reads
+    the index through `ClauseIndex` — can consume it. Kept side-effect-free so
+    tests can assert on the shapes without touching disk.
     """
-    nodes = _public_nodes(graph)
-
-    # Paragraphs of the vehicle document are clause-index entries for its policy.
-    para_entries = {
-        entry["clause_number"]: entry
-        for entry in clause_index.values()
-        if isinstance(entry, dict) and entry.get("document_id") == document_id
-    }
-
-    # Group verdict records by the paragraph they touch.
-    by_paragraph: dict[str, list[dict[str, Any]]] = {}
-    for record in verdicts.values():
-        para = record.get("paragraph")
-        if para is None:
-            continue
-        by_paragraph.setdefault(para, []).append(record)
-
-    connections_files: dict[str, dict[str, Any]] = {}
-    paragraphs: list[dict[str, Any]] = []
-
-    for clause_number, entry in sorted(para_entries.items()):
-        # A clause number like "AIDP 3.5" → the bare paragraph number "3.5".
-        number = clause_number.split(" ", 1)[-1]
-        title = entry.get("heading") or ""
-        records = by_paragraph.get(number, [])
-
-        conns = [
-            c
-            for c in (_connection_from_verdict(r, nodes, clause_index) for r in records)
-            if c is not None
-        ]
-        state = "analysed" if number in by_paragraph else "not_analysed"
-
-        paragraphs.append(
-            {
-                "number": number,
-                "title": title,
-                "text": entry.get("text", ""),
-                "state": state,
-                "connection_count": len(conns),
-            }
+    index = (
+        clause_index
+        if isinstance(clause_index, ClauseIndex)
+        else ClauseIndex(
+            {k: v for k, v in clause_index.items() if isinstance(v, dict)}
         )
+    )
 
-        if state == "analysed":
-            connections_files[number] = {
-                "paragraph": {"number": number, "title": title, "text": entry.get("text", "")},
-                "state": "analysed",
-                "no_matching_source": len(conns) == 0,
-                "connections": conns,
-            }
+    paragraphs_payload = render_paragraphs_index(document_id, index, verdicts, graph)
 
-    paragraphs_payload = {
-        "document_id": document_id,
-        "total_paragraphs": len(paragraphs),
-        "paragraphs": paragraphs,
-    }
+    # One connections file per ANALYSED paragraph — the same payload the live
+    # `GET …/{number}/connections` route serves (via the same render model).
+    connections_files: dict[str, dict[str, Any]] = {}
+    for paragraph in paragraphs_payload["paragraphs"]:
+        if paragraph["state"] != "analysed":
+            continue
+        payload = render_paragraph_connections(
+            document_id, paragraph["number"], verdicts, graph, index
+        )
+        if payload is not None:  # analysed paragraphs always resolve their entry
+            connections_files[paragraph["number"]] = payload
+
     return paragraphs_payload, connections_files
 
 

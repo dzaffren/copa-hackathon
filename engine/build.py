@@ -30,7 +30,8 @@ from engine.clauses import (
     segment_clauses,
 )
 from engine.graph import build_graph
-from engine.ingest import ingest_document
+from engine.ingest import ingest_document, normalise_glyph_artifacts
+from engine.verdicts import propose_verdicts
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +50,7 @@ def run_build(
     segment_fn: SegmentFn = segment_clauses,
     reference_documents: Optional[dict[str, dict[str, Any]]] = None,
     reference_edges: Optional[list[dict[str, Any]]] = None,
+    connection_fixtures: Optional[list[dict[str, Any]]] = None,
 ) -> None:
     """Run stages 1-3 and write `clause-index.json` + `graph.json`.
 
@@ -86,6 +88,14 @@ def run_build(
             doc["source_path"],
         )
         markdown = ingest_fn(doc["source_path"])
+        # DP-specific glyph repair, gated on the manifest flag: the vehicle
+        # document's stylised "AI" logotype is mis-read as "Al"/"$A l$"/"GenAl";
+        # `normalise_glyph_artifacts` fixes only those self-contained patterns and
+        # runs BEFORE segmentation, so every sliced clause text is the corrected,
+        # verbatim source. It is NOT applied globally — the bare Al→AI rule must
+        # not touch other corpus PDFs (see engine/config.py `normalise_glyphs`).
+        if doc.get("normalise_glyphs"):
+            markdown = normalise_glyph_artifacts(markdown)
         # Diagnostic: dump the raw ingested markdown so we can inspect exactly
         # what stage-1 (Document Intelligence / MarkItDown) produced for each
         # document — the ground truth for any "clause X is missing" question
@@ -94,7 +104,13 @@ def run_build(
         # frozen contract.
         ingest_debug_dir = output_dir / "_ingest"
         ingest_debug_dir.mkdir(parents=True, exist_ok=True)
-        (ingest_debug_dir / f"{document_id}.md").write_text(markdown)
+        # Explicit UTF-8: the vehicle DP's markdown contains non-cp1252 glyphs
+        # (e.g. the Unicode minus U+2212), which the platform-default encoding on
+        # Windows cannot write. All artifact writes must be UTF-8 for the offline
+        # build to run cross-platform.
+        (ingest_debug_dir / f"{document_id}.md").write_text(
+            markdown, encoding="utf-8"
+        )
         logger.info("[%d/%d] parsing clauses for %s", n, len(documents), document_id)
         entries = segment_fn(
             markdown,
@@ -131,18 +147,34 @@ def run_build(
     # clause.
     reference_documents = reference_documents or {}
     for ref_id, ref in reference_documents.items():
-        if "passage" not in ref:
-            continue  # node-only (restricted handbook / preview trend)
-        ref_clause = build_reference_clause(
-            document_id=ref_id,
-            policy_id=ref["policy_id"],
-            anchor=ref["anchor"],
-            heading=ref.get("heading"),
-            text=ref["passage"],
-        )
-        for clause_number, entry in ref_clause.items():
-            primary[clause_number] = entry
-            versions.setdefault(clause_number, {})[ref_id] = entry
+        # A reference may carry a single `passage`/`anchor`/`heading` (the #26
+        # form) OR a `passages` list of {anchor, heading, passage} for a source
+        # cited at more than one clause (e.g. BCBS 239 at P3 and P4) — one graph
+        # node, several verbatim clauses. Node-only references (restricted
+        # handbook, preview trend, blocked sources) carry neither and are skipped.
+        if "passages" in ref:
+            passage_specs = ref["passages"]
+        elif "passage" in ref:
+            passage_specs = [
+                {
+                    "anchor": ref["anchor"],
+                    "heading": ref.get("heading"),
+                    "passage": ref["passage"],
+                }
+            ]
+        else:
+            continue  # node-only — nothing ingested
+        for spec in passage_specs:
+            ref_clause = build_reference_clause(
+                document_id=ref_id,
+                policy_id=ref["policy_id"],
+                anchor=spec["anchor"],
+                heading=spec.get("heading"),
+                text=spec["passage"],
+            )
+            for clause_number, entry in ref_clause.items():
+                primary[clause_number] = entry
+                versions.setdefault(clause_number, {})[ref_id] = entry
 
     clause_index = ClauseIndex(primary, versions)
 
@@ -180,11 +212,33 @@ def run_build(
     )
     (output_dir / "graph.json").write_text(json.dumps(graph, indent=2))
 
+    # Stage 4b — verdict pass. The frozen showcase connections (or a live
+    # finder's output) are classified into per-connection verdict records,
+    # gated by the same "clause resolves verbatim" guardrail. Deterministic and
+    # credential-free: `AI_DP_CONNECTIONS` carry frozen verdicts, so no model is
+    # called here. verdicts.json is the read API's spine — joined onto the graph
+    # + clause index at read time (see engine.api / scripts.export_poc_snapshot).
+    if connection_fixtures is not None:
+        verdict_records = propose_verdicts(connection_fixtures, clause_index)
+        # Insertion order (fixture order) is preserved — NOT sort_keys — so the
+        # read layer renders connections in the curated display order the demo
+        # snapshot uses (cited/uncited/feedback per paragraph). Still fully
+        # deterministic: a static fixture yields a fixed order.
+        (output_dir / "verdicts.json").write_text(
+            json.dumps(verdict_records, indent=2), encoding="utf-8"
+        )
+        logger.info(
+            "%d verdict record(s) → %s",
+            len(verdict_records),
+            output_dir / "verdicts.json",
+        )
+
 
 def main() -> None:
     import argparse
 
     from engine.config import (
+        AI_DP_CONNECTIONS,
         CURATED_SEED_EDGES,
         DOCUMENTS,
         REFERENCE_DOCUMENTS,
@@ -219,6 +273,9 @@ def main() -> None:
     reference_edges: list[dict[str, Any]] = list(
         cast(list[dict[str, Any]], REFERENCE_SEED_EDGES)
     )
+    connection_fixtures: list[dict[str, Any]] = list(
+        cast(list[dict[str, Any]], AI_DP_CONNECTIONS)
+    )
 
     if args.docs:
         unknown = [d for d in args.docs if d not in documents]
@@ -238,8 +295,11 @@ def main() -> None:
         logger.info("building subset: %s", ", ".join(documents))
         # A subset build omits the external references — their edges originate
         # from the rmit draft and would dangle if rmit or a target is excluded.
+        # The showcase verdicts cite those references, so drop them too rather
+        # than emit a half-resolved verdicts.json.
         reference_documents = {}
         reference_edges = []
+        connection_fixtures = []
 
     draft_registry_path = REPO_ROOT / "data" / "draft_registry.json"
     draft_registry = json.loads(draft_registry_path.read_text())
@@ -253,6 +313,7 @@ def main() -> None:
             dict[str, dict[str, Any]], reference_documents
         ),
         reference_edges=reference_edges,
+        connection_fixtures=connection_fixtures,
     )
     logger.info("build complete → %s", REPO_ROOT / "data" / "artifacts")
 
