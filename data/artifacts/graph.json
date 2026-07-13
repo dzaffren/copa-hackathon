@@ -1,12 +1,22 @@
 {
   "nodes": [
     {
+      "id": "ai-dp-2025",
+      "policy_id": "ai-dp",
+      "title": "Discussion Paper on Artificial Intelligence in the Malaysian Financial Sector",
+      "version": "Discussion Paper \u00b7 Aug 2025",
+      "status": "In force",
+      "cluster": "ai-financial-sector",
+      "kind": "policy"
+    },
+    {
       "id": "rmit-v1-2020",
       "policy_id": "rmit",
       "title": "Risk Management in Technology (RMiT)",
       "version": "v1 \u00b7 2020",
       "status": "Superseded",
-      "cluster": "technology-risk"
+      "cluster": "technology-risk",
+      "kind": "policy"
     },
     {
       "id": "rmit-v2-2026-draft",
@@ -14,7 +24,8 @@
       "title": "Risk Management in Technology (RMiT)",
       "version": "v2 \u00b7 2026 draft",
       "status": "In progress",
-      "cluster": "technology-risk"
+      "cluster": "technology-risk",
+      "kind": "policy"
     },
     {
       "id": "outsourcing-v1-2019",
@@ -22,7 +33,8 @@
       "title": "Outsourcing",
       "version": "v1 \u00b7 2019",
       "status": "In force",
-      "cluster": "technology-risk"
+      "cluster": "technology-risk",
+      "kind": "policy"
     },
     {
       "id": "bcm-v1-2022",
@@ -30,7 +42,8 @@
       "title": "Business Continuity Management",
       "version": "v1 \u00b7 2022",
       "status": "In force",
-      "cluster": "technology-risk"
+      "cluster": "technology-risk",
+      "kind": "policy"
     },
     {
       "id": "opres-v1-2025-draft",
@@ -38,7 +51,8 @@
       "title": "Operational Resilience",
       "version": "draft \u00b7 Discussion Paper 2025",
       "status": "In progress",
-      "cluster": "technology-risk"
+      "cluster": "technology-risk",
+      "kind": "policy"
     },
     {
       "id": "recovery-planning-v1-2021",
@@ -46,7 +60,8 @@
       "title": "Recovery Planning",
       "version": "v1 \u00b7 2021",
       "status": "In force",
-      "cluster": "technology-risk"
+      "cluster": "technology-risk",
+      "kind": "policy"
     },
     {
       "id": "customer-info-v1-2025",
@@ -54,7 +69,216 @@
       "title": "Management of Customer Information",
       "version": "v1 \u00b7 2025",
       "status": "In force",
-      "cluster": "technology-risk"
+      "cluster": "technology-risk",
+      "kind": "policy"
+    },
+    {
+      "id": "mas-trm-2021",
+      "policy_id": "mas-trm",
+      "title": "Technology Risk Management Guidelines (MAS, Singapore)",
+      "version": "2021",
+      "status": "In force",
+      "cluster": "technology-risk",
+      "kind": "reference",
+      "source_type": "peer_regulator",
+      "access": "public",
+      "preview": false,
+      "source_url": "https://www.mas.gov.sg/regulation/guidelines/technology-risk-management-guidelines"
+    },
+    {
+      "id": "pdpa-2010",
+      "policy_id": "pdpa",
+      "title": "Personal Data Protection Act 2010 (Malaysia)",
+      "version": "2010 \u00b7 Act 709 (as amended by Act A1727)",
+      "status": "In force",
+      "cluster": "technology-risk",
+      "kind": "reference",
+      "source_type": "act",
+      "access": "public",
+      "preview": false,
+      "source_url": "https://www.pdp.gov.my/ppdpv1/en/akta/pdp-act-2010-en/",
+      "mother_document": "Personal Data Protection Act 2010",
+      "precedence": "national statute",
+      "legislated": true,
+      "standard_setting_party": "Parliament of Malaysia",
+      "doc_class": "principle"
+    },
+    {
+      "id": "basel-por-2021",
+      "policy_id": "basel-por",
+      "title": "Principles for Operational Resilience (Basel Committee)",
+      "version": "2021",
+      "status": "In force",
+      "cluster": "technology-risk",
+      "kind": "reference",
+      "source_type": "standard",
+      "access": "public",
+      "preview": false,
+      "source_url": "https://www.bis.org/bcbs/publ/d516.htm"
+    },
+    {
+      "id": "bcbs-239",
+      "policy_id": "bcbs-239",
+      "title": "BCBS 239 \u2014 Principles for effective risk data aggregation",
+      "version": "2013 \u00b7 BCBS d239",
+      "status": "In force",
+      "cluster": "ai-financial-sector",
+      "kind": "reference",
+      "source_type": "international_standard",
+      "access": "public",
+      "preview": false,
+      "source_url": "https://www.bis.org/publ/bcbs239.htm",
+      "mother_document": "Basel Committee on Banking Supervision",
+      "precedence": "international standard",
+      "legislated": false,
+      "standard_setting_party": "Basel Committee on Banking Supervision",
+      "doc_class": "principle"
+    },
+    {
+      "id": "oecd-ai",
+      "policy_id": "oecd-ai",
+      "title": "OECD AI Principles",
+      "version": "2019 (rev. 2024)",
+      "status": "In force",
+      "cluster": "ai-financial-sector",
+      "kind": "reference",
+      "source_type": "international_standard",
+      "access": "public",
+      "preview": false,
+      "source_url": "https://oecd.ai/en/ai-principles",
+      "mother_document": "OECD Recommendation on Artificial Intelligence",
+      "precedence": "international standard",
+      "legislated": false,
+      "standard_setting_party": "OECD",
+      "doc_class": "principle"
+    },
+    {
+      "id": "nist-ai-rmf",
+      "policy_id": "nist-ai-rmf",
+      "title": "NIST AI Risk Management Framework",
+      "version": "AI RMF 1.0 \u00b7 2023",
+      "status": "In force",
+      "cluster": "ai-financial-sector",
+      "kind": "reference",
+      "source_type": "international_standard",
+      "access": "public",
+      "preview": false,
+      "source_url": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "mother_document": "NIST AI Risk Management Framework (AI RMF 1.0)",
+      "precedence": "international standard",
+      "legislated": false,
+      "standard_setting_party": "NIST (US Department of Commerce)",
+      "doc_class": "technical"
+    },
+    {
+      "id": "bnm-ftfc",
+      "policy_id": "bnm-ftfc",
+      "title": "BNM Fair Treatment of Financial Consumers",
+      "version": "2019",
+      "status": "In force",
+      "cluster": "ai-financial-sector",
+      "kind": "reference",
+      "source_type": "internal_bnm",
+      "access": "public",
+      "preview": false,
+      "source_url": "https://www.bnm.gov.my/-/fair-treatment-of-financial-consumers",
+      "mother_document": "Fair Treatment of Financial Consumers",
+      "precedence": "domestic regulation",
+      "legislated": true,
+      "standard_setting_party": "Bank Negara Malaysia",
+      "doc_class": "principle"
+    },
+    {
+      "id": "eu-ai-act",
+      "policy_id": "eu-ai-act",
+      "title": "EU AI Act (Regulation 2024/1689)",
+      "version": "Regulation (EU) 2024/1689",
+      "status": "In force",
+      "cluster": "ai-financial-sector",
+      "kind": "reference",
+      "source_type": "act",
+      "access": "public",
+      "preview": false,
+      "source_url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+      "mother_document": "Regulation (EU) 2024/1689 (Artificial Intelligence Act)",
+      "precedence": "foreign statute",
+      "legislated": true,
+      "standard_setting_party": "European Parliament and Council",
+      "doc_class": "principle"
+    },
+    {
+      "id": "industry-fsp-3",
+      "policy_id": "industry-fsp-3",
+      "title": "Industry feedback \u2014 3 FSP respondents",
+      "version": "consultation response",
+      "status": "In force",
+      "cluster": "ai-financial-sector",
+      "kind": "reference",
+      "source_type": "industry_feedback",
+      "access": "public",
+      "preview": false,
+      "precedence": "industry feedback",
+      "legislated": false,
+      "standard_setting_party": "3 FSP respondents",
+      "stance": "partial"
+    },
+    {
+      "id": "industry-aob",
+      "policy_id": "industry-aob",
+      "title": "Association of Banks industry feedback",
+      "version": "consultation response",
+      "status": "In force",
+      "cluster": "ai-financial-sector",
+      "kind": "reference",
+      "source_type": "industry_feedback",
+      "access": "public",
+      "preview": false,
+      "precedence": "industry feedback",
+      "legislated": false,
+      "standard_setting_party": "Association of Banks",
+      "stance": "agree"
+    },
+    {
+      "id": "bnm-handbook",
+      "policy_id": "bnm-handbook",
+      "title": "Regulatory Handbook (BNM)",
+      "version": "internal",
+      "status": "In force",
+      "cluster": "technology-risk",
+      "kind": "reference",
+      "source_type": "handbook",
+      "access": "restricted",
+      "preview": false
+    },
+    {
+      "id": "trend-cloud-signals",
+      "policy_id": "trend-cloud-signals",
+      "title": "Trends \u00b7 News \u00b7 foreign policies",
+      "version": "preview",
+      "status": "In force",
+      "cluster": "technology-risk",
+      "kind": "reference",
+      "source_type": "trend",
+      "access": "public",
+      "preview": true
+    },
+    {
+      "id": "mas-feat",
+      "policy_id": "mas-feat",
+      "title": "MAS \u2014 FEAT Principles (Fairness)",
+      "version": "2018",
+      "status": "In force",
+      "cluster": "ai-financial-sector",
+      "kind": "reference",
+      "source_type": "peer_regulator",
+      "access": "public",
+      "preview": false,
+      "source_url": "https://www.mas.gov.sg/publications/monographs-or-information-paper/2018/feat",
+      "mother_document": "MAS FEAT Principles",
+      "precedence": "peer regulator guidance",
+      "legislated": false,
+      "standard_setting_party": "Monetary Authority of Singapore",
+      "doc_class": "principle"
     }
   ],
   "edges": [
@@ -98,6 +322,20 @@
     },
     {
       "source": "rmit-v2-2026-draft",
+      "target": "basel-por-2021",
+      "type": "references",
+      "reason": "The international baseline keeps responsibility for third-party (incl. cloud) dependencies with the bank whatever the approval model \u2014 17.1 must preserve that.",
+      "source_clauses": [
+        "RMiT 17.1"
+      ],
+      "target_clauses": [
+        "Basel POR TP-1"
+      ],
+      "provenance": "llm-found",
+      "confidence": 0.84
+    },
+    {
+      "source": "rmit-v2-2026-draft",
       "target": "bcm-v1-2022",
       "type": "overlaps",
       "reason": "Cloud services supporting critical operations must have continuity arrangements. RMiT 17.1 (cloud adoption for critical systems) engages BCM 9.17 (documenting essential services and the systems that support them).",
@@ -106,6 +344,20 @@
       ],
       "target_clauses": [
         "BCM 9.17"
+      ],
+      "provenance": "curated",
+      "confidence": 1.0
+    },
+    {
+      "source": "rmit-v2-2026-draft",
+      "target": "bnm-handbook",
+      "type": "references",
+      "reason": "Listed so the drafter knows the handbook connects to this clause; its content is confidential and deferred from MVP1.",
+      "source_clauses": [
+        "RMiT 17.1"
+      ],
+      "target_clauses": [
+        "BNM Handbook \u2014 Cloud & Outsourcing Manual"
       ],
       "provenance": "curated",
       "confidence": 1.0
@@ -123,6 +375,20 @@
       ],
       "provenance": "curated",
       "confidence": 1.0
+    },
+    {
+      "source": "rmit-v2-2026-draft",
+      "target": "mas-trm-2021",
+      "type": "references",
+      "reason": "MAS governs cloud through third-party risk management \u2014 assess technology risk before contracting, manage it on an ongoing basis \u2014 not pre-approval. The peer benchmark for 17.1's shift from consultation to 14-day notification.",
+      "source_clauses": [
+        "RMiT 17.1"
+      ],
+      "target_clauses": [
+        "MAS TRM Cloud"
+      ],
+      "provenance": "llm-found",
+      "confidence": 0.88
     },
     {
       "source": "rmit-v2-2026-draft",
@@ -149,6 +415,34 @@
       ],
       "target_clauses": [
         "Outsourcing 12.1"
+      ],
+      "provenance": "curated",
+      "confidence": 1.0
+    },
+    {
+      "source": "rmit-v2-2026-draft",
+      "target": "pdpa-2010",
+      "type": "references",
+      "reason": "A cloud region outside Malaysia engages the PDPA's cross-border transfer test (substantially similar law or adequate protection), so the 17.1 notification should still capture data residency once the requirement to consult the Bank is removed.",
+      "source_clauses": [
+        "RMiT 17.1"
+      ],
+      "target_clauses": [
+        "PDPA 129"
+      ],
+      "provenance": "llm-found",
+      "confidence": 0.9
+    },
+    {
+      "source": "rmit-v2-2026-draft",
+      "target": "trend-cloud-signals",
+      "type": "references",
+      "reason": "Signals such as in-country cloud regions and EU DORA \u2014 a what's-next preview, not a committed reference.",
+      "source_clauses": [
+        "RMiT 17.1"
+      ],
+      "target_clauses": [
+        "Trend \u2014 in-country cloud regions"
       ],
       "provenance": "curated",
       "confidence": 1.0

@@ -1,0 +1,123 @@
+{
+  "ai-dp-2025:3.5::oecd:OECD 1.2": {
+    "id": "ai-dp-2025:3.5::oecd:OECD 1.2",
+    "paragraph": "3.5",
+    "branch": "cited",
+    "source_document_id": "oecd-ai",
+    "verdict": "Consensus",
+    "verdict_status": "proposed",
+    "confidence": "High",
+    "rationale": "OECD backs the fairness stance and adds a human-agency & oversight mechanism paragraph 3.5 does not yet name.",
+    "clause_number": "OECD 1.2",
+    "verification": "verified"
+  },
+  "ai-dp-2025:3.5::nist:NIST MEASURE 2.11": {
+    "id": "ai-dp-2025:3.5::nist:NIST MEASURE 2.11",
+    "paragraph": "3.5",
+    "branch": "uncited",
+    "source_document_id": "nist-ai-rmf",
+    "verdict": "Gap",
+    "verdict_status": "proposed",
+    "confidence": "Medium",
+    "rationale": "NIST calls for a pre-deployment bias assessment across demographic groups that paragraph 3.5 does not require.",
+    "clause_number": "NIST MEASURE 2.11",
+    "verification": "verified"
+  },
+  "ai-dp-2025:3.5::ftfc:FTFC 8.1": {
+    "id": "ai-dp-2025:3.5::ftfc:FTFC 8.1",
+    "paragraph": "3.5",
+    "branch": "uncited",
+    "source_document_id": "bnm-ftfc",
+    "verdict": "Duplicate",
+    "verdict_status": "proposed",
+    "confidence": "Medium",
+    "rationale": "The fair-treatment obligation already covers non-discriminatory outcomes; 3.5 restates it for AI rather than cross-referencing.",
+    "clause_number": "FTFC 8.1",
+    "verification": "illustrative"
+  },
+  "ai-dp-2025:3.5::mas-feat": {
+    "id": "ai-dp-2025:3.5::mas-feat",
+    "paragraph": "3.5",
+    "branch": "uncited",
+    "source_document_id": "mas-feat",
+    "status": "could_not_retrieve",
+    "reason": "Identified as a likely peer benchmark for 3.5, but the MAS site blocks automated access. Upload the source to analyse this connection.",
+    "verdict": null,
+    "verdict_status": "proposed",
+    "clause_number": null
+  },
+  "ai-dp-2025:3.11::bcbs239:BCBS 239 P3": {
+    "id": "ai-dp-2025:3.11::bcbs239:BCBS 239 P3",
+    "paragraph": "3.11",
+    "branch": "cited",
+    "source_document_id": "bcbs-239",
+    "verdict": "Consensus",
+    "verdict_status": "proposed",
+    "confidence": "High",
+    "rationale": "BCBS 239's accuracy-and-integrity principle supports 3.11's call for controls over erroneous outputs.",
+    "clause_number": "BCBS 239 P3",
+    "verification": "verified"
+  },
+  "ai-dp-2025:3.11::euaiact:EU AI Act Art 50": {
+    "id": "ai-dp-2025:3.11::euaiact:EU AI Act Art 50",
+    "paragraph": "3.11",
+    "branch": "uncited",
+    "source_document_id": "eu-ai-act",
+    "verdict": "Gap",
+    "verdict_status": "proposed",
+    "confidence": "Medium",
+    "rationale": "The EU AI Act requires generative outputs to be marked as AI-generated \u2014 a transparency obligation 3.11 does not impose.",
+    "clause_number": "EU AI Act Art 50",
+    "verification": "verified"
+  },
+  "ai-dp-2025:3.11::industry-aob": {
+    "id": "ai-dp-2025:3.11::industry-aob",
+    "paragraph": "3.11",
+    "branch": "feedback",
+    "source_document_id": "industry-aob",
+    "verdict": "Consensus",
+    "verdict_status": "proposed",
+    "confidence": "Medium",
+    "rationale": "The Association of Banks agrees that human review of generative outputs should be proportionate to their impact \u2014 reinforcing 3.11.",
+    "clause_number": "Industry AoB",
+    "verification": "illustrative",
+    "stance": "agree"
+  },
+  "ai-dp-2025:4.6::pdpa-2010:PDPA 129": {
+    "id": "ai-dp-2025:4.6::pdpa-2010:PDPA 129",
+    "paragraph": "4.6",
+    "branch": "uncited",
+    "source_document_id": "pdpa-2010",
+    "verdict": "Conflict",
+    "verdict_status": "proposed",
+    "confidence": "High",
+    "rationale": "4.6 relies on broad informed consent; PDPA \u00a7129 sets a specific cross-border transfer test the draft does not cite and appears to conflict with.",
+    "clause_number": "PDPA 129",
+    "verification": "verified"
+  },
+  "ai-dp-2025:4.6::bcbs239:BCBS 239 P4": {
+    "id": "ai-dp-2025:4.6::bcbs239:BCBS 239 P4",
+    "paragraph": "4.6",
+    "branch": "cited",
+    "source_document_id": "bcbs-239",
+    "verdict": "Consensus",
+    "verdict_status": "proposed",
+    "confidence": "High",
+    "rationale": "BCBS 239's completeness principle supports 4.6's expectation of governed, complete data handling.",
+    "clause_number": "BCBS 239 P4",
+    "verification": "verified"
+  },
+  "ai-dp-2025:4.6::industry-fsp-3": {
+    "id": "ai-dp-2025:4.6::industry-fsp-3",
+    "paragraph": "4.6",
+    "branch": "feedback",
+    "source_document_id": "industry-fsp-3",
+    "verdict": "Partial",
+    "verdict_status": "proposed",
+    "confidence": "Medium",
+    "rationale": "The sector supports responsible data handling but rejects the informed-consent mechanism for legacy datasets \u2014 agrees in part, diverges in part.",
+    "clause_number": "Industry FSP-3",
+    "verification": "illustrative",
+    "stance": "partial"
+  }
+}
