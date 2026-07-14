@@ -45,10 +45,6 @@ def _load_trace(name: str) -> dict:
     return json.loads((ARTIFACTS_DIR / name).read_text(encoding="utf-8"))
 
 
-def _all_candidates(trace: dict) -> list[dict]:
-    return [item for section in CANDIDATE_SECTIONS for item in trace[section]]
-
-
 @pytest.fixture(scope="module")
 def traces() -> dict[str, dict]:
     return {name: _load_trace(name) for name in TRACE_FILES}
