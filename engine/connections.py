@@ -222,6 +222,12 @@ def _validate_candidates(
 
     Also returns a per-candidate validation trace (each cited clause and
     whether it resolved) for the recorded ``connection-trace``.
+
+    The candidate's semantic ``label`` and ``sentiment`` are carried through
+    verbatim onto every built record (supported and unsupported) and the trace —
+    the model's classification of the relationship. This never touches the
+    clause-resolution guardrail: clause TEXT is still fetched only via
+    ``_cite``/``ClauseIndex`` by number.
     """
     connections: list[Connection] = []
     unsupported: list[UnsupportedConnection] = []
@@ -229,6 +235,8 @@ def _validate_candidates(
 
     for candidate in candidates:
         summary = candidate.get("summary", "")
+        label = candidate.get("label")
+        sentiment = candidate.get("sentiment")
         source_numbers = [
             _normalize_clause_number(n) for n in candidate.get("source_clauses", [])
         ]
@@ -245,6 +253,8 @@ def _validate_candidates(
         validation.append(
             {
                 "summary": summary,
+                "label": label,
+                "sentiment": sentiment,
                 "cited_clauses": cited_results,
                 "supported": all_resolved,
             }
@@ -254,6 +264,8 @@ def _validate_candidates(
             connections.append(
                 {
                     "summary": summary,
+                    "label": label,
+                    "sentiment": sentiment,
                     "source_clauses": _cite(source_numbers, clause_index),
                     "target_clauses": _cite(target_numbers, clause_index),
                     "scope_note": candidate.get("scope_note"),
@@ -264,6 +276,8 @@ def _validate_candidates(
             unsupported.append(
                 {
                     "summary": summary,
+                    "label": label,
+                    "sentiment": sentiment,
                     "message": _MESSAGE_NO_CLAUSE,
                     "supported": False,
                 }

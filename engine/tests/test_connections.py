@@ -681,3 +681,97 @@ def test_parse_accepts_sentiment_on_differs():
     assert len(result) == 1
     assert result[0]["label"] == "differs-on"
     assert result[0]["sentiment"] == "tighten"
+
+
+def _finder_direction_aware(doc_a_id, doc_b_id, clause_index):
+    """Emit ``goes-beyond`` when RMiT is the OUR side (doc A) and ``silent-on``
+    when it is the THEIR side (doc B) — the same finding, direction-flipped. The
+    cited clauses resolve in both directions so only the label changes."""
+    label = "goes-beyond" if doc_a_id == "rmit-v2-2026-draft" else "silent-on"
+    return [
+        {
+            "summary": "Our side names a cloud-governance officer the other omits.",
+            "label": label,
+            "source_clauses": ["RMiT 17.1"],
+            "target_clauses": ["Outsourcing 12.1"],
+        }
+    ]
+
+
+def _critic_passthrough(doc_a_id, doc_b_id, clause_index, candidates):
+    """Critic that neither refutes nor scopes — it passes candidates through so
+    the test isolates direction handling in the validator."""
+    return list(candidates)
+
+
+def test_direction_flip_swaps_silent_and_goesbeyond(tmp_path):
+    """Swapping the pair flips ``silent-on`` ⇄ ``goes-beyond`` (a coverage
+    asymmetry is directional), while the verbatim citations are unchanged."""
+    clause_index = _build_fixture_clause_index()
+
+    forward = find_connections(
+        "rmit-v2-2026-draft",
+        "outsourcing-v1-2019",
+        clause_index,
+        finder_fn=_finder_direction_aware,
+        critic_fn=_critic_passthrough,
+        output_dir=tmp_path,
+        now=FIXED_NOW,
+    )
+    reverse = find_connections(
+        "outsourcing-v1-2019",
+        "rmit-v2-2026-draft",
+        clause_index,
+        finder_fn=_finder_direction_aware,
+        critic_fn=_critic_passthrough,
+        output_dir=tmp_path,
+        now=FIXED_NOW,
+    )
+
+    forward_finding = forward["connections"][0]
+    reverse_finding = reverse["connections"][0]
+    assert forward_finding["label"] == "goes-beyond"
+    assert reverse_finding["label"] == "silent-on"
+    # A coverage-asymmetry finding never carries a sentiment.
+    assert forward_finding["sentiment"] is None
+    assert reverse_finding["sentiment"] is None
+    # The verbatim citations are identical in both directions — only the label
+    # flips (the guardrail is untouched).
+    for finding in (forward_finding, reverse_finding):
+        assert [c["clause_number"] for c in finding["source_clauses"]] == ["RMiT 17.1"]
+        assert [c["clause_number"] for c in finding["target_clauses"]] == [
+            "Outsourcing 12.1"
+        ]
+
+
+def test_write_trace_records_label_and_sentiment(tmp_path):
+    """Every ``validation`` entry in the connection-trace records the finding's
+    ``label`` and ``sentiment`` alongside summary/cited_clauses/supported."""
+    clause_index = _build_fixture_clause_index()
+
+    def finder(doc_a_id, doc_b_id, clause_index):
+        return [
+            {
+                "summary": "RMiT 17.1 shortens the window Outsourcing 12.1 allows.",
+                "label": "differs-on",
+                "sentiment": "tighten",
+                "source_clauses": ["RMiT 17.1"],
+                "target_clauses": ["Outsourcing 12.1"],
+            }
+        ]
+
+    find_connections(
+        "rmit-v2-2026-draft",
+        "outsourcing-v1-2019",
+        clause_index,
+        finder_fn=finder,
+        critic_fn=_critic_passthrough,
+        output_dir=tmp_path,
+        now=FIXED_NOW,
+    )
+
+    trace_path = next(tmp_path.glob("connection-trace-*.json"))
+    trace = json.loads(trace_path.read_text(encoding="utf-8"))
+    entry = trace["validation"][0]
+    assert entry["label"] == "differs-on"
+    assert entry["sentiment"] == "tighten"
