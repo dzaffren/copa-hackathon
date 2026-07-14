@@ -28,16 +28,21 @@ turns with recorded/hand-written responses — no network access, no credentials
 Every run records a ``connection-trace-{pair}.json`` (model id, timestamp, raw
 finder output, raw critic output, and the full validation trace) — the demo
 backstop that proves connections were AI-found (not curated) and the
-deterministic fallback if the live API hiccups mid-pitch. Do NOT classify
-connections as Conflict/Duplication/Gap — that is the ripple story (#8). This
-engine emits raw clause-anchored connections only.
+deterministic fallback if the live API hiccups mid-pitch. Each surviving finding
+is classified with a five-label semantic taxonomy — ``aligns-with``,
+``differs-on`` (optionally refined by a ``tighten``/``loosen``/``neutral``
+sentiment), ``conflicts-with``, ``silent-on``, or ``goes-beyond`` — under the
+fixed direction convention that document A is "we/ours" and document B is
+"they/theirs" (so ``silent-on`` and ``goes-beyond`` swap when the pair flips).
+The clause TEXT and clause NUMBERS shown to users still come only from the
+``ClauseIndex`` — the label describes the relationship, never the citation.
 """
 
 import json
 import logging
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable, Optional, TypedDict
+from typing import Callable, Literal, Optional, TypedDict
 
 from engine.clauses import ClauseIndex
 from engine.config import FINDER_CRITIC_DEPLOYMENT
@@ -56,9 +61,20 @@ class ClauseCitation(TypedDict):
 
 class Connection(TypedDict):
     """A supported clause-anchored connection (matches the spec's
-    ``POST /connections/find`` 200 ``connections[]`` shape)."""
+    ``POST /connections/find`` 200 ``connections[]`` shape).
+
+    ``label`` is the semantic classification of the finding (one of the five
+    mutually-exclusive, exhaustive values). ``sentiment`` refines a
+    ``differs-on`` finding as tighten/loosen/neutral and is ``None`` for every
+    other label. Direction convention: document A is "we/ours", document B is
+    "they/theirs", so ``silent-on`` (ours is silent) and ``goes-beyond`` (ours
+    goes further) swap when the pair is flipped."""
 
     summary: str
+    label: Literal[
+        "aligns-with", "differs-on", "conflicts-with", "silent-on", "goes-beyond"
+    ]
+    sentiment: Optional[Literal["tighten", "loosen", "neutral"]]
     source_clauses: list[ClauseCitation]
     target_clauses: list[ClauseCitation]
     scope_note: Optional[str]
@@ -67,9 +83,15 @@ class Connection(TypedDict):
 
 class UnsupportedConnection(TypedDict):
     """A candidate that cited at least one clause absent from the index —
-    reported honestly, never invented, never promoted to a connection."""
+    reported honestly, never invented, never promoted to a connection.
+
+    ``label`` and ``sentiment`` record what the model attempted before the
+    citation validator dropped it (the audit trail); either may be ``None`` when
+    the candidate proposed none."""
 
     summary: str
+    label: Optional[str]
+    sentiment: Optional[str]
     message: str
     supported: bool
 
@@ -88,6 +110,19 @@ FinderFn = Callable[[str, str, ClauseIndex], list[dict]]
 CriticFn = Callable[[str, str, ClauseIndex, list[dict]], list[dict]]
 
 _MESSAGE_NO_CLAUSE = "No matching clause found"
+
+# The five mutually-exclusive, exhaustive semantic labels a finding may carry,
+# and the three sentiments that MAY refine a ``differs-on`` finding (and only
+# that one). Kept as tuples so error messages can list the allowed values.
+CONNECTION_LABELS = (
+    "aligns-with",
+    "differs-on",
+    "conflicts-with",
+    "silent-on",
+    "goes-beyond",
+)
+SENTIMENT_VALUES = ("tighten", "loosen", "neutral")
+_SENTIMENT_LABEL = "differs-on"
 
 
 def _normalize_clause_number(number: str) -> str:
@@ -187,6 +222,12 @@ def _validate_candidates(
 
     Also returns a per-candidate validation trace (each cited clause and
     whether it resolved) for the recorded ``connection-trace``.
+
+    The candidate's semantic ``label`` and ``sentiment`` are carried through
+    verbatim onto every built record (supported and unsupported) and the trace —
+    the model's classification of the relationship. This never touches the
+    clause-resolution guardrail: clause TEXT is still fetched only via
+    ``_cite``/``ClauseIndex`` by number.
     """
     connections: list[Connection] = []
     unsupported: list[UnsupportedConnection] = []
@@ -194,6 +235,8 @@ def _validate_candidates(
 
     for candidate in candidates:
         summary = candidate.get("summary", "")
+        label = candidate.get("label")
+        sentiment = candidate.get("sentiment")
         source_numbers = [
             _normalize_clause_number(n) for n in candidate.get("source_clauses", [])
         ]
@@ -210,6 +253,8 @@ def _validate_candidates(
         validation.append(
             {
                 "summary": summary,
+                "label": label,
+                "sentiment": sentiment,
                 "cited_clauses": cited_results,
                 "supported": all_resolved,
             }
@@ -219,6 +264,8 @@ def _validate_candidates(
             connections.append(
                 {
                     "summary": summary,
+                    "label": label,
+                    "sentiment": sentiment,
                     "source_clauses": _cite(source_numbers, clause_index),
                     "target_clauses": _cite(target_numbers, clause_index),
                     "scope_note": candidate.get("scope_note"),
@@ -229,6 +276,8 @@ def _validate_candidates(
             unsupported.append(
                 {
                     "summary": summary,
+                    "label": label,
+                    "sentiment": sentiment,
                     "message": _MESSAGE_NO_CLAUSE,
                     "supported": False,
                 }
@@ -286,9 +335,32 @@ def _write_trace(
         "critic_output": critic_output,
         "validation": validation,
     }
-    trace_path.write_text(json.dumps(trace, indent=2))
+    trace_path.write_text(json.dumps(trace, indent=2), encoding="utf-8")
     return trace_path
 
+
+# Shared taxonomy contract embedded in both agent prompts, so the finder and the
+# critic classify findings the same way. States the fixed direction convention,
+# the five mutually-exclusive labels, and the differs-on-only sentiment rule.
+_TAXONOMY_PROMPT_BLOCK = (
+    "DIRECTION CONVENTION (fixed): the first document is document A — treat it "
+    'as "we/ours"; the second is document B — treat it as "they/theirs". Two '
+    "labels are directional and would swap if the pair were flipped.\n\n"
+    "Classify each connection with EXACTLY ONE label (these five are mutually "
+    "exclusive and exhaustive):\n"
+    "  - aligns-with: same axis; the two clauses agree, or one adopts the other "
+    "without narrowing or widening.\n"
+    "  - differs-on: same axis, different position. MAY carry a sentiment.\n"
+    "  - conflicts-with: the two cannot both be followed (incompatible).\n"
+    "  - silent-on: coverage asymmetry — OUR side (document A) does NOT cover "
+    "it, THEIR side (document B) does.\n"
+    "  - goes-beyond: coverage asymmetry — OUR side (document A) covers it, "
+    "THEIR side (document B) does not.\n\n"
+    "SENTIMENT (optional) attaches ONLY to a differs-on label and is exactly "
+    "one of tighten / loosen / neutral (tighten = our position is stricter, "
+    "loosen = more permissive, neutral = different but neither stricter nor "
+    "looser). Omit sentiment for every other label.\n\n"
+)
 
 FINDER_SYSTEM_PROMPT = (
     "You are a policy analyst finding cross-policy CONNECTIONS between two "
@@ -296,9 +368,13 @@ FINDER_SYSTEM_PROMPT = (
     "its full list of clauses as `{clause_number}: {text}` lines, grouped "
     "under a document-id label.\n\n"
     "Find connections where a clause in one document relates to a clause in "
-    "the other — e.g. a conflict, a dependency, a duplication, or a scoping "
-    "relationship. For each connection, return an object:\n"
+    "the other. " + _TAXONOMY_PROMPT_BLOCK + "For each connection, return an "
+    "object:\n"
     '  {"summary": <one-sentence description>,\n'
+    '   "label": <one of aligns-with|differs-on|conflicts-with|silent-on'
+    "|goes-beyond>,\n"
+    '   "sentiment": <tighten|loosen|neutral, ONLY on differs-on; omit '
+    "otherwise>,\n"
     '   "source_clauses": [<clause_number>, ...],\n'
     '   "target_clauses": [<clause_number>, ...],\n'
     '   "scope_note": <optional caveat/exemption, omit if none>}\n\n'
@@ -316,13 +392,18 @@ CRITIC_SYSTEM_PROMPT = (
     "documents' full clause lists as `{clause_number}: {text}` lines grouped "
     "by document-id, plus the finder's candidate connections as a JSON array.\n\n"
     "Do two things:\n"
-    "1. REFUTE or SCOPE weak candidates — drop any that do not hold, and for "
-    "those that do, add or refine a `scope_note` capturing any exemption, "
-    "condition, or limit (e.g. an affiliate exemption clause).\n"
+    "1. REFUTE or SCOPE weak candidates — drop any that do not hold, correct a "
+    "wrong label, and for those that do hold add or refine a `scope_note` "
+    "capturing any exemption, condition, or limit (e.g. an affiliate exemption "
+    "clause).\n"
     "2. SURFACE MISSED connections the finder did not propose (recall).\n\n"
-    "Return the scoped/refuted surviving candidates PLUS any newly-found "
+    + _TAXONOMY_PROMPT_BLOCK
+    + "Return the scoped/refuted surviving candidates PLUS any newly-found "
     "connections, all in the SAME object shape:\n"
-    '  {"summary": ..., "source_clauses": [...], "target_clauses": [...], '
+    '  {"summary": ..., "label": <one of aligns-with|differs-on|conflicts-with'
+    "|silent-on|goes-beyond>, "
+    '"sentiment": <tighten|loosen|neutral, ONLY on differs-on>, '
+    '"source_clauses": [...], "target_clauses": [...], '
     '"scope_note": <optional>}\n\n'
     "CITATION RULE (strict): every clause_number MUST be copied EXACTLY from "
     "the provided clause lists. Never invent, guess, reformat, or paraphrase "
@@ -350,13 +431,20 @@ def _format_clause_context(
     return "\n\n".join(blocks)
 
 
-def _parse_candidate_list(raw: str) -> list[dict]:
+def _parse_candidate_list(raw: str, *, require_taxonomy: bool = True) -> list[dict]:
     """Parse an agent's raw reply into a candidate ``list[dict]``.
 
     Delegates to ``parse_json_response`` (strips fences, ``json.loads``) then
     enforces the raw candidate shape the citation validator consumes: a list of
     dict objects. Raises ``LLMResponseError`` (not a silent coercion) if the
     model returned a non-list or list items that are not objects.
+
+    ``require_taxonomy`` (default ``True``) additionally enforces the five-label
+    semantic taxonomy — each object MUST carry a valid ``label`` and, only on
+    ``differs-on``, an optional ``sentiment``. The PAIRWISE finder/critic use the
+    default. The two-branch ``_branch_finder_turn`` (which answers a DIFFERENT
+    question — *which sources bear on a paragraph* — and correctly emits
+    label-free candidates) passes ``require_taxonomy=False`` to skip that check.
     """
     parsed = parse_json_response(raw)
     if not isinstance(parsed, list):
@@ -376,7 +464,47 @@ def _parse_candidate_list(raw: str) -> list[dict]:
             f"Expected every list item to be a JSON object; found "
             f"non-object items at {bad}. Raw (truncated): {snippet!r}"
         )
+    if require_taxonomy:
+        for i, item in enumerate(parsed):
+            _validate_label_and_sentiment(item, i, raw)
     return parsed
+
+
+def _validate_label_and_sentiment(item: dict, index: int, raw: str) -> None:
+    """Enforce the semantic-taxonomy contract on one raw candidate object.
+
+    Every candidate MUST carry a ``label`` drawn from ``CONNECTION_LABELS``. A
+    ``sentiment`` (when present, i.e. not ``None``) MUST attach only to the
+    ``differs-on`` label and MUST be one of ``SENTIMENT_VALUES``. Anything else
+    raises ``LLMResponseError`` — the model's mistake is surfaced, never coerced.
+    """
+    snippet = raw.strip()[:200]
+    label = item.get("label")
+    if label is None:
+        raise LLMResponseError(
+            f"Candidate at index {index} is missing the required 'label' "
+            f"(one of {list(CONNECTION_LABELS)}). Raw (truncated): {snippet!r}"
+        )
+    if label not in CONNECTION_LABELS:
+        raise LLMResponseError(
+            f"Candidate at index {index} has invalid label {label!r}; must be "
+            f"one of {list(CONNECTION_LABELS)}. Raw (truncated): {snippet!r}"
+        )
+    sentiment = item.get("sentiment")
+    if sentiment is None:
+        return
+    if label != _SENTIMENT_LABEL:
+        raise LLMResponseError(
+            f"Candidate at index {index} carries sentiment {sentiment!r} on "
+            f"label {label!r}; sentiment attaches ONLY to '{_SENTIMENT_LABEL}'. "
+            f"Raw (truncated): {snippet!r}"
+        )
+    if sentiment not in SENTIMENT_VALUES:
+        raise LLMResponseError(
+            f"Candidate at index {index} has invalid sentiment {sentiment!r}; "
+            f"must be one of {list(SENTIMENT_VALUES)}. "
+            f"Raw (truncated): {snippet!r}"
+        )
 
 
 def _finder_turn(doc_a_id: str, doc_b_id: str, clause_index: ClauseIndex) -> list[dict]:
@@ -415,7 +543,12 @@ def _critic_turn(
 
 
 def _call_candidates_with_retry(
-    system: str, user: str, attempts: int = 3, max_tokens: int = 16384
+    system: str,
+    user: str,
+    attempts: int = 3,
+    max_tokens: int = 16384,
+    *,
+    require_taxonomy: bool = True,
 ) -> list[dict]:
     """Call the finder/critic LLM and parse candidates, retrying on non-JSON.
 
@@ -424,12 +557,15 @@ def _call_candidates_with_retry(
     times, returning the first reply `_parse_candidate_list` accepts, else
     re-raise the last `LLMResponseError` so the run fails loudly rather than
     silently losing connections.
+
+    ``require_taxonomy`` is forwarded to ``_parse_candidate_list`` — the pairwise
+    finder/critic keep the default (True); the branch finder passes False.
     """
     last_error: LLMResponseError | None = None
     for attempt in range(1, attempts + 1):
         raw = call_chat(FINDER_CRITIC_DEPLOYMENT, system, user, max_tokens=max_tokens)
         try:
-            return _parse_candidate_list(raw)
+            return _parse_candidate_list(raw, require_taxonomy=require_taxonomy)
         except LLMResponseError as exc:
             last_error = exc
             logger.warning(
@@ -657,7 +793,7 @@ def _write_analyse_trace(
         "raw_by_branch": raw_by_branch,
         "candidates": candidates,
     }
-    trace_path.write_text(json.dumps(trace, indent=2))
+    trace_path.write_text(json.dumps(trace, indent=2), encoding="utf-8")
     return trace_path
 
 
@@ -716,6 +852,11 @@ def _branch_finder_turn(
     consumes. This is the network seam — real callers use it (the live
     ``POST …/analyse`` path); tests inject ``finder_fn`` so no network or
     credentials are needed.
+
+    The branch finder answers a different question than the pairwise finder — it
+    reports *which sources bear on a paragraph* (``{source_document_id,
+    clause_number, confidence_score}``), NOT a five-label finding — so it opts
+    out of the taxonomy check with ``require_taxonomy=False``.
     """
     context = _format_source_context(clause_index, candidate_source_ids)
     user = (
@@ -723,4 +864,6 @@ def _branch_finder_turn(
         f"Branch: {branch}\n\n"
         f"Candidate sources:\n{context}"
     )
-    return _call_candidates_with_retry(BRANCH_FINDER_SYSTEM_PROMPT, user)
+    return _call_candidates_with_retry(
+        BRANCH_FINDER_SYSTEM_PROMPT, user, require_taxonomy=False
+    )
