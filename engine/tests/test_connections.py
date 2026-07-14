@@ -301,7 +301,7 @@ def test_finder_turn_parses_call_chat_json_array(monkeypatch):
     )
     captured = {}
 
-    def fake_call_chat(deployment, system, user):
+    def fake_call_chat(deployment, system, user, max_tokens=None):
         captured["deployment"] = deployment
         captured["system"] = system
         captured["user"] = user
@@ -338,7 +338,7 @@ def test_critic_turn_includes_finder_candidates_in_prompt(monkeypatch):
     )
     captured = {}
 
-    def fake_call_chat(deployment, system, user):
+    def fake_call_chat(deployment, system, user, max_tokens=None):
         captured["user"] = user
         return canned
 
@@ -362,7 +362,7 @@ def test_finder_turn_raises_on_non_json(monkeypatch):
     clause_index = _build_fixture_clause_index()
     monkeypatch.setattr(
         "engine.connections.call_chat",
-        lambda deployment, system, user: "sorry, no JSON here",
+        lambda deployment, system, user, max_tokens=None: "sorry, no JSON here",
     )
     with pytest.raises(LLMResponseError):
         _finder_turn("rmit-v2-2026-draft", "outsourcing-v1-2019", clause_index)
@@ -372,7 +372,7 @@ def test_critic_turn_raises_on_non_list_json(monkeypatch):
     clause_index = _build_fixture_clause_index()
     monkeypatch.setattr(
         "engine.connections.call_chat",
-        lambda deployment, system, user: json.dumps({"not": "a list"}),
+        lambda deployment, system, user, max_tokens=None: json.dumps({"not": "a list"}),
     )
     with pytest.raises(LLMResponseError):
         _critic_turn(
