@@ -314,8 +314,11 @@ prefilter story.
 
 ## Recommendation
 
-Proceed to build POC #2 (Workstream Brain) at `docs/poc/workstream-brain/`
-covering the four screens above. The clickable HTML prototype should:
+**Proceeding to build.** PRD written at `docs/specs/workstream-brain/`
+(epic overview `spec.md` plus 6 story specs). The institution map is
+carved out and deferred to a follow-on epic — see Open Questions.
+
+The clickable HTML prototype at `docs/poc/workstream-brain/`:
 
 1. Use the existing `docs/poc/workstream-brain/` HTML scaffold as a starting
    point (index, workstream, linkage, task, new-workstream already exist);
