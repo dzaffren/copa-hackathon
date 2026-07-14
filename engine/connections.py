@@ -431,16 +431,20 @@ def _format_clause_context(
     return "\n\n".join(blocks)
 
 
-def _parse_candidate_list(raw: str) -> list[dict]:
+def _parse_candidate_list(raw: str, *, require_taxonomy: bool = True) -> list[dict]:
     """Parse an agent's raw reply into a candidate ``list[dict]``.
 
     Delegates to ``parse_json_response`` (strips fences, ``json.loads``) then
     enforces the raw candidate shape the citation validator consumes: a list of
-    dict objects, each carrying a valid semantic ``label`` (one of the five) and
-    — only on ``differs-on`` — an optional ``sentiment`` (one of the three).
-    Raises ``LLMResponseError`` (not a silent coercion) if the model returned a
-    non-list, list items that are not objects, a missing/unknown ``label``, or a
-    ``sentiment`` that is misplaced or outside tighten/loosen/neutral.
+    dict objects. Raises ``LLMResponseError`` (not a silent coercion) if the
+    model returned a non-list or list items that are not objects.
+
+    ``require_taxonomy`` (default ``True``) additionally enforces the five-label
+    semantic taxonomy — each object MUST carry a valid ``label`` and, only on
+    ``differs-on``, an optional ``sentiment``. The PAIRWISE finder/critic use the
+    default. The two-branch ``_branch_finder_turn`` (which answers a DIFFERENT
+    question — *which sources bear on a paragraph* — and correctly emits
+    label-free candidates) passes ``require_taxonomy=False`` to skip that check.
     """
     parsed = parse_json_response(raw)
     if not isinstance(parsed, list):
@@ -460,8 +464,9 @@ def _parse_candidate_list(raw: str) -> list[dict]:
             f"Expected every list item to be a JSON object; found "
             f"non-object items at {bad}. Raw (truncated): {snippet!r}"
         )
-    for i, item in enumerate(parsed):
-        _validate_label_and_sentiment(item, i, raw)
+    if require_taxonomy:
+        for i, item in enumerate(parsed):
+            _validate_label_and_sentiment(item, i, raw)
     return parsed
 
 
@@ -538,7 +543,12 @@ def _critic_turn(
 
 
 def _call_candidates_with_retry(
-    system: str, user: str, attempts: int = 3, max_tokens: int = 16384
+    system: str,
+    user: str,
+    attempts: int = 3,
+    max_tokens: int = 16384,
+    *,
+    require_taxonomy: bool = True,
 ) -> list[dict]:
     """Call the finder/critic LLM and parse candidates, retrying on non-JSON.
 
@@ -547,12 +557,15 @@ def _call_candidates_with_retry(
     times, returning the first reply `_parse_candidate_list` accepts, else
     re-raise the last `LLMResponseError` so the run fails loudly rather than
     silently losing connections.
+
+    ``require_taxonomy`` is forwarded to ``_parse_candidate_list`` — the pairwise
+    finder/critic keep the default (True); the branch finder passes False.
     """
     last_error: LLMResponseError | None = None
     for attempt in range(1, attempts + 1):
         raw = call_chat(FINDER_CRITIC_DEPLOYMENT, system, user, max_tokens=max_tokens)
         try:
-            return _parse_candidate_list(raw)
+            return _parse_candidate_list(raw, require_taxonomy=require_taxonomy)
         except LLMResponseError as exc:
             last_error = exc
             logger.warning(
@@ -839,6 +852,11 @@ def _branch_finder_turn(
     consumes. This is the network seam — real callers use it (the live
     ``POST …/analyse`` path); tests inject ``finder_fn`` so no network or
     credentials are needed.
+
+    The branch finder answers a different question than the pairwise finder — it
+    reports *which sources bear on a paragraph* (``{source_document_id,
+    clause_number, confidence_score}``), NOT a five-label finding — so it opts
+    out of the taxonomy check with ``require_taxonomy=False``.
     """
     context = _format_source_context(clause_index, candidate_source_ids)
     user = (
@@ -846,4 +864,6 @@ def _branch_finder_turn(
         f"Branch: {branch}\n\n"
         f"Candidate sources:\n{context}"
     )
-    return _call_candidates_with_retry(BRANCH_FINDER_SYSTEM_PROMPT, user)
+    return _call_candidates_with_retry(
+        BRANCH_FINDER_SYSTEM_PROMPT, user, require_taxonomy=False
+    )

@@ -33,6 +33,7 @@ from engine.connections import (
     CRITIC_SYSTEM_PROMPT,
     FINDER_SYSTEM_PROMPT,
     Connection,
+    _branch_finder_turn,
     _critic_turn,
     _finder_turn,
     _format_clause_context,
@@ -683,6 +684,59 @@ def test_parse_accepts_sentiment_on_differs():
     assert len(result) == 1
     assert result[0]["label"] == "differs-on"
     assert result[0]["sentiment"] == "tighten"
+
+
+# A branch-finder-shaped candidate: it answers *which source bears on a
+# paragraph*, so it carries NO five-label taxonomy — only source/clause/score.
+_LABELLESS_BRANCH_CANDIDATE_JSON = json.dumps(
+    [
+        {
+            "source_document_id": "bcbs-239",
+            "clause_number": "BCBS 239 P4",
+            "confidence_score": 0.8,
+        }
+    ]
+)
+
+
+def test_parse_accepts_labelless_when_taxonomy_not_required():
+    """With ``require_taxonomy=False`` a label-free branch-finder candidate parses
+    intact — the taxonomy check is skipped for that different concern."""
+    result = _parse_candidate_list(
+        _LABELLESS_BRANCH_CANDIDATE_JSON, require_taxonomy=False
+    )
+    assert result == json.loads(_LABELLESS_BRANCH_CANDIDATE_JSON)
+    assert "label" not in result[0]
+
+
+def test_parse_rejects_labelless_under_default_taxonomy():
+    """The pairwise contract is unchanged: under the default the same label-free
+    candidate is still rejected for its missing label."""
+    with pytest.raises(LLMResponseError) as exc:
+        _parse_candidate_list(_LABELLESS_BRANCH_CANDIDATE_JSON)
+    assert "label" in str(exc.value)
+
+
+def test_branch_finder_turn_parses_labelless_candidates(monkeypatch):
+    """The live branch-finder seam parses its own label-free output without
+    raising (it calls the parser with ``require_taxonomy=False``)."""
+    index = _build_source_index()
+    monkeypatch.setattr(
+        "engine.connections.call_chat",
+        lambda deployment, system, user, max_tokens=None: (
+            _LABELLESS_BRANCH_CANDIDATE_JSON
+        ),
+    )
+
+    result = _branch_finder_turn(
+        "4.6",
+        "As AI applications process personal data...",
+        index,
+        "cited",
+        ["bcbs-239"],
+    )
+
+    assert result == json.loads(_LABELLESS_BRANCH_CANDIDATE_JSON)
 
 
 def _finder_direction_aware(doc_a_id, doc_b_id, clause_index):
