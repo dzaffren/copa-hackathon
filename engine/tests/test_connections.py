@@ -30,9 +30,11 @@ from engine.clauses import (
     merge_clause_indexes,
 )
 from engine.connections import (
+    Connection,
     _critic_turn,
     _finder_turn,
     _format_clause_context,
+    _parse_candidate_list,
     analyse_paragraph,
     connections_for_paragraph,
     find_connections,
@@ -546,3 +548,41 @@ def test_analyse_paragraph_guardrail_drops_unresolved_keeps_blocked_and_pending(
     assert blocked["status"] == "could_not_retrieve"
     pending = next(c for c in result if c["source_document_id"] == "basel-osfi")
     assert pending["verification"] == "pending_extraction"
+
+
+# --- Semantic linkage taxonomy (label + optional sentiment) -----------------
+
+
+def test_widened_connection_typeddict():
+    """A Connection now carries a five-value ``label`` and, only on
+    ``differs-on``, an optional ``sentiment`` — both reported by
+    ``get_type_hints`` and constructible with the documented values."""
+    import typing
+
+    aligned: Connection = {
+        "summary": "RMiT 17.1 adopts the same notification window as its source.",
+        "label": "aligns-with",
+        "sentiment": None,
+        "source_clauses": [],
+        "target_clauses": [],
+        "scope_note": None,
+        "supported": True,
+    }
+    differs: Connection = {
+        "summary": "RMiT 17.1 shortens the notification window its source allows.",
+        "label": "differs-on",
+        "sentiment": "tighten",
+        "source_clauses": [],
+        "target_clauses": [],
+        "scope_note": None,
+        "supported": True,
+    }
+
+    assert aligned["label"] == "aligns-with"
+    assert aligned["sentiment"] is None
+    assert differs["label"] == "differs-on"
+    assert differs["sentiment"] == "tighten"
+
+    hints = typing.get_type_hints(Connection)
+    assert "label" in hints
+    assert "sentiment" in hints

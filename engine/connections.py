@@ -28,16 +28,21 @@ turns with recorded/hand-written responses — no network access, no credentials
 Every run records a ``connection-trace-{pair}.json`` (model id, timestamp, raw
 finder output, raw critic output, and the full validation trace) — the demo
 backstop that proves connections were AI-found (not curated) and the
-deterministic fallback if the live API hiccups mid-pitch. Do NOT classify
-connections as Conflict/Duplication/Gap — that is the ripple story (#8). This
-engine emits raw clause-anchored connections only.
+deterministic fallback if the live API hiccups mid-pitch. Each surviving finding
+is classified with a five-label semantic taxonomy — ``aligns-with``,
+``differs-on`` (optionally refined by a ``tighten``/``loosen``/``neutral``
+sentiment), ``conflicts-with``, ``silent-on``, or ``goes-beyond`` — under the
+fixed direction convention that document A is "we/ours" and document B is
+"they/theirs" (so ``silent-on`` and ``goes-beyond`` swap when the pair flips).
+The clause TEXT and clause NUMBERS shown to users still come only from the
+``ClauseIndex`` — the label describes the relationship, never the citation.
 """
 
 import json
 import logging
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable, Optional, TypedDict
+from typing import Callable, Literal, Optional, TypedDict
 
 from engine.clauses import ClauseIndex
 from engine.config import FINDER_CRITIC_DEPLOYMENT
@@ -56,9 +61,20 @@ class ClauseCitation(TypedDict):
 
 class Connection(TypedDict):
     """A supported clause-anchored connection (matches the spec's
-    ``POST /connections/find`` 200 ``connections[]`` shape)."""
+    ``POST /connections/find`` 200 ``connections[]`` shape).
+
+    ``label`` is the semantic classification of the finding (one of the five
+    mutually-exclusive, exhaustive values). ``sentiment`` refines a
+    ``differs-on`` finding as tighten/loosen/neutral and is ``None`` for every
+    other label. Direction convention: document A is "we/ours", document B is
+    "they/theirs", so ``silent-on`` (ours is silent) and ``goes-beyond`` (ours
+    goes further) swap when the pair is flipped."""
 
     summary: str
+    label: Literal[
+        "aligns-with", "differs-on", "conflicts-with", "silent-on", "goes-beyond"
+    ]
+    sentiment: Optional[Literal["tighten", "loosen", "neutral"]]
     source_clauses: list[ClauseCitation]
     target_clauses: list[ClauseCitation]
     scope_note: Optional[str]
@@ -67,9 +83,15 @@ class Connection(TypedDict):
 
 class UnsupportedConnection(TypedDict):
     """A candidate that cited at least one clause absent from the index —
-    reported honestly, never invented, never promoted to a connection."""
+    reported honestly, never invented, never promoted to a connection.
+
+    ``label`` and ``sentiment`` record what the model attempted before the
+    citation validator dropped it (the audit trail); either may be ``None`` when
+    the candidate proposed none."""
 
     summary: str
+    label: Optional[str]
+    sentiment: Optional[str]
     message: str
     supported: bool
 
