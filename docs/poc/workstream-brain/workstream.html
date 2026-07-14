@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operational Resilience — Workstream Graph · Workstream Brain</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .node-hover { transition: transform .15s ease, filter .15s ease; cursor: pointer; }
+  .node-hover:hover { transform: scale(1.06); filter: drop-shadow(0 4px 6px rgba(0,0,0,.15)); }
+  .edge-hover { cursor: pointer; transition: stroke-width .15s ease; }
+  .edge-hover:hover { stroke-width: 4; }
+  .side-item { transition: background-color .12s ease; }
+  .side-item:hover { background-color: #eef2ff; }
+  .chip { transition: transform .1s ease; }
+  .chip:hover { transform: translateY(-1px); }
+  .sidebar { transition: width .2s ease; }
+  .sidebar.collapsed .side-label { display: none; }
+  .sidebar.collapsed .side-item { justify-content: center; padding-left: 0; padding-right: 0; }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+<!-- Topbar -->
+<nav class="bg-white border-b border-gray-200">
+  <div class="px-4 py-2.5 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="text-2xl">🧠</span>
+      <span class="font-bold text-lg">Workstream Brain</span>
+      <span class="hidden md:inline text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium ml-1">COPA Hackathon 2026 · MW6/9/10</span>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <button class="relative w-9 h-9 rounded-lg hover:bg-gray-100 grid place-items-center" title="Notifications">
+        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        <span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">3</span>
+      </button>
+      <button class="w-9 h-9 rounded-lg hover:bg-gray-100 grid place-items-center" title="Help">
+        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.2 9a3.8 3.8 0 017.6 0c0 1.5-1.1 2.3-2 2.9-.7.5-1.4 1-1.4 2v.1m0 3h.01M12 21a9 9 0 110-18 9 9 0 010 18z"/></svg>
+      </button>
+      <button class="w-9 h-9 rounded-lg hover:bg-gray-100 grid place-items-center" title="Settings">
+        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.3 3.6a1.7 1.7 0 013.4 0l.2 1.1c.1.7.7 1.2 1.4 1.2h.2c.7 0 1.3.5 1.4 1.2l.2 1.1a1.7 1.7 0 002.6 1.1l1-.6a1.7 1.7 0 012.2.6l1 1.7a1.7 1.7 0 01-.6 2.3l-1 .6a1.7 1.7 0 000 3l1 .6a1.7 1.7 0 01.6 2.3l-1 1.7a1.7 1.7 0 01-2.2.6l-1-.6a1.7 1.7 0 00-2.6 1.1l-.2 1.1a1.7 1.7 0 01-1.4 1.2h-.2c-.7 0-1.3-.5-1.4-1.2l-.2-1.1a1.7 1.7 0 00-2.6-1.1l-1 .6a1.7 1.7 0 01-2.2-.6l-1-1.7a1.7 1.7 0 01.6-2.3l1-.6a1.7 1.7 0 000-3l-1-.6a1.7 1.7 0 01-.6-2.3l1-1.7a1.7 1.7 0 012.2-.6l1 .6a1.7 1.7 0 002.6-1.1l.2-1.1z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15a3 3 0 100-6 3 3 0 000 6z"/></svg>
+      </button>
+      <div class="ml-1 flex items-center gap-2 pl-2 border-l border-gray-200">
+        <span class="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold grid place-items-center text-xs">AR</span>
+        <div class="hidden sm:block leading-tight">
+          <div class="text-sm font-semibold">Aisyah R.</div>
+          <div class="text-[11px] text-gray-500">Prudential Policy Dept.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="flex" style="min-height: calc(100vh - 57px);">
+
+  <!-- Collapsible sidebar -->
+  <aside id="sidebar" class="sidebar w-64 shrink-0 bg-white border-r border-gray-200 flex flex-col">
+    <div class="px-3 py-3 border-b border-gray-100 flex items-center justify-between">
+      <div class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold side-label">Workstreams</div>
+      <button onclick="toggleSidebar()" class="w-7 h-7 rounded hover:bg-gray-100 grid place-items-center text-gray-500" title="Collapse sidebar">
+        <svg id="sidebarIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+      </button>
+    </div>
+    <nav class="flex-1 overflow-y-auto py-2">
+      <a href="workstream.html" class="side-item flex items-center gap-2 px-4 py-2.5 border-l-4 border-indigo-600 bg-indigo-50" title="Operational Resilience">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+        <div class="side-label flex-1 min-w-0">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-sm text-indigo-900 truncate">Operational Resilience</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-semibold shrink-0 ml-1">✎ own</span>
+          </div>
+          <div class="text-[11px] text-gray-500 mt-0.5">Roadmap 2026 · v0.3 draft</div>
+        </div>
+      </a>
+      <a href="#" class="side-item flex items-center gap-2 px-4 py-2.5 border-l-4 border-transparent" title="Open Finance">
+        <span class="w-2 h-2 rounded-full bg-teal-500 shrink-0"></span>
+        <div class="side-label flex-1 min-w-0">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-sm truncate">Open Finance</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-teal-100 text-teal-700 font-semibold shrink-0 ml-1">review</span>
+          </div>
+          <div class="text-[11px] text-gray-500 mt-0.5">PD draft · Q3 2026</div>
+        </div>
+      </a>
+      <a href="#" class="side-item flex items-center gap-2 px-4 py-2.5 border-l-4 border-transparent opacity-70" title="RMiT PD">
+        <span class="w-2 h-2 rounded-full bg-gray-400 shrink-0"></span>
+        <div class="side-label flex-1 min-w-0">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-sm truncate">RMiT PD</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-600 font-semibold shrink-0 ml-1">done</span>
+          </div>
+          <div class="text-[11px] text-gray-500 mt-0.5">Issued 28 Nov 2025</div>
+        </div>
+      </a>
+      <a href="new-workstream.html" class="side-item flex items-center gap-2 px-4 py-2.5 mt-1 text-indigo-600 hover:bg-indigo-50 font-semibold" title="New workstream">
+        <span class="w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 grid place-items-center text-sm leading-none shrink-0">+</span>
+        <span class="side-label text-sm">New workstream</span>
+      </a>
+    </nav>
+    <div class="px-3 py-3 border-t border-gray-100">
+      <a href="index.html" class="side-item flex items-center gap-2 px-2 py-1.5 rounded text-gray-500 hover:text-indigo-600 font-medium" title="Institution map">
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.05 11a9 9 0 1117.9 0M12 21V3M3 12h18"/></svg>
+        <span class="side-label text-xs">Institution map</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="flex-1 flex flex-col overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 bg-white flex items-start justify-between gap-6">
+      <div>
+        <h1 class="text-xl font-bold">Operational Resilience · Roadmap 2026</h1>
+        <p class="text-sm text-gray-500 mt-0.5">Continuation of the 2025 Discussion Paper · Draft PD target Q4 2026 · <span class="font-medium text-gray-700">7 nodes</span> · <span class="font-medium text-gray-700">6 edges</span></p>
+      </div>
+      <button id="addNodeBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-2 rounded-lg font-medium flex items-center gap-1.5">
+        <span class="text-base leading-none">+</span> Add node
+      </button>
+    </div>
+
+    <div class="flex-1 grid grid-cols-12 gap-0" style="min-height: 640px;">
+
+      <!-- Graph canvas -->
+      <section class="col-span-12 lg:col-span-8 relative bg-gradient-to-br from-gray-50 to-indigo-50/30 border-r border-gray-100">
+        <!-- Legend card -->
+        <div class="absolute top-4 left-4 bg-white rounded-lg shadow-sm border border-gray-100 p-3 text-[11px] flex flex-col gap-2 z-10 w-52">
+          <div>
+            <div class="font-semibold text-gray-700 mb-1 text-[10px] uppercase tracking-wider">Node types</div>
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-indigo-600"></span><span>task (editable)</span></div>
+              <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-indigo-100 border-2 border-indigo-400"></span><span>internal-published</span></div>
+              <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-fuchsia-100 border-2 border-fuchsia-500"></span><span>international-standard</span></div>
+              <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-teal-100 border-2 border-teal-500"></span><span>peer-regulator</span></div>
+              <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-100 border-2 border-amber-500"></span><span>act-law</span></div>
+              <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-100 border-2 border-emerald-500"></span><span>industry-input</span></div>
+              <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-gray-100 border-2 border-gray-400"></span><span>others</span></div>
+            </div>
+          </div>
+          <div class="border-t border-gray-100 pt-2">
+            <div class="font-semibold text-gray-700 mb-1 text-[10px] uppercase tracking-wider">Edge types</div>
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-1.5"><svg width="24" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="#dc2626" stroke-width="2"/></svg><span>supersedes</span></div>
+              <div class="flex items-center gap-1.5"><svg width="24" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="#0891b2" stroke-width="2"/></svg><span>references</span></div>
+              <div class="flex items-center gap-1.5"><svg width="24" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="#4f46e5" stroke-width="2" stroke-dasharray="3 2"/></svg><span>contributes-to</span></div>
+              <div class="flex items-center gap-1.5"><svg width="24" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="#6b7280" stroke-width="2" stroke-dasharray="6 3"/></svg><span>parallel-to</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Zoom controls -->
+        <div class="absolute bottom-4 right-4 flex flex-col gap-1 z-10">
+          <button onclick="zoom(0.8)" class="w-9 h-9 bg-white shadow-sm border border-gray-200 rounded-lg grid place-items-center hover:bg-gray-50" title="Zoom in">
+            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M15 10.5a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM10.5 8v5M8 10.5h5"/></svg>
+          </button>
+          <button onclick="zoom(1.25)" class="w-9 h-9 bg-white shadow-sm border border-gray-200 rounded-lg grid place-items-center hover:bg-gray-50" title="Zoom out">
+            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M15 10.5a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM8 10.5h5"/></svg>
+          </button>
+          <button onclick="resetZoom()" class="w-9 h-9 bg-white shadow-sm border border-gray-200 rounded-lg grid place-items-center hover:bg-gray-50" title="Reset zoom">
+            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5M4 20l6-6m4-4l6-6"/></svg>
+          </button>
+        </div>
+
+        <div class="w-full h-full p-4 flex items-center justify-center overflow-hidden">
+          <svg id="graphSvg" viewBox="0 0 780 600" class="w-full h-full select-none" style="max-height: 620px; transition: transform .2s ease;">
+            <!-- Edges (structural — no relationship labels) -->
+            <!-- supersedes: RMiT PD supersedes prior RMiT working notes (dashed red-ish, but we use solid red for demo) -->
+            <!-- parallel-to: OpRes v0.3 <-> RMiT PD (dashed grey) -->
+            <g class="edge-hover" onclick="showEdge('rmit', 'parallel-to')">
+              <line x1="390" y1="310" x2="140" y2="470" stroke="#6b7280" stroke-width="2" stroke-dasharray="6 3"/>
+            </g>
+            <!-- contributes-to: BCBS OpRes 2021 contributes to OpRes v0.3 -->
+            <g class="edge-hover" onclick="showEdge('bcbs', 'contributes-to')">
+              <line x1="390" y1="310" x2="390" y2="90" stroke="#4f46e5" stroke-width="2" stroke-dasharray="3 2"/>
+            </g>
+            <!-- contributes-to: HKMA contributes to OpRes v0.3 -->
+            <g class="edge-hover" onclick="showEdge('hkma', 'contributes-to')">
+              <line x1="390" y1="310" x2="130" y2="130" stroke="#4f46e5" stroke-width="2" stroke-dasharray="3 2"/>
+            </g>
+            <!-- contributes-to: FSB contributes to OpRes v0.3 -->
+            <g class="edge-hover" onclick="showEdge('fsb', 'contributes-to')">
+              <line x1="390" y1="310" x2="655" y2="130" stroke="#4f46e5" stroke-width="2" stroke-dasharray="3 2"/>
+            </g>
+            <!-- references: OpRes v0.3 references FSA §143 (statutory basis) -->
+            <g class="edge-hover" onclick="showEdge('fsa', 'references')">
+              <line x1="390" y1="310" x2="650" y2="470" stroke="#0891b2" stroke-width="2"/>
+            </g>
+            <!-- contributes-to: ABM feedback contributes to OpRes v0.3 -->
+            <g class="edge-hover" onclick="showEdge('abm', 'contributes-to')">
+              <line x1="390" y1="310" x2="390" y2="540" stroke="#4f46e5" stroke-width="2" stroke-dasharray="3 2"/>
+            </g>
+
+            <!-- Focal working draft (task) -->
+            <g class="node-hover" onclick="showNode('draft')">
+              <circle cx="390" cy="310" r="58" fill="#4f46e5" stroke="#312e81" stroke-width="3"/>
+              <text x="390" y="304" text-anchor="middle" font-size="12" fill="#ffffff" font-weight="700">OpRes PD</text>
+              <text x="390" y="320" text-anchor="middle" font-size="11" fill="#ffffff" font-weight="600">v0.3</text>
+              <text x="390" y="335" text-anchor="middle" font-size="9.5" fill="#c7d2fe">task · draft</text>
+            </g>
+            <!-- BCBS OpRes 2021 (international-standard) -->
+            <g class="node-hover" onclick="showNode('bcbs')">
+              <circle cx="390" cy="70" r="32" fill="#fdf4ff" stroke="#c026d3" stroke-width="2.5"/>
+              <text x="390" y="64" text-anchor="middle" font-size="10" fill="#86198f" font-weight="700">BCBS</text>
+              <text x="390" y="77" text-anchor="middle" font-size="9" fill="#701a75">Op. Res.</text>
+              <text x="390" y="89" text-anchor="middle" font-size="8" fill="#a21caf">2021</text>
+            </g>
+            <!-- HKMA SPM (peer-regulator) -->
+            <g class="node-hover" onclick="showNode('hkma')">
+              <circle cx="105" cy="105" r="32" fill="#ecfeff" stroke="#0d9488" stroke-width="2.5"/>
+              <text x="105" y="99" text-anchor="middle" font-size="10" fill="#134e4a" font-weight="700">HKMA</text>
+              <text x="105" y="112" text-anchor="middle" font-size="9" fill="#115e59">SPM OR-2</text>
+              <text x="105" y="124" text-anchor="middle" font-size="8" fill="#0f766e">Sep 2024</text>
+            </g>
+            <!-- FSB (international-standard) -->
+            <g class="node-hover" onclick="showNode('fsb')">
+              <circle cx="680" cy="105" r="32" fill="#fdf4ff" stroke="#c026d3" stroke-width="2.5"/>
+              <text x="680" y="99" text-anchor="middle" font-size="10" fill="#86198f" font-weight="700">FSB</text>
+              <text x="680" y="112" text-anchor="middle" font-size="9" fill="#701a75">3rd-Party</text>
+              <text x="680" y="124" text-anchor="middle" font-size="8" fill="#a21caf">Toolkit</text>
+            </g>
+            <!-- RMiT PD (internal-published) -->
+            <g class="node-hover" onclick="showNode('rmit')">
+              <circle cx="110" cy="495" r="34" fill="#eef2ff" stroke="#6366f1" stroke-width="2.5"/>
+              <text x="110" y="488" text-anchor="middle" font-size="10" fill="#312e81" font-weight="700">RMiT PD</text>
+              <text x="110" y="501" text-anchor="middle" font-size="9" fill="#3730a3">28 Nov 2025</text>
+              <text x="110" y="513" text-anchor="middle" font-size="8" fill="#4338ca">internal</text>
+            </g>
+            <!-- FSA (act-law) -->
+            <g class="node-hover" onclick="showNode('fsa')">
+              <circle cx="675" cy="495" r="32" fill="#fef3c7" stroke="#d97706" stroke-width="2.5"/>
+              <text x="675" y="488" text-anchor="middle" font-size="10" fill="#78350f" font-weight="700">FSA 2013</text>
+              <text x="675" y="501" text-anchor="middle" font-size="9" fill="#92400e">§143</text>
+              <text x="675" y="513" text-anchor="middle" font-size="8" fill="#a16207">statute</text>
+            </g>
+            <!-- ABM feedback (industry-input) -->
+            <g class="node-hover" onclick="showNode('abm')">
+              <circle cx="390" cy="560" r="32" fill="#ecfdf5" stroke="#10b981" stroke-width="2.5"/>
+              <text x="390" y="553" text-anchor="middle" font-size="10" fill="#065f46" font-weight="700">ABM</text>
+              <text x="390" y="566" text-anchor="middle" font-size="9" fill="#047857">position</text>
+              <text x="390" y="578" text-anchor="middle" font-size="8" fill="#059669">May 2026</text>
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <!-- Detail panel -->
+      <section class="col-span-12 lg:col-span-4 bg-white overflow-y-auto">
+
+        <!-- NODE DETAIL -->
+        <div id="detailNode" class="p-5">
+          <div class="text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-3 border-b border-gray-100 pb-2">Node detail</div>
+
+          <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+            <div class="flex items-center gap-2 mb-2">
+              <span id="nodeTypeBadge" class="text-[10px] uppercase tracking-wider font-bold bg-indigo-100 text-indigo-800 px-2 py-1 rounded">task</span>
+              <span id="nodeSubBadge" class="text-[10px] text-gray-500">working draft</span>
+            </div>
+            <h2 id="nodeTitle" class="text-base font-bold text-gray-900">Operational Resilience PD — v0.3</h2>
+            <p id="nodeDesc" class="text-xs text-gray-600 mt-1.5 leading-relaxed">Working draft of the Policy Document following the 2025 Discussion Paper. Consolidates BCBS OpRes 2021 principles into Malaysian-scoped requirements with critical business service definitions and annual dependency mapping.</p>
+          </div>
+
+          <div class="mt-4 bg-white border border-gray-200 rounded-lg p-3">
+            <div class="text-[10px] uppercase tracking-wider text-gray-500 font-bold mb-2">First-order neighbours <span class="text-gray-400 font-normal">(6)</span></div>
+            <div class="flex flex-wrap gap-1.5">
+              <button class="chip text-xs bg-fuchsia-50 border border-fuchsia-200 text-fuchsia-800 px-2 py-1 rounded-md" onclick="showNode('bcbs')">BCBS Op. Res. 2021</button>
+              <button class="chip text-xs bg-fuchsia-50 border border-fuchsia-200 text-fuchsia-800 px-2 py-1 rounded-md" onclick="showNode('fsb')">FSB 3rd-Party</button>
+              <button class="chip text-xs bg-teal-50 border border-teal-200 text-teal-800 px-2 py-1 rounded-md" onclick="showNode('hkma')">HKMA SPM OR-2</button>
+              <button class="chip text-xs bg-indigo-50 border border-indigo-200 text-indigo-800 px-2 py-1 rounded-md" onclick="showNode('rmit')">RMiT PD</button>
+              <button class="chip text-xs bg-amber-50 border border-amber-200 text-amber-800 px-2 py-1 rounded-md" onclick="showNode('fsa')">FSA §143</button>
+              <button class="chip text-xs bg-emerald-50 border border-emerald-200 text-emerald-800 px-2 py-1 rounded-md" onclick="showNode('abm')">ABM position</button>
+            </div>
+          </div>
+
+          <div class="mt-3 bg-white border border-gray-200 rounded-lg p-3">
+            <div class="text-[10px] uppercase tracking-wider text-gray-500 font-bold mb-2">Second-order neighbours</div>
+            <p class="text-xs text-gray-400 italic">N/A in demo — traversal to be enabled after v2 corpus expansion.</p>
+          </div>
+
+          <div class="mt-3 bg-white border border-gray-200 rounded-lg p-3">
+            <div class="text-[10px] uppercase tracking-wider text-gray-500 font-bold mb-2">Recent activity</div>
+            <ul class="text-xs space-y-1.5">
+              <li class="flex items-start gap-2"><span class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold grid place-items-center shrink-0">AR</span><div><span class="font-medium">Aisyah R.</span> edited §4.4 — 2h ago</div></li>
+              <li class="flex items-start gap-2"><span class="w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold grid place-items-center shrink-0">FM</span><div><span class="font-medium">Farid M.</span> commented on §6.3 — yesterday</div></li>
+              <li class="flex items-start gap-2"><span class="w-5 h-5 rounded-full bg-gray-100 text-gray-500 text-[10px] font-bold grid place-items-center shrink-0">🤖</span><div>AI critic flagged RMiT version drift — 3d ago</div></li>
+            </ul>
+          </div>
+
+          <details class="mt-3 bg-white border border-gray-200 rounded-lg p-3 group">
+            <summary class="text-[10px] uppercase tracking-wider text-gray-500 font-bold cursor-pointer flex items-center gap-1.5 hover:text-gray-700">
+              <svg class="w-3 h-3 group-open:rotate-90 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path d="M7 5l6 5-6 5V5z"/></svg>
+              Concepts (14)
+            </summary>
+            <div class="mt-2 space-y-1.5 text-xs">
+              <div><span class="text-[10px] font-bold text-gray-500 uppercase mr-2">Requirement</span><span class="text-gray-700">RTO, MTPD, dependency map, scenario test, annual review</span></div>
+              <div><span class="text-[10px] font-bold text-gray-500 uppercase mr-2">Party</span><span class="text-gray-700">board, senior management, TPSP, CRO</span></div>
+              <div><span class="text-[10px] font-bold text-gray-500 uppercase mr-2">Topic</span><span class="text-gray-700">critical business service, cyber resilience, third-party risk</span></div>
+              <div><span class="text-[10px] font-bold text-gray-500 uppercase mr-2">Process</span><span class="text-gray-700">stress testing, incident response</span></div>
+            </div>
+          </details>
+
+          <a id="nodeActionBtn" href="task.html" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-2.5 rounded-lg font-semibold flex items-center justify-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            Open task
+          </a>
+        </div>
+
+        <!-- EDGE DETAIL -->
+        <div id="detailEdge" class="p-5 hidden">
+          <div class="text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-3 border-b border-gray-100 pb-2 flex items-center justify-between">
+            <span>Edge detail</span>
+            <button onclick="showNode('draft')" class="text-[10px] text-indigo-600 hover:text-indigo-800 font-semibold normal-case tracking-normal">← back to node</button>
+          </div>
+
+          <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+            <div class="flex items-center gap-2 mb-2">
+              <span id="edgeTypeBadge" class="text-[10px] uppercase tracking-wider font-bold bg-gray-200 text-gray-800 px-2 py-1 rounded">parallel-to</span>
+              <span id="edgeStatusBadge" class="text-[10px] uppercase tracking-wider font-bold bg-amber-100 text-amber-800 px-2 py-1 rounded">not analysed</span>
+            </div>
+            <h2 id="edgeTitle" class="text-sm font-semibold text-gray-900">OpRes PD v0.3 ↔ RMiT PD (28 Nov 2025)</h2>
+            <p id="edgeDesc" class="text-xs text-gray-600 mt-1.5">Two live BNM policy documents on adjacent domains. Run finder→critic to surface pairwise linkages between their clauses.</p>
+          </div>
+
+          <div id="edgeAnalyzedBox" class="hidden mt-4 bg-white border border-gray-200 rounded-lg p-3">
+            <div class="text-[10px] uppercase tracking-wider text-gray-500 font-bold mb-2">Linkages found</div>
+            <div id="edgeLinkageList" class="space-y-2 text-xs"></div>
+            <a href="review.html" class="mt-3 block text-center text-[11px] text-indigo-600 hover:text-indigo-800 font-semibold">Review all in Review linkages →</a>
+          </div>
+
+          <div id="edgePreAnalyze" class="mt-4 bg-indigo-50 border border-indigo-200 rounded-lg p-4 text-center">
+            <p class="text-xs text-indigo-900 leading-relaxed mb-3">No pairwise linkages yet — click below to run finder→critic on this document pair.</p>
+            <button onclick="analyzeEdge()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-2 rounded-lg font-semibold">
+              🔎 Analyze linkages
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- Add-node modal -->
+<div id="addNodeModal" class="hidden fixed inset-0 bg-black/40 z-50 grid place-items-center p-4">
+  <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+    <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+      <h3 class="font-bold text-lg">Add node to workstream</h3>
+      <button onclick="document.getElementById('addNodeModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+    </div>
+    <div class="p-5 space-y-4">
+      <!-- Source -->
+      <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+        <label class="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Source</label>
+        <div class="mt-2 grid grid-cols-2 gap-2 text-sm">
+          <button class="border border-gray-200 hover:border-indigo-400 hover:bg-indigo-50 rounded-lg px-3 py-3 text-left bg-white"><div class="font-semibold">📎 Upload file</div><div class="text-xs text-gray-500">PDF, DOCX, MD</div></button>
+          <button class="border border-gray-200 hover:border-indigo-400 hover:bg-indigo-50 rounded-lg px-3 py-3 text-left bg-white"><div class="font-semibold">🔗 Fetch URL</div><div class="text-xs text-gray-500">Link to source</div></button>
+        </div>
+      </div>
+
+      <!-- Node type -->
+      <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+        <label class="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Node type</label>
+        <div class="mt-2 grid grid-cols-2 gap-2 text-xs">
+          <button class="type-btn border-2 border-indigo-600 bg-indigo-50 rounded-lg px-2.5 py-2 text-left" onclick="pickType(this,'task')">
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span><span class="font-semibold">task</span></div>
+            <div class="text-[11px] text-gray-500 mt-0.5">editable working draft</div>
+          </button>
+          <button class="type-btn border border-gray-200 hover:border-indigo-400 rounded-lg px-2.5 py-2 text-left bg-white" onclick="pickType(this,'internal-published')">
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-100 border-2 border-indigo-400"></span><span class="font-semibold">internal-published</span></div>
+            <div class="text-[11px] text-gray-500 mt-0.5">BNM PD, ED, DP</div>
+          </button>
+          <button class="type-btn border border-gray-200 hover:border-indigo-400 rounded-lg px-2.5 py-2 text-left bg-white" onclick="pickType(this,'international-standard')">
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-fuchsia-100 border-2 border-fuchsia-500"></span><span class="font-semibold">international-standard</span></div>
+            <div class="text-[11px] text-gray-500 mt-0.5">BCBS, IOSCO, FSB, ISO</div>
+          </button>
+          <button class="type-btn border border-gray-200 hover:border-indigo-400 rounded-lg px-2.5 py-2 text-left bg-white" onclick="pickType(this,'peer-regulator')">
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-teal-100 border-2 border-teal-500"></span><span class="font-semibold">peer-regulator</span></div>
+            <div class="text-[11px] text-gray-500 mt-0.5">HKMA, MAS, APRA, OSFI</div>
+          </button>
+          <button class="type-btn border border-gray-200 hover:border-indigo-400 rounded-lg px-2.5 py-2 text-left bg-white" onclick="pickType(this,'act-law')">
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-100 border-2 border-amber-500"></span><span class="font-semibold">act-law</span></div>
+            <div class="text-[11px] text-gray-500 mt-0.5">FSA, IFSA, CCA</div>
+          </button>
+          <button class="type-btn border border-gray-200 hover:border-indigo-400 rounded-lg px-2.5 py-2 text-left bg-white" onclick="pickType(this,'industry-input')">
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-100 border-2 border-emerald-500"></span><span class="font-semibold">industry-input</span></div>
+            <div class="text-[11px] text-gray-500 mt-0.5">industry standard / feedback</div>
+          </button>
+          <button class="type-btn border border-gray-200 hover:border-indigo-400 rounded-lg px-2.5 py-2 text-left bg-white col-span-2" onclick="pickType(this,'others')">
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-gray-100 border-2 border-gray-400"></span><span class="font-semibold">others</span></div>
+            <div class="text-[11px] text-gray-500 mt-0.5">anything unclassified</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Edges (required, ≥1) -->
+      <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Connect to existing nodes <span class="text-red-500 normal-case font-normal">· required, at least 1</span></label>
+          <button onclick="addEdgeRow()" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold">+ Add edge</button>
+        </div>
+        <div id="edgeRows" class="space-y-2">
+          <div class="edge-row bg-white border border-gray-200 rounded-md p-2 flex items-center gap-2">
+            <select class="text-xs border border-gray-200 rounded px-2 py-1.5 flex-1 min-w-0">
+              <option>Target node…</option>
+              <option>OpRes PD v0.3 (task)</option>
+              <option>BCBS Op. Res. 2021 (international-standard)</option>
+              <option>HKMA SPM OR-2 (peer-regulator)</option>
+              <option>FSB 3rd-Party Toolkit (international-standard)</option>
+              <option>RMiT PD (internal-published)</option>
+              <option>FSA §143 (act-law)</option>
+              <option>ABM position paper (industry-input)</option>
+            </select>
+            <select class="text-xs border border-gray-200 rounded px-2 py-1.5">
+              <option>Edge type…</option>
+              <option>supersedes</option>
+              <option>references</option>
+              <option>contributes-to</option>
+              <option>parallel-to</option>
+            </select>
+            <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-red-600 text-lg leading-none w-6 grid place-items-center">&times;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="px-5 py-4 border-t border-gray-100 flex justify-end gap-2 sticky bottom-0 bg-white">
+      <button onclick="document.getElementById('addNodeModal').classList.add('hidden')" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">Cancel</button>
+      <button class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold">Add to graph</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const nodeData = {
+    draft: { title: "Operational Resilience PD — v0.3", desc: "Working draft of the Policy Document following the 2025 Discussion Paper. Consolidates BCBS OpRes 2021 principles into Malaysian-scoped requirements with critical business service definitions and annual dependency mapping.", typeLabel: "task", subLabel: "working draft", badgeCls: "bg-indigo-100 text-indigo-800", showOpenTask: true },
+    bcbs:  { title: "BCBS Principles for Operational Resilience 2021", desc: "International standard from the Basel Committee on Banking Supervision. Non-binding mother document for OpRes-family regulation globally.", typeLabel: "international-standard", subLabel: "BCBS · 2021", badgeCls: "bg-fuchsia-100 text-fuchsia-800", showOpenTask: false },
+    hkma:  { title: "HKMA SPM OR-2 (Sep 2024)", desc: "Hong Kong Monetary Authority Supervisory Policy Manual on Operational Resilience — lateral peer benchmark.", typeLabel: "peer-regulator", subLabel: "HKMA · Sep 2024", badgeCls: "bg-teal-100 text-teal-800", showOpenTask: false },
+    fsb:   { title: "FSB Third-Party Risk Toolkit", desc: "Financial Stability Board toolkit on third-party dependencies — international standard for systemic third-party risk.", typeLabel: "international-standard", subLabel: "FSB", badgeCls: "bg-fuchsia-100 text-fuchsia-800", showOpenTask: false },
+    rmit:  { title: "RMiT PD (28 Nov 2025)", desc: "BNM Policy Document on Risk Management in Technology — the reissued version.", typeLabel: "internal-published", subLabel: "BNM PD · 28 Nov 2025", badgeCls: "bg-indigo-100 text-indigo-800", showOpenTask: false },
+    fsa:   { title: "FSA 2013 §143", desc: "Financial Services Act 2013, Section 143 — statutory basis for BNM to issue prudential standards on operational risk.", typeLabel: "act-law", subLabel: "statute", badgeCls: "bg-amber-100 text-amber-800", showOpenTask: false },
+    abm:   { title: "ABM Position Paper (May 2026)", desc: "Association of Banks in Malaysia position paper on operational resilience — industry input on the 2025 DP.", typeLabel: "industry-input", subLabel: "ABM · May 2026", badgeCls: "bg-emerald-100 text-emerald-800", showOpenTask: false },
+  };
+
+  const edgeData = {
+    rmit: { title: "OpRes PD v0.3 ↔ RMiT PD (28 Nov 2025)", type: "parallel-to", desc: "Two live BNM policy documents on adjacent domains. Run finder→critic to surface pairwise linkages between their clauses.", analysed: false },
+    bcbs: { title: "OpRes PD v0.3 ← BCBS OpRes Principles 2021", type: "contributes-to", desc: "BCBS mother doc contributing to the OpRes drafting task. 3 linkages already validated in a prior run.", analysed: true, findings: [
+      { pill: "aligns-with", pillCls: "bg-emerald-100 text-emerald-800", text: "§4.4 dependency mapping tracks BCBS Principle 7." },
+      { pill: "differs-on ↑", pillCls: "bg-indigo-100 text-indigo-800", text: "§5.3 pins annual cadence; BCBS says 'periodically'." },
+      { pill: "aligns-with", pillCls: "bg-emerald-100 text-emerald-800", text: "§6 governance tracks BCBS Principle 1." }
+    ] },
+    hkma: { title: "OpRes PD v0.3 ← HKMA SPM OR-2", type: "contributes-to", desc: "Peer regulator contributing to the OpRes drafting task. Not yet analysed.", analysed: false },
+    fsb:  { title: "OpRes PD v0.3 ← FSB Third-Party Toolkit", type: "contributes-to", desc: "International standard contributing to the OpRes drafting task. Not yet analysed.", analysed: false },
+    fsa:  { title: "OpRes PD v0.3 → FSA 2013 §143", type: "references", desc: "Statutory basis for the OpRes PD. 1 linkage validated.", analysed: true, findings: [
+      { pill: "aligns-with", pillCls: "bg-emerald-100 text-emerald-800", text: "§1.1 empowered by FSA §143(2)." }
+    ] },
+    abm:  { title: "OpRes PD v0.3 ← ABM Position Paper (May 2026)", type: "contributes-to", desc: "Industry position paper contributing to the OpRes drafting task. Not yet analysed.", analysed: false },
+  };
+
+  function showNode(id) {
+    document.getElementById('detailNode').classList.remove('hidden');
+    document.getElementById('detailEdge').classList.add('hidden');
+    const d = nodeData[id] || nodeData.draft;
+    document.getElementById('nodeTitle').textContent = d.title;
+    document.getElementById('nodeDesc').textContent = d.desc;
+    const badge = document.getElementById('nodeTypeBadge');
+    badge.textContent = d.typeLabel;
+    badge.className = 'text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded ' + d.badgeCls;
+    document.getElementById('nodeSubBadge').textContent = d.subLabel;
+    document.getElementById('nodeActionBtn').style.display = d.showOpenTask ? 'flex' : 'none';
+  }
+
+  function showEdge(id, type) {
+    document.getElementById('detailNode').classList.add('hidden');
+    document.getElementById('detailEdge').classList.remove('hidden');
+    const d = edgeData[id] || edgeData.rmit;
+    document.getElementById('edgeTitle').textContent = d.title;
+    document.getElementById('edgeDesc').textContent = d.desc;
+    document.getElementById('edgeTypeBadge').textContent = d.type;
+    const typeColors = { 'supersedes': 'bg-red-100 text-red-800', 'references': 'bg-cyan-100 text-cyan-800', 'contributes-to': 'bg-indigo-100 text-indigo-800', 'parallel-to': 'bg-gray-200 text-gray-800' };
+    document.getElementById('edgeTypeBadge').className = 'text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded ' + (typeColors[d.type] || 'bg-gray-200 text-gray-800');
+
+    if (d.analysed) {
+      document.getElementById('edgePreAnalyze').classList.add('hidden');
+      document.getElementById('edgeAnalyzedBox').classList.remove('hidden');
+      document.getElementById('edgeStatusBadge').textContent = d.findings.length + ' linkage' + (d.findings.length === 1 ? '' : 's');
+      document.getElementById('edgeStatusBadge').className = 'text-[10px] uppercase tracking-wider font-bold bg-emerald-100 text-emerald-800 px-2 py-1 rounded';
+      document.getElementById('edgeLinkageList').innerHTML = d.findings.map(f => `
+        <div class="bg-gray-50 border border-gray-200 rounded p-2">
+          <span class="text-[10px] uppercase tracking-wider font-bold ${f.pillCls} px-1.5 py-0.5 rounded mr-1.5">${f.pill}</span>
+          <span class="text-gray-700">${f.text}</span>
+        </div>
+      `).join('');
+    } else {
+      document.getElementById('edgePreAnalyze').classList.remove('hidden');
+      document.getElementById('edgeAnalyzedBox').classList.add('hidden');
+      document.getElementById('edgeStatusBadge').textContent = 'not analysed';
+      document.getElementById('edgeStatusBadge').className = 'text-[10px] uppercase tracking-wider font-bold bg-amber-100 text-amber-800 px-2 py-1 rounded';
+    }
+  }
+
+  function analyzeEdge() {
+    const btn = event.target;
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Running finder→critic…';
+    setTimeout(() => { window.location.href = 'review.html'; }, 900);
+  }
+
+  document.getElementById('addNodeBtn').addEventListener('click', () => {
+    document.getElementById('addNodeModal').classList.remove('hidden');
+  });
+
+  function pickType(btn, name) {
+    document.querySelectorAll('.type-btn').forEach(b => {
+      b.className = b.className.replace('border-2 border-indigo-600 bg-indigo-50', 'border border-gray-200 hover:border-indigo-400 bg-white');
+    });
+    btn.className = btn.className.replace('border border-gray-200 hover:border-indigo-400 bg-white', 'border-2 border-indigo-600 bg-indigo-50');
+  }
+
+  function addEdgeRow() {
+    const tpl = document.querySelector('.edge-row').cloneNode(true);
+    tpl.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+    tpl.querySelector('button').onclick = () => tpl.remove();
+    document.getElementById('edgeRows').appendChild(tpl);
+  }
+
+  // Sidebar collapse
+  function toggleSidebar() {
+    const sb = document.getElementById('sidebar');
+    sb.classList.toggle('collapsed');
+    sb.classList.toggle('w-64');
+    sb.classList.toggle('w-14');
+  }
+
+  // Graph zoom
+  let zoomLevel = 1;
+  function zoom(factor) {
+    zoomLevel = Math.max(0.5, Math.min(2.5, zoomLevel * factor));
+    document.getElementById('graphSvg').style.transform = 'scale(' + zoomLevel + ')';
+  }
+  function resetZoom() {
+    zoomLevel = 1;
+    document.getElementById('graphSvg').style.transform = 'scale(1)';
+  }
+</script>
+
+</body>
+</html>

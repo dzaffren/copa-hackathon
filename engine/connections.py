@@ -90,6 +90,22 @@ CriticFn = Callable[[str, str, ClauseIndex, list[dict]], list[dict]]
 _MESSAGE_NO_CLAUSE = "No matching clause found"
 
 
+def _normalize_clause_number(number: str) -> str:
+    """Repair a common LLM output slip: a sub-item citation with a missing
+    closing paren (e.g. ``"RMiT 17.1(a"`` → ``"RMiT 17.1(a)"``).
+
+    The finder/critic prompts include the fully-parenthesised form in their
+    clause context, but Claude occasionally drops the trailing ``)`` when
+    serialising to JSON. This normalisation is deliberately narrow: it ONLY
+    appends ``)`` when the string contains an unbalanced ``(`` — never rewrites
+    any other character, never invents a number. Anything else falls through
+    unchanged and is judged by the validator on its own merits.
+    """
+    if number.count("(") == number.count(")") + 1 and not number.endswith(")"):
+        return number + ")"
+    return number
+
+
 class ConnectionFindError(Exception):
     """Raised when connection-finding cannot proceed (e.g. no Foundry
     credentials for the real finder/critic seam)."""
@@ -178,8 +194,12 @@ def _validate_candidates(
 
     for candidate in candidates:
         summary = candidate.get("summary", "")
-        source_numbers = candidate.get("source_clauses", [])
-        target_numbers = candidate.get("target_clauses", [])
+        source_numbers = [
+            _normalize_clause_number(n) for n in candidate.get("source_clauses", [])
+        ]
+        target_numbers = [
+            _normalize_clause_number(n) for n in candidate.get("target_clauses", [])
+        ]
 
         cited_results = [
             {"clause_number": number, "resolved": clause_index.get(number) is not None}
@@ -217,9 +237,7 @@ def _validate_candidates(
     return connections, unsupported, validation
 
 
-def _cite(
-    clause_numbers: list[str], clause_index: ClauseIndex
-) -> list[ClauseCitation]:
+def _cite(clause_numbers: list[str], clause_index: ClauseIndex) -> list[ClauseCitation]:
     """Build verbatim citations for a list of resolved clause numbers.
 
     The quoted ``text`` ALWAYS comes back through ``ClauseIndex.get(...)["text"]``
@@ -341,20 +359,27 @@ def _parse_candidate_list(raw: str) -> list[dict]:
     model returned a non-list or list items that are not objects.
     """
     parsed = parse_json_response(raw)
-    if not isinstance(parsed, list) or not all(
-        isinstance(item, dict) for item in parsed
-    ):
+    if not isinstance(parsed, list):
         snippet = raw.strip()[:200]
         raise LLMResponseError(
             f"Expected a JSON array of connection objects; got "
             f"{type(parsed).__name__}. Raw (truncated): {snippet!r}"
         )
+    bad = [
+        (i, type(item).__name__)
+        for i, item in enumerate(parsed)
+        if not isinstance(item, dict)
+    ]
+    if bad:
+        snippet = raw.strip()[:200]
+        raise LLMResponseError(
+            f"Expected every list item to be a JSON object; found "
+            f"non-object items at {bad}. Raw (truncated): {snippet!r}"
+        )
     return parsed
 
 
-def _finder_turn(
-    doc_a_id: str, doc_b_id: str, clause_index: ClauseIndex
-) -> list[dict]:
+def _finder_turn(doc_a_id: str, doc_b_id: str, clause_index: ClauseIndex) -> list[dict]:
     """Call the finder LLM (Azure AI Foundry) to propose candidate connections.
 
     Builds the two-document clause context, sends it with
@@ -390,7 +415,7 @@ def _critic_turn(
 
 
 def _call_candidates_with_retry(
-    system: str, user: str, attempts: int = 3
+    system: str, user: str, attempts: int = 3, max_tokens: int = 16384
 ) -> list[dict]:
     """Call the finder/critic LLM and parse candidates, retrying on non-JSON.
 
@@ -402,7 +427,7 @@ def _call_candidates_with_retry(
     """
     last_error: LLMResponseError | None = None
     for attempt in range(1, attempts + 1):
-        raw = call_chat(FINDER_CRITIC_DEPLOYMENT, system, user)
+        raw = call_chat(FINDER_CRITIC_DEPLOYMENT, system, user, max_tokens=max_tokens)
         try:
             return _parse_candidate_list(raw)
         except LLMResponseError as exc:

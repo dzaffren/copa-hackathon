@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drafting Workspace · OpRes PD v0.3 · Workstream Brain</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .doc-page { font-family: Georgia, 'Times New Roman', serif; }
+  .tab-btn.active { border-bottom-color: #4f46e5; color: #4f46e5; font-weight: 600; }
+  .linkage-ref { transition: transform .1s ease; cursor: pointer; }
+  .linkage-ref:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,.08); }
+  .msg-user { background: #eef2ff; }
+  .msg-copilot { background: #f9fafb; border: 1px solid #e5e7eb; }
+</style>
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+<!-- Topbar -->
+<nav class="bg-white border-b border-gray-200">
+  <div class="max-w-screen-2xl mx-auto px-4 py-2.5 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="text-2xl">🧠</span>
+      <span class="font-bold text-lg">Workstream Brain</span>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <button class="relative w-9 h-9 rounded-lg hover:bg-gray-100 grid place-items-center"><svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1"/></svg><span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">3</span></button>
+      <div class="ml-1 flex items-center gap-2 pl-2 border-l border-gray-200">
+        <span class="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold grid place-items-center text-xs">AR</span>
+        <div class="hidden sm:block leading-tight">
+          <div class="text-sm font-semibold">Aisyah R.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Breadcrumb -->
+<div class="bg-indigo-600 text-white">
+  <div class="max-w-screen-2xl mx-auto px-4 py-2 flex items-center justify-between text-sm">
+    <div class="flex items-center gap-2">
+      <a href="workstream.html" class="text-indigo-100 hover:text-white flex items-center gap-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Workstream graph
+      </a>
+      <span class="text-indigo-300">·</span>
+      <span class="font-semibold">Drafting workspace</span>
+      <span class="text-indigo-200">· OpRes PD v0.3</span>
+      <span class="ml-3 text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-400/30 border border-emerald-300/50 text-emerald-50 font-semibold">✎ editing</span>
+    </div>
+    <div class="flex items-center gap-3 text-xs text-indigo-100">
+      <span>Auto-saved 12s ago</span>
+      <button class="bg-white/10 hover:bg-white/20 border border-white/20 rounded px-2 py-1 font-medium">Share</button>
+    </div>
+  </div>
+</div>
+
+<main class="max-w-screen-2xl mx-auto px-4 py-4">
+  <div class="grid grid-cols-12 gap-4" style="min-height: calc(100vh - 160px);">
+
+    <!-- LEFT: Tabs -->
+    <aside class="col-span-12 lg:col-span-5 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col overflow-hidden">
+      <div class="flex border-b border-gray-100">
+        <button onclick="showTab('linkages')" id="tab-linkages" class="tab-btn active flex-1 px-3 py-3 text-xs border-b-2 border-transparent text-gray-500 hover:text-gray-800">
+          📎 Reviewed <span class="ml-1 text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 font-semibold">4</span>
+        </button>
+        <button onclick="showTab('related')" id="tab-related" class="tab-btn flex-1 px-3 py-3 text-xs border-b-2 border-transparent text-gray-500 hover:text-gray-800">
+          🔗 Related <span class="text-[10px] text-gray-400 font-normal">· 1 hop</span> <span class="ml-1 text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-semibold">5</span>
+        </button>
+        <button onclick="showTab('copilot')" id="tab-copilot" class="tab-btn flex-1 px-3 py-3 text-xs border-b-2 border-transparent text-gray-500 hover:text-gray-800">
+          🤖 Copilot
+        </button>
+      </div>
+
+      <!-- Tab 1: Reviewed linkages -->
+      <div id="panel-linkages" class="flex-1 overflow-y-auto p-4 space-y-3">
+        <p class="text-xs text-gray-500">Linkages you accepted in review — pinned here as references while you draft.</p>
+
+        <!-- Linkage ref 1 -->
+        <article class="linkage-ref bg-white border border-gray-200 rounded-lg p-3">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-red-100 text-red-800 px-2 py-0.5 rounded">conflicts-with</span>
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-red-600 text-white px-2 py-0.5 rounded">🚩</span>
+            <span class="text-[10px] text-gray-500 ml-auto">§7.1 ↔ RMiT front</span>
+          </div>
+          <p class="text-sm font-semibold text-gray-900">Update RMiT version anchor</p>
+          <p class="text-xs text-gray-600 mt-1 leading-relaxed">§7.1 references RMiT 1 June 2023 — supersede to the 28 November 2025 reissuance before publication.</p>
+          <div class="mt-2 bg-gray-50 border border-gray-200 rounded px-2 py-1.5 text-[11px] font-mono text-gray-600 leading-snug">"…Risk Management in Technology issued on <span class="bg-red-100 text-red-800 px-1 rounded">1 June 2023</span>…"</div>
+        </article>
+
+        <!-- Linkage ref 2 -->
+        <article class="linkage-ref bg-white border border-gray-200 rounded-lg p-3">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">differs-on</span>
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-white border border-indigo-300 text-indigo-700 px-2 py-0.5 rounded">↑ tighten</span>
+            <span class="text-[10px] text-gray-500 ml-auto">§5.3 ↔ HKMA §5.2</span>
+          </div>
+          <p class="text-sm font-semibold text-gray-900">Annual vs. biennial scenario testing</p>
+          <p class="text-xs text-gray-600 mt-1 leading-relaxed">BNM annual cadence tightens on HKMA's biennial. Defensible in supervisory college via Malaysian concentration risk.</p>
+          <div class="mt-2 bg-gray-50 border border-gray-200 rounded px-2 py-1.5 text-[11px] font-mono text-gray-600 leading-snug">HKMA SPM OR-2 §5.2 — "…at least once every two years."</div>
+        </article>
+
+        <!-- Linkage ref 3 -->
+        <article class="linkage-ref bg-white border border-gray-200 rounded-lg p-3">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">aligns-with</span>
+            <span class="text-[10px] text-gray-500 ml-auto">§4.4 ↔ BCBS Principle 7</span>
+          </div>
+          <p class="text-sm font-semibold text-gray-900">Dependency mapping tracks BCBS Principle 7</p>
+          <p class="text-xs text-gray-600 mt-1 leading-relaxed">BNM operationalises the BCBS principle by scoping to critical business services and pinning annual cadence.</p>
+          <div class="mt-2 bg-gray-50 border border-gray-200 rounded px-2 py-1.5 text-[11px] font-mono text-gray-600 leading-snug">BCBS 2021 Principle 7 — "…commensurate with its risk profile and systemic importance."</div>
+        </article>
+
+        <!-- Linkage ref 4 -->
+        <article class="linkage-ref bg-white border border-gray-200 rounded-lg p-3">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-sky-100 text-sky-800 px-2 py-0.5 rounded">goes-beyond</span>
+            <span class="text-[10px] text-gray-500 ml-auto">§6.3 ↔ RMiT (silent)</span>
+          </div>
+          <p class="text-sm font-semibold text-gray-900">Single accountable officer</p>
+          <p class="text-xs text-gray-600 mt-1 leading-relaxed">OpRes §6.3 introduces named-officer accountability that RMiT does not require. Note in preamble as scope expansion.</p>
+        </article>
+
+        <a href="review.html" class="block text-center text-xs text-indigo-600 hover:text-indigo-800 font-semibold py-2">← Back to full linkage review</a>
+      </div>
+
+      <!-- Tab 2: Related linkages (1 hop) -->
+      <div id="panel-related" class="hidden flex-1 overflow-y-auto p-4 space-y-3">
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-900 leading-relaxed">
+          <span class="font-bold">🔗 Related · 1 hop</span> — linkages that already exist between your task's neighbour nodes (not against your draft). Useful context when your draft is silent on a concept but its neighbours have already formed a position.
+        </div>
+
+        <article class="linkage-ref bg-white border border-gray-200 rounded-lg p-3">
+          <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-fuchsia-100 text-fuchsia-800 px-2 py-0.5 rounded">BCBS</span>
+            <span class="text-[10px]">↔</span>
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-teal-100 text-teal-800 px-2 py-0.5 rounded">HKMA</span>
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded ml-1">aligns-with</span>
+          </div>
+          <p class="text-sm font-semibold text-gray-900">HKMA implements BCBS OpRes Principle 6 verbatim</p>
+          <p class="text-xs text-gray-600 mt-1 leading-relaxed">HKMA SPM OR-2 §4 adopts BCBS Principle 6 (business continuity planning) with minimal amendment. Useful precedent for how the mother doc travels into peer regulator language.</p>
+        </article>
+
+        <article class="linkage-ref bg-white border border-gray-200 rounded-lg p-3">
+          <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-fuchsia-100 text-fuchsia-800 px-2 py-0.5 rounded">FSB</span>
+            <span class="text-[10px]">↔</span>
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-fuchsia-100 text-fuchsia-800 px-2 py-0.5 rounded">BCBS</span>
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded ml-1">aligns-with</span>
+          </div>
+          <p class="text-sm font-semibold text-gray-900">FSB toolkit references BCBS OpRes 2021</p>
+          <p class="text-xs text-gray-600 mt-1 leading-relaxed">FSB Third-Party Toolkit §2.1 explicitly cites BCBS OpRes as the underlying framework. Your draft's third-party clauses inherit both anchors consistently.</p>
+        </article>
+
+        <article class="linkage-ref bg-white border border-gray-200 rounded-lg p-3">
+          <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">RMiT</span>
+            <span class="text-[10px]">↔</span>
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">FSA §143</span>
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded ml-1">aligns-with</span>
+          </div>
+          <p class="text-sm font-semibold text-gray-900">RMiT anchors to FSA §143 statutory basis</p>
+          <p class="text-xs text-gray-600 mt-1 leading-relaxed">RMiT PD front matter cites FSA §143(2) as its enabling power — the same statutory basis your OpRes draft uses in §1.1.</p>
+        </article>
+
+        <article class="linkage-ref bg-white border border-gray-200 rounded-lg p-3">
+          <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-teal-100 text-teal-800 px-2 py-0.5 rounded">HKMA</span>
+            <span class="text-[10px]">↔</span>
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-fuchsia-100 text-fuchsia-800 px-2 py-0.5 rounded">FSB</span>
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded ml-1">differs-on</span>
+          </div>
+          <p class="text-sm font-semibold text-gray-900">HKMA scoping narrower than FSB toolkit</p>
+          <p class="text-xs text-gray-600 mt-1 leading-relaxed">HKMA scopes third-party oversight to authorised institutions; FSB toolkit covers a broader systemic frame. Consider which lens your draft aligns to.</p>
+        </article>
+
+        <article class="linkage-ref bg-white border border-gray-200 rounded-lg p-3">
+          <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">ABM</span>
+            <span class="text-[10px]">↔</span>
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">RMiT</span>
+            <span class="text-[10px] uppercase tracking-wider font-bold bg-sky-100 text-sky-800 px-2 py-0.5 rounded ml-1">goes-beyond</span>
+          </div>
+          <p class="text-sm font-semibold text-gray-900">Industry asked for self-attestation on top of RMiT</p>
+          <p class="text-xs text-gray-600 mt-1 leading-relaxed">ABM position paper proposes self-attestation for scenario testing — beyond what RMiT requires. Your draft §5.3 sits between these two positions.</p>
+        </article>
+      </div>
+
+      <!-- Tab 3: Copilot -->
+      <div id="panel-copilot" class="hidden flex-1 flex flex-col overflow-hidden">
+        <div class="p-4 border-b border-gray-100 space-y-2 bg-indigo-50">
+          <label class="text-[10px] uppercase tracking-wider text-indigo-800 font-bold">Intent preset</label>
+          <select class="w-full border border-indigo-200 rounded-lg px-3 py-2 text-sm bg-white">
+            <option>PD — Policy Document</option>
+            <option>DP — Discussion Paper</option>
+            <option>ED — Exposure Draft</option>
+            <option>FAQ</option>
+            <option>Engagement Deck</option>
+            <option>Feedback Template for Industry</option>
+            <option>Peer Benchmarking</option>
+          </select>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 space-y-3 text-sm">
+          <div class="msg-copilot rounded-lg px-3 py-2.5">
+            <div class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Copilot · PD preset</div>
+            <p class="text-gray-700 leading-relaxed">Hi Aisyah — I've loaded 4 accepted linkages and the OpRes DP feedback register. Want me to draft the §6.3 preamble that flags the accountable-officer expansion (goes-beyond RMiT)?</p>
+          </div>
+          <div class="msg-user rounded-lg px-3 py-2.5 ml-8">
+            <p class="text-gray-800 leading-relaxed">Yes — keep it neutral for the transposition of BCBS Principle 7, and cross-reference RMiT §17.1 for the technology-side dependency requirements.</p>
+          </div>
+          <div class="msg-copilot rounded-lg px-3 py-2.5">
+            <div class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Copilot</div>
+            <p class="text-gray-700 leading-relaxed mb-2">Here's a draft §6.3 preamble anchored to the accepted linkages:</p>
+            <div class="bg-white border-l-4 border-indigo-500 pl-3 py-2 rounded-r text-gray-800 italic">This Part establishes accountability for operational resilience outcomes, including a single senior officer responsible for critical business service continuity. This requirement complements the technology-specific responsibilities in the Policy Document on Risk Management in Technology (28 November 2025), §17.1.</div>
+            <div class="mt-2 flex gap-1.5">
+              <button class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded font-semibold">Insert into draft</button>
+              <button class="text-xs border border-gray-300 hover:bg-gray-50 text-gray-700 px-2.5 py-1 rounded font-semibold">Regenerate</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3 border-t border-gray-100 bg-gray-50">
+          <div class="flex gap-2">
+            <input type="text" placeholder="Ask Copilot to draft, cite, or benchmark…" class="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-400 bg-white">
+            <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-2 rounded-lg font-semibold">Send</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT: Editor -->
+    <section class="col-span-12 lg:col-span-7 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col overflow-hidden">
+      <div class="px-4 py-2 border-b border-gray-100 bg-gray-50 flex items-center justify-between text-xs">
+        <div class="flex items-center gap-3 text-gray-600">
+          <span class="font-semibold text-gray-800">OpRes_PD_v0.3.docx</span>
+          <span>·</span>
+          <span>Aisyah R. is editing</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <button class="w-7 h-7 rounded hover:bg-gray-100 grid place-items-center font-bold" title="Bold">B</button>
+          <button class="w-7 h-7 rounded hover:bg-gray-100 grid place-items-center italic" title="Italic">I</button>
+          <button class="w-7 h-7 rounded hover:bg-gray-100 grid place-items-center underline" title="Underline">U</button>
+          <span class="w-px h-4 bg-gray-300 mx-1"></span>
+          <button class="w-7 h-7 rounded hover:bg-gray-100 grid place-items-center" title="Heading">H</button>
+          <button class="w-7 h-7 rounded hover:bg-gray-100 grid place-items-center" title="List">•</button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-8 bg-gray-50">
+        <div class="doc-page bg-white shadow-md border border-gray-200 max-w-2xl mx-auto p-10 text-gray-800" style="min-height: 900px;">
+          <div class="text-xs text-gray-400 mb-6 flex justify-between border-b border-gray-100 pb-2">
+            <span>Bank Negara Malaysia · Policy Document</span>
+            <span>Draft v0.3 · Confidential</span>
+          </div>
+
+          <h1 class="text-2xl font-bold mb-1">Operational Resilience</h1>
+          <div class="text-sm text-gray-500 mb-6">Working draft — for internal review</div>
+
+          <h2 class="text-lg font-bold mt-6 mb-2">Part I — Preliminary</h2>
+          <p class="text-sm leading-relaxed mb-4"><strong>1.1</strong> This Policy Document is issued pursuant to section 143 of the Financial Services Act 2013 and section 155 of the Islamic Financial Services Act 2013.</p>
+
+          <h2 class="text-lg font-bold mt-6 mb-2">Part IV — Dependency Mapping</h2>
+          <p class="text-sm leading-relaxed mb-2"><strong>4.4</strong> A financial institution shall map dependencies for each critical business service and refresh the mapping at least annually.</p>
+          <div class="bg-emerald-50 border-l-4 border-emerald-500 rounded-r px-3 py-1.5 my-2 text-xs text-emerald-900">
+            <span class="font-bold">✓ aligns-with</span> BCBS Principle 7 — mapping "commensurate with risk profile and systemic importance".
+          </div>
+
+          <h2 class="text-lg font-bold mt-6 mb-2">Part V — Scenario Testing</h2>
+          <p class="text-sm leading-relaxed mb-2"><strong>5.3</strong> A financial institution shall conduct scenario testing <span class="bg-indigo-100 px-1 rounded font-semibold">annually</span>, covering severe-but-plausible disruptions to critical business services.</p>
+          <div class="bg-indigo-50 border-l-4 border-indigo-500 rounded-r px-3 py-1.5 my-2 text-xs text-indigo-900">
+            <span class="font-bold">↑ differs-on</span> HKMA SPM OR-2 §5.2 (biennial). Note in explanatory memo — deliberate tightening.
+          </div>
+
+          <h2 class="text-lg font-bold mt-6 mb-2">Part VI — Accountability</h2>
+          <p class="text-sm leading-relaxed mb-2"><strong>6.3</strong> The board shall assign a single senior officer, accountable for operational resilience outcomes across all critical business services.</p>
+          <div class="bg-sky-50 border-l-4 border-sky-500 rounded-r px-3 py-1.5 my-2 text-xs text-sky-900">
+            <span class="font-bold">↗ goes-beyond</span> RMiT PD (silent on named accountability). Preamble drafted by Copilot — pending insertion.
+          </div>
+
+          <h2 class="text-lg font-bold mt-6 mb-2">Part VII — Technology Anchor</h2>
+          <p class="text-sm leading-relaxed mb-2"><strong>7.1</strong> Financial institutions shall comply with the Policy Document on Risk Management in Technology issued on <span class="bg-red-100 text-red-800 px-1 rounded font-bold line-through">1 June 2023</span> <span class="bg-emerald-100 text-emerald-800 px-1 rounded font-bold">28 November 2025</span> when establishing controls for technology-enabled operations.</p>
+          <div class="bg-red-50 border-l-4 border-red-500 rounded-r px-3 py-1.5 my-2 text-xs text-red-900">
+            <span class="font-bold">🚩 conflicts-with</span> RMiT (28 Nov 2025) supersedes the 2023 version. Fix accepted — awaiting Farid M.'s final sign-off.
+          </div>
+
+          <h2 class="text-lg font-bold mt-6 mb-2">Part VIII — Third-Party Concentration</h2>
+          <p class="text-sm leading-relaxed mb-2"><strong>8.2</strong> Where more than one financial institution shares a technology service provider providing a critical business service, the Bank may impose additional oversight requirements.</p>
+
+          <p class="text-sm text-gray-400 italic mt-8">[cursor here — draft continues in Part IX…]</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script>
+  function showTab(name) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.getElementById('panel-linkages').classList.toggle('hidden', name !== 'linkages');
+    document.getElementById('panel-related').classList.toggle('hidden', name !== 'related');
+    document.getElementById('panel-copilot').classList.toggle('hidden', name !== 'copilot');
+    document.getElementById('panel-copilot').classList.toggle('flex', name === 'copilot');
+  }
+</script>
+
+</body>
+</html>

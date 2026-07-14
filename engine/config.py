@@ -31,6 +31,7 @@ AI_CLUSTER = "ai-financial-sector"
 # One entry per document *version*. A policy with more than one version
 # (e.g. rmit) has one manifest entry per document_id.
 DOCUMENTS = {
+<<<<<<< HEAD
     "ai-dp-2025": {
         "policy_id": "ai-dp",
         "document_id": "ai-dp-2025",
@@ -52,10 +53,23 @@ DOCUMENTS = {
         "normalise_glyphs": True,
     },
     "rmit-v1-2020": {
+=======
+    "rmit-v1-2023": {
+>>>>>>> a36a9ea5c5be47fb1707251f8a9dbe4342c7d783
         "policy_id": "rmit",
-        "document_id": "rmit-v1-2020",
+        "document_id": "rmit-v1-2023",
         "title": "Risk Management in Technology (RMiT)",
-        "version": "v1 · 2020",
+        "version": "v1 · 2023",
+        "effective_date": "2023-06-01",
+        "source_path": CORPUS_DIR / "PD-RMiT-June2023.pdf",
+        "source": "published",
+        "cluster": CLUSTER,
+    },
+    "rmit-v2-2025": {
+        "policy_id": "rmit",
+        "document_id": "rmit-v2-2025",
+        "title": "Risk Management in Technology (RMiT)",
+        "version": "v2 · 2025",
         "effective_date": "2025-11-28",
         "source_path": CORPUS_DIR / "pd-rmit-nov25.pdf",
         "source": "published",
@@ -124,6 +138,16 @@ DOCUMENTS = {
         "source_path": CORPUS_DIR / "MCIPD_PD_2025.pdf",
         "source": "published",
         "cluster": CLUSTER,
+    },
+    "open-finance-v1-2025-ed": {
+        "policy_id": "open-finance",
+        "document_id": "open-finance-v1-2025-ed",
+        "title": "Open Finance",
+        "version": "ED · 18 Nov 2025",
+        "effective_date": "2025-11-18",
+        "source_path": CORPUS_DIR / "ED_Open_Finance_2025.pdf",
+        "source": "draft",
+        "cluster": "open-finance",
     },
 }
 

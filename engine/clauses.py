@@ -32,6 +32,7 @@ POLICY_SHORT_NAMES = {
     "opres": "Operational Resilience",
     "recovery-planning": "Recovery Planning",
     "customer-info": "Customer Info",
+<<<<<<< HEAD
     # The analysed vehicle document — its numbered paragraphs (1.1 … 5.10) enter
     # the index keyed "AI-DP {number}" (e.g. "AI-DP 3.5"), so a paragraph number
     # round-trips as clause_number.split(" ", 1)[-1] for the read API.
@@ -55,6 +56,9 @@ POLICY_SHORT_NAMES = {
     # / "Industry AoB" (distinct keys under distinct document_ids).
     "industry-fsp-3": "Industry",
     "industry-aob": "Industry",
+=======
+    "open-finance": "Open Finance",
+>>>>>>> a36a9ea5c5be47fb1707251f8a9dbe4342c7d783
 }
 
 
@@ -736,7 +740,13 @@ _NOISE_LINE_RES = [
 # `(?:\s|$)` accepts either. A bare-label line's actual content is then picked up
 # from the following line(s) via `_skip_ws` (which skips newlines) + the
 # continuation-line accumulation in the main loop.
-_NUMBERED_CLAUSE_RE = re.compile(r"^(\d+(?:\.\d+)+)(?:\s|$)")
+# The optional ``[SG]\s+`` prefix accepts BNM's Exposure Draft / Discussion
+# Paper convention where each clause is tagged ``S`` (Standard) or ``G``
+# (Guidance) at line start — e.g. ``S 7.1 The board shall...``. The prefix is
+# only recognised, never captured; the resulting bare_number is the pure
+# numeric label (``7.1``), so downstream clause-numbering stays uniform across
+# PD, ED, and DP documents.
+_NUMBERED_CLAUSE_RE = re.compile(r"^(?:[SG]\s+)?(\d+(?:\.\d+)+)(?:\s|$)")
 _SUBITEM_RE = re.compile(r"^\(([a-z]{1,3}|[ivxl]{1,4})\)(?:\s|$)")
 _APPENDIX_RE = re.compile(r"^(Appendix\s+\d+)\b")
 _SECTION_HEADING_RE = re.compile(r"^(\d+)\s+([A-Z].*)$")

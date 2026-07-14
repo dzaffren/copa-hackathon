@@ -70,16 +70,25 @@ def main() -> None:
     trace = artifacts_dir / f"connection-trace-{pair}.json"
     print(f"Trace written: {trace}" if Path(trace).exists() else "Trace NOT found!")
 
-    # The load-bearing demo check: did we find the hero conflict, verbatim?
-    hero = any(
-        any(cite["clause_number"] == "Outsourcing 12.1" for cite in c["target_clauses"])
-        and any(cite["clause_number"] == "RMiT 17.1" for cite in c["source_clauses"])
-        for c in connections
-    )
-    print(
-        "\nHERO CONFLICT (RMiT 17.1 <-> Outsourcing 12.1): "
-        + ("FOUND ✓" if hero else "NOT found — review finder/critic prompts")
-    )
+    # Hero check is only meaningful on the original RMiT<->Outsourcing pair,
+    # where the discovery brief hand-verified the 17.1<->12.1 conflict. For any
+    # other pair (e.g. cross-workstream probes) we report a generic summary and
+    # leave the "did it find the right thing" judgement to the human reader.
+    if (doc_a, doc_b) == DEFAULT_PAIR:
+        hero = any(
+            any(cite["clause_number"] == "Outsourcing 12.1" for cite in c["target_clauses"])
+            and any(cite["clause_number"] == "RMiT 17.1" for cite in c["source_clauses"])
+            for c in connections
+        )
+        print(
+            "\nHERO CONFLICT (RMiT 17.1 <-> Outsourcing 12.1): "
+            + ("FOUND ✓" if hero else "NOT found — review finder/critic prompts")
+        )
+    else:
+        print(
+            f"\nSummary: {len(connections)} supported, {len(unsupported)} unsupported "
+            f"— inspect above for the linkages you expected."
+        )
 
 
 if __name__ == "__main__":
