@@ -30,9 +30,14 @@ from engine.clauses import (
     merge_clause_indexes,
 )
 from engine.connections import (
+    CRITIC_SYSTEM_PROMPT,
+    FINDER_SYSTEM_PROMPT,
+    Connection,
+    _branch_finder_turn,
     _critic_turn,
     _finder_turn,
     _format_clause_context,
+    _parse_candidate_list,
     analyse_paragraph,
     connections_for_paragraph,
     find_connections,
@@ -294,6 +299,7 @@ def test_finder_turn_parses_call_chat_json_array(monkeypatch):
         [
             {
                 "summary": "RMiT 17.1 conflicts with Outsourcing 12.1.",
+                "label": "conflicts-with",
                 "source_clauses": ["RMiT 17.1"],
                 "target_clauses": ["Outsourcing 12.1"],
             }
@@ -301,7 +307,7 @@ def test_finder_turn_parses_call_chat_json_array(monkeypatch):
     )
     captured = {}
 
-    def fake_call_chat(deployment, system, user):
+    def fake_call_chat(deployment, system, user, max_tokens=None):
         captured["deployment"] = deployment
         captured["system"] = system
         captured["user"] = user
@@ -322,6 +328,7 @@ def test_critic_turn_includes_finder_candidates_in_prompt(monkeypatch):
     finder_candidates = [
         {
             "summary": "RMiT 17.1 conflicts with Outsourcing 12.1.",
+            "label": "conflicts-with",
             "source_clauses": ["RMiT 17.1"],
             "target_clauses": ["Outsourcing 12.1"],
         }
@@ -331,6 +338,7 @@ def test_critic_turn_includes_finder_candidates_in_prompt(monkeypatch):
         + [
             {
                 "summary": "RMiT 17.2 depends on RMiT 17.1.",
+                "label": "aligns-with",
                 "source_clauses": ["RMiT 17.2"],
                 "target_clauses": ["RMiT 17.1"],
             }
@@ -338,7 +346,7 @@ def test_critic_turn_includes_finder_candidates_in_prompt(monkeypatch):
     )
     captured = {}
 
-    def fake_call_chat(deployment, system, user):
+    def fake_call_chat(deployment, system, user, max_tokens=None):
         captured["user"] = user
         return canned
 
@@ -362,7 +370,7 @@ def test_finder_turn_raises_on_non_json(monkeypatch):
     clause_index = _build_fixture_clause_index()
     monkeypatch.setattr(
         "engine.connections.call_chat",
-        lambda deployment, system, user: "sorry, no JSON here",
+        lambda deployment, system, user, max_tokens=None: "sorry, no JSON here",
     )
     with pytest.raises(LLMResponseError):
         _finder_turn("rmit-v2-2026-draft", "outsourcing-v1-2019", clause_index)
@@ -372,7 +380,7 @@ def test_critic_turn_raises_on_non_list_json(monkeypatch):
     clause_index = _build_fixture_clause_index()
     monkeypatch.setattr(
         "engine.connections.call_chat",
-        lambda deployment, system, user: json.dumps({"not": "a list"}),
+        lambda deployment, system, user, max_tokens=None: json.dumps({"not": "a list"}),
     )
     with pytest.raises(LLMResponseError):
         _critic_turn(
@@ -546,3 +554,382 @@ def test_analyse_paragraph_guardrail_drops_unresolved_keeps_blocked_and_pending(
     assert blocked["status"] == "could_not_retrieve"
     pending = next(c for c in result if c["source_document_id"] == "basel-osfi")
     assert pending["verification"] == "pending_extraction"
+
+
+# --- Semantic linkage taxonomy (label + optional sentiment) -----------------
+
+
+def test_widened_connection_typeddict():
+    """A Connection now carries a five-value ``label`` and, only on
+    ``differs-on``, an optional ``sentiment`` — both reported by
+    ``get_type_hints`` and constructible with the documented values."""
+    import typing
+
+    aligned: Connection = {
+        "summary": "RMiT 17.1 adopts the same notification window as its source.",
+        "label": "aligns-with",
+        "sentiment": None,
+        "source_clauses": [],
+        "target_clauses": [],
+        "scope_note": None,
+        "supported": True,
+    }
+    differs: Connection = {
+        "summary": "RMiT 17.1 shortens the notification window its source allows.",
+        "label": "differs-on",
+        "sentiment": "tighten",
+        "source_clauses": [],
+        "target_clauses": [],
+        "scope_note": None,
+        "supported": True,
+    }
+
+    assert aligned["label"] == "aligns-with"
+    assert aligned["sentiment"] is None
+    assert differs["label"] == "differs-on"
+    assert differs["sentiment"] == "tighten"
+
+    hints = typing.get_type_hints(Connection)
+    assert "label" in hints
+    assert "sentiment" in hints
+
+
+def test_parse_rejects_missing_label():
+    """A candidate with no ``label`` is rejected loudly (never coerced)."""
+    raw = json.dumps(
+        [
+            {
+                "summary": "x",
+                "source_clauses": ["RMiT 17.1"],
+                "target_clauses": ["Outsourcing 12.1"],
+            }
+        ]
+    )
+    with pytest.raises(LLMResponseError) as exc:
+        _parse_candidate_list(raw)
+    assert "label" in str(exc.value)
+
+
+def test_parse_rejects_unknown_label():
+    """A ``label`` outside the five-value set is rejected."""
+    raw = json.dumps(
+        [
+            {
+                "summary": "x",
+                "label": "duplicates",
+                "source_clauses": ["RMiT 17.1"],
+                "target_clauses": ["Outsourcing 12.1"],
+            }
+        ]
+    )
+    with pytest.raises(LLMResponseError) as exc:
+        _parse_candidate_list(raw)
+    assert "duplicates" in str(exc.value)
+
+
+def test_parse_rejects_sentiment_on_nondiffers():
+    """``sentiment`` on any label other than ``differs-on`` is rejected."""
+    raw = json.dumps(
+        [
+            {
+                "summary": "x",
+                "label": "aligns-with",
+                "sentiment": "tighten",
+                "source_clauses": ["RMiT 17.1"],
+                "target_clauses": ["Outsourcing 12.1"],
+            }
+        ]
+    )
+    with pytest.raises(LLMResponseError) as exc:
+        _parse_candidate_list(raw)
+    message = str(exc.value)
+    assert "sentiment" in message
+    assert "differs-on" in message
+
+
+def test_parse_rejects_unknown_sentiment():
+    """A ``sentiment`` outside tighten/loosen/neutral is rejected even on
+    ``differs-on``."""
+    raw = json.dumps(
+        [
+            {
+                "summary": "x",
+                "label": "differs-on",
+                "sentiment": "stricter",
+                "source_clauses": ["RMiT 17.1"],
+                "target_clauses": ["Outsourcing 12.1"],
+            }
+        ]
+    )
+    with pytest.raises(LLMResponseError) as exc:
+        _parse_candidate_list(raw)
+    assert "stricter" in str(exc.value)
+
+
+def test_parse_accepts_sentiment_on_differs():
+    """A well-formed ``differs-on`` candidate with a sentiment parses cleanly,
+    both fields intact, no coercion."""
+    raw = json.dumps(
+        [
+            {
+                "summary": "x",
+                "label": "differs-on",
+                "sentiment": "tighten",
+                "source_clauses": ["RMiT 17.1"],
+                "target_clauses": ["Outsourcing 12.1"],
+            }
+        ]
+    )
+    result = _parse_candidate_list(raw)
+    assert len(result) == 1
+    assert result[0]["label"] == "differs-on"
+    assert result[0]["sentiment"] == "tighten"
+
+
+# A branch-finder-shaped candidate: it answers *which source bears on a
+# paragraph*, so it carries NO five-label taxonomy — only source/clause/score.
+_LABELLESS_BRANCH_CANDIDATE_JSON = json.dumps(
+    [
+        {
+            "source_document_id": "bcbs-239",
+            "clause_number": "BCBS 239 P4",
+            "confidence_score": 0.8,
+        }
+    ]
+)
+
+
+def test_parse_accepts_labelless_when_taxonomy_not_required():
+    """With ``require_taxonomy=False`` a label-free branch-finder candidate parses
+    intact — the taxonomy check is skipped for that different concern."""
+    result = _parse_candidate_list(
+        _LABELLESS_BRANCH_CANDIDATE_JSON, require_taxonomy=False
+    )
+    assert result == json.loads(_LABELLESS_BRANCH_CANDIDATE_JSON)
+    assert "label" not in result[0]
+
+
+def test_parse_rejects_labelless_under_default_taxonomy():
+    """The pairwise contract is unchanged: under the default the same label-free
+    candidate is still rejected for its missing label."""
+    with pytest.raises(LLMResponseError) as exc:
+        _parse_candidate_list(_LABELLESS_BRANCH_CANDIDATE_JSON)
+    assert "label" in str(exc.value)
+
+
+def test_branch_finder_turn_parses_labelless_candidates(monkeypatch):
+    """The live branch-finder seam parses its own label-free output without
+    raising (it calls the parser with ``require_taxonomy=False``)."""
+    index = _build_source_index()
+    monkeypatch.setattr(
+        "engine.connections.call_chat",
+        lambda deployment, system, user, max_tokens=None: (
+            _LABELLESS_BRANCH_CANDIDATE_JSON
+        ),
+    )
+
+    result = _branch_finder_turn(
+        "4.6",
+        "As AI applications process personal data...",
+        index,
+        "cited",
+        ["bcbs-239"],
+    )
+
+    assert result == json.loads(_LABELLESS_BRANCH_CANDIDATE_JSON)
+
+
+def _finder_direction_aware(doc_a_id, doc_b_id, clause_index):
+    """Emit ``goes-beyond`` when RMiT is the OUR side (doc A) and ``silent-on``
+    when it is the THEIR side (doc B) — the same finding, direction-flipped. The
+    cited clauses resolve in both directions so only the label changes."""
+    label = "goes-beyond" if doc_a_id == "rmit-v2-2026-draft" else "silent-on"
+    return [
+        {
+            "summary": "Our side names a cloud-governance officer the other omits.",
+            "label": label,
+            "source_clauses": ["RMiT 17.1"],
+            "target_clauses": ["Outsourcing 12.1"],
+        }
+    ]
+
+
+def _critic_passthrough(doc_a_id, doc_b_id, clause_index, candidates):
+    """Critic that neither refutes nor scopes — it passes candidates through so
+    the test isolates direction handling in the validator."""
+    return list(candidates)
+
+
+def test_direction_flip_swaps_silent_and_goesbeyond(tmp_path):
+    """Swapping the pair flips ``silent-on`` ⇄ ``goes-beyond`` (a coverage
+    asymmetry is directional), while the verbatim citations are unchanged."""
+    clause_index = _build_fixture_clause_index()
+
+    forward = find_connections(
+        "rmit-v2-2026-draft",
+        "outsourcing-v1-2019",
+        clause_index,
+        finder_fn=_finder_direction_aware,
+        critic_fn=_critic_passthrough,
+        output_dir=tmp_path,
+        now=FIXED_NOW,
+    )
+    reverse = find_connections(
+        "outsourcing-v1-2019",
+        "rmit-v2-2026-draft",
+        clause_index,
+        finder_fn=_finder_direction_aware,
+        critic_fn=_critic_passthrough,
+        output_dir=tmp_path,
+        now=FIXED_NOW,
+    )
+
+    forward_finding = forward["connections"][0]
+    reverse_finding = reverse["connections"][0]
+    assert forward_finding["label"] == "goes-beyond"
+    assert reverse_finding["label"] == "silent-on"
+    # A coverage-asymmetry finding never carries a sentiment.
+    assert forward_finding["sentiment"] is None
+    assert reverse_finding["sentiment"] is None
+    # The verbatim citations are identical in both directions — only the label
+    # flips (the guardrail is untouched).
+    for finding in (forward_finding, reverse_finding):
+        assert [c["clause_number"] for c in finding["source_clauses"]] == ["RMiT 17.1"]
+        assert [c["clause_number"] for c in finding["target_clauses"]] == [
+            "Outsourcing 12.1"
+        ]
+
+
+def test_write_trace_records_label_and_sentiment(tmp_path):
+    """Every ``validation`` entry in the connection-trace records the finding's
+    ``label`` and ``sentiment`` alongside summary/cited_clauses/supported."""
+    clause_index = _build_fixture_clause_index()
+
+    def finder(doc_a_id, doc_b_id, clause_index):
+        return [
+            {
+                "summary": "RMiT 17.1 shortens the window Outsourcing 12.1 allows.",
+                "label": "differs-on",
+                "sentiment": "tighten",
+                "source_clauses": ["RMiT 17.1"],
+                "target_clauses": ["Outsourcing 12.1"],
+            }
+        ]
+
+    find_connections(
+        "rmit-v2-2026-draft",
+        "outsourcing-v1-2019",
+        clause_index,
+        finder_fn=finder,
+        critic_fn=_critic_passthrough,
+        output_dir=tmp_path,
+        now=FIXED_NOW,
+    )
+
+    trace_path = next(tmp_path.glob("connection-trace-*.json"))
+    trace = json.loads(trace_path.read_text(encoding="utf-8"))
+    entry = trace["validation"][0]
+    assert entry["label"] == "differs-on"
+    assert entry["sentiment"] == "tighten"
+
+
+@pytest.mark.parametrize("prompt", [FINDER_SYSTEM_PROMPT, CRITIC_SYSTEM_PROMPT])
+def test_prompts_describe_taxonomy_and_direction(prompt):
+    """Both system prompts must state the five labels, the sentiment values
+    (and that they attach only to ``differs-on``), and the fixed direction
+    convention (document A = we/ours, document B = they/theirs)."""
+    for label in (
+        "aligns-with",
+        "differs-on",
+        "conflicts-with",
+        "silent-on",
+        "goes-beyond",
+    ):
+        assert label in prompt
+    for sentiment in ("tighten", "loosen", "neutral"):
+        assert sentiment in prompt
+    # Sentiment is scoped to differs-on only.
+    assert "sentiment" in prompt
+    # Direction convention tokens.
+    assert "we/ours" in prompt
+    assert "they/theirs" in prompt
+    # The strict citation rule survives the rewrite.
+    assert "CITATION RULE" in prompt
+
+
+def _spy_write_text_encoding(monkeypatch) -> dict:
+    """Patch ``Path.write_text`` to record the ``encoding`` it is called with
+    (delegating to the real writer), so a test can assert the trace writers
+    force UTF-8 — the fix for the cp1252 platform default on Windows that
+    otherwise crashes on the AI DP's Unicode glyphs (U+2212)."""
+    import pathlib
+
+    captured: dict = {}
+    original = pathlib.Path.write_text
+
+    def spy(self, data, *args, **kwargs):
+        captured["encoding"] = kwargs.get("encoding")
+        return original(self, data, *args, **kwargs)
+
+    monkeypatch.setattr(pathlib.Path, "write_text", spy)
+    return captured
+
+
+def test_write_trace_encodes_utf8(tmp_path, monkeypatch):
+    """The connection-trace writer must pass ``encoding="utf-8"`` to write_text."""
+    captured = _spy_write_text_encoding(monkeypatch)
+    clause_index = _build_fixture_clause_index()
+
+    def finder(doc_a_id, doc_b_id, clause_index):
+        return [
+            {
+                "summary": "RMiT 17.1 trims the notification window.",
+                "label": "differs-on",
+                "sentiment": "tighten",
+                "source_clauses": ["RMiT 17.1"],
+                "target_clauses": ["Outsourcing 12.1"],
+            }
+        ]
+
+    find_connections(
+        "rmit-v2-2026-draft",
+        "outsourcing-v1-2019",
+        clause_index,
+        finder_fn=finder,
+        critic_fn=_critic_passthrough,
+        output_dir=tmp_path,
+        now=FIXED_NOW,
+    )
+
+    assert captured["encoding"] == "utf-8"
+
+
+def test_write_analyse_trace_encodes_utf8(tmp_path, monkeypatch):
+    """The analyse-trace writer must likewise pass ``encoding="utf-8"``."""
+    captured = _spy_write_text_encoding(monkeypatch)
+    index = _build_source_index()
+
+    def stub_finder(paragraph_number, paragraph_text, clause_index, branch, source_ids):
+        if branch != "cited":
+            return []
+        return [
+            {
+                "source_document_id": "bcbs-239",
+                "clause_number": "BCBS 239 P4",
+                "confidence_score": 0.88,
+                "verification": "verified",
+            }
+        ]
+
+    analyse_paragraph(
+        "4.6",
+        "As AI applications process personal data...",
+        index,
+        cited_source_ids=["bcbs-239"],
+        curated_source_ids=[],
+        finder_fn=stub_finder,
+        now=FIXED_NOW,
+        output_dir=tmp_path,
+    )
+
+    assert captured["encoding"] == "utf-8"

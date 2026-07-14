@@ -98,3 +98,9 @@ matching clause found" — never invent one. Preserve this in any spec or POC ed
   of document/markdown text in `engine/`; the AI DP's Unicode glyphs (U+2212) crash the
   cp1252 platform default on Windows. See
   `docs/learnings/pattern-engine-artifact-writes-utf8.md`.
+- **Forge verify hook false-fails here** — the forge `stop-verify` Stop hook reports
+  `LINT FAIL: No global/local python version…` because `.python-version` pins an
+  uninstalled `3.13` and `ruff` isn't installed; it's cosmetic (pytest via `.venv` is
+  green). Verify with `.venv/Scripts/python.exe -m pytest engine/tests`; don't disable
+  all hooks (kills secret-scan) or install ruff to appease it. See
+  `docs/learnings/blocker-forge-verify-hook-false-fail-pyenv-ruff.md`.
