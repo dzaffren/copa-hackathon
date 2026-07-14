@@ -185,7 +185,7 @@
     },
     {
       "summary": "Both documents rely on the same underlying policy documents (BCM, RMIT, Outsourcing, Risk Governance, Operational Risk) as the foundation for operational resilience and technology risk management.",
-      "label": "conflicts-with",
+      "label": "aligns-with",
       "sentiment": null,
       "source_clauses": [
         "Open Finance 6.1(c)",
@@ -424,7 +424,7 @@
     },
     {
       "summary": "Both documents rely on the same underlying policy documents (BCM, RMIT, Outsourcing, Risk Governance, Operational Risk) as the foundation for operational resilience and technology risk management.",
-      "label": "conflicts-with",
+      "label": "aligns-with",
       "sentiment": null,
       "cited_clauses": [
         {

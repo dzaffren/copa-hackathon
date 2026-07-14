@@ -126,12 +126,36 @@ def test_no_retired_vocabulary_as_label(traces: dict[str, dict]) -> None:
                 )
 
 
-def test_demo_trace_showcases_conflict_and_goes_beyond() -> None:
-    """The opres demo trace must exhibit the headline version-drift
-    ``conflicts-with`` and at least one ``goes-beyond`` coverage finding."""
-    validation = _load_trace(
-        "connection-trace-opres-v1-2025-draft__open-finance-v1-2025-ed.json"
-    )["validation"]
-    labels = [entry["label"] for entry in validation]
-    assert "conflicts-with" in labels, "opres trace lost its conflicts-with exhibit"
-    assert "goes-beyond" in labels, "opres trace lost its goes-beyond exhibit"
+def test_demo_traces_showcase_goes_beyond_and_a_genuine_conflict() -> None:
+    """The opres DP×ED trace showcases a ``goes-beyond`` coverage asymmetry
+    (spec Example 4: the single-accountable-officer requirement BNM has and the
+    peer does not). The DP×ED pair honestly contains no incompatibility, so we
+    do NOT force ``conflicts-with`` onto it — per the spec, ``conflicts-with``
+    means "applying both as written is incompatible", which would contradict
+    the "shared foundation holds" finding. The genuine version-drift /
+    incompatibility ``conflicts-with`` exhibit therefore lives in the RMiT
+    supersession traces, whose summaries truly support it."""
+    opres_labels = [
+        entry["label"]
+        for entry in _load_trace(
+            "connection-trace-opres-v1-2025-draft__open-finance-v1-2025-ed.json"
+        )["validation"]
+    ]
+    assert "goes-beyond" in opres_labels, "opres trace lost its goes-beyond exhibit"
+    assert "conflicts-with" not in opres_labels, (
+        "opres DP×ED pair has no genuine incompatibility; a conflicts-with here "
+        "would contradict the finding's own summary — see spec Example 3"
+    )
+    rmit_traces = (
+        "connection-trace-rmit-v1-2023__rmit-v2-2025.json",
+        "connection-trace-rmit-v2-2026-draft__outsourcing-v1-2019.json",
+    )
+    has_genuine_conflict = any(
+        entry["label"] == "conflicts-with"
+        for name in rmit_traces
+        for entry in _load_trace(name)["validation"]
+    )
+    assert has_genuine_conflict, (
+        "the genuine conflicts-with exhibit must survive in a RMiT supersession "
+        "trace whose summary genuinely supports 'cannot both be followed'"
+    )
