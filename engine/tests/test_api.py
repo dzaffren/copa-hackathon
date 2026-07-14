@@ -27,7 +27,12 @@ import json
 from fastapi.testclient import TestClient
 
 from engine.api import create_app
-from engine.clauses import ClauseIndex, build_clause_index, merge_clause_indexes
+from engine.clauses import (
+    ClauseIndex,
+    build_clause_index,
+    build_reference_clause,
+    merge_clause_indexes,
+)
 from engine.graph import build_graph
 from engine.ingest import UnreadableDocumentError
 
@@ -222,6 +227,130 @@ def _build_fixture_graph(clause_index: ClauseIndex) -> dict:
         clause_index=clause_index,
         draft_registry=DRAFT_REGISTRY,
     )
+
+
+# --- External reference fixtures (#26 Reference Radar) ----------------------
+
+REFERENCE_PDPA_PASSAGE = (
+    "A data controller may transfer any personal data of a data subject to any "
+    "place outside Malaysia if— (a) there is in that place in force any law which "
+    "is substantially similar to this Act..."
+)
+
+REFERENCE_DOCUMENTS = {
+    "pdpa-2010": {
+        "policy_id": "pdpa",
+        "document_id": "pdpa-2010",
+        "title": "Personal Data Protection Act 2010 (Malaysia)",
+        "version": "2010 · Act 709",
+        "cluster": "technology-risk",
+        "kind": "reference",
+        "source_type": "act",
+        "access": "public",
+        "preview": False,
+        "source_url": "https://example.test/pdpa",
+    },
+    "bnm-handbook": {
+        "policy_id": "bnm-handbook",
+        "document_id": "bnm-handbook",
+        "title": "Regulatory Handbook (BNM)",
+        "version": "internal",
+        "cluster": "technology-risk",
+        "kind": "reference",
+        "source_type": "handbook",
+        "access": "restricted",
+        "preview": False,
+    },
+}
+
+REFERENCE_EDGES = [
+    {
+        "source_policy_id": "rmit",
+        "target_policy_id": "pdpa",
+        "type": "references",
+        "reason": "A cloud region outside Malaysia engages the PDPA transfer test.",
+        "source_clauses": ["RMiT 17.1"],
+        "target_clauses": ["PDPA 129"],
+        "provenance": "llm-found",
+        "confidence": 0.9,
+    },
+    {
+        "source_policy_id": "rmit",
+        "target_policy_id": "bnm-handbook",
+        "type": "references",
+        "reason": "The handbook connects to this clause; content is confidential.",
+        "source_clauses": ["RMiT 17.1"],
+        "target_clauses": ["BNM Handbook — Cloud & Outsourcing Manual"],
+        "provenance": "curated",
+        "confidence": 1.0,
+    },
+]
+
+
+def _build_reference_app() -> TestClient:
+    """A TestClient whose graph carries reference nodes/edges and whose index
+    carries the public PDPA reference passage (RMiT 17.1 + PDPA 129 resolve)."""
+    from engine.clauses import build_reference_clause
+
+    clause_index = _build_fixture_clause_index()
+    primary = {
+        entry["clause_number"]: entry
+        for entry in [
+            clause_index.get("RMiT 17.1"),
+            clause_index.get("Outsourcing 12.1"),
+        ]
+        if entry is not None
+    }
+    versions = {cn: {e["document_id"]: e} for cn, e in primary.items()}
+    for clause_number, entry in build_reference_clause(
+        "pdpa-2010", "pdpa", "129", "Section 129(2)", REFERENCE_PDPA_PASSAGE
+    ).items():
+        primary[clause_number] = entry
+        versions.setdefault(clause_number, {})[entry["document_id"]] = entry
+    ref_index = ClauseIndex(primary, versions)
+
+    graph = build_graph(
+        documents={**DOCUMENTS, **REFERENCE_DOCUMENTS},
+        curated_edges=[],
+        clause_index=ref_index,
+        draft_registry=DRAFT_REGISTRY,
+        reference_edges=REFERENCE_EDGES,
+    )
+    return TestClient(create_app(clause_index=ref_index, graph=graph))
+
+
+def test_get_graph_includes_reference_nodes_and_edges():
+    client = _build_reference_app()
+
+    response = client.get("/graph")
+    assert response.status_code == 200
+    body = response.json()
+
+    nodes = {n["id"]: n for n in body["nodes"]}
+    assert nodes["pdpa-2010"]["kind"] == "reference"
+    assert nodes["pdpa-2010"]["source_type"] == "act"
+    assert nodes["pdpa-2010"]["access"] == "public"
+    assert nodes["pdpa-2010"]["source_url"] == "https://example.test/pdpa"
+    assert nodes["bnm-handbook"]["access"] == "restricted"
+
+    ref_edges = [e for e in body["edges"] if e["type"] == "references"]
+    assert {e["target"] for e in ref_edges} == {"pdpa-2010", "bnm-handbook"}
+
+
+def test_get_clause_returns_reference_passage_verbatim():
+    client = _build_reference_app()
+
+    response = client.get("/clauses/PDPA 129")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["clause_number"] == "PDPA 129"
+    assert body["source"] == "reference"
+    assert body["text"].startswith("A data controller may transfer")
+
+    # The restricted handbook has no ingested passage — GET /clauses 404s for it.
+    missing = client.get("/clauses/BNM Handbook — Cloud & Outsourcing Manual")
+    assert missing.status_code == 404
+    assert missing.json()["error"] == "CLAUSE_NOT_FOUND"
 
 
 # --- Stub finder / critic / converter --------------------------------------
@@ -557,3 +686,480 @@ def test_get_submission_unknown_id_returns_404(tmp_path):
         "error": "SUBMISSION_NOT_FOUND",
         "message": "No submission with id 'sub-999'",
     }
+
+
+# ===========================================================================
+# Two-branch source-connection routes (spec Task 6): GET …/paragraphs,
+# GET …/{number}/connections, POST …/{number}/analyse.
+#
+# Model-free reads over a hand-made clause index + graph + verdicts dict (the
+# verdicts.json join); the live analyse route uses a stubbed `analyse_fn`, so no
+# network — the same no-network discipline as the finder/critic tests above.
+# ===========================================================================
+
+# Verbatim source-clause text the connections quote (byte-for-byte via the index,
+# never the verdict record). Reused in the fixtures AND the byte-for-byte asserts.
+AIDP_PDPA_129_TEXT = (
+    "A data controller may transfer any personal data of a data subject to any "
+    "place outside Malaysia if— (a) there is in that place in force any law "
+    "which is substantially similar to this Act."
+)
+AIDP_BCBS_P4_TEXT = (
+    "A bank should be able to capture and aggregate all material risk data "
+    "across the banking group."
+)
+AIDP_FSP_TEXT = (
+    "The requirement to obtain informed consent is unworkable for models already "
+    "trained on legacy datasets collected before AI use was contemplated."
+)
+
+# Vehicle-document (AI DP) paragraph text — the addressable analysed units.
+AIDP_PARAGRAPHS = [
+    ("4.6", "Data & personal information", "As AI applications process personal data..."),
+    ("3.5", "Fair usage & bias", "A major challenge of AI revolves around fair usage..."),
+    ("3.2", "Board & senior management oversight", "The board and senior management..."),
+    ("5.2", "Capital treatment", "Capital treatment considerations for AI models..."),
+]
+
+
+def _aidp_paragraph_entry(number: str, heading: str, text: str) -> tuple[str, dict]:
+    clause_number = f"AI-DP {number}"
+    return clause_number, {
+        "clause_number": clause_number,
+        "policy_id": "ai-dp",
+        "document_id": "ai-dp-2025",
+        "text": text,
+        "heading": heading,
+        "source": "published",
+        "parent": None,
+        "children": [],
+        "superseded_versions": [],
+    }
+
+
+def _build_aidp_clause_index() -> ClauseIndex:
+    """The vehicle DP's paragraphs + the verbatim source passages the quotes come
+    from (source clause text NEVER comes from the verdict record)."""
+    primary: dict = {}
+    for number, heading, text in AIDP_PARAGRAPHS:
+        clause_number, entry = _aidp_paragraph_entry(number, heading, text)
+        primary[clause_number] = entry
+    for clause_number, ref_entry in {
+        **build_reference_clause(
+            "pdpa-2010", "pdpa", "129", "Section 129(2)", AIDP_PDPA_129_TEXT
+        ),
+        **build_reference_clause(
+            "bcbs-239", "bcbs-239", "P4", "Principle 4", AIDP_BCBS_P4_TEXT
+        ),
+        **build_reference_clause(
+            "industry-fsp-3", "industry-fsp-3", "FSP-3", "FSP feedback", AIDP_FSP_TEXT
+        ),
+    }.items():
+        primary[clause_number] = ref_entry
+    return ClauseIndex(primary)
+
+
+def _reference_node(node_id: str, title: str, source_type: str, **extra) -> dict:
+    return {
+        "id": node_id,
+        "policy_id": node_id,
+        "title": title,
+        "version": "ref",
+        "status": "In force",
+        "cluster": "ai-financial-sector",
+        "kind": "reference",
+        "source_type": source_type,
+        "access": "public",
+        "preview": False,
+        **extra,
+    }
+
+
+AIDP_GRAPH = {
+    "nodes": [
+        {
+            "id": "ai-dp-2025",
+            "policy_id": "ai-dp",
+            "title": "Discussion Paper on AI in the Malaysian Financial Sector",
+            "version": "DP Aug 2025",
+            "status": "In progress",
+            "cluster": "ai-financial-sector",
+            "kind": "policy",
+        },
+        _reference_node(
+            "pdpa-2010",
+            "Personal Data Protection Act 2010 (as amended 2024)",
+            "act",
+        ),
+        _reference_node("bcbs-239", "BCBS 239", "international_standard"),
+        _reference_node(
+            "industry-fsp-3", "Industry feedback — 3 FSP respondents", "industry_feedback"
+        ),
+        _reference_node("mas-feat", "MAS — FEAT Principles (Fairness)", "peer_regulator"),
+    ],
+    "edges": [],
+}
+
+# verdicts.json join: 4.6 (PDPA Conflict + BCBS Consensus + FSP Partial), 3.5
+# (MAS FEAT blocked), 5.2 (pending-extraction Basel row). Confidence is the band
+# string the verdict stage already computed; render adds `verdict_status`.
+AIDP_VERDICTS = {
+    "ai-dp-2025:4.6::pdpa-2010:PDPA 129": {
+        "id": "ai-dp-2025:4.6::pdpa-2010:PDPA 129",
+        "paragraph": "4.6",
+        "branch": "uncited",
+        "source_document_id": "pdpa-2010",
+        "verdict": "Conflict",
+        "verdict_status": "proposed",
+        "confidence": "High",
+        "rationale": (
+            "4.6 relies on broad informed consent; PDPA §129 sets a specific "
+            "cross-border transfer test the draft does not cite."
+        ),
+        "clause_number": "PDPA 129",
+        "verification": "verified",
+    },
+    "ai-dp-2025:4.6::bcbs239:BCBS 239 P4": {
+        "id": "ai-dp-2025:4.6::bcbs239:BCBS 239 P4",
+        "paragraph": "4.6",
+        "branch": "cited",
+        "source_document_id": "bcbs-239",
+        "verdict": "Consensus",
+        "verdict_status": "proposed",
+        "confidence": "High",
+        "rationale": "BCBS 239 completeness supports 4.6's governed-data expectation.",
+        "clause_number": "BCBS 239 P4",
+        "verification": "verified",
+    },
+    "ai-dp-2025:4.6::industry-fsp-3": {
+        "id": "ai-dp-2025:4.6::industry-fsp-3",
+        "paragraph": "4.6",
+        "branch": "feedback",
+        "source_document_id": "industry-fsp-3",
+        "verdict": "Partial",
+        "verdict_status": "proposed",
+        "confidence": "Medium",
+        "rationale": "Agrees on responsible handling, rejects consent for legacy data.",
+        "clause_number": "Industry FSP-3",
+        "verification": "illustrative",
+        "stance": "partial",
+    },
+    "ai-dp-2025:3.5::mas-feat": {
+        "id": "ai-dp-2025:3.5::mas-feat",
+        "paragraph": "3.5",
+        "branch": "uncited",
+        "source_document_id": "mas-feat",
+        "status": "could_not_retrieve",
+        "reason": (
+            "The MAS site blocks automated access; upload the source to analyse "
+            "this connection."
+        ),
+        "verdict": None,
+        "verdict_status": "proposed",
+        "clause_number": None,
+    },
+    "ai-dp-2025:5.2::basel:Basel RBC20": {
+        "id": "ai-dp-2025:5.2::basel:Basel RBC20",
+        "paragraph": "5.2",
+        "branch": "uncited",
+        "source_document_id": "bcbs-239",
+        "verdict": "Gap",
+        "verdict_status": "proposed",
+        "confidence": "Medium",
+        "rationale": "Illustrative Basel row; passage not yet extracted.",
+        "clause_number": "Basel RBC20",
+        "verification": "pending_extraction",
+    },
+}
+
+
+def _make_paragraph_client(
+    tmp_path, analyse_fn=None, verdict_fn=None, graph=None, verdicts=None
+) -> TestClient:
+    app = create_app(
+        clause_index=_build_aidp_clause_index(),
+        graph=AIDP_GRAPH if graph is None else graph,
+        submissions_dir=tmp_path / "submissions",
+        verdicts=AIDP_VERDICTS if verdicts is None else verdicts,
+        analyse_fn=analyse_fn,
+        verdict_fn=verdict_fn,
+    )
+    return TestClient(app)
+
+
+# --- GET /documents/{id}/paragraphs -----------------------------------------
+
+
+def test_get_paragraphs_index_states_and_counts(tmp_path):
+    client = _make_paragraph_client(tmp_path)
+    response = client.get("/documents/ai-dp-2025/paragraphs")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["document_id"] == "ai-dp-2025"
+    assert body["total_paragraphs"] == 4
+    by_number = {p["number"]: p for p in body["paragraphs"]}
+    assert by_number["4.6"]["state"] == "analysed"
+    assert by_number["4.6"]["connection_count"] == 3
+    assert by_number["4.6"]["title"] == "Data & personal information"
+    assert by_number["3.2"]["state"] == "not_analysed"
+    assert by_number["3.2"]["connection_count"] == 0
+
+
+def test_get_paragraphs_unknown_document_returns_404(tmp_path):
+    client = _make_paragraph_client(tmp_path)
+    response = client.get("/documents/nope/paragraphs")
+    assert response.status_code == 404
+    assert response.json() == {
+        "error": "DOCUMENT_NOT_FOUND",
+        "message": "No document with id 'nope'",
+    }
+
+
+# --- GET /documents/{id}/paragraphs/{number}/connections --------------------
+
+
+def test_get_paragraph_connections_4_6_full_render(tmp_path):
+    """Spec Test 6 — 4.6 returns three connections, each with branch, source
+    type, verdict, confidence, rationale, and a verification-marked quote."""
+    client = _make_paragraph_client(tmp_path)
+    response = client.get("/documents/ai-dp-2025/paragraphs/4.6/connections")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["paragraph"]["number"] == "4.6"
+    assert body["state"] == "analysed"
+    assert body["no_matching_source"] is False
+
+    conns = body["connections"]
+    assert len(conns) == 3
+    for conn in conns:
+        assert "branch" in conn
+        assert "source_type" in conn["source"]
+        assert "verdict" in conn
+        assert "confidence" in conn
+        assert "rationale" in conn
+        assert conn["quote"]["verification"] in {"verified", "illustrative"}
+
+    # The PDPA connection is a Conflict, verified, and its quote text is the
+    # index text byte-for-byte — never the verdict record's rationale.
+    pdpa = next(c for c in conns if c["source"]["document_id"] == "pdpa-2010")
+    assert pdpa["verdict"] == "Conflict"
+    assert pdpa["verdict_status"] == "proposed"
+    assert pdpa["quote"]["verification"] == "verified"
+    assert pdpa["quote"]["text"] == AIDP_PDPA_129_TEXT
+    assert pdpa["quote"]["text"] != pdpa["rationale"]
+
+
+def test_get_paragraph_connections_blocked_source(tmp_path):
+    """Spec Test 7 — a blocked source (MAS FEAT) renders could_not_retrieve with
+    a reason, verdict null, quote null; never a fabricated verdict/quote."""
+    client = _make_paragraph_client(tmp_path)
+    response = client.get("/documents/ai-dp-2025/paragraphs/3.5/connections")
+    assert response.status_code == 200
+    conns = response.json()["connections"]
+    assert len(conns) == 1
+    mas = conns[0]
+    assert mas["source"]["document_id"] == "mas-feat"
+    assert mas["status"] == "could_not_retrieve"
+    assert mas["reason"]
+    assert mas["verdict"] is None
+    assert mas["quote"] is None
+
+
+def test_get_paragraph_connections_pending_extraction(tmp_path):
+    """Spec Test 8 — a pending-extraction connection renders quote.text null with
+    a pending_extraction marker; no approximated string is returned."""
+    client = _make_paragraph_client(tmp_path)
+    response = client.get("/documents/ai-dp-2025/paragraphs/5.2/connections")
+    assert response.status_code == 200
+    conn = response.json()["connections"][0]
+    assert conn["quote"]["verification"] == "pending_extraction"
+    assert conn["quote"]["text"] is None  # never an approximated string
+
+
+def test_get_paragraph_connections_unknown_paragraph_returns_404(tmp_path):
+    client = _make_paragraph_client(tmp_path)
+    response = client.get("/documents/ai-dp-2025/paragraphs/9.9/connections")
+    assert response.status_code == 404
+    assert response.json() == {
+        "error": "PARAGRAPH_NOT_FOUND",
+        "message": "No paragraph '9.9' in document 'ai-dp-2025'",
+    }
+
+
+def test_get_paragraph_connections_unknown_document_returns_404(tmp_path):
+    client = _make_paragraph_client(tmp_path)
+    response = client.get("/documents/nope/paragraphs/4.6/connections")
+    assert response.status_code == 404
+    assert response.json()["error"] == "DOCUMENT_NOT_FOUND"
+
+
+# --- POST /documents/{id}/paragraphs/{number}/analyse -----------------------
+
+
+def _empty_analyse_fn(document_id, number, paragraph_text, clause_index):
+    return []
+
+
+def test_post_analyse_bare_paragraph_returns_no_matching_source(tmp_path):
+    """Spec Test 5 — analysing a bare paragraph (3.2) with nothing bearing on it
+    returns 200 / analysed / no_matching_source, not a fabrication."""
+    client = _make_paragraph_client(tmp_path, analyse_fn=_empty_analyse_fn)
+    response = client.post("/documents/ai-dp-2025/paragraphs/3.2/analyse")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["paragraph"]["number"] == "3.2"
+    assert body["state"] == "analysed"
+    assert body["no_matching_source"] is True
+    assert body["connections"] == []
+
+
+def test_post_analyse_live_candidates_render(tmp_path):
+    """A live analyse whose stub finder surfaces a candidate returns it rendered
+    (verdict + verbatim quote) — the same shape as GET …/connections."""
+    def analyse_fn(document_id, number, paragraph_text, clause_index):
+        return [
+            {
+                "id": "ai-dp-2025:3.2::bcbs-239:BCBS 239 P4",
+                "paragraph": number,
+                "branch": "uncited",
+                "source_document_id": "bcbs-239",
+                "clause_number": "BCBS 239 P4",
+                "confidence_score": 0.88,
+                "verification": "verified",
+                "verdict": "Consensus",
+                "rationale": "BCBS 239 completeness bears on board data oversight.",
+            }
+        ]
+
+    client = _make_paragraph_client(tmp_path, analyse_fn=analyse_fn)
+    response = client.post("/documents/ai-dp-2025/paragraphs/3.2/analyse")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["no_matching_source"] is False
+    conn = body["connections"][0]
+    assert conn["verdict"] == "Consensus"
+    assert conn["quote"]["text"] == AIDP_BCBS_P4_TEXT
+
+
+def test_post_analyse_already_analysed_without_force_returns_400(tmp_path):
+    client = _make_paragraph_client(tmp_path, analyse_fn=_empty_analyse_fn)
+    response = client.post("/documents/ai-dp-2025/paragraphs/4.6/analyse")
+    assert response.status_code == 400
+    assert response.json() == {
+        "error": "INVALID_ANALYSE_REQUEST",
+        "message": (
+            "Paragraph '4.6' is already analysed; re-analysis requires "
+            "?force=true"
+        ),
+    }
+
+
+def test_post_analyse_already_analysed_with_force_reanalyses(tmp_path):
+    client = _make_paragraph_client(tmp_path, analyse_fn=_empty_analyse_fn)
+    response = client.post(
+        "/documents/ai-dp-2025/paragraphs/4.6/analyse?force=true"
+    )
+    assert response.status_code == 200
+    assert response.json()["no_matching_source"] is True
+
+
+def test_post_analyse_empty_library_returns_409(tmp_path):
+    graph_no_refs = {
+        "nodes": [
+            {
+                "id": "ai-dp-2025",
+                "policy_id": "ai-dp",
+                "title": "AI DP",
+                "version": "v",
+                "status": "In progress",
+                "cluster": "ai-financial-sector",
+                "kind": "policy",
+            }
+        ],
+        "edges": [],
+    }
+    client = _make_paragraph_client(
+        tmp_path, analyse_fn=_empty_analyse_fn, graph=graph_no_refs
+    )
+    response = client.post("/documents/ai-dp-2025/paragraphs/3.2/analyse")
+    assert response.status_code == 409
+    assert response.json()["error"] == "SOURCE_LIBRARY_EMPTY"
+
+
+def test_post_analyse_seam_missing_returns_503(tmp_path):
+    client = _make_paragraph_client(tmp_path)  # analyse_fn=None
+    response = client.post("/documents/ai-dp-2025/paragraphs/3.2/analyse")
+    assert response.status_code == 503
+    assert response.json()["error"] == "ANALYSE_UNAVAILABLE"
+
+
+def test_post_analyse_seam_raising_returns_503(tmp_path):
+    def boom(document_id, number, paragraph_text, clause_index):
+        raise RuntimeError("Azure hiccup mid-pitch")
+
+    client = _make_paragraph_client(tmp_path, analyse_fn=boom)
+    response = client.post("/documents/ai-dp-2025/paragraphs/3.2/analyse")
+    assert response.status_code == 503
+    assert response.json() == {
+        "error": "ANALYSE_UNAVAILABLE",
+        "message": (
+            "Live analysis is temporarily unavailable; pre-analysed paragraphs "
+            "are unaffected"
+        ),
+    }
+
+
+def test_post_analyse_verdict_stage_failure_returns_503(tmp_path):
+    """A live VERDICT-stage failure also degrades to 503 — the graceful backstop
+    must cover the verdict pass, not just the finder, so a mid-pitch verdict
+    hiccup (or an invalid verdict) never surfaces a raw 500."""
+
+    def analyse_fn(document_id, number, paragraph_text, clause_index):
+        # A supported candidate with NO frozen verdict → verdict_fn is invoked.
+        return [
+            {
+                "id": "ai-dp-2025:3.2::bcbs-239:BCBS 239 P4",
+                "paragraph": number,
+                "branch": "uncited",
+                "source_document_id": "bcbs-239",
+                "clause_number": "BCBS 239 P4",
+                "confidence_score": 0.88,
+                "verification": "verified",
+            }
+        ]
+
+    def boom_verdict(connection, clause_index):
+        raise RuntimeError("verdict model timed out")
+
+    client = _make_paragraph_client(
+        tmp_path, analyse_fn=analyse_fn, verdict_fn=boom_verdict
+    )
+    response = client.post("/documents/ai-dp-2025/paragraphs/3.2/analyse")
+    assert response.status_code == 503
+    assert response.json()["error"] == "ANALYSE_UNAVAILABLE"
+
+
+def test_post_analyse_unknown_paragraph_returns_404(tmp_path):
+    client = _make_paragraph_client(tmp_path, analyse_fn=_empty_analyse_fn)
+    response = client.post("/documents/ai-dp-2025/paragraphs/9.9/analyse")
+    assert response.status_code == 404
+    assert response.json()["error"] == "PARAGRAPH_NOT_FOUND"
+
+
+# --- Regression guard: existing routes unchanged by the new paragraph app ----
+
+
+def test_existing_routes_unchanged_on_paragraph_app(tmp_path):
+    """The new verdicts/analyse params must not disturb the existing contracts:
+    GET /graph and GET /clauses/{n} still respond exactly as before."""
+    client = _make_paragraph_client(tmp_path)
+
+    graph = client.get("/graph")
+    assert graph.status_code == 200
+    graph_body = graph.json()
+    assert "nodes" in graph_body and "edges" in graph_body
+    assert any(n["id"] == "pdpa-2010" for n in graph_body["nodes"])
+
+    clause = client.get("/clauses/PDPA 129")
+    assert clause.status_code == 200
+    assert clause.json()["text"] == AIDP_PDPA_129_TEXT

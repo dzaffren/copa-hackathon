@@ -2,6 +2,13 @@
 
 **Ticket:** [#11](https://github.com/dzaffren/copa-hackathon/issues/11)
 
+> **Status — DEFERRED to a future phase (9 July 2026 single-draft pivot).** MVP1 has a
+> single editable draft (RMiT v2) and **no separate reviewer persona**. The drafter's
+> closing action — "submit for manager approval" — is folded into the
+> [Draft alignment](spec-ripple-impact-report.md) story (#8). This reviewer, multi-draft,
+> and separation-of-duties workflow returns when more than one policy team uses the tool.
+> Everything below describes that future phase and is **not in MVP1 scope**.
+
 After a policy drafter submits a consistency-checked draft, this feature lets the
 assigned reviewer read the draft, leave clause-anchored comments (but never change
 the text), and complete their review to route it back to the drafter for revision.

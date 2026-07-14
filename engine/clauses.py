@@ -32,7 +32,29 @@ POLICY_SHORT_NAMES = {
     "opres": "Operational Resilience",
     "recovery-planning": "Recovery Planning",
     "customer-info": "Customer Info",
-    "open-finance": "Open Finance",
+    # The analysed vehicle document — its numbered paragraphs (1.1 … 5.10) enter
+    # the index keyed "AI-DP {number}" (e.g. "AI-DP 3.5"), so a paragraph number
+    # round-trips as clause_number.split(" ", 1)[-1] for the read API.
+    "ai-dp": "AI-DP",
+    # External references (#26) — each contributes a single hand-anchored passage
+    # clause (e.g. "PDPA 129"); kept distinct from the internal cluster policies.
+    "mas-trm": "MAS TRM",
+    "pdpa": "PDPA",
+    "basel-por": "Basel POR",
+    # AI source library (source-connection engine) — the curated sources the
+    # workbench connects the AI DP's paragraphs to. Each passage clause is keyed
+    # "{short} {anchor}" (e.g. "BCBS 239 P4", "OECD 1.2", "EU AI Act Art 50").
+    "bcbs-239": "BCBS 239",
+    "oecd-ai": "OECD",
+    "nist-ai-rmf": "NIST",
+    "bnm-ftfc": "FTFC",
+    "eu-ai-act": "EU AI Act",
+    "mas-feat": "MAS FEAT",
+    # Industry-feedback sources — the sector's consultation responses. Each maps
+    # to the short name "Industry" so its passage clause keys as "Industry FSP-3"
+    # / "Industry AoB" (distinct keys under distinct document_ids).
+    "industry-fsp-3": "Industry",
+    "industry-aob": "Industry",
 }
 
 
@@ -546,6 +568,43 @@ def merge_clause_indexes(
         primary[clause_number] = winner_entry
 
     return primary, versions
+
+
+def build_reference_clause(
+    document_id: str,
+    policy_id: str,
+    anchor: str,
+    heading: Optional[str],
+    text: str,
+    source: str = "reference",
+) -> dict[str, ClauseEntry]:
+    """Build the single verbatim passage clause for an external reference (#26).
+
+    External references (MAS TRM, PDPA, Basel POR) are not BNM-numbered, so the
+    deterministic `segment_clauses` grammar does not apply. Each public reference
+    instead contributes exactly ONE clause, keyed by the canonical
+    "{PolicyShortName} {anchor}" (e.g. ``"PDPA 129"``), whose ``text`` is the
+    exact verbatim excerpt from the real source (see
+    ``engine.config.REFERENCE_DOCUMENTS``). Restricted/preview references have no
+    passage and never call this.
+
+    Returns a one-entry dict shaped exactly like a `build_clause_index` /
+    `segment_clauses` result, so `merge_clause_indexes`, `ClauseIndex`, the API,
+    and the graph treat a reference clause identically to a policy clause.
+    """
+    clause_number = _canonical(policy_id, anchor)
+    entry: ClauseEntry = {
+        "clause_number": clause_number,
+        "policy_id": policy_id,
+        "document_id": document_id,
+        "text": text,
+        "heading": heading,
+        "source": source,
+        "parent": None,
+        "children": [],
+        "superseded_versions": [],
+    }
+    return {clause_number: entry}
 
 
 class ClauseIndex:

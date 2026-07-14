@@ -11,11 +11,16 @@ from pathlib import Path
 
 import pytest
 
-from engine.ingest import UnreadableDocumentError, ingest_document
+from engine.ingest import (
+    UnreadableDocumentError,
+    ingest_document,
+    normalise_glyph_artifacts,
+)
 
 CORPUS_DIR = Path(__file__).resolve().parents[2] / "data" / "corpus"
 OUTSOURCING_PDF = CORPUS_DIR / "PD_Outsourcing_20191023.pdf"
 RMIT_PDF = CORPUS_DIR / "pd-rmit-nov25.pdf"
+AI_DP_PDF = CORPUS_DIR / "dp_ai_financial_sector.pdf"
 
 
 def test_ingest_returns_non_empty_readable_markdown():
@@ -105,3 +110,70 @@ def test_ingest_raises_unreadable_document_error_on_corrupt_input(tmp_path):
 
     with pytest.raises(UnreadableDocumentError):
         ingest_document(corrupt_pdf)
+
+
+# --- Glyph-artifact normalisation (AI DP "AI"-glyph mis-reads) --------------
+
+
+@pytest.mark.parametrize(
+    "raw,expected",
+    [
+        # short LaTeX math-mode wrappers around the mangled glyph
+        ("$A l$ models could exacerbate biases", "AI models could exacerbate biases"),
+        ("adoption of $\\mathrm { A l }$ in finance", "adoption of AI in finance"),
+        ("risks of $\\mathrm { A l } .$", "risks of AI."),
+        ("footnote $A l ^ { 2 } ,$ here", "footnote AI, here"),
+        # bare mis-cased tokens
+        ("A major challenge of Al revolves", "A major challenge of AI revolves"),
+        ('GenAl "hallucinations" arise', 'GenAI "hallucinations" arise'),
+        ("Al-driven decisions do not discriminate", "AI-driven decisions do not discriminate"),
+        ("leading Fls with the majority", "leading FIs with the majority"),
+    ],
+)
+def test_normalise_fixes_patterned_ai_glyph_artifacts(raw, expected):
+    assert normalise_glyph_artifacts(raw) == expected
+
+
+@pytest.mark.parametrize(
+    "safe",
+    [
+        "sample of $\\left( n = 1 0 2 \\right)$ firms",  # real survey figure
+        "concern score of $1 0 0$",  # numeric datum
+        "the word Also appears here",  # real word starting 'Al'
+        "an Alert was raised",  # real word
+        "additional guidance",  # 'al' mid-word untouched
+    ],
+)
+def test_normalise_leaves_real_content_untouched(safe):
+    assert normalise_glyph_artifacts(safe) == safe
+
+
+def test_normalise_does_not_eat_long_or_unterminated_math_spans():
+    """A long `$...$` run (or a dangling delimiter wrapping real prose) must be
+    left byte-for-byte intact — the guard prevents swallowing real content."""
+    long_span = "$ Leading adopters refer to the top quintile of FSPs by reported AI projects $"
+    assert normalise_glyph_artifacts(long_span) == long_span
+
+
+def test_normalise_is_idempotent():
+    once = normalise_glyph_artifacts("$A l$ and Al and GenAl")
+    twice = normalise_glyph_artifacts(once)
+    assert once == "AI and AI and GenAI"
+    assert twice == once
+
+
+@pytest.mark.skipif(not AI_DP_PDF.exists(), reason="AI DP corpus PDF not present")
+def test_ai_dp_showcase_paragraphs_are_clean_after_normalisation():
+    """The demo deep-quotes paragraphs 3.5 and 3.11; after normalisation their
+    text must contain 'AI'/'GenAI' and none of the '$A l$' / 'Al' / 'GenAl'
+    artifacts, so a 'verified' quote is faithful to the source PDF."""
+    text = normalise_glyph_artifacts(ingest_document(AI_DP_PDF))
+
+    i35 = text.find("A major challenge of AI revolves")
+    assert i35 != -1, "3.5 opening should read 'AI', not 'Al'"
+    seg35 = text[i35 : i35 + 200]
+    assert "$" not in seg35
+    assert not re.search(r"(?<![A-Za-z])Al(?![A-Za-z])", seg35)
+
+    assert "GenAI" in text
+    assert "GenAl" not in text

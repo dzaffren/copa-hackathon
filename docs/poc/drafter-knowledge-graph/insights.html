@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What you might have missed — Rulebook Radar</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+<header class="bg-white border-b border-gray-200">
+  <div class="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <a href="workspace.html" class="text-gray-400 hover:text-gray-600 text-sm">← Workspace</a>
+      <span class="text-gray-300">/</span>
+      <h1 class="font-semibold">✨ What you might have missed</h1>
+    </div>
+    <div class="flex items-center gap-3 text-sm">
+      <a href="monitor.html" class="text-amber-600 hover:text-amber-800 font-medium">🔔 Drift</a>
+      <a href="assistant.html" class="text-indigo-600 hover:text-indigo-800 font-medium">✍️ Redraft assistant</a>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-screen-lg mx-auto px-4 py-6">
+  <div class="mb-5">
+    <h2 class="text-xl font-semibold">Connections a human scouring source-by-source would likely miss.</h2>
+    <p class="text-sm text-gray-500 mt-1">The AI reads <b>across every connected source at once</b> — so it surfaces cross-source implications, silent gaps, second-order links, and temporal divergences (vs what we said last year) you wouldn't spot reading one document at a time. These are <b>AI-generated hypotheses to verify</b>, not asserted facts — each names the sources it reasoned across and carries a <b>confidence band</b> so you know what to check first. You decide what to act on: carry it into the redraft assistant, or set it aside.</p>
+  </div>
+
+  <div id="insights" class="space-y-4"></div>
+
+  <!-- what you've pulled into the draft -->
+  <div class="mt-8">
+    <h3 class="font-semibold">Pulled into your draft so far</h3>
+    <p class="text-sm text-gray-500 mt-1">Every guiding principle you've accepted — each with its source and verification status — your defensible research trail.</p>
+    <div id="trail" class="mt-3 space-y-2"></div>
+  </div>
+</main>
+
+<script>
+// AI-surfaced "unseen" insights — cross-source reasoning a single-doc read misses
+const insights = [
+  { id:"i1", tag:"Cross-source implication", tone:"violet", conf:"High", live:true, carry:"assistant",
+    title:"Your bias stance (3.5) and your data stance (4.6) point to the same missing control",
+    body:"3.5 calls for fair models and 4.6 calls for responsible data — but neither requires <b>bias testing on the training data itself</b>. OECD (human oversight), NIST (fairness evaluated &amp; documented), and BCBS 239 (data quality) all tie fairness to data-quality review. Reading them together implies a single control (pre-deployment data bias assessment) that would satisfy both paragraphs at once.",
+    cites:"OECD 1.2 · NIST MEASURE 2.11 · BCBS 239" },
+  { id:"i2", tag:"Silent gap", tone:"orange", conf:"Medium", carry:"assistant",
+    title:"No paragraph addresses AI model concentration / third-party dependency",
+    body:"Your DP covers bias, hallucination, and data — but the FSB and BCBS both flag <b>systemic concentration risk</b> when many FSPs rely on the same few foundation-model providers. Nothing in the current draft speaks to it; a reader focused on individual-firm risk would miss this system-level angle.",
+    cites:"FSB (2024a) · BCBS Newsletter on AI/ML (2022)" },
+  { id:"i3", tag:"Second-order link", tone:"amber", conf:"Medium", carry:"track",
+    title:"A live regulatory shift (EU AI Act GPAI rules) may reshape peer expectations before your DP finalises",
+    body:"The EU AI Act's general-purpose-AI transparency obligations are phasing in through 2025-26. Because your DP is still open for feedback, this could shift what counts as an international benchmark by the time it becomes a policy — worth tracking, not just citing.",
+    cites:"EU AI Act (Regulation 2024/1689)" },
+  { id:"i4", tag:"Temporal self-consistency", tone:"sky", conf:"Low", carry:"assistant",
+    title:"This draft's data-handling stance may diverge from BNM's earlier published position",
+    body:"Compared with BNM's prior published guidance on data handling, this DP's framing of consent and cross-border transfer appears to shift emphasis. Worth checking against <b>what we said last year</b> so the institution's position stays consistent over time — the graph holds past versions as nodes.",
+    cites:"prior published version of the policy" },
+];
+const toneMap = {
+  violet:{ badge:"bg-violet-100 text-violet-700", dot:"bg-violet-500" },
+  orange:{ badge:"bg-orange-100 text-orange-700", dot:"bg-orange-500" },
+  amber:{ badge:"bg-amber-100 text-amber-700", dot:"bg-amber-500" },
+  sky:{ badge:"bg-sky-100 text-sky-700", dot:"bg-sky-500" },
+};
+const confColor = { High:"bg-emerald-100 text-emerald-700", Medium:"bg-amber-100 text-amber-700", Low:"bg-gray-100 text-gray-500" };
+
+document.getElementById("insights").innerHTML = insights.map(i=>{
+  const t = toneMap[i.tone];
+  const liveTag = i.live ? `<span class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">⚡ generated live</span>` : `<span class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">prepared</span>`;
+  const carryLabel = i.carry==="track" ? "Track this →" : "Carry into redraft assistant →";
+  return `<div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+    <div class="flex items-center gap-2 flex-wrap">
+      <span class="w-2.5 h-2.5 rounded-full inline-block ${t.dot}"></span>
+      <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${t.badge}">${i.tag}</span>
+      <span class="text-[10px] font-medium px-2 py-0.5 rounded-full ${confColor[i.conf]}">confidence: ${i.conf}</span>
+      ${liveTag}
+    </div>
+    <h3 class="font-semibold mt-2">${i.title}</h3>
+    <p class="text-sm text-gray-700 mt-1 leading-relaxed">${i.body}</p>
+    <p class="text-xs text-gray-400 mt-2">Reasoned across: ${i.cites}</p>
+    <p class="text-[11px] text-gray-400 mt-1 italic">Hypothesis to verify — not a fact. A high-confidence insight still needs your check.</p>
+    <div class="flex gap-2 mt-3">
+      <button onclick="carry('${i.id}','${i.carry}')" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-md font-medium">${carryLabel}</button>
+      <button onclick="setAside('${i.id}')" class="text-xs border border-gray-300 text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-md">Set aside</button>
+    </div>
+  </div>`;
+}).join("");
+
+function carry(id, dest){
+  if(dest==="track"){ alert("Added to your \"track this\" watch-list. Nothing is written to your draft — a second-order link has nothing to redraft yet. Prototype: recorded."); return; }
+  // carry into the grounded redraft assistant with context pre-loaded
+  location.href = "assistant.html?from=insight&i="+id;
+}
+function setAside(id){
+  alert("Set aside — marked considered. Your draft and decision trail are unchanged. (AI proposes; you decide what to act on.)");
+}
+window.carry = carry; window.setAside = setAside;
+
+// trail of pulled-in principles (shared state from connections.html)
+function getPulled(){ return JSON.parse(localStorage.getItem("rr_pulled")||"[]"); }
+const verdictBadge={consensus:{t:"Consensus",c:"bg-emerald-100 text-emerald-700"},conflict:{t:"Conflict",c:"bg-red-100 text-red-700"},gap:{t:"Gap",c:"bg-orange-100 text-orange-700"},duplicate:{t:"Duplicate",c:"bg-sky-100 text-sky-700"}};
+function renderTrail(){
+  const pulled = getPulled();
+  const el = document.getElementById("trail");
+  if(pulled.length===0){
+    el.innerHTML = `<div class="bg-white rounded-lg border border-dashed border-gray-300 p-5 text-center text-sm text-gray-500">Nothing recorded yet. Open a connection from the workspace and act on it (pull in, anchor, note a gap, or flag a conflict) to build your research trail.</div>`;
+    return;
+  }
+  el.innerHTML = pulled.map(x=>{
+    const v = verdictBadge[x.verdict]||verdictBadge.consensus;
+    return `<div class="bg-white rounded-lg border border-emerald-200 p-3">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-xs font-semibold text-indigo-600">para ${x.para}</span>
+        <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${v.c}">${v.t}</span>
+        <span class="text-xs text-gray-500">${x.src}</span>
+      </div>
+      <blockquote class="mt-1 text-xs text-gray-700 border-l-2 ${x.unverified?'border-amber-300':'border-emerald-300'} pl-2 italic">“${x.quote}”
+        <span class="not-italic block mt-0.5 text-[10px] ${x.unverified?'text-amber-600':'text-emerald-600'}">${x.unverified?'◦ illustrative — not yet verified':'✓ verbatim — verified against source'}</span>
+      </blockquote>
+    </div>`;
+  }).join("");
+}
+renderTrail();
+window.addEventListener("storage", renderTrail);
+</script>
+</body>
+</html>

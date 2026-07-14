@@ -1,0 +1,66 @@
+{
+  "paragraph": {
+    "number": "4.6",
+    "title": "Data & personal information",
+    "text": "As AI applications rely on large volumes of data, including personal data, financial service providers should ensure that the collection, use and processing of such data is undertaken with appropriate consent and in compliance with applicable data protection requirements."
+  },
+  "state": "analysed",
+  "no_matching_source": false,
+  "connections": [
+    {
+      "id": "ai-dp-2025:4.6::pdpa-2010:PDPA 129",
+      "branch": "uncited",
+      "source": {
+        "document_id": "pdpa-2010",
+        "title": "Personal Data Protection Act 2010 (as amended 2024)",
+        "source_type": "act"
+      },
+      "verdict": "Conflict",
+      "verdict_status": "proposed",
+      "confidence": "High",
+      "rationale": "4.6 relies on broad informed consent; PDPA §129 sets a specific cross-border transfer test the draft does not cite and appears to conflict with.",
+      "quote": {
+        "clause_number": "PDPA 129",
+        "text": "A data controller may transfer any personal data of a data subject to any place outside Malaysia if— (a) there is in that place in force any law which is substantially similar to this Act; or (b) that place ensures an adequate level of protection in relation to the processing of personal data which is at least equivalent to the level of protection afforded by this Act.",
+        "verification": "verified"
+      }
+    },
+    {
+      "id": "ai-dp-2025:4.6::bcbs239:BCBS 239 P4",
+      "branch": "cited",
+      "source": {
+        "document_id": "bcbs-239",
+        "title": "BCBS 239 — Principles for effective risk data aggregation",
+        "source_type": "international_standard"
+      },
+      "verdict": "Consensus",
+      "verdict_status": "proposed",
+      "confidence": "High",
+      "rationale": "BCBS 239's completeness principle supports 4.6's expectation of governed, complete data handling.",
+      "quote": {
+        "clause_number": "BCBS 239 P4",
+        "text": "A bank should be able to capture and aggregate all material risk data across the banking group. Data should be available by business line, legal entity, asset type, industry, region and other groupings.",
+        "verification": "verified"
+      }
+    },
+    {
+      "id": "ai-dp-2025:4.6::industry-fsp-3",
+      "branch": "feedback",
+      "source": {
+        "document_id": "industry-fsp-3",
+        "title": "Industry feedback — 3 FSP respondents",
+        "source_type": "industry_feedback",
+        "stance": "partial"
+      },
+      "verdict": "Partial",
+      "verdict_status": "proposed",
+      "confidence": "Medium",
+      "rationale": "The sector supports responsible data handling but rejects the informed-consent mechanism for legacy datasets — agrees in part, diverges in part.",
+      "quote": {
+        "clause_number": "Industry FSP-3",
+        "text": "The requirement to obtain informed consent is unworkable for models already trained on legacy datasets collected before AI use was contemplated.",
+        "verification": "illustrative"
+      }
+    }
+  ]
+}

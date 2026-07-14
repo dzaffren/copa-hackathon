@@ -440,3 +440,287 @@ def _call_candidates_with_retry(
             )
     assert last_error is not None
     raise last_error
+
+
+# ---------------------------------------------------------------------------
+# Two-branch paragraph orchestration (source-connection engine, spec Task 5).
+#
+# Distinct from the pairwise ``find_connections`` above (which stays green for
+# its existing consumers): this analyses ONE paragraph of the uploaded vehicle
+# document against a *split* source universe —
+#
+#   * Branch ① (cited)   — the sources the document itself cites.
+#   * Branch ② (uncited) — relevant sources the document did NOT cite, matched
+#                          against the preloaded curated library.
+#
+# Each branch runs a finder over its own candidate source ids; the combined,
+# branch-tagged, guardrail-filtered candidate list is the input to the verdict
+# stage (``engine.verdicts.propose_verdicts``), which the API runs afterwards.
+# An EMPTY return is the signal the caller turns into ``no_matching_source``.
+# ---------------------------------------------------------------------------
+
+# Branch labels for the two-branch split. Branch ① is the document's own cited
+# sources; branch ② is the un-cited curated library. They match the ``branch``
+# values on the frozen ``engine.config.AI_DP_CONNECTIONS`` fixtures.
+BRANCH_CITED = "cited"
+BRANCH_UNCITED = "uncited"
+
+# The default vehicle document id (the analysed AI Discussion Paper). Passed in
+# so the deterministic candidate ``id`` matches the AI_DP_CONNECTIONS convention
+# (``{document_id}:{paragraph}::{source}:{clause}``); overridable for other docs.
+DEFAULT_DOCUMENT_ID = "ai-dp-2025"
+
+# A branch finder turn reads one paragraph's text + a set of candidate sources
+# (by document id, via the clause index) for a single branch and returns raw
+# candidate dicts: each carries at least ``source_document_id`` +
+# ``clause_number`` + ``confidence_score`` and MAY carry ``status:
+# "could_not_retrieve"`` (+ ``reason``) for a blocked source, or ``verification:
+# "pending_extraction"`` for a real source whose passage is not yet extracted.
+BranchFinderFn = Callable[[str, str, ClauseIndex, str, list[str]], list[dict]]
+
+
+def connections_for_paragraph(
+    connections: list[dict], paragraph_number: str
+) -> list[dict]:
+    """Filter a list of connection specs to those touching ``paragraph_number``.
+
+    The pre-baked read path uses this to slice the frozen showcase connections
+    (shaped like ``engine.config.AI_DP_CONNECTIONS``) down to a single
+    paragraph. Pure and side-effect-free — a straight ``paragraph ==`` match, so
+    a paragraph with no connections yields an empty list (the caller turns that
+    into ``no_matching_source`` / ``not_analysed`` as appropriate).
+    """
+    return [
+        connection
+        for connection in connections
+        if connection.get("paragraph") == paragraph_number
+    ]
+
+
+def _candidate_id(
+    document_id: str,
+    paragraph_number: str,
+    source_document_id: Optional[str],
+    clause_number: Optional[str],
+) -> str:
+    """Build a deterministic connection id matching the AI_DP_CONNECTIONS
+    convention: ``{document_id}:{paragraph}::{source}:{clause}`` when a clause is
+    cited, and ``{document_id}:{paragraph}::{source}`` for a blocked source that
+    carries no clause (e.g. MAS FEAT). Same inputs → same id, every run."""
+    base = f"{document_id}:{paragraph_number}::{source_document_id}"
+    if clause_number:
+        return f"{base}:{clause_number}"
+    return base
+
+
+def _tag_candidate(
+    candidate: dict,
+    branch: str,
+    paragraph_number: str,
+    document_id: str,
+) -> dict:
+    """Stamp a raw finder candidate with the branch that produced it, the
+    paragraph it touches, and a deterministic id.
+
+    ``branch`` and ``paragraph`` are authoritative from the orchestration (the
+    candidate came from this branch's finder call for this paragraph), so they
+    are always set. The ``id`` is generated deterministically but only when the
+    candidate does not already carry one, so a caller that pre-assigns an id (or
+    a frozen fixture) is respected. Returns a shallow copy — the caller's raw
+    dict is never mutated in place.
+    """
+    tagged = dict(candidate)
+    tagged["branch"] = branch
+    tagged["paragraph"] = paragraph_number
+    tagged.setdefault(
+        "id",
+        _candidate_id(
+            document_id,
+            paragraph_number,
+            candidate.get("source_document_id"),
+            candidate.get("clause_number"),
+        ),
+    )
+    return tagged
+
+
+def _candidate_survives_guardrail(candidate: dict, clause_index: ClauseIndex) -> bool:
+    """Anti-hallucination guardrail, mirroring ``verdicts.propose_verdicts``.
+
+    A candidate is kept only when its cited ``clause_number`` resolves verbatim
+    in the index, EXCEPT the two honest carve-outs that need no resolved clause:
+    a blocked source (``status == "could_not_retrieve"``) and a
+    ``pending_extraction`` source (a real source whose passage is not yet
+    extracted — the read layer renders its quote text as null). Every other
+    candidate whose clause does not resolve is dropped here, BEFORE the verdict
+    stage, so anything returned is verbatim-resolvable or explicitly
+    blocked/pending — never a fabricated citation.
+    """
+    if candidate.get("status") == "could_not_retrieve":
+        return True
+    if candidate.get("verification") == "pending_extraction":
+        return True
+    clause_number = candidate.get("clause_number")
+    return clause_number is not None and clause_index.get(clause_number) is not None
+
+
+def analyse_paragraph(
+    paragraph_number: str,
+    paragraph_text: str,
+    clause_index: ClauseIndex,
+    cited_source_ids: list[str],
+    curated_source_ids: list[str],
+    finder_fn: Optional[BranchFinderFn] = None,
+    now: Optional[datetime] = None,
+    output_dir: Optional[Path] = None,
+    document_id: str = DEFAULT_DOCUMENT_ID,
+) -> list[dict]:
+    """Run the LIVE two-branch analysis for one paragraph (``POST …/analyse``).
+
+    Branch ① runs a finder over the document's own ``cited_source_ids``; branch
+    ② runs a finder over ``curated_source_ids`` (the un-cited library, matched by
+    topic). Each raw candidate is branch-tagged, given a deterministic id, and
+    passed through the same citation guardrail as the verdict stage. The combined
+    branch-①+② candidate list is returned; the caller (the API) runs
+    ``engine.verdicts.propose_verdicts`` over it and renders the records.
+
+    Args:
+        paragraph_number: the bare paragraph number (e.g. ``"3.2"``).
+        paragraph_text: the paragraph's verbatim text — the finder reads it.
+        clause_index: the built index; gates the guardrail and (downstream)
+            supplies verbatim quote text by clause number.
+        cited_source_ids: branch ① — the source document ids the document cites.
+        curated_source_ids: branch ② — the un-cited curated library's source ids.
+        finder_fn: injectable branch-finder seam. Defaults to the Azure-backed
+            ``_branch_finder_turn`` (never called by tests); tests inject a stub
+            returning canned candidates per branch, so no network is touched.
+        now: timestamp for the optional trace; defaults to wall-clock UTC.
+        output_dir: when provided, an ``analyse-trace-{paragraph}.json`` backstop
+            is written there (mirroring ``find_connections``); ``None`` writes no
+            trace (so a live API call leaves nothing in the tracked artifacts).
+        document_id: the analysed document's id, used for the candidate ids;
+            defaults to the vehicle DP (``ai-dp-2025``).
+
+    Returns:
+        The combined, branch-tagged, guardrail-filtered candidate list. An EMPTY
+        list is the explicit signal for ``no_matching_source`` at the API — never
+        a fabricated connection.
+    """
+    finder = finder_fn if finder_fn is not None else _branch_finder_turn
+    timestamp = now if now is not None else datetime.now(timezone.utc)
+
+    branch_specs = [
+        (BRANCH_CITED, cited_source_ids),
+        (BRANCH_UNCITED, curated_source_ids),
+    ]
+
+    candidates: list[dict] = []
+    raw_by_branch: dict[str, list[dict]] = {}
+    for branch, source_ids in branch_specs:
+        raw = finder(paragraph_number, paragraph_text, clause_index, branch, source_ids)
+        raw_by_branch[branch] = raw
+        for candidate in raw:
+            tagged = _tag_candidate(candidate, branch, paragraph_number, document_id)
+            if _candidate_survives_guardrail(tagged, clause_index):
+                candidates.append(tagged)
+
+    if output_dir is not None:
+        _write_analyse_trace(
+            paragraph_number=paragraph_number,
+            document_id=document_id,
+            timestamp=timestamp,
+            raw_by_branch=raw_by_branch,
+            candidates=candidates,
+            output_dir=output_dir,
+        )
+
+    return candidates
+
+
+def _write_analyse_trace(
+    paragraph_number: str,
+    document_id: str,
+    timestamp: datetime,
+    raw_by_branch: dict[str, list[dict]],
+    candidates: list[dict],
+    output_dir: Path,
+) -> Path:
+    """Record the analyse run's demo backstop: each branch's raw finder output
+    and the combined surviving candidate list. Written to ``output_dir`` (a tmp
+    dir in tests) — the caller only asks for a trace when it supplies a dir."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+    trace_path = output_dir / f"analyse-trace-{paragraph_number}.json"
+    trace = {
+        "document_id": document_id,
+        "paragraph": paragraph_number,
+        "timestamp": timestamp.isoformat(),
+        "raw_by_branch": raw_by_branch,
+        "candidates": candidates,
+    }
+    trace_path.write_text(json.dumps(trace, indent=2))
+    return trace_path
+
+
+BRANCH_FINDER_SYSTEM_PROMPT = (
+    "You are a policy analyst finding which SOURCES bear on a single paragraph "
+    "of a Bank Negara Malaysia policy document. You are given the paragraph's "
+    "text, the branch you are searching (`cited` = sources the document already "
+    "cites; `uncited` = relevant sources it did not cite), and, for each "
+    "candidate source, its clauses as `{clause_number}: {text}` lines grouped "
+    "under a source-id label.\n\n"
+    "For each source that genuinely bears on the paragraph, return an object:\n"
+    '  {"source_document_id": <source id>,\n'
+    '   "clause_number": <the single clause number that supports it>,\n'
+    '   "confidence_score": <0.0-1.0>}\n\n'
+    "CITATION RULE (strict): every `clause_number` MUST be copied EXACTLY from "
+    "the clause lists provided. Never invent, guess, reformat, or paraphrase a "
+    "clause number, and never claim a source that does not genuinely bear on "
+    "the paragraph.\n\n"
+    "Return ONLY a JSON array of these objects — no prose, no markdown. Return "
+    "an empty array `[]` if no source in this branch bears on the paragraph."
+)
+
+
+def _format_source_context(
+    clause_index: ClauseIndex, candidate_source_ids: list[str]
+) -> str:
+    """Build the candidate-source clause-context block the branch finder reads.
+
+    Lists every clause of each candidate source as ``{clause_number}: {text}``
+    lines, grouped under a per-source label. Pure given the index — the clause
+    text comes straight from ``ClauseIndex.entries_for_document`` (verbatim),
+    never the model. A source with no ingested passage (e.g. a blocked or
+    node-only source) simply contributes its label and no clause lines.
+    """
+    blocks: list[str] = []
+    for source_id in candidate_source_ids:
+        lines = [f"Source: {source_id}"]
+        for entry in clause_index.entries_for_document(source_id):
+            lines.append(f"{entry['clause_number']}: {entry['text']}")
+        blocks.append("\n".join(lines))
+    return "\n\n".join(blocks)
+
+
+def _branch_finder_turn(
+    paragraph_number: str,
+    paragraph_text: str,
+    clause_index: ClauseIndex,
+    branch: str,
+    candidate_source_ids: list[str],
+) -> list[dict]:
+    """Call the branch-finder LLM (Azure AI Foundry) for one branch.
+
+    Builds the paragraph + candidate-source clause context, sends it with
+    ``BRANCH_FINDER_SYSTEM_PROMPT`` to ``FINDER_CRITIC_DEPLOYMENT``, and parses
+    the reply into the raw candidate ``list[dict]`` shape ``analyse_paragraph``
+    consumes. This is the network seam — real callers use it (the live
+    ``POST …/analyse`` path); tests inject ``finder_fn`` so no network or
+    credentials are needed.
+    """
+    context = _format_source_context(clause_index, candidate_source_ids)
+    user = (
+        f"Paragraph {paragraph_number}:\n{paragraph_text}\n\n"
+        f"Branch: {branch}\n\n"
+        f"Candidate sources:\n{context}"
+    )
+    return _call_candidates_with_retry(BRANCH_FINDER_SYSTEM_PROMPT, user)
