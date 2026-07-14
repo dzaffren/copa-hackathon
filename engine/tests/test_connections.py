@@ -30,6 +30,8 @@ from engine.clauses import (
     merge_clause_indexes,
 )
 from engine.connections import (
+    CRITIC_SYSTEM_PROMPT,
+    FINDER_SYSTEM_PROMPT,
     Connection,
     _critic_turn,
     _finder_turn,
@@ -775,3 +777,27 @@ def test_write_trace_records_label_and_sentiment(tmp_path):
     entry = trace["validation"][0]
     assert entry["label"] == "differs-on"
     assert entry["sentiment"] == "tighten"
+
+
+@pytest.mark.parametrize("prompt", [FINDER_SYSTEM_PROMPT, CRITIC_SYSTEM_PROMPT])
+def test_prompts_describe_taxonomy_and_direction(prompt):
+    """Both system prompts must state the five labels, the sentiment values
+    (and that they attach only to ``differs-on``), and the fixed direction
+    convention (document A = we/ours, document B = they/theirs)."""
+    for label in (
+        "aligns-with",
+        "differs-on",
+        "conflicts-with",
+        "silent-on",
+        "goes-beyond",
+    ):
+        assert label in prompt
+    for sentiment in ("tighten", "loosen", "neutral"):
+        assert sentiment in prompt
+    # Sentiment is scoped to differs-on only.
+    assert "sentiment" in prompt
+    # Direction convention tokens.
+    assert "we/ours" in prompt
+    assert "they/theirs" in prompt
+    # The strict citation rule survives the rewrite.
+    assert "CITATION RULE" in prompt

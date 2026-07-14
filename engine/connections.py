@@ -339,15 +339,42 @@ def _write_trace(
     return trace_path
 
 
+# Shared taxonomy contract embedded in both agent prompts, so the finder and the
+# critic classify findings the same way. States the fixed direction convention,
+# the five mutually-exclusive labels, and the differs-on-only sentiment rule.
+_TAXONOMY_PROMPT_BLOCK = (
+    "DIRECTION CONVENTION (fixed): the first document is document A — treat it "
+    'as "we/ours"; the second is document B — treat it as "they/theirs". Two '
+    "labels are directional and would swap if the pair were flipped.\n\n"
+    "Classify each connection with EXACTLY ONE label (these five are mutually "
+    "exclusive and exhaustive):\n"
+    "  - aligns-with: same axis; the two clauses agree, or one adopts the other "
+    "without narrowing or widening.\n"
+    "  - differs-on: same axis, different position. MAY carry a sentiment.\n"
+    "  - conflicts-with: the two cannot both be followed (incompatible).\n"
+    "  - silent-on: coverage asymmetry — OUR side (document A) does NOT cover "
+    "it, THEIR side (document B) does.\n"
+    "  - goes-beyond: coverage asymmetry — OUR side (document A) covers it, "
+    "THEIR side (document B) does not.\n\n"
+    "SENTIMENT (optional) attaches ONLY to a differs-on label and is exactly "
+    "one of tighten / loosen / neutral (tighten = our position is stricter, "
+    "loosen = more permissive, neutral = different but neither stricter nor "
+    "looser). Omit sentiment for every other label.\n\n"
+)
+
 FINDER_SYSTEM_PROMPT = (
     "You are a policy analyst finding cross-policy CONNECTIONS between two "
     "Bank Negara Malaysia policy documents. You are given, for each document, "
     "its full list of clauses as `{clause_number}: {text}` lines, grouped "
     "under a document-id label.\n\n"
     "Find connections where a clause in one document relates to a clause in "
-    "the other — e.g. a conflict, a dependency, a duplication, or a scoping "
-    "relationship. For each connection, return an object:\n"
+    "the other. " + _TAXONOMY_PROMPT_BLOCK + "For each connection, return an "
+    "object:\n"
     '  {"summary": <one-sentence description>,\n'
+    '   "label": <one of aligns-with|differs-on|conflicts-with|silent-on'
+    "|goes-beyond>,\n"
+    '   "sentiment": <tighten|loosen|neutral, ONLY on differs-on; omit '
+    "otherwise>,\n"
     '   "source_clauses": [<clause_number>, ...],\n'
     '   "target_clauses": [<clause_number>, ...],\n'
     '   "scope_note": <optional caveat/exemption, omit if none>}\n\n'
@@ -365,13 +392,18 @@ CRITIC_SYSTEM_PROMPT = (
     "documents' full clause lists as `{clause_number}: {text}` lines grouped "
     "by document-id, plus the finder's candidate connections as a JSON array.\n\n"
     "Do two things:\n"
-    "1. REFUTE or SCOPE weak candidates — drop any that do not hold, and for "
-    "those that do, add or refine a `scope_note` capturing any exemption, "
-    "condition, or limit (e.g. an affiliate exemption clause).\n"
+    "1. REFUTE or SCOPE weak candidates — drop any that do not hold, correct a "
+    "wrong label, and for those that do hold add or refine a `scope_note` "
+    "capturing any exemption, condition, or limit (e.g. an affiliate exemption "
+    "clause).\n"
     "2. SURFACE MISSED connections the finder did not propose (recall).\n\n"
-    "Return the scoped/refuted surviving candidates PLUS any newly-found "
+    + _TAXONOMY_PROMPT_BLOCK
+    + "Return the scoped/refuted surviving candidates PLUS any newly-found "
     "connections, all in the SAME object shape:\n"
-    '  {"summary": ..., "source_clauses": [...], "target_clauses": [...], '
+    '  {"summary": ..., "label": <one of aligns-with|differs-on|conflicts-with'
+    "|silent-on|goes-beyond>, "
+    '"sentiment": <tighten|loosen|neutral, ONLY on differs-on>, '
+    '"source_clauses": [...], "target_clauses": [...], '
     '"scope_note": <optional>}\n\n'
     "CITATION RULE (strict): every clause_number MUST be copied EXACTLY from "
     "the provided clause lists. Never invent, guess, reformat, or paraphrase "
