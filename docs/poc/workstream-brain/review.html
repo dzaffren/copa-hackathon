@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Linkages · OpRes PD ↔ RMiT PD · Workstream Brain</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .clause { transition: background-color .2s ease, border-color .2s ease; }
+  .clause.hl-source { background-color: #eef2ff; border-left: 4px solid #4f46e5; }
+  .clause.hl-target { background-color: #fef2f2; border-left: 4px solid #dc2626; }
+  .clause.hl-source-emerald { background-color: #ecfdf5; border-left: 4px solid #10b981; }
+  .clause.hl-target-emerald { background-color: #ecfdf5; border-left: 4px solid #10b981; }
+  .clause.hl-source-indigo { background-color: #eef2ff; border-left: 4px solid #6366f1; }
+  .clause.hl-target-indigo { background-color: #eef2ff; border-left: 4px solid #6366f1; }
+  .finding-card { transition: all .2s ease; }
+  .finding-card.active { border-color: #4f46e5; box-shadow: 0 4px 12px rgba(79,70,229,.15); }
+  .finding-card.dismissed { opacity: .5; }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+<!-- Topbar -->
+<nav class="bg-white border-b border-gray-200">
+  <div class="max-w-screen-2xl mx-auto px-4 py-2.5 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="text-2xl">🧠</span>
+      <span class="font-bold text-lg">Workstream Brain</span>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <button class="relative w-9 h-9 rounded-lg hover:bg-gray-100 grid place-items-center"><svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1"/></svg><span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">3</span></button>
+      <div class="ml-1 flex items-center gap-2 pl-2 border-l border-gray-200">
+        <span class="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold grid place-items-center text-xs">AR</span>
+        <div class="hidden sm:block leading-tight">
+          <div class="text-sm font-semibold">Aisyah R.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Breadcrumb -->
+<div class="bg-indigo-600 text-white">
+  <div class="max-w-screen-2xl mx-auto px-4 py-2 flex items-center justify-between text-sm">
+    <div class="flex items-center gap-2">
+      <a href="workstream.html" class="text-indigo-100 hover:text-white flex items-center gap-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back to workstream graph
+      </a>
+      <span class="text-indigo-300">·</span>
+      <span class="font-semibold">Review linkages</span>
+      <span class="text-indigo-200">· OpRes PD v0.3 ↔ RMiT PD (28 Nov 2025)</span>
+    </div>
+    <div class="flex items-center gap-4 text-xs text-indigo-100">
+      <span><span class="text-white font-semibold">5</span> findings</span>
+      <span><span class="text-white font-semibold">1</span> accepted</span>
+      <span><span class="text-white font-semibold">1</span> dismissed</span>
+    </div>
+  </div>
+</div>
+
+<main class="max-w-screen-2xl mx-auto px-4 py-4">
+  <div class="grid grid-cols-12 gap-4" style="min-height: calc(100vh - 160px);">
+
+    <!-- LEFT: Source doc -->
+    <section class="col-span-12 lg:col-span-4 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col overflow-hidden">
+      <div class="px-4 py-3 border-b border-gray-100 bg-indigo-50">
+        <div class="text-[10px] uppercase tracking-wider text-indigo-700 font-bold">Source · task</div>
+        <div class="font-semibold text-sm mt-0.5">OpRes PD — v0.3 working draft</div>
+        <div class="text-[11px] text-gray-500">Aisyah R. · edited 2h ago</div>
+      </div>
+      <div class="p-4 overflow-y-auto text-sm space-y-3" style="max-height: 720px;">
+        <div class="clause" data-clause="4.4">
+          <div class="text-[10px] font-bold text-gray-500 uppercase mb-0.5 px-3 pt-2">§4.4 · Dependency mapping</div>
+          <p class="px-3 pb-2 text-gray-700 leading-relaxed">A financial institution shall map dependencies for each critical business service and refresh the mapping at least annually.</p>
+        </div>
+        <div class="clause" data-clause="5.3">
+          <div class="text-[10px] font-bold text-gray-500 uppercase mb-0.5 px-3 pt-2">§5.3 · Scenario testing</div>
+          <p class="px-3 pb-2 text-gray-700 leading-relaxed">A financial institution shall conduct scenario testing annually, covering severe-but-plausible disruptions to critical business services.</p>
+        </div>
+        <div class="clause" data-clause="6.3">
+          <div class="text-[10px] font-bold text-gray-500 uppercase mb-0.5 px-3 pt-2">§6.3 · Responsibility mapping</div>
+          <p class="px-3 pb-2 text-gray-700 leading-relaxed">The board shall assign a single senior officer, accountable for operational resilience outcomes across all critical business services.</p>
+        </div>
+        <div class="clause" data-clause="7.1">
+          <div class="text-[10px] font-bold text-gray-500 uppercase mb-0.5 px-3 pt-2">§7.1 · Technology risk anchor</div>
+          <p class="px-3 pb-2 text-gray-700 leading-relaxed">Financial institutions shall comply with the Policy Document on Risk Management in Technology issued on 1 June 2023 when establishing controls for technology-enabled operations.</p>
+        </div>
+        <div class="clause" data-clause="8.2">
+          <div class="text-[10px] font-bold text-gray-500 uppercase mb-0.5 px-3 pt-2">§8.2 · Third-party concentration</div>
+          <p class="px-3 pb-2 text-gray-700 leading-relaxed">Where more than one financial institution shares a technology service provider providing a critical business service, the Bank may impose additional oversight requirements.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CENTRE: Target doc -->
+    <section class="col-span-12 lg:col-span-4 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col overflow-hidden">
+      <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
+        <div class="text-[10px] uppercase tracking-wider text-gray-600 font-bold">Target · resource · internal-published</div>
+        <div class="font-semibold text-sm mt-0.5">RMiT PD (28 Nov 2025)</div>
+        <div class="text-[11px] text-gray-500">Issued 28 Nov 2025 · supersedes 1 Jun 2023</div>
+      </div>
+      <div class="p-4 overflow-y-auto text-sm space-y-3" style="max-height: 720px;">
+        <div class="clause" data-clause-tgt="front">
+          <div class="text-[10px] font-bold text-gray-500 uppercase mb-0.5 px-3 pt-2">Front matter</div>
+          <p class="px-3 pb-2 text-gray-700 leading-relaxed">This Policy Document supersedes the version issued on 28 November 2025. All references to the 1 June 2023 version shall be construed as references to this Document.</p>
+        </div>
+        <div class="clause" data-clause-tgt="10.49">
+          <div class="text-[10px] font-bold text-gray-500 uppercase mb-0.5 px-3 pt-2">§10.49 · Board approval</div>
+          <p class="px-3 pb-2 text-gray-700 leading-relaxed">The board must approve the technology risk appetite at least annually.</p>
+        </div>
+        <div class="clause" data-clause-tgt="17.1">
+          <div class="text-[10px] font-bold text-gray-500 uppercase mb-0.5 px-3 pt-2">§17.1 · Third-party technology risk</div>
+          <p class="px-3 pb-2 text-gray-700 leading-relaxed">A financial institution shall identify, assess and manage risks arising from the use of third-party technology service providers, including cloud service providers.</p>
+        </div>
+        <div class="clause" data-clause-tgt="17.2">
+          <div class="text-[10px] font-bold text-gray-500 uppercase mb-0.5 px-3 pt-2">§17.2 · Critical technology outsourcing</div>
+          <p class="px-3 pb-2 text-gray-700 leading-relaxed">Where a critical technology service is outsourced, the financial institution remains fully responsible for outcomes affecting operational resilience.</p>
+        </div>
+        <div class="clause" data-clause-tgt="21.5">
+          <div class="text-[10px] font-bold text-gray-500 uppercase mb-0.5 px-3 pt-2">§21.5 · Scenario testing (tech)</div>
+          <p class="px-3 pb-2 text-gray-700 leading-relaxed">A financial institution shall conduct scenario testing on technology recovery capabilities not less than once every calendar year.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Findings cards -->
+    <aside class="col-span-12 lg:col-span-4 flex flex-col gap-3 overflow-y-auto" style="max-height: 100vh;">
+
+      <!-- Actions bar -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex items-center justify-between gap-2">
+        <button onclick="document.getElementById('findMoreModal').classList.remove('hidden')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-2 rounded-lg font-semibold">🔎 Find more linkages</button>
+        <button onclick="document.getElementById('addManualModal').classList.remove('hidden')" class="flex-1 border-2 border-indigo-600 text-indigo-700 hover:bg-indigo-50 text-xs px-3 py-2 rounded-lg font-semibold">+ Add manually</button>
+      </div>
+
+      <!-- Card 1: version drift (open) -->
+      <article class="finding-card active bg-white rounded-xl shadow-sm border-2 border-indigo-500 p-4" data-finding="1" data-source="7.1" data-target="front" data-hl="hl-source hl-target">
+        <div class="flex items-center gap-2 mb-2 flex-wrap">
+          <span class="text-[10px] uppercase tracking-wider font-bold bg-red-100 text-red-800 px-2 py-1 rounded">conflicts-with</span>
+          <span class="text-[10px] uppercase tracking-wider font-bold bg-red-600 text-white px-2 py-1 rounded">🚩 version drift</span>
+        </div>
+        <p class="text-sm font-semibold text-gray-900">Anchor to superseded RMiT version</p>
+        <p class="text-xs text-gray-600 mt-1.5 leading-relaxed">OpRes PD §7.1 anchors to the 1 June 2023 RMiT. The current RMiT PD (28 Nov 2025) supersedes that version. Update anchor before publication.</p>
+        <div class="text-[11px] text-gray-500 mt-2">§7.1 ↔ front matter</div>
+        <div class="mt-3 flex items-center gap-1.5">
+          <button onclick="acceptFinding(this, 1)" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2 py-1.5 rounded-md font-semibold">✓ Accept</button>
+          <button onclick="dismissFinding(this, 1)" class="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs px-2 py-1.5 rounded-md font-semibold">✗ Dismiss</button>
+          <button onclick="toggleThread(1)" class="border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs px-2 py-1.5 rounded-md font-semibold">💬 2</button>
+        </div>
+        <div id="thread-1" class="hidden mt-3 pt-3 border-t border-gray-100 space-y-2">
+          <div class="flex items-start gap-2 text-xs"><span class="w-6 h-6 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold grid place-items-center shrink-0">FM</span><div><span class="font-semibold">Farid M.</span> <span class="text-gray-400">· yesterday</span><br>Agree — the 2023 version is fully superseded. Should we also update every RMiT reference in the Open Finance ED?</div></div>
+          <div class="flex items-start gap-2 text-xs"><span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold grid place-items-center shrink-0">AR</span><div><span class="font-semibold">Aisyah R.</span> <span class="text-gray-400">· 2h ago</span><br>Yes, tag Priya on the OF workstream too. I'll accept this finding once we agree the wording.</div></div>
+          <div class="flex gap-2 mt-2">
+            <input type="text" placeholder="Comment or @tag…" class="flex-1 border border-gray-200 rounded-md px-2 py-1.5 text-xs focus:outline-none focus:border-indigo-400">
+            <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-md font-semibold">Post</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 2: aligns-with (accepted) -->
+      <article class="finding-card bg-white rounded-xl shadow-sm border border-gray-200 p-4" data-finding="2" data-source="8.2" data-target="17.1" data-hl="hl-source-emerald hl-target-emerald">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-[10px] uppercase tracking-wider font-bold bg-emerald-100 text-emerald-800 px-2 py-1 rounded">aligns-with</span>
+          <span class="text-[10px] uppercase tracking-wider font-bold bg-white border border-emerald-300 text-emerald-700 px-2 py-1 rounded">✓ accepted</span>
+        </div>
+        <p class="text-sm font-semibold text-gray-900">Third-party concentration overlaps RMiT §17.1</p>
+        <p class="text-xs text-gray-600 mt-1.5 leading-relaxed">Both clauses treat third-party technology providers as a supervisory concern. OpRes PD extends to critical business services generally; RMiT §17.1 scopes to technology risk specifically.</p>
+        <div class="text-[11px] text-gray-500 mt-2">§8.2 ↔ §17.1</div>
+      </article>
+
+      <!-- Card 3: aligns-with with tightening context -->
+      <article class="finding-card bg-white rounded-xl shadow-sm border border-gray-200 p-4" data-finding="3" data-source="5.3" data-target="21.5" data-hl="hl-source-indigo hl-target-indigo">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-[10px] uppercase tracking-wider font-bold bg-indigo-100 text-indigo-800 px-2 py-1 rounded">differs-on</span>
+          <span class="text-[10px] uppercase tracking-wider font-bold bg-white border border-indigo-300 text-indigo-700 px-2 py-1 rounded">↑ tighten</span>
+        </div>
+        <p class="text-sm font-semibold text-gray-900">Scenario testing scope wider than RMiT</p>
+        <p class="text-xs text-gray-600 mt-1.5 leading-relaxed">OpRes PD §5.3 requires annual scenario testing for all critical business services; RMiT §21.5 requires it only for technology recovery. Deliberate broadening — legitimate finding for the drafter to defend.</p>
+        <div class="text-[11px] text-gray-500 mt-2">§5.3 ↔ §21.5</div>
+        <div class="mt-3 flex items-center gap-1.5">
+          <button onclick="acceptFinding(this, 3)" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2 py-1.5 rounded-md font-semibold">✓ Accept</button>
+          <button onclick="dismissFinding(this, 3)" class="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs px-2 py-1.5 rounded-md font-semibold">✗ Dismiss</button>
+          <button onclick="toggleThread(3)" class="border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs px-2 py-1.5 rounded-md font-semibold">💬 0</button>
+        </div>
+        <div id="thread-3" class="hidden mt-3 pt-3 border-t border-gray-100">
+          <div class="flex gap-2"><input type="text" placeholder="Start a comment…" class="flex-1 border border-gray-200 rounded-md px-2 py-1.5 text-xs focus:outline-none focus:border-indigo-400"><button class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-md font-semibold">Post</button></div>
+        </div>
+      </article>
+
+      <!-- Card 4: goes-beyond -->
+      <article class="finding-card bg-white rounded-xl shadow-sm border border-gray-200 p-4" data-finding="4" data-source="6.3" data-target="" data-hl="hl-source">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-[10px] uppercase tracking-wider font-bold bg-sky-100 text-sky-800 px-2 py-1 rounded">goes-beyond</span>
+        </div>
+        <p class="text-sm font-semibold text-gray-900">Single accountable officer — absent from RMiT</p>
+        <p class="text-xs text-gray-600 mt-1.5 leading-relaxed">OpRes PD §6.3 requires a single senior officer accountable for operational resilience. RMiT PD does not name any single ultimately-accountable person for operational resilience outcomes. Coverage gap on RMiT side.</p>
+        <div class="text-[11px] text-gray-500 mt-2">§6.3 ↔ (silent)</div>
+        <div class="mt-3 flex items-center gap-1.5">
+          <button onclick="acceptFinding(this, 4)" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2 py-1.5 rounded-md font-semibold">✓ Accept</button>
+          <button onclick="dismissFinding(this, 4)" class="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs px-2 py-1.5 rounded-md font-semibold">✗ Dismiss</button>
+          <button onclick="toggleThread(4)" class="border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs px-2 py-1.5 rounded-md font-semibold">💬 1</button>
+        </div>
+        <div id="thread-4" class="hidden mt-3 pt-3 border-t border-gray-100 space-y-2">
+          <div class="flex items-start gap-2 text-xs"><span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold grid place-items-center shrink-0">PS</span><div><span class="font-semibold">Priya S.</span> <span class="text-gray-400">· 3d ago</span><br>This is exactly the accountability-gap catch from the OpRes×OpenFinance experiment. Worth flagging in the RMiT next-review docket too.</div></div>
+        </div>
+      </article>
+
+      <!-- Card 5: dismissed -->
+      <article class="finding-card dismissed bg-white rounded-xl shadow-sm border border-gray-200 p-4" data-finding="5" data-source="4.4" data-target="10.49">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-[10px] uppercase tracking-wider font-bold bg-gray-200 text-gray-700 px-2 py-1 rounded">aligns-with</span>
+          <span class="text-[10px] uppercase tracking-wider font-bold bg-gray-100 text-gray-500 px-2 py-1 rounded">✗ dismissed</span>
+        </div>
+        <p class="text-sm font-semibold text-gray-700">Board approval cadence — false positive</p>
+        <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">Different subjects. OpRes §4.4 is about dependency-mapping cadence; RMiT §10.49 is about technology risk appetite approval. Not a real linkage.</p>
+        <div class="text-[11px] text-gray-400 mt-2">§4.4 ↔ §10.49</div>
+        <button onclick="reopenFinding(this, 5)" class="mt-2 text-xs text-indigo-600 hover:text-indigo-800 font-semibold">↻ Reopen</button>
+      </article>
+
+    </aside>
+
+  </div>
+</main>
+
+<!-- Find more modal -->
+<div id="findMoreModal" class="hidden fixed inset-0 bg-black/40 z-50 grid place-items-center p-4">
+  <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full">
+    <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+      <h3 class="font-bold text-lg">Find more linkages</h3>
+      <button onclick="document.getElementById('findMoreModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+    </div>
+    <div class="p-5 space-y-4">
+      <p class="text-sm text-gray-600">Give the finder a hint about what to look for. The critic will scope-check anything it finds.</p>
+      <div>
+        <label class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Focus area</label>
+        <select class="mt-2 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+          <option>Any — broad sweep</option>
+          <option>Third-party / outsourcing overlap</option>
+          <option>Governance and accountability</option>
+          <option>Testing and validation cadences</option>
+          <option>Definitions and scope</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Additional prompt (optional)</label>
+        <textarea rows="3" placeholder="e.g. focus on clauses that reference cloud service providers" class="mt-2 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-400"></textarea>
+      </div>
+    </div>
+    <div class="px-5 py-4 border-t border-gray-100 flex justify-end gap-2">
+      <button onclick="document.getElementById('findMoreModal').classList.add('hidden')" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">Cancel</button>
+      <button onclick="document.getElementById('findMoreModal').classList.add('hidden')" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold">Run finder→critic</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add manual modal -->
+<div id="addManualModal" class="hidden fixed inset-0 bg-black/40 z-50 grid place-items-center p-4">
+  <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full">
+    <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+      <h3 class="font-bold text-lg">Add linkage manually</h3>
+      <button onclick="document.getElementById('addManualModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+    </div>
+    <div class="p-5 space-y-4">
+      <p class="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">Pick both clauses from the parsed lists — the tool never invents clause references.</p>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Source clause · OpRes PD v0.3</label>
+          <select class="mt-2 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+            <option>§4.4 Dependency mapping</option>
+            <option>§5.3 Scenario testing</option>
+            <option>§6.3 Responsibility mapping</option>
+            <option>§7.1 Technology risk anchor</option>
+            <option>§8.2 Third-party concentration</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Target clause · RMiT PD</label>
+          <select class="mt-2 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+            <option>Front matter</option>
+            <option>§10.49 Board approval</option>
+            <option>§17.1 Third-party tech risk</option>
+            <option>§17.2 Critical tech outsourcing</option>
+            <option>§21.5 Scenario testing</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Linkage type</label>
+        <select class="mt-2 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+          <option>aligns-with</option>
+          <option>differs-on (neutral)</option>
+          <option>differs-on ↑ tighten</option>
+          <option>differs-on ↓ loosen</option>
+          <option>conflicts-with</option>
+          <option>silent-on</option>
+          <option>goes-beyond</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Your finding</label>
+        <textarea rows="3" placeholder="One-sentence description of the linkage…" class="mt-2 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-400"></textarea>
+      </div>
+    </div>
+    <div class="px-5 py-4 border-t border-gray-100 flex justify-end gap-2">
+      <button onclick="document.getElementById('addManualModal').classList.add('hidden')" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">Cancel</button>
+      <button onclick="document.getElementById('addManualModal').classList.add('hidden')" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold">Add linkage</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.finding-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+      if (card.classList.contains('dismissed')) return;
+      document.querySelectorAll('.finding-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+
+      document.querySelectorAll('.clause').forEach(cl => {
+        cl.classList.remove('hl-source', 'hl-target', 'hl-source-emerald', 'hl-target-emerald', 'hl-source-indigo', 'hl-target-indigo');
+      });
+
+      const src = card.dataset.source;
+      const tgt = card.dataset.target;
+      const hl = (card.dataset.hl || '').split(' ');
+      const sourceCls = hl.find(c => c.includes('source')) || 'hl-source';
+      const targetCls = hl.find(c => c.includes('target')) || 'hl-target';
+
+      if (src) {
+        const el = document.querySelector(`.clause[data-clause="${src}"]`);
+        if (el) { el.classList.add(sourceCls); el.scrollIntoView({behavior: 'smooth', block: 'center'}); }
+      }
+      if (tgt) {
+        const el = document.querySelector(`.clause[data-clause-tgt="${tgt}"]`);
+        if (el) { el.classList.add(targetCls); el.scrollIntoView({behavior: 'smooth', block: 'center'}); }
+      }
+    });
+  });
+
+  function acceptFinding(btn, id) {
+    const card = btn.closest('.finding-card');
+    card.querySelectorAll('button').forEach(b => b.remove());
+    const badge = document.createElement('span');
+    badge.className = 'text-[10px] uppercase tracking-wider font-bold bg-white border border-emerald-300 text-emerald-700 px-2 py-1 rounded ml-1';
+    badge.textContent = '✓ accepted';
+    card.querySelector('.flex.items-center.gap-2.mb-2').appendChild(badge);
+  }
+  function dismissFinding(btn, id) {
+    const card = btn.closest('.finding-card');
+    card.classList.add('dismissed');
+    card.classList.remove('active');
+    card.parentElement.appendChild(card);
+    const btnRow = card.querySelector('.mt-3.flex');
+    if (btnRow) btnRow.innerHTML = '<button onclick="reopenFinding(this,' + id + ')" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold">↻ Reopen</button>';
+  }
+  function reopenFinding(btn, id) {
+    const card = btn.closest('.finding-card');
+    card.classList.remove('dismissed');
+  }
+  function toggleThread(id) {
+    const t = document.getElementById('thread-' + id);
+    if (t) t.classList.toggle('hidden');
+  }
+
+  // Auto-select first finding on load
+  document.querySelector('.finding-card').click();
+</script>
+
+</body>
+</html>
