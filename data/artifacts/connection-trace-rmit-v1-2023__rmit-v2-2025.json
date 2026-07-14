@@ -8,6 +8,8 @@
   "finder_output": [
     {
       "summary": "Both versions require adoption of industry standards for cryptographic algorithms, key lifecycle management, and compromise-recovery plans, with v2 restructuring the same cryptography policy requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.16(a)",
         "RMiT 10.16(b)",
@@ -21,6 +23,8 @@
     },
     {
       "summary": "The periodic cryptographic review requirement was tightened from at least every three years (v1) to at least annually (v2), creating a conflict in review frequency.",
+      "label": "conflicts-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.16(c)"
       ],
@@ -30,6 +34,8 @@
     },
     {
       "summary": "v2 adds a new requirement to expand IT asset inventory to include all cryptographic tools and algorithms, which has no direct counterpart in v1's cryptography clauses.",
+      "label": "silent-on",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.16(a)"
       ],
@@ -40,6 +46,8 @@
     },
     {
       "summary": "Both versions require a user access matrix outlining access rights, roles, and approving authorities that is periodically reviewed.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.58"
       ],
@@ -49,6 +57,8 @@
     },
     {
       "summary": "Both versions require effective management/monitoring of enterprise-wide access controls and logging of critical system user activities retained for at least three years, with v2 adding anomaly flagging.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.59",
         "RMiT 10.59(a)",
@@ -63,6 +73,8 @@
     },
     {
       "summary": "Both versions specify access control principles including 'deny all' default, 'least privilege', time-bound access, and segregation of incompatible functions.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.53(a)",
         "RMiT 10.53(b)",
@@ -78,6 +90,8 @@
     },
     {
       "summary": "v1's separate dual control and stronger authentication clauses are consolidated in v2 into dual authorization criteria and criticality-based authentication requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.53(e)",
         "RMiT 10.53(f)"
@@ -90,6 +104,8 @@
     },
     {
       "summary": "v1 requires large financial institutions to deploy identity access management systems and automated audit tools, whereas v2 replaces this with general anomaly-flagging obligations without a large-institution-specific carve-out.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "source_clauses": [
         "RMiT 10.60",
         "RMiT 10.60(a)",
@@ -102,6 +118,8 @@
     },
     {
       "summary": "Both versions require critical systems not to run on outdated or EOL technology and assign monitoring/patching and remedial responsibilities, with v2 adding security baselines and management approval for exceptions.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.61",
         "RMiT 10.61(a)",
@@ -117,6 +135,8 @@
     },
     {
       "summary": "v1's requirement for large financial institutions to establish dedicated EOL/patch resources has no direct counterpart in v2.",
+      "label": "goes-beyond",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.62"
       ],
@@ -127,6 +147,8 @@
     },
     {
       "summary": "Both versions require a patch and EOL management framework covering asset vulnerability assessment, turnaround times, compatibility testing, and end-to-end deployment workflow.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.63",
         "RMiT 10.63(a)",
@@ -145,6 +167,8 @@
     },
     {
       "summary": "v1's detailed digital services security control assurances are consolidated in v2 into a broader CRF-based digital service security requirement referencing Appendices.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.64",
         "RMiT 10.64(a)",
@@ -160,6 +184,8 @@
     },
     {
       "summary": "v1's prescriptive MFA and RM10,000 high-value transaction authentication controls are largely replaced in v2 by a principle-based MFA requirement and expanded digital fraud management provisions.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "source_clauses": [
         "RMiT 10.66",
         "RMiT 10.67",
@@ -177,6 +203,8 @@
     },
     {
       "summary": "v1's low-risk transaction safeguards (limits, opt-in MFA, account suspension) are reframed in v2 as customer empowerment and self-service 'kill switch' fraud mitigation measures.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "source_clauses": [
         "RMiT 10.72",
         "RMiT 10.73",
@@ -192,6 +220,8 @@
     },
     {
       "summary": "Both versions require digital service/network logs be retained for investigations and forensic purposes for at least three years.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.74"
       ],
@@ -202,6 +232,8 @@
     },
     {
       "summary": "Both versions require continuous surveillance of digital delivery channels (SST, Internet banking, mobile) with reference to control appendices.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.79",
         "RMiT 10.79(a)",
@@ -219,6 +251,8 @@
     },
     {
       "summary": "Both versions require SOC monitoring capabilities including log collection/SIEM, incident response, vulnerability management, and threat intelligence.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.18(a)",
         "RMiT 11.18(b)",
@@ -237,6 +271,8 @@
     },
     {
       "summary": "Both versions require comprehensive cyber crisis management policies incorporating cyber-attack scenarios, escalation, business continuity and a communication plan.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.22"
       ],
@@ -246,6 +282,8 @@
     },
     {
       "summary": "Both versions require a comprehensive Cyber Incident Response Plan covering preparedness, detection/analysis, containment/eradication and recovery/post-incident, with v2 splitting recovery into a distinct phase.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.23",
         "RMiT 11.23(a)",
@@ -263,6 +301,8 @@
     },
     {
       "summary": "Both versions require CERT members to be conversant with the incident response plan and remain contactable at all times, though v1 additionally mandates appointing a key contact to liaise with the Bank.",
+      "label": "goes-beyond",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.24"
       ],
@@ -272,6 +312,8 @@
     },
     {
       "summary": "Both versions require an annual cyber drill exercise testing CIRP effectiveness with board, senior management and third party involvement, with v2 adding out-of-band communication testing and board reporting.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.25",
         "RMiT 11.25(a)",
@@ -285,6 +327,8 @@
     },
     {
       "summary": "Both versions require notifying the Bank of cyber incidents, with v1 referencing ORION and v2 referencing multiple operational risk and business continuity reporting policy documents.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.26"
       ],
@@ -294,6 +338,8 @@
     },
     {
       "summary": "v1's encouragement to collaborate and share threat intelligence becomes a mandatory requirement in v2 to share cyber threat intelligence and collaborate with authorities.",
+      "label": "differs-on",
+      "sentiment": "loosen",
       "source_clauses": [
         "RMiT 11.27"
       ],
@@ -304,6 +350,8 @@
     },
     {
       "summary": "Both versions require a centralised automated technology asset tracking system and a dedicated cyber risk management function analysing cyber threats and escalating risk assessments.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.4(a)",
         "RMiT 11.4(b)",
@@ -316,6 +364,8 @@
     },
     {
       "summary": "v1's Red Team simulation requirement is carried into v2 with an explicit at-least-every-three-years frequency.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.4(ii)"
       ],
@@ -325,6 +375,8 @@
     },
     {
       "summary": "Both versions define cybersecurity operations in terms of the same cyber-attack lifecycle phases from reconnaissance through exfiltration.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.5(a)",
         "RMiT 11.5(b)",
@@ -346,6 +398,8 @@
     },
     {
       "summary": "v1's e-banking/Internet insurance notification information requirements are consolidated in v2 into digital services first-time notification requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 14.2",
         "RMiT 14.2(a)",
@@ -367,6 +421,8 @@
     },
     {
       "summary": "Both versions require engaging an independent external party for assurance and a CISO/board confirmation of readiness before notifying the Bank of new or materially enhanced services.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 14.5",
         "RMiT 14.5(a)",
@@ -382,6 +438,8 @@
     },
     {
       "summary": "Both versions permit offering services or enhancements immediately upon submission of the notification, with v2 adding compliance with related notification requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 14.9"
       ],
@@ -391,6 +449,8 @@
     },
     {
       "summary": "v1's simplified/exempt enhancement notification rules are carried into v2 as a simplified notification requirement referencing Appendix 6 criteria.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 14.4",
         "RMiT 14.4(a)",
@@ -405,6 +465,8 @@
     },
     {
       "summary": "Both versions require board/senior management cloud governance and a cloud risk management framework integrated with existing outsourcing, TRMF and CRF, with v2 restructuring under third-party and cloud services sections.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 15.1(a)",
         "RMiT 15.1(b)"
@@ -416,6 +478,8 @@
     },
     {
       "summary": "Both versions require first-time consultation with the Bank before adopting public cloud for critical systems and a subsequent notification process, with v2 expanding scope to emerging technology.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 15.2(a)",
         "RMiT 15.2(b)",
@@ -433,6 +497,8 @@
     },
     {
       "summary": "Both versions grant the Bank discretion to direct consultation, notification or observance of cloud guidance including for non-critical systems.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 15.4"
       ],
@@ -442,6 +508,8 @@
     },
     {
       "summary": "Both versions require the cloud adoption roadmap to be included in the annual outsourcing plan and cloud risk assessment documented for the Bank's review.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 15.5"
       ],
@@ -451,6 +519,8 @@
     },
     {
       "summary": "Both versions require SLA provisions granting access rights for the regulator and appointed parties to examine the financial institution's activities and records.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.43(a)"
       ],
@@ -460,6 +530,8 @@
     },
     {
       "summary": "Both versions cite the same enabling legal provisions of the FSA, IFSA and DFIA, with v2 additionally invoking the MSBA.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 3.1",
         "RMiT 3.1(a)",
@@ -475,6 +547,8 @@
     },
     {
       "summary": "Both versions issue guidance pursuant to the same statutory sections, with v2 adding the MSBA section.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "source_clauses": [
         "RMiT 3.2"
       ],
@@ -484,6 +558,8 @@
     },
     {
       "summary": "The effective date provision differs between versions, with v1 taking effect 1 June 2023 and v2 taking effect 28 November 2025.",
+      "label": "conflicts-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 4.2"
       ],
@@ -493,6 +569,8 @@
     },
     {
       "summary": "v2 supersedes the prior RMiT policy document issued as v1, establishing a direct supersession relationship.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 7.1(r)"
       ],
@@ -502,6 +580,8 @@
     },
     {
       "summary": "Both versions require the board to oversee IT and cybersecurity strategic plans covering no less than three years with periodic review at least every three years.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 8.2"
       ],
@@ -512,6 +592,8 @@
     },
     {
       "summary": "Both versions require senior management to translate board-approved TRMF and CRF into specific policies and procedures consistent with the approved risk appetite.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 8.8"
       ],
@@ -521,6 +603,8 @@
     },
     {
       "summary": "Both versions require senior management to establish a cross-functional committee overseeing technology plans, updating the board and approving policy deviations, with v2 adding cyber function representation.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 8.9",
         "RMiT 8.9(a)",
@@ -536,6 +620,8 @@
     },
     {
       "summary": "v1's large financial institution self-assessment provisions have no direct counterpart in v2, which instead applies a general proportionality principle based on size and complexity.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "source_clauses": [
         "RMiT 8.12",
         "RMiT 8.12(a)",
@@ -551,6 +637,8 @@
     },
     {
       "summary": "Both versions require data protection controls addressing data in-use, in-motion and at-rest, with v2 embedding these in cloud data ownership and CRF requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.15(a)",
         "RMiT 11.15(b)",
@@ -565,6 +653,8 @@
   "critic_output": [
     {
       "summary": "Both versions require adoption of industry standards for cryptographic algorithms, key lifecycle management, and compromise-recovery plans, with v2 restructuring the same cryptography policy requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.16(a)",
         "RMiT 10.16(b)",
@@ -578,6 +668,8 @@
     },
     {
       "summary": "The periodic cryptographic review requirement was tightened from at least every three years applied to existing standards (v1) to at least annually applied to all cryptographic standards in use (v2), creating a stricter review frequency.",
+      "label": "differs-on",
+      "sentiment": "loosen",
       "source_clauses": [
         "RMiT 10.16(c)"
       ],
@@ -588,6 +680,8 @@
     },
     {
       "summary": "v2 adds a new requirement to expand IT asset inventory to include all cryptographic tools and algorithms, which has no direct counterpart in v1's cryptography clauses.",
+      "label": "silent-on",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.16(a)"
       ],
@@ -598,6 +692,8 @@
     },
     {
       "summary": "Both versions require a user access matrix outlining access rights, roles, and approving authorities that is periodically reviewed.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.58"
       ],
@@ -607,6 +703,8 @@
     },
     {
       "summary": "Both versions require effective management/monitoring of enterprise-wide access controls and logging of critical system user activities retained for at least three years, with v2 adding anomaly flagging.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.59",
         "RMiT 10.59(a)",
@@ -621,6 +719,8 @@
     },
     {
       "summary": "Both versions specify access control principles including 'deny all' default, 'least privilege', time-bound access, and segregation of incompatible functions.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.53(a)",
         "RMiT 10.53(b)",
@@ -636,6 +736,8 @@
     },
     {
       "summary": "v1's separate dual control and stronger authentication clauses are consolidated in v2 into dual authorization criteria and criticality-based authentication requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.53(e)",
         "RMiT 10.53(f)"
@@ -648,6 +750,8 @@
     },
     {
       "summary": "v1 requires large financial institutions to deploy identity access management systems and automated audit tools, whereas v2 replaces this with a general anomaly-flagging obligation applicable to all institutions without a large-institution carve-out.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "source_clauses": [
         "RMiT 10.60",
         "RMiT 10.60(a)",
@@ -660,6 +764,8 @@
     },
     {
       "summary": "Both versions require critical systems not to run on outdated or EOL technology and assign monitoring/patching and remedial responsibilities, with v2 adding security baselines, expanding scope to all systems including digital services, and requiring management approval for exceptions.",
+      "label": "differs-on",
+      "sentiment": "loosen",
       "source_clauses": [
         "RMiT 10.61",
         "RMiT 10.61(a)",
@@ -676,6 +782,8 @@
     },
     {
       "summary": "v1's requirement for large financial institutions to establish dedicated EOL/patch resources has no direct counterpart in v2.",
+      "label": "goes-beyond",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.62"
       ],
@@ -686,6 +794,8 @@
     },
     {
       "summary": "Both versions require a patch and EOL management framework covering asset vulnerability assessment, turnaround times, compatibility testing, and end-to-end deployment workflow, with v2 adding end-user awareness for orderly transition.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.63",
         "RMiT 10.63(a)",
@@ -704,6 +814,8 @@
     },
     {
       "summary": "v1's detailed digital services security control assurances are consolidated in v2 into a broader CRF-based digital service security requirement referencing Appendices.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.64",
         "RMiT 10.64(a)",
@@ -719,6 +831,8 @@
     },
     {
       "summary": "v1's prescriptive MFA and RM10,000 high-value transaction authentication controls are largely replaced in v2 by a principle-based MFA requirement and expanded digital fraud management provisions.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "source_clauses": [
         "RMiT 10.66",
         "RMiT 10.67",
@@ -736,6 +850,8 @@
     },
     {
       "summary": "v1's low-risk transaction safeguards (limits, opt-in MFA, account suspension) are reframed in v2 as customer empowerment and self-service 'kill switch' fraud mitigation measures.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "source_clauses": [
         "RMiT 10.72",
         "RMiT 10.73",
@@ -751,6 +867,8 @@
     },
     {
       "summary": "Both versions require digital service/network logs be retained for investigations and forensic purposes for at least three years.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.74"
       ],
@@ -761,6 +879,8 @@
     },
     {
       "summary": "Both versions require continuous surveillance of digital delivery channels (SST, Internet banking, mobile) with reference to control appendices.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.79",
         "RMiT 10.79(a)",
@@ -778,6 +898,8 @@
     },
     {
       "summary": "Both versions require SOC monitoring capabilities including log collection/SIEM, incident response, vulnerability management, and threat intelligence.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.18(a)",
         "RMiT 11.18(b)",
@@ -796,6 +918,8 @@
     },
     {
       "summary": "Both versions require comprehensive cyber crisis management policies incorporating cyber-attack scenarios, escalation, business continuity and a communication plan.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.22"
       ],
@@ -805,6 +929,8 @@
     },
     {
       "summary": "Both versions require a comprehensive Cyber Incident Response Plan covering preparedness, detection/analysis, containment/eradication and recovery/post-incident, with v2 splitting recovery into a distinct phase.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.23",
         "RMiT 11.23(a)",
@@ -822,6 +948,8 @@
     },
     {
       "summary": "Both versions require CERT members to be conversant with the incident response plan and remain contactable at all times, though v1 additionally mandates appointing a key contact to liaise with the Bank.",
+      "label": "goes-beyond",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.24"
       ],
@@ -832,6 +960,8 @@
     },
     {
       "summary": "Both versions require an annual cyber drill exercise testing CIRP effectiveness with board, senior management and third party involvement, with v2 adding out-of-band communication testing and board reporting.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.25",
         "RMiT 11.25(a)",
@@ -845,6 +975,8 @@
     },
     {
       "summary": "Both versions require notifying the Bank of cyber incidents, with v1 referencing ORION and v2 referencing multiple operational risk and business continuity reporting policy documents.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.26"
       ],
@@ -854,6 +986,8 @@
     },
     {
       "summary": "v1's encouragement to collaborate and share threat intelligence becomes a mandatory requirement in v2 to share cyber threat intelligence and collaborate with authorities.",
+      "label": "differs-on",
+      "sentiment": "loosen",
       "source_clauses": [
         "RMiT 11.27"
       ],
@@ -865,6 +999,8 @@
     },
     {
       "summary": "Both versions require a centralised automated technology asset tracking system and a dedicated cyber risk management function analysing cyber threats and escalating risk assessments.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.4(a)",
         "RMiT 11.4(b)",
@@ -877,6 +1013,8 @@
     },
     {
       "summary": "v1's Red Team simulation requirement is carried into v2 with an explicit at-least-every-three-years frequency.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.4(ii)"
       ],
@@ -886,6 +1024,8 @@
     },
     {
       "summary": "Both versions define cybersecurity operations in terms of the same cyber-attack lifecycle phases from reconnaissance through exfiltration.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.5(a)",
         "RMiT 11.5(b)",
@@ -907,6 +1047,8 @@
     },
     {
       "summary": "v1's e-banking/Internet insurance notification information requirements are consolidated in v2 into digital services first-time notification requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 14.2",
         "RMiT 14.2(a)",
@@ -928,6 +1070,8 @@
     },
     {
       "summary": "Both versions require engaging an independent external party for assurance and a CISO/board confirmation of readiness before notifying the Bank of new or materially enhanced services.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 14.5",
         "RMiT 14.5(a)",
@@ -943,6 +1087,8 @@
     },
     {
       "summary": "Both versions permit offering services or enhancements immediately upon submission of the notification, with v2 adding compliance with related notification requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 14.9"
       ],
@@ -952,6 +1098,8 @@
     },
     {
       "summary": "v1's simplified/exempt enhancement notification rules are carried into v2 as a simplified notification requirement referencing Appendix 6 criteria.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 14.4",
         "RMiT 14.4(a)",
@@ -966,6 +1114,8 @@
     },
     {
       "summary": "Both versions require board/senior management cloud governance and a cloud risk management framework integrated with existing outsourcing, TRMF and CRF, with v2 restructuring under third-party and cloud services sections.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 15.1(a)",
         "RMiT 15.1(b)"
@@ -977,6 +1127,8 @@
     },
     {
       "summary": "Both versions require first-time consultation with the Bank before adopting public cloud for critical systems and a subsequent notification process, with v2 expanding scope to emerging technology.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 15.2(a)",
         "RMiT 15.2(b)",
@@ -994,6 +1146,8 @@
     },
     {
       "summary": "Both versions grant the Bank discretion to direct consultation, notification or observance of cloud guidance including for non-critical systems.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 15.4"
       ],
@@ -1004,6 +1158,8 @@
     },
     {
       "summary": "Both versions require the cloud adoption roadmap to be included in the annual outsourcing plan and cloud risk assessment documented for the Bank's review.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 15.5"
       ],
@@ -1014,6 +1170,8 @@
     },
     {
       "summary": "Both versions require SLA provisions granting access rights for the regulator and appointed parties to examine the financial institution's activities and records.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.43(a)"
       ],
@@ -1023,6 +1181,8 @@
     },
     {
       "summary": "Both versions issue guidance pursuant to the same statutory sections, with v2 adding the MSBA section.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 3.2"
       ],
@@ -1032,6 +1192,8 @@
     },
     {
       "summary": "The effective date provision differs between versions, with v1 taking effect 1 June 2023 (for licensed digital banks) and v2 taking effect 28 November 2025.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "source_clauses": [
         "RMiT 4.2"
       ],
@@ -1041,6 +1203,8 @@
     },
     {
       "summary": "v2 supersedes the prior RMiT policy document issued as v1, establishing a direct supersession relationship.",
+      "label": "conflicts-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 7.1(r)"
       ],
@@ -1050,6 +1214,8 @@
     },
     {
       "summary": "Both versions require the board to oversee IT and cybersecurity strategic plans covering no less than three years with periodic review at least every three years.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 8.2"
       ],
@@ -1060,6 +1226,8 @@
     },
     {
       "summary": "Both versions require senior management to translate board-approved TRMF and CRF into specific policies and procedures consistent with the approved risk appetite.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 8.8"
       ],
@@ -1069,6 +1237,8 @@
     },
     {
       "summary": "Both versions require senior management to establish a cross-functional committee overseeing technology plans, updating the board and approving policy deviations, with v2 adding cyber function representation.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 8.9",
         "RMiT 8.9(a)",
@@ -1084,6 +1254,8 @@
     },
     {
       "summary": "v1's large financial institution self-assessment provisions have no direct counterpart in v2, which instead applies a general proportionality principle based on size and complexity.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "source_clauses": [
         "RMiT 8.12",
         "RMiT 8.12(a)",
@@ -1099,6 +1271,8 @@
     },
     {
       "summary": "v1 requires cloud data protection controls addressing data in-use, in-motion and at-rest; v2 embeds equivalent data ownership/protection and encryption-key control obligations in its cloud services and cryptography clauses.",
+      "label": "differs-on",
+      "sentiment": "tighten",
       "source_clauses": [
         "RMiT 11.15(a)",
         "RMiT 11.15(b)",
@@ -1112,6 +1286,8 @@
     },
     {
       "summary": "Both versions require the SLA/contractual arrangements to bind third party service providers to secrecy and confidentiality provisions concerning the financial institution and its customers, including handling of confidential information during transmission, processing or storage.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.42(g)"
       ],
@@ -1121,6 +1297,8 @@
     },
     {
       "summary": "Both versions identify the same categories of operational/technology risks arising from third-party arrangements, including data leakage/unauthorised disclosure and mishandling of confidential information during transmission, processing or storage.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.42(a)",
         "RMiT 10.42(g)"
@@ -1132,6 +1310,8 @@
     },
     {
       "summary": "Both versions require robust cryptographic key storage and protection using secure environments and recognised protocols; v2 elaborates HSM/TEE-based protected environments and certificate-authority-issued public key handling absent in v1's high-level key lifecycle clause.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.16(b)"
       ],
@@ -1143,6 +1323,8 @@
     },
     {
       "summary": "Both versions require independent external assessment of data centre resilience/risk; v1 embeds data-centre and network risks in its outsourcing/risk register, whereas v2 mandates a formal DCRA and NRA at least once every three years by a competent external party.",
+      "label": "differs-on",
+      "sentiment": "loosen",
       "source_clauses": [
         "RMiT 10.42(b)",
         "RMiT 10.42(d)"
@@ -1155,6 +1337,8 @@
     },
     {
       "summary": "Both versions mandate MFA that is resistant to interception/social engineering for authenticating access; v1's transaction-focused MFA interception-resistance requirement corresponds to v2's requirement that MFA defend against social engineering for critical system access.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "source_clauses": [
         "RMiT 10.70(a)"
       ],
@@ -1165,6 +1349,8 @@
     },
     {
       "summary": "v2 introduces new service availability and resilience obligations (quantified downtime limits, stand-in processing, service degradation early warning) for digital services that expand on v1's high-availability requirement for critical online payment and banking services.",
+      "label": "differs-on",
+      "sentiment": "loosen",
       "source_clauses": [
         "RMiT 10.75"
       ],
@@ -1177,6 +1363,8 @@
     },
     {
       "summary": "Both versions require risk assessment of advanced technologies/algorithms and secure biometric authentication in digital services; v2 addresses these via CRF-based digital fraud and mobile-device security provisions.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.76",
         "RMiT 10.77",
@@ -1190,6 +1378,8 @@
     },
     {
       "summary": "Both versions require timely customer notification of transactions and suspicious activity for online/mobile transactions, with substantially identical mobile online-transaction control checklists.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 15.1(i)",
         "RMiT 15.1(ii)",
@@ -1216,6 +1406,8 @@
     },
     {
       "summary": "Both versions require monitoring and timely takedown of fake applications on application distribution platforms.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 15.1(viii)",
         "RMiT 16.2(g)"
@@ -1226,6 +1418,8 @@
     },
     {
       "summary": "Both versions require a security awareness and education programme; v2 makes explicit the annual frequency and third-party inclusion, expanding on v1's staff resourcing/competency provision.",
+      "label": "differs-on",
+      "sentiment": "loosen",
       "source_clauses": [
         "RMiT 8.10"
       ],
@@ -1237,6 +1431,8 @@
     },
     {
       "summary": "Both versions establish the CRF/TRMF governance and the requirement for a dedicated cyber/technology risk management function reporting to board and senior management.",
+      "label": "differs-on",
+      "sentiment": "loosen",
       "source_clauses": [
         "RMiT 8.11"
       ],
@@ -1248,6 +1444,8 @@
     },
     {
       "summary": "Both versions require the same removable-media/sensitive-data transportation controls; v1's custody-in-transit conditions correspond to v2's Appendix 1 removable media controls.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 16.2(i)",
         "RMiT 16.2(ii)",
@@ -1262,6 +1460,8 @@
   "validation": [
     {
       "summary": "Both versions require adoption of industry standards for cryptographic algorithms, key lifecycle management, and compromise-recovery plans, with v2 restructuring the same cryptography policy requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.16(a)",
@@ -1292,6 +1492,8 @@
     },
     {
       "summary": "The periodic cryptographic review requirement was tightened from at least every three years applied to existing standards (v1) to at least annually applied to all cryptographic standards in use (v2), creating a stricter review frequency.",
+      "label": "differs-on",
+      "sentiment": "loosen",
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.16(c)",
@@ -1306,6 +1508,8 @@
     },
     {
       "summary": "v2 adds a new requirement to expand IT asset inventory to include all cryptographic tools and algorithms, which has no direct counterpart in v1's cryptography clauses.",
+      "label": "silent-on",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.16(a)",
@@ -1320,6 +1524,8 @@
     },
     {
       "summary": "Both versions require a user access matrix outlining access rights, roles, and approving authorities that is periodically reviewed.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.58",
@@ -1334,6 +1540,8 @@
     },
     {
       "summary": "Both versions require effective management/monitoring of enterprise-wide access controls and logging of critical system user activities retained for at least three years, with v2 adding anomaly flagging.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.59",
@@ -1368,6 +1576,8 @@
     },
     {
       "summary": "Both versions specify access control principles including 'deny all' default, 'least privilege', time-bound access, and segregation of incompatible functions.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.53(a)",
@@ -1406,6 +1616,8 @@
     },
     {
       "summary": "v1's separate dual control and stronger authentication clauses are consolidated in v2 into dual authorization criteria and criticality-based authentication requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.53(e)",
@@ -1432,6 +1644,8 @@
     },
     {
       "summary": "v1 requires large financial institutions to deploy identity access management systems and automated audit tools, whereas v2 replaces this with a general anomaly-flagging obligation applicable to all institutions without a large-institution carve-out.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.60",
@@ -1454,6 +1668,8 @@
     },
     {
       "summary": "Both versions require critical systems not to run on outdated or EOL technology and assign monitoring/patching and remedial responsibilities, with v2 adding security baselines, expanding scope to all systems including digital services, and requiring management approval for exceptions.",
+      "label": "differs-on",
+      "sentiment": "loosen",
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.61",
@@ -1492,6 +1708,8 @@
     },
     {
       "summary": "v1's requirement for large financial institutions to establish dedicated EOL/patch resources has no direct counterpart in v2.",
+      "label": "goes-beyond",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.62",
@@ -1506,6 +1724,8 @@
     },
     {
       "summary": "Both versions require a patch and EOL management framework covering asset vulnerability assessment, turnaround times, compatibility testing, and end-to-end deployment workflow, with v2 adding end-user awareness for orderly transition.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.63",
@@ -1556,6 +1776,8 @@
     },
     {
       "summary": "v1's detailed digital services security control assurances are consolidated in v2 into a broader CRF-based digital service security requirement referencing Appendices.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.64",
@@ -1594,6 +1816,8 @@
     },
     {
       "summary": "v1's prescriptive MFA and RM10,000 high-value transaction authentication controls are largely replaced in v2 by a principle-based MFA requirement and expanded digital fraud management provisions.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.66",
@@ -1636,6 +1860,8 @@
     },
     {
       "summary": "v1's low-risk transaction safeguards (limits, opt-in MFA, account suspension) are reframed in v2 as customer empowerment and self-service 'kill switch' fraud mitigation measures.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.72",
@@ -1674,6 +1900,8 @@
     },
     {
       "summary": "Both versions require digital service/network logs be retained for investigations and forensic purposes for at least three years.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.74",
@@ -1692,6 +1920,8 @@
     },
     {
       "summary": "Both versions require continuous surveillance of digital delivery channels (SST, Internet banking, mobile) with reference to control appendices.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.79",
@@ -1738,6 +1968,8 @@
     },
     {
       "summary": "Both versions require SOC monitoring capabilities including log collection/SIEM, incident response, vulnerability management, and threat intelligence.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 11.18(a)",
@@ -1788,6 +2020,8 @@
     },
     {
       "summary": "Both versions require comprehensive cyber crisis management policies incorporating cyber-attack scenarios, escalation, business continuity and a communication plan.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 11.22",
@@ -1802,6 +2036,8 @@
     },
     {
       "summary": "Both versions require a comprehensive Cyber Incident Response Plan covering preparedness, detection/analysis, containment/eradication and recovery/post-incident, with v2 splitting recovery into a distinct phase.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 11.23",
@@ -1848,6 +2084,8 @@
     },
     {
       "summary": "Both versions require CERT members to be conversant with the incident response plan and remain contactable at all times, though v1 additionally mandates appointing a key contact to liaise with the Bank.",
+      "label": "goes-beyond",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 11.24",
@@ -1862,6 +2100,8 @@
     },
     {
       "summary": "Both versions require an annual cyber drill exercise testing CIRP effectiveness with board, senior management and third party involvement, with v2 adding out-of-band communication testing and board reporting.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 11.25",
@@ -1892,6 +2132,8 @@
     },
     {
       "summary": "Both versions require notifying the Bank of cyber incidents, with v1 referencing ORION and v2 referencing multiple operational risk and business continuity reporting policy documents.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 11.26",
@@ -1906,6 +2148,8 @@
     },
     {
       "summary": "v1's encouragement to collaborate and share threat intelligence becomes a mandatory requirement in v2 to share cyber threat intelligence and collaborate with authorities.",
+      "label": "differs-on",
+      "sentiment": "loosen",
       "cited_clauses": [
         {
           "clause_number": "RMiT 11.27",
@@ -1924,6 +2168,8 @@
     },
     {
       "summary": "Both versions require a centralised automated technology asset tracking system and a dedicated cyber risk management function analysing cyber threats and escalating risk assessments.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 11.4(a)",
@@ -1950,6 +2196,8 @@
     },
     {
       "summary": "v1's Red Team simulation requirement is carried into v2 with an explicit at-least-every-three-years frequency.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 11.4(ii)",
@@ -1964,6 +2212,8 @@
     },
     {
       "summary": "Both versions define cybersecurity operations in terms of the same cyber-attack lifecycle phases from reconnaissance through exfiltration.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 11.5(a)",
@@ -2026,6 +2276,8 @@
     },
     {
       "summary": "v1's e-banking/Internet insurance notification information requirements are consolidated in v2 into digital services first-time notification requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 14.2",
@@ -2088,6 +2340,8 @@
     },
     {
       "summary": "Both versions require engaging an independent external party for assurance and a CISO/board confirmation of readiness before notifying the Bank of new or materially enhanced services.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 14.5",
@@ -2126,6 +2380,8 @@
     },
     {
       "summary": "Both versions permit offering services or enhancements immediately upon submission of the notification, with v2 adding compliance with related notification requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 14.9",
@@ -2140,6 +2396,8 @@
     },
     {
       "summary": "v1's simplified/exempt enhancement notification rules are carried into v2 as a simplified notification requirement referencing Appendix 6 criteria.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 14.4",
@@ -2174,6 +2432,8 @@
     },
     {
       "summary": "Both versions require board/senior management cloud governance and a cloud risk management framework integrated with existing outsourcing, TRMF and CRF, with v2 restructuring under third-party and cloud services sections.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 15.1(a)",
@@ -2196,6 +2456,8 @@
     },
     {
       "summary": "Both versions require first-time consultation with the Bank before adopting public cloud for critical systems and a subsequent notification process, with v2 expanding scope to emerging technology.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 15.2(a)",
@@ -2242,6 +2504,8 @@
     },
     {
       "summary": "Both versions grant the Bank discretion to direct consultation, notification or observance of cloud guidance including for non-critical systems.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 15.4",
@@ -2256,6 +2520,8 @@
     },
     {
       "summary": "Both versions require the cloud adoption roadmap to be included in the annual outsourcing plan and cloud risk assessment documented for the Bank's review.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 15.5",
@@ -2270,6 +2536,8 @@
     },
     {
       "summary": "Both versions require SLA provisions granting access rights for the regulator and appointed parties to examine the financial institution's activities and records.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.43(a)",
@@ -2284,6 +2552,8 @@
     },
     {
       "summary": "Both versions issue guidance pursuant to the same statutory sections, with v2 adding the MSBA section.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 3.2",
@@ -2298,6 +2568,8 @@
     },
     {
       "summary": "The effective date provision differs between versions, with v1 taking effect 1 June 2023 (for licensed digital banks) and v2 taking effect 28 November 2025.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "cited_clauses": [
         {
           "clause_number": "RMiT 4.2",
@@ -2312,6 +2584,8 @@
     },
     {
       "summary": "v2 supersedes the prior RMiT policy document issued as v1, establishing a direct supersession relationship.",
+      "label": "conflicts-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 7.1(r)",
@@ -2326,6 +2600,8 @@
     },
     {
       "summary": "Both versions require the board to oversee IT and cybersecurity strategic plans covering no less than three years with periodic review at least every three years.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 8.2",
@@ -2344,6 +2620,8 @@
     },
     {
       "summary": "Both versions require senior management to translate board-approved TRMF and CRF into specific policies and procedures consistent with the approved risk appetite.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 8.8",
@@ -2358,6 +2636,8 @@
     },
     {
       "summary": "Both versions require senior management to establish a cross-functional committee overseeing technology plans, updating the board and approving policy deviations, with v2 adding cyber function representation.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 8.9",
@@ -2396,6 +2676,8 @@
     },
     {
       "summary": "v1's large financial institution self-assessment provisions have no direct counterpart in v2, which instead applies a general proportionality principle based on size and complexity.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "cited_clauses": [
         {
           "clause_number": "RMiT 8.12",
@@ -2430,6 +2712,8 @@
     },
     {
       "summary": "v1 requires cloud data protection controls addressing data in-use, in-motion and at-rest; v2 embeds equivalent data ownership/protection and encryption-key control obligations in its cloud services and cryptography clauses.",
+      "label": "differs-on",
+      "sentiment": "tighten",
       "cited_clauses": [
         {
           "clause_number": "RMiT 11.15(a)",
@@ -2456,6 +2740,8 @@
     },
     {
       "summary": "Both versions require the SLA/contractual arrangements to bind third party service providers to secrecy and confidentiality provisions concerning the financial institution and its customers, including handling of confidential information during transmission, processing or storage.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.42(g)",
@@ -2470,6 +2756,8 @@
     },
     {
       "summary": "Both versions identify the same categories of operational/technology risks arising from third-party arrangements, including data leakage/unauthorised disclosure and mishandling of confidential information during transmission, processing or storage.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.42(a)",
@@ -2492,6 +2780,8 @@
     },
     {
       "summary": "Both versions require robust cryptographic key storage and protection using secure environments and recognised protocols; v2 elaborates HSM/TEE-based protected environments and certificate-authority-issued public key handling absent in v1's high-level key lifecycle clause.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.16(b)",
@@ -2510,6 +2800,8 @@
     },
     {
       "summary": "Both versions require independent external assessment of data centre resilience/risk; v1 embeds data-centre and network risks in its outsourcing/risk register, whereas v2 mandates a formal DCRA and NRA at least once every three years by a competent external party.",
+      "label": "differs-on",
+      "sentiment": "loosen",
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.42(b)",
@@ -2532,6 +2824,8 @@
     },
     {
       "summary": "Both versions mandate MFA that is resistant to interception/social engineering for authenticating access; v1's transaction-focused MFA interception-resistance requirement corresponds to v2's requirement that MFA defend against social engineering for critical system access.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.70(a)",
@@ -2546,6 +2840,8 @@
     },
     {
       "summary": "v2 introduces new service availability and resilience obligations (quantified downtime limits, stand-in processing, service degradation early warning) for digital services that expand on v1's high-availability requirement for critical online payment and banking services.",
+      "label": "differs-on",
+      "sentiment": "loosen",
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.75",
@@ -2568,6 +2864,8 @@
     },
     {
       "summary": "Both versions require risk assessment of advanced technologies/algorithms and secure biometric authentication in digital services; v2 addresses these via CRF-based digital fraud and mobile-device security provisions.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.76",
@@ -2594,6 +2892,8 @@
     },
     {
       "summary": "Both versions require timely customer notification of transactions and suspicious activity for online/mobile transactions, with substantially identical mobile online-transaction control checklists.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 15.1(i)",
@@ -2676,6 +2976,8 @@
     },
     {
       "summary": "Both versions require monitoring and timely takedown of fake applications on application distribution platforms.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 15.1(viii)",
@@ -2694,6 +2996,8 @@
     },
     {
       "summary": "Both versions require a security awareness and education programme; v2 makes explicit the annual frequency and third-party inclusion, expanding on v1's staff resourcing/competency provision.",
+      "label": "differs-on",
+      "sentiment": "loosen",
       "cited_clauses": [
         {
           "clause_number": "RMiT 8.10",
@@ -2712,6 +3016,8 @@
     },
     {
       "summary": "Both versions establish the CRF/TRMF governance and the requirement for a dedicated cyber/technology risk management function reporting to board and senior management.",
+      "label": "differs-on",
+      "sentiment": "loosen",
       "cited_clauses": [
         {
           "clause_number": "RMiT 8.11",
@@ -2730,6 +3036,8 @@
     },
     {
       "summary": "Both versions require the same removable-media/sensitive-data transportation controls; v1's custody-in-transit conditions correspond to v2's Appendix 1 removable media controls.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 16.2(i)",
