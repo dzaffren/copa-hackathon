@@ -296,6 +296,7 @@ def test_finder_turn_parses_call_chat_json_array(monkeypatch):
         [
             {
                 "summary": "RMiT 17.1 conflicts with Outsourcing 12.1.",
+                "label": "conflicts-with",
                 "source_clauses": ["RMiT 17.1"],
                 "target_clauses": ["Outsourcing 12.1"],
             }
@@ -324,6 +325,7 @@ def test_critic_turn_includes_finder_candidates_in_prompt(monkeypatch):
     finder_candidates = [
         {
             "summary": "RMiT 17.1 conflicts with Outsourcing 12.1.",
+            "label": "conflicts-with",
             "source_clauses": ["RMiT 17.1"],
             "target_clauses": ["Outsourcing 12.1"],
         }
@@ -333,6 +335,7 @@ def test_critic_turn_includes_finder_candidates_in_prompt(monkeypatch):
         + [
             {
                 "summary": "RMiT 17.2 depends on RMiT 17.1.",
+                "label": "aligns-with",
                 "source_clauses": ["RMiT 17.2"],
                 "target_clauses": ["RMiT 17.1"],
             }
@@ -586,3 +589,95 @@ def test_widened_connection_typeddict():
     hints = typing.get_type_hints(Connection)
     assert "label" in hints
     assert "sentiment" in hints
+
+
+def test_parse_rejects_missing_label():
+    """A candidate with no ``label`` is rejected loudly (never coerced)."""
+    raw = json.dumps(
+        [
+            {
+                "summary": "x",
+                "source_clauses": ["RMiT 17.1"],
+                "target_clauses": ["Outsourcing 12.1"],
+            }
+        ]
+    )
+    with pytest.raises(LLMResponseError) as exc:
+        _parse_candidate_list(raw)
+    assert "label" in str(exc.value)
+
+
+def test_parse_rejects_unknown_label():
+    """A ``label`` outside the five-value set is rejected."""
+    raw = json.dumps(
+        [
+            {
+                "summary": "x",
+                "label": "duplicates",
+                "source_clauses": ["RMiT 17.1"],
+                "target_clauses": ["Outsourcing 12.1"],
+            }
+        ]
+    )
+    with pytest.raises(LLMResponseError) as exc:
+        _parse_candidate_list(raw)
+    assert "duplicates" in str(exc.value)
+
+
+def test_parse_rejects_sentiment_on_nondiffers():
+    """``sentiment`` on any label other than ``differs-on`` is rejected."""
+    raw = json.dumps(
+        [
+            {
+                "summary": "x",
+                "label": "aligns-with",
+                "sentiment": "tighten",
+                "source_clauses": ["RMiT 17.1"],
+                "target_clauses": ["Outsourcing 12.1"],
+            }
+        ]
+    )
+    with pytest.raises(LLMResponseError) as exc:
+        _parse_candidate_list(raw)
+    message = str(exc.value)
+    assert "sentiment" in message
+    assert "differs-on" in message
+
+
+def test_parse_rejects_unknown_sentiment():
+    """A ``sentiment`` outside tighten/loosen/neutral is rejected even on
+    ``differs-on``."""
+    raw = json.dumps(
+        [
+            {
+                "summary": "x",
+                "label": "differs-on",
+                "sentiment": "stricter",
+                "source_clauses": ["RMiT 17.1"],
+                "target_clauses": ["Outsourcing 12.1"],
+            }
+        ]
+    )
+    with pytest.raises(LLMResponseError) as exc:
+        _parse_candidate_list(raw)
+    assert "stricter" in str(exc.value)
+
+
+def test_parse_accepts_sentiment_on_differs():
+    """A well-formed ``differs-on`` candidate with a sentiment parses cleanly,
+    both fields intact, no coercion."""
+    raw = json.dumps(
+        [
+            {
+                "summary": "x",
+                "label": "differs-on",
+                "sentiment": "tighten",
+                "source_clauses": ["RMiT 17.1"],
+                "target_clauses": ["Outsourcing 12.1"],
+            }
+        ]
+    )
+    result = _parse_candidate_list(raw)
+    assert len(result) == 1
+    assert result[0]["label"] == "differs-on"
+    assert result[0]["sentiment"] == "tighten"

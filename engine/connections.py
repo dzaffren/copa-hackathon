@@ -111,6 +111,19 @@ CriticFn = Callable[[str, str, ClauseIndex, list[dict]], list[dict]]
 
 _MESSAGE_NO_CLAUSE = "No matching clause found"
 
+# The five mutually-exclusive, exhaustive semantic labels a finding may carry,
+# and the three sentiments that MAY refine a ``differs-on`` finding (and only
+# that one). Kept as tuples so error messages can list the allowed values.
+CONNECTION_LABELS = (
+    "aligns-with",
+    "differs-on",
+    "conflicts-with",
+    "silent-on",
+    "goes-beyond",
+)
+SENTIMENT_VALUES = ("tighten", "loosen", "neutral")
+_SENTIMENT_LABEL = "differs-on"
+
 
 def _normalize_clause_number(number: str) -> str:
     """Repair a common LLM output slip: a sub-item citation with a missing
@@ -377,8 +390,11 @@ def _parse_candidate_list(raw: str) -> list[dict]:
 
     Delegates to ``parse_json_response`` (strips fences, ``json.loads``) then
     enforces the raw candidate shape the citation validator consumes: a list of
-    dict objects. Raises ``LLMResponseError`` (not a silent coercion) if the
-    model returned a non-list or list items that are not objects.
+    dict objects, each carrying a valid semantic ``label`` (one of the five) and
+    — only on ``differs-on`` — an optional ``sentiment`` (one of the three).
+    Raises ``LLMResponseError`` (not a silent coercion) if the model returned a
+    non-list, list items that are not objects, a missing/unknown ``label``, or a
+    ``sentiment`` that is misplaced or outside tighten/loosen/neutral.
     """
     parsed = parse_json_response(raw)
     if not isinstance(parsed, list):
@@ -398,7 +414,46 @@ def _parse_candidate_list(raw: str) -> list[dict]:
             f"Expected every list item to be a JSON object; found "
             f"non-object items at {bad}. Raw (truncated): {snippet!r}"
         )
+    for i, item in enumerate(parsed):
+        _validate_label_and_sentiment(item, i, raw)
     return parsed
+
+
+def _validate_label_and_sentiment(item: dict, index: int, raw: str) -> None:
+    """Enforce the semantic-taxonomy contract on one raw candidate object.
+
+    Every candidate MUST carry a ``label`` drawn from ``CONNECTION_LABELS``. A
+    ``sentiment`` (when present, i.e. not ``None``) MUST attach only to the
+    ``differs-on`` label and MUST be one of ``SENTIMENT_VALUES``. Anything else
+    raises ``LLMResponseError`` — the model's mistake is surfaced, never coerced.
+    """
+    snippet = raw.strip()[:200]
+    label = item.get("label")
+    if label is None:
+        raise LLMResponseError(
+            f"Candidate at index {index} is missing the required 'label' "
+            f"(one of {list(CONNECTION_LABELS)}). Raw (truncated): {snippet!r}"
+        )
+    if label not in CONNECTION_LABELS:
+        raise LLMResponseError(
+            f"Candidate at index {index} has invalid label {label!r}; must be "
+            f"one of {list(CONNECTION_LABELS)}. Raw (truncated): {snippet!r}"
+        )
+    sentiment = item.get("sentiment")
+    if sentiment is None:
+        return
+    if label != _SENTIMENT_LABEL:
+        raise LLMResponseError(
+            f"Candidate at index {index} carries sentiment {sentiment!r} on "
+            f"label {label!r}; sentiment attaches ONLY to '{_SENTIMENT_LABEL}'. "
+            f"Raw (truncated): {snippet!r}"
+        )
+    if sentiment not in SENTIMENT_VALUES:
+        raise LLMResponseError(
+            f"Candidate at index {index} has invalid sentiment {sentiment!r}; "
+            f"must be one of {list(SENTIMENT_VALUES)}. "
+            f"Raw (truncated): {snippet!r}"
+        )
 
 
 def _finder_turn(doc_a_id: str, doc_b_id: str, clause_index: ClauseIndex) -> list[dict]:
