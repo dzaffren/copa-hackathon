@@ -801,3 +801,81 @@ def test_prompts_describe_taxonomy_and_direction(prompt):
     assert "they/theirs" in prompt
     # The strict citation rule survives the rewrite.
     assert "CITATION RULE" in prompt
+
+
+def _spy_write_text_encoding(monkeypatch) -> dict:
+    """Patch ``Path.write_text`` to record the ``encoding`` it is called with
+    (delegating to the real writer), so a test can assert the trace writers
+    force UTF-8 — the fix for the cp1252 platform default on Windows that
+    otherwise crashes on the AI DP's Unicode glyphs (U+2212)."""
+    import pathlib
+
+    captured: dict = {}
+    original = pathlib.Path.write_text
+
+    def spy(self, data, *args, **kwargs):
+        captured["encoding"] = kwargs.get("encoding")
+        return original(self, data, *args, **kwargs)
+
+    monkeypatch.setattr(pathlib.Path, "write_text", spy)
+    return captured
+
+
+def test_write_trace_encodes_utf8(tmp_path, monkeypatch):
+    """The connection-trace writer must pass ``encoding="utf-8"`` to write_text."""
+    captured = _spy_write_text_encoding(monkeypatch)
+    clause_index = _build_fixture_clause_index()
+
+    def finder(doc_a_id, doc_b_id, clause_index):
+        return [
+            {
+                "summary": "RMiT 17.1 trims the notification window.",
+                "label": "differs-on",
+                "sentiment": "tighten",
+                "source_clauses": ["RMiT 17.1"],
+                "target_clauses": ["Outsourcing 12.1"],
+            }
+        ]
+
+    find_connections(
+        "rmit-v2-2026-draft",
+        "outsourcing-v1-2019",
+        clause_index,
+        finder_fn=finder,
+        critic_fn=_critic_passthrough,
+        output_dir=tmp_path,
+        now=FIXED_NOW,
+    )
+
+    assert captured["encoding"] == "utf-8"
+
+
+def test_write_analyse_trace_encodes_utf8(tmp_path, monkeypatch):
+    """The analyse-trace writer must likewise pass ``encoding="utf-8"``."""
+    captured = _spy_write_text_encoding(monkeypatch)
+    index = _build_source_index()
+
+    def stub_finder(paragraph_number, paragraph_text, clause_index, branch, source_ids):
+        if branch != "cited":
+            return []
+        return [
+            {
+                "source_document_id": "bcbs-239",
+                "clause_number": "BCBS 239 P4",
+                "confidence_score": 0.88,
+                "verification": "verified",
+            }
+        ]
+
+    analyse_paragraph(
+        "4.6",
+        "As AI applications process personal data...",
+        index,
+        cited_source_ids=["bcbs-239"],
+        curated_source_ids=[],
+        finder_fn=stub_finder,
+        now=FIXED_NOW,
+        output_dir=tmp_path,
+    )
+
+    assert captured["encoding"] == "utf-8"

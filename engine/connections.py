@@ -335,7 +335,7 @@ def _write_trace(
         "critic_output": critic_output,
         "validation": validation,
     }
-    trace_path.write_text(json.dumps(trace, indent=2))
+    trace_path.write_text(json.dumps(trace, indent=2), encoding="utf-8")
     return trace_path
 
 
@@ -780,7 +780,7 @@ def _write_analyse_trace(
         "raw_by_branch": raw_by_branch,
         "candidates": candidates,
     }
-    trace_path.write_text(json.dumps(trace, indent=2))
+    trace_path.write_text(json.dumps(trace, indent=2), encoding="utf-8")
     return trace_path
 
 
