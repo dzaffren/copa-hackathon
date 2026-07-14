@@ -8,6 +8,8 @@
   "finder_output": [
     {
       "summary": "RMiT requires the cloud adoption roadmap and risk assessment to be incorporated into the annual outsourcing plan submitted under the Outsourcing policy, directly depending on the Outsourcing plan submission requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 17.5"
       ],
@@ -19,6 +21,8 @@
     },
     {
       "summary": "RMiT's cloud services risk assessment factors substantially overlap with the Outsourcing policy's requirements for addressing cloud service risks such as data accessibility, confidentiality, sovereignty and regulatory compliance.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.50",
         "RMiT 10.50(c)",
@@ -32,6 +36,8 @@
     },
     {
       "summary": "RMiT's cloud adoption notification regime for critical systems potentially conflicts with, or must be reconciled against, the Outsourcing policy's requirement to obtain prior written approval for material outsourcing arrangements involving cloud service providers.",
+      "label": "conflicts-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 17.1",
         "RMiT 17.2",
@@ -45,6 +51,8 @@
     },
     {
       "summary": "Both documents mandate the same board and senior management accountability for oversight of technology/cloud adoptions and outsourcing risk, with RMiT requiring a readiness confirmation officer that aligns with the Outsourcing board oversight duties.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 8.1",
         "RMiT 8.3"
@@ -56,6 +64,8 @@
     },
     {
       "summary": "RMiT explicitly requires this policy to be read together with the Outsourcing policy document, establishing a cross-reference dependency.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 6.1",
         "RMiT 17.5"
@@ -66,6 +76,8 @@
     },
     {
       "summary": "RMiT's requirement to obtain independent assurance on critical external service providers' technology risk practices parallels the Outsourcing policy's due diligence and audit/inspection rights over service providers.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 14.1"
       ],
@@ -76,6 +88,8 @@
     },
     {
       "summary": "Both policies require robust protection of confidentiality and integrity of customer information handled by service providers/digital services.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 12.1"
       ],
@@ -86,6 +100,8 @@
     },
     {
       "summary": "RMiT's termination-related cloud risk assessment (securing data following termination) aligns with the Outsourcing policy's requirements on data access, return and destruction upon termination.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.50(h)"
       ],
@@ -96,6 +112,8 @@
     },
     {
       "summary": "RMiT's assessment of cloud infrastructure location and cross-border data transmission risks corresponds to the Outsourcing policy's requirements for outsourcing outside Malaysia and comparable data protection standards.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.50(c)",
         "RMiT 10.50(j)"
@@ -108,6 +126,8 @@
     },
     {
       "summary": "RMiT's definition of 'critical system' underpins the cloud notification thresholds, relating to the Outsourcing policy's materiality assessment framework for outsourcing arrangements.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 5.2",
         "RMiT 17.1"
@@ -121,6 +141,8 @@
   "critic_output": [
     {
       "summary": "RMiT requires the cloud adoption roadmap and risk assessment to be incorporated into the annual outsourcing plan submitted under the Outsourcing policy, directly depending on the Outsourcing plan submission requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 17.5"
       ],
@@ -132,6 +154,8 @@
     },
     {
       "summary": "RMiT's cloud services risk assessment factors substantially overlap with the Outsourcing policy's requirements for addressing cloud service risks such as data accessibility, confidentiality, sovereignty and regulatory compliance.",
+      "label": "differs-on",
+      "sentiment": "tighten",
       "source_clauses": [
         "RMiT 10.50",
         "RMiT 10.50(c)",
@@ -146,6 +170,8 @@
     },
     {
       "summary": "RMiT's cloud adoption notification regime for critical systems must be reconciled against the Outsourcing policy's requirement to obtain prior written approval for material outsourcing arrangements involving cloud service providers.",
+      "label": "conflicts-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 17.1",
         "RMiT 17.2",
@@ -159,6 +185,8 @@
     },
     {
       "summary": "Both documents mandate board and senior management accountability for oversight of technology/cloud adoptions and outsourcing risk, with RMiT requiring a designated readiness confirmation officer that aligns with the Outsourcing board oversight duties.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 8.1",
         "RMiT 8.3"
@@ -171,6 +199,8 @@
     },
     {
       "summary": "RMiT explicitly requires this policy to be read together with the Outsourcing policy document, establishing a cross-reference dependency.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 6.1",
         "RMiT 17.5"
@@ -181,6 +211,8 @@
     },
     {
       "summary": "RMiT's requirement to obtain independent assurance on critical external service providers' technology risk practices parallels the Outsourcing policy's due diligence and audit/inspection rights over service providers.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 14.1"
       ],
@@ -192,6 +224,8 @@
     },
     {
       "summary": "Both policies require robust protection of confidentiality and integrity of customer information handled by service providers/digital services.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 12.1"
       ],
@@ -202,6 +236,8 @@
     },
     {
       "summary": "RMiT's termination-related cloud risk assessment (securing data following termination) aligns with the Outsourcing policy's requirements on data access, return and destruction upon termination.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.50(h)"
       ],
@@ -212,6 +248,8 @@
     },
     {
       "summary": "RMiT's assessment of cloud infrastructure location and cross-border data transmission risks corresponds to the Outsourcing policy's requirements for outsourcing outside Malaysia and comparable data protection standards.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.50(c)",
         "RMiT 10.50(j)"
@@ -224,6 +262,8 @@
     },
     {
       "summary": "RMiT's definition of 'critical system' underpins the cloud notification thresholds, relating to the Outsourcing policy's materiality assessment framework for outsourcing arrangements.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "source_clauses": [
         "RMiT 5.2",
         "RMiT 17.1"
@@ -236,6 +276,8 @@
     },
     {
       "summary": "Both policies establish parallel BCP/operational resilience obligations extending to service provider disruption, linking RMiT's system resilience and operational resilience expectations to the Outsourcing BCP requirements for outsourced/cloud activities.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 10.1",
         "RMiT 1.1(d)"
@@ -249,6 +291,8 @@
     },
     {
       "summary": "Both policies are issued under the identical statutory authority (FSA, IFSA and DFIA sections), establishing a shared legal basis and consistent applicability to the same class of financial institutions.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 3.1",
         "RMiT 3.1(a)",
@@ -264,6 +308,8 @@
     },
     {
       "summary": "Both policies define their scope of applicability by reference to a list/definition of financial institutions, with provisions applying only to subsets stated expressly, establishing consistent applicability frameworks.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 2.1",
         "RMiT 2.2"
@@ -276,6 +322,8 @@
     },
     {
       "summary": "The Outsourcing due diligence requirement to assess IT security controls, business continuity and cyber-attack resilience of service providers corresponds to RMiT's cybersecurity framework and cloud cyber-attack exposure assessment.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 11.1",
         "RMiT 10.50(g)"
@@ -287,6 +335,8 @@
     },
     {
       "summary": "RMiT's requirement to conduct periodic technology audits of the risk management framework aligns with the Outsourcing policy's periodic assessments of the effectiveness of outsourcing risk management, including data security practices at the service provider.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 13.1"
       ],
@@ -298,6 +348,8 @@
     },
     {
       "summary": "RMiT's Bank-directed discretion to require cloud adoption compliance and its documentation/review provisions parallel the Outsourcing policy's supervisory access and register/documentation availability requirements enabling continued Bank oversight.",
+      "label": "aligns-with",
+      "sentiment": null,
       "source_clauses": [
         "RMiT 17.4",
         "RMiT 16.6",
@@ -313,6 +365,8 @@
   "validation": [
     {
       "summary": "RMiT requires the cloud adoption roadmap and risk assessment to be incorporated into the annual outsourcing plan submitted under the Outsourcing policy, directly depending on the Outsourcing plan submission requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 17.5",
@@ -331,6 +385,8 @@
     },
     {
       "summary": "RMiT's cloud services risk assessment factors substantially overlap with the Outsourcing policy's requirements for addressing cloud service risks such as data accessibility, confidentiality, sovereignty and regulatory compliance.",
+      "label": "differs-on",
+      "sentiment": "tighten",
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.50",
@@ -361,6 +417,8 @@
     },
     {
       "summary": "RMiT's cloud adoption notification regime for critical systems must be reconciled against the Outsourcing policy's requirement to obtain prior written approval for material outsourcing arrangements involving cloud service providers.",
+      "label": "conflicts-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 17.1",
@@ -387,6 +445,8 @@
     },
     {
       "summary": "Both documents mandate board and senior management accountability for oversight of technology/cloud adoptions and outsourcing risk, with RMiT requiring a designated readiness confirmation officer that aligns with the Outsourcing board oversight duties.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 8.1",
@@ -409,6 +469,8 @@
     },
     {
       "summary": "RMiT explicitly requires this policy to be read together with the Outsourcing policy document, establishing a cross-reference dependency.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 6.1",
@@ -427,6 +489,8 @@
     },
     {
       "summary": "RMiT's requirement to obtain independent assurance on critical external service providers' technology risk practices parallels the Outsourcing policy's due diligence and audit/inspection rights over service providers.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 14.1",
@@ -445,6 +509,8 @@
     },
     {
       "summary": "Both policies require robust protection of confidentiality and integrity of customer information handled by service providers/digital services.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 12.1",
@@ -463,6 +529,8 @@
     },
     {
       "summary": "RMiT's termination-related cloud risk assessment (securing data following termination) aligns with the Outsourcing policy's requirements on data access, return and destruction upon termination.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.50(h)",
@@ -481,6 +549,8 @@
     },
     {
       "summary": "RMiT's assessment of cloud infrastructure location and cross-border data transmission risks corresponds to the Outsourcing policy's requirements for outsourcing outside Malaysia and comparable data protection standards.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.50(c)",
@@ -507,6 +577,8 @@
     },
     {
       "summary": "RMiT's definition of 'critical system' underpins the cloud notification thresholds, relating to the Outsourcing policy's materiality assessment framework for outsourcing arrangements.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "cited_clauses": [
         {
           "clause_number": "RMiT 5.2",
@@ -529,6 +601,8 @@
     },
     {
       "summary": "Both policies establish parallel BCP/operational resilience obligations extending to service provider disruption, linking RMiT's system resilience and operational resilience expectations to the Outsourcing BCP requirements for outsourced/cloud activities.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 10.1",
@@ -555,6 +629,8 @@
     },
     {
       "summary": "Both policies are issued under the identical statutory authority (FSA, IFSA and DFIA sections), establishing a shared legal basis and consistent applicability to the same class of financial institutions.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 3.1",
@@ -593,6 +669,8 @@
     },
     {
       "summary": "Both policies define their scope of applicability by reference to a list/definition of financial institutions, with provisions applying only to subsets stated expressly, establishing consistent applicability frameworks.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 2.1",
@@ -615,6 +693,8 @@
     },
     {
       "summary": "The Outsourcing due diligence requirement to assess IT security controls, business continuity and cyber-attack resilience of service providers corresponds to RMiT's cybersecurity framework and cloud cyber-attack exposure assessment.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 11.1",
@@ -633,6 +713,8 @@
     },
     {
       "summary": "RMiT's requirement to conduct periodic technology audits of the risk management framework aligns with the Outsourcing policy's periodic assessments of the effectiveness of outsourcing risk management, including data security practices at the service provider.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 13.1",
@@ -651,6 +733,8 @@
     },
     {
       "summary": "RMiT's Bank-directed discretion to require cloud adoption compliance and its documentation/review provisions parallel the Outsourcing policy's supervisory access and register/documentation availability requirements enabling continued Bank oversight.",
+      "label": "aligns-with",
+      "sentiment": null,
       "cited_clauses": [
         {
           "clause_number": "RMiT 17.4",
