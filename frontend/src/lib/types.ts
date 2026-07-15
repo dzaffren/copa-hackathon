@@ -73,6 +73,55 @@ export interface Connection {
   target_clauses: ClauseRef[];
 }
 
+// --- Review Linkages -------------------------------------------------------
+// `GET .../edges/{edgeId}/review`, `PATCH .../edges/{edgeId}/findings/{id}`.
+
+export type ReviewState = "pending" | "accepted" | "dismissed";
+
+/** A finding as the review screen sees it: a Connection plus the two fields the
+ *  engine derives on read — a stable id and a review state. */
+export interface ReviewFinding extends Connection {
+  id: string;
+  review_state: ReviewState;
+}
+
+/** A clause card in a pane. Text is the verbatim citation stored on the finding
+ *  that cites it — the engine never re-parses it from a clause index. */
+export interface ReviewClause {
+  clause_number: string;
+  text: string;
+}
+
+export interface ReviewEdgeNode {
+  id: string;
+  title: string | null;
+  node_type: NodeType | null;
+}
+
+export interface ReviewCounts {
+  total: number;
+  accepted: number;
+  dismissed: number;
+}
+
+export interface ReviewResponse {
+  edge: {
+    id: string;
+    edge_type: EdgeType | null;
+    source_node: ReviewEdgeNode;
+    target_node: ReviewEdgeNode;
+  };
+  source_clauses: ReviewClause[];
+  target_clauses: ReviewClause[];
+  findings: ReviewFinding[];
+  counts: ReviewCounts;
+}
+
+export interface PatchReviewStateResponse {
+  finding: ReviewFinding;
+  counts: ReviewCounts;
+}
+
 // --- Graph Screen ----------------------------------------------------------
 
 export interface WorkstreamSummary {

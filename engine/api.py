@@ -32,7 +32,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from engine.config import REPO_ROOT
-from engine import workstreams
+from engine import findings, workstreams
 
 # The Workstream Brain fixture store (Task 1): one directory per workstream, each
 # holding a `graph.json` (`{"nodes": [...], "edges": [...]}`) and a `findings/`
@@ -401,6 +401,110 @@ def create_app(
             "findings": [],
             "findings_count": 0,
         }
+
+    # --- Workstream Brain — Review Linkages routes -------------------------
+    # The pairwise clause reader. Clause text is served from each finding's own
+    # `source_clauses` / `target_clauses` records, NOT re-parsed from a clause
+    # index: `data/artifacts/clause-index.json` covers only the RMiT documents,
+    # so OpRes / BCBS / HKMA / FSB / FSA have no index to read. Quoting the
+    # finding's own stored text keeps the verbatim guarantee intact — a finding
+    # can never cite text its record does not contain.
+
+    def _review_node(ws_graph: dict[str, Any], node_id: str) -> dict[str, Any]:
+        node = next(
+            (n for n in ws_graph.get("nodes", []) if n["id"] == node_id), {}
+        )
+        return {
+            "id": node_id,
+            "title": node.get("title"),
+            "node_type": node.get("node_type"),
+        }
+
+    def _clause_pane(findings: list[dict[str, Any]], side: str) -> list[dict[str, Any]]:
+        """The pane's clause cards: every clause cited by any finding on this
+        side, de-duplicated by clause number, in first-cited order.
+
+        A `goes-beyond` / `silent-on` finding may cite nothing on one side; it
+        simply contributes no card there.
+        """
+        pane: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        for finding in findings:
+            for clause in finding.get(f"{side}_clauses") or []:
+                number = clause.get("clause_number")
+                if number is None or number in seen:
+                    continue
+                seen.add(number)
+                pane.append({"clause_number": number, "text": clause.get("text")})
+        return pane
+
+    @app.get("/api/workstreams/{workstream_id}/edges/{edge_id}/review")
+    def get_edge_review(workstream_id: str, edge_id: str) -> Any:
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        edge = next((e for e in ws_graph.get("edges", []) if e["id"] == edge_id), None)
+        if edge is None:
+            return _ws_error(
+                404,
+                "EDGE_NOT_FOUND",
+                f"Edge {edge_id} not found in workstream {workstream_id}",
+            )
+        try:
+            edge_findings = findings.load(workstreams_dir, workstream_id, edge_id)
+        except findings.FindingsNotAnalysedError:
+            # Distinct from "analysed, zero findings": the edge has never been
+            # run, so the screen prompts Analyze rather than showing an empty
+            # reader. `analysed` is derived from findings-file presence.
+            return _ws_error(
+                400,
+                "EDGE_NOT_ANALYSED",
+                f"Edge {edge_id} has not been analysed yet",
+            )
+        return {
+            "edge": {
+                "id": edge_id,
+                "edge_type": edge.get("edge_type"),
+                "source_node": _review_node(ws_graph, edge["source"]),
+                "target_node": _review_node(ws_graph, edge["target"]),
+            },
+            "source_clauses": _clause_pane(edge_findings, "source"),
+            "target_clauses": _clause_pane(edge_findings, "target"),
+            "findings": edge_findings,
+            "counts": findings.counts(edge_findings),
+        }
+
+    @app.patch(
+        "/api/workstreams/{workstream_id}/edges/{edge_id}/findings/{finding_id}"
+    )
+    async def patch_finding_review_state(
+        workstream_id: str, edge_id: str, finding_id: str, request: Request
+    ) -> Any:
+        body = await request.json()
+        state = body.get("review_state") if isinstance(body, dict) else None
+        if state not in findings.REVIEW_STATES:
+            return _ws_error(
+                400,
+                "INVALID_REVIEW_STATE",
+                f"review_state must be one of {sorted(findings.REVIEW_STATES)}, "
+                f"got {state!r}",
+            )
+        try:
+            updated = findings.set_review_state(
+                workstreams_dir, workstream_id, edge_id, finding_id, state
+            )
+        except findings.FindingsNotAnalysedError:
+            return _ws_error(
+                400, "EDGE_NOT_ANALYSED", f"Edge {edge_id} has not been analysed yet"
+            )
+        except findings.FindingNotFoundError:
+            return _ws_error(
+                404, "FINDING_NOT_FOUND", f"Finding {finding_id} not found on {edge_id}"
+            )
+        all_findings = findings.load(workstreams_dir, workstream_id, edge_id)
+        return {"finding": updated, "counts": findings.counts(all_findings)}
 
     return app
 

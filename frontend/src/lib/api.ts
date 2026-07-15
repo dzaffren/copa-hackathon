@@ -5,6 +5,9 @@ import type {
   CreateNodeResponse,
   EdgeDetail,
   NodeDetail,
+  PatchReviewStateResponse,
+  ReviewResponse,
+  ReviewState,
   TaskResponse,
   WorkstreamGraph,
   WorkstreamSummary,
@@ -54,6 +57,18 @@ async function postJson<T>(url: string, body?: unknown): Promise<T> {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  if (!res.ok) {
+    return throwHttpError(res);
+  }
+  return (await res.json()) as T;
+}
+
+async function patchJson<T>(url: string, body: unknown): Promise<T> {
+  const res = await fetch(url, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
   });
   if (!res.ok) {
     return throwHttpError(res);
@@ -130,6 +145,32 @@ export function analyzeEdge(
 ): Promise<AnalyzeResponse> {
   return postJson<AnalyzeResponse>(
     `${API_BASE}/api/workstreams/${workstreamId}/edges/${edgeId}/analyze`,
+  );
+}
+
+// --- Review Linkages -------------------------------------------------------
+
+export function fetchReview(
+  workstreamId: string,
+  edgeId: string,
+): Promise<ReviewResponse> {
+  return getJson<ReviewResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/edges/${edgeId}/review`,
+  );
+}
+
+export function setReviewState(
+  workstreamId: string,
+  edgeId: string,
+  findingId: string,
+  reviewState: ReviewState,
+): Promise<PatchReviewStateResponse> {
+  // Finding ids carry a `~` separator, which is unreserved in a path segment —
+  // encoded anyway so any future id shape survives the round-trip.
+  return patchJson<PatchReviewStateResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/edges/${edgeId}/findings/` +
+      encodeURIComponent(findingId),
+    { review_state: reviewState },
   );
 }
 

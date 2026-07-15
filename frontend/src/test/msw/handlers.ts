@@ -5,6 +5,10 @@ import type {
   GraphEdge,
   GraphNode,
   NodeDetail,
+  ReviewClause,
+  ReviewCounts,
+  ReviewFinding,
+  ReviewState,
   TaskResponse,
   WorkstreamGraph,
   WorkstreamSummary,
@@ -588,7 +592,136 @@ function jsonError(status: number, code: string, message: string) {
   return HttpResponse.json({ code, message }, { status });
 }
 
+// --- Review Linkages -------------------------------------------------------
+// Mirrors the engine: findings get a derived `~{index}` id and a review_state
+// defaulting to "pending"; clause panes are the findings' own cited clauses,
+// de-duplicated by number. `reviewState` is per-run mutable so PATCH round-trips
+// behave like the real file-backed store; `resetReviewState()` clears it.
+
+const reviewState = new Map<string, ReviewState>();
+
+export function resetReviewState() {
+  reviewState.clear();
+}
+
+function reviewFindings(edgeId: string): ReviewFinding[] {
+  return (FINDINGS[edgeId] ?? []).map((finding, i) => {
+    const id = `${edgeId}~${i}`;
+    return { ...finding, id, review_state: reviewState.get(id) ?? "pending" };
+  });
+}
+
+function clausePane(
+  findings: ReviewFinding[],
+  side: "source" | "target",
+): ReviewClause[] {
+  const seen = new Set<string>();
+  const pane: ReviewClause[] = [];
+  for (const finding of findings) {
+    for (const clause of finding[`${side}_clauses`]) {
+      if (seen.has(clause.clause_number)) continue;
+      seen.add(clause.clause_number);
+      pane.push({ clause_number: clause.clause_number, text: clause.text });
+    }
+  }
+  return pane;
+}
+
+function reviewCounts(findings: ReviewFinding[]): ReviewCounts {
+  return {
+    total: findings.length,
+    accepted: findings.filter((f) => f.review_state === "accepted").length,
+    dismissed: findings.filter((f) => f.review_state === "dismissed").length,
+  };
+}
+
 export const handlers = [
+  http.get(
+    "*/api/workstreams/:workstreamId/edges/:edgeId/review",
+    ({ params }) => {
+      const { workstreamId, edgeId } = params as {
+        workstreamId: string;
+        edgeId: string;
+      };
+      if (workstreamId !== "opres-v2") {
+        return jsonError(
+          404,
+          "WORKSTREAM_NOT_FOUND",
+          `Workstream ${workstreamId} not found`,
+        );
+      }
+      const edge = GRAPH_EDGES.find((e) => e.id === edgeId);
+      if (!edge) {
+        return jsonError(404, "EDGE_NOT_FOUND", `Edge ${edgeId} not found`);
+      }
+      // `analysed` is the mock's stand-in for findings-file presence, which is
+      // what the engine derives it from. Not FINDINGS membership: FINDINGS also
+      // holds what `analyze` *would* return for an as-yet unanalysed edge (the
+      // fsb-3rd-party demo pair), which has no file on disk.
+      if (!edge.analysed) {
+        return jsonError(
+          400,
+          "EDGE_NOT_ANALYSED",
+          `Edge ${edgeId} has not been analysed yet`,
+        );
+      }
+      const findings = reviewFindings(edgeId);
+      const node = (id: string) => {
+        const n = GRAPH_NODES[id];
+        return {
+          id,
+          title: n?.title ?? null,
+          node_type: n?.node_type ?? null,
+        };
+      };
+      return HttpResponse.json({
+        edge: {
+          id: edgeId,
+          edge_type: edge.edge_type,
+          source_node: node(edge.source),
+          target_node: node(edge.target),
+        },
+        source_clauses: clausePane(findings, "source"),
+        target_clauses: clausePane(findings, "target"),
+        findings,
+        counts: reviewCounts(findings),
+      });
+    },
+  ),
+
+  http.patch(
+    "*/api/workstreams/:workstreamId/edges/:edgeId/findings/:findingId",
+    async ({ params, request }) => {
+      const { edgeId, findingId } = params as {
+        edgeId: string;
+        findingId: string;
+      };
+      const body = (await request.json()) as { review_state?: string };
+      const next = body.review_state;
+      if (next !== "pending" && next !== "accepted" && next !== "dismissed") {
+        return jsonError(
+          400,
+          "INVALID_REVIEW_STATE",
+          `review_state must be pending|accepted|dismissed, got ${next}`,
+        );
+      }
+      const decoded = decodeURIComponent(findingId);
+      if (!reviewFindings(edgeId).some((f) => f.id === decoded)) {
+        return jsonError(
+          404,
+          "FINDING_NOT_FOUND",
+          `Finding ${decoded} not found on ${edgeId}`,
+        );
+      }
+      reviewState.set(decoded, next);
+      const findings = reviewFindings(edgeId);
+      return HttpResponse.json({
+        finding: findings.find((f) => f.id === decoded),
+        counts: reviewCounts(findings),
+      });
+    },
+  ),
+
   http.get("*/api/workstreams/:workstreamId/tasks/:nodeId", ({ params }) => {
     const { workstreamId, nodeId } = params as {
       workstreamId: string;
