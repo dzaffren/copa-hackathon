@@ -1,0 +1,21 @@
+[
+  {
+    "summary": "Annual vs biennial scenario testing — draft pins annual cadence; HKMA requires at least biennial",
+    "label": "differs-on",
+    "sentiment": "tighten",
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "Operational Resilience 5.3",
+        "text": "A financial institution shall conduct scenario testing of its operational resilience arrangements at least annually."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "HKMA SPM OR-2 5.2",
+        "text": "An authorized institution should conduct scenario testing at least once every two years."
+      }
+    ]
+  }
+]

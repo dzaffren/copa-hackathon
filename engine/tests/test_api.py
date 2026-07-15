@@ -33,6 +33,7 @@ from engine.clauses import (
     build_reference_clause,
     merge_clause_indexes,
 )
+from engine.config import REPO_ROOT
 from engine.graph import build_graph
 from engine.ingest import UnreadableDocumentError
 
@@ -1163,3 +1164,181 @@ def test_existing_routes_unchanged_on_paragraph_app(tmp_path):
     clause = client.get("/clauses/PDPA 129")
     assert clause.status_code == 200
     assert clause.json()["text"] == AIDP_PDPA_129_TEXT
+
+
+# ===========================================================================
+# Workstream Brain — Task Screen routes (Task 1):
+#   GET /api/workstreams/{workstream_id}/tasks/{node_id}
+#   GET /api/workstreams/{workstream_id}/edges/{edge_id}/findings
+#
+# Served from the committed on-disk fixture `data/workstreams/opres-v2` — a
+# per-workstream `graph.json` + `findings/{edge_id}.json` files. `create_app`
+# takes an injectable `workstreams_dir`, so these tests point it at the real
+# fixture dir (no clause index / graph needed for these routes).
+# ===========================================================================
+
+WORKSTREAMS_FIXTURE_DIR = REPO_ROOT / "data" / "workstreams"
+
+
+def _make_workstream_client(workstreams_dir=WORKSTREAMS_FIXTURE_DIR) -> TestClient:
+    app = create_app(
+        clause_index=ClauseIndex({}),
+        graph={"nodes": [], "edges": []},
+        workstreams_dir=workstreams_dir,
+    )
+    return TestClient(app)
+
+
+# --- GET /api/workstreams/{id}/tasks/{node_id} ------------------------------
+
+
+def test_GET_task_returns_opres_pd_v0_3_with_6_neighbours():
+    client = _make_workstream_client()
+    response = client.get("/api/workstreams/opres-v2/tasks/opres-pd-v0-3")
+    assert response.status_code == 200
+    body = response.json()
+
+    task = body["task"]
+    assert task["id"] == "opres-pd-v0-3"
+    assert task["title"] == "Operational Resilience PD — v0.3"
+    assert task["source_name"] == "OpRes PD v0.3 working draft"
+    assert task["format"] == ".docx"
+    assert task["status"] == "in_progress"
+    assert task["clause_count"] == 42
+    assert task["last_edited_at"] == "2026-07-13T14:30:00Z"
+    assert task["owner"] == {"id": "ar", "name": "Aisyah R."}
+    assert task["reviewers"] == [
+        {"id": "fm", "name": "Farid M."},
+        {"id": "ps", "name": "Priya S."},
+    ]
+
+    assert body["draft_empty"] is False
+
+    neighbours = body["neighbours"]
+    assert [n["node_id"] for n in neighbours] == [
+        "bcbs-opres-2021",
+        "fsb-3rd-party",
+        "hkma-spm-or2",
+        "rmit-pd-2025",
+        "fsa-2013-143",
+        "abm-position",
+    ]
+
+    bcbs = neighbours[0]
+    assert bcbs["title"] == "BCBS OpRes 2021"
+    assert bcbs["node_type"] == "international-standard"
+    assert bcbs["edge_type"] == "contributes-to"
+    assert bcbs["edge_id"] == "e-opres_v0_3--bcbs_opres_2021"
+    assert bcbs["analysed"] is True
+    assert bcbs["findings_count"] == 3
+
+    assert sum(1 for n in neighbours if n["analysed"]) == 4
+
+
+def test_GET_task_neighbour_order_matches_graph_json():
+    # The neighbour order in the response must preserve the edge order declared
+    # in graph.json for this task node (BCBS, FSB, HKMA, RMiT, FSA, ABM).
+    client = _make_workstream_client()
+    body = client.get("/api/workstreams/opres-v2/tasks/opres-pd-v0-3").json()
+    assert [n["edge_id"] for n in body["neighbours"]] == [
+        "e-opres_v0_3--bcbs_opres_2021",
+        "e-opres_v0_3--fsb_3rd_party",
+        "e-opres_v0_3--hkma_spm_or2",
+        "e-opres_v0_3--rmit_pd_2025",
+        "e-opres_v0_3--fsa_2013_143",
+        "e-opres_v0_3--abm_position",
+    ]
+
+
+def test_GET_task_unanalysed_neighbours_have_no_findings():
+    # FSB and ABM have no findings file → not analysed, zero findings, and (per
+    # the contract) no label/summary is exposed here at all.
+    client = _make_workstream_client()
+    body = client.get("/api/workstreams/opres-v2/tasks/opres-pd-v0-3").json()
+    by_id = {n["node_id"]: n for n in body["neighbours"]}
+    for unanalysed in ("fsb-3rd-party", "abm-position"):
+        assert by_id[unanalysed]["analysed"] is False
+        assert by_id[unanalysed]["findings_count"] == 0
+
+
+def test_GET_task_draft_empty_true_when_no_draft_file():
+    # opres-pd-v0-0 has clause_count 0 → draft_empty True, but its neighbours
+    # (declared as edges) are still populated.
+    client = _make_workstream_client()
+    response = client.get("/api/workstreams/opres-v2/tasks/opres-pd-v0-0")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["draft_empty"] is True
+    assert body["task"]["clause_count"] == 0
+    assert len(body["neighbours"]) == 2  # BCBS + HKMA edges declared for v0-0
+
+
+def test_GET_task_404_NODE_NOT_FOUND():
+    client = _make_workstream_client()
+    response = client.get("/api/workstreams/opres-v2/tasks/does-not-exist")
+    assert response.status_code == 404
+    assert response.json()["code"] == "NODE_NOT_FOUND"
+
+
+def test_GET_task_400_NOT_A_TASK_for_bcbs_node():
+    # bcbs-opres-2021 exists but is an international-standard, not a task.
+    client = _make_workstream_client()
+    response = client.get("/api/workstreams/opres-v2/tasks/bcbs-opres-2021")
+    assert response.status_code == 400
+    body = response.json()
+    assert body["code"] == "NOT_A_TASK"
+    assert "international-standard" in body["message"]
+
+
+def test_GET_task_404_WORKSTREAM_NOT_FOUND():
+    client = _make_workstream_client()
+    response = client.get("/api/workstreams/no-such-ws/tasks/opres-pd-v0-3")
+    assert response.status_code == 404
+    assert response.json()["code"] == "WORKSTREAM_NOT_FOUND"
+
+
+# --- GET /api/workstreams/{id}/edges/{edge_id}/findings ---------------------
+
+
+def test_GET_edge_findings_returns_bcbs_connections():
+    client = _make_workstream_client()
+    response = client.get(
+        "/api/workstreams/opres-v2/edges/e-opres_v0_3--bcbs_opres_2021/findings"
+    )
+    assert response.status_code == 200
+    findings = response.json()
+    assert len(findings) == 3
+    assert findings[0]["label"] == "aligns-with"
+    assert findings[0]["summary"] == "Dependency mapping tracks BCBS Principle 7"
+    # Verbatim-citation guarantee: cited clauses carry real text, never blank.
+    assert findings[0]["source_clauses"][0]["text"]
+
+
+def test_GET_edge_findings_hkma_carries_tighten_sentiment():
+    client = _make_workstream_client()
+    response = client.get(
+        "/api/workstreams/opres-v2/edges/e-opres_v0_3--hkma_spm_or2/findings"
+    )
+    assert response.status_code == 200
+    findings = response.json()
+    assert findings[0]["label"] == "differs-on"
+    assert findings[0]["sentiment"] == "tighten"
+
+
+def test_GET_edge_findings_empty_list_for_unanalysed_edge():
+    # FSB edge exists in graph.json but has no findings file → 200 with [].
+    client = _make_workstream_client()
+    response = client.get(
+        "/api/workstreams/opres-v2/edges/e-opres_v0_3--fsb_3rd_party/findings"
+    )
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_GET_edge_findings_404_EDGE_NOT_FOUND():
+    client = _make_workstream_client()
+    response = client.get(
+        "/api/workstreams/opres-v2/edges/e-does-not-exist/findings"
+    )
+    assert response.status_code == 404
+    assert response.json()["code"] == "EDGE_NOT_FOUND"

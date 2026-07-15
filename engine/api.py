@@ -35,6 +35,7 @@ from engine.clauses import (
     ClauseIndex,
     ClauseVersionNotFoundError,
 )
+from engine.config import REPO_ROOT
 from engine.connections import CriticFn, FinderFn, find_connections
 from engine.ingest import UnreadableDocumentError, ingest_document
 from engine.read_model import (
@@ -63,6 +64,12 @@ _PDF_MIME = "application/pdf"
 _DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 _SUPPORTED_SUBMISSION_MIMES = {_PDF_MIME, _DOCX_MIME}
 
+# The Workstream Brain fixture store (Task 1): one directory per workstream, each
+# holding a `graph.json` (`{"nodes": [...], "edges": [...]}`) and a `findings/`
+# folder of `{edge_id}.json` connection arrays. Injectable so tests point it at a
+# tmp/fixture dir; the module-level `app` defaults it to `data/workstreams`.
+WORKSTREAMS_DIR = REPO_ROOT / "data" / "workstreams"
+
 # The public-facing clause-index fields (the frozen contract) — the private
 # `_full_text` slice used to compose a parent's view is never exposed; the
 # composed view is returned under `full_text` instead.
@@ -84,6 +91,25 @@ def _error(status_code: int, code: str, message: str) -> JSONResponse:
     return JSONResponse(
         status_code=status_code, content={"error": code, "message": message}
     )
+
+
+def _ws_error(status_code: int, code: str, message: str) -> JSONResponse:
+    """Error body for the Workstream Brain routes: `{code, message}` (Task 1
+    contract) — a distinct shape from the `{error, message}` clause/graph API."""
+    return JSONResponse(
+        status_code=status_code, content={"code": code, "message": message}
+    )
+
+
+def _load_workstream_graph(
+    workstreams_dir: Path, workstream_id: str
+) -> Optional[dict[str, Any]]:
+    """Load a workstream's `graph.json`, or `None` when the workstream dir or its
+    `graph.json` is missing (→ the route reports 404 WORKSTREAM_NOT_FOUND)."""
+    graph_path = workstreams_dir / workstream_id / "graph.json"
+    if not graph_path.exists():
+        return None
+    return json.loads(graph_path.read_text(encoding="utf-8"))
 
 
 def _public_clause(entry: ClauseEntry, full_text: Optional[str]) -> dict[str, Any]:
@@ -114,6 +140,7 @@ def create_app(
     verdicts: Optional[dict[str, Any]] = None,
     analyse_fn: Optional[AnalyseFn] = None,
     verdict_fn: Optional[VerdictFn] = None,
+    workstreams_dir: Union[str, Path] = WORKSTREAMS_DIR,
 ) -> FastAPI:
     """Construct the read API against injected dependencies.
 
@@ -142,6 +169,10 @@ def create_app(
         verdict_fn: injectable verdict seam passed to `propose_verdicts` on the
             live analyse path; `None` in the demo (candidates carry frozen
             verdicts). Tests stub it.
+        workstreams_dir: the Workstream Brain fixture store (one dir per
+            workstream with a `graph.json` + `findings/{edge_id}.json`);
+            injectable so tests point it at a fixture/tmp dir. Defaults to
+            `data/workstreams`.
 
     Returns:
         A configured `FastAPI` app. No network or credentials are required to
@@ -151,6 +182,7 @@ def create_app(
     app = FastAPI(title="Rulebook Radar — read API")
 
     submissions_dir = Path(submissions_dir)
+    workstreams_dir = Path(workstreams_dir)
     known_document_ids = {node["id"] for node in graph.get("nodes", [])}
     verdicts = verdicts or {}
 
@@ -442,6 +474,114 @@ def create_app(
                 f"No submission with id '{submission_id}'",
             )
         return json.loads(record_path.read_text())
+
+    # --- Workstream Brain — Task Screen routes (Task 1) --------------------
+    # Read-only projections over a per-workstream `graph.json` + `findings/`
+    # fixture store. A neighbour is "analysed" iff its edge has a findings file;
+    # `findings_count` is that file's length. `draft_empty` is derived from the
+    # task node's `clause_count` so it tracks the actual draft state. Error body
+    # is `{code, message}` (see `_ws_error`) — the Task Screen contract.
+
+    def _edge_findings_path(workstream_id: str, edge_id: str) -> Path:
+        return workstreams_dir / workstream_id / "findings" / f"{edge_id}.json"
+
+    @app.get("/api/workstreams/{workstream_id}/tasks/{node_id}")
+    def get_workstream_task(workstream_id: str, node_id: str) -> Any:
+        try:
+            ws_graph = _load_workstream_graph(workstreams_dir, workstream_id)
+            if ws_graph is None:
+                return _ws_error(
+                    404,
+                    "WORKSTREAM_NOT_FOUND",
+                    f"Workstream {workstream_id} not found",
+                )
+
+            nodes_by_id = {n["id"]: n for n in ws_graph.get("nodes", [])}
+            node = nodes_by_id.get(node_id)
+            if node is None:
+                return _ws_error(
+                    404,
+                    "NODE_NOT_FOUND",
+                    f"Node {node_id} not found in workstream {workstream_id}",
+                )
+            if node.get("node_type") != "task":
+                return _ws_error(
+                    400,
+                    "NOT_A_TASK",
+                    f"Node {node_id} is of type {node.get('node_type')}, "
+                    "not task",
+                )
+
+            # Neighbours = edges out of this task node, in graph.json order.
+            neighbours = []
+            for edge in ws_graph.get("edges", []):
+                if edge.get("source") != node_id:
+                    continue
+                target = nodes_by_id.get(edge["target"], {})
+                findings_path = _edge_findings_path(workstream_id, edge["id"])
+                analysed = findings_path.exists()
+                findings_count = (
+                    len(json.loads(findings_path.read_text(encoding="utf-8")))
+                    if analysed
+                    else 0
+                )
+                neighbours.append(
+                    {
+                        "node_id": edge["target"],
+                        "title": target.get("title", edge["target"]),
+                        "node_type": target.get("node_type"),
+                        "edge_type": edge.get("edge_type"),
+                        "edge_id": edge["id"],
+                        "analysed": analysed,
+                        "findings_count": findings_count,
+                    }
+                )
+
+            clause_count = node.get("clause_count", 0)
+            task = {
+                "id": node["id"],
+                "title": node.get("title"),
+                "source_name": node.get("source_name"),
+                "format": node.get("format"),
+                "description": node.get("description"),
+                "status": node.get("status"),
+                "owner": node.get("owner"),
+                "reviewers": node.get("reviewers", []),
+                "clause_count": clause_count,
+                "last_edited_at": node.get("last_edited_at"),
+            }
+            return {
+                "task": task,
+                "neighbours": neighbours,
+                "draft_empty": clause_count == 0,
+            }
+        except Exception:  # noqa: BLE001 — contract: any load error → 500
+            return _ws_error(
+                500,
+                "INTERNAL_ERROR",
+                f"Failed to load task {node_id} in workstream {workstream_id}",
+            )
+
+    @app.get("/api/workstreams/{workstream_id}/edges/{edge_id}/findings")
+    def get_workstream_edge_findings(workstream_id: str, edge_id: str) -> Any:
+        ws_graph = _load_workstream_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404,
+                "WORKSTREAM_NOT_FOUND",
+                f"Workstream {workstream_id} not found",
+            )
+        edge_ids = {e["id"] for e in ws_graph.get("edges", [])}
+        if edge_id not in edge_ids:
+            return _ws_error(
+                404,
+                "EDGE_NOT_FOUND",
+                f"Edge {edge_id} not found in workstream {workstream_id}",
+            )
+        findings_path = _edge_findings_path(workstream_id, edge_id)
+        if not findings_path.exists():
+            return []
+        return json.loads(findings_path.read_text(encoding="utf-8"))
 
     return app
 

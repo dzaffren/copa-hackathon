@@ -1,0 +1,21 @@
+[
+  {
+    "summary": "Statutory basis correctly cited — preamble anchors this PD to FSA §143(2)",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "Operational Resilience 1.1",
+        "text": "This policy document is issued pursuant to section 143(2) of the Financial Services Act 2013."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "FSA 2013 §143(2)",
+        "text": "The Bank may issue standards on prudential matters to a financial institution."
+      }
+    ]
+  }
+]
