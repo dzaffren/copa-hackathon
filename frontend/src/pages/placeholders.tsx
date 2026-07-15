@@ -33,18 +33,6 @@ export function HomePage() {
   );
 }
 
-export function WorkstreamGraphPage() {
-  const { workstreamId } = useParams();
-  return (
-    <Shell eyebrow="Workstream graph" title={`Workstream ${workstreamId}`}>
-      <p>
-        The workstream graph canvas is not part of this build. This placeholder
-        confirms the breadcrumb route resolves.
-      </p>
-    </Shell>
-  );
-}
-
 export function DraftingWorkspacePage() {
   const { workstreamId, nodeId } = useParams();
   return (
@@ -64,6 +52,28 @@ export function ReviewLinkagesPage() {
       <p>
         Review linkages for edge <code>{edgeId}</code> in workstream{" "}
         <code>{workstreamId}</code>. Placeholder for the review story.
+      </p>
+    </Shell>
+  );
+}
+
+export function NewWorkstreamPage() {
+  return (
+    <Shell eyebrow="New workstream" title="New workstream">
+      <p>
+        The new-workstream form is a separate story. This placeholder confirms
+        the route resolves.
+      </p>
+    </Shell>
+  );
+}
+
+export function InstitutionMapPage() {
+  return (
+    <Shell eyebrow="Institution map" title="Institution map">
+      <p>
+        The institution map is a separate epic. This placeholder confirms the
+        route resolves.
       </p>
     </Shell>
   );

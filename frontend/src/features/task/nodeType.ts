@@ -49,6 +49,12 @@ export const NODE_TYPE_STYLES: Record<NodeType, NodeTypeStyle> = {
     chip: "border-emerald-300 text-emerald-800",
     pill: "bg-emerald-100 text-emerald-800",
   },
+  others: {
+    dot: "bg-gray-400",
+    row: "bg-gray-50 border-gray-200 text-gray-900",
+    chip: "border-gray-300 text-gray-800",
+    pill: "bg-gray-100 text-gray-800",
+  },
 };
 
 const FALLBACK: NodeTypeStyle = {

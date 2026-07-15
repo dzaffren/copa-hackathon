@@ -240,8 +240,10 @@ describe("TaskScreenPage — navigation", () => {
     await loadTaskScreen();
 
     await user.click(screen.getByRole("link", { name: /Workstream graph/i }));
+    // The real workstream graph screen now mounts here (previously a
+    // placeholder heading); its "+ Add node" action confirms we landed.
     expect(
-      await screen.findByRole("heading", { name: /Workstream opres-v2/i }),
+      await screen.findByRole("button", { name: /add node/i }),
     ).toBeInTheDocument();
   });
 

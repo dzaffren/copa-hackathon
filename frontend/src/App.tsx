@@ -1,16 +1,20 @@
 import { Routes, Route } from "react-router-dom";
 import TaskScreenPage from "@/features/task/TaskScreenPage";
+import WorkstreamGraphPage from "@/features/workstream-graph/WorkstreamGraphPage";
 import {
   HomePage,
-  WorkstreamGraphPage,
   DraftingWorkspacePage,
   ReviewLinkagesPage,
+  NewWorkstreamPage,
+  InstitutionMapPage,
 } from "@/pages/placeholders";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="/workstreams/new" element={<NewWorkstreamPage />} />
+      <Route path="/institution-map" element={<InstitutionMapPage />} />
       <Route
         path="/workstreams/:workstreamId"
         element={<WorkstreamGraphPage />}

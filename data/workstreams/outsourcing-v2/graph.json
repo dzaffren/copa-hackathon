@@ -1,0 +1,53 @@
+{
+  "nodes": [
+    {
+      "id": "outsourcing-pd-v2",
+      "node_type": "task",
+      "title": "Outsourcing PD — v2",
+      "issuer": "BNM",
+      "short_type": "PD (draft)",
+      "source_name": "Outsourcing PD v2 working draft",
+      "format": ".docx",
+      "description": "Working draft of the reissued Outsourcing Policy Document.",
+      "source_url": null,
+      "status": "in_progress",
+      "owner": { "id": "fm", "name": "Farid M." },
+      "reviewers": [{ "id": "ar", "name": "Aisyah R." }],
+      "clause_count": 30,
+      "last_edited_at": "2026-07-09T11:00:00Z",
+      "recent_activity": []
+    },
+    {
+      "id": "eba-outsourcing-2019",
+      "node_type": "international-standard",
+      "title": "EBA Outsourcing Guidelines",
+      "issuer": "EBA",
+      "short_type": "Guidelines",
+      "description": "European Banking Authority guidelines on outsourcing arrangements (2019).",
+      "source_url": "https://www.eba.europa.eu"
+    },
+    {
+      "id": "mas-outsourcing",
+      "node_type": "peer-regulator",
+      "title": "MAS Outsourcing Guidelines",
+      "issuer": "MAS",
+      "short_type": "Guidelines",
+      "description": "Monetary Authority of Singapore guidelines on outsourcing.",
+      "source_url": "https://www.mas.gov.sg"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-outsourcing_v2--eba_outsourcing_2019",
+      "source": "outsourcing-pd-v2",
+      "target": "eba-outsourcing-2019",
+      "edge_type": "contributes-to"
+    },
+    {
+      "id": "e-outsourcing_v2--mas_outsourcing",
+      "source": "outsourcing-pd-v2",
+      "target": "mas-outsourcing",
+      "edge_type": "contributes-to"
+    }
+  ]
+}
