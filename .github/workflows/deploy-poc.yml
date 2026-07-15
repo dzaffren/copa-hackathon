@@ -1,13 +1,23 @@
 name: Deploy POC to GitHub Pages
 
-# Publishes the clickable HTML prototype (docs/poc/policy-consistency-ai)
-# as a live demo site. The site root is the POC, so the URL opens on index.html.
+# Publishes the Workstream Brain clickable prototype (docs/poc/workstream-brain)
+# as the live demo site. The site root is the POC, so the URL opens on index.html.
+#
+# This previously published docs/poc/policy-consistency-ai — the FIRST of four
+# iterations, titled "Rulebook Radar". It last changed 10 Jul while current work
+# continued elsewhere, and because the path filter only watched that folder, no
+# workstream-brain change could ever trigger a deploy. Anyone following the
+# README's live-demo link was evaluating a three-iteration-old product.
+#
+# Deploys from `main` only. Workstream-brain work currently lands on `dzaf/main`,
+# so the public demo will not refresh until that is merged up — deliberate: the
+# published artifact should track the canonical branch, not a personal one.
 
 on:
   push:
     branches: [main]
     paths:
-      - "docs/poc/policy-consistency-ai/**"
+      - "docs/poc/workstream-brain/**"
       - ".github/workflows/deploy-poc.yml"
   workflow_dispatch:
 
@@ -37,7 +47,7 @@ jobs:
       - name: Upload POC as the site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/poc/policy-consistency-ai
+          path: docs/poc/workstream-brain
 
       - name: Deploy
         id: deployment

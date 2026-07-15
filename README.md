@@ -1,108 +1,150 @@
-# 🛰️ Rulebook Radar
+# 🧠 Workstream Brain
 
 **AI for policy consistency — COPA Hackathon 2026 (Bank Negara Malaysia).**
 
-Rulebook Radar maps a cluster of BNM's own published policy documents as a
-connected **knowledge graph** and uses it to keep the rulebook consistent. When a
-policy drafter revises a policy, it traces the ripple across every linked policy
-and flags where the change creates a **Conflict**, a **Duplication**, or a
-**Gap** — each finding quoting the exact clause it is based on. The same graph
-serves a **supervisor**, who uploads a bank's application and receives a cited
-checklist of every requirement it must meet across the linked policies, flagging
-what is missing.
+A BNM policy team drafts a Discussion Paper, an Exposure Draft, or a Policy
+Document over months, against a shifting web of anchors: BCBS standards, peer
+regulators, acts of law, industry feedback, and BNM's own published policies.
+Today the map of how those anchors relate to the draft lives in one senior
+policymaker's head.
 
-> **One-line pitch defence:** a chatbot answers _"what does the rule say"_;
-> Rulebook Radar answers _"what breaks if the rule changes"_ and _"what's missing
-> from this submission"_ — the consistency / supervision job a chatbot can't do.
+**Workstream Brain makes that map explicit.** Each workstream becomes a knowledge
+graph: documents are nodes, joined by structural edges (`supersedes`,
+`references`, `contributes-to`, `parallel-to`). The engine reads clause pairs
+across a draft and its anchors and proposes **linkages** — each one labelled,
+each one quoting the exact clause it relies on. The drafter reviews, accepts, or
+corrects. The demo climax is **cross-workstream drift**: two workstreams running
+in parallel that touch the same concept and don't yet know it.
 
-Built entirely on **public** BNM policy documents and demonstrated on the
-technology-risk cluster (RMiT · Operational Resilience · Outsourcing · Business
-Continuity · Cyber Risk).
+> **Pitch defence:** a chatbot answers _"what does the rule say"_. Workstream
+> Brain answers _"what does my draft disagree with, and where's the proof"_ —
+> and it survives the policymaker rotating out.
+
+Built entirely on **public** documents. Demonstrated on two real workstreams in
+parallel: **Operational Resilience** (continuation) and **Open Finance** (ED
+response).
 
 ## Why it matters
 
-Aligned to **BP2026 Must-Win 10** (AI roadmap for supervision), whose Key Result 3
-targets _">15% efficiency across 10 supervisory processes from staff usage of AI
-tools."_ It also supports **MW9** (process efficiency) and **MW6** (a coherent,
-non-contradictory rulebook), and the broader SET2027 goals of a Trusted
-Institution / Credible Regulator and Engaged Employees.
+The strategic frame is **institutional continuity** — cross-workstream drift that
+today exists only as expert judgement becomes explicit, cited, and inspectable, so
+the map survives when the policymaker rotates, retires, or is on leave.
 
-## Two users, one knowledge graph
+Anchored on **BP2026 Must-Win 10** (AI for supervision) — KR2 (AI-driven business
+process reengineering) and KR3 (_">15% efficiency across 10 supervisory processes"_)
+— and **MW6** (a coherent, non-contradictory rulebook), supporting BNM's SET2027
+Trusted Institution / Credible Regulator narrative and IMF FSAP readiness.
 
-| Persona                             | Task                        | What the tool does                                                                                                                                                                                                   |
-| ----------------------------------- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Policy drafter**                  | Revising a policy           | Maps the cluster, traces the ripple of a change, flags Conflict / Duplication / Gap findings, and offers a grounded drafting copilot that writes accepted redrafts back into the living document as tracked changes. |
-| **Supervisor (Jabatan Penyeliaan)** | Assessing a bank submission | Reads an uploaded application, assembles every applicable requirement _across_ policies, and marks each Met / Missing / Unclear — so nothing slips through.                                                          |
+## The five-label taxonomy
 
-**The graph is the engine, not always the interface:** the drafter operates the
-graph directly; the supervisor consumes its output as a checklist and sees the
-graph only on demand ("why is this required?").
+Every finding carries exactly one label. This is the vocabulary — not
+Conflict/Duplication/Gap, which was retired in an earlier iteration:
+
+| Label            | Meaning                                                              |
+| ---------------- | -------------------------------------------------------------------- |
+| `aligns-with`    | The draft and the source say the same thing.                         |
+| `differs-on`     | Both address it, but differ. Carries a `tighten`/`loosen` sentiment. |
+| `conflicts-with` | They cannot both be complied with.                                   |
+| `silent-on`      | The source addresses something the draft does not.                   |
+| `goes-beyond`    | The draft addresses something the source does not.                   |
 
 ## Core guardrail — verbatim citation
 
-Every finding, checklist line, and copilot answer **quotes the exact clause** it
-relies on, with its clause number. If no supporting clause exists, the tool says
-so explicitly ("No matching clause found") rather than assert an unsupported
-claim. This anti-hallucination rule was validated in a blind LLM test on the real
-RMiT and Outsourcing documents — it independently found the genuine cross-policy
-conflict (Outsourcing 12.1 "approve-before" vs. RMiT 17.1 amended to
-"notify-after") and every cited clause checked out verbatim.
+Every finding **quotes the exact clause** it relies on, with its clause number. If
+no supporting clause exists, the tool says **"No matching clause found"** rather
+than assert an unsupported claim.
+
+**"Verbatim" applies to citations, not to equivalence.** BNM never copy-pastes from
+BCBS; the tool never claims two paraphrases are equivalent — it cites both sides
+exactly and labels the relationship.
+
+This anti-hallucination rule was validated on real documents: a blind LLM test
+independently found the genuine cross-policy conflict (Outsourcing 12.1
+"approve-before" vs. RMiT 17.1 amended to "notify-after"), with every cited clause
+checking out verbatim. A later experiment on the OpRes × Open Finance pair found
+12 supported cross-workstream linkages and zero unsupported.
 
 ## Repository layout
 
+**Live code:**
+
 ```
-docs/
-├── discovery/policy-consistency-ai/
-│   └── brief.md            # Opportunity solution tree + validated LLM experiment
-├── poc/policy-consistency-ai/
-│   ├── index.html          # Role-aware workspace knowledge graph (drafter)
-│   ├── review.html         # RMiT change — side-by-side review
-│   ├── review-opres.html   # Operational Resilience change
-│   ├── review-outsourcing.html  # Reviewer (comment-only) view
-│   ├── impact.html         # Ripple report: Conflict / Duplication / Gap findings
-│   ├── chat.html           # Drafting copilot + live document viewer
-│   └── supervisor.html     # Upload → cited Met/Missing/Unclear checklist → decide
-└── specs/rulebook-radar/
-    ├── spec.md                          # Epic overview (shared rules, journey, metrics)
-    ├── spec-knowledge-graph-engine.md   # Ingestion + clause index + graph (technical)
-    ├── spec-drafter-workspace.md        # Role-aware workspace
-    ├── spec-ripple-impact-report.md     # Consistency ripple check
-    ├── spec-drafting-copilot.md         # Copilot with live write-back
-    ├── spec-supervisor-check.md         # Submission completeness & compliance check
-    └── spec-reviewer-approval.md        # Reviewer & approval workflow
+engine/          FastAPI read service, clause index, finder→critic linkage loop
+frontend/        Workstream Brain app (Vite + React 18 + TanStack Query)  ← UI work lands here
+data/
+├── corpus/      Parsed BNM policy PDFs (public)
+├── references/  External standards — Basel, MAS TRM, PDPA (public)
+├── workstreams/ Workstream fixtures: opres-v2, outsourcing-v2, rmit-v2-2025
+└── artifacts/   Built clause index + graph + recorded linkage traces
+kg-poc/          Standalone ontology/NER pipeline spike (isolated; nothing imports it)
+scripts/         Trace runner, snapshot exporter
 ```
+
+**Docs:** `docs/discovery/` (briefs per iteration) · `docs/specs/workstream-brain/`
+(current epic) · `docs/adr/` (decisions) · `docs/learnings/` (repo conventions —
+read `INDEX.md` first) · `docs/poc/workstream-brain/` (clickable UX reference).
+
+**Earlier iterations, kept as read-only reference — do not build from these:**
+`web/` (Next.js app from the reconciliation-workbench iteration),
+`docs/poc/{policy-consistency-ai,drafter-knowledge-graph}/`,
+`docs/specs/{rulebook-radar,reconciliation-workbench}/`.
+
+> **Confidential:** `docs/references/` is git-ignored and internal — never commit
+> anything under it. Note this is _not_ `data/references/`, which is public and
+> tracked.
+
+## Run it
+
+**Engine** (no Azure credentials needed — every model call site is an injectable
+seam, stubbed in tests):
+
+```bash
+uv venv .venv && uv pip install pytest python-dotenv fastapi httpx \
+  python-multipart uvicorn anthropic azure-ai-inference 'markitdown[pdf,docx]'
+PYTHONPATH=. .venv/bin/python -m pytest engine/tests -q   # 196 tests
+PYTHONPATH=. .venv/bin/uvicorn engine.api:app --reload    # serves :8000
+```
+
+**Frontend:**
+
+```bash
+cd frontend
+npm ci
+npm test          # vitest — 44 tests
+npm run dev       # vite dev server
+```
+
+Point the app at a live engine with `VITE_API_BASE` (see `frontend/.env.example`);
+unset, it uses the bundled fixtures.
 
 ## View the prototype
 
 **🔗 Live demo:** https://dzaffren.github.io/copa-hackathon/
 
-The POC is a self-contained, clickable HTML prototype (Tailwind via CDN — no build
-step). Open any page directly in a browser, starting with the drafter workspace:
+The clickable prototype is self-contained HTML — open any page directly:
 
 ```bash
-open docs/poc/policy-consistency-ai/index.html
+open docs/poc/workstream-brain/index.html
 ```
 
-Or serve the folder locally:
-
-```bash
-python3 -m http.server --directory docs/poc/policy-consistency-ai 8000
-# then visit http://localhost:8000/index.html
-```
+It is the **UX reference** the `frontend/` build follows, not the product itself.
 
 ## Status
 
-- **Discovery:** complete — opportunity selected, riskiest assumption retired via a
-  green LLM experiment on real documents.
-- **POC:** clickable prototype covering both personas, both loops closed.
-- **PRD:** epic + 6 vertically-sliced story specs, ready for technical refinement.
-- **Scope:** MVP1 is a single cluster (technology-risk); cross-cluster ripple is a
-  labelled "what's next" preview, not built.
+- **Discovery:** complete — riskiest assumption retired (12 supported linkages
+  found on the OpRes × Open Finance pair, zero unsupported).
+- **Engine:** clause index, five-label finder→critic loop, workstream routes. Green.
+- **Frontend:** workstream graph (hero) and task screen shipped; drafting
+  workspace, review linkages, and new-workstream screens specced.
+- **Deferred:** the institution map (management-facing zoom-out view) and the
+  separate supervisor persona.
+- **Scope:** at least two real workstreams in parallel — cross-workstream linkage
+  is the demo climax, not a preview.
 
 ## Note on confidential material
 
 Internal BNM reference documents used during discovery are **excluded** from this
-repository (see `.gitignore`). Everything published here is built on public policy
+repository (see `.gitignore`). Everything published here is built on public
 documents.
 
 ## Contributing
