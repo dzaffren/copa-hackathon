@@ -104,3 +104,12 @@ matching clause found" — never invent one. Preserve this in any spec or POC ed
   green). Verify with `.venv/Scripts/python.exe -m pytest engine/tests`; don't disable
   all hooks (kills secret-scan) or install ruff to appease it. See
   `docs/learnings/blocker-forge-verify-hook-false-fail-pyenv-ruff.md`.
+- **Workstream-brain uses the opres-v2 base, not the specs' shapes** — the
+  workstream-brain specs are greenfield-stale; build screens to the `opres-v2`
+  fixtures + `engine/workstreams.py` (`node_type`/`edge_type`, `analysed` derived
+  from a findings file, task node is always the edge source). See
+  `docs/learnings/convention-workstream-brain-opres-v2-conventions.md`.
+- **Run forge builds in the main tree, not a worktree** — `.venv` and
+  `frontend/node_modules` exist only in the main working tree, so builds that need
+  `pytest`/`vitest` must run there rather than in isolated feature-builder
+  worktrees. See `docs/learnings/blocker-forge-build-run-in-main-worktree.md`.
