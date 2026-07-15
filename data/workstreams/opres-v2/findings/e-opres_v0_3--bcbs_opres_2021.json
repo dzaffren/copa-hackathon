@@ -1,0 +1,59 @@
+[
+  {
+    "summary": "Dependency mapping tracks BCBS Principle 7",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "Operational Resilience 4.4",
+        "text": "A financial institution shall map its dependencies on external service providers that support critical operations."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "BCBS OpRes Principle 7",
+        "text": "Banks should manage their dependencies on relationships, including but not limited to those of third parties or intra-group entities."
+      }
+    ]
+  },
+  {
+    "summary": "Board accountability for operational resilience aligns with BCBS Principle 1",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "Operational Resilience 2.1",
+        "text": "The board shall approve and oversee the financial institution's operational resilience framework, including its risk appetite for disruption to critical operations."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "BCBS OpRes Principle 1",
+        "text": "Banks should utilise their existing governance structure to establish, oversee and implement an effective operational resilience approach."
+      }
+    ]
+  },
+  {
+    "summary": "Draft mandates tested exit plans for critical third parties, going beyond the BCBS baseline",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "scope_note": "BCBS Principle 7 expects dependency management but stops short of requiring a tested exit plan per provider.",
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "Operational Resilience 4.7",
+        "text": "A financial institution shall maintain a documented and periodically tested exit plan for each critical third-party service provider."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "BCBS OpRes Principle 7",
+        "text": "Banks should manage their dependencies on relationships, including but not limited to those of third parties or intra-group entities."
+      }
+    ]
+  }
+]

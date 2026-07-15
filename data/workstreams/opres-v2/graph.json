@@ -1,0 +1,116 @@
+{
+  "nodes": [
+    {
+      "id": "opres-pd-v0-3",
+      "node_type": "task",
+      "title": "Operational Resilience PD — v0.3",
+      "source_name": "OpRes PD v0.3 working draft",
+      "format": ".docx",
+      "description": "Working draft of the Policy Document following the 2025 Discussion Paper",
+      "status": "in_progress",
+      "owner": { "id": "ar", "name": "Aisyah R." },
+      "reviewers": [
+        { "id": "fm", "name": "Farid M." },
+        { "id": "ps", "name": "Priya S." }
+      ],
+      "clause_count": 42,
+      "last_edited_at": "2026-07-13T14:30:00Z"
+    },
+    {
+      "id": "opres-pd-v0-0",
+      "node_type": "task",
+      "title": "Operational Resilience PD — v0.0",
+      "source_name": "OpRes PD v0.0 working draft",
+      "format": ".docx",
+      "description": "Empty working draft (no clauses parsed yet)",
+      "status": "in_progress",
+      "owner": { "id": "ar", "name": "Aisyah R." },
+      "reviewers": [
+        { "id": "fm", "name": "Farid M." },
+        { "id": "ps", "name": "Priya S." }
+      ],
+      "clause_count": 0,
+      "last_edited_at": "2026-07-10T09:00:00Z"
+    },
+    {
+      "id": "bcbs-opres-2021",
+      "node_type": "international-standard",
+      "title": "BCBS OpRes 2021"
+    },
+    {
+      "id": "fsb-3rd-party",
+      "node_type": "international-standard",
+      "title": "FSB 3rd-Party Toolkit"
+    },
+    {
+      "id": "hkma-spm-or2",
+      "node_type": "peer-regulator",
+      "title": "HKMA SPM OR-2"
+    },
+    {
+      "id": "rmit-pd-2025",
+      "node_type": "internal-published",
+      "title": "RMiT PD (28 Nov 2025)"
+    },
+    {
+      "id": "fsa-2013-143",
+      "node_type": "act-law",
+      "title": "FSA 2013 §143"
+    },
+    {
+      "id": "abm-position",
+      "node_type": "industry-input",
+      "title": "ABM position paper"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-opres_v0_3--bcbs_opres_2021",
+      "source": "opres-pd-v0-3",
+      "target": "bcbs-opres-2021",
+      "edge_type": "contributes-to"
+    },
+    {
+      "id": "e-opres_v0_3--fsb_3rd_party",
+      "source": "opres-pd-v0-3",
+      "target": "fsb-3rd-party",
+      "edge_type": "contributes-to"
+    },
+    {
+      "id": "e-opres_v0_3--hkma_spm_or2",
+      "source": "opres-pd-v0-3",
+      "target": "hkma-spm-or2",
+      "edge_type": "contributes-to"
+    },
+    {
+      "id": "e-opres_v0_3--rmit_pd_2025",
+      "source": "opres-pd-v0-3",
+      "target": "rmit-pd-2025",
+      "edge_type": "parallel-to"
+    },
+    {
+      "id": "e-opres_v0_3--fsa_2013_143",
+      "source": "opres-pd-v0-3",
+      "target": "fsa-2013-143",
+      "edge_type": "references"
+    },
+    {
+      "id": "e-opres_v0_3--abm_position",
+      "source": "opres-pd-v0-3",
+      "target": "abm-position",
+      "edge_type": "contributes-to"
+    },
+    {
+      "id": "e-opres_v0_0--bcbs_opres_2021",
+      "source": "opres-pd-v0-0",
+      "target": "bcbs-opres-2021",
+      "edge_type": "contributes-to"
+    },
+    {
+      "id": "e-opres_v0_0--hkma_spm_or2",
+      "source": "opres-pd-v0-0",
+      "target": "hkma-spm-or2",
+      "edge_type": "contributes-to"
+    }
+  ]
+}
