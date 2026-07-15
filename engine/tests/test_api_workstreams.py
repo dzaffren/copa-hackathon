@@ -4,8 +4,7 @@ Each test copies the real seeded `data/workstreams/` fixtures into a `tmp_path`
 and points `create_app(workstreams_dir=...)` at the copy. GET tests therefore
 double as integrity checks on the seeded demo data, while the mutating POST /
 analyze tests touch only the throwaway copy. No network, credentials, or real
-artifacts are required — the clause index / graph are empty stubs the workstream
-routes never touch.
+artifacts are required — the API is a projection over the fixture store alone.
 """
 
 import json
@@ -14,7 +13,6 @@ import shutil
 from fastapi.testclient import TestClient
 
 from engine.api import create_app
-from engine.clauses import ClauseIndex
 from engine.config import REPO_ROOT
 
 _OPRES = "opres-v2"
@@ -23,20 +21,10 @@ _BCBS_EDGE = "e-opres_v0_3--bcbs_opres_2021"  # seeded analysed edge (3 findings
 _FSB_EDGE = "e-opres_v0_3--fsb_3rd_party"  # unanalysed; the analyze demo pair
 
 
-def _boom(*_args, **_kwargs):  # pragma: no cover - must never be called
-    raise AssertionError("finder_fn must not be called by the workstream routes")
-
-
-def _make_client(tmp_path, finder_fn=None) -> tuple[TestClient, "object"]:
+def _make_client(tmp_path) -> tuple[TestClient, "object"]:
     dst = tmp_path / "workstreams"
     shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
-    app = create_app(
-        clause_index=ClauseIndex({}),
-        graph={"nodes": [], "edges": []},
-        workstreams_dir=dst,
-        finder_fn=finder_fn,
-        analyze_delay=0,
-    )
+    app = create_app(workstreams_dir=dst, analyze_delay=0)
     return TestClient(app), dst
 
 
@@ -256,8 +244,10 @@ def test_POST_node_unknown_workstream_returns_404_WORKSTREAM_NOT_FOUND(tmp_path)
 
 
 def test_POST_edge_analyze_replays_canned_findings_for_demo_pair(tmp_path):
-    # finder_fn is wired to explode; the demo pair must NOT reach it.
-    client, _ = _make_client(tmp_path, finder_fn=_boom)
+    # The demo pair replays canned findings and must not reach a model. This is
+    # now structural rather than asserted: `create_app` takes no finder seam, so
+    # the API has no path to one (it previously injected an exploding stub).
+    client, _ = _make_client(tmp_path)
     res = client.post(f"/api/workstreams/{_OPRES}/edges/{_FSB_EDGE}/analyze")
     assert res.status_code == 200
     body = res.json()

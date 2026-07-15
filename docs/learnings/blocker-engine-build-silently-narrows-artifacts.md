@@ -57,16 +57,18 @@ does not fail — it just yields less. See [[convention-offline-build-needs-doci
    RMiT document IDs, so restoring fixes the two broken traces and breaks the one
    that currently works. It is a trade, not a fix. A correct restore needs a DI-backed
    rebuild covering both ID generations.
-4. **This is legacy-path only — it does not block workstream-brain.** The current app
-   reads `data/workstreams/` (fixtures + `canned_analysis`) and never touches
-   `data/artifacts/`; those artifacts feed the superseded `web/` routes, the snapshot
-   exporter, and the trace conformance tests. See
-   [[convention-workstream-brain-opres-v2-conventions]] and
-   [[convention-frontend-app-is-frontend-dir]].
-5. **`data/artifacts/verdicts.json` does not exist** — `read_model.py`, `api.py` and
-   `scripts/export_poc_snapshot.py` all read it, it is not built, and it is not
-   gitignored. `_load_verdicts` returns `{}`, so every legacy paragraph renders
-   `not_analysed`. Treat the legacy read path as unreproducible from a fresh clone.
+4. **It does not block workstream-brain.** The app reads `data/workstreams/` (fixtures
+   - `canned_analysis`) and never touches `data/artifacts/`. Since the 16 Jul legacy
+     removal, the only remaining consumers of `data/artifacts/` are
+     `engine/tests/test_taxonomy_traces.py` (trace conformance) and
+     `scripts/run_finder_trace.py` (which writes new traces). See
+     [[convention-workstream-brain-opres-v2-conventions]] and
+     [[convention-frontend-app-is-frontend-dir]].
+5. **`verdicts.json` is gone for good.** It never existed on disk, and the code that
+   read it (`read_model.py`, the legacy API routes, `scripts/export_poc_snapshot.py`)
+   plus the stage that wrote it (`build.py` stage 4b, via the deleted `verdicts.py`)
+   were all removed on 16 Jul. `engine.build` now writes `clause-index.json` +
+   `graph.json` only.
 
 **Open decision:** whether the 2-document index is intentional scope-shedding (the
 demo no longer needs the legacy cluster) or an accidental clobber. If intentional,

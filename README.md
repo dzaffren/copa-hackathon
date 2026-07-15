@@ -85,9 +85,11 @@ scripts/         Trace runner, snapshot exporter
 read `INDEX.md` first) · `docs/poc/workstream-brain/` (clickable UX reference).
 
 **Earlier iterations, kept as read-only reference — do not build from these:**
-`web/` (Next.js app from the reconciliation-workbench iteration),
-`docs/poc/{policy-consistency-ai,drafter-knowledge-graph}/`,
-`docs/specs/{rulebook-radar,reconciliation-workbench}/`.
+`docs/poc/{policy-consistency-ai,drafter-knowledge-graph}/` and
+`docs/specs/{rulebook-radar,reconciliation-workbench}/`. Their **code** is gone: the
+reconciliation-workbench Next.js app (`web/`), the verdict/submission/paragraph read
+path, and their HTTP routes were removed on 16 Jul 2026 when Workstream Brain became
+the end state. A spec referencing them describes a repo that no longer exists.
 
 > **Confidential:** `docs/references/` is git-ignored and internal — never commit
 > anything under it. Note this is _not_ `data/references/`, which is public and

@@ -30,23 +30,14 @@ Full guideline: [`CONTRIBUTING.md`](CONTRIBUTING.md). Enforceable rules:
 - Prefer **squash merge**; delete the branch after merge.
 - **Only commit or push when the user explicitly asks.**
 
-## Issue tracking
+## Issue tracking — none
 
-Tracker is **GitHub Issues + a Project board** (no Jira). Use the `gh` CLI.
-
-> ⚠️ **This section is stale and needs a decision.** Epic #5 and stories #6–#11 below
-> describe the **superseded rulebook-radar** plan and are still open, while actual work
-> ships as PRs with no matching issues (#33–#37, workstream-brain). Don't assume an
-> issue exists for the work you're doing; confirm with `gh issue list` first.
-
-- Epic **#5** = high-level checklist. Stories **#6–#11**, one per spec in
-  `docs/specs/rulebook-radar/`; each spec's `**Ticket:**` field links to its issue.
-- Milestone: `Rulebook Radar MVP1 (Hackathon 3 Aug 2026)`.
-- Build order / deps: #6 engine (first) → #7 workspace (#6) → #8 ripple (#6,#7)
-  → #9 copilot (#6,#8); #10 supervisor (#6, parallel); #11 reviewer (#7,#8).
-- Read a ticket before working it: `gh issue view <n>` (links to its spec).
-- **Put `Closes #<n>` in the PR body** — merging auto-closes the issue, ticks the
-  epic checklist, and moves the board card to Done. Don't hand-edit issue state.
+**This repo does not use an issue tracker.** GitHub Issues was abandoned on
+16 Jul 2026; the rulebook-radar epic (#5) and its stories (#6–#11, #26) described a
+plan superseded twice over and were closed. Don't open issues, don't look for a
+ticket before working, and **don't put `Closes #<n>` in a PR body** — there is
+nothing to close. A spec under `docs/specs/workstream-brain/` plus a PR is the whole
+process. Specs may still carry a stale `**Ticket:**` field; ignore it.
 
 ## Confidentiality (hard rule)
 
@@ -62,27 +53,37 @@ matching clause found" — never invent one. Preserve this in any spec or POC ed
 
 ## Repository layout
 
-**Live code:**
+**Live code — this is the whole product now:**
 
-- `engine/` — FastAPI read service, clause index, finder→critic connection loop.
-  Serves two route families (see "Two taxonomies" below).
+- `engine/` — FastAPI service serving **only** `/api/workstreams/*`, projections over
+  `data/workstreams/`. Also holds `clauses.py` (the clause index / verbatim guarantee)
+  and `connections.py` (the five-label finder→critic loop) — the current engine, not
+  yet mounted as HTTP routes; exercised by `scripts/run_finder_trace.py` and tests.
 - `frontend/` — **the Workstream Brain app** (Vite + React 18 + Tailwind + shadcn/ui).
-  This is where current UI work lands.
+  The only frontend. This is where UI work lands.
 - `data/corpus/` — the parsed BNM policy PDFs; `data/workstreams/` — workstream
-  fixtures (`opres-v2`, `outsourcing-v2`, `rmit-v2-2025`); `data/references/` —
-  **public** external standards (Basel, MAS TRM, PDPA). Not confidential.
-- `kg-poc/` — standalone ontology/NER pipeline experiment (MECE-7 classes).
-- `scripts/` — trace runners, snapshot exporter.
+  fixtures (`opres-v2`, `outsourcing-v2`, `rmit-v2-2025`), which the API reads;
+  `data/references/` — **public** external standards (Basel, MAS TRM, PDPA);
+  `data/artifacts/` — built clause index + recorded linkage traces (see the
+  narrowing blocker below).
+- `kg-poc/` — standalone ontology/NER pipeline spike (MECE-7 classes). Isolated —
+  nothing imports it, and its `node_type` vocabulary is unrelated to the engine's.
+- `scripts/` — `run_finder_trace.py` (records linkage traces).
 
 **Earlier iterations — read-only reference, do not build from:**
 
-- `web/` — Next.js app from the reconciliation-workbench iteration (superseded).
 - `docs/poc/{policy-consistency-ai,drafter-knowledge-graph,workstream-brain}/` —
   three generations of clickable HTML prototypes; the workstream-brain set is the
   UX reference for current work.
 - `docs/specs/{rulebook-radar,reconciliation-workbench}/` — superseded epics.
   `docs/specs/workstream-brain/` is current but **greenfield-stale** — see the
   opres-v2 learning below before building from it.
+
+> **The legacy code is gone** (16 Jul 2026). `web/` (the reconciliation-workbench
+> Next.js app), `engine/{verdicts,submissions,read_model}.py`, the clause/graph/
+> paragraph/submission HTTP routes, and `scripts/export_poc_snapshot.py` were all
+> removed when Workstream Brain became the end state. If a spec or POC references
+> them, that spec is describing a repo that no longer exists.
 
 **Docs:** `docs/discovery/` (briefs per iteration), `docs/adr/` (decisions),
 `docs/learnings/` (repo conventions — read `INDEX.md` first).
@@ -105,22 +106,20 @@ Note this is _not_ `data/references/`, which is public and tracked.
   cross-workstream linkage is the demo climax, not a preview. The management-facing
   institution map is deferred to a follow-on epic.
 - **The frontend is `frontend/`** — Vite + React 18 + Tailwind + shadcn/ui, with
-  TanStack Query against the engine's `/api/workstreams/*` routes. This is where
-  Workstream Brain UI work lands (#36, #37). `web/` is the **previous** iteration's
-  Next.js app (reconciliation workbench, Zustand + persist, `NEXT_PUBLIC_API_BASE`)
-  and is not the active surface — don't add workstream-brain screens there. The
-  `docs/poc/workstream-brain/*.html` pages are the read-only UX reference.
-- **Two taxonomies live in the engine — don't conflate them.** They are separate
-  fields on separate route families:
-
-  | Module                  | Field     | Values                                                                        | Serves                             |
-  | ----------------------- | --------- | ----------------------------------------------------------------------------- | ---------------------------------- |
-  | `engine/connections.py` | `label`   | `aligns-with` / `differs-on` / `conflicts-with` / `silent-on` / `goes-beyond` | `/api/workstreams/*` → `frontend/` |
-  | `engine/verdicts.py`    | `verdict` | `Consensus` / `Conflict` / `Gap` / `Duplicate` / `Partial`                    | legacy routes → `web/`             |
-
-  Both have five values and both contain a "conflict", but they mean different things.
-  New workstream-brain work uses `label`. The retired-vocabulary test guards `label`
-  only, so `verdicts.py` legitimately still emits `Conflict` as a `verdict`.
+  TanStack Query against the engine's `/api/workstreams/*` routes (`VITE_API_BASE`).
+  It is now the only frontend. The `docs/poc/workstream-brain/*.html` pages are the
+  read-only UX reference.
+- **One taxonomy: the five semantic labels.** Findings carry exactly one `label` —
+  `aligns-with` / `differs-on` / `conflicts-with` / `silent-on` / `goes-beyond`
+  (`engine/connections.py`), with `sentiment` (`tighten`/`loosen`) valid **only** on
+  `differs-on`. `engine/tests/test_taxonomy_traces.py` guards this. The competing
+  `verdict` vocabulary (`Consensus`/`Conflict`/`Gap`/`Duplicate`/`Partial`) went with
+  `verdicts.py`, so "conflict" now means exactly one thing.
+- **The API is a fixture projection, not a model client.** Every route reads
+  `data/workstreams/`; the `analyze` route replays `workstreams.canned_analysis` for
+  the demo pair and returns `no_matching_source` otherwise. `create_app()` takes no
+  model seam, so the service _cannot_ reach a model — editing `connections.py` will
+  not change what the demo renders.
 
 ## Learnings
 
@@ -131,20 +130,19 @@ Note this is _not_ `data/references/`, which is public and tracked.
 - **FastAPI TestClient deps** — tests using `fastapi.testclient.TestClient` need
   `httpx` and `python-multipart` as explicit `pyproject.toml` deps (not pulled in
   by `fastapi` alone). See `docs/learnings/pattern-fastapi-testclient-deps.md`.
-- **/ship is GitLab — use gh** — the `/ship` skill targets GitLab; on this GitHub
-  repo override to `gh pr create --base main` with `Closes #<n>` in the PR body.
-  See `docs/learnings/skill-ship-is-gitlab-use-gh.md`.
-- **The frontend is a build-step app, and Workstream Brain's is `frontend/`** — the
-  11 Jul 2026 re-platform retired "self-contained HTML, no build step"; don't flag a
-  framework/`package.json`/build step as a mistake. Current UI work is `frontend/`
-  (Vite + React 18), **not** `web/` (the previous iteration's Next.js app). See
+- **/ship is GitLab — use gh** — the `/ship` skill targets GitLab; on this GitHub repo
+  override to `gh pr create --base dzaf/main`. **No `Closes #<n>`** — there is no issue
+  tracker. See `docs/learnings/skill-ship-is-gitlab-use-gh.md`.
+- **The frontend is a build-step app, and it's `frontend/`** — the 11 Jul 2026
+  re-platform retired "self-contained HTML, no build step"; don't flag a
+  framework/`package.json`/build step as a mistake. `frontend/` (Vite + React 18) is
+  now the only frontend. See
   `docs/learnings/convention-frontend-app-is-frontend-dir.md`.
 - **Offline build needs Azure Document Intelligence** — a full `python -m engine.build`
   fails offline on the legacy tech-risk PDFs (`BCM 9.17` won't resolve → `GraphBuildError`)
   because the default extractor scrambles multi-column PDFs; the committed artifacts were
-  DI-built. The AI DP + references + `verdicts.json` DO build offline — don't read that
-  `GraphBuildError` as a regression. See
-  `docs/learnings/convention-offline-build-needs-docintel.md`.
+  DI-built. The AI DP + references DO build offline — don't read that `GraphBuildError`
+  as a regression. See `docs/learnings/convention-offline-build-needs-docintel.md`.
 - **Engine artifact writes must be UTF-8** — pass `encoding="utf-8"` to any `write_text`
   of document/markdown text in `engine/`; the AI DP's Unicode glyphs (U+2212) crash the
   cp1252 platform default on Windows. See

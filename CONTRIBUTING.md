@@ -73,43 +73,26 @@ Guidance:
 - [ ] Specs stay internally consistent (personas, clause citations, story index).
 - [ ] Commit messages follow Conventional Commits.
 
-## Issue tracking
+## Issue tracking — none
 
-We use **GitHub Issues + a Project board** as the tracker (no Jira). Everything
-lives in this repo.
+**This repo does not use an issue tracker.** GitHub Issues was abandoned on
+16 Jul 2026: the rulebook-radar epic (#5) and its stories (#6–#11, #26) described a
+plan that had been superseded twice, and tracking them was costing more than it gave.
+They were closed as superseded. There is no Project board and no milestone.
 
-- **Milestone:** `Rulebook Radar MVP1 (Hackathon 3 Aug 2026)` — the delivery deadline.
-- **Epic issue [#5](https://github.com/dzaffren/copa-hackathon/issues/5)** — the
-  high-level checklist linking every story.
-- **Story issues [#6–#11]** — one per story spec in `docs/specs/rulebook-radar/`.
-  Each spec's `**Ticket:**` field links to its issue, and the epic
-  [Story Index](docs/specs/rulebook-radar/spec.md) lists them with dependencies.
-- **Project board:** _Rulebook Radar MVP1_ — a Todo / In Progress / Done view of
-  those issues (Projects tab → open the board).
+The process is: **a spec under `docs/specs/workstream-brain/`, a branch, a PR.**
 
-| Issue | Story                                                 | Build order / depends on |
-| ----- | ----------------------------------------------------- | ------------------------ |
-| #6    | Policy ingestion & knowledge-graph engine (technical) | build first — no deps    |
-| #7    | Drafter rulebook workspace                            | #6                       |
-| #8    | Consistency ripple check & impact report              | #6, #7                   |
-| #9    | Drafting copilot with live write-back                 | #6, #8                   |
-| #10   | Supervisor submission completeness & compliance check | #6 (parallel)            |
-| #11   | Reviewer & approval workflow                          | #7, #8                   |
-
-**How the tracking stays current automatically:**
-
-- Put `Closes #6` (or `Fixes #6`) in a PR description. Merging the PR **closes the
-  issue**, **ticks the epic checklist**, and the board's default workflows **move
-  the card to Done** — no manual dragging.
-- Move a card to **In Progress** when you start it; the board reflects live status.
-
-**Working an issue:**
+- **Don't** open issues, and **don't** put `Closes #<n>` / `Fixes #<n>` in a PR body —
+  there is nothing to close. If a tool or skill asks for a ticket id, there isn't one;
+  don't invent one to satisfy it.
+- Some older specs still carry a `**Ticket:**` field pointing at a closed issue.
+  It's vestigial — ignore it.
+- Describe the work in the PR body itself. That is the record.
 
 ```bash
-gh issue list                 # see open tickets
-gh issue view 6               # read a ticket (links to its spec)
-git switch -c feat/graph-engine   # branch named for the work
-# ... commit, push, then in the PR body: "Closes #6"
+git switch -c feat/short-kebab    # branch named for the work
+# ... commit, push, then open the PR against dzaf/main:
+gh pr create --base dzaf/main
 ```
 
 ## Repository areas
