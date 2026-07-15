@@ -45,17 +45,8 @@ export function DraftingWorkspacePage() {
   );
 }
 
-export function ReviewLinkagesPage() {
-  const { workstreamId, edgeId } = useParams();
-  return (
-    <Shell eyebrow="Review linkages" title="Review linkages">
-      <p>
-        Review linkages for edge <code>{edgeId}</code> in workstream{" "}
-        <code>{workstreamId}</code>. Placeholder for the review story.
-      </p>
-    </Shell>
-  );
-}
+// ReviewLinkagesPage is no longer a placeholder — see
+// @/features/review-linkages/ReviewLinkagesPage.
 
 export function NewWorkstreamPage() {
   return (

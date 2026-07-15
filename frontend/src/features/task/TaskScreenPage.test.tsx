@@ -258,10 +258,14 @@ describe("TaskScreenPage — navigation", () => {
       within(hkma).getByRole("link", { name: /Open in Review/i }),
     );
 
+    // Lands on the real review screen (it replaced the placeholder), which is
+    // headed by the pair under review rather than the screen's name.
     expect(
-      await screen.findByRole("heading", { name: /Review linkages/i }),
+      await screen.findByRole("heading", {
+        name: /Operational Resilience PD — v0.3 ↔ HKMA SPM OR-2/,
+      }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/e-opres_v0_3--hkma_spm_or2/)).toBeInTheDocument();
+    expect(screen.getByLabelText("findings")).toBeInTheDocument();
   });
 
   it("Open draft routes to the drafting workspace", async () => {
