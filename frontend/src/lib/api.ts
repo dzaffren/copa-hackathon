@@ -1,9 +1,13 @@
 import type {
   AnalyzeResponse,
   Connection,
+  CopilotIntent,
+  CopilotResponse,
   CreateNodeRequest,
   CreateNodeResponse,
+  DraftResponse,
   EdgeDetail,
+  LinkagesResponse,
   NodeDetail,
   PatchReviewStateResponse,
   ReviewResponse,
@@ -171,6 +175,75 @@ export function setReviewState(
     `${API_BASE}/api/workstreams/${workstreamId}/edges/${edgeId}/findings/` +
       encodeURIComponent(findingId),
     { review_state: reviewState },
+  );
+}
+
+// --- Drafting Workspace ----------------------------------------------------
+
+async function putJson<T>(url: string, body: unknown): Promise<T> {
+  const res = await fetch(url, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    return throwHttpError(res);
+  }
+  return (await res.json()) as T;
+}
+
+export function fetchReviewedLinkages(
+  workstreamId: string,
+  nodeId: string,
+): Promise<LinkagesResponse> {
+  return getJson<LinkagesResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/tasks/${nodeId}/reviewed-linkages`,
+  );
+}
+
+export function fetchRelatedLinkages(
+  workstreamId: string,
+  nodeId: string,
+): Promise<LinkagesResponse> {
+  // hops is fixed at 1 and sent explicitly: the server rejects anything else,
+  // and naming it here keeps the bound visible at the call site.
+  return getJson<LinkagesResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/tasks/${nodeId}/related-linkages?hops=1`,
+  );
+}
+
+export function fetchDraft(
+  workstreamId: string,
+  nodeId: string,
+): Promise<DraftResponse> {
+  return getJson<DraftResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/tasks/${nodeId}/draft`,
+  );
+}
+
+export function saveDraft(
+  workstreamId: string,
+  nodeId: string,
+  contentHtml: string,
+): Promise<DraftResponse> {
+  return putJson<DraftResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/tasks/${nodeId}/draft`,
+    { content_html: contentHtml },
+  );
+}
+
+export function sendCopilotMessage(
+  workstreamId: string,
+  nodeId: string,
+  intent: CopilotIntent,
+  message: string,
+  turn: number,
+): Promise<CopilotResponse> {
+  // `turn` is client-owned: the chat is deliberately not persisted, so the
+  // server holds no conversation state to count from.
+  return postJson<CopilotResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/tasks/${nodeId}/copilot`,
+    { intent, message, turn },
   );
 }
 

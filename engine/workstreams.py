@@ -244,6 +244,32 @@ def neighbour_ids(edges: list[dict[str, Any]], node_id: str) -> list[str]:
     return out
 
 
+def edges_between(
+    edges: list[dict[str, Any]], node_ids: set[str], exclude_node: Optional[str] = None
+) -> list[dict[str, Any]]:
+    """Edges whose BOTH endpoints are in `node_ids`, in graph order.
+
+    Backs the drafting workspace's "Related · 1 hop" tab: the linkages the task's
+    anchors have with each other, as opposed to with the draft. `exclude_node`
+    drops any edge touching that node, which is how the caller keeps the task's
+    own edges out of a set that contains it.
+
+    Note the seeded `opres-v2` fixture has no anchor↔anchor edges at all — every
+    edge runs task → anchor — so this correctly returns [] there. That is a
+    fixture gap, not a bug: seeding those edges means asserting what BCBS says
+    about HKMA, and no source text for that exists in this repo.
+    """
+    out: list[dict[str, Any]] = []
+    for e in edges:
+        source, target = e.get("source"), e.get("target")
+        if source not in node_ids or target not in node_ids:
+            continue
+        if exclude_node is not None and exclude_node in (source, target):
+            continue
+        out.append(e)
+    return out
+
+
 def slugify(text: str) -> str:
     """A lowercase, hyphen-joined id fragment from free text."""
     s = re.sub(r"[^a-z0-9]+", "-", (text or "").lower()).strip("-")

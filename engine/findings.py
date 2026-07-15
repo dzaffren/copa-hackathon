@@ -10,8 +10,9 @@ Two fields the fixtures do not carry are needed to review a finding — a stable
 `id` and a `review_state`. Rather than migrate the fixtures (and force every
 existing finding to be rewritten), both are **derived on read**:
 
-- `id` is the edge id plus the finding's index (`{edge_id}#{i}`). Stable for a
-  given file, and no fixture edit is needed to introduce it.
+- `id` is the edge id plus the finding's index (`{edge_id}~{i}`). Stable for a
+  given file, and no fixture edit is needed to introduce it. See `finding_id`
+  for why the separator is `~` and must stay that way.
 - `review_state` defaults to `"pending"` when absent.
 
 A write persists the full list back with `review_state` materialised, so the

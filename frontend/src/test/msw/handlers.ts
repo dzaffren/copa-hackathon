@@ -1,9 +1,12 @@
 import { http, HttpResponse } from "msw";
 import type {
   Connection,
+  CopilotIntent,
+  DraftResponse,
   EdgeDetail,
   GraphEdge,
   GraphNode,
+  LinkageCard,
   NodeDetail,
   ReviewClause,
   ReviewCounts,
@@ -635,7 +638,171 @@ function reviewCounts(findings: ReviewFinding[]): ReviewCounts {
   };
 }
 
+// --- Drafting Workspace ----------------------------------------------------
+// Mirrors the engine: reviewed-linkages aggregates ACCEPTED findings across the
+// task's incident edges (reusing the same reviewState map, so accepting on the
+// review screen shows up here exactly as it does against the real store), and
+// related-linkages is empty because opres-v2 genuinely has no anchor↔anchor
+// edges. The Copilot replies from a script, never a model.
+
+const SEEDED_DRAFT_HTML =
+  "<h1>Operational Resilience</h1>\n<p><strong>5.3</strong> A financial institution shall conduct scenario testing of its operational resilience arrangements at least annually.</p>";
+
+let draftHtml = SEEDED_DRAFT_HTML;
+let draftSavedAt: string | null = "2026-07-13T14:30:00Z";
+
+export function resetDraft() {
+  draftHtml = SEEDED_DRAFT_HTML;
+  draftSavedAt = "2026-07-13T14:30:00Z";
+}
+
+const NODE_TITLES: Record<string, string> = Object.fromEntries(
+  Object.entries(GRAPH_NODES).map(([id, n]) => [id, n.title]),
+);
+
+function linkageCard(finding: ReviewFinding, edge: GraphEdge): LinkageCard {
+  return {
+    id: finding.id,
+    label: finding.label,
+    sentiment: finding.sentiment,
+    summary: finding.summary,
+    edge_id: edge.id,
+    left: {
+      id: edge.source,
+      title: NODE_TITLES[edge.source] ?? edge.source,
+      node_type: GRAPH_NODES[edge.source]?.node_type ?? null,
+    },
+    right: {
+      id: edge.target,
+      title: NODE_TITLES[edge.target] ?? edge.target,
+      node_type: GRAPH_NODES[edge.target]?.node_type ?? null,
+    },
+    source_clause_number: finding.source_clauses[0]?.clause_number ?? null,
+    target_clause_number: finding.target_clauses[0]?.clause_number ?? null,
+  };
+}
+
+// The scripted PD reply, quoting RMiT 9.4 verbatim. Kept in step with
+// engine/copilot_scripts.py, whose own test re-resolves the quote against the
+// built clause index.
+const RMIT_9_4_QUOTE =
+  "A financial institution must designate a Chief Information Security (CISO) by whatever name called, to be responsible for the technology risk management function of the financial institution.";
+
+const COPILOT_SCRIPT: Record<string, unknown[]> = {
+  PD: [
+    {
+      role: "copilot",
+      text: "Hi Aisyah — I've loaded your accepted linkages and the OpRes DP feedback register. The draft has no §6.3 yet. Want me to draft the accountable-officer preamble that goes beyond RMiT?",
+    },
+    {
+      role: "copilot",
+      text: "Here is a neutral §6.3 preamble, grounded in RMiT 9.4.",
+      citations: [{ clause_number: "RMiT 9.4", text: RMIT_9_4_QUOTE }],
+      snippet_html:
+        "<h2>PART E — ACCOUNTABILITY</h2>\n<p><strong>6.3</strong> A financial institution shall designate a single accountable officer for operational resilience.</p>",
+    },
+  ],
+  DP: [{ role: "copilot", text: "Discussion Paper mode." }],
+  ED: [{ role: "copilot", text: "Exposure Draft mode." }],
+  FAQ: [{ role: "copilot", text: "FAQ mode." }],
+  "Engagement Deck": [{ role: "copilot", text: "Engagement deck mode." }],
+  "Feedback Template for Industry": [
+    { role: "copilot", text: "Feedback template mode." },
+  ],
+  "Peer Benchmarking": [{ role: "copilot", text: "Peer benchmarking mode." }],
+};
+
 export const handlers = [
+  http.get(
+    "*/api/workstreams/:workstreamId/tasks/:nodeId/reviewed-linkages",
+    ({ params }) => {
+      const nodeId = params.nodeId as string;
+      if (!TASKS[nodeId]) {
+        return HttpResponse.json(
+          { code: "TASK_NOT_FOUND", message: `${nodeId} is not a task` },
+          { status: 404 },
+        );
+      }
+      const cards: LinkageCard[] = [];
+      for (const edge of GRAPH_EDGES) {
+        if (edge.source !== nodeId && edge.target !== nodeId) continue;
+        for (const f of reviewFindings(edge.id)) {
+          if (f.review_state === "accepted") cards.push(linkageCard(f, edge));
+        }
+      }
+      return HttpResponse.json({ findings: cards });
+    },
+  ),
+
+  http.get(
+    "*/api/workstreams/:workstreamId/tasks/:nodeId/related-linkages",
+    ({ request, params }) => {
+      const hops = new URL(request.url).searchParams.get("hops");
+      if (hops !== null && hops !== "1") {
+        return HttpResponse.json(
+          { code: "HOPS_OUT_OF_RANGE", message: "Only hops=1 is supported" },
+          { status: 400 },
+        );
+      }
+      if (!TASKS[params.nodeId as string]) {
+        return HttpResponse.json(
+          { code: "TASK_NOT_FOUND", message: "not a task" },
+          { status: 404 },
+        );
+      }
+      // opres-v2 has no anchor↔anchor edges — the empty tab is the truth.
+      return HttpResponse.json({ findings: [] });
+    },
+  ),
+
+  http.get("*/api/workstreams/:workstreamId/tasks/:nodeId/draft", ({ params }) => {
+    const nodeId = params.nodeId as string;
+    if (!TASKS[nodeId]) {
+      return HttpResponse.json(
+        { code: "TASK_NOT_FOUND", message: `${nodeId} is not a task` },
+        { status: 404 },
+      );
+    }
+    return HttpResponse.json<DraftResponse>({
+      node_id: nodeId,
+      content_html: draftHtml,
+      last_saved_at: draftSavedAt,
+    });
+  }),
+
+  http.put(
+    "*/api/workstreams/:workstreamId/tasks/:nodeId/draft",
+    async ({ request, params }) => {
+      const body = (await request.json()) as { content_html: string };
+      draftHtml = body.content_html;
+      draftSavedAt = "2026-07-15T09:00:00Z";
+      return HttpResponse.json<DraftResponse>({
+        node_id: params.nodeId as string,
+        content_html: draftHtml,
+        last_saved_at: draftSavedAt,
+      });
+    },
+  ),
+
+  http.post(
+    "*/api/workstreams/:workstreamId/tasks/:nodeId/copilot",
+    async ({ request }) => {
+      const body = (await request.json()) as {
+        intent: CopilotIntent;
+        turn?: number;
+      };
+      const script = COPILOT_SCRIPT[body.intent];
+      if (!script) {
+        return HttpResponse.json(
+          { code: "INVALID_INTENT", message: `bad intent ${body.intent}` },
+          { status: 400 },
+        );
+      }
+      const turn = Math.min(body.turn ?? 0, script.length - 1);
+      return HttpResponse.json({ reply: script[turn] });
+    },
+  ),
+
   http.get(
     "*/api/workstreams/:workstreamId/edges/:edgeId/review",
     ({ params }) => {

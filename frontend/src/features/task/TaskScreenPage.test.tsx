@@ -273,9 +273,11 @@ describe("TaskScreenPage — navigation", () => {
     await loadTaskScreen();
 
     await user.click(screen.getByRole("link", { name: /Open draft/i }));
-    expect(
-      await screen.findByRole("heading", { name: /Drafting workspace/i }),
-    ).toBeInTheDocument();
+    // The real workspace now mounts here (it replaced the placeholder, whose
+    // heading read "Drafting workspace"). It is headed by the task title, so
+    // the editor surface is what confirms we landed.
+    expect(await screen.findByTestId("draft-surface")).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /Reviewed/ })).toBeInTheDocument();
   });
 });
 
