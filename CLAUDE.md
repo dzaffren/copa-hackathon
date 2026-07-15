@@ -164,3 +164,11 @@ Note this is _not_ `data/references/`, which is public and tracked.
   `frontend/node_modules` exist only in the main working tree, so builds that need
   `pytest`/`vitest` must run there rather than in isolated feature-builder
   worktrees. See `docs/learnings/blocker-forge-build-run-in-main-worktree.md`.
+- **`engine.build` silently narrows `data/artifacts/`** — a rebuild without Azure
+  Document Intelligence shrinks the clause index instead of failing (#34 took it from
+  7 documents to 2 and orphaned two committed traces; the suite stays green because
+  the trace tests never re-resolve citations). Don't rebuild without DI; diff the
+  entry count before committing; **don't** naive-restore from an old revision — the
+  document IDs are disjoint and it breaks the one working trace. Legacy-path only:
+  workstream-brain reads `data/workstreams/`, not `data/artifacts/`. See
+  `docs/learnings/blocker-engine-build-silently-narrows-artifacts.md`.

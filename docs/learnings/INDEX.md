@@ -13,3 +13,4 @@ file in this directory. The active ruleset is synced into the repo's
 - [Forge verify hook false-fails (pyenv/ruff)](blocker-forge-verify-hook-false-fail-pyenv-ruff.md) — cosmetic Stop-hook `LINT FAIL`; verify with venv pytest, don't disable hooks or install ruff
 - [Workstream-brain opres-v2 conventions](convention-workstream-brain-opres-v2-conventions.md) — build workstream-brain screens to the opres-v2 base (node_type/edge_type, derived analysed, task-as-edge-source), not the stale specs
 - [Run forge builds in the main worktree](blocker-forge-build-run-in-main-worktree.md) — .venv + node_modules live only in the main tree; run test-requiring builds there, not in isolated worktrees
+- [engine.build silently narrows data/artifacts/](blocker-engine-build-silently-narrows-artifacts.md) — a rebuild without Azure DI shrank the index 7 docs → 2 and orphaned two traces; no test catches it, and a naive restore makes it worse
