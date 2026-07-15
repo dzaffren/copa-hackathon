@@ -1,5 +1,14 @@
 import { http, HttpResponse } from "msw";
-import type { Connection, TaskResponse } from "@/lib/types";
+import type {
+  Connection,
+  EdgeDetail,
+  GraphEdge,
+  GraphNode,
+  NodeDetail,
+  TaskResponse,
+  WorkstreamGraph,
+  WorkstreamSummary,
+} from "@/lib/types";
 
 // Mirrors data/workstreams/opres-v2/graph.json + findings/*.json exactly.
 
@@ -288,6 +297,293 @@ const FINDINGS: Record<string, Connection[]> = {
   "e-opres_v0_3--abm_position": [],
 };
 
+// --- Graph Screen fixtures (mirror data/workstreams/opres-v2) ---------------
+
+const WORKSTREAMS: WorkstreamSummary[] = [
+  {
+    id: "opres-v2",
+    name: "Operational Resilience v0.3",
+    deliverable_type: "Policy Document",
+    role: "own",
+  },
+  {
+    id: "outsourcing-v2",
+    name: "Outsourcing v2",
+    deliverable_type: "Policy Document",
+    role: "review",
+  },
+  {
+    id: "rmit-v2-2025",
+    name: "RMiT v2 (delivered 28 Nov 2025)",
+    deliverable_type: "Policy Document",
+    role: "delivered",
+  },
+];
+
+interface GraphNodeFull extends GraphNode {
+  description: string | null;
+  source_url: string | null;
+}
+
+const GRAPH_NODES: Record<string, GraphNodeFull> = {
+  "opres-pd-v0-3": {
+    id: "opres-pd-v0-3",
+    node_type: "task",
+    title: "Operational Resilience PD — v0.3",
+    issuer: "BNM",
+    short_type: "PD (draft)",
+    description: "Working draft of the OpRes Policy Document.",
+    source_url: null,
+  },
+  "bcbs-opres-2021": {
+    id: "bcbs-opres-2021",
+    node_type: "international-standard",
+    title: "BCBS OpRes 2021",
+    issuer: "BCBS",
+    short_type: "Principles",
+    description:
+      "Basel Committee Principles for Operational Resilience (2021).",
+    source_url: "https://www.bis.org/bcbs/publ/d509.htm",
+  },
+  "fsb-3rd-party": {
+    id: "fsb-3rd-party",
+    node_type: "international-standard",
+    title: "FSB 3rd-Party Toolkit",
+    issuer: "FSB",
+    short_type: "Toolkit",
+    description: "FSB third-party risk management toolkit (2023).",
+    source_url: "https://www.fsb.org",
+  },
+  "hkma-spm-or2": {
+    id: "hkma-spm-or2",
+    node_type: "peer-regulator",
+    title: "HKMA SPM OR-2",
+    issuer: "HKMA",
+    short_type: "SPM",
+    description: "HKMA Supervisory Policy Manual OR-2.",
+    source_url: "https://www.hkma.gov.hk",
+  },
+  "rmit-pd-2025": {
+    id: "rmit-pd-2025",
+    node_type: "internal-published",
+    title: "RMiT PD (28 Nov 2025)",
+    issuer: "BNM",
+    short_type: "PD (in force)",
+    description: "BNM RMiT policy document, reissued 28 Nov 2025.",
+    source_url: "https://www.bnm.gov.my",
+  },
+  "fsa-2013-143": {
+    id: "fsa-2013-143",
+    node_type: "act-law",
+    title: "FSA 2013 §143",
+    issuer: "Parliament",
+    short_type: "Act",
+    description: "Financial Services Act 2013, section 143.",
+    source_url: "https://www.bnm.gov.my",
+  },
+  "abm-position": {
+    id: "abm-position",
+    node_type: "industry-input",
+    title: "ABM position paper",
+    issuer: "ABM",
+    short_type: "Position paper",
+    description: "ABM position paper on operational resilience.",
+    source_url: null,
+  },
+};
+
+const GRAPH_EDGES: GraphEdge[] = [
+  {
+    id: "e-opres_v0_3--bcbs_opres_2021",
+    source: "opres-pd-v0-3",
+    target: "bcbs-opres-2021",
+    edge_type: "contributes-to",
+    analysed: true,
+    findings_count: 3,
+  },
+  {
+    id: "e-opres_v0_3--fsb_3rd_party",
+    source: "opres-pd-v0-3",
+    target: "fsb-3rd-party",
+    edge_type: "contributes-to",
+    analysed: false,
+    findings_count: 0,
+  },
+  {
+    id: "e-opres_v0_3--hkma_spm_or2",
+    source: "opres-pd-v0-3",
+    target: "hkma-spm-or2",
+    edge_type: "contributes-to",
+    analysed: true,
+    findings_count: 1,
+  },
+  {
+    id: "e-opres_v0_3--rmit_pd_2025",
+    source: "opres-pd-v0-3",
+    target: "rmit-pd-2025",
+    edge_type: "parallel-to",
+    analysed: true,
+    findings_count: 1,
+  },
+  {
+    id: "e-opres_v0_3--fsa_2013_143",
+    source: "opres-pd-v0-3",
+    target: "fsa-2013-143",
+    edge_type: "references",
+    analysed: true,
+    findings_count: 1,
+  },
+  {
+    id: "e-opres_v0_3--abm_position",
+    source: "opres-pd-v0-3",
+    target: "abm-position",
+    edge_type: "contributes-to",
+    analysed: false,
+    findings_count: 0,
+  },
+];
+
+const GRAPH_OPRES: WorkstreamGraph = {
+  workstream_id: "opres-v2",
+  primary_task_id: "opres-pd-v0-3",
+  nodes: Object.values(GRAPH_NODES).map(
+    ({ id, node_type, title, issuer, short_type }) => ({
+      id,
+      node_type,
+      title,
+      issuer,
+      short_type,
+    }),
+  ),
+  edges: GRAPH_EDGES,
+};
+
+// Canned "Analyze linkages" result for the FSB demo pair (mirrors the backend
+// engine.workstreams._DEMO_ANALYZE_FINDINGS — verbatim clause quotes only).
+const ANALYZE_FSB: Connection[] = [
+  {
+    summary:
+      "Third-party register aligns with FSB Toolkit register expectations",
+    label: "aligns-with",
+    sentiment: null,
+    scope_note: null,
+    supported: true,
+    source_clauses: [
+      {
+        clause_number: "Operational Resilience 4.5",
+        text: "A financial institution shall maintain a register of arrangements with third-party service providers that support critical operations.",
+      },
+    ],
+    target_clauses: [
+      {
+        clause_number: "FSB Toolkit Tool 2",
+        text: "Financial institutions maintain a comprehensive register of third-party service relationships.",
+      },
+    ],
+  },
+  {
+    summary:
+      "Draft mandates tested exit plans per critical provider, going beyond the FSB baseline",
+    label: "goes-beyond",
+    sentiment: null,
+    scope_note:
+      "The FSB Toolkit expects dependency oversight but stops short of a tested per-provider exit plan.",
+    supported: true,
+    source_clauses: [
+      {
+        clause_number: "Operational Resilience 4.7",
+        text: "A financial institution shall maintain a documented and periodically tested exit plan for each critical third-party service provider.",
+      },
+    ],
+    target_clauses: [
+      {
+        clause_number: "FSB Toolkit Tool 6",
+        text: "Financial institutions consider exit strategies for critical third-party service relationships.",
+      },
+    ],
+  },
+  {
+    summary:
+      "FSB covers third-party concentration risk; the draft is silent on concentration",
+    label: "silent-on",
+    sentiment: null,
+    scope_note: null,
+    supported: true,
+    source_clauses: [],
+    target_clauses: [
+      {
+        clause_number: "FSB Toolkit Tool 7",
+        text: "Financial authorities monitor systemic third-party dependencies and concentration across the sector.",
+      },
+    ],
+  },
+];
+
+const TASK_ACTIVITY = [
+  {
+    kind: "edit",
+    author: "Aisyah R.",
+    at: "2026-07-13T14:30:00Z",
+    summary: "Revised §5.3 scenario testing cadence",
+  },
+  {
+    kind: "comment",
+    author: "Farid M.",
+    at: "2026-07-12T16:42:00Z",
+    summary: "Suggested tightening §6.3 accountable officer language",
+  },
+];
+
+function buildNodeDetail(nodeId: string): NodeDetail | null {
+  const node = GRAPH_NODES[nodeId];
+  if (!node) return null;
+  const neighbourIds: string[] = [];
+  for (const edge of GRAPH_EDGES) {
+    const other =
+      edge.source === nodeId
+        ? edge.target
+        : edge.target === nodeId
+          ? edge.source
+          : null;
+    if (other && !neighbourIds.includes(other)) neighbourIds.push(other);
+  }
+  return {
+    id: node.id,
+    node_type: node.node_type,
+    title: node.title,
+    issuer: node.issuer,
+    short_type: node.short_type,
+    description: node.description,
+    source_url: node.source_url,
+    first_order_neighbours: neighbourIds.map((id) => ({
+      id,
+      node_type: GRAPH_NODES[id].node_type,
+      title: GRAPH_NODES[id].title,
+    })),
+    second_order_neighbours: { status: "placeholder", message: "N/A in demo" },
+    recent_activity: node.node_type === "task" ? TASK_ACTIVITY : [],
+    concepts: {
+      status: "placeholder",
+      message: "Concept extraction not enabled in MVP1",
+    },
+  };
+}
+
+function buildEdgeDetail(edgeId: string): EdgeDetail | null {
+  const edge = GRAPH_EDGES.find((e) => e.id === edgeId);
+  if (!edge) return null;
+  const src = GRAPH_NODES[edge.source];
+  const tgt = GRAPH_NODES[edge.target];
+  return {
+    id: edge.id,
+    source: { id: src.id, title: src.title, node_type: src.node_type },
+    target: { id: tgt.id, title: tgt.title, node_type: tgt.node_type },
+    edge_type: edge.edge_type,
+    status: edge.analysed ? "analysed" : "not_analysed",
+    findings: edge.analysed ? (FINDINGS[edgeId] ?? []) : [],
+  };
+}
+
 function jsonError(status: number, code: string, message: string) {
   return HttpResponse.json({ code, message }, { status });
 }
@@ -339,6 +635,83 @@ export const handlers = [
       return HttpResponse.json(FINDINGS[edgeId] ?? []);
     },
   ),
+
+  // --- Graph Screen routes -------------------------------------------------
+  http.get("*/api/workstreams", () => {
+    return HttpResponse.json({ workstreams: WORKSTREAMS });
+  }),
+  http.get("*/api/workstreams/:workstreamId/graph", ({ params }) => {
+    const { workstreamId } = params as { workstreamId: string };
+    if (workstreamId === "opres-v2") return HttpResponse.json(GRAPH_OPRES);
+    // Other seeded workstreams render an empty canvas in component tests.
+    return HttpResponse.json({
+      workstream_id: workstreamId,
+      primary_task_id: null,
+      nodes: [],
+      edges: [],
+    });
+  }),
+  http.get("*/api/workstreams/:workstreamId/nodes/:nodeId", ({ params }) => {
+    const { nodeId } = params as { nodeId: string };
+    const detail = buildNodeDetail(nodeId);
+    if (!detail) {
+      return jsonError(404, "NODE_NOT_FOUND", `Node ${nodeId} not found`);
+    }
+    return HttpResponse.json(detail);
+  }),
+  http.get("*/api/workstreams/:workstreamId/edges/:edgeId", ({ params }) => {
+    const { edgeId } = params as { edgeId: string };
+    const detail = buildEdgeDetail(edgeId);
+    if (!detail) {
+      return jsonError(404, "EDGE_NOT_FOUND", `Edge ${edgeId} not found`);
+    }
+    return HttpResponse.json(detail);
+  }),
+  http.post("*/api/workstreams/:workstreamId/nodes", async ({ request }) => {
+    const body = (await request.json()) as {
+      node_type: string;
+      title: string;
+      edges: Array<{ target_node_id: string; edge_type: string }>;
+    };
+    const id = (body.title || "node")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    return HttpResponse.json(
+      {
+        id,
+        node_type: body.node_type,
+        title: body.title,
+        created_edges: body.edges.map((e) => {
+          // Mirror the backend: a task target stays the edge source.
+          const targetIsTask =
+            GRAPH_NODES[e.target_node_id]?.node_type === "task";
+          const source = targetIsTask ? e.target_node_id : id;
+          const target = targetIsTask ? id : e.target_node_id;
+          return {
+            id: `e-${source}--${target}`,
+            source,
+            target,
+            edge_type: e.edge_type,
+            analysed: false,
+          };
+        }),
+      },
+      { status: 201 },
+    );
+  }),
+  http.post(
+    "*/api/workstreams/:workstreamId/edges/:edgeId/analyze",
+    ({ params }) => {
+      const { edgeId } = params as { edgeId: string };
+      return HttpResponse.json({
+        id: edgeId,
+        status: "analysed",
+        findings: ANALYZE_FSB,
+        findings_count: ANALYZE_FSB.length,
+      });
+    },
+  ),
 ];
 
-export { TASK_V0_3, TASK_V0_0, FINDINGS };
+export { TASK_V0_3, TASK_V0_0, FINDINGS, GRAPH_OPRES, WORKSTREAMS };

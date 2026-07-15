@@ -23,6 +23,7 @@ store — no submission text ever reaches the public artifacts.
 """
 
 import json
+import time
 from pathlib import Path
 from typing import Any, Callable, Optional, Union
 from urllib.parse import unquote
@@ -47,6 +48,7 @@ from engine.read_model import (
 )
 from engine.submissions import SUBMISSIONS_DIR, ingest_submission
 from engine.verdicts import VerdictFn, propose_verdicts
+from engine import workstreams
 
 # The live two-branch analysis seam for `POST …/analyse`: given a document id, a
 # paragraph number, the paragraph's verbatim text, and the clause index, it
@@ -141,6 +143,7 @@ def create_app(
     analyse_fn: Optional[AnalyseFn] = None,
     verdict_fn: Optional[VerdictFn] = None,
     workstreams_dir: Union[str, Path] = WORKSTREAMS_DIR,
+    analyze_delay: float = 0.8,
 ) -> FastAPI:
     """Construct the read API against injected dependencies.
 
@@ -173,6 +176,9 @@ def create_app(
             workstream with a `graph.json` + `findings/{edge_id}.json`);
             injectable so tests point it at a fixture/tmp dir. Defaults to
             `data/workstreams`.
+        analyze_delay: artificial delay (seconds) the Graph Screen `analyze`
+            route waits before returning the canned demo findings, so the
+            "Analyze linkages" spinner is visible in the demo. Tests pass `0`.
 
     Returns:
         A configured `FastAPI` app. No network or credentials are required to
@@ -582,6 +588,218 @@ def create_app(
         if not findings_path.exists():
             return []
         return json.loads(findings_path.read_text(encoding="utf-8"))
+
+    # --- Workstream Brain — Graph Screen routes (spec-workstream-graph) -----
+    # The drafter's hero screen: a canvas of the workstream's primary draft +
+    # its anchors. Same `{code, message}` error body and derived-`analysed`
+    # convention as the Task Screen routes above. Node/edge shapes stay on the
+    # on-disk `node_type`/`edge_type` vocabulary; the schema helpers live in
+    # `engine/workstreams.py`.
+
+    @app.get("/api/workstreams")
+    def list_workstreams_route() -> Any:
+        return {"workstreams": workstreams.list_workstreams(workstreams_dir)}
+
+    @app.get("/api/workstreams/{workstream_id}/graph")
+    def get_workstream_graph(workstream_id: str) -> Any:
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        ws_meta = workstreams.load_workstream(workstreams_dir, workstream_id)
+        task_id = workstreams.primary_task_id(ws_meta, ws_graph)
+        nodes, edges = workstreams.primary_subgraph(ws_graph, task_id)
+        out_nodes = [
+            {
+                "id": n["id"],
+                "node_type": n.get("node_type"),
+                "title": n.get("title"),
+                "issuer": n.get("issuer"),
+                "short_type": n.get("short_type"),
+            }
+            for n in nodes
+        ]
+        out_edges = []
+        for e in edges:
+            findings = workstreams.load_findings(workstreams_dir, workstream_id, e["id"])
+            out_edges.append(
+                {
+                    "id": e["id"],
+                    "source": e["source"],
+                    "target": e["target"],
+                    "edge_type": e.get("edge_type"),
+                    "analysed": findings is not None,
+                    "findings_count": len(findings) if findings else 0,
+                }
+            )
+        return {
+            "workstream_id": workstream_id,
+            "primary_task_id": task_id,
+            "nodes": out_nodes,
+            "edges": out_edges,
+        }
+
+    @app.get("/api/workstreams/{workstream_id}/nodes/{node_id}")
+    def get_workstream_node_detail(workstream_id: str, node_id: str) -> Any:
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        all_by_id = {n["id"]: n for n in ws_graph.get("nodes", [])}
+        node = all_by_id.get(node_id)
+        if node is None:
+            return _ws_error(
+                404,
+                "NODE_NOT_FOUND",
+                f"Node {node_id} not found in workstream {workstream_id}",
+            )
+        ws_meta = workstreams.load_workstream(workstreams_dir, workstream_id)
+        task_id = workstreams.primary_task_id(ws_meta, ws_graph)
+        sub_nodes, sub_edges = workstreams.primary_subgraph(ws_graph, task_id)
+        sub_ids = {n["id"] for n in sub_nodes}
+        # A node shown on the canvas takes its neighbours from the primary
+        # subgraph (so an anchor shared with a sibling draft still lists only
+        # this draft); a node outside it falls back to the whole graph.
+        edge_scope = sub_edges if node_id in sub_ids else ws_graph.get("edges", [])
+        first_order = [
+            {
+                "id": nid,
+                "node_type": all_by_id[nid].get("node_type"),
+                "title": all_by_id[nid].get("title"),
+            }
+            for nid in workstreams.neighbour_ids(edge_scope, node_id)
+            if nid in all_by_id
+        ]
+        return {
+            "id": node["id"],
+            "node_type": node.get("node_type"),
+            "title": node.get("title"),
+            "issuer": node.get("issuer"),
+            "short_type": node.get("short_type"),
+            "description": node.get("description"),
+            "source_url": node.get("source_url"),
+            "first_order_neighbours": first_order,
+            "second_order_neighbours": {"status": "placeholder", "message": "N/A in demo"},
+            "recent_activity": node.get("recent_activity", []),
+            "concepts": {
+                "status": "placeholder",
+                "message": "Concept extraction not enabled in MVP1",
+            },
+        }
+
+    @app.get("/api/workstreams/{workstream_id}/edges/{edge_id}")
+    def get_workstream_edge_detail(workstream_id: str, edge_id: str) -> Any:
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        edge = next(
+            (e for e in ws_graph.get("edges", []) if e["id"] == edge_id), None
+        )
+        if edge is None:
+            return _ws_error(
+                404,
+                "EDGE_NOT_FOUND",
+                f"Edge {edge_id} not found in workstream {workstream_id}",
+            )
+        by_id = {n["id"]: n for n in ws_graph.get("nodes", [])}
+        src = by_id.get(edge["source"], {})
+        tgt = by_id.get(edge["target"], {})
+        findings = workstreams.load_findings(workstreams_dir, workstream_id, edge_id)
+        return {
+            "id": edge_id,
+            "source": {
+                "id": edge["source"],
+                "title": src.get("title", edge["source"]),
+                "node_type": src.get("node_type"),
+            },
+            "target": {
+                "id": edge["target"],
+                "title": tgt.get("title", edge["target"]),
+                "node_type": tgt.get("node_type"),
+            },
+            "edge_type": edge.get("edge_type"),
+            "status": "analysed" if findings is not None else "not_analysed",
+            "findings": findings or [],
+        }
+
+    @app.post("/api/workstreams/{workstream_id}/nodes")
+    async def create_workstream_node(workstream_id: str, request: Request) -> Any:
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        body = await request.json()
+        if not isinstance(body, dict):
+            return _ws_error(400, "EDGE_REQUIRED", "Request body must be an object")
+        problem = workstreams.validate_node_create(body)
+        if problem is not None:
+            return _ws_error(*problem)
+        node_ids = {n["id"] for n in ws_graph.get("nodes", [])}
+        for edge in body["edges"]:
+            if edge["target_node_id"] not in node_ids:
+                return _ws_error(
+                    400,
+                    "INVALID_EDGE_TARGET",
+                    f"Edge target {edge['target_node_id']} is not an existing node",
+                )
+        new_node, created = workstreams.add_node(ws_graph, body)
+        workstreams.save_graph(workstreams_dir, workstream_id, ws_graph)
+        return JSONResponse(
+            status_code=201,
+            content={
+                "id": new_node["id"],
+                "node_type": new_node["node_type"],
+                "title": new_node["title"],
+                "created_edges": [{**edge, "analysed": False} for edge in created],
+            },
+        )
+
+    @app.post("/api/workstreams/{workstream_id}/edges/{edge_id}/analyze")
+    def analyze_workstream_edge(workstream_id: str, edge_id: str) -> Any:
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        edge = next(
+            (e for e in ws_graph.get("edges", []) if e["id"] == edge_id), None
+        )
+        if edge is None:
+            return _ws_error(
+                404,
+                "EDGE_NOT_FOUND",
+                f"Edge {edge_id} not found in workstream {workstream_id}",
+            )
+        # The demo pair replays canned, verbatim-cited findings (no model call).
+        # Any other pair yields no findings — the corpus finder operates over
+        # clause docs, not the workstream anchor set, so it is out of scope for
+        # this screen's demo.
+        findings = workstreams.canned_analysis(edge["source"], edge["target"])
+        if analyze_delay:
+            time.sleep(analyze_delay)
+        # Only persist a real result. Writing an empty findings file would
+        # one-way-flip the edge to "analysed" (analysed is derived from file
+        # presence) with zero linkages and no path back — so a no-match leaves
+        # the edge unanalysed and re-analysable.
+        if findings:
+            workstreams.save_findings(workstreams_dir, workstream_id, edge_id, findings)
+            return {
+                "id": edge_id,
+                "status": "analysed",
+                "findings": findings,
+                "findings_count": len(findings),
+            }
+        return {
+            "id": edge_id,
+            "status": "no_matching_source",
+            "findings": [],
+            "findings_count": 0,
+        }
 
     return app
 
