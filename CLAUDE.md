@@ -1,9 +1,22 @@
-# Rulebook Radar — Agent Guide
+# COPA Hackathon — Agent Guide
 
-AI for BNM policy consistency (COPA Hackathon 2026, Must-Win 10). A knowledge-graph
-tool that flags Conflict / Duplication / Gap findings when a policy changes
-(drafter) and checks a bank submission for missing requirements (supervisor).
-Docs-only repo today: discovery brief, a clickable HTML POC, and PRD specs.
+AI for BNM policy consistency (COPA Hackathon 2026, Must-Win 10). **Workstream Brain**
+is the current product: each policy workstream (DP / ED / PD under active drafting) is
+a knowledge graph of documents joined by structural edges, and AI-found linkages between
+clause pairs surface as findings the drafter reviews and accepts before drafting.
+Findings carry a **five-label semantic taxonomy** — `aligns-with` / `differs-on` /
+`conflicts-with` / `silent-on` / `goes-beyond`.
+
+Working code lives in `engine/` (FastAPI + the finder→critic loop), `frontend/` (the
+Workstream Brain app), plus earlier iterations kept as reference. This is **not** a
+docs-only repo.
+
+> **Iteration history — read this before trusting any spec.** Four generations, each
+> superseding the last: policy-consistency-ai → rulebook-radar → reconciliation-workbench
+> → **workstream-brain (current)**. Older specs and POCs are retained as historical record
+> and are explicitly _not_ buildable. `Conflict / Duplication / Gap` is **retired**
+> vocabulary from the rulebook-radar era — `engine/tests/test_taxonomy_traces.py::test_no_retired_vocabulary_as_label`
+> asserts it never reappears as a finding `label`.
 
 ## Git strategy (follow exactly)
 
@@ -17,18 +30,14 @@ Full guideline: [`CONTRIBUTING.md`](CONTRIBUTING.md). Enforceable rules:
 - Prefer **squash merge**; delete the branch after merge.
 - **Only commit or push when the user explicitly asks.**
 
-## Issue tracking
+## Issue tracking — none
 
-Tracker is **GitHub Issues + a Project board** (no Jira). Use the `gh` CLI.
-
-- Epic **#5** = high-level checklist. Stories **#6–#11**, one per spec in
-  `docs/specs/rulebook-radar/`; each spec's `**Ticket:**` field links to its issue.
-- Milestone: `Rulebook Radar MVP1 (Hackathon 3 Aug 2026)`.
-- Build order / deps: #6 engine (first) → #7 workspace (#6) → #8 ripple (#6,#7)
-  → #9 copilot (#6,#8); #10 supervisor (#6, parallel); #11 reviewer (#7,#8).
-- Read a ticket before working it: `gh issue view <n>` (links to its spec).
-- **Put `Closes #<n>` in the PR body** — merging auto-closes the issue, ticks the
-  epic checklist, and moves the board card to Done. Don't hand-edit issue state.
+**This repo does not use an issue tracker.** GitHub Issues was abandoned on
+16 Jul 2026; the rulebook-radar epic (#5) and its stories (#6–#11, #26) described a
+plan superseded twice over and were closed. Don't open issues, don't look for a
+ticket before working, and **don't put `Closes #<n>` in a PR body** — there is
+nothing to close. A spec under `docs/specs/workstream-brain/` plus a PR is the whole
+process. Specs may still carry a stale `**Ticket:**` field; ignore it.
 
 ## Confidentiality (hard rule)
 
@@ -44,33 +53,73 @@ matching clause found" — never invent one. Preserve this in any spec or POC ed
 
 ## Repository layout
 
-- `docs/discovery/` — discovery brief (opportunity solution tree, LLM experiment)
-- `docs/poc/policy-consistency-ai/` — clickable prototype; open `index.html`
-- `docs/specs/rulebook-radar/` — epic overview (`spec.md`) + 6 story specs
-- `docs/references/` — **git-ignored**, internal, local only
+**Live code — this is the whole product now:**
+
+- `engine/` — FastAPI service serving **only** `/api/workstreams/*`, projections over
+  `data/workstreams/`. Also holds `clauses.py` (the clause index / verbatim guarantee)
+  and `connections.py` (the five-label finder→critic loop) — the current engine, not
+  yet mounted as HTTP routes; exercised by `scripts/run_finder_trace.py` and tests.
+- `frontend/` — **the Workstream Brain app** (Vite + React 18 + Tailwind + shadcn/ui).
+  The only frontend. This is where UI work lands.
+- `data/corpus/` — the parsed BNM policy PDFs; `data/workstreams/` — workstream
+  fixtures (`opres-v2`, `outsourcing-v2`, `rmit-v2-2025`), which the API reads;
+  `data/references/` — **public** external standards (Basel, MAS TRM, PDPA);
+  `data/artifacts/` — built clause index + recorded linkage traces (see the
+  narrowing blocker below).
+- `kg-poc/` — standalone ontology/NER pipeline spike (MECE-7 classes). Isolated —
+  nothing imports it, and its `node_type` vocabulary is unrelated to the engine's.
+- `scripts/` — `run_finder_trace.py` (records linkage traces).
+
+**Earlier iterations — read-only reference, do not build from:**
+
+- `docs/poc/{policy-consistency-ai,drafter-knowledge-graph,workstream-brain}/` —
+  three generations of clickable HTML prototypes; the workstream-brain set is the
+  UX reference for current work.
+- `docs/specs/{rulebook-radar,reconciliation-workbench}/` — superseded epics.
+  `docs/specs/workstream-brain/` is current but **greenfield-stale** — see the
+  opres-v2 learning below before building from it.
+
+> **The legacy code is gone** (16 Jul 2026). `web/` (the reconciliation-workbench
+> Next.js app), `engine/{verdicts,submissions,read_model}.py`, the clause/graph/
+> paragraph/submission HTTP routes, and `scripts/export_poc_snapshot.py` were all
+> removed when Workstream Brain became the end state. If a spec or POC references
+> them, that spec is describing a repo that no longer exists.
+
+**Docs:** `docs/discovery/` (briefs per iteration), `docs/adr/` (decisions),
+`docs/learnings/` (repo conventions — read `INDEX.md` first).
+
+**Confidential:** `docs/references/` — **git-ignored**, internal, local only.
+Note this is _not_ `data/references/`, which is public and tracked.
 
 ## Conventions
 
 - Specs are non-technical and grounded in real clauses (RMiT 17.1/17.2,
   Outsourcing 12.1, Operational Resilience 1.1 — note "OpRes 6.11" is a phantom
-  clause, not in the parsed corpus). Keep personas consistent (single-draft MVP1, per
-  the 9 Jul 2026 pivot): Aisyah R. drafts **RMiT v2** — the sole editable draft;
-  every other BNM policy is published, read-only context; an approving manager gives
-  the final sign-off. There is **no separate reviewer persona** in MVP1 — the
-  reviewer / multi-draft model (incl. Farid M.) is deferred to a future phase.
-- Drafter value leads with the **Reference Radar** (external references — peer
-  regulators, acts like PDPA, standards — cited verbatim); internal Conflict /
-  Duplication / Gap consistency is the secondary "good to know" layer and the
-  supervisor-checklist engine.
-- The demo frontend is a **Next.js + React + Tailwind + shadcn/ui** app under `web/`
-  (deployed to Vercel), with **Zustand + persist** for the shared finding state and a
-  bundled JSON snapshot (`web/public/data/`) that `NEXT_PUBLIC_API_BASE` can swap for the
-  live FastAPI engine. This **supersedes** the earlier "self-contained HTML, no build step"
-  convention (11 Jul 2026 re-platform — see
-  `docs/specs/reconciliation-workbench/frontend-nextjs-migration-design.md`). The old
-  `docs/poc/drafter-knowledge-graph/*.html` pages are kept as the read-only UX reference.
-- MVP1 scope is a single cluster (technology-risk); cross-cluster ripple is a
-  labelled "what's next" preview, not built.
+  clause, not in the parsed corpus).
+- **Personas.** Aisyah R. is the policy drafter throughout. The Workstream Brain
+  demo runs on **OpRes PD v0.3** as the task node (the editable working draft);
+  every other document in the workstream is published, read-only context. An
+  approving manager gives the final sign-off. There is **no separate reviewer
+  persona** — the reviewer / multi-draft model (incl. Farid M.) is deferred.
+- **Scope is multi-workstream, not a single cluster.** MVP1 demos at least two real
+  BNM workstreams in parallel (Operational Resilience + Open Finance ED response);
+  cross-workstream linkage is the demo climax, not a preview. The management-facing
+  institution map is deferred to a follow-on epic.
+- **The frontend is `frontend/`** — Vite + React 18 + Tailwind + shadcn/ui, with
+  TanStack Query against the engine's `/api/workstreams/*` routes (`VITE_API_BASE`).
+  It is now the only frontend. The `docs/poc/workstream-brain/*.html` pages are the
+  read-only UX reference.
+- **One taxonomy: the five semantic labels.** Findings carry exactly one `label` —
+  `aligns-with` / `differs-on` / `conflicts-with` / `silent-on` / `goes-beyond`
+  (`engine/connections.py`), with `sentiment` (`tighten`/`loosen`) valid **only** on
+  `differs-on`. `engine/tests/test_taxonomy_traces.py` guards this. The competing
+  `verdict` vocabulary (`Consensus`/`Conflict`/`Gap`/`Duplicate`/`Partial`) went with
+  `verdicts.py`, so "conflict" now means exactly one thing.
+- **The API is a fixture projection, not a model client.** Every route reads
+  `data/workstreams/`; the `analyze` route replays `workstreams.canned_analysis` for
+  the demo pair and returns `no_matching_source` otherwise. `create_app()` takes no
+  model seam, so the service _cannot_ reach a model — editing `connections.py` will
+  not change what the demo renders.
 
 ## Learnings
 
@@ -81,19 +130,19 @@ matching clause found" — never invent one. Preserve this in any spec or POC ed
 - **FastAPI TestClient deps** — tests using `fastapi.testclient.TestClient` need
   `httpx` and `python-multipart` as explicit `pyproject.toml` deps (not pulled in
   by `fastapi` alone). See `docs/learnings/pattern-fastapi-testclient-deps.md`.
-- **/ship is GitLab — use gh** — the `/ship` skill targets GitLab; on this GitHub
-  repo override to `gh pr create --base main` with `Closes #<n>` in the PR body.
-  See `docs/learnings/skill-ship-is-gitlab-use-gh.md`.
-- **Frontend is Next.js under `web/`, not static HTML** — the 11 Jul 2026 re-platform
-  replaced the "self-contained HTML, no build step" convention with a Next.js + React app.
-  Don't flag the framework/`package.json`/build step as a mistake. See
-  `docs/learnings/convention-frontend-nextjs-not-static-html.md`.
+- **/ship is GitLab — use gh** — the `/ship` skill targets GitLab; on this GitHub repo
+  override to `gh pr create --base dzaf/main`. **No `Closes #<n>`** — there is no issue
+  tracker. See `docs/learnings/skill-ship-is-gitlab-use-gh.md`.
+- **The frontend is a build-step app, and it's `frontend/`** — the 11 Jul 2026
+  re-platform retired "self-contained HTML, no build step"; don't flag a
+  framework/`package.json`/build step as a mistake. `frontend/` (Vite + React 18) is
+  now the only frontend. See
+  `docs/learnings/convention-frontend-app-is-frontend-dir.md`.
 - **Offline build needs Azure Document Intelligence** — a full `python -m engine.build`
   fails offline on the legacy tech-risk PDFs (`BCM 9.17` won't resolve → `GraphBuildError`)
   because the default extractor scrambles multi-column PDFs; the committed artifacts were
-  DI-built. The AI DP + references + `verdicts.json` DO build offline — don't read that
-  `GraphBuildError` as a regression. See
-  `docs/learnings/convention-offline-build-needs-docintel.md`.
+  DI-built. The AI DP + references DO build offline — don't read that `GraphBuildError`
+  as a regression. See `docs/learnings/convention-offline-build-needs-docintel.md`.
 - **Engine artifact writes must be UTF-8** — pass `encoding="utf-8"` to any `write_text`
   of document/markdown text in `engine/`; the AI DP's Unicode glyphs (U+2212) crash the
   cp1252 platform default on Windows. See
@@ -113,3 +162,11 @@ matching clause found" — never invent one. Preserve this in any spec or POC ed
   `frontend/node_modules` exist only in the main working tree, so builds that need
   `pytest`/`vitest` must run there rather than in isolated feature-builder
   worktrees. See `docs/learnings/blocker-forge-build-run-in-main-worktree.md`.
+- **`engine.build` silently narrows `data/artifacts/`** — a rebuild without Azure
+  Document Intelligence shrinks the clause index instead of failing (#34 took it from
+  7 documents to 2 and orphaned two committed traces; the suite stays green because
+  the trace tests never re-resolve citations). Don't rebuild without DI; diff the
+  entry count before committing; **don't** naive-restore from an old revision — the
+  document IDs are disjoint and it breaks the one working trace. Legacy-path only:
+  workstream-brain reads `data/workstreams/`, not `data/artifacts/`. See
+  `docs/learnings/blocker-engine-build-silently-narrows-artifacts.md`.

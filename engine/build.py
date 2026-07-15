@@ -31,7 +31,6 @@ from engine.clauses import (
 )
 from engine.graph import build_graph
 from engine.ingest import ingest_document, normalise_glyph_artifacts
-from engine.verdicts import propose_verdicts
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +49,6 @@ def run_build(
     segment_fn: SegmentFn = segment_clauses,
     reference_documents: Optional[dict[str, dict[str, Any]]] = None,
     reference_edges: Optional[list[dict[str, Any]]] = None,
-    connection_fixtures: Optional[list[dict[str, Any]]] = None,
 ) -> None:
     """Run stages 1-3 and write `clause-index.json` + `graph.json`.
 
@@ -212,33 +210,17 @@ def run_build(
     )
     (output_dir / "graph.json").write_text(json.dumps(graph, indent=2))
 
-    # Stage 4b — verdict pass. The frozen showcase connections (or a live
-    # finder's output) are classified into per-connection verdict records,
-    # gated by the same "clause resolves verbatim" guardrail. Deterministic and
-    # credential-free: `AI_DP_CONNECTIONS` carry frozen verdicts, so no model is
-    # called here. verdicts.json is the read API's spine — joined onto the graph
-    # + clause index at read time (see engine.api / scripts.export_poc_snapshot).
-    if connection_fixtures is not None:
-        verdict_records = propose_verdicts(connection_fixtures, clause_index)
-        # Insertion order (fixture order) is preserved — NOT sort_keys — so the
-        # read layer renders connections in the curated display order the demo
-        # snapshot uses (cited/uncited/feedback per paragraph). Still fully
-        # deterministic: a static fixture yields a fixed order.
-        (output_dir / "verdicts.json").write_text(
-            json.dumps(verdict_records, indent=2), encoding="utf-8"
-        )
-        logger.info(
-            "%d verdict record(s) → %s",
-            len(verdict_records),
-            output_dir / "verdicts.json",
-        )
+    # Stage 4b (verdict pass) was removed with the reconciliation-workbench read
+    # path: it wrote `verdicts.json`, whose only consumers were `engine.read_model`
+    # and `scripts/export_poc_snapshot.py`. Both are gone, and the artifact was
+    # never committed. The five-label taxonomy that replaced it lives in
+    # `engine.connections` and is recorded via `scripts/run_finder_trace.py`.
 
 
 def main() -> None:
     import argparse
 
     from engine.config import (
-        AI_DP_CONNECTIONS,
         CURATED_SEED_EDGES,
         DOCUMENTS,
         REFERENCE_DOCUMENTS,
@@ -273,9 +255,6 @@ def main() -> None:
     reference_edges: list[dict[str, Any]] = list(
         cast(list[dict[str, Any]], REFERENCE_SEED_EDGES)
     )
-    connection_fixtures: list[dict[str, Any]] = list(
-        cast(list[dict[str, Any]], AI_DP_CONNECTIONS)
-    )
 
     if args.docs:
         unknown = [d for d in args.docs if d not in documents]
@@ -295,11 +274,8 @@ def main() -> None:
         logger.info("building subset: %s", ", ".join(documents))
         # A subset build omits the external references — their edges originate
         # from the rmit draft and would dangle if rmit or a target is excluded.
-        # The showcase verdicts cite those references, so drop them too rather
-        # than emit a half-resolved verdicts.json.
         reference_documents = {}
         reference_edges = []
-        connection_fixtures = []
 
     draft_registry_path = REPO_ROOT / "data" / "draft_registry.json"
     draft_registry = json.loads(draft_registry_path.read_text())
@@ -313,7 +289,6 @@ def main() -> None:
             dict[str, dict[str, Any]], reference_documents
         ),
         reference_edges=reference_edges,
-        connection_fixtures=connection_fixtures,
     )
     logger.info("build complete → %s", REPO_ROOT / "data" / "artifacts")
 
