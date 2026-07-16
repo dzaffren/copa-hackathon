@@ -16,9 +16,11 @@ Failure modes (unfound/ambiguous anchor, incomplete clause set) are loud
 exceptions raised at build time — never silent corruption.
 """
 
+import json
 import logging
 import re
-from typing import NotRequired, Optional, TypedDict, cast
+from pathlib import Path
+from typing import NotRequired, Optional, TypedDict, Union, cast
 
 
 logger = logging.getLogger(__name__)
@@ -1010,3 +1012,25 @@ def segment_clauses(
         dropped_report=dropped_report,
         raw_ends=raw_ends,
     )
+
+
+def load_clause_index(artifacts_dir: Union[str, Path]) -> ClauseIndex:
+    """Load `clause-index.json` from `artifacts_dir` into a `ClauseIndex`.
+
+    This lived in `engine.api` until the legacy read path was removed in #38,
+    which quietly broke `scripts/run_finder_trace.py` — its import survived the
+    deletion because no test exercises the script. It belongs here: this module
+    owns `ClauseIndex`, and the API's whole invariant is that it never reads the
+    index (workstream findings carry their own verbatim text).
+
+    A missing artifact yields an empty index rather than raising, so a fresh
+    checkout can import this without a build having run. Callers that need real
+    clauses should check (e.g. `entries_for_document`) and say so loudly — an
+    empty index silently finding nothing is exactly the failure mode
+    docs/learnings/blocker-engine-build-silently-narrows-artifacts.md records.
+    """
+    path = Path(artifacts_dir) / "clause-index.json"
+    if not path.exists():
+        return ClauseIndex({})
+    primary: dict[str, ClauseEntry] = json.loads(path.read_text(encoding="utf-8"))
+    return ClauseIndex(primary)

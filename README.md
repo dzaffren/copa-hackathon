@@ -102,8 +102,8 @@ seam, stubbed in tests):
 
 ```bash
 uv venv .venv && uv pip install pytest python-dotenv fastapi httpx \
-  python-multipart uvicorn anthropic azure-ai-inference 'markitdown[pdf,docx]'
-PYTHONPATH=. .venv/bin/python -m pytest engine/tests -q   # 196 tests
+  python-multipart uvicorn anthropic azure-ai-inference bleach 'markitdown[pdf,docx]'
+PYTHONPATH=. .venv/bin/python -m pytest engine/tests -q   # 255 tests
 PYTHONPATH=. .venv/bin/uvicorn engine.api:app --reload    # serves :8000
 ```
 
@@ -112,12 +112,57 @@ PYTHONPATH=. .venv/bin/uvicorn engine.api:app --reload    # serves :8000
 ```bash
 cd frontend
 npm ci
-npm test          # vitest — 44 tests
+npm test          # vitest — 93 tests
 npm run dev       # vite dev server
 ```
 
 Point the app at a live engine with `VITE_API_BASE` (see `frontend/.env.example`);
 unset, it uses the bundled fixtures.
+
+## Rebuilding from the corpus
+
+**You do not need this to run or demo the app.** The app is a projection over
+`data/workstreams/`, which is committed; `create_app()` has no model seam, so the
+service cannot reach a model even if you wanted it to. Everything above runs with
+no credentials and no build.
+
+The corpus pipeline is separate, and only joins the app at one point:
+
+```
+data/corpus/*.pdf                                  10 registered documents
+  └─ python -m engine.build                     →  data/artifacts/clause-index.json
+       └─ scripts/run_finder_trace.py A B       →  data/artifacts/connection-trace-A__B.json
+            └─ scripts/project_cross_workstream_findings.py
+                                                →  data/workstreams/_cross/findings/*.json
+```
+
+> **A `--docs` build REPLACES the clause index.** It writes only what it built, so
+> a subset run silently drops every other document's clauses. That is not
+> hypothetical — it took the index from 7 documents to 2, orphaned two recorded
+> traces, and the whole test suite stayed green
+> ([the learning](docs/learnings/blocker-engine-build-silently-narrows-artifacts.md)).
+> Use `--merge`, which adds instead and refuses any clause-number collision.
+
+```bash
+# Safe: add two documents to the existing index (offline, no Azure needed)
+PYTHONPATH=. .venv/bin/python -m engine.build \
+  --docs opres-v1-2025-draft open-finance-v1-2025-ed --merge
+
+# Inspect a build before it touches anything committed
+PYTHONPATH=. .venv/bin/python -m engine.build --docs rmit-v2-2025 --output-dir /tmp/probe
+```
+
+A **full** 10-document build needs Azure Document Intelligence credentials in
+`.env` — offline it fails on the legacy tech-risk PDFs (`GraphBuildError`, BCM
+9.17), because the default extractor scrambles their multi-column layout. The
+modern PDFs build offline fine. Re-running the finder (`run_finder_trace.py`)
+needs Azure Claude credentials — it is the only step that makes live model calls.
+
+Extraction quality is not uniform, and it matters: DI-built RMiT has 1 hollow
+clause in 608, while the offline OpRes DP has 21 in 71 (present, but with empty
+text). `engine/tests/test_artifact_integrity.py` pins those counts in both
+directions, so a DI rebuild has to lock its gains in rather than leave a standing
+excuse.
 
 ## View the prototype
 

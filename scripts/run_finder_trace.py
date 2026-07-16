@@ -21,7 +21,7 @@ from pathlib import Path
 # by path puts scripts/ on sys.path, not the repo root). Prepend the repo root.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from engine.api import _load_clause_index  # noqa: E402
+from engine.clauses import load_clause_index  # noqa: E402
 from engine.config import REPO_ROOT  # noqa: E402
 from engine.connections import find_connections  # noqa: E402
 
@@ -37,7 +37,20 @@ def main() -> None:
         sys.exit("usage: run_finder_trace.py [<doc_a_id> <doc_b_id>]")
 
     artifacts_dir = REPO_ROOT / "data" / "artifacts"
-    clause_index = _load_clause_index(artifacts_dir)
+    clause_index = load_clause_index(artifacts_dir)
+
+    # Fail loudly on a document the index does not cover. The finder would
+    # otherwise run happily against zero clauses, cost real model calls, and
+    # record a trace of nothing — the silent-narrowing failure mode again
+    # (docs/learnings/blocker-engine-build-silently-narrows-artifacts.md).
+    for doc_id in (doc_a, doc_b):
+        if not clause_index.entries_for_document(doc_id):
+            sys.exit(
+                f"No clauses indexed for '{doc_id}'. Build it first:\n"
+                f"    PYTHONPATH=. python -m engine.build --docs {doc_a} {doc_b} "
+                f"--output-dir <tmp> --merge\n"
+                f"(a bare --docs build REPLACES the index — see --merge.)"
+            )
 
     print(f"Running live finder+critic on:  {doc_a}  <->  {doc_b}")
     print("(this makes real Azure Claude calls — 2-3 round-trips, ~30-60s)\n")
