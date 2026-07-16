@@ -2,12 +2,15 @@ import { http, HttpResponse } from "msw";
 import type {
   Connection,
   CopilotIntent,
+  CreateWorkstreamRequest,
+  CreateWorkstreamResponse,
   DraftResponse,
   EdgeDetail,
   GraphEdge,
   GraphNode,
   LinkageCard,
   NodeDetail,
+  Person,
   ReviewClause,
   ReviewCounts,
   ReviewFinding,
@@ -712,7 +715,86 @@ const COPILOT_SCRIPT: Record<string, unknown[]> = {
   "Peer Benchmarking": [{ role: "copilot", text: "Peer benchmarking mode." }],
 };
 
+// --- New Workstream --------------------------------------------------------
+// Mirrors the engine: the reviewer list excludes the owner, create slugs the
+// name and appends to the in-memory workstream list so the sidebar picks it up,
+// and validation returns {code, message, field}.
+
+const DIRECTORY: Person[] = [
+  { id: "fm", name: "Farid M." },
+  { id: "ps", name: "Priya S." },
+  { id: "jn", name: "Jarod N." },
+];
+
+const DELIVERABLE_LABELS: Record<string, string> = {
+  PD: "Policy Document",
+  ED: "Exposure Draft",
+  DP: "Discussion Paper",
+  Other: "Other",
+};
+
+let createdWorkstreams: WorkstreamSummary[] = [];
+
+export function resetCreatedWorkstreams() {
+  createdWorkstreams = [];
+}
+
 export const handlers = [
+  http.get("*/api/reviewers", () => {
+    return HttpResponse.json({ reviewers: DIRECTORY });
+  }),
+
+  http.post("*/api/workstreams", async ({ request }) => {
+    const body = (await request.json()) as CreateWorkstreamRequest;
+    const name = (body.name ?? "").trim();
+    if (!name) {
+      return HttpResponse.json(
+        {
+          code: "NAME_REQUIRED",
+          message: "Give the workstream a name.",
+          field: "name",
+        },
+        { status: 400 },
+      );
+    }
+    if (name.length > 120) {
+      return HttpResponse.json(
+        {
+          code: "NAME_TOO_LONG",
+          message: "Workstream name must be 120 characters or fewer.",
+          field: "name",
+        },
+        { status: 400 },
+      );
+    }
+    const id = name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+    const created: CreateWorkstreamResponse = {
+      id,
+      name,
+      deliverable_type: DELIVERABLE_LABELS[body.deliverable_type] ?? "Other",
+      role: "own",
+      description: body.description ?? null,
+      primary_task_id: null,
+      target_publication: body.target_publication ?? null,
+      owner: { id: "ar", name: "Aisyah R." },
+      reviewers: (body.reviewer_ids ?? []).map(
+        (rid) => DIRECTORY.find((d) => d.id === rid)!,
+      ),
+      access: body.access,
+      created_at: "2026-07-16T09:00:00Z",
+    };
+    createdWorkstreams.push({
+      id,
+      name,
+      deliverable_type: created.deliverable_type,
+      role: "own",
+    });
+    return HttpResponse.json(created, { status: 201 });
+  }),
+
   http.get(
     "*/api/workstreams/:workstreamId/tasks/:nodeId/reviewed-linkages",
     ({ params }) => {
@@ -938,7 +1020,9 @@ export const handlers = [
 
   // --- Graph Screen routes -------------------------------------------------
   http.get("*/api/workstreams", () => {
-    return HttpResponse.json({ workstreams: WORKSTREAMS });
+    return HttpResponse.json({
+      workstreams: [...WORKSTREAMS, ...createdWorkstreams],
+    });
   }),
   http.get("*/api/workstreams/:workstreamId/graph", ({ params }) => {
     const { workstreamId } = params as { workstreamId: string };

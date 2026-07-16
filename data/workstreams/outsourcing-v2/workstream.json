@@ -8,5 +8,5 @@
   "target_publication": "2027-03-31",
   "owner": { "id": "fm", "name": "Farid M." },
   "reviewers": [{ "id": "ar", "name": "Aisyah R." }],
-  "access": ["Aisyah R.", "Farid M."]
+  "access": "team_only"
 }

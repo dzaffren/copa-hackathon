@@ -5,9 +5,12 @@ import type {
   CopilotResponse,
   CreateNodeRequest,
   CreateNodeResponse,
+  CreateWorkstreamRequest,
+  CreateWorkstreamResponse,
   DraftResponse,
   EdgeDetail,
   LinkagesResponse,
+  Person,
   NodeDetail,
   PatchReviewStateResponse,
   ReviewResponse,
@@ -22,30 +25,37 @@ const API_BASE = import.meta.env.VITE_API_BASE ?? "";
 export interface ApiError {
   code: string;
   message: string;
+  /** Which input the error belongs to, when the route names one. Lets a form
+   *  flag the offending field instead of showing a banner. */
+  field?: string;
 }
 
 class HttpError extends Error {
   code: string;
   status: number;
-  constructor(status: number, code: string, message: string) {
+  field?: string;
+  constructor(status: number, code: string, message: string, field?: string) {
     super(message);
     this.name = "HttpError";
     this.status = status;
     this.code = code;
+    this.field = field;
   }
 }
 
 async function throwHttpError(res: Response): Promise<never> {
   let code = "INTERNAL_ERROR";
   let message = `Request failed with status ${res.status}`;
+  let field: string | undefined;
   try {
     const body = (await res.json()) as Partial<ApiError>;
     if (body.code) code = body.code;
     if (body.message) message = body.message;
+    if (body.field) field = body.field;
   } catch {
     // non-JSON error body — keep defaults
   }
-  throw new HttpError(res.status, code, message);
+  throw new HttpError(res.status, code, message, field);
 }
 
 async function getJson<T>(url: string): Promise<T> {
@@ -245,6 +255,21 @@ export function sendCopilotMessage(
     `${API_BASE}/api/workstreams/${workstreamId}/tasks/${nodeId}/copilot`,
     { intent, message, turn },
   );
+}
+
+// --- New Workstream --------------------------------------------------------
+
+export async function fetchReviewers(): Promise<Person[]> {
+  // The server already excludes the owner, so the picker cannot offer a drafter
+  // themselves — no client-side filtering to keep in step.
+  const body = await getJson<{ reviewers: Person[] }>(`${API_BASE}/api/reviewers`);
+  return body.reviewers;
+}
+
+export function createWorkstream(
+  body: CreateWorkstreamRequest,
+): Promise<CreateWorkstreamResponse> {
+  return postJson<CreateWorkstreamResponse>(`${API_BASE}/api/workstreams`, body);
 }
 
 export { HttpError };

@@ -11,5 +11,5 @@
     { "id": "fm", "name": "Farid M." },
     { "id": "ps", "name": "Priya S." }
   ],
-  "access": ["Aisyah R.", "Farid M.", "Priya S."]
+  "access": "team_only"
 }

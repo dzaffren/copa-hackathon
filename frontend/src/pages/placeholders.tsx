@@ -39,16 +39,8 @@ export function HomePage() {
 // ReviewLinkagesPage is no longer a placeholder — see
 // @/features/review-linkages/ReviewLinkagesPage.
 
-export function NewWorkstreamPage() {
-  return (
-    <Shell eyebrow="New workstream" title="New workstream">
-      <p>
-        The new-workstream form is a separate story. This placeholder confirms
-        the route resolves.
-      </p>
-    </Shell>
-  );
-}
+// NewWorkstreamPage is no longer a placeholder — see
+// @/features/new-workstream/NewWorkstreamPage.
 
 export function InstitutionMapPage() {
   return (

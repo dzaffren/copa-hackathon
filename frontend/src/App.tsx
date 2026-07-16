@@ -3,11 +3,8 @@ import TaskScreenPage from "@/features/task/TaskScreenPage";
 import WorkstreamGraphPage from "@/features/workstream-graph/WorkstreamGraphPage";
 import { ReviewLinkagesPage } from "@/features/review-linkages/ReviewLinkagesPage";
 import { DraftingWorkspacePage } from "@/features/drafting-workspace/DraftingWorkspacePage";
-import {
-  HomePage,
-  NewWorkstreamPage,
-  InstitutionMapPage,
-} from "@/pages/placeholders";
+import { NewWorkstreamPage } from "@/features/new-workstream/NewWorkstreamPage";
+import { HomePage, InstitutionMapPage } from "@/pages/placeholders";
 
 function App() {
   return (
