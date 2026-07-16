@@ -130,6 +130,12 @@ Note this is _not_ `data/references/`, which is public and tracked.
 - **FastAPI TestClient deps** — tests using `fastapi.testclient.TestClient` need
   `httpx` and `python-multipart` as explicit `pyproject.toml` deps (not pulled in
   by `fastapi` alone). See `docs/learnings/pattern-fastapi-testclient-deps.md`.
+- **Engine deps live in two places** — a new `engine/` dependency must be added to
+  **both** `pyproject.toml` and the explicit `pip install` list in
+  `.github/workflows/test.yml`; CI does not install from `pyproject.toml`. Miss the
+  second and CI fails collection on every `engine.api` importer while your local
+  suite stays green (the venv already has it). See
+  `docs/learnings/pattern-engine-deps-live-in-two-places.md`.
 - **/ship is GitLab — use gh** — the `/ship` skill targets GitLab; on this GitHub repo
   override to `gh pr create --base dzaf/main`. **No `Closes #<n>`** — there is no issue
   tracker. See `docs/learnings/skill-ship-is-gitlab-use-gh.md`.
