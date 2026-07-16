@@ -36,7 +36,7 @@ const PURIFY_CONFIG = {
 };
 
 /** Extract the clause number a callout should sit beside, e.g. "5.3" from
- *  "Operational Resilience 5.3". The draft marks clauses as `<strong>5.3</strong>`,
+ *  "OpRes PD 5.3". The draft marks clauses as `<strong>5.3</strong>`,
  *  so only the trailing numeric part is comparable. */
 function clauseTail(clauseNumber: string | null): string | null {
   if (!clauseNumber) return null;

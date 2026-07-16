@@ -30,6 +30,14 @@ POLICY_SHORT_NAMES = {
     "outsourcing": "Outsourcing",
     "bcm": "BCM",
     "opres": "Operational Resilience",
+    # The Open Finance Exposure Draft (BNM/RH/ED 028-36). `config.DOCUMENTS`
+    # has declared `open-finance` since the OpRes×OpenFinance cross-workstream
+    # experiment, but this mapping was never committed alongside it — so any
+    # build including that document died here with a KeyError, which is why its
+    # trace has sat un-rebuildable. "Open Finance" is not a guess: it is the
+    # prefix the experiment's own recorded clause numbers use ("Open Finance
+    # 7.6(b)"), so rebuilding now reproduces keys the trace can still resolve.
+    "open-finance": "Open Finance",
     "recovery-planning": "Recovery Planning",
     "customer-info": "Customer Info",
     # The analysed vehicle document — its numbered paragraphs (1.1 … 5.10) enter

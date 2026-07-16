@@ -54,7 +54,7 @@ RMIT_9_4_QUOTE: str = (
     "risk management function of the financial institution."
 )
 
-# Operational Resilience 5.3, verbatim from the opres-v2 findings fixtures
+# OpRes PD 5.3, verbatim from the opres-v2 findings fixtures
 # (findings/e-opres_v0_3--hkma_spm_or2.json, source_clauses[0]).
 OPRES_5_3_QUOTE: str = (
     "A financial institution shall conduct scenario testing of its "
@@ -117,7 +117,7 @@ COPILOT_SCRIPTS: dict[str, list[dict[str, Any]]] = {
                 "tighter cadence is proportionate."
             ),
             "citations": [
-                {"clause_number": "Operational Resilience 5.3", "text": OPRES_5_3_QUOTE},
+                {"clause_number": "OpRes PD 5.3", "text": OPRES_5_3_QUOTE},
                 {"clause_number": "HKMA SPM OR-2 5.2", "text": HKMA_5_2_QUOTE},
             ],
         },
@@ -132,7 +132,7 @@ COPILOT_SCRIPTS: dict[str, list[dict[str, Any]]] = {
                 "guessing at it."
             ),
             "citations": [
-                {"clause_number": "Operational Resilience 5.3", "text": OPRES_5_3_QUOTE},
+                {"clause_number": "OpRes PD 5.3", "text": OPRES_5_3_QUOTE},
             ],
         },
     ],

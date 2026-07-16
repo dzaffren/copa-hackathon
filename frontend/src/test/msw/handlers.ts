@@ -162,7 +162,7 @@ const FINDINGS: Record<string, Connection[]> = {
       supported: true,
       source_clauses: [
         {
-          clause_number: "Operational Resilience 4.4",
+          clause_number: "OpRes PD 4.4",
           text: "A financial institution shall map its dependencies on external service providers that support critical operations.",
         },
       ],
@@ -182,7 +182,7 @@ const FINDINGS: Record<string, Connection[]> = {
       supported: true,
       source_clauses: [
         {
-          clause_number: "Operational Resilience 2.1",
+          clause_number: "OpRes PD 2.1",
           text: "The board shall approve and oversee the financial institution's operational resilience framework, including its risk appetite for disruption to critical operations.",
         },
       ],
@@ -203,7 +203,7 @@ const FINDINGS: Record<string, Connection[]> = {
       supported: true,
       source_clauses: [
         {
-          clause_number: "Operational Resilience 4.7",
+          clause_number: "OpRes PD 4.7",
           text: "A financial institution shall maintain a documented and periodically tested exit plan for each critical third-party service provider.",
         },
       ],
@@ -225,7 +225,7 @@ const FINDINGS: Record<string, Connection[]> = {
       supported: true,
       source_clauses: [
         {
-          clause_number: "Operational Resilience 5.3",
+          clause_number: "OpRes PD 5.3",
           text: "A financial institution shall conduct scenario testing of its operational resilience arrangements at least annually.",
         },
       ],
@@ -247,7 +247,7 @@ const FINDINGS: Record<string, Connection[]> = {
       supported: true,
       source_clauses: [
         {
-          clause_number: "Operational Resilience 7.1",
+          clause_number: "OpRes PD 7.1",
           text: "This Policy Document shall be read together with the Risk Management in Technology (RMiT) policy document issued on 1 June 2023.",
         },
       ],
@@ -269,7 +269,7 @@ const FINDINGS: Record<string, Connection[]> = {
       supported: true,
       source_clauses: [
         {
-          clause_number: "Operational Resilience 1.1",
+          clause_number: "OpRes PD 1.1",
           text: "This policy document is issued pursuant to section 143(2) of the Financial Services Act 2013.",
         },
       ],
@@ -292,7 +292,7 @@ const FINDINGS: Record<string, Connection[]> = {
       supported: true,
       source_clauses: [
         {
-          clause_number: "Operational Resilience 4.5",
+          clause_number: "OpRes PD 4.5",
           text: "A financial institution shall maintain a register of arrangements with third-party service providers that support critical operations.",
         },
       ],
@@ -480,7 +480,7 @@ const ANALYZE_FSB: Connection[] = [
     supported: true,
     source_clauses: [
       {
-        clause_number: "Operational Resilience 4.5",
+        clause_number: "OpRes PD 4.5",
         text: "A financial institution shall maintain a register of arrangements with third-party service providers that support critical operations.",
       },
     ],
@@ -501,7 +501,7 @@ const ANALYZE_FSB: Connection[] = [
     supported: true,
     source_clauses: [
       {
-        clause_number: "Operational Resilience 4.7",
+        clause_number: "OpRes PD 4.7",
         text: "A financial institution shall maintain a documented and periodically tested exit plan for each critical third-party service provider.",
       },
     ],
