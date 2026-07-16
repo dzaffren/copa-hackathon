@@ -36,6 +36,10 @@ jobs:
         # Installed explicitly rather than via `pip install -e .` — the editable
         # build does not resolve cleanly here, and TestClient needs httpx +
         # python-multipart as explicit deps (see the FastAPI TestClient learning).
+        #
+        # This list is NOT derived from pyproject.toml, so a new engine
+        # dependency must be added in BOTH places or CI fails at import with a
+        # ModuleNotFoundError that no local run reproduces.
         run: |
           python -m pip install --upgrade pip
           pip install \
@@ -47,6 +51,7 @@ jobs:
             uvicorn \
             anthropic \
             azure-ai-inference \
+            bleach \
             'markitdown[pdf,docx]'
 
       - name: Run engine tests

@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Shell({
   eyebrow,
@@ -33,17 +33,8 @@ export function HomePage() {
   );
 }
 
-export function DraftingWorkspacePage() {
-  const { workstreamId, nodeId } = useParams();
-  return (
-    <Shell eyebrow="Drafting workspace" title="Drafting workspace">
-      <p>
-        Drafting workspace for task <code>{nodeId}</code> in workstream{" "}
-        <code>{workstreamId}</code>. Placeholder for the drafting story.
-      </p>
-    </Shell>
-  );
-}
+// DraftingWorkspacePage is no longer a placeholder — see
+// @/features/drafting-workspace/DraftingWorkspacePage.
 
 // ReviewLinkagesPage is no longer a placeholder — see
 // @/features/review-linkages/ReviewLinkagesPage.

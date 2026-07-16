@@ -2,9 +2,9 @@ import { Routes, Route } from "react-router-dom";
 import TaskScreenPage from "@/features/task/TaskScreenPage";
 import WorkstreamGraphPage from "@/features/workstream-graph/WorkstreamGraphPage";
 import { ReviewLinkagesPage } from "@/features/review-linkages/ReviewLinkagesPage";
+import { DraftingWorkspacePage } from "@/features/drafting-workspace/DraftingWorkspacePage";
 import {
   HomePage,
-  DraftingWorkspacePage,
   NewWorkstreamPage,
   InstitutionMapPage,
 } from "@/pages/placeholders";

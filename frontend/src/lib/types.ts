@@ -237,3 +237,93 @@ export interface AnalyzeResponse {
   findings: Connection[];
   findings_count: number;
 }
+
+// --- Drafting Workspace ----------------------------------------------------
+
+/** The seven Copilot intent presets. Cosmetic in MVP1 beyond keying the
+ *  scripted reply map — they signal the surface area the tool will cover. */
+export type CopilotIntent =
+  | "PD"
+  | "DP"
+  | "ED"
+  | "FAQ"
+  | "Engagement Deck"
+  | "Feedback Template for Industry"
+  | "Peer Benchmarking";
+
+export const COPILOT_INTENTS: CopilotIntent[] = [
+  "PD",
+  "DP",
+  "ED",
+  "FAQ",
+  "Engagement Deck",
+  "Feedback Template for Industry",
+  "Peer Benchmarking",
+];
+
+/** Human labels for the intent dropdown. The wire values stay terse. */
+export const COPILOT_INTENT_LABELS: Record<CopilotIntent, string> = {
+  PD: "PD — Policy Document",
+  DP: "DP — Discussion Paper",
+  ED: "ED — Exposure Draft",
+  FAQ: "FAQ",
+  "Engagement Deck": "Engagement Deck",
+  "Feedback Template for Industry": "Feedback Template for Industry",
+  "Peer Benchmarking": "Peer Benchmarking",
+};
+
+export interface LinkageEndpoint {
+  id: string;
+  title: string | null;
+  node_type: NodeType | null;
+}
+
+/** A side-panel card. Carries clause NUMBERS only, never clause text: the
+ *  cards are references into the review reader, so they cannot misquote. */
+export interface LinkageCard {
+  id: string;
+  label: SemanticLabel;
+  sentiment: Sentiment;
+  summary: string;
+  edge_id: string;
+  left: LinkageEndpoint;
+  right: LinkageEndpoint;
+  source_clause_number: string | null;
+  target_clause_number: string | null;
+}
+
+export interface LinkagesResponse {
+  findings: LinkageCard[];
+}
+
+export interface DraftResponse {
+  node_id: string;
+  content_html: string;
+  last_saved_at: string | null;
+}
+
+/** A clause the Copilot quotes. `text` is verbatim from the clause index or the
+ *  findings fixtures — see engine/copilot_scripts.py. */
+export interface CopilotCitation {
+  clause_number: string;
+  text: string;
+}
+
+export interface CopilotReply {
+  role: "copilot";
+  text: string;
+  citations?: CopilotCitation[];
+  snippet_html?: string;
+}
+
+export interface CopilotResponse {
+  reply: CopilotReply;
+}
+
+/** A rendered chat turn. The user's own turns never carry citations. */
+export interface ChatMessage {
+  role: "user" | "copilot";
+  text: string;
+  citations?: CopilotCitation[];
+  snippet_html?: string;
+}

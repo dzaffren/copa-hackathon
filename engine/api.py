@@ -32,7 +32,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from engine.config import REPO_ROOT
-from engine import findings, workstreams
+from engine import copilot_scripts, drafts, findings, workstreams
 
 # The Workstream Brain fixture store (Task 1): one directory per workstream, each
 # holding a `graph.json` (`{"nodes": [...], "edges": [...]}`) and a `findings/`
@@ -505,6 +505,195 @@ def create_app(
             )
         all_findings = findings.load(workstreams_dir, workstream_id, edge_id)
         return {"finding": updated, "counts": findings.counts(all_findings)}
+
+    # --- Workstream Brain — Drafting Workspace routes ----------------------
+    # The editor plus its three-tab context panel. Same `{code, message}` error
+    # body as above. The Copilot here is a scripted map, not a model: see
+    # `engine/copilot_scripts.py` for why every clause it quotes is checkable.
+
+    def _task_node(
+        ws_graph: dict[str, Any], workstream_id: str, node_id: str
+    ) -> Union[dict[str, Any], JSONResponse]:
+        """The node, or the error response for "not a task"/"not found"."""
+        node = next(
+            (n for n in ws_graph.get("nodes", []) if n["id"] == node_id), None
+        )
+        if node is None or node.get("node_type") != "task":
+            # One code for both: the workspace is only ever reached from a task,
+            # so a caller asking for a draft of an anchor node and a caller
+            # asking for a draft of nothing are equally out of contract.
+            return _ws_error(
+                404,
+                "TASK_NOT_FOUND",
+                f"Node {node_id} is not a task node in workstream {workstream_id}"
+                if node is not None
+                else f"Task {node_id} not found in workstream {workstream_id}",
+            )
+        return node
+
+    def _linkage_card(
+        finding: dict[str, Any], edge: dict[str, Any], ws_graph: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Project a finding onto the side panel's card shape.
+
+        Only `clause_number`s travel, not clause text: the cards are references
+        into the reader, and the drafter clicks through to the review screen for
+        the full quotation. Nothing here is a citation, so nothing here can
+        misquote.
+        """
+        source_clauses = finding.get("source_clauses") or []
+        target_clauses = finding.get("target_clauses") or []
+        return {
+            "id": finding["id"],
+            "label": finding.get("label"),
+            "sentiment": finding.get("sentiment"),
+            "summary": finding.get("summary"),
+            "edge_id": edge["id"],
+            "left": _review_node(ws_graph, edge["source"]),
+            "right": _review_node(ws_graph, edge["target"]),
+            "source_clause_number": (
+                source_clauses[0].get("clause_number") if source_clauses else None
+            ),
+            "target_clause_number": (
+                target_clauses[0].get("clause_number") if target_clauses else None
+            ),
+        }
+
+    @app.get("/api/workstreams/{workstream_id}/tasks/{node_id}/reviewed-linkages")
+    def get_reviewed_linkages(workstream_id: str, node_id: str) -> Any:
+        """Accepted findings across every edge incident to the task.
+
+        Filtered server-side, per the spec's negative constraint: the Reviewed
+        tab must not receive dismissed findings and filter them away in the
+        browser.
+        """
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        node = _task_node(ws_graph, workstream_id, node_id)
+        if isinstance(node, JSONResponse):
+            return node
+
+        cards: list[dict[str, Any]] = []
+        for edge in ws_graph.get("edges", []):
+            if node_id not in (edge.get("source"), edge.get("target")):
+                continue
+            try:
+                edge_findings = findings.load(workstreams_dir, workstream_id, edge["id"])
+            except findings.FindingsNotAnalysedError:
+                continue  # unanalysed edge — nothing to have accepted yet
+            cards.extend(
+                _linkage_card(f, edge, ws_graph)
+                for f in edge_findings
+                if f["review_state"] == "accepted"
+            )
+        return {"findings": cards}
+
+    @app.get("/api/workstreams/{workstream_id}/tasks/{node_id}/related-linkages")
+    def get_related_linkages(workstream_id: str, node_id: str, hops: int = 1) -> Any:
+        """Findings on edges between the task's neighbours themselves.
+
+        Peer context: what the anchors already say about each other, useful when
+        the draft is silent on a concept the neighbours have settled. Bounded at
+        exactly 1 hop — `hops` is validated rather than ignored so a caller who
+        asks for 2 learns it is unsupported instead of silently getting 1.
+        """
+        if hops != 1:
+            return _ws_error(
+                400, "HOPS_OUT_OF_RANGE", f"Only hops=1 is supported, got {hops}"
+            )
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        node = _task_node(ws_graph, workstream_id, node_id)
+        if isinstance(node, JSONResponse):
+            return node
+
+        all_edges = ws_graph.get("edges", [])
+        neighbours = set(workstreams.neighbour_ids(all_edges, node_id))
+        peer_edges = workstreams.edges_between(all_edges, neighbours, exclude_node=node_id)
+
+        cards: list[dict[str, Any]] = []
+        for edge in peer_edges:
+            try:
+                edge_findings = findings.load(workstreams_dir, workstream_id, edge["id"])
+            except findings.FindingsNotAnalysedError:
+                continue
+            cards.extend(_linkage_card(f, edge, ws_graph) for f in edge_findings)
+        return {"findings": cards}
+
+    @app.get("/api/workstreams/{workstream_id}/tasks/{node_id}/draft")
+    def get_draft(workstream_id: str, node_id: str) -> Any:
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        node = _task_node(ws_graph, workstream_id, node_id)
+        if isinstance(node, JSONResponse):
+            return node
+        return drafts.load(workstreams_dir, workstream_id, node_id)
+
+    @app.put("/api/workstreams/{workstream_id}/tasks/{node_id}/draft")
+    async def put_draft(workstream_id: str, node_id: str, request: Request) -> Any:
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        node = _task_node(ws_graph, workstream_id, node_id)
+        if isinstance(node, JSONResponse):
+            return node
+        body = await request.json()
+        content_html = body.get("content_html") if isinstance(body, dict) else None
+        if not isinstance(content_html, str):
+            return _ws_error(
+                400, "INVALID_HTML", "content_html must be a string"
+            )
+        try:
+            return drafts.save(workstreams_dir, workstream_id, node_id, content_html)
+        except drafts.DraftTooLargeError:
+            return _ws_error(
+                413,
+                "DRAFT_TOO_LARGE",
+                f"Draft exceeds {drafts.MAX_DRAFT_BYTES} bytes after sanitization",
+            )
+        except drafts.DraftEmptyError:
+            return _ws_error(
+                400,
+                "INVALID_HTML",
+                "Nothing survived sanitization — no allowed content in payload",
+            )
+
+    @app.post("/api/workstreams/{workstream_id}/tasks/{node_id}/copilot")
+    async def post_copilot(workstream_id: str, node_id: str, request: Request) -> Any:
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        node = _task_node(ws_graph, workstream_id, node_id)
+        if isinstance(node, JSONResponse):
+            return node
+        body = await request.json() if await request.body() else {}
+        intent = body.get("intent") if isinstance(body, dict) else None
+        if intent not in copilot_scripts.INTENTS:
+            return _ws_error(
+                400,
+                "INVALID_INTENT",
+                f"intent must be one of {list(copilot_scripts.INTENTS)}, got {intent!r}",
+            )
+        # `turn` is the count of prior copilot replies in this conversation. The
+        # client owns it because the chat is deliberately not persisted (spec:
+        # no cross-session history), so the server holds no conversation state.
+        turn = body.get("turn", 0)
+        if not isinstance(turn, int) or turn < 0:
+            turn = 0
+        return {"reply": copilot_scripts.reply_for(intent, turn)}
 
     return app
 
