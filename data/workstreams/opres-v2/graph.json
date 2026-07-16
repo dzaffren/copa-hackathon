@@ -11,10 +11,19 @@
       "description": "Working draft of the Policy Document following the 2025 Discussion Paper",
       "source_url": null,
       "status": "in_progress",
-      "owner": { "id": "ar", "name": "Aisyah R." },
+      "owner": {
+        "id": "ar",
+        "name": "Aisyah R."
+      },
       "reviewers": [
-        { "id": "fm", "name": "Farid M." },
-        { "id": "ps", "name": "Priya S." }
+        {
+          "id": "fm",
+          "name": "Farid M."
+        },
+        {
+          "id": "ps",
+          "name": "Priya S."
+        }
       ],
       "clause_count": 42,
       "last_edited_at": "2026-07-13T14:30:00Z",
@@ -44,10 +53,19 @@
       "description": "Empty working draft (no clauses parsed yet)",
       "source_url": null,
       "status": "in_progress",
-      "owner": { "id": "ar", "name": "Aisyah R." },
+      "owner": {
+        "id": "ar",
+        "name": "Aisyah R."
+      },
       "reviewers": [
-        { "id": "fm", "name": "Farid M." },
-        { "id": "ps", "name": "Priya S." }
+        {
+          "id": "fm",
+          "name": "Farid M."
+        },
+        {
+          "id": "ps",
+          "name": "Priya S."
+        }
       ],
       "clause_count": 0,
       "last_edited_at": "2026-07-10T09:00:00Z",
@@ -106,6 +124,15 @@
       "short_type": "Position paper",
       "description": "Association of Banks in Malaysia position paper on operational resilience expectations.",
       "source_url": null
+    },
+    {
+      "id": "opres-dp-2025",
+      "node_type": "internal-published",
+      "title": "OpRes DP (Dec 2025)",
+      "issuer": "BNM",
+      "short_type": "DP",
+      "description": "Operational Resilience Discussion Paper, December 2025 — the consultation the v0.3 PD draft follows.",
+      "source_url": null
     }
   ],
   "edges": [
@@ -156,6 +183,12 @@
       "source": "opres-pd-v0-0",
       "target": "hkma-spm-or2",
       "edge_type": "contributes-to"
+    },
+    {
+      "id": "e-opres_v0_3--opres_dp_2025",
+      "source": "opres-pd-v0-3",
+      "target": "opres-dp-2025",
+      "edge_type": "references"
     }
   ]
 }

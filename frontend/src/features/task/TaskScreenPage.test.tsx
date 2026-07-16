@@ -22,7 +22,7 @@ async function loadTaskScreen() {
 }
 
 describe("TaskScreenPage — landing", () => {
-  it("renders the header, source card, six neighbours, six pairs and footer", async () => {
+  it("renders the header, source card, seven neighbours, seven pairs and footer", async () => {
     await loadTaskScreen();
 
     // Header
@@ -31,7 +31,7 @@ describe("TaskScreenPage — landing", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Working draft of the Policy Document following the 2025 Discussion Paper · 6 neighbour nodes defined at creation",
+        "Working draft of the Policy Document following the 2025 Discussion Paper · 7 neighbour nodes defined at creation",
       ),
     ).toBeInTheDocument();
 
@@ -48,11 +48,11 @@ describe("TaskScreenPage — landing", () => {
     expect(within(source).getByText("in progress")).toBeInTheDocument();
 
     // Neighbours + pairs
-    expect(screen.getAllByTestId("neighbour-row")).toHaveLength(6);
-    expect(screen.getAllByTestId("pair-card")).toHaveLength(6);
+    expect(screen.getAllByTestId("neighbour-row")).toHaveLength(7);
+    expect(screen.getAllByTestId("pair-card")).toHaveLength(7);
 
     // Footer
-    expect(screen.getByText("4 of 6 neighbours analysed")).toBeInTheDocument();
+    expect(screen.getByText("4 of 7 neighbours analysed")).toBeInTheDocument();
   });
 });
 
@@ -68,6 +68,7 @@ describe("TaskScreenPage — neighbour list", () => {
       ["RMiT PD (28 Nov 2025)", "parallel-to · internal-published"],
       ["FSA 2013 §143", "references · act-law"],
       ["ABM position paper", "contributes-to · industry-input"],
+      ["OpRes DP (Dec 2025)", "references · internal-published"],
     ];
 
     expected.forEach(([title, meta], i) => {
@@ -137,7 +138,7 @@ describe("TaskScreenPage — unanalysed pairs", () => {
 });
 
 describe("TaskScreenPage — filter chips", () => {
-  it("narrows to one pair on HKMA and restores all six on All", async () => {
+  it("narrows to one pair on HKMA and restores all seven on All", async () => {
     const user = userEvent.setup();
     await loadTaskScreen();
 
@@ -152,7 +153,7 @@ describe("TaskScreenPage — filter chips", () => {
 
     await user.click(screen.getByRole("button", { name: "All" }));
     cards = screen.getAllByTestId("pair-card");
-    expect(cards).toHaveLength(6);
+    expect(cards).toHaveLength(7);
   });
 
   it.each([
@@ -190,7 +191,7 @@ describe("TaskScreenPage — analyze linkages", () => {
     const user = userEvent.setup();
     await loadTaskScreen();
 
-    expect(screen.getByText("4 of 6 neighbours analysed")).toBeInTheDocument();
+    expect(screen.getByText("4 of 7 neighbours analysed")).toBeInTheDocument();
 
     const fsb = pairCard("fsb-3rd-party");
     await user.click(
@@ -208,7 +209,7 @@ describe("TaskScreenPage — analyze linkages", () => {
     // Footer increments.
     await waitFor(() =>
       expect(
-        screen.getByText("5 of 6 neighbours analysed"),
+        screen.getByText("5 of 7 neighbours analysed"),
       ).toBeInTheDocument(),
     );
   });

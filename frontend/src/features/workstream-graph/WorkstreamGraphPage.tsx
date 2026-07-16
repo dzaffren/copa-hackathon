@@ -9,6 +9,7 @@ import { Sidebar } from "./Sidebar";
 import { GraphCanvas } from "./GraphCanvas";
 import { NodeDetailPanel } from "./NodeDetailPanel";
 import { EdgeDetailPanel } from "./EdgeDetailPanel";
+import { CrossWorkstreamPanel } from "./CrossWorkstreamPanel";
 import { AddNodeDialog } from "./AddNodeDialog";
 import {
   EDGE_LEGEND,
@@ -136,8 +137,14 @@ export default function WorkstreamGraphPage() {
                 edgeId={selection.id}
               />
             ) : (
-              <div className="flex h-full items-center justify-center p-6 text-center text-sm text-muted-foreground">
-                Select a node or edge to see its details.
+              // Nothing selected: the rail leads with cross-workstream drift.
+              // It is the one thing on this screen a drafter cannot find by
+              // reading their own workstream, so it should not need hunting for.
+              <div className="flex h-full flex-col gap-3 overflow-y-auto p-3">
+                <CrossWorkstreamPanel workstreamId={workstreamId} />
+                <p className="px-3 text-center text-sm text-muted-foreground">
+                  Select a node or edge to see its details.
+                </p>
               </div>
             )}
           </div>

@@ -1,0 +1,68 @@
+{
+  "nodes": [
+    {
+      "id": "of-ed-2025",
+      "node_type": "task",
+      "title": "Open Finance ED — 18 Nov 2025",
+      "issuer": "BNM",
+      "short_type": "ED",
+      "source_name": "ED_Open_Finance_2025.pdf",
+      "format": ".pdf",
+      "description": "Exposure Draft BNM/RH/ED 028-36 on Open Finance, issued 18 November 2025 for industry response.",
+      "source_url": null,
+      "status": "in_progress",
+      "owner": { "id": "jn", "name": "Jarod N." },
+      "reviewers": [{ "id": "ar", "name": "Aisyah R." }],
+      "clause_count": 129,
+      "last_edited_at": "2025-11-18T00:00:00Z",
+      "recent_activity": []
+    },
+    {
+      "id": "rmit-pd-2023",
+      "node_type": "internal-published",
+      "title": "RMiT PD (1 June 2023)",
+      "issuer": "BNM",
+      "short_type": "PD",
+      "description": "Risk Management in Technology policy document issued 1 June 2023 — the version the Open Finance ED anchors to at paragraph 6.1(h).",
+      "source_url": null
+    },
+    {
+      "id": "bcm-pd-2022",
+      "node_type": "internal-published",
+      "title": "BCM PD (19 Dec 2022)",
+      "issuer": "BNM",
+      "short_type": "PD",
+      "description": "Business Continuity Management policy document issued 19 December 2022, referenced at Open Finance 6.1(g).",
+      "source_url": null
+    },
+    {
+      "id": "risk-governance-pd-2013",
+      "node_type": "internal-published",
+      "title": "Risk Governance PD (1 Mar 2013)",
+      "issuer": "BNM",
+      "short_type": "PD",
+      "description": "Risk Governance policy document issued 1 March 2013, referenced at Open Finance 6.1(c).",
+      "source_url": null
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-of_ed_2025--rmit_pd_2023",
+      "source": "of-ed-2025",
+      "target": "rmit-pd-2023",
+      "edge_type": "references"
+    },
+    {
+      "id": "e-of_ed_2025--bcm_pd_2022",
+      "source": "of-ed-2025",
+      "target": "bcm-pd-2022",
+      "edge_type": "references"
+    },
+    {
+      "id": "e-of_ed_2025--risk_governance_pd_2013",
+      "source": "of-ed-2025",
+      "target": "risk-governance-pd-2013",
+      "edge_type": "references"
+    }
+  ]
+}

@@ -7,6 +7,7 @@ import type {
   CreateNodeResponse,
   CreateWorkstreamRequest,
   CreateWorkstreamResponse,
+  CrossLinksResponse,
   DraftResponse,
   EdgeDetail,
   LinkagesResponse,
@@ -270,6 +271,15 @@ export function createWorkstream(
   body: CreateWorkstreamRequest,
 ): Promise<CreateWorkstreamResponse> {
   return postJson<CreateWorkstreamResponse>(`${API_BASE}/api/workstreams`, body);
+}
+
+// --- Cross-workstream linkage ----------------------------------------------
+
+export async function fetchCrossLinks(workstreamId: string) {
+  const body = await getJson<CrossLinksResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/cross-links`,
+  );
+  return body.links;
 }
 
 export { HttpError };
