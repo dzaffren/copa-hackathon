@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Institution Map · Workstream Brain</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+        boxShadow: { soft: '0 1px 2px rgba(15,23,42,.04), 0 4px 16px rgba(15,23,42,.06)' }
+      }
+    }
+  }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body { -webkit-font-smoothing: antialiased; }
+  .sidebar { transition: width .2s ease; }
+  .sidebar.collapsed .side-label { display: none; }
+  .sidebar.collapsed .side-item { justify-content: center; padding-left: 0; padding-right: 0; }
+  .side-item { transition: background-color .12s ease, color .12s ease; }
+  .ws-chip { transition: all .15s ease; cursor: pointer; }
+  .ws-chip:hover { transform: translateY(-1px); }
+  .ws-chip.selected { background-color: #4f46e5; color: white; border-color: #312e81; }
+  .concept-bridge { transition: transform .15s ease, filter .15s ease; cursor: pointer; }
+  .concept-bridge:hover { transform: scale(1.06); filter: drop-shadow(0 4px 8px rgba(0,0,0,.15)); }
+  .doc-node { transition: transform .15s ease; cursor: pointer; }
+  .doc-node:hover { transform: scale(1.05); }
+  .pulse { animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.55 } }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans">
+
+<!-- Topbar -->
+<nav class="bg-white/90 backdrop-blur border-b border-slate-200 sticky top-0 z-30">
+  <div class="px-4 py-2.5 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <span class="grid place-items-center w-9 h-9 rounded-xl bg-indigo-600 text-white text-lg shadow-sm">🧠</span>
+      <div class="leading-tight">
+        <div class="font-bold text-[15px] tracking-tight">Workstream Brain</div>
+        <div class="text-[11px] text-slate-400 -mt-0.5">Policy drafting intelligence</div>
+      </div>
+      <span class="hidden md:inline text-[11px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium ml-1">COPA Hackathon 2026 · MW6/9/10</span>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <button class="relative w-9 h-9 rounded-lg hover:bg-slate-100 grid place-items-center"><svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1"/></svg><span class="absolute top-1 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span></button>
+      <button class="w-9 h-9 rounded-lg hover:bg-slate-100 grid place-items-center"><svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.2 9a3.8 3.8 0 017.6 0c0 1.5-1.1 2.3-2 2.9-.7.5-1.4 1-1.4 2v.1m0 3h.01M12 21a9 9 0 110-18 9 9 0 010 18z"/></svg></button>
+      <div class="ml-1 flex items-center gap-2 pl-2 border-l border-slate-200">
+        <span class="w-8 h-8 rounded-full bg-indigo-600 text-white font-semibold grid place-items-center text-xs">AR</span>
+        <div class="hidden sm:block leading-tight">
+          <div class="text-sm font-semibold">Aisyah R.</div>
+          <div class="text-[11px] text-slate-400">Prudential Policy Dept.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- God-mode banner (outside the drafting lifecycle) -->
+<div class="bg-gradient-to-r from-slate-900 to-indigo-900 text-white">
+  <div class="px-6 py-2.5 flex items-center justify-between gap-4 flex-wrap text-sm">
+    <div class="flex items-center gap-2">
+      <svg class="w-4 h-4 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.05 11a9 9 0 1117.9 0M12 21V3M3 12h18"/></svg>
+      <span class="font-semibold">Institution map</span>
+      <span class="text-indigo-200 text-xs">· cross-workstream oversight — sits above the drafting lifecycle</span>
+    </div>
+    <a href="workstream.html" class="text-indigo-100 hover:text-white text-xs flex items-center gap-1">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      Back to a workstream
+    </a>
+  </div>
+</div>
+
+<div class="flex" style="min-height: calc(100vh - 100px);">
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar w-64 shrink-0 bg-white border-r border-slate-200 flex flex-col">
+    <div class="px-3 py-3 border-b border-slate-100 flex items-center justify-between">
+      <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold side-label">Workstreams</div>
+      <button onclick="toggleSidebar()" class="w-7 h-7 rounded-lg hover:bg-slate-100 grid place-items-center text-slate-500" title="Collapse">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+      </button>
+    </div>
+    <nav class="flex-1 overflow-y-auto p-2 space-y-1">
+      <a href="workstream.html" class="side-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-50">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+        <div class="side-label flex-1 min-w-0">
+          <div class="flex items-center justify-between"><span class="font-semibold text-sm truncate">Operational Resilience</span><span class="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-semibold shrink-0 ml-1">✎ own</span></div>
+          <div class="text-[11px] text-slate-400 mt-0.5">v0.3 draft</div>
+        </div>
+      </a>
+      <a href="#" class="side-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-50">
+        <span class="w-2 h-2 rounded-full bg-teal-500 shrink-0"></span>
+        <div class="side-label flex-1 min-w-0">
+          <div class="flex items-center justify-between"><span class="font-semibold text-sm truncate">Open Finance</span><span class="text-[10px] px-1.5 py-0.5 rounded-full bg-teal-100 text-teal-700 font-semibold shrink-0 ml-1">review</span></div>
+        </div>
+      </a>
+      <a href="#" class="side-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-50 opacity-60">
+        <span class="w-2 h-2 rounded-full bg-slate-400 shrink-0"></span>
+        <div class="side-label flex-1 min-w-0"><span class="font-semibold text-sm truncate">RMiT PD</span></div>
+      </a>
+      <a href="new-workstream.html" class="side-item flex items-center gap-2.5 px-3 py-2.5 mt-1 rounded-xl text-indigo-600 hover:bg-indigo-50 font-semibold">
+        <span class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-600 grid place-items-center text-sm leading-none shrink-0">+</span>
+        <span class="side-label text-sm">New workstream</span>
+      </a>
+    </nav>
+    <div class="px-3 py-3 border-t border-slate-100">
+      <a href="index.html" class="side-item flex items-center gap-2.5 px-3 py-2 rounded-xl bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100 font-semibold">
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.05 11a9 9 0 1117.9 0M12 21V3M3 12h18"/></svg>
+        <span class="side-label text-xs">Institution map</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="flex-1 overflow-y-auto">
+  <div class="px-6 py-6">
+
+  <div class="mb-5 flex items-start justify-between gap-6 flex-wrap">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight">Institution map</h1>
+      <p class="text-sm text-slate-500 mt-1 max-w-2xl leading-relaxed">The cross-workstream layer — pick two or more workstreams and the map surfaces shared concepts, version drift, and linkages neither team flagged. What today lives in senior policymakers' heads, made explicit.</p>
+    </div>
+    <div class="flex gap-3">
+      <div class="bg-white rounded-2xl shadow-soft border border-slate-200 px-4 py-2.5">
+        <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Concept bridges</div>
+        <div class="text-2xl font-bold text-indigo-600 mt-0.5">7</div>
+      </div>
+      <div class="bg-white rounded-2xl shadow-soft border border-slate-200 px-4 py-2.5">
+        <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Cross-ws linkages</div>
+        <div class="text-2xl font-bold text-indigo-600 mt-0.5">12</div>
+      </div>
+      <div class="bg-white rounded-2xl shadow-soft border border-rose-200 px-4 py-2.5">
+        <div class="text-[10px] uppercase tracking-wider text-rose-400 font-semibold">Version drifts</div>
+        <div class="text-2xl font-bold text-rose-600 mt-0.5">1</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter-pill workstream picker -->
+  <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-3 mb-5 flex items-center gap-2 flex-wrap">
+    <span class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mr-2">Comparing</span>
+
+    <!-- Add-workstream (leftmost) -->
+    <div class="relative">
+      <button onclick="document.getElementById('addWsMenu').classList.toggle('hidden')" class="border-2 border-dashed border-slate-300 rounded-full px-3 py-1 text-xs font-medium text-slate-600 hover:border-indigo-400 hover:text-indigo-600 flex items-center gap-1">
+        <span class="text-base leading-none">+</span> Add workstream
+      </button>
+      <div id="addWsMenu" class="hidden absolute top-full left-0 mt-1 bg-white shadow-lg border border-slate-200 rounded-xl py-1 text-sm z-20 min-w-[220px]">
+        <button class="w-full text-left px-3 py-2 hover:bg-indigo-50 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-slate-400"></span> RMiT PD <span class="text-xs text-slate-400 ml-auto">delivered</span>
+        </button>
+        <button class="w-full text-left px-3 py-2 hover:bg-indigo-50 flex items-center gap-2 opacity-50 cursor-not-allowed" disabled>
+          <span class="w-2 h-2 rounded-full bg-slate-300"></span> Climate Risk PD <span class="text-xs text-slate-400 ml-auto">not started</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Selected workstream pills -->
+    <span class="inline-flex items-center gap-1.5 bg-indigo-600 text-white rounded-full pl-2 pr-1 py-1 text-xs">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-300"></span>
+      <span class="font-semibold">Operational Resilience</span>
+      <button class="w-4 h-4 rounded-full hover:bg-white/20 grid place-items-center text-white/80 hover:text-white ml-0.5">&times;</button>
+    </span>
+    <span class="inline-flex items-center gap-1.5 bg-indigo-600 text-white rounded-full pl-2 pr-1 py-1 text-xs">
+      <span class="w-1.5 h-1.5 rounded-full bg-teal-300"></span>
+      <span class="font-semibold">Open Finance</span>
+      <button class="w-4 h-4 rounded-full hover:bg-white/20 grid place-items-center text-white/80 hover:text-white ml-0.5">&times;</button>
+    </span>
+
+    <span class="text-[11px] text-slate-400 ml-auto">2 workstreams · 12 docs · 7 concept bridges</span>
+  </div>
+
+  <div class="grid grid-cols-12 gap-5">
+
+    <!-- Main map canvas -->
+    <section class="col-span-12 lg:col-span-8 bg-white rounded-2xl shadow-soft border border-slate-200 p-4">
+      <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+        <h2 class="font-semibold text-sm">Shared concepts between the two workstreams <span class="text-xs text-slate-400 font-normal ml-1">· click a concept for verbatim clauses across both sides</span></h2>
+        <div class="flex items-center gap-3 text-[11px] text-slate-600">
+          <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-full bg-emerald-500"></span>OpRes doc</span>
+          <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-full bg-teal-500"></span>OpenFinance doc</span>
+          <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-full bg-amber-300"></span>shared concept</span>
+        </div>
+      </div>
+
+      <svg viewBox="0 0 780 560" class="w-full h-auto select-none">
+
+        <!-- OpRes docs (left) -->
+        <g class="doc-node" onclick="showConcept(null)">
+          <rect x="20" y="60" width="130" height="34" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+          <text x="85" y="82" text-anchor="middle" font-size="11" fill="#065f46" font-weight="700">OpRes DP</text>
+        </g>
+        <g class="doc-node">
+          <rect x="20" y="180" width="130" height="34" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+          <text x="85" y="196" text-anchor="middle" font-size="11" fill="#065f46" font-weight="700">OpRes PD v0.3</text>
+          <text x="85" y="208" text-anchor="middle" font-size="9" fill="#047857">working draft</text>
+        </g>
+        <g class="doc-node">
+          <rect x="20" y="300" width="130" height="34" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+          <text x="85" y="322" text-anchor="middle" font-size="11" fill="#065f46" font-weight="700">BCBS OpRes 2021</text>
+        </g>
+        <g class="doc-node">
+          <rect x="20" y="420" width="130" height="34" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+          <text x="85" y="442" text-anchor="middle" font-size="11" fill="#065f46" font-weight="700">HKMA SPM OR-2</text>
+        </g>
+
+        <!-- OpenFinance docs (right) -->
+        <g class="doc-node">
+          <rect x="630" y="60" width="130" height="34" rx="8" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+          <text x="695" y="82" text-anchor="middle" font-size="11" fill="#134e4a" font-weight="700">Open Finance ED</text>
+        </g>
+        <g class="doc-node">
+          <rect x="630" y="180" width="130" height="34" rx="8" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+          <text x="695" y="202" text-anchor="middle" font-size="11" fill="#134e4a" font-weight="700">OF PD draft v0.2</text>
+        </g>
+        <g class="doc-node">
+          <rect x="630" y="300" width="130" height="34" rx="8" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+          <text x="695" y="322" text-anchor="middle" font-size="11" fill="#134e4a" font-weight="700">ABS Open API</text>
+        </g>
+        <g class="doc-node">
+          <rect x="630" y="420" width="130" height="34" rx="8" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+          <text x="695" y="442" text-anchor="middle" font-size="11" fill="#134e4a" font-weight="700">MAS Notice 655</text>
+        </g>
+
+        <!-- Concept bridges (centre column) -->
+        <!-- critical business service -->
+        <g class="concept-bridge" onclick="showConcept('cbs')">
+          <line x1="150" y1="77" x2="330" y2="80" stroke="#f59e0b" stroke-width="1.5"/>
+          <line x1="150" y1="197" x2="330" y2="80" stroke="#f59e0b" stroke-width="1.5"/>
+          <line x1="450" y1="80" x2="630" y2="77" stroke="#f59e0b" stroke-width="1.5"/>
+          <rect x="330" y="60" width="120" height="42" rx="18" fill="#fef3c7" stroke="#f59e0b" stroke-width="2.5"/>
+          <text x="390" y="79" text-anchor="middle" font-size="12" fill="#78350f" font-weight="700">critical business</text>
+          <text x="390" y="93" text-anchor="middle" font-size="12" fill="#78350f" font-weight="700">service</text>
+          <text x="390" y="55" text-anchor="middle" font-size="9" fill="#92400e" font-style="italic">6 clauses each side</text>
+        </g>
+
+        <!-- board -->
+        <g class="concept-bridge" onclick="showConcept('board')">
+          <line x1="150" y1="197" x2="330" y2="180" stroke="#f59e0b" stroke-width="1.5"/>
+          <line x1="450" y1="180" x2="630" y2="197" stroke="#f59e0b" stroke-width="1.5"/>
+          <line x1="450" y1="180" x2="630" y2="77" stroke="#f59e0b" stroke-width="1.5"/>
+          <rect x="345" y="160" width="90" height="40" rx="18" fill="#fef3c7" stroke="#f59e0b" stroke-width="2.5"/>
+          <text x="390" y="185" text-anchor="middle" font-size="12" fill="#78350f" font-weight="700">board</text>
+          <text x="390" y="155" text-anchor="middle" font-size="9" fill="#92400e" font-style="italic">4 vs 3 clauses</text>
+        </g>
+
+        <!-- TPSP (third-party service provider) -->
+        <g class="concept-bridge" onclick="showConcept('tpsp')">
+          <line x1="150" y1="197" x2="330" y2="280" stroke="#f59e0b" stroke-width="1.5"/>
+          <line x1="150" y1="317" x2="330" y2="280" stroke="#f59e0b" stroke-width="1.5"/>
+          <line x1="450" y1="280" x2="630" y2="197" stroke="#f59e0b" stroke-width="1.5"/>
+          <line x1="450" y1="280" x2="630" y2="317" stroke="#f59e0b" stroke-width="1.5"/>
+          <rect x="345" y="260" width="90" height="40" rx="18" fill="#fef3c7" stroke="#f59e0b" stroke-width="2.5"/>
+          <text x="390" y="285" text-anchor="middle" font-size="12" fill="#78350f" font-weight="700">TPSP</text>
+          <text x="390" y="255" text-anchor="middle" font-size="9" fill="#92400e" font-style="italic">systemic overlap</text>
+        </g>
+
+        <!-- RMiT (with drift indicator) -->
+        <g class="concept-bridge" onclick="showConcept('rmit')">
+          <line x1="150" y1="197" x2="330" y2="370" stroke="#dc2626" stroke-width="2" stroke-dasharray="4 3"/>
+          <line x1="450" y1="370" x2="630" y2="77" stroke="#dc2626" stroke-width="2" stroke-dasharray="4 3"/>
+          <rect x="335" y="350" width="110" height="42" rx="18" fill="#fee2e2" stroke="#dc2626" stroke-width="2.5"/>
+          <text x="390" y="368" text-anchor="middle" font-size="12" fill="#7f1d1d" font-weight="700">RMiT anchor</text>
+          <text x="390" y="382" text-anchor="middle" font-size="9.5" fill="#991b1b" font-weight="700">🚩 v-drift</text>
+        </g>
+
+        <!-- scenario testing -->
+        <g class="concept-bridge" onclick="showConcept('scenario')">
+          <line x1="150" y1="437" x2="330" y2="440" stroke="#f59e0b" stroke-width="1.5"/>
+          <line x1="150" y1="197" x2="330" y2="440" stroke="#f59e0b" stroke-width="1.5"/>
+          <line x1="450" y1="440" x2="630" y2="437" stroke="#f59e0b" stroke-width="1.5"/>
+          <rect x="330" y="420" width="120" height="40" rx="18" fill="#fef3c7" stroke="#f59e0b" stroke-width="2.5"/>
+          <text x="390" y="445" text-anchor="middle" font-size="12" fill="#78350f" font-weight="700">scenario testing</text>
+          <text x="390" y="415" text-anchor="middle" font-size="9" fill="#92400e" font-style="italic">annual vs biennial</text>
+        </g>
+
+        <!-- accountability -->
+        <g class="concept-bridge" onclick="showConcept('acc')">
+          <line x1="150" y1="197" x2="330" y2="520" stroke="#f59e0b" stroke-width="1.5"/>
+          <line x1="450" y1="520" x2="630" y2="197" stroke="#f59e0b" stroke-width="1.5"/>
+          <rect x="325" y="500" width="130" height="40" rx="18" fill="#fef3c7" stroke="#f59e0b" stroke-width="2.5"/>
+          <text x="390" y="525" text-anchor="middle" font-size="12" fill="#78350f" font-weight="700">accountability</text>
+          <text x="390" y="495" text-anchor="middle" font-size="9" fill="#92400e" font-style="italic">OF silent</text>
+        </g>
+
+      </svg>
+    </section>
+
+    <!-- Right sidebar: shared concept detail + coverage matrix -->
+    <aside class="col-span-12 lg:col-span-4 space-y-4">
+
+      <!-- Concept detail -->
+      <div id="conceptPanel" class="bg-white rounded-2xl shadow-soft border border-slate-200 p-4">
+        <div class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">Selected concept · click a bridge</div>
+        <div id="conceptBody">
+          <h3 class="font-bold text-lg text-slate-900">accountability</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Concept class: <span class="font-medium">Requirement</span> · appears in 5 clauses across the 2 workstreams</p>
+
+          <div class="mt-4 space-y-3">
+            <div class="border-l-4 border-emerald-500 pl-3 py-1">
+              <div class="text-[10px] uppercase tracking-wider text-emerald-700 font-bold">Operational Resilience · §6.3</div>
+              <p class="text-xs text-slate-700 mt-0.5 leading-relaxed italic">"The board shall assign a single senior officer, accountable for operational resilience outcomes across all critical business services."</p>
+            </div>
+            <div class="border-l-4 border-teal-500 pl-3 py-1">
+              <div class="text-[10px] uppercase tracking-wider text-teal-700 font-bold">Open Finance · §7.1</div>
+              <p class="text-xs text-slate-700 mt-0.5 leading-relaxed italic">"The board is responsible for overseeing the open finance data-sharing arrangements…" <span class="text-slate-500 not-italic">— no single named accountable person.</span></p>
+            </div>
+          </div>
+
+          <div class="mt-4 bg-sky-50 border border-sky-200 rounded-xl p-3">
+            <div class="text-[10px] uppercase tracking-wider text-sky-800 font-bold mb-1">🔎 Auto-surfaced linkage</div>
+            <p class="text-xs text-sky-900 leading-relaxed"><span class="font-semibold">goes-beyond</span> · Open Finance is silent on named accountability where OpRes requires a single officer. Neither workstream team flagged this — surfaced by the shared-concept prefilter.</p>
+            <button class="mt-2 text-xs bg-sky-600 hover:bg-sky-700 text-white font-semibold px-2.5 py-1 rounded-lg">Send to Open Finance team</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coverage matrix -->
+      <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-semibold text-sm">External-anchor coverage</h3>
+          <span class="text-[10px] text-slate-400 font-medium">nice-to-have</span>
+        </div>
+        <table class="w-full text-xs">
+          <thead>
+            <tr class="text-[10px] uppercase text-slate-500 border-b border-slate-200">
+              <th class="text-left py-1.5 font-semibold">Anchor</th>
+              <th class="text-center py-1.5 font-semibold">OpRes</th>
+              <th class="text-center py-1.5 font-semibold">Open Finance</th>
+            </tr>
+          </thead>
+          <tbody class="text-slate-700">
+            <tr class="border-b border-slate-100"><td class="py-1.5">BCBS OpRes 2021</td><td class="text-center"><span class="text-emerald-600 font-bold">✓</span></td><td class="text-center"><span class="text-slate-300">—</span></td></tr>
+            <tr class="border-b border-slate-100"><td class="py-1.5">FSB 3rd-Party</td><td class="text-center"><span class="text-emerald-600 font-bold">✓</span></td><td class="text-center"><span class="text-slate-300">—</span></td></tr>
+            <tr class="border-b border-slate-100"><td class="py-1.5">HKMA SPM OR-2</td><td class="text-center"><span class="text-emerald-600 font-bold">✓</span></td><td class="text-center"><span class="text-slate-300">—</span></td></tr>
+            <tr class="border-b border-slate-100"><td class="py-1.5">MAS Notice 655</td><td class="text-center"><span class="text-slate-300">—</span></td><td class="text-center"><span class="text-emerald-600 font-bold">✓</span></td></tr>
+            <tr class="border-b border-slate-100"><td class="py-1.5">FSA 2013 §143</td><td class="text-center"><span class="text-emerald-600 font-bold">✓</span></td><td class="text-center"><span class="text-emerald-600 font-bold">✓</span></td></tr>
+            <tr><td class="py-1.5">BCBS d424 (Basel III)</td><td class="text-center"><span class="text-slate-300">—</span></td><td class="text-center"><span class="text-amber-600 font-bold" title="Should anchor here?">?</span></td></tr>
+          </tbody>
+        </table>
+        <p class="text-[11px] text-slate-500 mt-3">Open Finance is silent on 3 anchors OpRes uses. Worth checking whether that's deliberate scope or missed benchmark.</p>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- Cross-workstream linkage list -->
+  <section class="bg-white rounded-2xl shadow-soft border border-slate-200 p-4 mt-5">
+    <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+      <h2 class="font-semibold text-sm">Cross-workstream linkages surfaced by shared-concept prefilter <span class="text-xs text-slate-400 font-normal ml-1">· neither team flagged these</span></h2>
+      <span class="text-[11px] px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 font-semibold">12 supported · 0 unsupported</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <article class="border border-slate-200 rounded-xl p-3">
+        <div class="flex items-center gap-1.5 mb-1.5"><span class="text-[10px] uppercase tracking-wider font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">aligns-with</span><span class="text-[10px] text-slate-500 ml-auto">via <em>critical business service</em></span></div>
+        <p class="text-sm font-semibold">Business continuity framing on both sides</p>
+        <p class="text-xs text-slate-600 mt-1 leading-relaxed">OpRes §4.3 and Open Finance §7.6(b) both require BCP implementation for critical operations, with OF framing continuity around data availability.</p>
+      </article>
+
+      <article class="border border-slate-200 rounded-xl p-3">
+        <div class="flex items-center gap-1.5 mb-1.5"><span class="text-[10px] uppercase tracking-wider font-bold bg-sky-100 text-sky-800 px-2 py-0.5 rounded">goes-beyond</span><span class="text-[10px] text-slate-500 ml-auto">via <em>accountability</em></span></div>
+        <p class="text-sm font-semibold">Named accountability absent in Open Finance</p>
+        <p class="text-xs text-slate-600 mt-1 leading-relaxed">OpRes 6.3 mandates a single accountable officer; Open Finance §7 leaves accountability to general board oversight. Real policy gap.</p>
+      </article>
+
+      <article class="border border-red-300 bg-red-50 rounded-xl p-3">
+        <div class="flex items-center gap-1.5 mb-1.5"><span class="text-[10px] uppercase tracking-wider font-bold bg-red-100 text-red-800 px-2 py-0.5 rounded">conflicts-with</span><span class="text-[10px] uppercase tracking-wider font-bold bg-red-600 text-white px-2 py-0.5 rounded">🚩 v-drift</span></div>
+        <p class="text-sm font-semibold text-red-900">Divergent RMiT version anchors</p>
+        <p class="text-xs text-red-800 mt-1 leading-relaxed">OF 6.1(h) cites RMiT 1 Jun 2023; OpRes footnote 6 cites the 28 Nov 2025 reissuance. Deterministic catch, no LLM needed.</p>
+      </article>
+
+      <article class="border border-slate-200 rounded-xl p-3">
+        <div class="flex items-center gap-1.5 mb-1.5"><span class="text-[10px] uppercase tracking-wider font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">aligns-with</span><span class="text-[10px] text-slate-500 ml-auto">via <em>TPSP</em></span></div>
+        <p class="text-sm font-semibold">TPSP concentration risk (analytical)</p>
+        <p class="text-xs text-slate-600 mt-1 leading-relaxed">OF §8.6 (mandated platform participation) and OpRes 2.6(a) (shared-infrastructure concentration) share the systemic-risk analytical frame.</p>
+      </article>
+    </div>
+
+    <a href="workstream.html" class="flex items-center justify-center gap-1.5 text-center mt-4 text-xs text-indigo-600 hover:text-indigo-800 font-semibold">View all 12 linkages in Operational Resilience workstream
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+    </a>
+  </section>
+
+  </div>
+  </main>
+</div>
+
+<script>
+  function toggleSidebar() {
+    const sb = document.getElementById('sidebar');
+    sb.classList.toggle('collapsed');
+    sb.classList.toggle('w-64');
+    sb.classList.toggle('w-16');
+  }
+
+  const conceptData = {
+    cbs: {
+      title: "critical business service",
+      cls: "Topic",
+      count: "12 clauses across both workstreams",
+      clauses: [
+        { side: "OpRes", ref: "§4.4", text: "A financial institution shall map dependencies for each critical business service and refresh the mapping at least annually." },
+        { side: "Open Finance", ref: "§5.2", text: "A participating financial institution shall identify critical business services impacted by open finance data flows." }
+      ],
+      linkage: { type: "aligns-with", note: "Both scope resilience obligations to critical business services. Wording is compatible; no cross-workstream conflict on this concept." }
+    },
+    board: {
+      title: "board",
+      cls: "Party",
+      count: "7 clauses across both workstreams",
+      clauses: [
+        { side: "OpRes", ref: "§6.3", text: "The board shall assign a single senior officer, accountable for operational resilience outcomes across all critical business services." },
+        { side: "Open Finance", ref: "§7.1", text: "The board is responsible for overseeing the open finance data-sharing arrangements and approving material changes." }
+      ],
+      linkage: { type: "differs-on", sentiment: "neutral", note: "Both name board oversight; OpRes goes further to require single-officer accountability. See accountability bridge for the resulting gap." }
+    },
+    tpsp: {
+      title: "TPSP (third-party service provider)",
+      cls: "Party",
+      count: "9 clauses across both workstreams",
+      clauses: [
+        { side: "OpRes", ref: "§8.2", text: "Where more than one financial institution shares a technology service provider providing a critical business service, the Bank may impose additional oversight requirements." },
+        { side: "Open Finance", ref: "§8.6", text: "The Bank may prescribe minimum participation on a designated open finance platform, having regard to concentration risk." }
+      ],
+      linkage: { type: "aligns-with", note: "Systemic concentration risk framed the same way on both sides. Analytical linkage, not textual." }
+    },
+    rmit: {
+      title: "RMiT anchor",
+      cls: "Reference",
+      count: "🚩 version drift detected",
+      clauses: [
+        { side: "OpRes", ref: "footnote 6", text: "Refer to the Policy Document on Risk Management in Technology, 28 November 2025 reissuance." },
+        { side: "Open Finance", ref: "§6.1(h)", text: "…the Policy Document on Risk Management in Technology issued on 1 June 2023…" }
+      ],
+      linkage: { type: "conflicts-with", note: "🚩 Two live workstreams anchor to different versions of the same source. One must update before publication." }
+    },
+    scenario: {
+      title: "scenario testing",
+      cls: "Process",
+      count: "5 clauses across both workstreams",
+      clauses: [
+        { side: "OpRes", ref: "§5.3", text: "A financial institution shall conduct scenario testing annually, covering severe-but-plausible disruptions to critical business services." },
+        { side: "Open Finance", ref: "§9.4", text: "Participants shall periodically test resilience of data-sharing infrastructure against disruption scenarios." }
+      ],
+      linkage: { type: "differs-on", sentiment: "neutral", note: "OpRes pins annual cadence; OF says 'periodically'. Not a conflict — but a chance to harmonise language before OF publication." }
+    },
+    acc: {
+      title: "accountability",
+      cls: "Requirement",
+      count: "5 clauses across both workstreams",
+      clauses: [
+        { side: "OpRes", ref: "§6.3", text: "The board shall assign a single senior officer, accountable for operational resilience outcomes across all critical business services." },
+        { side: "Open Finance", ref: "§7.1", text: "The board is responsible for overseeing the open finance data-sharing arrangements…" }
+      ],
+      linkage: { type: "goes-beyond", note: "Open Finance is silent on named accountability where OpRes requires a single officer. Neither workstream team flagged this — surfaced by the shared-concept prefilter." }
+    }
+  };
+
+  function showConcept(id) {
+    if (!id) return;
+    const c = conceptData[id];
+    if (!c) return;
+    const isDrift = id === 'rmit';
+    const sentiment = c.linkage.sentiment ? ` <span class="text-[10px] font-normal">(${c.linkage.sentiment})</span>` : '';
+
+    document.getElementById('conceptBody').innerHTML = `
+      <h3 class="font-bold text-lg text-slate-900">${c.title}</h3>
+      <p class="text-xs text-slate-500 mt-0.5">Concept class: <span class="font-medium">${c.cls}</span> · ${c.count}</p>
+      <div class="mt-4 space-y-3">
+        ${c.clauses.map((cl, i) => `
+          <div class="border-l-4 ${i === 0 ? 'border-emerald-500' : 'border-teal-500'} pl-3 py-1">
+            <div class="text-[10px] uppercase tracking-wider ${i === 0 ? 'text-emerald-700' : 'text-teal-700'} font-bold">${cl.side} · ${cl.ref}</div>
+            <p class="text-xs text-slate-700 mt-0.5 leading-relaxed italic">"${cl.text}"</p>
+          </div>
+        `).join('')}
+      </div>
+      <div class="mt-4 ${isDrift ? 'bg-red-50 border-red-300' : 'bg-sky-50 border-sky-200'} border rounded-xl p-3">
+        <div class="text-[10px] uppercase tracking-wider ${isDrift ? 'text-red-800' : 'text-sky-800'} font-bold mb-1">🔎 Auto-surfaced linkage</div>
+        <p class="text-xs ${isDrift ? 'text-red-900' : 'text-sky-900'} leading-relaxed"><span class="font-semibold">${c.linkage.type}${sentiment}</span> · ${c.linkage.note}</p>
+      </div>
+    `;
+  }
+</script>
+
+<!-- ===== Demo navigator (presentation aid) ===== -->
+<style>
+  @keyframes demoPulse { 0%,100% { box-shadow: 0 8px 24px rgba(15,23,42,.14); } 50% { box-shadow: 0 8px 24px rgba(15,23,42,.14), 0 0 0 6px rgba(99,102,241,.16); } }
+  #demoNextBtn { animation: demoPulse 2.6s ease-in-out infinite; }
+  #demoNavBar { animation: demoRise .35s ease both; }
+  @keyframes demoRise { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
+</style>
+<div id="demoNav"></div>
+<script>
+(function(){
+  const PAGES = [
+    ["new-workstream.html","Setup"],
+    ["workstream.html","Map connections"],
+    ["task.html","Task dashboard"],
+    ["review.html","Review linkages"],
+    ["drafting.html","Draft document"],
+    ["index.html","Institution map"]
+  ];
+  const active = 5;
+  const prev = active > 0 ? PAGES[active-1] : null;
+  const next = PAGES[(active+1) % PAGES.length];
+  const restart = active === PAGES.length - 1;
+  const chevL = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>';
+  const chevR = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>';
+  const dots = PAGES.map((p,i)=>{
+    const cur = i === active;
+    return '<a href="'+p[0]+'" title="'+(i+1)+'. '+p[1]+'" class="block rounded-full transition-all '+(cur?'w-6 h-2.5 bg-indigo-600':'w-2.5 h-2.5 bg-slate-300 hover:bg-slate-500')+'"></a>';
+  }).join('');
+  const prevBtn = prev
+    ? '<a href="'+prev[0]+'" title="Previous — '+prev[1]+' (Left arrow)" class="w-10 h-10 rounded-full grid place-items-center text-slate-500 hover:bg-slate-100 hover:text-indigo-600 shrink-0">'+chevL+'</a>'
+    : '<span class="w-10 h-10 rounded-full grid place-items-center text-slate-300 shrink-0">'+chevL+'</span>';
+  const nextBtn = '<a href="'+next[0]+'" id="demoNextBtn" title="Next — '+next[1]+' (Right arrow)" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold pl-4 pr-3 py-2 rounded-full shrink-0">'
+    + '<span class="text-left leading-tight"><span class="block text-[9px] uppercase tracking-wider text-indigo-200 font-bold">'+(restart?'Restart demo':'Next step')+'</span><span class="block -mt-0.5">'+next[1]+'</span></span>'
+    + chevR + '</a>';
+  document.getElementById('demoNav').outerHTML =
+    '<div id="demoNavBar" class="fixed bottom-5 left-1/2 z-40 flex items-center gap-2 bg-white/95 backdrop-blur border border-slate-200 shadow-2xl rounded-full pl-2 pr-2 py-1.5" style="transform:translateX(-50%)">'
+    + prevBtn + '<div class="hidden sm:flex items-center gap-1.5 px-3 border-x border-slate-100">'+dots+'</div>' + nextBtn + '</div>';
+  document.addEventListener('keydown', function(e){
+    const t = e.target;
+    if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
+    if (document.querySelector('.fixed.inset-0:not(.hidden)')) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); window.location.href = next[0]; }
+    else if (e.key === 'ArrowLeft' && prev) { e.preventDefault(); window.location.href = prev[0]; }
+  });
+})();
+</script>
+
+</body>
+</html>

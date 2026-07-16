@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New Workstream · Workstream Brain</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+        boxShadow: { soft: '0 1px 2px rgba(15,23,42,.04), 0 4px 16px rgba(15,23,42,.06)' }
+      }
+    }
+  }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body { -webkit-font-smoothing: antialiased; }
+  .sidebar { transition: width .2s ease; }
+  .sidebar.collapsed .side-label { display: none; }
+  .sidebar.collapsed .side-item { justify-content: center; padding-left: 0; padding-right: 0; }
+  .side-item { transition: background-color .12s ease, color .12s ease; }
+  .field { transition: border-color .15s ease, box-shadow .15s ease; }
+  .field:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.15); }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans">
+
+<!-- Topbar -->
+<nav class="bg-white/90 backdrop-blur border-b border-slate-200 sticky top-0 z-30">
+  <div class="px-4 py-2.5 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <span class="grid place-items-center w-9 h-9 rounded-xl bg-indigo-600 text-white text-lg shadow-sm">🧠</span>
+      <div class="leading-tight">
+        <div class="font-bold text-[15px] tracking-tight">Workstream Brain</div>
+        <div class="text-[11px] text-slate-400 -mt-0.5">Policy drafting intelligence</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <button class="relative w-9 h-9 rounded-lg hover:bg-slate-100 grid place-items-center" title="Notifications"><svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1"/></svg><span class="absolute top-1 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span></button>
+      <div class="ml-1 flex items-center gap-2 pl-2 border-l border-slate-200">
+        <span class="w-8 h-8 rounded-full bg-indigo-600 text-white font-semibold grid place-items-center text-xs">AR</span>
+        <div class="hidden sm:block leading-tight">
+          <div class="text-sm font-semibold">Aisyah R.</div>
+          <div class="text-[11px] text-slate-400">Prudential Policy Dept.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Lifecycle stepper -->
+<div class="bg-white border-b border-slate-200">
+  <div class="max-w-4xl mx-auto px-6">
+    <ol class="flex items-center py-3.5">
+      <!-- 1 Setup · current -->
+      <li class="flex items-center gap-3">
+        <span class="grid place-items-center w-8 h-8 rounded-full bg-indigo-600 text-white text-sm font-semibold ring-4 ring-indigo-100 shrink-0">1</span>
+        <div class="leading-tight hidden sm:block">
+          <div class="text-[10px] uppercase tracking-wider text-indigo-600 font-bold">Step 1</div>
+          <div class="text-sm font-semibold text-slate-900">Setup</div>
+        </div>
+      </li>
+      <li class="flex-1 h-0.5 bg-slate-200 mx-3 sm:mx-4 rounded-full"></li>
+      <!-- 2 Map · upcoming -->
+      <li>
+        <a href="workstream.html" class="flex items-center gap-3 group">
+          <span class="grid place-items-center w-8 h-8 rounded-full bg-white border-2 border-slate-300 text-slate-400 text-sm font-semibold group-hover:border-indigo-400 group-hover:text-indigo-500 shrink-0 transition">2</span>
+          <div class="leading-tight hidden sm:block">
+            <div class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Step 2</div>
+            <div class="text-sm font-semibold text-slate-400 group-hover:text-slate-600 transition">Map connections</div>
+          </div>
+        </a>
+      </li>
+      <li class="flex-1 h-0.5 bg-slate-200 mx-3 sm:mx-4 rounded-full"></li>
+      <!-- 3 Review · upcoming -->
+      <li>
+        <a href="task.html" class="flex items-center gap-3 group">
+          <span class="grid place-items-center w-8 h-8 rounded-full bg-white border-2 border-slate-300 text-slate-400 text-sm font-semibold group-hover:border-indigo-400 group-hover:text-indigo-500 shrink-0 transition">3</span>
+          <div class="leading-tight hidden sm:block">
+            <div class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Step 3</div>
+            <div class="text-sm font-semibold text-slate-400 group-hover:text-slate-600 transition">Review findings</div>
+          </div>
+        </a>
+      </li>
+      <li class="flex-1 h-0.5 bg-slate-200 mx-3 sm:mx-4 rounded-full"></li>
+      <!-- 4 Draft · upcoming -->
+      <li>
+        <a href="drafting.html" class="flex items-center gap-3 group">
+          <span class="grid place-items-center w-8 h-8 rounded-full bg-white border-2 border-slate-300 text-slate-400 text-sm font-semibold group-hover:border-indigo-400 group-hover:text-indigo-500 shrink-0 transition">4</span>
+          <div class="leading-tight hidden sm:block">
+            <div class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Step 4</div>
+            <div class="text-sm font-semibold text-slate-400 group-hover:text-slate-600 transition">Draft document</div>
+          </div>
+        </a>
+      </li>
+    </ol>
+  </div>
+</div>
+
+<div class="flex" style="min-height: calc(100vh - 114px);">
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar w-64 shrink-0 bg-white border-r border-slate-200 flex flex-col">
+    <div class="px-3 py-3 border-b border-slate-100 flex items-center justify-between">
+      <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold side-label">Workstreams</div>
+      <button onclick="toggleSidebar()" class="w-7 h-7 rounded-lg hover:bg-slate-100 grid place-items-center text-slate-500" title="Collapse">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+      </button>
+    </div>
+    <nav class="flex-1 overflow-y-auto p-2 space-y-1">
+      <a href="workstream.html" class="side-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-50">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+        <div class="side-label flex-1 min-w-0">
+          <div class="flex items-center justify-between"><span class="font-semibold text-sm truncate">Operational Resilience</span><span class="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-semibold shrink-0 ml-1">✎ own</span></div>
+          <div class="text-[11px] text-slate-400 mt-0.5">v0.3 draft</div>
+        </div>
+      </a>
+      <a href="#" class="side-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-50">
+        <span class="w-2 h-2 rounded-full bg-teal-500 shrink-0"></span>
+        <div class="side-label flex-1 min-w-0"><span class="font-semibold text-sm truncate">Open Finance</span></div>
+      </a>
+      <a href="#" class="side-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-50 opacity-60">
+        <span class="w-2 h-2 rounded-full bg-slate-400 shrink-0"></span>
+        <div class="side-label flex-1 min-w-0"><span class="font-semibold text-sm truncate">RMiT PD</span></div>
+      </a>
+      <a href="new-workstream.html" class="side-item flex items-center gap-2.5 px-3 py-2.5 mt-1 rounded-xl border-2 border-indigo-200 bg-indigo-50 text-indigo-700 font-semibold">
+        <span class="w-5 h-5 rounded-full bg-indigo-600 text-white grid place-items-center text-sm leading-none shrink-0">+</span>
+        <span class="side-label text-sm">New workstream</span>
+      </a>
+    </nav>
+    <div class="px-3 py-3 border-t border-slate-100">
+      <a href="index.html" class="side-item flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-indigo-600 font-medium">
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.05 11a9 9 0 1117.9 0M12 21V3M3 12h18"/></svg>
+        <span class="side-label text-xs">Institution map</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="flex-1 overflow-y-auto">
+    <div class="max-w-2xl mx-auto px-6 py-8">
+
+      <div class="mb-6">
+        <div class="flex items-center gap-2 text-xs text-slate-400 mb-2">
+          <a href="workstream.html" class="hover:text-indigo-600">Workstreams</a>
+          <span>/</span>
+          <span class="text-slate-600 font-medium">New</span>
+        </div>
+        <h1 class="text-[26px] font-bold tracking-tight">Create a new workstream</h1>
+        <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">A workstream is one Discussion Paper, Exposure Draft, or Policy Document under active drafting. You'll add source nodes next, on the connection graph.</p>
+      </div>
+
+      <form class="space-y-4">
+
+        <!-- Basics -->
+        <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-6">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="grid place-items-center w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 text-xs font-bold">1</span>
+            <div class="text-sm font-semibold text-slate-800">Basics</div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="text-[13px] font-semibold text-slate-700">Workstream name</label>
+              <input type="text" placeholder="e.g. Climate Risk PD v2 · 2026" class="field mt-1.5 w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
+            </div>
+            <div>
+              <label class="text-[13px] font-semibold text-slate-700">Short description</label>
+              <textarea rows="2" placeholder="One sentence — what this workstream delivers and its target quarter." class="field mt-1.5 w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm resize-none"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="text-[13px] font-semibold text-slate-700">Deliverable type</label>
+                <select class="field mt-1.5 w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm bg-white">
+                  <option>Policy Document (PD)</option>
+                  <option>Exposure Draft (ED)</option>
+                  <option>Discussion Paper (DP)</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[13px] font-semibold text-slate-700">Target publication</label>
+                <input type="text" placeholder="e.g. Q4 2026" class="field mt-1.5 w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- People -->
+        <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-6">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="grid place-items-center w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 text-xs font-bold">2</span>
+            <div class="text-sm font-semibold text-slate-800">People</div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="text-[13px] font-semibold text-slate-700">Owner</label>
+              <div class="mt-1.5 flex items-center gap-2 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm bg-slate-50">
+                <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold grid place-items-center">AR</span>
+                <span>Aisyah R. <span class="text-slate-400 text-xs">(you)</span></span>
+              </div>
+            </div>
+            <div>
+              <label class="text-[13px] font-semibold text-slate-700">Reviewers</label>
+              <input type="text" placeholder="Search colleagues to add as reviewers…" class="field mt-1.5 w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
+              <div class="mt-2 flex items-center gap-1.5 flex-wrap">
+                <span class="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-full pl-1 pr-2 py-0.5 text-xs">
+                  <span class="w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold grid place-items-center">FM</span>
+                  Farid M.
+                  <button type="button" class="text-amber-500 hover:text-amber-800 ml-0.5">&times;</button>
+                </span>
+                <span class="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-full pl-1 pr-2 py-0.5 text-xs">
+                  <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold grid place-items-center">PS</span>
+                  Priya S.
+                  <button type="button" class="text-emerald-500 hover:text-emerald-800 ml-0.5">&times;</button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Access -->
+        <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-6">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="grid place-items-center w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 text-xs font-bold">3</span>
+            <div class="text-sm font-semibold text-slate-800">Access</div>
+          </div>
+          <div class="space-y-2.5 text-sm">
+            <label class="flex items-start gap-3 cursor-pointer p-3.5 border border-slate-200 rounded-xl hover:border-indigo-400 hover:bg-indigo-50/40 has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50/60 has-[:checked]:ring-1 has-[:checked]:ring-indigo-500/30">
+              <input type="radio" name="access" checked class="mt-0.5 accent-indigo-600 w-4 h-4">
+              <div>
+                <div class="font-semibold">Team-only</div>
+                <div class="text-xs text-slate-500 mt-0.5 leading-relaxed">Owner + reviewers can open nodes; other BNM staff see the workstream on the institution map but not its contents.</div>
+              </div>
+            </label>
+            <label class="flex items-start gap-3 cursor-pointer p-3.5 border border-slate-200 rounded-xl hover:border-indigo-400 hover:bg-indigo-50/40 has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50/60 has-[:checked]:ring-1 has-[:checked]:ring-indigo-500/30">
+              <input type="radio" name="access" class="mt-0.5 accent-indigo-600 w-4 h-4">
+              <div>
+                <div class="font-semibold">Department-wide</div>
+                <div class="text-xs text-slate-500 mt-0.5 leading-relaxed">Anyone in Prudential Policy Dept. can open nodes.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Next-step action bar -->
+        <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-4 flex items-center justify-between gap-4 flex-wrap">
+          <div class="flex items-center gap-2 text-xs text-slate-500">
+            <svg class="w-4 h-4 text-indigo-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            Next: map source connections on the graph.
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="workstream.html" class="px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100">Cancel</a>
+            <button type="button" onclick="window.location.href='workstream.html'" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-5 py-2.5 rounded-xl font-semibold shadow-sm shadow-indigo-600/25 flex items-center gap-1.5">
+              Create &amp; map connections
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
+
+<script>
+  function toggleSidebar() {
+    const sb = document.getElementById('sidebar');
+    sb.classList.toggle('collapsed');
+    sb.classList.toggle('w-64');
+    sb.classList.toggle('w-16');
+  }
+</script>
+
+<!-- ===== Demo navigator (presentation aid) ===== -->
+<style>
+  @keyframes demoPulse { 0%,100% { box-shadow: 0 8px 24px rgba(15,23,42,.14); } 50% { box-shadow: 0 8px 24px rgba(15,23,42,.14), 0 0 0 6px rgba(99,102,241,.16); } }
+  #demoNextBtn { animation: demoPulse 2.6s ease-in-out infinite; }
+  #demoNavBar { animation: demoRise .35s ease both; }
+  @keyframes demoRise { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
+</style>
+<div id="demoNav"></div>
+<script>
+(function(){
+  const PAGES = [
+    ["new-workstream.html","Setup"],
+    ["workstream.html","Map connections"],
+    ["task.html","Task dashboard"],
+    ["review.html","Review linkages"],
+    ["drafting.html","Draft document"],
+    ["index.html","Institution map"]
+  ];
+  const active = 0;
+  const prev = active > 0 ? PAGES[active-1] : null;
+  const next = PAGES[(active+1) % PAGES.length];
+  const restart = active === PAGES.length - 1;
+  const chevL = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>';
+  const chevR = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>';
+  const dots = PAGES.map((p,i)=>{
+    const cur = i === active;
+    return '<a href="'+p[0]+'" title="'+(i+1)+'. '+p[1]+'" class="block rounded-full transition-all '+(cur?'w-6 h-2.5 bg-indigo-600':'w-2.5 h-2.5 bg-slate-300 hover:bg-slate-500')+'"></a>';
+  }).join('');
+  const prevBtn = prev
+    ? '<a href="'+prev[0]+'" title="Previous — '+prev[1]+' (Left arrow)" class="w-10 h-10 rounded-full grid place-items-center text-slate-500 hover:bg-slate-100 hover:text-indigo-600 shrink-0">'+chevL+'</a>'
+    : '<span class="w-10 h-10 rounded-full grid place-items-center text-slate-300 shrink-0">'+chevL+'</span>';
+  const nextBtn = '<a href="'+next[0]+'" id="demoNextBtn" title="Next — '+next[1]+' (Right arrow)" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold pl-4 pr-3 py-2 rounded-full shrink-0">'
+    + '<span class="text-left leading-tight"><span class="block text-[9px] uppercase tracking-wider text-indigo-200 font-bold">'+(restart?'Restart demo':'Next step')+'</span><span class="block -mt-0.5">'+next[1]+'</span></span>'
+    + chevR + '</a>';
+  document.getElementById('demoNav').outerHTML =
+    '<div id="demoNavBar" class="fixed bottom-5 left-1/2 z-40 flex items-center gap-2 bg-white/95 backdrop-blur border border-slate-200 shadow-2xl rounded-full pl-2 pr-2 py-1.5" style="transform:translateX(-50%)">'
+    + prevBtn + '<div class="hidden sm:flex items-center gap-1.5 px-3 border-x border-slate-100">'+dots+'</div>' + nextBtn + '</div>';
+  document.addEventListener('keydown', function(e){
+    const t = e.target;
+    if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
+    if (document.querySelector('.fixed.inset-0:not(.hidden)')) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); window.location.href = next[0]; }
+    else if (e.key === 'ArrowLeft' && prev) { e.preventDefault(); window.location.href = prev[0]; }
+  });
+})();
+</script>
+
+</body>
+</html>
