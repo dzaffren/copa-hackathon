@@ -2,10 +2,14 @@
 name = "engine"
 version = "0.1.0"
 description = "Add your description here"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
     "anthropic>=0.116.0",
     "azure-ai-inference>=1.0.0b9",
+    # Server-side sanitizer for the drafting workspace's contentEditable HTML.
+    # The frontend also runs DOMPurify, but that is a nicety — anyone can curl
+    # the PUT endpoint, so engine/drafts.py is the actual boundary.
+    "bleach>=6.4.0",
     "fastapi>=0.139.0",
     "httpx>=0.28.1",
     "markitdown[az-doc-intel,docx,pdf]>=0.1.6",

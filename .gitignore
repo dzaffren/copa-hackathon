@@ -27,3 +27,8 @@ __pycache__/
 # graphify generated graphs (exploration artifacts, rebuildable, not source)
 graphify-out/
 graphify-out-corpus/
+
+.agents
+skills-lock.json
+# subagent-driven-development scratch
+.superpowers/

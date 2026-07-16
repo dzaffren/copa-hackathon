@@ -19,6 +19,7 @@ Intelligence) is the only part that reaches the network, at ingest time.
 
 import json
 import logging
+import tempfile
 from pathlib import Path
 from typing import Any, Callable, Optional, Union, cast
 
@@ -31,7 +32,6 @@ from engine.clauses import (
 )
 from engine.graph import build_graph
 from engine.ingest import ingest_document, normalise_glyph_artifacts
-from engine.verdicts import propose_verdicts
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +50,6 @@ def run_build(
     segment_fn: SegmentFn = segment_clauses,
     reference_documents: Optional[dict[str, dict[str, Any]]] = None,
     reference_edges: Optional[list[dict[str, Any]]] = None,
-    connection_fixtures: Optional[list[dict[str, Any]]] = None,
 ) -> None:
     """Run stages 1-3 and write `clause-index.json` + `graph.json`.
 
@@ -212,33 +211,57 @@ def run_build(
     )
     (output_dir / "graph.json").write_text(json.dumps(graph, indent=2))
 
-    # Stage 4b — verdict pass. The frozen showcase connections (or a live
-    # finder's output) are classified into per-connection verdict records,
-    # gated by the same "clause resolves verbatim" guardrail. Deterministic and
-    # credential-free: `AI_DP_CONNECTIONS` carry frozen verdicts, so no model is
-    # called here. verdicts.json is the read API's spine — joined onto the graph
-    # + clause index at read time (see engine.api / scripts.export_poc_snapshot).
-    if connection_fixtures is not None:
-        verdict_records = propose_verdicts(connection_fixtures, clause_index)
-        # Insertion order (fixture order) is preserved — NOT sort_keys — so the
-        # read layer renders connections in the curated display order the demo
-        # snapshot uses (cited/uncited/feedback per paragraph). Still fully
-        # deterministic: a static fixture yields a fixed order.
-        (output_dir / "verdicts.json").write_text(
-            json.dumps(verdict_records, indent=2), encoding="utf-8"
+    # Stage 4b (verdict pass) was removed with the reconciliation-workbench read
+    # path: it wrote `verdicts.json`, whose only consumers were `engine.read_model`
+    # and `scripts/export_poc_snapshot.py`. Both are gone, and the artifact was
+    # never committed. The five-label taxonomy that replaced it lives in
+    # `engine.connections` and is recorded via `scripts/run_finder_trace.py`.
+
+
+
+def _merge_clause_index(built_dir: Path, target_dir: Path) -> int:
+    """Merge a freshly-built clause index INTO an existing one. Returns the count added.
+
+    Refuses on any key collision rather than picking a winner. Two documents
+    claiming the same clause number is either a real conflict (the same policy
+    rebuilt — use a full build) or a namespace bug; silently letting the newer
+    one win is how a "recovery" quietly rewrites clauses that other committed
+    traces already cite.
+
+    Only `clause-index.json` merges. `graph.json` is left alone deliberately: a
+    subset graph is not a subset of the full graph — its edges were validated
+    against a partial document set — so grafting it in would produce a graph
+    that never existed.
+    """
+    built_path = built_dir / "clause-index.json"
+    target_path = target_dir / "clause-index.json"
+    built = json.loads(built_path.read_text(encoding="utf-8"))
+    if not target_path.exists():
+        target_dir.mkdir(parents=True, exist_ok=True)
+        target_path.write_text(
+            json.dumps(built, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
         )
-        logger.info(
-            "%d verdict record(s) → %s",
-            len(verdict_records),
-            output_dir / "verdicts.json",
+        return len(built)
+
+    existing = json.loads(target_path.read_text(encoding="utf-8"))
+    collisions = sorted(set(existing) & set(built))
+    if collisions:
+        raise ValueError(
+            f"--merge refuses to overwrite {len(collisions)} existing clause(s): "
+            f"{collisions[:5]}{' …' if len(collisions) > 5 else ''}. These documents "
+            f"are already indexed; a rebuild of them needs a full build, not a merge."
         )
+    merged = {k: v for k, v in sorted({**existing, **built}.items())}
+    target_path.write_text(
+        json.dumps(merged, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
+    return len(built)
 
 
 def main() -> None:
     import argparse
 
     from engine.config import (
-        AI_DP_CONNECTIONS,
         CURATED_SEED_EDGES,
         DOCUMENTS,
         REFERENCE_DOCUMENTS,
@@ -256,10 +279,33 @@ def main() -> None:
         help=(
             "Build only these document ids (space-separated). Useful for "
             "testing one document end-to-end before the full corpus. Curated "
-            "edges referencing an excluded policy are dropped for the run."
+            "edges referencing an excluded policy are dropped for the run. "
+            "WARNING: on its own this REPLACES the clause index with just "
+            "these documents — pass --merge to add them instead."
+        ),
+    )
+    parser.add_argument(
+        "--output-dir",
+        metavar="DIR",
+        help=(
+            "Write artifacts here instead of data/artifacts/. Use a scratch "
+            "directory to inspect a build before it touches the committed one."
+        ),
+    )
+    parser.add_argument(
+        "--merge",
+        action="store_true",
+        help=(
+            "Merge the built clause index INTO the existing one instead of "
+            "replacing it, and refuse if any clause number would be "
+            "overwritten. Use with --docs: a subset build otherwise drops "
+            "every document it did not build."
         ),
     )
     args = parser.parse_args()
+
+    if args.merge and not args.docs:
+        parser.error("--merge only makes sense with --docs (a full build has nothing to merge into)")
 
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s"
@@ -272,9 +318,6 @@ def main() -> None:
     reference_documents: dict[str, Any] = dict(REFERENCE_DOCUMENTS)
     reference_edges: list[dict[str, Any]] = list(
         cast(list[dict[str, Any]], REFERENCE_SEED_EDGES)
-    )
-    connection_fixtures: list[dict[str, Any]] = list(
-        cast(list[dict[str, Any]], AI_DP_CONNECTIONS)
     )
 
     if args.docs:
@@ -295,27 +338,62 @@ def main() -> None:
         logger.info("building subset: %s", ", ".join(documents))
         # A subset build omits the external references — their edges originate
         # from the rmit draft and would dangle if rmit or a target is excluded.
-        # The showcase verdicts cite those references, so drop them too rather
-        # than emit a half-resolved verdicts.json.
         reference_documents = {}
         reference_edges = []
-        connection_fixtures = []
 
     draft_registry_path = REPO_ROOT / "data" / "draft_registry.json"
     draft_registry = json.loads(draft_registry_path.read_text())
+
+    default_dir = REPO_ROOT / "data" / "artifacts"
+    output_dir = Path(args.output_dir) if args.output_dir else default_dir
+
+    # A subset build writes only what it built. Writing that straight over
+    # data/artifacts/ silently deletes every other document's clauses — which
+    # is precisely what #34 did (7 documents → 2, two traces orphaned, suite
+    # still green). Warn on the way in; --merge is the safe path.
+    if args.docs and not args.merge and output_dir == default_dir:
+        logger.warning(
+            "REPLACING %s with a %d-document subset — every other document's "
+            "clauses will be dropped. Pass --merge to add instead, or "
+            "--output-dir to write elsewhere. See "
+            "docs/learnings/blocker-engine-build-silently-narrows-artifacts.md",
+            output_dir,
+            len(documents),
+        )
+
+    build_dir = output_dir
+    if args.merge:
+        # Build into scratch first, then merge, so a failed build cannot leave
+        # the committed index half-written.
+        merge_scratch = tempfile.mkdtemp(prefix="engine-build-merge-")
+        build_dir = Path(merge_scratch)
 
     run_build(
         documents=cast(dict[str, dict[str, Any]], documents),
         curated_edges=curated_edges,
         draft_registry=draft_registry,
-        output_dir=REPO_ROOT / "data" / "artifacts",
+        output_dir=build_dir,
         reference_documents=cast(
             dict[str, dict[str, Any]], reference_documents
         ),
         reference_edges=reference_edges,
-        connection_fixtures=connection_fixtures,
     )
-    logger.info("build complete → %s", REPO_ROOT / "data" / "artifacts")
+
+    if args.merge:
+        try:
+            added = _merge_clause_index(build_dir, output_dir)
+        except ValueError as exc:
+            # A refused merge is a normal outcome the operator has to act on
+            # (rebuild fully, or drop the already-indexed document), not a
+            # crash. The built artifacts stay in scratch; nothing was written.
+            raise SystemExit(f"{exc}\n(nothing was written to {output_dir})") from None
+        logger.info(
+            "merged %d clause(s) into %s (graph.json left alone — a subset "
+            "graph is not mergeable)",
+            added,
+            output_dir / "clause-index.json",
+        )
+    logger.info("build complete → %s", output_dir)
 
 
 if __name__ == "__main__":

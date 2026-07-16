@@ -1,0 +1,21 @@
+[
+  {
+    "summary": "Anchor to superseded RMiT version — draft anchors to the 1 June 2023 RMiT while the 28 Nov 2025 version supersedes it",
+    "label": "conflicts-with",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "OpRes PD 7.1",
+        "text": "This Policy Document shall be read together with the Risk Management in Technology (RMiT) policy document issued on 1 June 2023."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT PD 1.2",
+        "text": "This policy document supersedes the Risk Management in Technology policy document issued on 1 June 2023."
+      }
+    ]
+  }
+]

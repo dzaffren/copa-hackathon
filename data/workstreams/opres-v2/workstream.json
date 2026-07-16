@@ -1,0 +1,15 @@
+{
+  "id": "opres-v2",
+  "name": "Operational Resilience v0.3",
+  "deliverable_type": "Policy Document",
+  "role": "own",
+  "description": "BNM Prudential Policy Department working draft of the Operational Resilience Policy Document, v0.3 (target ED Q4 2026).",
+  "primary_task_id": "opres-pd-v0-3",
+  "target_publication": "2026-11-30",
+  "owner": { "id": "ar", "name": "Aisyah R." },
+  "reviewers": [
+    { "id": "fm", "name": "Farid M." },
+    { "id": "ps", "name": "Priya S." }
+  ],
+  "access": "team_only"
+}

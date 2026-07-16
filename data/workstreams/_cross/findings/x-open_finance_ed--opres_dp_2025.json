@@ -1,0 +1,386 @@
+[
+  {
+    "summary": "Open finance's operational resilience obligations for ensuring continuity during disruptions, system downtime, API outages, and third-party failures directly embody the operational resilience themes and business continuity requirements discussed in the discussion paper.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": "Open finance frames continuity around availability, integrity and confidentiality of data exchanged, whereas the discussion paper's continuity concept centres on identifying and preserving 'critical operations and/or services' more broadly; alignment is thematic rather than a one-to-one requirement mapping.",
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 7.6(b)",
+        "text": "as well as safeguards that support the overall operational resilience of an FSP’s participation in an open finance arrangement. This includes, but is not limited to, ensuring the continuity of services in the event of disruptions, system downtime, API outages, cyber risk incidents or third- party failures; conduct due diligence and oversight to ensure only consented customer"
+      },
+      {
+        "clause_number": "Open Finance 12.2",
+        "text": "An FSP shall ensure that its technology operations management practices are appropriately extended to support its open finance activities. This includes, but is not limited to, controls for ensuring effective and safe implementation of IT systems, robust third-party service provider management, and operational resilience measures to ensure the availability, integrity and confidentiality of data exchanged through open finance arrangements."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Operational Resilience 4.3",
+        "text": "In the context of preserving continuity of critical operations and/or services, the Business Continuity Management (BCM) policy document requires financial institutions to identify critical business functions, which among others, is meant to support the continuity of their essential customer-facing services. The BCM policy document also requires the establishment of business continuity objectives, including MTD and RTO, in line with the risk appetite of financial institutions. This is complemented by more granular requirements on technology risk under the Risk Management in Technology (RMiT) policy document to ensure that the technology architecture is designed to be robust, with high availability, and is capable of withstanding disruptions. to identify and assess"
+      },
+      {
+        "clause_number": "Operational Resilience 3.3(a)",
+        "text": "Preserve continuity of critical operations and/or services Not all operations and/or services carry equal significance. With the assumption that disruptions are inevitable, financial institutions must be able to prioritise the ability to continue delivering what is essential and critical to its customers and stakeholders. Failures in delivering these critical operations and/or services can adversely impact customers and other stakeholders, create contagion risks, and undermine confidence in the financial institution and the financial industry;"
+      },
+      {
+        "clause_number": "Operational Resilience 2.9(b)",
+        "text": "No matching clause found"
+      }
+    ]
+  },
+  {
+    "summary": "Open finance's reliance on third-party service providers and cloud/outsourcing arrangements maps directly to the discussion paper's concerns on external dependency management and third-party oversight requirements.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "scope_note": "Open finance's third-party obligations are anchored to data privacy/confidentiality/security (via the Customer Information, RMIT and Outsourcing policy documents), while the discussion paper's third-party concern extends to substitutability, concentration and systemic risk which open finance does not explicitly address.",
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 11.8",
+        "text": "An FSP that is a data consumer shall ensure that any third-party service provider involved in handling customer information, whether related to an open finance arrangement (including that associated with outsourcing or cloud computing arrangements), complies with relevant requirements relating to data privacy, confidentiality and security, as set out in the Policy Document on Management of Customer Information and Permitted Disclosures, the Policy Document on Risk Management and Information Technology, and the Policy Document on Outsourcing."
+      },
+      {
+        "clause_number": "Open Finance 12.2",
+        "text": "An FSP shall ensure that its technology operations management practices are appropriately extended to support its open finance activities. This includes, but is not limited to, controls for ensuring effective and safe implementation of IT systems, robust third-party service provider management, and operational resilience measures to ensure the availability, integrity and confidentiality of data exchanged through open finance arrangements."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Operational Resilience 4.5",
+        "text": "To manage risks financial (including institutions from external dependencies reliance on niche/specialised services by third-party service providers), the Outsourcing policy document currently requires to conduct risk assessment and due diligence, execute outsourcing agreements and incorporate contractual terms, establish contingency plans to manage any failures of the service provider (e.g., engaging an alternate service provider), and maintain a register of outsourcing information. For engagements with technology-related service providers, the RMiT policy document further supplements these measures by mandating risk assessments throughout the engagement with technology- related service providers, inclusion of adequate rights of access by the financial institution and the Bank as well as business continuity capabilities within the the provider’s service cybersecurity posture. level agreements, and continuous monitoring of"
+      },
+      {
+        "clause_number": "Operational Resilience 2.6",
+        "text": "Digitalisation has also raised consumer expectations for uninterrupted access to financial services, where there is often little to no tolerance for downtime. This is particularly the case for access to financial services that affect consumer’s ability to access their funds (such as mobile/online banking, e-wallets, or real-time payments) and, by extension, the livelihoods of the public at large. Any interrupted access to these financial services will typically trigger immediate consumer dissatisfaction, which is often amplified through social media. This in turn may threaten the reputation of the financial institution and diminish the trust and confidence of consumers, especially if the privacy of their personal information is perceived or known to be compromised (including due to fraudulent activities). infrastructures, shared The financial system is tightly interconnected through payment networks, clearing telecommunication services, cloud and settlement ecosystems, and financial technology (fintech) and API-driven platforms. The growing dependence of financial institutions on cloud service providers, outsourced operational and IT functions, fintech partners, data centres, and telecommunication networks heightens concentration and systemic risks, where–"
+      },
+      {
+        "clause_number": "Operational Resilience 4.4",
+        "text": "The BCM policy document also requires financial institutions to have in place internal and external processes interdependencies the mapping of people, processes, and technologies). Outsourcing and third-party arrangements that support critical business functions must be captured in the business continuity planning and properly documented to ensure that financial institutions have visibility and retain the various (including"
+      }
+    ]
+  },
+  {
+    "summary": "Open finance's cyber and API security control requirements correspond to the discussion paper's emphasis on managing cyber threats and vulnerabilities in software supply chains and interfaces.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 12.3",
+        "text": "An FSP shall ensure that its cyber risk management capabilities and cybersecurity controls are also appropriately extended to govern, identify, prevent, detect, respond and address cyber risks associated with open finance activities. This includes for the FSP to implement robust API security controls, strengthening digital fraud detection and management, as well as take steps to secure technology networks and internal systems from potential external risks arising from the FSP’s participation in an open finance arrangement."
+      },
+      {
+        "clause_number": "Open Finance 11.5",
+        "text": "An FSP shall ensure that any transmission of customer information through an open finance arrangement is conducted through secure means, in line with relevant requirements set out in the Policy Document on Risk Management in Technology. Without limiting the generality of paragraph 11.4, a data provider shall authenticate the customer and authorise consent using a reliable and effective authentication procedure (e.g. multi-factor authentication) before granting a data consumer access to the customer’s information."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Operational Resilience 2.4",
+        "text": "Operational disruptions2 – whether arising from cyber incidents, technology failures, third-party outages, compromise of data and information assets, or power outages – can quickly lead to widespread loss of access to essential banking, insurance, takaful, and payment services. As financial services increasingly rely on real-time digital channels, cloud-based platforms, and shared external infrastructures such as telecommunication networks, the impact of outages on financial institutions, their stakeholders, and the economy has become more immediate and far-reaching. In the current landscape, operational resilience must be viewed against the backdrop of these megatrends that are transforming the way financial services are delivered and consumed. Digital adoption in financial services continues to accelerate across retail and wholesale markets. Mobile banking, online insurance and takaful services, electronic Know-Your-Customer (e-KYC), digital onboarding, Quick Response (QR) payments, and cloud-hosted financial applications are now integral to how individuals and businesses access financial services. While cloud computing, application programming interface (API)-based integration, and open financial architectures enhance efficiency and innovation, these advancements also create complex dependency chains. This shift heightens reliance on real-time digital channels, increases sensitivity to service outages, amplifies reputational consequences of disruptions, and elevates exposure to vulnerabilities in software supply chains and interfaces. Cyber threats remain among the most significant risks globally. The growing sophistication of attacks – including artificial intelligence (AI)-enabled exploits, ransomware, and cyberattacks targeting critical infrastructure – poses material risks to the continuity of financial services. This is evident in the shift from data thefts to cyberattacks that aim to disrupt, destruct, and destabilise systems. Global incidents highlight the growing prevalence of ransomware targeting core systems, destructive malware designed to corrupt data, attacks via third-party providers, exploitation of supply chains, and coordinated multi-entity attacks. These incidents can impair systems for extended periods of time and necessitate dynamic capabilities beyond traditional recovery measures as cyber threats continue to evolve to create disruptions that are new and unprecedented."
+      },
+      {
+        "clause_number": "Operational Resilience 4.7",
+        "text": "Requirements on technology and third-party risk management are relatively more prescriptive because technology failures, cyber incidents, and disruptions in critical third-party arrangements can result in high-impact consequences that propagate quickly through the financial ecosystem. These risks exhibit a very low tolerance for error, as they involve shared infrastructure and common vendors which can quickly degrade public confidence if not managed to a consistent technical baseline. the RMiT policy document sets clear requirements that are fundamental for the continuity of services, particularly in relation to system availability, security controls, recovery capability, and failover arrangements. In particular,"
+      },
+      {
+        "clause_number": "Operational Resilience 2.3",
+        "text": "No matching clause found"
+      }
+    ]
+  },
+  {
+    "summary": "Open finance's requirement for board and senior management oversight of resilient and secure operations aligns with the discussion paper's call for board-level ownership and accountability for operational resilience.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "scope_note": "Open finance does not mandate a single ultimately-accountable person for operational resilience outcomes (cf. OpRes 6.3 Responsibility Mapping); it relies on general board/senior-management oversight applied to open finance activities.",
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 7.1",
+        "text": "The board and senior management shall exercise effective oversight of an FSP’s implementation of arrangements relating to open finance to ensure its efficient, resilient and secure operations."
+      },
+      {
+        "clause_number": "Open Finance 7.3",
+        "text": "The board shall ensure that a sound risk strategy and appropriate risk management framework is in place and implemented effectively to manage any operational, technology, cyber, fraud, conduct or other risk arising from an FSP’s participation in an open finance arrangement, in line with the FSP’s risk appetite. This includes for the board to evaluate the risks and opportunities arising from the FSP’s participation in an open finance arrangement, and consider how these factors should be reflected in its strategies and business plan."
+      },
+      {
+        "clause_number": "Open Finance 7.5",
+        "text": "Senior management shall be responsible for developing and implementing the framework for managing risk arising from an FSP’s participation in an open finance arrangement. The framework shall include policies, procedures and systems that enables the identification, measurement, control and ongoing monitoring of all relevant risks, including risks that the FSP is exposed to arising from information received from other data providers and that it poses to other data consumers through information it provides."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Operational Resilience 6.1",
+        "text": "Operational resilience must be made a board-level priority due to the growing frequency and severity of disruptions which can cause intolerable harm to customers and threaten financial stability. Boards play a crucial role in overseeing operational resilience, including approving critical operations and/or services, setting impact tolerances for disruptions, reviewing resilience testing results, and holding senior management accountable for resilience outcomes. To meet these expectations, boards need their expertise, challenge senior management effectively, integrate resilience considerations into strategy and resource allocation, and establish clear governance and accountability structures for operational resilience. to enhance"
+      },
+      {
+        "clause_number": "Operational Resilience 3.4",
+        "text": "Central to these key themes are the leadership and culture within financial institutions. Boards and senior management are expected to take clear ownership by ensuring that critical operations and/or services are understood, adequately resourced for, and supported by robust oversight across technology, operations, and risk functions. This includes making informed decisions about outsourcing, technology investments, and recovery capabilities, with a fuller appreciation of their implications on the financial institutions’ operational resilience. Operational Resilience – Discussion Paper 7 of 17"
+      },
+      {
+        "clause_number": "Operational Resilience 6.3",
+        "text": "The Responsibility Mapping policy document, which will come into effect on 1 January 2026 mandates financial institutions to designate a member of senior management with a direct reporting line to the Chief Executive Officer (CEO) as responsible for implementing the operational resilience framework. While the Bank expects a single person to be ultimately accountable for operational resilience outcomes, other members of senior management share the responsibility for delivering operational resilience outcomes in their respective domains (for Operational Resilience – Discussion Paper 16 of 17 example, CTO for technology resilience, CISO for cyber resilience, COO for process resilience, Chief Risk Officer (CRO) for risk appetite, and heads of business units for critical services)."
+      }
+    ]
+  },
+  {
+    "summary": "Both documents rely on the same underlying policy documents (BCM, RMIT, Outsourcing, Risk Governance, Operational Risk) as the foundation for operational resilience and technology risk management.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": "The two documents cite differing effective/issuance dates for the same instruments (e.g. RMIT issued 1 June 2023 per Open Finance 6.1(h) vs 28 November 2025 per OpRes footnote 6); the shared foundation holds but versions may differ.",
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 6.1(c)",
+        "text": "Policy Document on Risk Governance issued on 1 March 2013;"
+      },
+      {
+        "clause_number": "Open Finance 6.1(d)",
+        "text": "Policy Document on Operational Risk issued on 10 May 2016;"
+      },
+      {
+        "clause_number": "Open Finance 6.1(g)",
+        "text": "Policy Document on Business Continuity Management issued on 19 December 2022; Issued on: 18 November 2025 Open Finance 10 of 28"
+      },
+      {
+        "clause_number": "Open Finance 6.1(h)",
+        "text": "Policy Document on Risk Management in Technology issued on 1 June"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Operational Resilience 4.2",
+        "text": "Over the years, the Bank has purposefully built a complementary set of policies6 designed to address distinct needs, including ensuring that financial institutions maintain clear oversight structures, sound risk management practices, robust systems, and well-managed third-party arrangements. These requirements are intended to enable financial institutions to sustain critical services and restore normal operations promptly following disruptions. While these requirements already embed elements of the common themes described in paragraph 3.3, it is an opportune moment for financial institutions and the Bank to assess and review the extent of implementation of these key elements and take appropriate steps to strengthen practices of the financial institutions, where needed."
+      },
+      {
+        "clause_number": "Operational Resilience 4.3",
+        "text": "In the context of preserving continuity of critical operations and/or services, the Business Continuity Management (BCM) policy document requires financial institutions to identify critical business functions, which among others, is meant to support the continuity of their essential customer-facing services. The BCM policy document also requires the establishment of business continuity objectives, including MTD and RTO, in line with the risk appetite of financial institutions. This is complemented by more granular requirements on technology risk under the Risk Management in Technology (RMiT) policy document to ensure that the technology architecture is designed to be robust, with high availability, and is capable of withstanding disruptions. to identify and assess"
+      },
+      {
+        "clause_number": "Operational Resilience 4.5",
+        "text": "To manage risks financial (including institutions from external dependencies reliance on niche/specialised services by third-party service providers), the Outsourcing policy document currently requires to conduct risk assessment and due diligence, execute outsourcing agreements and incorporate contractual terms, establish contingency plans to manage any failures of the service provider (e.g., engaging an alternate service provider), and maintain a register of outsourcing information. For engagements with technology-related service providers, the RMiT policy document further supplements these measures by mandating risk assessments throughout the engagement with technology- related service providers, inclusion of adequate rights of access by the financial institution and the Bank as well as business continuity capabilities within the the provider’s service cybersecurity posture. level agreements, and continuous monitoring of"
+      }
+    ]
+  },
+  {
+    "summary": "Open finance's independent review requirements relating to operational resilience of technology functions correspond to the discussion paper's emphasis on scenario testing and validation of recovery capabilities.",
+    "label": "differs-on",
+    "sentiment": "tighten",
+    "scope_note": "Open finance requires independent review/audit and assurance coverage but does not prescribe severe-but-plausible scenario testing; the connection to OpRes scenario-testing themes is aspirational. OpRes 5.3 (board technical literacy) dropped as not supported by the cited open finance clauses.",
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 12.5",
+        "text": "An FSP participating in an open finance arrangement shall also comply with technology and operational requirements of the open finance platform for which the FSP is a member. This may include, but is not limited to, requirements in relation to the user journey, API specifications, uptime requirements, operational procedures and requirements for independent review relating to the operational resilience of its technology functions. Issued on: 18 November 2025 Open Finance 26 of 28"
+      },
+      {
+        "clause_number": "Open Finance 7.6(f)",
+        "text": "are extended to cover its open finance activities, including but not limited to coverage over its open finance-related services and API integrations;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Operational Resilience 2.9(e)",
+        "text": "No matching clause found"
+      },
+      {
+        "clause_number": "Operational Resilience 3.3(e)",
+        "text": "No matching clause found"
+      }
+    ]
+  },
+  {
+    "summary": "Open finance's concentration of participation on shared platforms and common data-sharing infrastructure amplifies the systemic and concentration risks the discussion paper identifies from interconnected shared infrastructures.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": "This is an inferred systemic-risk linkage; open finance clauses describe interface/platform obligations rather than explicitly recognising concentration risk, so the mapping is analytical rather than textual.",
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 8.6",
+        "text": "A mandated FSP shall also participate in an open finance platform as a data consumer. In this regard, the mandated FSP shall establish, develop and maintain interfaces that allow customers to interact with the platform and give permission to retrieve the customer’s information from other data providers through the FSP as a data consumer. In its role as a data consumer, the mandated FSP shall develop and operate, at a minimum, the following interfaces:"
+      },
+      {
+        "clause_number": "Open Finance 12.5",
+        "text": "An FSP participating in an open finance arrangement shall also comply with technology and operational requirements of the open finance platform for which the FSP is a member. This may include, but is not limited to, requirements in relation to the user journey, API specifications, uptime requirements, operational procedures and requirements for independent review relating to the operational resilience of its technology functions. Issued on: 18 November 2025 Open Finance 26 of 28"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Operational Resilience 2.6",
+        "text": "Digitalisation has also raised consumer expectations for uninterrupted access to financial services, where there is often little to no tolerance for downtime. This is particularly the case for access to financial services that affect consumer’s ability to access their funds (such as mobile/online banking, e-wallets, or real-time payments) and, by extension, the livelihoods of the public at large. Any interrupted access to these financial services will typically trigger immediate consumer dissatisfaction, which is often amplified through social media. This in turn may threaten the reputation of the financial institution and diminish the trust and confidence of consumers, especially if the privacy of their personal information is perceived or known to be compromised (including due to fraudulent activities). infrastructures, shared The financial system is tightly interconnected through payment networks, clearing telecommunication services, cloud and settlement ecosystems, and financial technology (fintech) and API-driven platforms. The growing dependence of financial institutions on cloud service providers, outsourced operational and IT functions, fintech partners, data centres, and telecommunication networks heightens concentration and systemic risks, where–"
+      },
+      {
+        "clause_number": "Operational Resilience 2.6(a)",
+        "text": "during Failures in these shared infrastructures can concurrently impact multiple financial institutions, large consumer groups, and market functions; challenging when Substitutability interdependencies are either opaque (where financial institutions have limited visibility into the external providers’ supply chains), or when financial institutions are critically dependent on a concentrated number of service providers due to their niche/specialised services that are not easily replaceable; and becomes outages"
+      },
+      {
+        "clause_number": "Operational Resilience 5.5",
+        "text": "From the broader industry standpoint, financial institutions face another trade-off between optimisation at the individual financial institution level and collective operational resilience at the industry level. Decisions made by a single financial institution (such as selecting low-cost vendors or designing resilience standards below the industry frontier) can create systemic vulnerabilities when financial institutions are interconnected through common payment systems, digital platforms, or cloud service providers. While financial institutions may view investments on their operational resilience as a private cost unique to their respective financial institution’s circumstances, the benefits of these investments often accrue to consumers, counterparties, and the broader financial system. This disconnect can result in underinvestment at the system level if financial institutions act independently."
+      }
+    ]
+  },
+  {
+    "summary": "Open finance's uptime and availability requirements for platform participation reflect the discussion paper's low-tolerance-for-downtime expectations and consumer sensitivity to service outages.",
+    "label": "differs-on",
+    "sentiment": "tighten",
+    "scope_note": "Open finance sets uptime requirements via platform membership rules rather than defining impact tolerances; the discussion paper's impact-tolerance/MTD/RTO concepts (OpRes 2.9(d)) are broader than open finance's uptime obligations.",
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 12.5",
+        "text": "An FSP participating in an open finance arrangement shall also comply with technology and operational requirements of the open finance platform for which the FSP is a member. This may include, but is not limited to, requirements in relation to the user journey, API specifications, uptime requirements, operational procedures and requirements for independent review relating to the operational resilience of its technology functions. Issued on: 18 November 2025 Open Finance 26 of 28"
+      },
+      {
+        "clause_number": "Open Finance 12.2",
+        "text": "An FSP shall ensure that its technology operations management practices are appropriately extended to support its open finance activities. This includes, but is not limited to, controls for ensuring effective and safe implementation of IT systems, robust third-party service provider management, and operational resilience measures to ensure the availability, integrity and confidentiality of data exchanged through open finance arrangements."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Operational Resilience 2.5",
+        "text": "No matching clause found"
+      },
+      {
+        "clause_number": "Operational Resilience 2.9(d)",
+        "text": "No matching clause found"
+      },
+      {
+        "clause_number": "Operational Resilience 4.7",
+        "text": "Requirements on technology and third-party risk management are relatively more prescriptive because technology failures, cyber incidents, and disruptions in critical third-party arrangements can result in high-impact consequences that propagate quickly through the financial ecosystem. These risks exhibit a very low tolerance for error, as they involve shared infrastructure and common vendors which can quickly degrade public confidence if not managed to a consistent technical baseline. the RMiT policy document sets clear requirements that are fundamental for the continuity of services, particularly in relation to system availability, security controls, recovery capability, and failover arrangements. In particular,"
+      }
+    ]
+  },
+  {
+    "summary": "Open finance's customer information breach handling and incident response plan requirements correspond to the discussion paper's emphasis on effective incident response, timely escalation, and remediation of weaknesses.",
+    "label": "differs-on",
+    "sentiment": "tighten",
+    "scope_note": "Open finance breach handling is scoped specifically to customer information breaches under the PDPA and Customer Information policy document, narrower than the discussion paper's general operational incident response and continuous-learning themes.",
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 11.11",
+        "text": "When an FSP experiences a customer information breach arising from an open finance arrangement, the FSP shall comply with all requirements as stipulated in paragraph 11 of the Policy Document on Management of Customer Information and Permitted Disclosures on customer information breaches, and all other obligations as prescribed under the law (e.g. PDPA)."
+      },
+      {
+        "clause_number": "Open Finance 11.12",
+        "text": "In relation to paragraph 11.11, an FSP shall have in place a customer information breach handling and response plan in the event of theft, loss, misuse or unauthorised access, modification or disclosure of customer information associated with an open finance arrangement. The plan must, at a minimum, include escalation procedures and a clear line of responsibility to contain the customer information breach and take remedial actions. Handling disputes and complaints Clear accountability and liability"
+      },
+      {
+        "clause_number": "Open Finance 7.6(g)",
+        "text": "and ensure that material issues and concerns relating to the FSP’s open finance arrangements are promptly escalated to the board, which include but are not limited to breaches of customer information security and confidentiality. 8 Participation and scope of information sharing"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Operational Resilience 6.4(d)",
+        "text": "No matching clause found"
+      },
+      {
+        "clause_number": "Operational Resilience 6.4(f)",
+        "text": "Stronger cross-functional coordination within the financial institution during both business-as-usual and crisis conditions; Integration of resilience considerations into strategy, business, and outsourcing decisions; Robust management of trade-offs between resilience versus cost, innovation, efficiency, customer experience, business growth, and risk appetite; Timely escalation of issues and remediation of identified weaknesses; Consistent, structured, and forward-looking reporting on operational resilience risks; and More effective incident response and crisis management. Questions for feedback 15. What are the challenges faced by the board in overseeing operational resilience role and (e.g., accountability, timeliness and sufficiency of incident reporting)? information quality, clarity on technical understanding, 16. On technical literacy, what forms of support, capacity building, and reporting structures would help boards and senior management engage more effectively on discussions related to operational resilience? 17. Please provide your financial institution’s views on having a single accountable person ultimately accountable for operational resilience. In addition, please describe how this will or will not improve the board’s oversight on operational resilience, including any appropriate alternative governance arrangements. 18. Which member of senior management is most suited to be made ultimately accountable for operational resilience outcomes and why? 19. Do you plan to have a dedicated Chief Operational Resilience Officer? Explain the reason for your answer. 7 Future direction and priorities"
+      },
+      {
+        "clause_number": "Operational Resilience 2.9(g)",
+        "text": "No matching clause found"
+      }
+    ]
+  },
+  {
+    "summary": "Open finance's requirement to establish and maintain business continuity plans covering service continuity in the event of disruptions maps to the discussion paper's reliance on the BCM policy document for continuity of critical business functions.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 7.6(b)",
+        "text": "as well as safeguards that support the overall operational resilience of an FSP’s participation in an open finance arrangement. This includes, but is not limited to, ensuring the continuity of services in the event of disruptions, system downtime, API outages, cyber risk incidents or third- party failures; conduct due diligence and oversight to ensure only consented customer"
+      },
+      {
+        "clause_number": "Open Finance 6.1(g)",
+        "text": "Policy Document on Business Continuity Management issued on 19 December 2022; Issued on: 18 November 2025 Open Finance 10 of 28"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Operational Resilience 4.3",
+        "text": "In the context of preserving continuity of critical operations and/or services, the Business Continuity Management (BCM) policy document requires financial institutions to identify critical business functions, which among others, is meant to support the continuity of their essential customer-facing services. The BCM policy document also requires the establishment of business continuity objectives, including MTD and RTO, in line with the risk appetite of financial institutions. This is complemented by more granular requirements on technology risk under the Risk Management in Technology (RMiT) policy document to ensure that the technology architecture is designed to be robust, with high availability, and is capable of withstanding disruptions. to identify and assess"
+      },
+      {
+        "clause_number": "Operational Resilience 4.4",
+        "text": "The BCM policy document also requires financial institutions to have in place internal and external processes interdependencies the mapping of people, processes, and technologies). Outsourcing and third-party arrangements that support critical business functions must be captured in the business continuity planning and properly documented to ensure that financial institutions have visibility and retain the various (including"
+      },
+      {
+        "clause_number": "Operational Resilience 4.12(a)",
+        "text": "Business continuity planning, where financial institutions must identify key business functions and plan for their restoration; Technology governance, with established baseline requirements for system availability and cyber preparedness; Third-party management that are subject to adequate safeguards and continuity provisions;"
+      }
+    ]
+  },
+  {
+    "summary": "Open finance's requirement to ensure data consumers apply safeguards at least equivalent to their own, and to manage risks posed to and by other participants, reflects the discussion paper's theme of mapping and managing internal and external interdependencies across interconnected institutions.",
+    "label": "differs-on",
+    "sentiment": "tighten",
+    "scope_note": "Open finance's dependency concern is data-flow specific (risks arising from information received from data providers and posed to data consumers) rather than the full people/process/technology/facilities mapping envisaged in OpRes 3.3(b).",
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 11.6",
+        "text": "An FSP that is a data consumer shall ensure that customer information received from another FSP through an open finance arrangement is subject to safeguards that are at least equivalent to those applicable to the FSP’s own customer information."
+      },
+      {
+        "clause_number": "Open Finance 7.5",
+        "text": "Senior management shall be responsible for developing and implementing the framework for managing risk arising from an FSP’s participation in an open finance arrangement. The framework shall include policies, procedures and systems that enables the identification, measurement, control and ongoing monitoring of all relevant risks, including risks that the FSP is exposed to arising from information received from other data providers and that it poses to other data consumers through information it provides."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Operational Resilience 3.3(b)",
+        "text": "Map internal and external interdependencies Disruptions can propagate through a complex network of people, processes, data, technology, facilities, and business units. A financial institution cannot protect its critical operations and/or services without understanding what it relies on and how failures propagate. Mapping the interdependencies will facilitate identification of vulnerabilities and critical points of failure arising from any weaknesses in risk controls and the"
+      },
+      {
+        "clause_number": "Operational Resilience 2.9(c)",
+        "text": "No matching clause found"
+      },
+      {
+        "clause_number": "Operational Resilience 4.4",
+        "text": "The BCM policy document also requires financial institutions to have in place internal and external processes interdependencies the mapping of people, processes, and technologies). Outsourcing and third-party arrangements that support critical business functions must be captured in the business continuity planning and properly documented to ensure that financial institutions have visibility and retain the various (including"
+      }
+    ]
+  },
+  {
+    "summary": "Open finance's framing of secure, resilient data-sharing infrastructure as foundational to trust and resilience in an increasingly digital financial system echoes the discussion paper's context of rising digitalisation, deeper dependency chains, and the imperative to sustain continuity of essential digital services.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": "Contextual/thematic alignment on digitalisation and resilience objectives rather than an operative requirement mapping.",
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 1.1",
+        "text": "As the financial sector continues to evolve in the digital age, the volume of the customer information processed has grown significantly alongside increasing shift of transactions to digital platforms. This underscores the importance of having strong infrastructures that enable the secure access, sharing and processing of financial information, which is a critical foundation for maintaining trust and resilience in an increasingly digital financial system."
+      },
+      {
+        "clause_number": "Open Finance 1.3",
+        "text": "This Policy Document sets out the regulatory framework for open finance which seeks to ensure that it is implemented in an efficient, resilient and secure fashion. In addition to ensuring that the sharing of data is conducted in full compliance with the Personal Data Protection Act 2010 and other relevant data privacy and protection requirements, the Policy Document seeks to promote responsible data sharing that strikes an appropriate balance between financial innovation and prudent management of risks."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Operational Resilience 2.1",
+        "text": "A wave of technological innovation, behavioural shifts, and environmental pressures is redefining the global financial ecosystem. These megatrends have introduced new forms of operational vulnerabilities and amplified existing ones. While considerable efforts have been placed on strengthening financial resilience through strong capital and liquidity buffers in the past, recent large-scale global disruptions have made it clear that this alone is no longer sufficient to shield financial institutions from the effects of major operational disruptions. The capacity to sustain continuity of essential services under stress is now just as important as maintaining adequate financial buffers, especially as digital interdependencies continue to deepen worldwide."
+      },
+      {
+        "clause_number": "Operational Resilience 2.3",
+        "text": "No matching clause found"
+      },
+      {
+        "clause_number": "Operational Resilience 7.1",
+        "text": "Strengthening operational resilience is now an essential priority for safeguarding consumer trust, preserving financial stability, and ensuring the continuity of critical operations and/or services interconnected landscape. Malaysia’s financial sector is well-placed to advance this, building on the foundations set out by the existing requirements and practical experience gained from past disruptions. However, global developments and domestic trends will need to continue to be considered more holistically with an outcome-focused increasingly digital and in an Operational Resilience – Discussion Paper 17 of 17 approach – one that is anchored on critical operations and/or services, informed by deep visibility of dependencies, supported by strong governance, reinforced through realistic scenario testing, and continuous improvements."
+      }
+    ]
+  }
+]

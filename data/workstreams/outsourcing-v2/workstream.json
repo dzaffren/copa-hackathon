@@ -1,0 +1,12 @@
+{
+  "id": "outsourcing-v2",
+  "name": "Outsourcing v2",
+  "deliverable_type": "Policy Document",
+  "role": "review",
+  "description": "BNM Outsourcing Policy Document, v2 draft under review.",
+  "primary_task_id": "outsourcing-pd-v2",
+  "target_publication": "2027-03-31",
+  "owner": { "id": "fm", "name": "Farid M." },
+  "reviewers": [{ "id": "ar", "name": "Aisyah R." }],
+  "access": "team_only"
+}

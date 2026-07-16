@@ -1,0 +1,12 @@
+{
+  "id": "open-finance-ed",
+  "name": "Open Finance ED · 2025",
+  "deliverable_type": "Exposure Draft",
+  "role": "review",
+  "description": "BNM Open Finance Exposure Draft (BNM/RH/ED 028-36, 18 Nov 2025), drafted in parallel with the Operational Resilience workstream.",
+  "primary_task_id": "of-ed-2025",
+  "target_publication": "2026-06-30",
+  "owner": { "id": "jn", "name": "Jarod N." },
+  "reviewers": [{ "id": "ar", "name": "Aisyah R." }],
+  "access": "department_wide"
+}

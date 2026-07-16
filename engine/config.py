@@ -31,7 +31,6 @@ AI_CLUSTER = "ai-financial-sector"
 # One entry per document *version*. A policy with more than one version
 # (e.g. rmit) has one manifest entry per document_id.
 DOCUMENTS = {
-<<<<<<< HEAD
     "ai-dp-2025": {
         "policy_id": "ai-dp",
         "document_id": "ai-dp-2025",
@@ -52,10 +51,7 @@ DOCUMENTS = {
         # gated on this flag rather than wired globally (see engine/build.py).
         "normalise_glyphs": True,
     },
-    "rmit-v1-2020": {
-=======
     "rmit-v1-2023": {
->>>>>>> a36a9ea5c5be47fb1707251f8a9dbe4342c7d783
         "policy_id": "rmit",
         "document_id": "rmit-v1-2023",
         "title": "Risk Management in Technology (RMiT)",

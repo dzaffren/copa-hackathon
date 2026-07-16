@@ -1,0 +1,12 @@
+{
+  "id": "rmit-v2-2025",
+  "name": "RMiT v2 (delivered 28 Nov 2025)",
+  "deliverable_type": "Policy Document",
+  "role": "delivered",
+  "description": "Risk Management in Technology policy document, v2, delivered 28 November 2025.",
+  "primary_task_id": "rmit-pd-v2",
+  "target_publication": "2025-11-28",
+  "owner": { "id": "ar", "name": "Aisyah R." },
+  "reviewers": [{ "id": "fm", "name": "Farid M." }],
+  "access": "team_only"
+}

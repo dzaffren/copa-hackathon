@@ -1,0 +1,32 @@
+{
+  "nodes": [
+    {
+      "id": "of-ed-2025",
+      "node_type": "task",
+      "title": "Open Finance ED — 18 Nov 2025",
+      "issuer": "BNM",
+      "short_type": "ED",
+      "workstream_id": "open-finance-ed",
+      "description": "Exposure Draft BNM/RH/ED 028-36 on Open Finance, issued 18 November 2025."
+    },
+    {
+      "id": "opres-dp-2025",
+      "node_type": "internal-published",
+      "title": "OpRes DP (Dec 2025)",
+      "issuer": "BNM",
+      "short_type": "DP",
+      "workstream_id": "opres-v2",
+      "description": "Operational Resilience Discussion Paper, December 2025."
+    }
+  ],
+  "edges": [
+    {
+      "id": "x-open_finance_ed--opres_dp_2025",
+      "source": "of-ed-2025",
+      "target": "opres-dp-2025",
+      "edge_type": "parallel-to",
+      "source_workstream_id": "open-finance-ed",
+      "target_workstream_id": "opres-v2"
+    }
+  ]
+}
