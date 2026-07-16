@@ -65,7 +65,7 @@ def test_GET_reviewed_linkages_returns_only_accepted_findings(tmp_path):
     assert card["label"] == "aligns-with"
     assert card["edge_id"] == _BCBS_EDGE
     assert card["right"]["title"] == "BCBS OpRes 2021"
-    assert card["source_clause_number"] == "Operational Resilience 4.4"
+    assert card["source_clause_number"] == "OpRes PD 4.4"
 
 
 def test_GET_reviewed_linkages_excludes_dismissed(tmp_path):

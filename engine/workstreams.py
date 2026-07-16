@@ -59,7 +59,7 @@ _DEMO_ANALYZE_FINDINGS: list[dict[str, Any]] = [
         "supported": True,
         "source_clauses": [
             {
-                "clause_number": "Operational Resilience 4.5",
+                "clause_number": "OpRes PD 4.5",
                 "text": "A financial institution shall maintain a register of arrangements with third-party service providers that support critical operations.",
             }
         ],
@@ -78,7 +78,7 @@ _DEMO_ANALYZE_FINDINGS: list[dict[str, Any]] = [
         "supported": True,
         "source_clauses": [
             {
-                "clause_number": "Operational Resilience 4.7",
+                "clause_number": "OpRes PD 4.7",
                 "text": "A financial institution shall maintain a documented and periodically tested exit plan for each critical third-party service provider.",
             }
         ],

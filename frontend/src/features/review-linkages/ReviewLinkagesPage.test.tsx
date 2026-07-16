@@ -34,9 +34,7 @@ describe("ReviewLinkagesPage — landing", () => {
 
     const source = screen.getByLabelText("source clauses");
     const target = screen.getByLabelText("target clauses");
-    expect(
-      within(source).getByText("Operational Resilience 4.4"),
-    ).toBeInTheDocument();
+    expect(within(source).getByText("OpRes PD 4.4")).toBeInTheDocument();
     expect(
       within(target).getByText("BCBS OpRes Principle 7"),
     ).toBeInTheDocument();
@@ -69,8 +67,11 @@ describe("ReviewLinkagesPage — landing", () => {
     expect(card(0)).toHaveAttribute("data-active", "true");
 
     const source = screen.getByLabelText("source clauses");
+    // "OpRes PD ...", not "Operational Resilience ...": the fixture draft is
+    // namespaced away from the real Discussion Paper's clause numbers, which
+    // the clause index now holds with entirely different text.
     const lit = within(source)
-      .getAllByText(/Operational Resilience/)
+      .getAllByText(/OpRes PD/)
       .map((el) => el.closest("[data-clause]"))
       .filter((el) => el?.getAttribute("data-highlighted"));
     expect(lit).toHaveLength(1);

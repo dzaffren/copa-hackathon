@@ -7,7 +7,7 @@
     "supported": true,
     "source_clauses": [
       {
-        "clause_number": "Operational Resilience 5.3",
+        "clause_number": "OpRes PD 5.3",
         "text": "A financial institution shall conduct scenario testing of its operational resilience arrangements at least annually."
       }
     ],
