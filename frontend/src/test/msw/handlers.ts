@@ -4,6 +4,7 @@ import type {
   CopilotIntent,
   CreateWorkstreamRequest,
   CreateWorkstreamResponse,
+  CrossLink,
   DraftResponse,
   EdgeDetail,
   GraphEdge,
@@ -94,6 +95,15 @@ const TASK_V0_3: TaskResponse = {
       analysed: false,
       findings_count: 0,
     },
+    {
+      node_id: "opres-dp-2025",
+      title: "OpRes DP (Dec 2025)",
+      node_type: "internal-published",
+      edge_type: "references",
+      edge_id: "e-opres_v0_3--opres_dp_2025",
+      analysed: false,
+      findings_count: 0,
+    },
   ],
   draft_empty: false,
 };
@@ -150,6 +160,7 @@ const NODE_TYPES: Record<string, string> = {
   "rmit-pd-2025": "internal-published",
   "fsa-2013-143": "act-law",
   "abm-position": "industry-input",
+  "opres-dp-2025": "internal-published",
 };
 
 const FINDINGS: Record<string, Connection[]> = {
@@ -400,6 +411,16 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     description: "ABM position paper on operational resilience.",
     source_url: null,
   },
+  "opres-dp-2025": {
+    id: "opres-dp-2025",
+    node_type: "internal-published",
+    title: "OpRes DP (Dec 2025)",
+    issuer: "BNM",
+    short_type: "DP",
+    description:
+      "Operational Resilience Discussion Paper, December 2025 — the consultation the v0.3 PD draft follows.",
+    source_url: null,
+  },
 };
 
 const GRAPH_EDGES: GraphEdge[] = [
@@ -448,6 +469,14 @@ const GRAPH_EDGES: GraphEdge[] = [
     source: "opres-pd-v0-3",
     target: "abm-position",
     edge_type: "contributes-to",
+    analysed: false,
+    findings_count: 0,
+  },
+  {
+    id: "e-opres_v0_3--opres_dp_2025",
+    source: "opres-pd-v0-3",
+    target: "opres-dp-2025",
+    edge_type: "references",
     analysed: false,
     findings_count: 0,
   },
@@ -739,7 +768,128 @@ export function resetCreatedWorkstreams() {
   createdWorkstreams = [];
 }
 
+// Mirrors data/workstreams/_cross/: one link, OpRes DP <-> Open Finance ED,
+// projected from the real 2026-07-11 finder+critic trace.
+const CROSS_LINK: CrossLink = {
+  id: "x-open_finance_ed--opres_dp_2025",
+  edge_type: "parallel-to",
+  near: {
+    node_id: "opres-dp-2025",
+    title: "OpRes DP (Dec 2025)",
+    workstream_id: "opres-v2",
+  },
+  far: {
+    node_id: "of-ed-2025",
+    title: "Open Finance ED — 18 Nov 2025",
+    workstream_id: "open-finance-ed",
+    workstream_name: "Open Finance ED · 2025",
+  },
+  findings_count: 12,
+  labels: { "aligns-with": 6, "differs-on": 4, "goes-beyond": 2 },
+  counts: { total: 12, accepted: 0, dismissed: 0 },
+};
+
 export const handlers = [
+  // The _cross store is served by the ordinary review route. Two of the twelve
+  // findings are enough to prove the screen reads them unchanged.
+  http.get(
+    "*/api/workstreams/_cross/edges/:edgeId/review",
+    ({ params }) => {
+      const edgeId = params.edgeId as string;
+      const findings = [
+        {
+          summary:
+            "Open finance's requirement for board and senior management oversight goes beyond the discussion paper's responsibility mapping",
+          label: "goes-beyond" as const,
+          sentiment: null,
+          scope_note:
+            "Open finance does not mandate a single ultimately-accountable person for operational resilience outcomes.",
+          supported: true,
+          source_clauses: [
+            {
+              clause_number: "Open Finance 7.1",
+              text: "The board and senior management shall exercise effective oversight of an FSP's implementation of open finance.",
+            },
+          ],
+          target_clauses: [
+            {
+              clause_number: "Operational Resilience 6.3",
+              text: "Responsibility Mapping identifies the person accountable for each critical operation.",
+            },
+          ],
+        },
+        {
+          summary:
+            "Both documents rely on the same underlying policy documents but anchor to different RMiT versions",
+          label: "aligns-with" as const,
+          sentiment: null,
+          scope_note: null,
+          supported: true,
+          source_clauses: [
+            {
+              clause_number: "Open Finance 6.1(h)",
+              text: "Policy Document on Risk Management in Technology issued on 1 June",
+            },
+          ],
+          target_clauses: [
+            {
+              clause_number: "Operational Resilience 7.2",
+              text: "This Discussion Paper should be read together with the Risk Management in Technology policy document.",
+            },
+          ],
+        },
+      ].map((f, i) => ({
+        ...f,
+        id: `${edgeId}~${i}`,
+        review_state: reviewState.get(`${edgeId}~${i}`) ?? "pending",
+      }));
+
+      return HttpResponse.json({
+        edge: {
+          id: edgeId,
+          edge_type: "parallel-to",
+          source_node: {
+            id: "of-ed-2025",
+            title: "Open Finance ED — 18 Nov 2025",
+            node_type: "task",
+          },
+          target_node: {
+            id: "opres-dp-2025",
+            title: "OpRes DP (Dec 2025)",
+            node_type: "internal-published",
+          },
+        },
+        source_clauses: findings.flatMap((f) => f.source_clauses),
+        target_clauses: findings.flatMap((f) => f.target_clauses),
+        findings,
+        counts: reviewCounts(findings as never),
+      });
+    },
+  ),
+
+  http.get("*/api/workstreams/:workstreamId/cross-links", ({ params }) => {
+    // Only opres-v2 and open-finance-ed touch the seeded link.
+    const id = params.workstreamId as string;
+    if (id === "opres-v2") return HttpResponse.json({ links: [CROSS_LINK] });
+    if (id === "open-finance-ed") {
+      // Read from the other end: near/far swap, and `workstream_name` belongs
+      // to whichever side is now far.
+      return HttpResponse.json({
+        links: [
+          {
+            ...CROSS_LINK,
+            near: { ...CROSS_LINK.far, workstream_name: undefined },
+            far: {
+              ...CROSS_LINK.near,
+              workstream_name: "Operational Resilience v0.3",
+            },
+          },
+        ],
+      });
+    }
+    return HttpResponse.json({ links: [] });
+  }),
+
   http.get("*/api/reviewers", () => {
     return HttpResponse.json({ reviewers: DIRECTORY });
   }),

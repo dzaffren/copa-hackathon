@@ -41,6 +41,38 @@ from engine import copilot_scripts, directory, drafts, findings, workstreams
 # tmp/fixture dir; the module-level `app` defaults it to `data/workstreams`.
 WORKSTREAMS_DIR = REPO_ROOT / "data" / "workstreams"
 
+# The store for edges whose endpoints live in DIFFERENT workstreams. Not a
+# workstream itself: it carries no `workstream.json`, so `list_workstreams()`
+# skips it and it never shows up in the sidebar. Its `graph.json` uses the
+# ordinary node/edge shape, which is what lets the existing review route serve
+# cross-workstream findings without a line of new code. See
+# data/workstreams/_cross/README.md.
+CROSS_STORE = "_cross"
+
+
+def _cross_side(
+    edge: dict[str, Any], workstream_id: str
+) -> Optional[tuple[str, str]]:
+    """Orient a cross-link relative to `workstream_id` → `(near_id, far_id)`.
+
+    Returns None when the edge does not touch this workstream. A link is stored
+    once, in one direction (the direction its findings were written from), so
+    each side has to read it from its own end.
+    """
+    if edge.get("source_workstream_id") == workstream_id:
+        return edge["source"], edge["target"]
+    if edge.get("target_workstream_id") == workstream_id:
+        return edge["target"], edge["source"]
+    return None
+
+
+def _workstream_name(workstreams_dir: Path, workstream_id: Optional[str]) -> Optional[str]:
+    """The far workstream's display name, for "…in Open Finance ED · 2025"."""
+    if workstream_id is None:
+        return None
+    meta = workstreams.load_workstream(workstreams_dir, workstream_id)
+    return meta.get("name") if meta else None
+
 def _ws_error(status_code: int, code: str, message: str) -> JSONResponse:
     """Error body for the Workstream Brain routes: `{code, message}` (Task 1
     contract)."""
@@ -250,6 +282,72 @@ def create_app(
                 500, "WORKSTREAM_WRITE_FAILED", "Could not write the new workstream."
             )
         return record
+
+    @app.get("/api/workstreams/{workstream_id}/cross-links")
+    def get_cross_links(workstream_id: str) -> Any:
+        """Linkages from this workstream's documents into another workstream's.
+
+        Cross-workstream drift is the thing this product exists to catch: two
+        teams draft in parallel, each anchoring to different versions of the same
+        policy, and nobody notices until publication. An edge between them
+        belongs to neither workstream's `graph.json`, so it lives in the `_cross`
+        store (see `data/workstreams/_cross/README.md`).
+
+        Returns the far side of each link plus a label tally, so a caller can
+        render "12 linkages · 4 differ" without fetching every finding. The
+        findings themselves are read through the ordinary review route, which
+        serves `_cross` unchanged.
+        """
+        if workstreams.load_graph(workstreams_dir, workstream_id) is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        cross = workstreams.load_graph(workstreams_dir, CROSS_STORE)
+        if cross is None:
+            return {"links": []}  # no cross store on disk — nothing to report
+
+        nodes_by_id = {n["id"]: n for n in cross.get("nodes", [])}
+        links: list[dict[str, Any]] = []
+        for edge in cross.get("edges", []):
+            near_side = _cross_side(edge, workstream_id)
+            if near_side is None:
+                continue  # this link does not touch the workstream being asked about
+            near_id, far_id = near_side
+            try:
+                edge_findings = findings.load(workstreams_dir, CROSS_STORE, edge["id"])
+            except findings.FindingsNotAnalysedError:
+                edge_findings = []
+
+            labels: dict[str, int] = {}
+            for finding in edge_findings:
+                label = finding.get("label")
+                labels[label] = labels.get(label, 0) + 1
+
+            far_node = nodes_by_id.get(far_id, {})
+            near_node = nodes_by_id.get(near_id, {})
+            links.append(
+                {
+                    "id": edge["id"],
+                    "edge_type": edge.get("edge_type"),
+                    "near": {
+                        "node_id": near_id,
+                        "title": near_node.get("title"),
+                        "workstream_id": workstream_id,
+                    },
+                    "far": {
+                        "node_id": far_id,
+                        "title": far_node.get("title"),
+                        "workstream_id": far_node.get("workstream_id"),
+                        "workstream_name": _workstream_name(
+                            workstreams_dir, far_node.get("workstream_id")
+                        ),
+                    },
+                    "findings_count": len(edge_findings),
+                    "labels": labels,
+                    "counts": findings.counts(edge_findings),
+                }
+            )
+        return {"links": links}
 
     @app.get("/api/workstreams/{workstream_id}/graph")
     def get_workstream_graph(workstream_id: str) -> Any:

@@ -52,8 +52,8 @@ def test_GET_workstreams_lists_three_seeded_workstreams(tmp_path):
 def test_GET_graph_returns_seeded_opres_workstream(tmp_path):
     client, _ = _make_client(tmp_path)
     body = client.get(f"/api/workstreams/{_OPRES}/graph").json()
-    assert len(body["nodes"]) == 7  # one PD + six anchors (sibling draft excluded)
-    assert len(body["edges"]) == 6
+    assert len(body["nodes"]) == 8  # one PD + seven anchors (sibling draft excluded)
+    assert len(body["edges"]) == 7
     assert body["primary_task_id"] == _TASK
     edges = {e["id"]: e for e in body["edges"]}
     assert edges[_BCBS_EDGE]["analysed"] is True
@@ -79,7 +79,7 @@ def test_GET_node_detail_returns_first_order_neighbours_for_task_node(tmp_path):
     client, _ = _make_client(tmp_path)
     body = client.get(f"/api/workstreams/{_OPRES}/nodes/{_TASK}").json()
     assert body["node_type"] == "task"
-    assert len(body["first_order_neighbours"]) == 6
+    assert len(body["first_order_neighbours"]) == 7
     assert body["issuer"] == "BNM"
     assert body["second_order_neighbours"] == {
         "status": "placeholder",

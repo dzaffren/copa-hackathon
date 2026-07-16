@@ -373,3 +373,33 @@ export interface CreateWorkstreamResponse {
   access: AccessLevel;
   created_at: string;
 }
+
+// --- Cross-workstream linkage ----------------------------------------------
+
+export interface CrossLinkEnd {
+  node_id: string;
+  title: string | null;
+  workstream_id: string | null;
+  /** Only the far side carries this — the near side is the workstream you asked from. */
+  workstream_name?: string | null;
+}
+
+export interface CrossLink {
+  id: string;
+  edge_type: EdgeType;
+  near: CrossLinkEnd;
+  far: CrossLinkEnd;
+  findings_count: number;
+  /** Tally by semantic label, so the card reads "12 linkages · 4 differ"
+   *  without fetching every finding. */
+  labels: Partial<Record<SemanticLabel, number>>;
+  counts: ReviewCounts;
+}
+
+export interface CrossLinksResponse {
+  links: CrossLink[];
+}
+
+/** The store holding edges whose endpoints live in different workstreams. Not a
+ *  workstream: it has no workstream.json and never appears in the sidebar. */
+export const CROSS_STORE = "_cross";
