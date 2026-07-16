@@ -270,10 +270,158 @@ def edges_between(
     return out
 
 
-def slugify(text: str) -> str:
-    """A lowercase, hyphen-joined id fragment from free text."""
+# --- Create New Workstream -------------------------------------------------
+# The form captures a workstream before any of its nodes exist. Shapes here
+# follow the SEEDED FIXTURES, not the spec, which is greenfield-stale in three
+# ways that would produce a workstream the rest of the app cannot consume:
+#
+#   - it omits `role`, which the sidebar renders as a badge on every row;
+#   - it stores `deliverable_type` as a code ("PD") where the fixtures store the
+#     human label ("Policy Document"), which is what list_workstreams projects;
+#   - it uses the app's `{code, message}` error body nowhere, inventing a
+#     nested `{error: {...}}` shape this API does not otherwise speak.
+#
+# `access` is the one place the spec wins: the fixtures stored a list of names,
+# which is just owner + reviewers restated, while the form captures an actual
+# policy choice. The three seeded fixtures were converted — losslessly, since
+# each one's list was exactly its owner plus its reviewers.
+
+DELIVERABLE_TYPES: dict[str, str] = {
+    "PD": "Policy Document",
+    "ED": "Exposure Draft",
+    "DP": "Discussion Paper",
+    "Other": "Other",
+}
+
+ACCESS_LEVELS: frozenset[str] = frozenset({"team_only", "department_wide"})
+
+NAME_MIN, NAME_MAX = 3, 120
+DESCRIPTION_MAX = 500
+TARGET_PUBLICATION_MAX = 60
+
+
+def validate_workstream_create(body: dict[str, Any]) -> Optional[tuple[str, str, str]]:
+    """Validate a create-workstream body.
+
+    Returns `None` when valid, else `(code, message, field)` for the first rule
+    broken. Checked in field order so the response points at the topmost problem
+    on the form rather than an arbitrary one.
+    """
+    name = (body.get("name") or "").strip()
+    if not name:
+        return ("NAME_REQUIRED", "Give the workstream a name.", "name")
+    if len(name) < NAME_MIN:
+        return (
+            "NAME_TOO_SHORT",
+            f"Workstream name must be at least {NAME_MIN} characters.",
+            "name",
+        )
+    if len(name) > NAME_MAX:
+        return (
+            "NAME_TOO_LONG",
+            f"Workstream name must be {NAME_MAX} characters or fewer.",
+            "name",
+        )
+    description = body.get("description") or ""
+    if len(description) > DESCRIPTION_MAX:
+        return (
+            "DESCRIPTION_TOO_LONG",
+            f"Description must be {DESCRIPTION_MAX} characters or fewer.",
+            "description",
+        )
+    target = body.get("target_publication") or ""
+    if len(target) > TARGET_PUBLICATION_MAX:
+        return (
+            "TARGET_PUBLICATION_TOO_LONG",
+            f"Target publication must be {TARGET_PUBLICATION_MAX} characters or fewer.",
+            "target_publication",
+        )
+    if body.get("deliverable_type") not in DELIVERABLE_TYPES:
+        return (
+            "INVALID_DELIVERABLE_TYPE",
+            f"deliverable_type must be one of {sorted(DELIVERABLE_TYPES)}, "
+            f"got {body.get('deliverable_type')!r}",
+            "deliverable_type",
+        )
+    if body.get("access") not in ACCESS_LEVELS:
+        return (
+            "INVALID_ACCESS",
+            f"access must be one of {sorted(ACCESS_LEVELS)}, got {body.get('access')!r}",
+            "access",
+        )
+    return None
+
+
+def make_workstream_id(name: str, existing_ids: set[str]) -> str:
+    """A unique directory-safe id from the workstream name.
+
+    Suffixes on collision rather than failing: two workstreams may legitimately
+    share a name (a re-run of a cycle), and the id is not user-visible. A name
+    that slugifies to nothing — all punctuation, or a non-Latin script — falls
+    back to "workstream" and then takes the same numeric suffix treatment.
+    """
+    base = slugify(name, fallback="workstream")
+    ws_id = base
+    n = 2
+    while ws_id in existing_ids:
+        ws_id = f"{base}-{n}"
+        n += 1
+    return ws_id
+
+
+def create_workstream(
+    root: Union[str, Path],
+    body: dict[str, Any],
+    owner: dict[str, str],
+    reviewers: list[dict[str, str]],
+    created_at: str,
+) -> dict[str, Any]:
+    """Scaffold a new workstream on disk and return its record.
+
+    Writes `workstream.json` plus an empty `graph.json`, because every read path
+    treats a missing graph.json as "workstream not found" — a workstream without
+    one would 404 the instant the user landed on it, which is exactly where the
+    form sends them.
+
+    Assumes `body` already passed `validate_workstream_create`.
+    """
+    root = Path(root)
+    existing = {p.name for p in root.iterdir() if p.is_dir()} if root.exists() else set()
+    ws_id = make_workstream_id(body["name"].strip(), existing)
+
+    record: dict[str, Any] = {
+        "id": ws_id,
+        "name": body["name"].strip(),
+        "deliverable_type": DELIVERABLE_TYPES[body["deliverable_type"]],
+        # Anything you create, you own — which is also what makes the sidebar's
+        # role badge render.
+        "role": "own",
+        "description": (body.get("description") or "").strip() or None,
+        # No task node exists yet; the graph screen falls back to the first task
+        # it finds, and an empty graph has none. Explicitly null beats absent.
+        "primary_task_id": None,
+        "target_publication": (body.get("target_publication") or "").strip() or None,
+        "owner": owner,
+        "reviewers": reviewers,
+        "access": body["access"],
+        "created_at": created_at,
+    }
+    _write_json(root / ws_id / "workstream.json", record)
+    _write_json(root / ws_id / "graph.json", {"nodes": [], "edges": []})
+    return record
+
+
+def slugify(text: str, fallback: str = "node") -> str:
+    """A lowercase, hyphen-joined id fragment from free text.
+
+    `fallback` is what you get when nothing survives — pure punctuation, or a
+    script with no ASCII letters. It is a parameter rather than a hard-coded
+    "node" because callers naming something other than a node want their own
+    word: `slugify(name) or "workstream"` reads like it works and does not, since
+    the fallback fires first and "node" is truthy.
+    """
     s = re.sub(r"[^a-z0-9]+", "-", (text or "").lower()).strip("-")
-    return s or "node"
+    return s or fallback
 
 
 def make_node_id(title: str, existing_ids: set[str]) -> str:

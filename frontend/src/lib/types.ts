@@ -327,3 +327,49 @@ export interface ChatMessage {
   citations?: CopilotCitation[];
   snippet_html?: string;
 }
+
+// --- New Workstream --------------------------------------------------------
+
+/** Wire codes for the deliverable dropdown. The server maps these to the human
+ *  labels the fixtures store ("PD" → "Policy Document"). */
+export type DeliverableTypeCode = "PD" | "ED" | "DP" | "Other";
+
+export const DELIVERABLE_TYPE_OPTIONS: {
+  code: DeliverableTypeCode;
+  label: string;
+}[] = [
+  { code: "PD", label: "Policy Document (PD)" },
+  { code: "ED", label: "Exposure Draft (ED)" },
+  { code: "DP", label: "Discussion Paper (DP)" },
+  { code: "Other", label: "Other" },
+];
+
+export type AccessLevel = "team_only" | "department_wide";
+
+export interface Person {
+  id: string;
+  name: string;
+}
+
+export interface CreateWorkstreamRequest {
+  name: string;
+  description?: string;
+  deliverable_type: DeliverableTypeCode;
+  target_publication?: string;
+  reviewer_ids: string[];
+  access: AccessLevel;
+}
+
+export interface CreateWorkstreamResponse {
+  id: string;
+  name: string;
+  deliverable_type: string;
+  role: WorkstreamRole;
+  description: string | null;
+  primary_task_id: string | null;
+  target_publication: string | null;
+  owner: Person;
+  reviewers: Person[];
+  access: AccessLevel;
+  created_at: string;
+}

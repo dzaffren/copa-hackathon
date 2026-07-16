@@ -25,6 +25,7 @@ fixtures derive from public BNM documents.
 
 import json
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional, Union
 
@@ -32,7 +33,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from engine.config import REPO_ROOT
-from engine import copilot_scripts, drafts, findings, workstreams
+from engine import copilot_scripts, directory, drafts, findings, workstreams
 
 # The Workstream Brain fixture store (Task 1): one directory per workstream, each
 # holding a `graph.json` (`{"nodes": [...], "edges": [...]}`) and a `findings/`
@@ -200,6 +201,55 @@ def create_app(
     @app.get("/api/workstreams")
     def list_workstreams_route() -> Any:
         return {"workstreams": workstreams.list_workstreams(workstreams_dir)}
+
+    @app.get("/api/reviewers")
+    def list_reviewers_route() -> Any:
+        """The colleagues the current user may nominate — the directory minus
+        themselves. Static: there is no staff directory in MVP1."""
+        return {"reviewers": directory.selectable_reviewers()}
+
+    @app.post("/api/workstreams", status_code=201)
+    async def create_workstream_route(request: Request) -> Any:
+        """Scaffold a new workstream and return it.
+
+        This is the only route in the service that WRITES a new directory under
+        `data/workstreams/` — a tracked path. On the demo host that means
+        creating a workstream dirties the working tree; that is the fixture
+        store doubling as the database, and is a property of the whole design
+        rather than of this route.
+        """
+        body = await request.json() if await request.body() else {}
+        if not isinstance(body, dict):
+            return _ws_error(400, "NAME_REQUIRED", "Give the workstream a name.")
+
+        invalid = workstreams.validate_workstream_create(body)
+        if invalid:
+            code, message, field = invalid
+            return JSONResponse(
+                status_code=400, content={"code": code, "message": message, "field": field}
+            )
+
+        reviewers, bad_id = directory.resolve_reviewers(body.get("reviewer_ids"))
+        if reviewers is None:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "code": "INVALID_REVIEWER_ID",
+                    "message": f"{bad_id!r} is not a colleague you can nominate.",
+                    "field": "reviewer_ids",
+                },
+            )
+
+        stamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        try:
+            record = workstreams.create_workstream(
+                workstreams_dir, body, directory.owner(), reviewers, stamp
+            )
+        except OSError:
+            return _ws_error(
+                500, "WORKSTREAM_WRITE_FAILED", "Could not write the new workstream."
+            )
+        return record
 
     @app.get("/api/workstreams/{workstream_id}/graph")
     def get_workstream_graph(workstream_id: str) -> Any:

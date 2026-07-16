@@ -2,7 +2,11 @@ import "@testing-library/jest-dom/vitest";
 import { afterAll, afterEach, beforeAll } from "vitest";
 import { cleanup } from "@testing-library/react";
 import { server } from "./msw/server";
-import { resetDraft, resetReviewState } from "./msw/handlers";
+import {
+  resetCreatedWorkstreams,
+  resetDraft,
+  resetReviewState,
+} from "./msw/handlers";
 
 // jsdom implements no layout engine, so Element.scrollIntoView does not exist.
 // The review screen's clause panes call it to bring a cited clause into view;
@@ -22,6 +26,7 @@ afterEach(() => {
   // independent.
   resetReviewState();
   resetDraft();
+  resetCreatedWorkstreams();
 });
 
 afterAll(() => server.close());
