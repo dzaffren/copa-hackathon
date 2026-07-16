@@ -6,6 +6,7 @@ file in this directory. The active ruleset is synced into the repo's
 
 - [mypy third-party stub baseline](convention-mypy-third-party-stub-baseline.md) — the 4 mypy stub warnings in engine/ are accepted baseline, not a regression
 - [FastAPI TestClient deps](pattern-fastapi-testclient-deps.md) — TestClient tests need httpx + python-multipart as explicit deps
+- [Engine deps live in two places](pattern-engine-deps-live-in-two-places.md) — a new engine dep must go in `pyproject.toml` AND the CI workflow's pip list, or CI fails where local never can
 - [/ship is GitLab, use gh](skill-ship-is-gitlab-use-gh.md) — override /ship's glab with `gh pr create --base dzaf/main`; no "Closes #<n>" (no issue tracker)
 - [Frontend app is `frontend/`](convention-frontend-app-is-frontend-dir.md) — frontend/ (Vite + React 18) is the only frontend; a build step is intentional, not drift
 - [Offline build needs Document Intelligence](convention-offline-build-needs-docintel.md) — full `python -m engine.build` needs Azure DI for the legacy tech-risk PDFs; the AI DP + refs + verdicts build offline
