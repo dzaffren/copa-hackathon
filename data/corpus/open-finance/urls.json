@@ -1,0 +1,5 @@
+{
+    "paynet": ["https://pay-net.atlassian.net/wiki/spaces/OF/overview"],
+    "mas": ["https://www.mas.gov.sg/development/fintech/financial-industry-api-register"],
+    "hkma": ["https://apidocs.hkma.gov.hk/documentation/", "https://www.hkma.gov.hk/eng/key-functions/international-financial-centre/fintech/open-application-programming-interface-api-for-the-banking-sector/phase-approach"]
+}
