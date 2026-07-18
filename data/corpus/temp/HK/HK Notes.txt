@@ -1,0 +1,15 @@
+My benchmarking contains documents in 3 areas:
+1. Banking Capital Rules 
+	a. [HKMA] SA Cap. 155L Banking (Capital) Rules
+	b. BACR Annex 1- Proposed Amendments Credit Risk Framework & Output Floor (20230531)
+	c. HKMA B3 Gazetted rules Dec 2023
+	d. Rules on Basel III Final Package & Related Updates (20240208)
+2. Capital Adequacy Regime
+	a. HKMA CA-G-1
+3. Consultation paper
+	a. [Latest] Annex 1 Proposed amendments CR framework and output floor (20230531)
+	b. [Latest] Annex_2_ECAI_mapping_tables_(20230531)
+	c. CP Implementation of B3 Final Reform Package 2021
+	d. Implementation of the Basel III Final Reform Package
+	e. Response to feedback
+4. [Letter] Implementation of Basel III final reform package

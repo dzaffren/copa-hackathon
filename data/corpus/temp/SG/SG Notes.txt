@@ -1,0 +1,6 @@
+SG provides documents on:
+1. Consultation paper
+	a. Credit Risk Cap & Output Floor Reqs (March 2021)
+	b. Proposed Implementation Final Basel III (May 2019)
+	c. Response to Feedback_Proposed Final BIII Reforms_Credit Risk Capital and Output
+2. Policy requirement (aka "Notice")
