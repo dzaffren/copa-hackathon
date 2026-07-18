@@ -78,23 +78,28 @@ Guidance:
 We use **GitHub Issues + a Project board** as the tracker (no Jira). Everything
 lives in this repo.
 
-- **Milestone:** `Rulebook Radar MVP1 (Hackathon 3 Aug 2026)` — the delivery deadline.
-- **Epic issue [#5](https://github.com/dzaffren/copa-hackathon/issues/5)** — the
-  high-level checklist linking every story.
-- **Story issues [#6–#11]** — one per story spec in `docs/specs/rulebook-radar/`.
-  Each spec's `**Ticket:**` field links to its issue, and the epic
-  [Story Index](docs/specs/rulebook-radar/spec.md) lists them with dependencies.
-- **Project board:** _Rulebook Radar MVP1_ — a Todo / In Progress / Done view of
-  those issues (Projects tab → open the board).
+- **Milestone:** `Workstream Brain MVP1 (Hackathon 3 Aug 2026)` — the delivery deadline.
+- **Live epic:** [`docs/specs/workstream-brain/spec.md`](docs/specs/workstream-brain/spec.md)
+  lists every story with dependencies. Each story spec's `**Ticket:**` field
+  links to its GitHub issue when one exists (`TBD` until it lands on the tracker).
+- **Project board:** _Workstream Brain MVP1_ — a Todo / In Progress / Done view
+  of those issues (Projects tab → open the board).
 
-| Issue | Story                                                 | Build order / depends on |
-| ----- | ----------------------------------------------------- | ------------------------ |
-| #6    | Policy ingestion & knowledge-graph engine (technical) | build first — no deps    |
-| #7    | Drafter rulebook workspace                            | #6                       |
-| #8    | Consistency ripple check & impact report              | #6, #7                   |
-| #9    | Drafting copilot with live write-back                 | #6, #8                   |
-| #10   | Supervisor submission completeness & compliance check | #6 (parallel)            |
-| #11   | Reviewer & approval workflow                          | #7, #8                   |
+| Story                                            | Type        | Build order / depends on      |
+| ------------------------------------------------ | ----------- | ----------------------------- |
+| Linkage taxonomy widening                        | Technical   | build first — no deps         |
+| Anchor segmentation (multi-strategy AnchorIndex) | Technical   | taxonomy                      |
+| Retrieval-first pipeline (axes + hybrid)         | Technical   | taxonomy; anchor segmentation |
+| Workstream graph screen (hero)                   | User-facing | anchor segmentation           |
+| Task screen with pairwise comparison             | User-facing | graph; retrieval pipeline     |
+| Review linkages screen                           | User-facing | graph; retrieval pipeline     |
+| New workstream form                              | User-facing | graph                         |
+| Drafting workspace with 3-tab side panel         | User-facing | review linkages (build last)  |
+
+**Historical:** the Rulebook Radar epic (**#5**, stories #6–#11) and the
+Reconciliation Workbench re-platform are retired. Their issues stay on GitHub
+for history; their specs live under `docs/specs/rulebook-radar/` and
+`docs/specs/reconciliation-workbench/` and are not being worked.
 
 **How the tracking stays current automatically:**
 

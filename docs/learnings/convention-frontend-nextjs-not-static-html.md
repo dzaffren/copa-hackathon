@@ -1,10 +1,17 @@
 ---
 name: frontend-nextjs-not-static-html
-description: The demo frontend is a Next.js + React app under web/, not static HTML — don't flag the build step as a mistake
+description: SUPERSEDED (18 Jul 2026). Historical record of the Reconciliation Workbench Next.js re-platform. Live convention is `convention-frontend-vite-react-not-nextjs.md`.
 type: convention
 captured: 2026-07-11
+superseded: 2026-07-18
 source: frontend re-platform brainstorm (Reconciliation Workbench)
 ---
+
+> **SUPERSEDED (18 Jul 2026).** Reconciliation Workbench was retired in favour
+> of the Workstream Brain epic; its Next.js app was moved to `archive/web/`.
+> The current frontend convention is Vite + React 18 + TS + Tailwind + shadcn
+> under `frontend/` — see [[convention-frontend-vite-react-not-nextjs]]. Text
+> below is kept as history; do NOT apply it to new work.
 
 The Reconciliation Workbench demo frontend is a **Next.js + React + Tailwind +
 shadcn/ui** application under `web/` (deployed to Vercel), using **Zustand +
