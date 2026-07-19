@@ -350,3 +350,38 @@ def test_semi_structured_mas_637_headings():
     # Text starts with the leaf's own paragraph and is a substring of source.
     assert leaf["text"].startswith("A financial institution shall apply")
     assert leaf["text"] in _MAS_637_MARKDOWN
+
+
+def test_semi_structured_uses_only_leaves():
+    """A heading with both text under it AND child headings is INTERNAL — its
+    own paragraph text is dropped. This is the documented leaf-only rule; the
+    parent's intro paragraph is not a legal citation because it has no unique
+    numeric key of its own without a leaf.
+    """
+    mixed_content = """# 1 Overview
+
+An intro paragraph attached to the section 1 heading itself — MUST NOT appear
+as its own anchor because section 1 has child headings.
+
+## 1.1 First principle
+
+The first principle body text.
+
+## 1.2 Second principle
+
+The second principle body text.
+"""
+
+    anchors = semi_structured_segment(
+        document_id="mixed",
+        source_markdown=mixed_content,
+        shortname="X",
+    )
+
+    # Only leaves 1.1 and 1.2. Parent `1` is DROPPED.
+    assert [a["anchor_id"] for a in anchors] == ["X 1.1", "X 1.2"]
+    for anchor in anchors:
+        # The parent's intro paragraph is not in any leaf anchor.
+        assert (
+            "An intro paragraph attached to the section 1 heading" not in anchor["text"]
+        )
