@@ -416,3 +416,23 @@ def test_semi_structured_verifies_substring(monkeypatch):
     # otherwise — this line asserts no exceptions leaked through).
     for anchor in anchors:
         assert anchor["text"] in _BCBS_CRE_MARKDOWN
+
+
+def test_semi_structured_registered_by_default():
+    """`segment(...)` uses the default registry, which Task 4 populates at
+    import time with the semi-structured strategy. No explicit `.register(...)`
+    call by the caller is required.
+    """
+    anchors = segment(
+        document_id="bcbs-cre",
+        source_markdown=_BCBS_CRE_MARKDOWN,
+        doc_class="semi-structured",
+    )
+
+    assert len(anchors) == 4
+    assert all(a["doc_class"] == "semi-structured" for a in anchors)
+    # anchor_ids use document_id as prefix when segment() is called without a
+    # shortname override — the build pipeline (Task 7) wires manifest-driven
+    # shortnames via a functools.partial, but the module-level dispatcher
+    # falls back to document_id here.
+    assert anchors[0]["anchor_id"] == "bcbs-cre 20.1"
