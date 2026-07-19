@@ -206,6 +206,53 @@ def test_structured_rules_registered_by_default():
     assert anchors[0]["anchor_id"].startswith("Outsourcing ")
 
 
+def test_structured_rules_round_trips_bnm_clauses_byte_identical():
+    """The structured-rules segmenter wraps ClauseIndex output — a BNM clause's
+    text MUST match byte-for-byte what ClauseIndex returns today.
+
+    Runs the same real BNM markdown (`data/mock/rmit-v2-2026-draft.md`) through
+    BOTH pipelines and compares selected clause texts. Any drift here would be
+    an anchor-wrapper bug corrupting the verbatim-citation guarantee — the
+    whole point of Task 3 is that this round-trip is a no-op.
+    """
+    from pathlib import Path
+
+    from engine.clauses import ClauseIndex, segment_clauses
+
+    md_path = Path("data/mock/rmit-v2-2026-draft.md")
+    markdown = md_path.read_text(encoding="utf-8")
+
+    # Baseline: what ClauseIndex returns today.
+    entries = segment_clauses(
+        markdown=markdown,
+        document_id="rmit",
+        policy_id="rmit",
+        source="published",
+    )
+    baseline_index = ClauseIndex(entries)
+
+    # Anchor path: what Task 3's segmenter emits.
+    anchors = structured_rules_segment("rmit", markdown)
+    anchors_by_id = {a["anchor_id"]: a for a in anchors}
+
+    # Every ClauseIndex clause is present as an Anchor with byte-identical text.
+    for clause_number, baseline in entries.items():
+        anchor = anchors_by_id.get(clause_number)
+        assert anchor is not None, f"missing anchor for {clause_number}"
+        assert anchor["text"] == baseline["text"], (
+            f"text drift for {clause_number}: "
+            f"anchor {anchor['text'][:40]!r} vs baseline "
+            f"{baseline['text'][:40]!r}"
+        )
+
+    # Spot-check a few well-known BNM clause_numbers explicitly, so a future
+    # regression flags loudly on named clauses instead of an aggregate diff.
+    for clause_number in ("RMiT 1.1", "RMiT 1.1(a)", "RMiT 1.2"):
+        baseline_entry = baseline_index.get(clause_number)
+        assert baseline_entry is not None
+        assert anchors_by_id[clause_number]["text"] == baseline_entry["text"]
+
+
 def test_segment_raises_unknown_doc_class():
     # Task 3 registers `"structured-rules"` at import time; `"semi-structured"`
     # and `"prose"` land in later tasks. Any unregistered doc_class raises.
