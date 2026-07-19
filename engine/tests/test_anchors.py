@@ -15,6 +15,7 @@ from engine.anchors import (
     SegmenterRegistry,
     UnknownDocClassError,
     segment,
+    structured_rules_segment,
     verify_substring,
 )
 
@@ -131,12 +132,47 @@ def test_segmenter_registry_stores_and_retrieves_functions():
     assert registry.get("prose") is None
 
 
+# ---------------------------------------------------------------------------
+# Task 3: structured-rules segmenter (wraps engine.clauses.segment_clauses).
+#
+# BNM policy documents (RMiT, Outsourcing, OpRes, etc.) flow through this path
+# unchanged — the segmenter is a thin re-wrapper of the existing ClauseIndex
+# pipeline, so every emitted anchor is byte-identical to today's clause text.
+
+_STRUCTURED_RULES_MARKDOWN = """1 Introduction
+
+1.1 A financial institution must obtain the Bank's written approval before entering into a new material outsourcing arrangement.
+
+1.2 An application for approval under paragraph 1.1 must be submitted at least ninety days before the proposed commencement date.
+"""
+
+
+def test_structured_rules_segment_wraps_clauses_as_anchors():
+    anchors = structured_rules_segment("outsourcing", _STRUCTURED_RULES_MARKDOWN)
+
+    assert len(anchors) == 2
+
+    first, second = anchors
+    assert first["anchor_id"] == "Outsourcing 1.1"
+    assert first["anchor_label"] == "Outsourcing 1.1"
+    assert first["doc_class"] == "structured-rules"
+    assert first["document_id"] == "outsourcing"
+    assert first["heading_path"] == []
+    assert first["page_span"] is None
+    assert first["parent_anchor"] is None
+    assert first["text"] in _STRUCTURED_RULES_MARKDOWN
+    assert first["text"].startswith("A financial institution")
+
+    assert second["anchor_id"] == "Outsourcing 1.2"
+    assert second["text"] in _STRUCTURED_RULES_MARKDOWN
+
+
 def test_segment_raises_unknown_doc_class():
-    # Module-level `segment` uses the module-level registry which is empty on
-    # import — Tasks 3-5 register the real strategies. Any doc_class raises.
-    with pytest.raises(UnknownDocClassError, match="structured-rules"):
+    # Task 3 registers `"structured-rules"` at import time; `"semi-structured"`
+    # and `"prose"` land in later tasks. Any unregistered doc_class raises.
+    with pytest.raises(UnknownDocClassError, match="semi-structured"):
         segment(
             document_id="doc-a",
             source_markdown="ignored",
-            doc_class="structured-rules",
+            doc_class="semi-structured",
         )
