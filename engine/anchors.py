@@ -244,8 +244,6 @@ def structured_rules_segment(
             f"Add a shortname mapping (or use a different doc_class)."
         )
 
-    short_name = POLICY_SHORT_NAMES[document_id]
-
     entries = segment_clauses(
         markdown=source_markdown,
         document_id=document_id,
@@ -256,10 +254,10 @@ def structured_rules_segment(
     anchors: list[Anchor] = []
     for entry in entries.values():
         # `clause_number` on a ClauseEntry is already the canonical
-        # "{PolicyShortName} {bare_number}" — reuse it as anchor_id directly so
-        # BNM callers see the exact same citation key they read today.
+        # "{PolicyShortName} {bare_number}" (segment_clauses handles the join
+        # via POLICY_SHORT_NAMES) — reuse it as anchor_id directly so BNM
+        # callers see the exact same citation key they read today.
         canonical = entry["clause_number"]
-        parent = entry["parent"]
         anchor: Anchor = {
             "anchor_id": canonical,
             "anchor_label": canonical,
@@ -268,15 +266,10 @@ def structured_rules_segment(
             "document_id": document_id,
             "heading_path": [],
             "page_span": None,
-            "parent_anchor": parent,
+            "parent_anchor": entry["parent"],
         }
         verify_substring(anchor, source_markdown)
         anchors.append(anchor)
-
-    # Sanity: the shortname we resolved above matches the canonical prefix
-    # every emitted anchor_id will carry. The compiler cannot enforce this,
-    # so leave `short_name` referenced explicitly.
-    assert all(a["anchor_id"].startswith(f"{short_name} ") for a in anchors)
 
     return anchors
 
