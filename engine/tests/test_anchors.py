@@ -15,6 +15,7 @@ from engine.anchors import (
     SegmenterRegistry,
     UnknownDocClassError,
     UnknownDocumentIdError,
+    prose_segment,
     segment,
     semi_structured_segment,
     structured_rules_segment,
@@ -255,13 +256,14 @@ def test_structured_rules_round_trips_bnm_clauses_byte_identical():
 
 
 def test_segment_raises_unknown_doc_class():
-    # Task 3 registers `"structured-rules"` at import time; Task 4 registers
-    # `"semi-structured"`; `"prose"` lands in Task 5 and is still unregistered.
-    with pytest.raises(UnknownDocClassError, match="prose"):
+    # Tasks 3-5 register `"structured-rules"`, `"semi-structured"`, `"prose"`
+    # at import time. An arbitrary unregistered class must still raise a clear
+    # UnknownDocClassError naming the offending class in the message.
+    with pytest.raises(UnknownDocClassError, match="not-a-real-class"):
         segment(
             document_id="doc-a",
             source_markdown="ignored",
-            doc_class="prose",
+            doc_class="not-a-real-class",
         )
 
 
@@ -436,3 +438,204 @@ def test_semi_structured_registered_by_default():
     # shortnames via a functools.partial, but the module-level dispatcher
     # falls back to document_id here.
     assert anchors[0]["anchor_id"] == "bcbs-cre 20.1"
+
+
+# ---------------------------------------------------------------------------
+# Task 5: prose segmenter (semantic paragraph chunker).
+#
+# Deterministic Python — no LLM. Three rules from the spec:
+#   1. Split on paragraph boundaries (`\n\s*\n`).
+#   2. Min-length merge — paragraphs under 200 chars merge into the NEXT.
+#   3. Max-length split — chunks over 1500 chars split at the nearest
+#      sentence boundary before the 1500-char mark.
+# Every emitted anchor's `text` is a literal substring of `source_markdown`
+# (Option A: byte-offset tracking through merges, never string concatenation).
+
+
+def test_prose_paragraph_split_basic():
+    """Three well-separated paragraphs of ~300 chars each become three anchors —
+    each is above the 200-char merge floor and below the 1500-char split ceiling.
+    """
+    para = (
+        "The bank shall maintain a comprehensive operational resilience framework "
+        "that identifies critical business services and sets impact tolerances "
+        "for disruption. The framework must be reviewed annually and updated "
+        "whenever material changes to the operating model occur."
+    )
+    assert 200 <= len(para) <= 1500  # sanity: within the plain-chunk band
+    source = f"{para}\n\n{para}\n\n{para}\n"
+
+    anchors = prose_segment("boe-op-res", source)
+
+    assert len(anchors) == 3
+    for anchor in anchors:
+        assert anchor["doc_class"] == "prose"
+        assert anchor["document_id"] == "boe-op-res"
+        assert anchor["text"] in source
+
+
+def test_prose_min_length_merge():
+    """Paragraphs under 200 chars merge into the NEXT paragraph. Source has
+    three paragraphs of lengths 80, 60, 900 chars: the two short leading
+    paragraphs both fold into the 900-char follower, yielding ONE anchor
+    (~1040 chars — still under the 1500-char split ceiling).
+    """
+    short_a = "Short paragraph A. " * 4  # ~76 chars
+    short_b = "Short B. " * 7  # ~63 chars
+    long_para = (
+        "This is the substantive paragraph that carries the citable regulatory "
+        "content. It must be at least nine hundred characters long so that when "
+        "the two short precursor paragraphs merge into it under the min-length "
+        "rule, the resulting chunk still sits above the two-hundred-character "
+        "floor and below the fifteen-hundred-character split ceiling. To reach "
+        "that length we describe in careful, redundant detail the framework "
+        "requirements: institutions shall document their approach, obtain "
+        "senior management approval, and review the framework at least "
+        "annually or whenever material changes occur. The framework shall also "
+        "identify critical business services, set impact tolerances, and "
+        "specify recovery objectives that align with the institution's risk "
+        "appetite and strategic objectives. Every element of the framework is "
+        "subject to independent review by the internal audit function on a "
+        "risk-based cycle."
+    )
+    assert len(short_a) < 200
+    assert len(short_b) < 200
+    assert 700 < len(long_para) < 1200
+    source = f"{short_a}\n\n{short_b}\n\n{long_para}\n"
+
+    anchors = prose_segment("boe-op-res", source)
+
+    # All three paragraphs collapsed into ONE chunk because both short heads
+    # fold forward into the long tail.
+    assert len(anchors) == 1
+    text = anchors[0]["text"]
+    # The merged text is a literal slice of the source (contains the blank
+    # lines between the original paragraphs).
+    assert text in source
+    # And it contains snippets from all three original paragraphs.
+    assert "Short paragraph A." in text
+    assert "Short B." in text
+    assert "substantive paragraph" in text
+
+
+def test_prose_max_length_sentence_split():
+    """A single 2400-char paragraph with four sentence boundaries splits at
+    the sentence boundary NEAREST 1500 chars — yielding two anchors, both
+    ending in `.`, `!`, or `?`.
+    """
+    # Four sentences, each ~600 chars, joined with a single space. The whole
+    # paragraph is one block of prose (no paragraph boundaries) so the
+    # segmenter's max-length rule is the only thing that can split it.
+    sentence = (
+        "This sentence describes in patient detail the operational "
+        "resilience requirements that the framework imposes on regulated "
+        "institutions and their material third parties, including the "
+        "obligation to identify critical business services, set impact "
+        "tolerances denominated in time or units of loss, test the "
+        "recovery objectives against a range of severe but plausible "
+        "scenarios, and document the outcomes of those tests in a form "
+        "that internal audit and the supervisor can inspect on demand and "
+        "compare against prior-year exercises to establish trend lines."
+    )
+    assert 550 < len(sentence) < 650
+    paragraph = f"{sentence} {sentence} {sentence} {sentence}"
+    assert 2200 < len(paragraph) < 2600
+
+    anchors = prose_segment("boe-op-res", paragraph)
+
+    assert len(anchors) == 2
+    for anchor in anchors:
+        # Every emitted chunk ends with a sentence terminator.
+        assert anchor["text"].rstrip()[-1] in {".", "!", "?"}
+        # Every chunk is a literal substring of the source.
+        assert anchor["text"] in paragraph
+    # First chunk sits at or under 1500 chars (split before the ceiling).
+    assert len(anchors[0]["text"]) <= 1500
+
+
+def test_prose_page_span_from_page_marker():
+    """Azure Document Intelligence emits `<!-- page N -->` breadcrumbs inline.
+    The prose segmenter reads the nearest page marker above the chunk to fill
+    `page_span=(N, N)`, and the resulting anchor_id embeds `p.N`.
+    """
+    para = (
+        "The Prudential Regulation Authority expects firms to establish and "
+        "maintain governance arrangements that are proportionate to the nature, "
+        "scale, and complexity of their business. Firms shall document these "
+        "arrangements and review them at least annually against evolving "
+        "regulatory expectations and industry practice."
+    )
+    assert len(para) >= 200
+    source = f"<!-- page 5 -->\n\n{para}\n"
+
+    anchors = prose_segment("boe-op-res", source, shortname="BoE OpRes")
+
+    assert len(anchors) == 1
+    anchor = anchors[0]
+    assert anchor["page_span"] == (5, 5)
+    assert "p.5" in anchor["anchor_id"]
+    # Shortname prefix landed in the anchor_id.
+    assert anchor["anchor_id"].startswith("BoE OpRes ")
+
+
+def test_prose_verify_substring_passes():
+    """Every emitted anchor's `text` is a LITERAL substring of the input
+    (Option A: byte-offset tracking, never string concatenation with `" "`).
+    Uses a mixed source with short + long paragraphs plus a heading, exercising
+    all three merge/split code paths, and checks each anchor round-trips.
+    """
+    heading = "# Chapter 3 Credit Risk"
+    short = "Very short intro."
+    long_a = "A" * 300 + " " + "B" * 300 + " " + "C" * 300 + " " + "D" * 300
+    long_b = "E" * 250 + " " + "F" * 250
+    source = f"{heading}\n\n{short}\n\n{long_a}\n\n{long_b}\n"
+
+    anchors = prose_segment("chapter-3", source)
+
+    # Whatever the segmenter emits, every chunk text must be findable
+    # verbatim in the source markdown.
+    assert len(anchors) >= 1
+    for anchor in anchors:
+        assert anchor["text"] in source, (
+            f"anchor {anchor['anchor_id']!r} text is not a literal substring "
+            f"(starts: {anchor['text'][:60]!r})"
+        )
+
+
+def test_prose_no_headings_uses_chunk_index():
+    """When there is neither a page marker nor a markdown heading above a
+    chunk, the anchor_id falls back to `{shortname} chunk#{i}` — the
+    index-based disambiguator.
+    """
+    para_a = "First substantive paragraph. " * 12
+    para_b = "Second substantive paragraph. " * 12
+    assert len(para_a) >= 200 and len(para_b) >= 200
+    source = f"{para_a}\n\n{para_b}\n"
+
+    anchors = prose_segment("plain-doc", source, shortname="Plain")
+
+    assert len(anchors) == 2
+    assert anchors[0]["anchor_id"] == "Plain chunk#0"
+    assert anchors[1]["anchor_id"] == "Plain chunk#1"
+    for anchor in anchors:
+        assert anchor["heading_path"] == []
+        assert anchor["page_span"] is None
+
+
+def test_prose_registered_by_default():
+    """The default registry ships with `"prose"` installed at import time,
+    matching `structured-rules` / `semi-structured`. `segment(...)` therefore
+    works on prose without any explicit `.register(...)` call.
+    """
+    para = "A" * 250
+    source = f"{para}\n\n{para}\n"
+
+    anchors = segment(
+        document_id="prose-doc",
+        source_markdown=source,
+        doc_class="prose",
+    )
+
+    assert len(anchors) == 2
+    assert all(a["doc_class"] == "prose" for a in anchors)
+    assert all(a["document_id"] == "prose-doc" for a in anchors)

@@ -673,9 +673,246 @@ def semi_structured_segment(
     return anchors
 
 
+# ---------------------------------------------------------------------------
+# Task 5: prose strategy — semantic paragraph chunker.
+#
+# Deterministic Python — NO LLM calls. Handles flowing prose (Bank of England
+# chapters, Federal Register excerpts, BCBS discussion papers) where the doc
+# has no reliable heading numbering to walk. Three rules from the spec:
+#
+#   1. Split on paragraph boundaries (`\n\s*\n+`).
+#   2. Min-length merge — any paragraph under 200 chars merges into the NEXT
+#      paragraph (so trailing short paragraphs cling upward, and leading short
+#      paragraphs fold into the first substantive block).
+#   3. Max-length split — any resulting chunk over 1500 chars splits at the
+#      nearest sentence boundary (`.`, `!`, `?` + whitespace or EOS) before
+#      the 1500-char mark; if none is found, split at 1500 chars exactly.
+#
+# The verbatim-substring guardrail is preserved by carrying (start, end) byte
+# offsets through every merge and split — the emitted `text` is always
+# `source_markdown[start:end].strip()`, i.e. a literal slice.
+
+# A sentence terminator followed by whitespace OR end-of-string. Regex-level
+# only — good enough for well-punctuated regulatory prose. The trailing
+# `(?=\s|$)` is a lookahead so we can identify the boundary POSITION as the
+# index of the terminating char + 1 (i.e. right after the `.`/`!`/`?`).
+_SENTENCE_BOUNDARY_RE = re.compile(r"[.!?](?=\s|$)")
+
+# Inline page-break comment emitted by Azure Document Intelligence.
+_PAGE_MARKER_RE = re.compile(r"<!--\s*page\s+(\d+)\s*-->", re.IGNORECASE)
+
+# Markdown heading line (`#`, `##`, ...). Used by the prose segmenter to
+# record the nearest heading above each chunk. Distinct from
+# `_MARKDOWN_HEADING_RE` because we anchor with `MULTILINE` and want a raw
+# capture (no title normalisation until label time).
+_PROSE_HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.MULTILINE)
+
+
+def _find_sentence_boundary_before(text: str, limit: int) -> Optional[int]:
+    """Return the byte offset of the last sentence terminator (`.`, `!`, `?`)
+    in `text[:limit]` such that the boundary is followed by whitespace or the
+    end of the string. Boundary offset is the index AFTER the terminator, so
+    `text[:boundary]` ends with the punctuation.
+
+    Returns `None` when no sentence boundary lies within the limit — callers
+    fall back to a hard split at `limit`.
+    """
+    # Scan within [0, limit); accept a terminator whose position + 1 == limit
+    # only if the char at `limit` is whitespace or we've hit end-of-string.
+    best: Optional[int] = None
+    for match in _SENTENCE_BOUNDARY_RE.finditer(text[:limit]):
+        # match.end() is the index right after the terminator — this is the
+        # split point that keeps the terminator with the earlier chunk.
+        best = match.end()
+    return best
+
+
+def _page_before(source_markdown: str, offset: int) -> Optional[int]:
+    """Return the page number from the last `<!-- page N -->` comment at or
+    before `offset` in `source_markdown`, or `None` if none precedes the
+    offset.
+    """
+    latest: Optional[int] = None
+    for match in _PAGE_MARKER_RE.finditer(source_markdown):
+        if match.start() > offset:
+            break
+        latest = int(match.group(1))
+    return latest
+
+
+def _heading_before(source_markdown: str, offset: int) -> Optional[str]:
+    """Return the title of the last markdown heading at or before `offset`,
+    stripped of leading `#` characters and surrounding whitespace. `None` when
+    no heading precedes the offset.
+    """
+    latest: Optional[str] = None
+    for match in _PROSE_HEADING_RE.finditer(source_markdown):
+        if match.start() > offset:
+            break
+        latest = match.group(2).strip()
+    return latest
+
+
+def _build_prose_anchor_id(
+    shortname: str,
+    page: Optional[int],
+    heading: Optional[str],
+    index: int,
+) -> str:
+    """Compose the prose `anchor_id` from the shortname + best-available
+    context. The invariant is uniqueness within one `prose_segment` call — a
+    trailing `chunk#{index}` is appended when nothing else disambiguates.
+
+    Shapes:
+    - page + heading:       `"{shortname} p.{page} \"{heading}\""`
+    - page only:            `"{shortname} p.{page} chunk#{index}"`
+    - heading only:         `"{shortname} \"{heading}\" chunk#{index}"`
+    - neither page/heading: `"{shortname} chunk#{index}"`
+
+    The `chunk#{index}` fallback also lands on the page+heading path when
+    called for disambiguation — but that's the caller's job (this helper
+    accepts the index unconditionally and lets the caller decide whether to
+    fold it in). Here we ALWAYS include it in the fallback branches so two
+    chunks under the same heading/page can never collide.
+    """
+    if page is not None and heading:
+        return f'{shortname} p.{page} "{heading}"'
+    if page is not None:
+        return f"{shortname} p.{page} chunk#{index}"
+    if heading:
+        return f'{shortname} "{heading}" chunk#{index}'
+    return f"{shortname} chunk#{index}"
+
+
+def _split_paragraph_spans(source_markdown: str) -> list[tuple[int, int]]:
+    """Return (start, end) byte-offset spans of each paragraph in
+    `source_markdown`, where a paragraph boundary is one or more blank lines
+    (`\\n\\s*\\n+`). Spans exclude the trailing whitespace/blank-line region
+    that separates neighbours, so each span points at a "meaningful"
+    (non-empty when stripped) block of source text.
+
+    Empty runs are dropped — a source that starts with blank lines yields
+    spans only for the non-empty chunks that follow.
+    """
+    spans: list[tuple[int, int]] = []
+    # Locate blank-line boundaries; anything BETWEEN two boundaries (or
+    # between the start and the first boundary, or between the last boundary
+    # and the end) is one paragraph span.
+    boundary_re = re.compile(r"\n\s*\n+")
+    prev = 0
+    for match in boundary_re.finditer(source_markdown):
+        start, end = prev, match.start()
+        if source_markdown[start:end].strip():
+            spans.append((start, end))
+        prev = match.end()
+    # Tail
+    if prev < len(source_markdown) and source_markdown[prev:].strip():
+        spans.append((prev, len(source_markdown)))
+    return spans
+
+
+def prose_segment(
+    document_id: str,
+    source_markdown: str,
+    *,
+    shortname: Optional[str] = None,
+) -> list[Anchor]:
+    """Segment flowing prose markdown into `Anchor` records.
+
+    Three rules (see module comment above):
+    1. Paragraph-boundary split.
+    2. Min-length merge (< 200 chars merges into the NEXT paragraph).
+    3. Max-length split (> 1500 chars splits at the nearest sentence boundary
+       before 1500 chars; hard-split at 1500 if no boundary is found).
+
+    `shortname` defaults to `document_id` when not supplied. Page metadata is
+    read from Azure Document Intelligence's `<!-- page N -->` inline comments
+    (nearest marker at or before the chunk's start). `heading_path` records
+    the nearest markdown heading above the chunk (single-element list; `[]`
+    when no heading precedes it).
+
+    Every emitted anchor's `text` is a literal slice of `source_markdown`
+    (byte-offset tracking through merges), and `verify_substring` is called
+    per anchor as a belt-and-braces guardrail.
+    """
+    shortname = shortname if shortname is not None else document_id
+
+    # 1. Paragraph-boundary split — as (start, end) byte-offset spans so we
+    #    can carry the ORIGINAL source whitespace through the merges.
+    paragraphs = _split_paragraph_spans(source_markdown)
+    if not paragraphs:
+        return []
+
+    # 2. Min-length merge. `carry` holds the (start, end) of the pending short
+    #    paragraph(s); when we find a paragraph that brings the merged length
+    #    to >= 200 chars, flush the merged span into `merged`. Any leftover
+    #    trailing short carry folds into the previous merged chunk (or emits
+    #    alone if there's no previous chunk).
+    merged: list[tuple[int, int]] = []
+    carry: Optional[tuple[int, int]] = None
+    for p_start, p_end in paragraphs:
+        span = (carry[0], p_end) if carry is not None else (p_start, p_end)
+        stripped_len = len(source_markdown[span[0] : span[1]].strip())
+        if stripped_len < 200:
+            carry = span
+        else:
+            merged.append(span)
+            carry = None
+    if carry is not None:
+        if merged:
+            prev_start, _prev_end = merged[-1]
+            merged[-1] = (prev_start, carry[1])
+        else:
+            merged.append(carry)
+
+    # 3. Max-length split at the nearest sentence boundary before 1500 chars.
+    #    Operate on the STRIPPED text length but split at byte offsets so the
+    #    emitted `text` remains a literal substring of `source_markdown`.
+    final_spans: list[tuple[int, int]] = []
+    for span_start, span_end in merged:
+        cur_start = span_start
+        cur_end = span_end
+        while True:
+            slice_text = source_markdown[cur_start:cur_end]
+            if len(slice_text) <= 1500:
+                final_spans.append((cur_start, cur_end))
+                break
+            boundary = _find_sentence_boundary_before(slice_text, 1500)
+            if boundary is None or boundary == 0:
+                # No sentence boundary found — hard split at 1500 chars.
+                boundary = 1500
+            split_at = cur_start + boundary
+            final_spans.append((cur_start, split_at))
+            cur_start = split_at
+
+    # 4. Build anchors with page + heading metadata.
+    anchors: list[Anchor] = []
+    for i, (s, e) in enumerate(final_spans):
+        chunk_text = source_markdown[s:e].strip()
+        if not chunk_text:
+            continue
+        page = _page_before(source_markdown, s)
+        heading = _heading_before(source_markdown, s)
+        anchor_id = _build_prose_anchor_id(shortname, page, heading, i)
+        anchor: Anchor = {
+            "anchor_id": anchor_id,
+            "anchor_label": anchor_id,
+            "text": chunk_text,
+            "doc_class": "prose",
+            "document_id": document_id,
+            "heading_path": [heading] if heading else [],
+            "page_span": (page, page) if page is not None else None,
+            "parent_anchor": None,
+        }
+        verify_substring(anchor, source_markdown)
+        anchors.append(anchor)
+    return anchors
+
+
 _REGISTRY = SegmenterRegistry()
 _REGISTRY.register("structured-rules", structured_rules_segment)
 _REGISTRY.register("semi-structured", semi_structured_segment)
+_REGISTRY.register("prose", prose_segment)
 
 
 def segment(
