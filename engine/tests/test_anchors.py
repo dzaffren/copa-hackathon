@@ -385,3 +385,34 @@ The second principle body text.
         assert (
             "An intro paragraph attached to the section 1 heading" not in anchor["text"]
         )
+
+
+def test_semi_structured_verifies_substring(monkeypatch):
+    """Every emitted anchor's `text` MUST pass `verify_substring` — the
+    verbatim-citation guardrail. Wraps `verify_substring` with a spy and
+    asserts one call per emitted anchor, all passing.
+    """
+    import engine.anchors as anchors_module
+
+    calls: list[tuple[str, str]] = []
+    real_verify = anchors_module.verify_substring
+
+    def spy(anchor: Anchor, source: str) -> None:
+        calls.append((anchor["anchor_id"], anchor["text"]))
+        real_verify(anchor, source)
+
+    monkeypatch.setattr(anchors_module, "verify_substring", spy)
+
+    anchors = anchors_module.semi_structured_segment(
+        document_id="bcbs-cre",
+        source_markdown=_BCBS_CRE_MARKDOWN,
+        shortname="BCBS CRE",
+    )
+
+    # One call per emitted anchor, in emission order.
+    assert len(calls) == len(anchors) == 4
+    assert [call[0] for call in calls] == [a["anchor_id"] for a in anchors]
+    # Every text is a genuine substring of the source (real_verify would raise
+    # otherwise — this line asserts no exceptions leaked through).
+    for anchor in anchors:
+        assert anchor["text"] in _BCBS_CRE_MARKDOWN
