@@ -304,3 +304,49 @@ def test_semi_structured_bcbs_cre_numbered_paragraphs():
         assert anchor["doc_class"] == "semi-structured"
         assert anchor["document_id"] == "bcbs-cre"
         assert anchor["text"] in _BCBS_CRE_MARKDOWN
+
+
+_MAS_637_MARKDOWN = """# Section 7 Credit Risk
+
+Introductory paragraph for section 7 that must be dropped because Section 7 has children.
+
+## 7.3 Standardised Approach
+
+Introductory paragraph for 7.3 that must be dropped because 7.3 has a child.
+
+### 7.3.15 Residential mortgage risk weights
+
+A financial institution shall apply a risk weight of 35% to a residential mortgage loan that meets the eligibility criteria set out in this paragraph.
+
+The loan must be secured by a first legal charge over the property.
+"""
+
+
+def test_semi_structured_mas_637_headings():
+    """MAS 637-style 3-level markdown heading (`# Section 7 → ## 7.3 → ### 7.3.15`).
+
+    Only the leaf `7.3.15` gets an anchor; parents are internal nodes. The
+    `heading_path` records the enclosing headings, most-general first, with
+    header prefixes stripped. `section_mark=True` inserts `§` between the
+    shortname and the numeric path — the MAS/BoE citation convention.
+    """
+    anchors = semi_structured_segment(
+        document_id="mas-637-2024-07",
+        source_markdown=_MAS_637_MARKDOWN,
+        shortname="MAS 637",
+        section_mark=True,
+    )
+
+    assert len(anchors) == 1
+    leaf = anchors[0]
+    assert leaf["anchor_id"] == "MAS 637 §7.3.15"
+    assert leaf["anchor_label"] == "MAS 637 §7.3.15"
+    assert leaf["doc_class"] == "semi-structured"
+    assert leaf["document_id"] == "mas-637-2024-07"
+    assert leaf["heading_path"] == [
+        "Section 7 Credit Risk",
+        "7.3 Standardised Approach",
+    ]
+    # Text starts with the leaf's own paragraph and is a substring of source.
+    assert leaf["text"].startswith("A financial institution shall apply")
+    assert leaf["text"] in _MAS_637_MARKDOWN

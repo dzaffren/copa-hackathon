@@ -384,11 +384,21 @@ def _parse_semi_structured(source_markdown: str) -> list[_Heading]:
             level = len(hashes)
             start = offsets[i]
             content_start = offsets[i + 1] if i + 1 < len(offsets) else running
+            # A markdown heading whose title STARTS with a numeric path
+            # (`## 7.3 Standardised Approach`) carries a citation key — pull
+            # the number out so the leaf detector treats it as part of the
+            # numeric hierarchy. Otherwise it stays a bare markdown ancestor.
+            inner_num_match = _NUMBERED_HEADING_RE.match(title.strip())
+            num_path = ""
+            heading_title = title.strip()
+            if inner_num_match:
+                num_path = inner_num_match.group("num")
+                heading_title = (inner_num_match.group("title") or "").strip()
             headings.append(
                 _Heading(
                     level=level,
-                    num_path="",
-                    title=title.strip(),
+                    num_path=num_path,
+                    title=heading_title,
                     start=start,
                     content_start=content_start,
                 )
@@ -607,10 +617,10 @@ def _text_for_leaf(
             end = other.start
             break
     passage = source_markdown[leaf.content_start : end]
-    # Trim trailing whitespace/newlines so the anchor doesn't dangle a blank
-    # line into the next section. `.rstrip()` keeps the passage a literal
-    # substring because we only shrink the right edge.
-    return passage.rstrip()
+    # Trim leading/trailing whitespace so the anchor doesn't dangle blank
+    # lines into either neighbour. `.strip()` keeps the passage a literal
+    # substring because we only shrink the edges.
+    return passage.strip()
 
 
 def semi_structured_segment(
