@@ -22,7 +22,18 @@ import logging
 from pathlib import Path
 from typing import Any, Callable, Optional, Union, cast
 
+from engine.anchors import (
+    Anchor,
+    AnchorIndex,
+    SegmenterRegistry,
+    _REGISTRY as _DEFAULT_ANCHOR_REGISTRY,
+    prose_segment,
+    semi_structured_segment,
+    structured_rules_segment,
+    verify_substring,
+)
 from engine.clauses import (
+    POLICY_SHORT_NAMES,
     ClauseEntry,
     ClauseIndex,
     build_reference_clause,
@@ -108,9 +119,7 @@ def run_build(
         # (e.g. the Unicode minus U+2212), which the platform-default encoding on
         # Windows cannot write. All artifact writes must be UTF-8 for the offline
         # build to run cross-platform.
-        (ingest_debug_dir / f"{document_id}.md").write_text(
-            markdown, encoding="utf-8"
-        )
+        (ingest_debug_dir / f"{document_id}.md").write_text(markdown, encoding="utf-8")
         logger.info("[%d/%d] parsing clauses for %s", n, len(documents), document_id)
         entries = segment_fn(
             markdown,
@@ -234,6 +243,295 @@ def run_build(
         )
 
 
+# ---------------------------------------------------------------------------
+# Task 7: anchor-index build pipeline.
+#
+# Reads `data/corpus/manifest.json`, dispatches each `in_mvp1: true` document
+# through the doc_class-appropriate segmenter (registered on
+# `engine.anchors._REGISTRY`), unions the anchors into one `AnchorIndex`, and
+# writes `data/artifacts/anchor-index.json` as a list of Anchor dicts (the
+# shape `AnchorIndex(json.loads(...))` consumes for a straight round-trip).
+#
+# Failure handling is loud-but-tolerant per the spec: a missing source_path is
+# a WARNING + skip, a segmenter crash is an ERROR + skip. Only a
+# verify_substring failure (an anchor whose text is NOT a substring of the
+# source) aborts the build — that's the verbatim-citation guardrail the whole
+# KG engine relies on and must never silently pass.
+
+
+# Per-document_id override map for structured-rules documents whose manifest
+# `document_id` cannot be derived to a POLICY_SHORT_NAMES key by the token
+# heuristic below (e.g. `bnm-ai-financial-sector-dp` → `ai-dp`).
+_STRUCTURED_RULES_KEY_OVERRIDE: dict[str, str] = {
+    "bnm-ai-financial-sector-dp": "ai-dp",
+    "bnm-operational-resilience-dp-dec2025": "opres",
+    "bnm-rmit-nov25": "rmit",
+    "bnm-rmit-june2023": "rmit",
+    "bnm-outsourcing-2019": "outsourcing",
+    "bnm-bcm-pd": "bcm",
+    "bnm-recovery-planning-pd": "recovery-planning",
+}
+
+
+def _derive_structured_rules_key(document_id: str) -> Optional[str]:
+    """Best-effort derivation of a POLICY_SHORT_NAMES key from a manifest
+    document_id.
+
+    The structured-rules segmenter expects its `document_id` argument to be a
+    key in `engine.clauses.POLICY_SHORT_NAMES` (e.g. `"rmit"`, `"outsourcing"`).
+    Manifest ids are richer (`"bnm-rmit-nov25"`, `"bnm-outsourcing-2019"`), so
+    we first consult a hand-curated override table, then fall back to
+    tokenising the manifest id and looking for a POLICY_SHORT_NAMES key that
+    appears as a token — longest key first so `"recovery-planning"` beats
+    `"recovery"` if both were registered. Returns `None` when no key matches;
+    the caller logs and skips.
+    """
+    if document_id in POLICY_SHORT_NAMES:
+        return document_id
+    if document_id in _STRUCTURED_RULES_KEY_OVERRIDE:
+        return _STRUCTURED_RULES_KEY_OVERRIDE[document_id]
+    tokens = document_id.replace("_", "-").split("-")
+    token_set = set(tokens)
+    for key in sorted(POLICY_SHORT_NAMES, key=len, reverse=True):
+        # Match either the whole key as a token, or the key as a hyphenated
+        # substring of the id — covers `"recovery-planning"` inside
+        # `"bnm-recovery-planning-pd"`.
+        if key in token_set:
+            return key
+        if key in document_id and "-" in key:
+            return key
+    return None
+
+
+# Per-document_id shortname overrides for the 25 MVP1 manifest entries — used
+# when two documents from the same issuer would otherwise collide on an issuer
+# prefix (e.g. both BIS papers producing "BIS 1"). Keyed by manifest
+# `document_id`; entries without an override fall back to the issuer mapping.
+_SHORTNAME_BY_DOCUMENT_ID: dict[str, str] = {
+    "bis-d575-digitalisation": "BIS d575",
+    "bis-pap168-open-finance": "BIS Pap168",
+    "hkma-open-api-framework-2018": "HKMA OpenAPI",
+    "hkma-open-api-next-phase": "HKMA OpenAPI NextPhase",
+    "mas-abs-api-playbook": "ABS-MAS Playbook",
+    "cma-open-banking-roadmap-may2020": "CMA Roadmap",
+    "cma-retail-banking-final-report-summary": "CMA Retail Banking",
+    "bnm-open-api-bulletin": "BNM OpenAPI Bulletin",
+}
+
+# A tiny mapping from manifest issuer to a shortname used as the anchor_id
+# prefix for semi-structured / prose segmenters when no per-document override
+# applies. Keyed by manifest `issuer`.
+_SHORTNAME_BY_ISSUER: dict[str, str] = {
+    "MAS": "MAS",
+    "Bank of England": "BoE",
+    "BCBS": "BCBS",
+    "BIS": "BIS",
+    "HKMA": "HKMA",
+    "CMA": "CMA",
+    "BNM": "BNM",
+}
+
+
+def _derive_shortname(entry: dict[str, Any]) -> str:
+    """Return the anchor_id prefix for a semi-structured / prose entry.
+
+    Preference order: explicit `shortname` on the manifest entry →
+    per-document_id override → derived from issuer → `document_id` (fallback).
+    Never returns an empty string.
+    """
+    explicit = entry.get("shortname")
+    if isinstance(explicit, str) and explicit.strip():
+        return explicit.strip()
+    document_id = entry.get("document_id", "")
+    if document_id in _SHORTNAME_BY_DOCUMENT_ID:
+        return _SHORTNAME_BY_DOCUMENT_ID[document_id]
+    issuer = entry.get("issuer")
+    if isinstance(issuer, str) and issuer in _SHORTNAME_BY_ISSUER:
+        return _SHORTNAME_BY_ISSUER[issuer]
+    return document_id
+
+
+def build_anchor_index(
+    manifest_path: Path,
+    artifacts_dir: Path,
+    ingest_fn: IngestFn = ingest_document,
+    repo_root: Optional[Path] = None,
+    segmenter_registry: Optional[SegmenterRegistry] = None,
+    require_source_exists: bool = True,
+) -> AnchorIndex:
+    """Read the corpus manifest, segment every in_mvp1 document, write
+    `anchor-index.json`, and return the constructed `AnchorIndex`.
+
+    Args:
+        manifest_path: path to `data/corpus/manifest.json`.
+        artifacts_dir: directory to write `anchor-index.json` into.
+        ingest_fn: PDF-to-markdown seam (defaults to
+            `engine.ingest.ingest_document`; tests inject a stub).
+        repo_root: root against which each entry's `source_path` is resolved.
+            Defaults to `manifest_path.parent.parent.parent` — i.e. the repo
+            containing `data/corpus/manifest.json`.
+        segmenter_registry: dispatch table for `doc_class -> segmenter fn`.
+            Defaults to the module-level registry in `engine.anchors`.
+        require_source_exists: when True (production default), missing source
+            files are WARNed and skipped; when False, `ingest_fn` is called
+            unconditionally (useful for stubbed-ingest tests).
+
+    Returns the freshly-built AnchorIndex. Also writes the JSON artifact.
+    """
+    registry = (
+        segmenter_registry
+        if segmenter_registry is not None
+        else _DEFAULT_ANCHOR_REGISTRY
+    )
+    resolved_root = (
+        repo_root
+        if repo_root is not None
+        else manifest_path.resolve().parent.parent.parent
+    )
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    entries = manifest.get("documents", [])
+
+    all_anchors: list[Anchor] = []
+    seen_ids: set[str] = set()
+    kept = 0
+    skipped = 0
+    for entry in entries:
+        document_id = entry.get("document_id", "<unknown>")
+        if not entry.get("in_mvp1"):
+            logger.info("skipping %s: in_mvp1=false", document_id)
+            skipped += 1
+            continue
+
+        source_path = resolved_root / entry["source_path"]
+        if require_source_exists and not source_path.exists():
+            logger.warning(
+                "skipping %s: source_path %s not on disk",
+                document_id,
+                source_path,
+            )
+            skipped += 1
+            continue
+
+        doc_class = entry["doc_class"]
+        segmenter_fn = registry.get(doc_class)
+        if segmenter_fn is None:
+            logger.error(
+                "skipping %s: no segmenter registered for doc_class %r",
+                document_id,
+                doc_class,
+            )
+            skipped += 1
+            continue
+
+        try:
+            markdown = ingest_fn(source_path)
+        except Exception as exc:  # pragma: no cover - ingest error is per-doc
+            logger.error("skipping %s: ingest failed (%s)", document_id, exc)
+            skipped += 1
+            continue
+
+        # Build the call the segmenter expects for its doc_class. Only the
+        # structured-rules strategy is picky about its `document_id` argument
+        # (must be a POLICY_SHORT_NAMES key); the semi-structured / prose
+        # strategies accept the manifest id as-is plus a shortname kwarg.
+        # A caller-supplied registry always wins — tests inject custom
+        # segmenters to exercise the guardrail; production routes through the
+        # default registry via the doc_class-specific helpers below.
+        try:
+            if segmenter_registry is not None:
+                anchors = segmenter_fn(document_id, markdown)
+            elif doc_class == "structured-rules":
+                key = _derive_structured_rules_key(document_id)
+                if key is None:
+                    logger.error(
+                        "skipping %s: no POLICY_SHORT_NAMES key can be derived "
+                        "(add one to engine.clauses.POLICY_SHORT_NAMES or use a "
+                        "different doc_class)",
+                        document_id,
+                    )
+                    skipped += 1
+                    continue
+                anchors = structured_rules_segment(key, markdown)
+                # Re-tag document_id back to the manifest id so callers can
+                # look up anchors by the same id the manifest declares.
+                for anchor in anchors:
+                    anchor["document_id"] = document_id
+            elif doc_class == "semi-structured":
+                shortname = _derive_shortname(entry)
+                anchors = semi_structured_segment(
+                    document_id, markdown, shortname=shortname
+                )
+            elif doc_class == "prose":
+                shortname = _derive_shortname(entry)
+                anchors = prose_segment(document_id, markdown, shortname=shortname)
+            else:
+                # Unknown class handled by an ad-hoc registered segmenter.
+                anchors = segmenter_fn(document_id, markdown)
+        except Exception as exc:
+            # Anchor-text-not-found bubbles up — that's the guardrail. All
+            # other segmenter errors are per-doc failures: log + skip.
+            from engine.anchors import AnchorTextNotFoundError
+
+            if isinstance(exc, AnchorTextNotFoundError):
+                raise
+            logger.error(
+                "skipping %s: segmenter (%s) crashed: %s",
+                document_id,
+                doc_class,
+                exc,
+            )
+            skipped += 1
+            continue
+
+        # Belt-and-braces substring check — every registered strategy already
+        # calls verify_substring internally, but a custom test registry might
+        # not, so we re-verify here. Cheap: substring test is O(n).
+        for anchor in anchors:
+            verify_substring(anchor, markdown)
+
+        # Two manifest entries can legitimately share a shortname (e.g. two
+        # RMiT versions both mapping to "rmit"): the second run's clause IDs
+        # collide with the first. Drop the collisions with a WARNING rather
+        # than let `AnchorIndex(...)` raise — the first winner is the earlier
+        # manifest entry, which matches the manifest's insertion order.
+        deduped: list[Anchor] = []
+        for anchor in anchors:
+            aid = anchor["anchor_id"]
+            if aid in seen_ids:
+                logger.warning(
+                    "dropping duplicate anchor_id %r from %s (already emitted "
+                    "by an earlier manifest entry — likely two documents share "
+                    "a shortname; disambiguate via shortname or per-document override)",
+                    aid,
+                    document_id,
+                )
+                continue
+            seen_ids.add(aid)
+            deduped.append(anchor)
+
+        all_anchors.extend(deduped)
+        kept += 1
+
+    index = AnchorIndex(all_anchors)
+
+    artifacts_dir.mkdir(parents=True, exist_ok=True)
+    out_path = artifacts_dir / "anchor-index.json"
+    # List-of-anchors shape — the ctor consumes this directly on reload.
+    out_path.write_text(
+        json.dumps(index.all(), indent=2, sort_keys=False),
+        encoding="utf-8",
+    )
+    logger.info(
+        "Wrote %d anchors from %d documents (skipped %d) to %s",
+        len(index),
+        kept,
+        skipped,
+        out_path,
+    )
+    return index
+
+
 def main() -> None:
     import argparse
 
@@ -257,6 +555,23 @@ def main() -> None:
             "Build only these document ids (space-separated). Useful for "
             "testing one document end-to-end before the full corpus. Curated "
             "edges referencing an excluded policy are dropped for the run."
+        ),
+    )
+    parser.add_argument(
+        "--with-anchors",
+        action="store_true",
+        help=(
+            "In addition to (or instead of) the legacy clause-index build, "
+            "read data/corpus/manifest.json and produce "
+            "data/artifacts/anchor-index.json."
+        ),
+    )
+    parser.add_argument(
+        "--anchors-only",
+        action="store_true",
+        help=(
+            "Only run the anchor-index build; skip the legacy clause-index / "
+            "graph / verdicts pipeline entirely."
         ),
     )
     args = parser.parse_args()
@@ -301,21 +616,30 @@ def main() -> None:
         reference_edges = []
         connection_fixtures = []
 
-    draft_registry_path = REPO_ROOT / "data" / "draft_registry.json"
-    draft_registry = json.loads(draft_registry_path.read_text())
+    artifacts_dir = REPO_ROOT / "data" / "artifacts"
 
-    run_build(
-        documents=cast(dict[str, dict[str, Any]], documents),
-        curated_edges=curated_edges,
-        draft_registry=draft_registry,
-        output_dir=REPO_ROOT / "data" / "artifacts",
-        reference_documents=cast(
-            dict[str, dict[str, Any]], reference_documents
-        ),
-        reference_edges=reference_edges,
-        connection_fixtures=connection_fixtures,
-    )
-    logger.info("build complete → %s", REPO_ROOT / "data" / "artifacts")
+    if not args.anchors_only:
+        draft_registry_path = REPO_ROOT / "data" / "draft_registry.json"
+        draft_registry = json.loads(draft_registry_path.read_text())
+
+        run_build(
+            documents=cast(dict[str, dict[str, Any]], documents),
+            curated_edges=curated_edges,
+            draft_registry=draft_registry,
+            output_dir=artifacts_dir,
+            reference_documents=cast(dict[str, dict[str, Any]], reference_documents),
+            reference_edges=reference_edges,
+            connection_fixtures=connection_fixtures,
+        )
+        logger.info("build complete → %s", artifacts_dir)
+
+    if args.with_anchors or args.anchors_only:
+        manifest_path = REPO_ROOT / "data" / "corpus" / "manifest.json"
+        build_anchor_index(
+            manifest_path=manifest_path,
+            artifacts_dir=artifacts_dir,
+        )
+        logger.info("anchor-index build complete → %s", artifacts_dir)
 
 
 if __name__ == "__main__":

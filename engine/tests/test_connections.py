@@ -131,7 +131,7 @@ FIXED_NOW = datetime(2026, 7, 8, 12, 0, 0, tzinfo=timezone.utc)
 # --- Stub agent turns -------------------------------------------------------
 
 
-def _finder_returns_conflict(doc_a_id, doc_b_id, clause_index):
+def _finder_returns_conflict(doc_a_id, doc_b_id, anchor_index):
     """Finder pass: proposes the 12.1 ↔ 17.1 conflict, no scope note yet."""
     return [
         {
@@ -139,13 +139,14 @@ def _finder_returns_conflict(doc_a_id, doc_b_id, clause_index):
                 "RMiT 17.1 (notify-after amendment) conflicts with Outsourcing "
                 "12.1 (approve-before)."
             ),
-            "source_clauses": ["RMiT 17.1"],
-            "target_clauses": ["Outsourcing 12.1"],
+            "label": "conflicts-with",
+            "source_anchors": ["RMiT 17.1"],
+            "target_anchors": ["Outsourcing 12.1"],
         }
     ]
 
 
-def _critic_scopes_and_adds_dependency(doc_a_id, doc_b_id, clause_index, candidates):
+def _critic_scopes_and_adds_dependency(doc_a_id, doc_b_id, anchor_index, candidates):
     """Critic pass: scopes the finder's conflict with the 12.4 affiliate
     exemption AND surfaces the missed 17.2 → 17.1 dependency (recall)."""
     return [
@@ -155,8 +156,9 @@ def _critic_scopes_and_adds_dependency(doc_a_id, doc_b_id, clause_index, candida
                 "12.1 (approve-before) where the cloud service is also a "
                 "material outsourcing."
             ),
-            "source_clauses": ["RMiT 17.1"],
-            "target_clauses": ["Outsourcing 12.1"],
+            "label": "conflicts-with",
+            "source_anchors": ["RMiT 17.1"],
+            "target_anchors": ["Outsourcing 12.1"],
             "scope_note": (
                 "Applies only where the cloud service is a material outsourcing; "
                 "Outsourcing 12.4 exempts intra-group affiliate arrangements."
@@ -167,19 +169,20 @@ def _critic_scopes_and_adds_dependency(doc_a_id, doc_b_id, clause_index, candida
                 "RMiT 17.2 depends on a prior 17.1 consultation that the "
                 "amendment removes."
             ),
-            "source_clauses": ["RMiT 17.2"],
-            "target_clauses": ["RMiT 17.1"],
+            "label": "aligns-with",
+            "source_anchors": ["RMiT 17.2"],
+            "target_anchors": ["RMiT 17.1"],
         },
     ]
 
 
 def test_two_agent_loop_surfaces_conflict_and_critic_found_dependency(tmp_path):
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
 
     result = find_connections(
         "rmit-v2-2026-draft",
         "outsourcing-v1-2019",
-        clause_index,
+        anchor_index,
         finder_fn=_finder_returns_conflict,
         critic_fn=_critic_scopes_and_adds_dependency,
         output_dir=tmp_path,
@@ -193,16 +196,12 @@ def test_two_agent_loop_surfaces_conflict_and_critic_found_dependency(tmp_path):
     conflict = next(
         c
         for c in connections
-        if any(sc["clause_number"] == "RMiT 17.1" for sc in c["source_clauses"])
-        and any(
-            tc["clause_number"] == "Outsourcing 12.1" for tc in c["target_clauses"]
-        )
+        if any(sc["anchor_id"] == "RMiT 17.1" for sc in c["source_anchors"])
+        and any(tc["anchor_id"] == "Outsourcing 12.1" for tc in c["target_anchors"])
     )
     assert conflict["supported"] is True
     target_12_1 = next(
-        tc
-        for tc in conflict["target_clauses"]
-        if tc["clause_number"] == "Outsourcing 12.1"
+        tc for tc in conflict["target_anchors"] if tc["anchor_id"] == "Outsourcing 12.1"
     )
     assert target_12_1["text"] == OUTSOURCING_12_1_TEXT
     assert "affiliate" in conflict["scope_note"]
@@ -211,8 +210,8 @@ def test_two_agent_loop_surfaces_conflict_and_critic_found_dependency(tmp_path):
     dependency = next(
         c
         for c in connections
-        if any(sc["clause_number"] == "RMiT 17.2" for sc in c["source_clauses"])
-        and any(tc["clause_number"] == "RMiT 17.1" for tc in c["target_clauses"])
+        if any(sc["anchor_id"] == "RMiT 17.2" for sc in c["source_anchors"])
+        and any(tc["anchor_id"] == "RMiT 17.1" for tc in c["target_anchors"])
     )
     assert dependency["supported"] is True
 
@@ -223,30 +222,31 @@ def test_two_agent_loop_surfaces_conflict_and_critic_found_dependency(tmp_path):
     assert trace["model_id"]
     assert trace["timestamp"] == FIXED_NOW.isoformat()
     assert trace["finder_output"] == _finder_returns_conflict(
-        "rmit-v2-2026-draft", "outsourcing-v1-2019", clause_index
+        "rmit-v2-2026-draft", "outsourcing-v1-2019", anchor_index
     )
     assert trace["critic_output"] == _critic_scopes_and_adds_dependency(
-        "rmit-v2-2026-draft", "outsourcing-v1-2019", clause_index, []
+        "rmit-v2-2026-draft", "outsourcing-v1-2019", anchor_index, []
     )
     assert trace["validation"]
 
 
 def test_unsupported_candidate_from_critic_is_flagged_not_invented(tmp_path):
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
 
-    def critic_emits_absent_clause(doc_a_id, doc_b_id, clause_index, candidates):
+    def critic_emits_absent_clause(doc_a_id, doc_b_id, anchor_index, candidates):
         return [
             {
                 "summary": "RMiT 17.1 conflicts with a cyber-resilience requirement.",
-                "source_clauses": ["RMiT 17.1"],
-                "target_clauses": ["Cyber 4.4"],
+                "label": "conflicts-with",
+                "source_anchors": ["RMiT 17.1"],
+                "target_anchors": ["Cyber 4.4"],
             }
         ]
 
     result = find_connections(
         "rmit-v2-2026-draft",
         "outsourcing-v1-2019",
-        clause_index,
+        anchor_index,
         finder_fn=_finder_returns_conflict,
         critic_fn=critic_emits_absent_clause,
         output_dir=tmp_path,
@@ -256,8 +256,8 @@ def test_unsupported_candidate_from_critic_is_flagged_not_invented(tmp_path):
     # The candidate citing the absent Cyber 4.4 never reaches `connections`.
     for connection in result["connections"]:
         cited = [
-            c["clause_number"]
-            for c in connection["source_clauses"] + connection["target_clauses"]
+            c["anchor_id"]
+            for c in connection["source_anchors"] + connection["target_anchors"]
         ]
         assert "Cyber 4.4" not in cited
 
@@ -265,25 +265,25 @@ def test_unsupported_candidate_from_critic_is_flagged_not_invented(tmp_path):
     unsupported = result["unsupported"][0]
     assert unsupported["supported"] is False
     assert unsupported["message"] == "No matching clause found"
-    # No fabricated clause text is attached to an unsupported candidate.
-    assert "source_clauses" not in unsupported
-    assert "target_clauses" not in unsupported
+    # No fabricated anchor text is attached to an unsupported candidate.
+    assert "source_anchors" not in unsupported
+    assert "target_anchors" not in unsupported
 
 
 # --- Turn helpers (pure + parsing, no network) ------------------------------
 
 
 def test_format_clause_context_labels_both_documents_with_numbers_and_text():
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
 
     context = _format_clause_context(
-        clause_index, "rmit-v2-2026-draft", "outsourcing-v1-2019"
+        anchor_index, "rmit-v2-2026-draft", "outsourcing-v1-2019"
     )
 
     # Both document ids appear as labels.
     assert "rmit-v2-2026-draft" in context
     assert "outsourcing-v1-2019" in context
-    # Every clause number of both documents appears...
+    # Every anchor_id of both documents appears...
     assert "RMiT 17.1" in context
     assert "RMiT 17.2" in context
     assert "Outsourcing 12.1" in context
@@ -294,14 +294,14 @@ def test_format_clause_context_labels_both_documents_with_numbers_and_text():
 
 
 def test_finder_turn_parses_call_chat_json_array(monkeypatch):
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
     canned = json.dumps(
         [
             {
                 "summary": "RMiT 17.1 conflicts with Outsourcing 12.1.",
                 "label": "conflicts-with",
-                "source_clauses": ["RMiT 17.1"],
-                "target_clauses": ["Outsourcing 12.1"],
+                "source_anchors": ["RMiT 17.1"],
+                "target_anchors": ["Outsourcing 12.1"],
             }
         ]
     )
@@ -315,22 +315,22 @@ def test_finder_turn_parses_call_chat_json_array(monkeypatch):
 
     monkeypatch.setattr("engine.connections.call_chat", fake_call_chat)
 
-    result = _finder_turn("rmit-v2-2026-draft", "outsourcing-v1-2019", clause_index)
+    result = _finder_turn("rmit-v2-2026-draft", "outsourcing-v1-2019", anchor_index)
 
     assert result == json.loads(canned)
-    # The finder handed the model both documents' clause context.
+    # The finder handed the model both documents' anchor context.
     assert "RMiT 17.1" in captured["user"]
     assert "Outsourcing 12.1" in captured["user"]
 
 
 def test_critic_turn_includes_finder_candidates_in_prompt(monkeypatch):
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
     finder_candidates = [
         {
             "summary": "RMiT 17.1 conflicts with Outsourcing 12.1.",
             "label": "conflicts-with",
-            "source_clauses": ["RMiT 17.1"],
-            "target_clauses": ["Outsourcing 12.1"],
+            "source_anchors": ["RMiT 17.1"],
+            "target_anchors": ["Outsourcing 12.1"],
         }
     ]
     canned = json.dumps(
@@ -339,8 +339,8 @@ def test_critic_turn_includes_finder_candidates_in_prompt(monkeypatch):
             {
                 "summary": "RMiT 17.2 depends on RMiT 17.1.",
                 "label": "aligns-with",
-                "source_clauses": ["RMiT 17.2"],
-                "target_clauses": ["RMiT 17.1"],
+                "source_anchors": ["RMiT 17.2"],
+                "target_anchors": ["RMiT 17.1"],
             }
         ]
     )
@@ -355,37 +355,35 @@ def test_critic_turn_includes_finder_candidates_in_prompt(monkeypatch):
     result = _critic_turn(
         "rmit-v2-2026-draft",
         "outsourcing-v1-2019",
-        clause_index,
+        anchor_index,
         finder_candidates,
     )
 
     assert result == json.loads(canned)
     # The critic prompt carries the finder's candidates for it to scope/refute.
     assert "RMiT 17.1 conflicts with Outsourcing 12.1." in captured["user"]
-    # ...and still the clause context.
+    # ...and still the anchor context.
     assert "Outsourcing 12.4" in captured["user"]
 
 
 def test_finder_turn_raises_on_non_json(monkeypatch):
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
     monkeypatch.setattr(
         "engine.connections.call_chat",
         lambda deployment, system, user, max_tokens=None: "sorry, no JSON here",
     )
     with pytest.raises(LLMResponseError):
-        _finder_turn("rmit-v2-2026-draft", "outsourcing-v1-2019", clause_index)
+        _finder_turn("rmit-v2-2026-draft", "outsourcing-v1-2019", anchor_index)
 
 
 def test_critic_turn_raises_on_non_list_json(monkeypatch):
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
     monkeypatch.setattr(
         "engine.connections.call_chat",
         lambda deployment, system, user, max_tokens=None: json.dumps({"not": "a list"}),
     )
     with pytest.raises(LLMResponseError):
-        _critic_turn(
-            "rmit-v2-2026-draft", "outsourcing-v1-2019", clause_index, []
-        )
+        _critic_turn("rmit-v2-2026-draft", "outsourcing-v1-2019", anchor_index, [])
 
 
 # --- Two-branch paragraph orchestration (spec Task 5) -----------------------
@@ -490,7 +488,9 @@ def test_analyse_paragraph_empty_both_branches_returns_empty():
     turns into no_matching_source (never a fabricated connection)."""
     index = _build_source_index()
 
-    def empty_finder(paragraph_number, paragraph_text, clause_index, branch, source_ids):
+    def empty_finder(
+        paragraph_number, paragraph_text, clause_index, branch, source_ids
+    ):
         return []
 
     result = analyse_paragraph(
@@ -569,8 +569,8 @@ def test_widened_connection_typeddict():
         "summary": "RMiT 17.1 adopts the same notification window as its source.",
         "label": "aligns-with",
         "sentiment": None,
-        "source_clauses": [],
-        "target_clauses": [],
+        "source_anchors": [],
+        "target_anchors": [],
         "scope_note": None,
         "supported": True,
     }
@@ -578,8 +578,8 @@ def test_widened_connection_typeddict():
         "summary": "RMiT 17.1 shortens the notification window its source allows.",
         "label": "differs-on",
         "sentiment": "tighten",
-        "source_clauses": [],
-        "target_clauses": [],
+        "source_anchors": [],
+        "target_anchors": [],
         "scope_note": None,
         "supported": True,
     }
@@ -600,8 +600,8 @@ def test_parse_rejects_missing_label():
         [
             {
                 "summary": "x",
-                "source_clauses": ["RMiT 17.1"],
-                "target_clauses": ["Outsourcing 12.1"],
+                "source_anchors": ["RMiT 17.1"],
+                "target_anchors": ["Outsourcing 12.1"],
             }
         ]
     )
@@ -617,8 +617,8 @@ def test_parse_rejects_unknown_label():
             {
                 "summary": "x",
                 "label": "duplicates",
-                "source_clauses": ["RMiT 17.1"],
-                "target_clauses": ["Outsourcing 12.1"],
+                "source_anchors": ["RMiT 17.1"],
+                "target_anchors": ["Outsourcing 12.1"],
             }
         ]
     )
@@ -635,8 +635,8 @@ def test_parse_rejects_sentiment_on_nondiffers():
                 "summary": "x",
                 "label": "aligns-with",
                 "sentiment": "tighten",
-                "source_clauses": ["RMiT 17.1"],
-                "target_clauses": ["Outsourcing 12.1"],
+                "source_anchors": ["RMiT 17.1"],
+                "target_anchors": ["Outsourcing 12.1"],
             }
         ]
     )
@@ -656,8 +656,8 @@ def test_parse_rejects_unknown_sentiment():
                 "summary": "x",
                 "label": "differs-on",
                 "sentiment": "stricter",
-                "source_clauses": ["RMiT 17.1"],
-                "target_clauses": ["Outsourcing 12.1"],
+                "source_anchors": ["RMiT 17.1"],
+                "target_anchors": ["Outsourcing 12.1"],
             }
         ]
     )
@@ -675,8 +675,8 @@ def test_parse_accepts_sentiment_on_differs():
                 "summary": "x",
                 "label": "differs-on",
                 "sentiment": "tighten",
-                "source_clauses": ["RMiT 17.1"],
-                "target_clauses": ["Outsourcing 12.1"],
+                "source_anchors": ["RMiT 17.1"],
+                "target_anchors": ["Outsourcing 12.1"],
             }
         ]
     )
@@ -739,22 +739,22 @@ def test_branch_finder_turn_parses_labelless_candidates(monkeypatch):
     assert result == json.loads(_LABELLESS_BRANCH_CANDIDATE_JSON)
 
 
-def _finder_direction_aware(doc_a_id, doc_b_id, clause_index):
+def _finder_direction_aware(doc_a_id, doc_b_id, anchor_index):
     """Emit ``goes-beyond`` when RMiT is the OUR side (doc A) and ``silent-on``
     when it is the THEIR side (doc B) — the same finding, direction-flipped. The
-    cited clauses resolve in both directions so only the label changes."""
+    cited anchors resolve in both directions so only the label changes."""
     label = "goes-beyond" if doc_a_id == "rmit-v2-2026-draft" else "silent-on"
     return [
         {
             "summary": "Our side names a cloud-governance officer the other omits.",
             "label": label,
-            "source_clauses": ["RMiT 17.1"],
-            "target_clauses": ["Outsourcing 12.1"],
+            "source_anchors": ["RMiT 17.1"],
+            "target_anchors": ["Outsourcing 12.1"],
         }
     ]
 
 
-def _critic_passthrough(doc_a_id, doc_b_id, clause_index, candidates):
+def _critic_passthrough(doc_a_id, doc_b_id, anchor_index, candidates):
     """Critic that neither refutes nor scopes — it passes candidates through so
     the test isolates direction handling in the validator."""
     return list(candidates)
@@ -763,12 +763,12 @@ def _critic_passthrough(doc_a_id, doc_b_id, clause_index, candidates):
 def test_direction_flip_swaps_silent_and_goesbeyond(tmp_path):
     """Swapping the pair flips ``silent-on`` ⇄ ``goes-beyond`` (a coverage
     asymmetry is directional), while the verbatim citations are unchanged."""
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
 
     forward = find_connections(
         "rmit-v2-2026-draft",
         "outsourcing-v1-2019",
-        clause_index,
+        anchor_index,
         finder_fn=_finder_direction_aware,
         critic_fn=_critic_passthrough,
         output_dir=tmp_path,
@@ -777,7 +777,7 @@ def test_direction_flip_swaps_silent_and_goesbeyond(tmp_path):
     reverse = find_connections(
         "outsourcing-v1-2019",
         "rmit-v2-2026-draft",
-        clause_index,
+        anchor_index,
         finder_fn=_finder_direction_aware,
         critic_fn=_critic_passthrough,
         output_dir=tmp_path,
@@ -794,32 +794,32 @@ def test_direction_flip_swaps_silent_and_goesbeyond(tmp_path):
     # The verbatim citations are identical in both directions — only the label
     # flips (the guardrail is untouched).
     for finding in (forward_finding, reverse_finding):
-        assert [c["clause_number"] for c in finding["source_clauses"]] == ["RMiT 17.1"]
-        assert [c["clause_number"] for c in finding["target_clauses"]] == [
+        assert [c["anchor_id"] for c in finding["source_anchors"]] == ["RMiT 17.1"]
+        assert [c["anchor_id"] for c in finding["target_anchors"]] == [
             "Outsourcing 12.1"
         ]
 
 
 def test_write_trace_records_label_and_sentiment(tmp_path):
     """Every ``validation`` entry in the connection-trace records the finding's
-    ``label`` and ``sentiment`` alongside summary/cited_clauses/supported."""
-    clause_index = _build_fixture_clause_index()
+    ``label`` and ``sentiment`` alongside summary/cited_anchors/supported."""
+    anchor_index = _build_fixture_anchor_index()
 
-    def finder(doc_a_id, doc_b_id, clause_index):
+    def finder(doc_a_id, doc_b_id, anchor_index):
         return [
             {
                 "summary": "RMiT 17.1 shortens the window Outsourcing 12.1 allows.",
                 "label": "differs-on",
                 "sentiment": "tighten",
-                "source_clauses": ["RMiT 17.1"],
-                "target_clauses": ["Outsourcing 12.1"],
+                "source_anchors": ["RMiT 17.1"],
+                "target_anchors": ["Outsourcing 12.1"],
             }
         ]
 
     find_connections(
         "rmit-v2-2026-draft",
         "outsourcing-v1-2019",
-        clause_index,
+        anchor_index,
         finder_fn=finder,
         critic_fn=_critic_passthrough,
         output_dir=tmp_path,
@@ -878,23 +878,23 @@ def _spy_write_text_encoding(monkeypatch) -> dict:
 def test_write_trace_encodes_utf8(tmp_path, monkeypatch):
     """The connection-trace writer must pass ``encoding="utf-8"`` to write_text."""
     captured = _spy_write_text_encoding(monkeypatch)
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
 
-    def finder(doc_a_id, doc_b_id, clause_index):
+    def finder(doc_a_id, doc_b_id, anchor_index):
         return [
             {
                 "summary": "RMiT 17.1 trims the notification window.",
                 "label": "differs-on",
                 "sentiment": "tighten",
-                "source_clauses": ["RMiT 17.1"],
-                "target_clauses": ["Outsourcing 12.1"],
+                "source_anchors": ["RMiT 17.1"],
+                "target_anchors": ["Outsourcing 12.1"],
             }
         ]
 
     find_connections(
         "rmit-v2-2026-draft",
         "outsourcing-v1-2019",
-        clause_index,
+        anchor_index,
         finder_fn=finder,
         critic_fn=_critic_passthrough,
         output_dir=tmp_path,
@@ -933,3 +933,251 @@ def test_write_analyse_trace_encodes_utf8(tmp_path, monkeypatch):
     )
 
     assert captured["encoding"] == "utf-8"
+
+
+# --- Anchor-based citation shape (spec-engine-anchor-segmentation Task 6) ----
+#
+# The pairwise path now cites AnchorCitation records (anchor_id / anchor_label
+# / text / doc_class) resolved through an AnchorIndex, replacing the old
+# clause_number-keyed ClauseCitation shape. The four tests below lock the new
+# contract end-to-end: schema, index lookup, unresolved handling, and trace
+# field name.
+
+
+def _make_anchor_for_test(
+    anchor_id: str,
+    *,
+    text: str,
+    document_id: str,
+    anchor_label: str | None = None,
+    doc_class: str = "structured-rules",
+):
+    """A minimal Anchor dict for the AnchorIndex fixtures below (mirrors
+    engine.tests.test_anchors._make_anchor)."""
+    return {
+        "anchor_id": anchor_id,
+        "anchor_label": anchor_label if anchor_label is not None else anchor_id,
+        "text": text,
+        "doc_class": doc_class,
+        "document_id": document_id,
+        "heading_path": [],
+        "page_span": None,
+        "parent_anchor": None,
+    }
+
+
+def _build_fixture_anchor_index():
+    """AnchorIndex mirror of `_build_fixture_clause_index` — the four RMiT/
+    Outsourcing anchors keyed by their canonical anchor_id."""
+    from engine.anchors import AnchorIndex
+
+    return AnchorIndex(
+        [
+            _make_anchor_for_test(
+                "RMiT 17.1",
+                text=(
+                    "A financial institution shall notify the Bank within 14 days "
+                    "of the first-time adoption of a public cloud service for a "
+                    "critical system."
+                ),
+                document_id="rmit-v2-2026-draft",
+            ),
+            _make_anchor_for_test(
+                "RMiT 17.2",
+                text=(
+                    "A financial institution shall notify the Bank of any "
+                    "subsequent adoption of a public cloud service for a critical "
+                    "system."
+                ),
+                document_id="rmit-v2-2026-draft",
+            ),
+            _make_anchor_for_test(
+                "Outsourcing 12.1",
+                text=OUTSOURCING_12_1_TEXT,
+                document_id="outsourcing-v1-2019",
+            ),
+            _make_anchor_for_test(
+                "Outsourcing 12.4",
+                text=(
+                    "The approval requirement does not apply to an outsourcing "
+                    "arrangement with an affiliate within the same financial "
+                    "group."
+                ),
+                document_id="outsourcing-v1-2019",
+            ),
+        ]
+    )
+
+
+def test_supported_connection_carries_anchor_citations(tmp_path):
+    """A supported Connection emits `source_anchors` / `target_anchors` as
+    AnchorCitation dicts with all four fields (anchor_id, anchor_label, text,
+    doc_class) fetched from the AnchorIndex — never the model."""
+    index = _build_fixture_anchor_index()
+
+    def finder(doc_a_id, doc_b_id, anchor_index):
+        return [
+            {
+                "summary": "RMiT 17.1 tightens the notification window.",
+                "label": "differs-on",
+                "sentiment": "tighten",
+                "source_anchors": ["RMiT 17.1"],
+                "target_anchors": ["Outsourcing 12.1"],
+            }
+        ]
+
+    result = find_connections(
+        "rmit-v2-2026-draft",
+        "outsourcing-v1-2019",
+        index,
+        finder_fn=finder,
+        critic_fn=_critic_passthrough,
+        output_dir=tmp_path,
+        now=FIXED_NOW,
+    )
+
+    assert result["unsupported"] == []
+    assert len(result["connections"]) == 1
+    connection = result["connections"][0]
+    assert "source_anchors" in connection
+    assert "target_anchors" in connection
+    source = connection["source_anchors"][0]
+    target = connection["target_anchors"][0]
+    for citation in (source, target):
+        assert set(citation.keys()) == {
+            "anchor_id",
+            "anchor_label",
+            "text",
+            "doc_class",
+        }
+    assert source["anchor_id"] == "RMiT 17.1"
+    assert target["anchor_id"] == "Outsourcing 12.1"
+    assert target["text"] == OUTSOURCING_12_1_TEXT
+    assert source["doc_class"] == "structured-rules"
+
+
+def test_validate_candidates_uses_anchor_index(tmp_path):
+    """`_validate_candidates` fetches verbatim text through `AnchorIndex.get(
+    anchor_id)`; the built citation's `text` is byte-identical to the anchor's."""
+    from engine.anchors import AnchorIndex
+
+    anchor_text = (
+        "Retail exposures shall be risk-weighted at 75% subject to the "
+        "granularity criterion in §4.2."
+    )
+    index = AnchorIndex(
+        [
+            _make_anchor_for_test(
+                "BoE Ch3 §4.2",
+                text=anchor_text,
+                document_id="boe-ch3-sacr",
+                doc_class="semi-structured",
+            ),
+            _make_anchor_for_test(
+                "MAS 637 §7.3.15",
+                text="A reporting bank shall apply the standardised approach.",
+                document_id="mas-637-2024-07",
+                doc_class="semi-structured",
+            ),
+        ]
+    )
+
+    def finder(doc_a_id, doc_b_id, anchor_index):
+        return [
+            {
+                "summary": "MAS 637 aligns with BoE Ch3 on the standardised approach.",
+                "label": "aligns-with",
+                "source_anchors": ["MAS 637 §7.3.15"],
+                "target_anchors": ["BoE Ch3 §4.2"],
+            }
+        ]
+
+    result = find_connections(
+        "mas-637-2024-07",
+        "boe-ch3-sacr",
+        index,
+        finder_fn=finder,
+        critic_fn=_critic_passthrough,
+        output_dir=tmp_path,
+        now=FIXED_NOW,
+    )
+
+    assert len(result["connections"]) == 1
+    target = result["connections"][0]["target_anchors"][0]
+    assert target["anchor_id"] == "BoE Ch3 §4.2"
+    assert target["text"] == anchor_text  # verbatim from the index, byte-identical
+    assert target["doc_class"] == "semi-structured"
+
+
+def test_unresolved_anchor_id_goes_to_unsupported(tmp_path):
+    """A candidate citing an anchor_id absent from the AnchorIndex is dropped
+    to `unsupported` with the exact message the spec's verbatim guarantee
+    preserves — "No matching clause found" — never invented."""
+    index = _build_fixture_anchor_index()
+
+    def finder(doc_a_id, doc_b_id, anchor_index):
+        return [
+            {
+                "summary": "RMiT 17.1 conflicts with a cyber-resilience requirement.",
+                "label": "conflicts-with",
+                "source_anchors": ["RMiT 17.1"],
+                "target_anchors": ["Cyber 4.4"],  # absent from the index
+            }
+        ]
+
+    result = find_connections(
+        "rmit-v2-2026-draft",
+        "outsourcing-v1-2019",
+        index,
+        finder_fn=finder,
+        critic_fn=_critic_passthrough,
+        output_dir=tmp_path,
+        now=FIXED_NOW,
+    )
+
+    assert result["connections"] == []
+    assert len(result["unsupported"]) == 1
+    unsupported = result["unsupported"][0]
+    assert unsupported["supported"] is False
+    assert unsupported["message"] == "No matching clause found"
+    # No fabricated citation text on an unsupported record.
+    assert "source_anchors" not in unsupported
+    assert "target_anchors" not in unsupported
+
+
+def test_write_trace_records_cited_anchors_not_cited_clauses(tmp_path):
+    """The connection-trace records each validation entry's cited items under
+    `cited_anchors` (widened schema); the retired `cited_clauses` field is gone."""
+    index = _build_fixture_anchor_index()
+
+    def finder(doc_a_id, doc_b_id, anchor_index):
+        return [
+            {
+                "summary": "RMiT 17.1 differs from Outsourcing 12.1 on window.",
+                "label": "differs-on",
+                "sentiment": "tighten",
+                "source_anchors": ["RMiT 17.1"],
+                "target_anchors": ["Outsourcing 12.1"],
+            }
+        ]
+
+    find_connections(
+        "rmit-v2-2026-draft",
+        "outsourcing-v1-2019",
+        index,
+        finder_fn=finder,
+        critic_fn=_critic_passthrough,
+        output_dir=tmp_path,
+        now=FIXED_NOW,
+    )
+
+    trace_path = next(tmp_path.glob("connection-trace-*.json"))
+    trace = json.loads(trace_path.read_text(encoding="utf-8"))
+    entry = trace["validation"][0]
+    assert "cited_anchors" in entry
+    assert "cited_clauses" not in entry
+    cited = entry["cited_anchors"]
+    ids = [item["anchor_id"] for item in cited]
+    assert ids == ["RMiT 17.1", "Outsourcing 12.1"]
+    for item in cited:
+        assert item["resolved"] is True

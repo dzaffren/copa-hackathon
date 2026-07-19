@@ -18,9 +18,9 @@ from engine.ingest import (
 )
 
 CORPUS_DIR = Path(__file__).resolve().parents[2] / "data" / "corpus"
-OUTSOURCING_PDF = CORPUS_DIR / "PD_Outsourcing_20191023.pdf"
-RMIT_PDF = CORPUS_DIR / "pd-rmit-nov25.pdf"
-AI_DP_PDF = CORPUS_DIR / "dp_ai_financial_sector.pdf"
+OUTSOURCING_PDF = CORPUS_DIR / "sample" / "PD_Outsourcing_20191023.pdf"
+RMIT_PDF = CORPUS_DIR / "open-finance" / "pd-rmit-nov25.pdf"
+AI_DP_PDF = CORPUS_DIR / "sample" / "dp_ai_financial_sector.pdf"
 
 
 def test_ingest_returns_non_empty_readable_markdown():
@@ -126,7 +126,10 @@ def test_ingest_raises_unreadable_document_error_on_corrupt_input(tmp_path):
         # bare mis-cased tokens
         ("A major challenge of Al revolves", "A major challenge of AI revolves"),
         ('GenAl "hallucinations" arise', 'GenAI "hallucinations" arise'),
-        ("Al-driven decisions do not discriminate", "AI-driven decisions do not discriminate"),
+        (
+            "Al-driven decisions do not discriminate",
+            "AI-driven decisions do not discriminate",
+        ),
         ("leading Fls with the majority", "leading FIs with the majority"),
     ],
 )
@@ -151,7 +154,9 @@ def test_normalise_leaves_real_content_untouched(safe):
 def test_normalise_does_not_eat_long_or_unterminated_math_spans():
     """A long `$...$` run (or a dangling delimiter wrapping real prose) must be
     left byte-for-byte intact — the guard prevents swallowing real content."""
-    long_span = "$ Leading adopters refer to the top quintile of FSPs by reported AI projects $"
+    long_span = (
+        "$ Leading adopters refer to the top quintile of FSPs by reported AI projects $"
+    )
     assert normalise_glyph_artifacts(long_span) == long_span
 
 

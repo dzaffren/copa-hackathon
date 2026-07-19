@@ -44,6 +44,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Literal, Optional, TypedDict
 
+from engine.anchors import AnchorCitation, AnchorIndex
 from engine.clauses import ClauseIndex
 from engine.config import FINDER_CRITIC_DEPLOYMENT
 from engine.llm import LLMResponseError, call_chat, parse_json_response
@@ -51,16 +52,8 @@ from engine.llm import LLMResponseError, call_chat, parse_json_response
 logger = logging.getLogger(__name__)
 
 
-class ClauseCitation(TypedDict):
-    """A clause reference on a supported connection, with verbatim text
-    fetched from the ``ClauseIndex`` by number — never model-produced."""
-
-    clause_number: str
-    text: str
-
-
 class Connection(TypedDict):
-    """A supported clause-anchored connection (matches the spec's
+    """A supported anchor-cited connection (matches the spec's
     ``POST /connections/find`` 200 ``connections[]`` shape).
 
     ``label`` is the semantic classification of the finding (one of the five
@@ -68,15 +61,20 @@ class Connection(TypedDict):
     ``differs-on`` finding as tighten/loosen/neutral and is ``None`` for every
     other label. Direction convention: document A is "we/ours", document B is
     "they/theirs", so ``silent-on`` (ours is silent) and ``goes-beyond`` (ours
-    goes further) swap when the pair is flipped."""
+    goes further) swap when the pair is flipped.
+
+    ``source_anchors`` / ``target_anchors`` carry ``AnchorCitation`` records
+    (widened from the retired ``ClauseCitation`` shape by
+    ``spec-engine-anchor-segmentation.md`` Task 6). The verbatim ``text`` on
+    each citation still comes from the ``AnchorIndex`` — never the model."""
 
     summary: str
     label: Literal[
         "aligns-with", "differs-on", "conflicts-with", "silent-on", "goes-beyond"
     ]
     sentiment: Optional[Literal["tighten", "loosen", "neutral"]]
-    source_clauses: list[ClauseCitation]
-    target_clauses: list[ClauseCitation]
+    source_anchors: list[AnchorCitation]
+    target_anchors: list[AnchorCitation]
     scope_note: Optional[str]
     supported: bool
 
@@ -101,13 +99,13 @@ class FindConnectionsResult(TypedDict):
     unsupported: list[UnsupportedConnection]
 
 
-# A finder turn reads the two documents (via the clause index) and returns raw
-# candidate dicts: {summary, source_clauses: [clause_number, ...],
-# target_clauses: [...], scope_note?: str}. A critic turn additionally receives
+# A finder turn reads the two documents (via the anchor index) and returns raw
+# candidate dicts: {summary, source_anchors: [anchor_id, ...],
+# target_anchors: [...], scope_note?: str}. A critic turn additionally receives
 # the finder's candidates and returns the scoped/refuted set plus newly-found
 # connections, in the same raw shape.
-FinderFn = Callable[[str, str, ClauseIndex], list[dict]]
-CriticFn = Callable[[str, str, ClauseIndex, list[dict]], list[dict]]
+FinderFn = Callable[[str, str, AnchorIndex], list[dict]]
+CriticFn = Callable[[str, str, AnchorIndex, list[dict]], list[dict]]
 
 _MESSAGE_NO_CLAUSE = "No matching clause found"
 
@@ -149,7 +147,7 @@ class ConnectionFindError(Exception):
 def find_connections(
     doc_a_id: str,
     doc_b_id: str,
-    clause_index: ClauseIndex,
+    anchor_index: AnchorIndex,
     finder_fn: Optional[FinderFn] = None,
     critic_fn: Optional[CriticFn] = None,
     output_dir: Optional[Path] = None,
@@ -161,8 +159,8 @@ def find_connections(
     Args:
         doc_a_id, doc_b_id: the two documents to search for connections
             between (the pairwise unit — see spec Solution Design).
-        clause_index: the built ``ClauseIndex``; used both to give the agents
-            clause text and, deterministically, to validate every citation and
+        anchor_index: the built ``AnchorIndex``; used both to give the agents
+            anchor text and, deterministically, to validate every citation and
             fetch verbatim text for supported connections.
         finder_fn: stage 4a seam — proposes candidate connections. Defaults to
             the real Azure-AI-Foundry call (``_finder_turn``); tests inject a
@@ -179,7 +177,7 @@ def find_connections(
 
     Returns:
         ``{"connections": [...], "unsupported": [...]}`` — supported
-        connections carry verbatim clause text; unsupported candidates are
+        connections carry verbatim anchor text; unsupported candidates are
         reported with "No matching clause found", never invented.
     """
     finder = finder_fn if finder_fn is not None else _finder_turn
@@ -187,12 +185,12 @@ def find_connections(
     timestamp = now if now is not None else datetime.now(timezone.utc)
 
     # [4a] finder proposes; [4b] critic scopes/refutes + surfaces missed.
-    finder_output = finder(doc_a_id, doc_b_id, clause_index)
-    critic_output = critic(doc_a_id, doc_b_id, clause_index, finder_output)
+    finder_output = finder(doc_a_id, doc_b_id, anchor_index)
+    critic_output = critic(doc_a_id, doc_b_id, anchor_index, finder_output)
 
     # [5] deterministic citation validator gates whatever survives the critic.
     connections, unsupported, validation = _validate_candidates(
-        critic_output, clause_index
+        critic_output, anchor_index
     )
 
     _write_trace(
@@ -210,24 +208,24 @@ def find_connections(
 
 
 def _validate_candidates(
-    candidates: list[dict], clause_index: ClauseIndex
+    candidates: list[dict], anchor_index: AnchorIndex
 ) -> tuple[list[Connection], list[UnsupportedConnection], list[dict]]:
     """Split candidates into supported/unsupported by looking up every cited
-    clause number in the index (the anti-hallucination guardrail).
+    anchor_id in the index (the anti-hallucination guardrail).
 
-    A candidate is supported only when EVERY clause it cites (source and
-    target) resolves in the index; its clause text is then fetched verbatim by
-    number — never taken from the candidate/model. Any missing clause drops the
+    A candidate is supported only when EVERY anchor it cites (source and
+    target) resolves in the index; its anchor text is then fetched verbatim by
+    id — never taken from the candidate/model. Any missing anchor drops the
     candidate to ``unsupported`` with "No matching clause found".
 
-    Also returns a per-candidate validation trace (each cited clause and
+    Also returns a per-candidate validation trace (each cited anchor and
     whether it resolved) for the recorded ``connection-trace``.
 
     The candidate's semantic ``label`` and ``sentiment`` are carried through
     verbatim onto every built record (supported and unsupported) and the trace —
     the model's classification of the relationship. This never touches the
-    clause-resolution guardrail: clause TEXT is still fetched only via
-    ``_cite``/``ClauseIndex`` by number.
+    anchor-resolution guardrail: anchor TEXT is still fetched only via
+    ``_cite``/``AnchorIndex`` by id.
     """
     connections: list[Connection] = []
     unsupported: list[UnsupportedConnection] = []
@@ -237,16 +235,19 @@ def _validate_candidates(
         summary = candidate.get("summary", "")
         label = candidate.get("label")
         sentiment = candidate.get("sentiment")
-        source_numbers = [
-            _normalize_clause_number(n) for n in candidate.get("source_clauses", [])
+        source_ids = [
+            _normalize_clause_number(n) for n in candidate.get("source_anchors", [])
         ]
-        target_numbers = [
-            _normalize_clause_number(n) for n in candidate.get("target_clauses", [])
+        target_ids = [
+            _normalize_clause_number(n) for n in candidate.get("target_anchors", [])
         ]
 
         cited_results = [
-            {"clause_number": number, "resolved": clause_index.get(number) is not None}
-            for number in source_numbers + target_numbers
+            {
+                "anchor_id": anchor_id,
+                "resolved": anchor_index.get(anchor_id) is not None,
+            }
+            for anchor_id in source_ids + target_ids
         ]
         all_resolved = all(item["resolved"] for item in cited_results)
 
@@ -255,7 +256,7 @@ def _validate_candidates(
                 "summary": summary,
                 "label": label,
                 "sentiment": sentiment,
-                "cited_clauses": cited_results,
+                "cited_anchors": cited_results,
                 "supported": all_resolved,
             }
         )
@@ -266,8 +267,8 @@ def _validate_candidates(
                     "summary": summary,
                     "label": label,
                     "sentiment": sentiment,
-                    "source_clauses": _cite(source_numbers, clause_index),
-                    "target_clauses": _cite(target_numbers, clause_index),
+                    "source_anchors": _cite(source_ids, anchor_index),
+                    "target_anchors": _cite(target_ids, anchor_index),
                     "scope_note": candidate.get("scope_note"),
                     "supported": True,
                 }
@@ -286,23 +287,30 @@ def _validate_candidates(
     return connections, unsupported, validation
 
 
-def _cite(clause_numbers: list[str], clause_index: ClauseIndex) -> list[ClauseCitation]:
-    """Build verbatim citations for a list of resolved clause numbers.
+def _cite(anchor_ids: list[str], anchor_index: AnchorIndex) -> list[AnchorCitation]:
+    """Build verbatim citations for a list of resolved anchor_ids.
 
-    The quoted ``text`` ALWAYS comes back through ``ClauseIndex.get(...)["text"]``
-    by number — never from the model. Callers must have already confirmed each
-    number resolves (see ``_validate_candidates``); a missing entry here is a
+    The quoted ``text`` ALWAYS comes back through ``AnchorIndex.get(...)["text"]``
+    by id — never from the model. Callers must have already confirmed each
+    id resolves (see ``_validate_candidates``); a missing entry here is a
     programming error, not a hallucination path.
     """
-    citations: list[ClauseCitation] = []
-    for number in clause_numbers:
-        entry = clause_index.get(number)
+    citations: list[AnchorCitation] = []
+    for anchor_id in anchor_ids:
+        entry = anchor_index.get(anchor_id)
         if entry is None:  # pragma: no cover - guarded by _validate_candidates
             raise ConnectionFindError(
-                f"_cite called for unresolved clause '{number}' — validation "
+                f"_cite called for unresolved anchor '{anchor_id}' — validation "
                 f"must gate citations before this point"
             )
-        citations.append({"clause_number": number, "text": entry["text"]})
+        citations.append(
+            {
+                "anchor_id": anchor_id,
+                "anchor_label": entry["anchor_label"],
+                "text": entry["text"],
+                "doc_class": entry["doc_class"],
+            }
+        )
     return citations
 
 
@@ -365,9 +373,9 @@ _TAXONOMY_PROMPT_BLOCK = (
 FINDER_SYSTEM_PROMPT = (
     "You are a policy analyst finding cross-policy CONNECTIONS between two "
     "Bank Negara Malaysia policy documents. You are given, for each document, "
-    "its full list of clauses as `{clause_number}: {text}` lines, grouped "
+    "its full list of anchors as `{anchor_id}: {text}` lines, grouped "
     "under a document-id label.\n\n"
-    "Find connections where a clause in one document relates to a clause in "
+    "Find connections where an anchor in one document relates to an anchor in "
     "the other. " + _TAXONOMY_PROMPT_BLOCK + "For each connection, return an "
     "object:\n"
     '  {"summary": <one-sentence description>,\n'
@@ -375,13 +383,13 @@ FINDER_SYSTEM_PROMPT = (
     "|goes-beyond>,\n"
     '   "sentiment": <tighten|loosen|neutral, ONLY on differs-on; omit '
     "otherwise>,\n"
-    '   "source_clauses": [<clause_number>, ...],\n'
-    '   "target_clauses": [<clause_number>, ...],\n'
+    '   "source_anchors": [<anchor_id>, ...],\n'
+    '   "target_anchors": [<anchor_id>, ...],\n'
     '   "scope_note": <optional caveat/exemption, omit if none>}\n\n'
-    "CITATION RULE (strict): every clause_number in `source_clauses` and "
-    "`target_clauses` MUST be copied EXACTLY from the clause lists provided. "
-    "Never invent, guess, reformat, or paraphrase a clause number. Do not "
-    "cite a clause that is not in the lists.\n\n"
+    "CITATION RULE (strict): every anchor_id in `source_anchors` and "
+    "`target_anchors` MUST be copied EXACTLY from the anchor lists provided. "
+    "Never invent, guess, reformat, or paraphrase an anchor_id. Do not "
+    "cite an anchor that is not in the lists.\n\n"
     "Return ONLY a JSON array of these objects — no prose, no markdown, no "
     "commentary. Return an empty array `[]` if there are no connections."
 )
@@ -389,7 +397,7 @@ FINDER_SYSTEM_PROMPT = (
 CRITIC_SYSTEM_PROMPT = (
     "You are a senior policy reviewer critiquing a set of candidate "
     "cross-policy connections proposed by a finder agent. You are given both "
-    "documents' full clause lists as `{clause_number}: {text}` lines grouped "
+    "documents' full anchor lists as `{anchor_id}: {text}` lines grouped "
     "by document-id, plus the finder's candidate connections as a JSON array.\n\n"
     "Do two things:\n"
     "1. REFUTE or SCOPE weak candidates — drop any that do not hold, correct a "
@@ -403,30 +411,30 @@ CRITIC_SYSTEM_PROMPT = (
     '  {"summary": ..., "label": <one of aligns-with|differs-on|conflicts-with'
     "|silent-on|goes-beyond>, "
     '"sentiment": <tighten|loosen|neutral, ONLY on differs-on>, '
-    '"source_clauses": [...], "target_clauses": [...], '
+    '"source_anchors": [...], "target_anchors": [...], '
     '"scope_note": <optional>}\n\n'
-    "CITATION RULE (strict): every clause_number MUST be copied EXACTLY from "
-    "the provided clause lists. Never invent, guess, reformat, or paraphrase "
-    "a clause number.\n\n"
+    "CITATION RULE (strict): every anchor_id MUST be copied EXACTLY from "
+    "the provided anchor lists. Never invent, guess, reformat, or paraphrase "
+    "an anchor_id.\n\n"
     "Return ONLY a JSON array of these objects — no prose, no markdown."
 )
 
 
 def _format_clause_context(
-    clause_index: ClauseIndex, doc_a_id: str, doc_b_id: str
+    anchor_index: AnchorIndex, doc_a_id: str, doc_b_id: str
 ) -> str:
-    """Build the clause-context text block the agents read.
+    """Build the anchor-context text block the agents read.
 
-    Lists every clause of both documents as ``{clause_number}: {text}`` lines,
-    grouped under a per-document label. Pure given the index — the clause text
-    comes straight from ``ClauseIndex.entries_for_document`` (verbatim), never
-    the model. Used by both turns so the finder and critic see the same corpus.
+    Lists every anchor of both documents as ``{anchor_id}: {text}`` lines,
+    grouped under a per-document label. Pure given the index — the anchor text
+    comes straight from ``AnchorIndex.by_document`` (verbatim), never the
+    model. Used by both turns so the finder and critic see the same corpus.
     """
     blocks: list[str] = []
     for document_id in (doc_a_id, doc_b_id):
         lines = [f"Document: {document_id}"]
-        for entry in clause_index.entries_for_document(document_id):
-            lines.append(f"{entry['clause_number']}: {entry['text']}")
+        for entry in anchor_index.by_document(document_id):
+            lines.append(f"{entry['anchor_id']}: {entry['text']}")
         blocks.append("\n".join(lines))
     return "\n\n".join(blocks)
 
@@ -507,34 +515,34 @@ def _validate_label_and_sentiment(item: dict, index: int, raw: str) -> None:
         )
 
 
-def _finder_turn(doc_a_id: str, doc_b_id: str, clause_index: ClauseIndex) -> list[dict]:
+def _finder_turn(doc_a_id: str, doc_b_id: str, anchor_index: AnchorIndex) -> list[dict]:
     """Call the finder LLM (Azure AI Foundry) to propose candidate connections.
 
-    Builds the two-document clause context, sends it with
+    Builds the two-document anchor context, sends it with
     ``FINDER_SYSTEM_PROMPT`` to ``FINDER_CRITIC_DEPLOYMENT`` (the confirmed
     high-reasoning deployment for this stage), and parses the reply into the
     raw candidate ``list[dict]`` shape ``_validate_candidates`` consumes. This
     is the network seam — real callers use it; tests inject ``finder_fn``.
     """
-    context = _format_clause_context(clause_index, doc_a_id, doc_b_id)
+    context = _format_clause_context(anchor_index, doc_a_id, doc_b_id)
     return _call_candidates_with_retry(FINDER_SYSTEM_PROMPT, context)
 
 
 def _critic_turn(
     doc_a_id: str,
     doc_b_id: str,
-    clause_index: ClauseIndex,
+    anchor_index: AnchorIndex,
     candidates: list[dict],
 ) -> list[dict]:
     """Call the critic LLM (Azure AI Foundry) — refute/scope + surface missed
     connections (recall).
 
-    Sends the same two-document clause context PLUS the finder's ``candidates``
+    Sends the same two-document anchor context PLUS the finder's ``candidates``
     (serialised as JSON) with ``CRITIC_SYSTEM_PROMPT``, and parses the reply
     into the raw candidate ``list[dict]`` shape. The network seam for stage 4b;
     real callers use it, tests inject ``critic_fn``.
     """
-    context = _format_clause_context(clause_index, doc_a_id, doc_b_id)
+    context = _format_clause_context(anchor_index, doc_a_id, doc_b_id)
     user = (
         f"{context}\n\n"
         f"Finder candidate connections (JSON):\n{json.dumps(candidates)}"

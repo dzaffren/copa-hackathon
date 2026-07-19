@@ -356,12 +356,13 @@ def test_get_clause_returns_reference_passage_verbatim():
 # --- Stub finder / critic / converter --------------------------------------
 
 
-def _finder_returns_conflict(doc_a_id, doc_b_id, clause_index):
+def _finder_returns_conflict(doc_a_id, doc_b_id, anchor_index):
     return [
         {
             "summary": "RMiT 17.1 conflicts with Outsourcing 12.1.",
-            "source_clauses": ["RMiT 17.1"],
-            "target_clauses": ["Outsourcing 12.1"],
+            "label": "conflicts-with",
+            "source_anchors": ["RMiT 17.1"],
+            "target_anchors": ["Outsourcing 12.1"],
         }
     ]
 
@@ -521,9 +522,7 @@ def test_post_connections_find_surfaces_verbatim_conflict(tmp_path):
     conflict = body["connections"][0]
     assert conflict["supported"] is True
     target_12_1 = next(
-        tc
-        for tc in conflict["target_clauses"]
-        if tc["clause_number"] == "Outsourcing 12.1"
+        tc for tc in conflict["target_anchors"] if tc["anchor_id"] == "Outsourcing 12.1"
     )
     assert target_12_1["text"] == OUTSOURCING_12_1_TEXT
 
@@ -555,9 +554,7 @@ def test_post_connections_find_unknown_id_returns_400(tmp_path):
 # --- POST /submissions ------------------------------------------------------
 
 PDF_MIME = "application/pdf"
-DOCX_MIME = (
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-)
+DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
 
 def test_post_submission_supervisor_pdf_returns_201(tmp_path):
@@ -678,9 +675,7 @@ def test_get_submission_without_role_returns_403(tmp_path):
 
 def test_get_submission_unknown_id_returns_404(tmp_path):
     client = _make_client(tmp_path)
-    response = client.get(
-        "/submissions/sub-999", headers={"X-Role": "supervisor"}
-    )
+    response = client.get("/submissions/sub-999", headers={"X-Role": "supervisor"})
     assert response.status_code == 404
     assert response.json() == {
         "error": "SUBMISSION_NOT_FOUND",
@@ -715,9 +710,21 @@ AIDP_FSP_TEXT = (
 
 # Vehicle-document (AI DP) paragraph text — the addressable analysed units.
 AIDP_PARAGRAPHS = [
-    ("4.6", "Data & personal information", "As AI applications process personal data..."),
-    ("3.5", "Fair usage & bias", "A major challenge of AI revolves around fair usage..."),
-    ("3.2", "Board & senior management oversight", "The board and senior management..."),
+    (
+        "4.6",
+        "Data & personal information",
+        "As AI applications process personal data...",
+    ),
+    (
+        "3.5",
+        "Fair usage & bias",
+        "A major challenge of AI revolves around fair usage...",
+    ),
+    (
+        "3.2",
+        "Board & senior management oversight",
+        "The board and senior management...",
+    ),
     ("5.2", "Capital treatment", "Capital treatment considerations for AI models..."),
 ]
 
@@ -793,9 +800,13 @@ AIDP_GRAPH = {
         ),
         _reference_node("bcbs-239", "BCBS 239", "international_standard"),
         _reference_node(
-            "industry-fsp-3", "Industry feedback — 3 FSP respondents", "industry_feedback"
+            "industry-fsp-3",
+            "Industry feedback — 3 FSP respondents",
+            "industry_feedback",
         ),
-        _reference_node("mas-feat", "MAS — FEAT Principles (Fairness)", "peer_regulator"),
+        _reference_node(
+            "mas-feat", "MAS — FEAT Principles (Fairness)", "peer_regulator"
+        ),
     ],
     "edges": [],
 }
@@ -1016,6 +1027,7 @@ def test_post_analyse_bare_paragraph_returns_no_matching_source(tmp_path):
 def test_post_analyse_live_candidates_render(tmp_path):
     """A live analyse whose stub finder surfaces a candidate returns it rendered
     (verdict + verbatim quote) — the same shape as GET …/connections."""
+
     def analyse_fn(document_id, number, paragraph_text, clause_index):
         return [
             {
@@ -1048,17 +1060,14 @@ def test_post_analyse_already_analysed_without_force_returns_400(tmp_path):
     assert response.json() == {
         "error": "INVALID_ANALYSE_REQUEST",
         "message": (
-            "Paragraph '4.6' is already analysed; re-analysis requires "
-            "?force=true"
+            "Paragraph '4.6' is already analysed; re-analysis requires " "?force=true"
         ),
     }
 
 
 def test_post_analyse_already_analysed_with_force_reanalyses(tmp_path):
     client = _make_paragraph_client(tmp_path, analyse_fn=_empty_analyse_fn)
-    response = client.post(
-        "/documents/ai-dp-2025/paragraphs/4.6/analyse?force=true"
-    )
+    response = client.post("/documents/ai-dp-2025/paragraphs/4.6/analyse?force=true")
     assert response.status_code == 200
     assert response.json()["no_matching_source"] is True
 

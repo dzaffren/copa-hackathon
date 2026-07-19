@@ -30,7 +30,9 @@ from urllib.parse import unquote
 from fastapi import FastAPI, Header, Request, UploadFile
 from fastapi.responses import JSONResponse
 
+from engine.anchors import Anchor, AnchorIndex
 from engine.clauses import (
+    POLICY_SHORT_NAMES,
     ClauseEntry,
     ClauseIndex,
     ClauseVersionNotFoundError,
@@ -153,6 +155,12 @@ def create_app(
     submissions_dir = Path(submissions_dir)
     known_document_ids = {node["id"] for node in graph.get("nodes", [])}
     verdicts = verdicts or {}
+    # Bridge the loaded ClauseIndex into an AnchorIndex so
+    # `find_connections` (which now expects the anchor-shaped index) can
+    # consume the same clause data. The build pipeline (Task 7) will later
+    # produce a native anchor-index.json and replace this bridge; until then
+    # every clause entry maps to a structured-rules Anchor byte-identically.
+    anchor_index = _anchor_index_from_clause_index(clause_index)
 
     # The curated source library (branch ②) is the graph's public reference
     # nodes — the un-cited sources a live `POST …/analyse` matches a paragraph
@@ -214,9 +222,7 @@ def create_app(
     def get_node(node_id: str) -> Any:
         matches = [n for n in graph.get("nodes", []) if n["id"] == node_id]
         if not matches:
-            return _error(
-                404, "NODE_NOT_FOUND", f"No node with id '{node_id}'"
-            )
+            return _error(404, "NODE_NOT_FOUND", f"No node with id '{node_id}'")
         node = matches[0]
         incident = [
             {"target": e["target"], "type": e["type"], "reason": e["reason"]}
@@ -253,7 +259,7 @@ def create_app(
         result = find_connections(
             doc_a,
             doc_b,
-            clause_index,
+            anchor_index,
             finder_fn=finder_fn,
             critic_fn=critic_fn,
             output_dir=trace_output_dir,
@@ -444,6 +450,39 @@ def create_app(
         return json.loads(record_path.read_text())
 
     return app
+
+
+def _anchor_index_from_clause_index(clause_index: ClauseIndex) -> AnchorIndex:
+    """Bridge a loaded `ClauseIndex` into an `AnchorIndex`.
+
+    Every primary clause entry becomes an `Anchor` under
+    `doc_class="structured-rules"`, using the canonical
+    `"{PolicyShortName} {clause_number}"` id (already the shape
+    `ClauseIndex` keys itself by, so the mapping is a straight lift).
+    Verbatim text is preserved byte-for-byte from the clause entry.
+
+    This is the temporary bridge that lets `find_connections` (which now
+    expects an `AnchorIndex`) run on top of the legacy `clause-index.json`
+    artifact. The build-pipeline story (Task 7 in the anchor-segmentation
+    spec) will produce a native `anchor-index.json`, and this helper will
+    be replaced by a direct load at that point.
+    """
+    anchors: list[Anchor] = []
+    for entry in clause_index._primary.values():
+        anchor_id = entry["clause_number"]
+        anchors.append(
+            {
+                "anchor_id": anchor_id,
+                "anchor_label": anchor_id,
+                "text": entry["text"],
+                "doc_class": "structured-rules",
+                "document_id": entry["document_id"],
+                "heading_path": [],
+                "page_span": None,
+                "parent_anchor": None,
+            }
+        )
+    return AnchorIndex(anchors)
 
 
 def _load_clause_index(artifacts_dir: Path) -> ClauseIndex:
