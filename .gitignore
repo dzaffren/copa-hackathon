@@ -12,6 +12,16 @@ data/submissions/
 # artifact; the committed contract is clause-index.json / graph.json only.
 data/artifacts/_ingest/
 
+# Large cross-jurisdiction benchmarking PDFs (HKMA/MAS/UK PRA/US/NZ Basel III
+# source docs, ~80 MB). Kept local for the retrieval-pipeline experiment; this
+# is a public repo, so they are never committed.
+data/corpus/temp/
+
+# Stray local build/tooling artifacts (the old Next.js web/ build tree removed
+# on 16 Jul 2026; a 0-byte libghostty file). Not part of the tracked product.
+web/
+libghostty62
+
 # Local secrets — copy .env.example to .env and fill in; never committed
 .env
 
