@@ -16,6 +16,7 @@ from engine.anchors import (
     UnknownDocClassError,
     UnknownDocumentIdError,
     segment,
+    semi_structured_segment,
     structured_rules_segment,
     verify_substring,
 )
@@ -254,11 +255,52 @@ def test_structured_rules_round_trips_bnm_clauses_byte_identical():
 
 
 def test_segment_raises_unknown_doc_class():
-    # Task 3 registers `"structured-rules"` at import time; `"semi-structured"`
-    # and `"prose"` land in later tasks. Any unregistered doc_class raises.
-    with pytest.raises(UnknownDocClassError, match="semi-structured"):
+    # Task 3 registers `"structured-rules"` at import time; Task 4 registers
+    # `"semi-structured"`; `"prose"` lands in Task 5 and is still unregistered.
+    with pytest.raises(UnknownDocClassError, match="prose"):
         segment(
             document_id="doc-a",
             source_markdown="ignored",
-            doc_class="semi-structured",
+            doc_class="prose",
         )
+
+
+# ---------------------------------------------------------------------------
+# Task 4: semi-structured segmenter (deterministic markdown-heading walker).
+#
+# Detects `#`/`##`/`###` headings AND numbered-list-as-heading patterns
+# (`4.4 Title`, `(a)`, `(i)`, `20.3(a)`). Emits one Anchor per leaf section.
+# NO LLM calls — pure Python parsing.
+
+
+_BCBS_CRE_MARKDOWN = """20.1 The standardised approach for credit risk applies to all banking book exposures unless explicitly exempted.
+
+20.2 Banks shall assign risk weights to on-balance sheet exposures using the tables set out in this chapter.
+
+20.3(a) For residential real estate exposures, banks shall apply the risk weight determined by the loan-to-value ratio.
+
+20.3(b) For commercial real estate exposures, banks shall apply the risk weight determined by paragraph 20.9.
+"""
+
+
+def test_semi_structured_bcbs_cre_numbered_paragraphs():
+    """BCBS-style numbered paragraphs (`20.1`, `20.2`, `20.3(a)`, `20.3(b)`)
+    each become one leaf anchor. BCBS shortnames render WITHOUT the `§` mark
+    (unlike MAS/BoE) — the caller passes `section_mark=False` (the default).
+    """
+    anchors = semi_structured_segment(
+        document_id="bcbs-cre",
+        source_markdown=_BCBS_CRE_MARKDOWN,
+        shortname="BCBS CRE",
+    )
+
+    assert [a["anchor_id"] for a in anchors] == [
+        "BCBS CRE 20.1",
+        "BCBS CRE 20.2",
+        "BCBS CRE 20.3(a)",
+        "BCBS CRE 20.3(b)",
+    ]
+    for anchor in anchors:
+        assert anchor["doc_class"] == "semi-structured"
+        assert anchor["document_id"] == "bcbs-cre"
+        assert anchor["text"] in _BCBS_CRE_MARKDOWN
