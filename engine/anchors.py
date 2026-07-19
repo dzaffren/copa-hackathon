@@ -320,9 +320,13 @@ def _numeric_depth(num_path: str) -> int:
 
 
 class _Heading:
-    """A parsed heading node during the semi-structured walk."""
+    """A parsed heading node during the semi-structured walk.
 
-    __slots__ = ("level", "num_path", "title", "start", "content_start", "children")
+    The nesting tree is inferred on demand via `_is_child` / `_closes_block`
+    rather than materialised — no `.children` list, no pointer chasing.
+    """
+
+    __slots__ = ("level", "num_path", "title", "start", "content_start")
 
     def __init__(
         self,
@@ -337,7 +341,6 @@ class _Heading:
         self.title = title  # heading label without `#`s or numeric prefix
         self.start = start  # byte offset of heading line in source
         self.content_start = content_start  # byte offset AFTER the heading line
-        self.children: list[_Heading] = []
 
 
 def _strip_hashes(title: str) -> str:
@@ -501,9 +504,11 @@ def _identify_leaves(headings: list[_Heading]) -> list[int]:
     """Return the indices of headings that have no descendant in the mixed
     markdown/numeric hierarchy — i.e. leaves of the nesting tree.
 
-    Walks forward from each heading until it hits a boundary (a heading that
-    is NOT its child). If any heading strictly before that boundary is a
-    descendant, the current heading is an internal node.
+    Walks forward from each heading `h`: if we hit a child, `h` is internal;
+    if we hit a heading that closes `h`'s block (a sibling / shallower
+    ancestor), stop scanning — `h` has no descendants and is a leaf. Non-child
+    headings that DON'T close the block are cousins in a different subtree;
+    keep scanning past them.
     """
     leaves: list[int] = []
     n = len(headings)
@@ -514,17 +519,8 @@ def _identify_leaves(headings: list[_Heading]) -> list[int]:
             if _is_child(other, h):
                 has_child = True
                 break
-            # A non-child that is also not deeper-than-h closes h's section.
-            if not _is_child(other, h):
-                # We can't `break` blindly: `20.3(a)` may be followed by
-                # `20.3(b)` — both are siblings, and neither is a child of
-                # `20.2`. But `20.3(b)` is also not a child of `20.2`. So
-                # keep scanning past non-children as long as they are also
-                # not shallower ancestors. Simpler rule: keep scanning until
-                # we find a child OR we find a heading that is shallower/
-                # sibling of h (which closes h's block).
-                if _closes_block(other, h):
-                    break
+            if _closes_block(other, h):
+                break
         if not has_child:
             leaves.append(i)
     return leaves
@@ -555,36 +551,22 @@ def _closes_block(other: "_Heading", h: "_Heading") -> bool:
 
 
 def _heading_path_labels(headings: list[_Heading], leaf_index: int) -> list[str]:
-    """Build the ancestor label chain for a leaf, most-general first.
+    """Build the direct ancestor label chain for a leaf, most-general first.
 
-    Walks backwards from the leaf, keeping only headings for which the leaf is
-    a descendant (per `_is_child`). Header prefixes like `#`/`##` are stripped;
+    Walks backwards from the leaf. Each step, if the candidate is an ancestor
+    of the current node (`current` is a child of `candidate`), record it and
+    make it the new `current` — the next earlier ancestor must sit above THIS
+    candidate to enter the chain. Header prefixes like `#`/`##` are stripped;
     numeric prefixes are joined with the title so downstream UI sees
     `"Section 7 Credit Risk"` / `"7.3 Standardised Approach"`.
     """
-    leaf = headings[leaf_index]
-    ancestors: list[_Heading] = []
+    chain: list[_Heading] = []
+    current = headings[leaf_index]
     for j in range(leaf_index - 1, -1, -1):
         candidate = headings[j]
-        if _is_child(leaf, candidate):
-            # Keep only the CLOSEST ancestor at each layer — skip a candidate
-            # that is itself a descendant of an already-collected ancestor at
-            # the same layer. Simpler test: after collecting, only keep those
-            # whose num_path/level chain is monotonically less nested.
-            ancestors.append(candidate)
-    # Deduplicate: for two collected ancestors A and B where B is a descendant
-    # of A, we want BOTH (A is a real ancestor, B is a real ancestor). Keep
-    # only the ones that form the direct ancestor chain up from leaf.
-    ancestors.reverse()
-
-    # Filter to the direct ancestor chain: walking from leaf, take each
-    # closest strictly-shallower ancestor.
-    chain: list[_Heading] = []
-    current = leaf
-    for anc in reversed(ancestors):
-        if _is_child(current, anc):
-            chain.append(anc)
-            current = anc
+        if _is_child(current, candidate):
+            chain.append(candidate)
+            current = candidate
     chain.reverse()
 
     labels: list[str] = []
