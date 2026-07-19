@@ -186,20 +186,115 @@ class SegmenterRegistry:
         return self._fns.get(doc_class)
 
 
+# ---------------------------------------------------------------------------
+# Task 3: structured-rules strategy — wraps `engine.clauses.segment_clauses`.
+#
+# BNM policy documents (RMiT, Outsourcing, OpRes, etc.) go through this path
+# UNCHANGED. The segmenter is a thin re-wrapper: `segment_clauses` is the same
+# deterministic rule-primary parser `ClauseIndex` uses today, so every emitted
+# anchor's `text` is byte-identical to the clause text `ClauseIndex.get()`
+# returns for the same clause number. The Anchor wrapper adds only
+# metadata (`doc_class`, `anchor_id`, `anchor_label`, empty `heading_path`).
+
+
+class UnknownDocumentIdError(ValueError):
+    """Raised when `structured_rules_segment` is called with a `document_id`
+    that has no entry in `engine.clauses.POLICY_SHORT_NAMES`.
+
+    Structured-rules anchor_ids follow the canonical BNM shape
+    ``"{PolicyShortName} {clause_number}"`` (e.g. ``"RMiT 17.1"``). The
+    shortname must come from `POLICY_SHORT_NAMES` — the segmenter never
+    fabricates one. Add the document to `POLICY_SHORT_NAMES` (or use a
+    different `doc_class`) to fix.
+    """
+
+
+def structured_rules_segment(
+    document_id: str,
+    source_markdown: str,
+) -> list[Anchor]:
+    """Segment a BNM-style structured-rules document into Anchor records.
+
+    Delegates to `engine.clauses.segment_clauses` — the same deterministic
+    parser that backs `ClauseIndex` today. Each resulting `ClauseEntry` is
+    wrapped as an `Anchor` with `anchor_id = "{PolicyShortName} {clause_number}"`
+    (the canonical BNM citation shape). `heading_path` is empty and `page_span`
+    is `None` — structured rules don't carry either.
+
+    `verify_substring` is called on every emitted anchor as the verbatim-citation
+    guardrail. Because `segment_clauses` slices clause text as a literal
+    substring of `source_markdown`, this always passes; the assertion is a
+    belt-and-braces check that a future refactor of `clauses.py` cannot silently
+    break the invariant.
+
+    `document_id` is interpreted as the POLICY_SHORT_NAMES key (what `clauses.py`
+    internally calls `policy_id`) — e.g. `"rmit"`, `"outsourcing"`, `"opres"`.
+    An unknown key raises `UnknownDocumentIdError` rather than fabricating a
+    shortname or letting a bare `KeyError` bubble up.
+    """
+    # Local imports keep engine/anchors.py importable in test envs that stub
+    # out engine.clauses, and avoid a circular import if clauses.py grows to
+    # reference Anchor in future.
+    from engine.clauses import POLICY_SHORT_NAMES, segment_clauses
+
+    if document_id not in POLICY_SHORT_NAMES:
+        raise UnknownDocumentIdError(
+            f"Unknown document_id {document_id!r} for structured-rules "
+            f"segmentation — no entry in engine.clauses.POLICY_SHORT_NAMES. "
+            f"Add a shortname mapping (or use a different doc_class)."
+        )
+
+    entries = segment_clauses(
+        markdown=source_markdown,
+        document_id=document_id,
+        policy_id=document_id,
+        source="published",
+    )
+
+    anchors: list[Anchor] = []
+    for entry in entries.values():
+        # `clause_number` on a ClauseEntry is already the canonical
+        # "{PolicyShortName} {bare_number}" (segment_clauses handles the join
+        # via POLICY_SHORT_NAMES) — reuse it as anchor_id directly so BNM
+        # callers see the exact same citation key they read today.
+        canonical = entry["clause_number"]
+        anchor: Anchor = {
+            "anchor_id": canonical,
+            "anchor_label": canonical,
+            "text": entry["text"],
+            "doc_class": "structured-rules",
+            "document_id": document_id,
+            "heading_path": [],
+            "page_span": None,
+            "parent_anchor": entry["parent"],
+        }
+        verify_substring(anchor, source_markdown)
+        anchors.append(anchor)
+
+    return anchors
+
+
 _REGISTRY = SegmenterRegistry()
+_REGISTRY.register("structured-rules", structured_rules_segment)
 
 
 def segment(
     document_id: str,
     source_markdown: str,
     doc_class: str,
+    registry: Optional[SegmenterRegistry] = None,
 ) -> list[Anchor]:
     """Dispatch to the segmenter registered for `doc_class`.
 
-    Raises `UnknownDocClassError` when no strategy is registered — the case
-    every test in this module exercises on the empty default registry.
+    Uses the module-level `_REGISTRY` by default (which has `structured-rules`
+    installed at import time — see Task 3). Tests can inject their own
+    `registry` to keep module state clean.
+
+    Raises `UnknownDocClassError` when no strategy is registered for
+    `doc_class` on the resolved registry.
     """
-    fn = _REGISTRY.get(doc_class)
+    active_registry = registry if registry is not None else _REGISTRY
+    fn = active_registry.get(doc_class)
     if fn is None:
         raise UnknownDocClassError(
             f"No segmenter registered for doc_class {doc_class!r}. Register "

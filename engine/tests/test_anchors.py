@@ -14,7 +14,9 @@ from engine.anchors import (
     AnchorTextNotFoundError,
     SegmenterRegistry,
     UnknownDocClassError,
+    UnknownDocumentIdError,
     segment,
+    structured_rules_segment,
     verify_substring,
 )
 
@@ -131,12 +133,132 @@ def test_segmenter_registry_stores_and_retrieves_functions():
     assert registry.get("prose") is None
 
 
+# ---------------------------------------------------------------------------
+# Task 3: structured-rules segmenter (wraps engine.clauses.segment_clauses).
+#
+# BNM policy documents (RMiT, Outsourcing, OpRes, etc.) flow through this path
+# unchanged — the segmenter is a thin re-wrapper of the existing ClauseIndex
+# pipeline, so every emitted anchor is byte-identical to today's clause text.
+
+_STRUCTURED_RULES_MARKDOWN = """1 Introduction
+
+1.1 A financial institution must obtain the Bank's written approval before entering into a new material outsourcing arrangement.
+
+1.2 An application for approval under paragraph 1.1 must be submitted at least ninety days before the proposed commencement date.
+"""
+
+
+def test_structured_rules_segment_wraps_clauses_as_anchors():
+    anchors = structured_rules_segment("outsourcing", _STRUCTURED_RULES_MARKDOWN)
+
+    assert len(anchors) == 2
+
+    first, second = anchors
+    assert first["anchor_id"] == "Outsourcing 1.1"
+    assert first["anchor_label"] == "Outsourcing 1.1"
+    assert first["doc_class"] == "structured-rules"
+    assert first["document_id"] == "outsourcing"
+    assert first["heading_path"] == []
+    assert first["page_span"] is None
+    assert first["parent_anchor"] is None
+    assert first["text"] in _STRUCTURED_RULES_MARKDOWN
+    assert first["text"].startswith("A financial institution")
+
+    assert second["anchor_id"] == "Outsourcing 1.2"
+    assert second["text"] in _STRUCTURED_RULES_MARKDOWN
+
+
+def test_structured_rules_uses_policy_short_name_for_anchor_id():
+    # `"rmit"` maps to `"RMiT"` in POLICY_SHORT_NAMES — the anchor_id must use
+    # the canonical shortname (mixed case), NOT the raw lowercase document_id.
+    rmit_markdown = (
+        "1 Introduction\n\n"
+        "1.1 Financial institutions must invest in the required expertise.\n"
+    )
+
+    anchors = structured_rules_segment("rmit", rmit_markdown)
+
+    assert len(anchors) == 1
+    assert anchors[0]["anchor_id"] == "RMiT 1.1"
+    assert not anchors[0]["anchor_id"].startswith("rmit ")
+
+
+def test_structured_rules_raises_for_unknown_document_id():
+    # A document_id with no entry in POLICY_SHORT_NAMES must raise a clear
+    # wrapped error, not a bare KeyError. Naming the offending document_id in
+    # the message is the "diagnose without a debugger" contract.
+    with pytest.raises(UnknownDocumentIdError, match="not-a-real-doc"):
+        structured_rules_segment("not-a-real-doc", "1.1 Some clause text.\n")
+
+
+def test_structured_rules_registered_by_default():
+    # The module-level `segment(...)` uses the default registry, which Task 3
+    # populates at import time with the structured-rules strategy. No explicit
+    # `.register(...)` call by the caller is required.
+    anchors = segment(
+        document_id="outsourcing",
+        source_markdown=_STRUCTURED_RULES_MARKDOWN,
+        doc_class="structured-rules",
+    )
+
+    assert len(anchors) >= 1
+    assert all(a["doc_class"] == "structured-rules" for a in anchors)
+    assert anchors[0]["anchor_id"].startswith("Outsourcing ")
+
+
+def test_structured_rules_round_trips_bnm_clauses_byte_identical():
+    """The structured-rules segmenter wraps ClauseIndex output — a BNM clause's
+    text MUST match byte-for-byte what ClauseIndex returns today.
+
+    Runs the same real BNM markdown (`data/mock/rmit-v2-2026-draft.md`) through
+    BOTH pipelines and compares selected clause texts. Any drift here would be
+    an anchor-wrapper bug corrupting the verbatim-citation guarantee — the
+    whole point of Task 3 is that this round-trip is a no-op.
+    """
+    from pathlib import Path
+
+    from engine.clauses import ClauseIndex, segment_clauses
+
+    md_path = Path("data/mock/rmit-v2-2026-draft.md")
+    markdown = md_path.read_text(encoding="utf-8")
+
+    # Baseline: what ClauseIndex returns today.
+    entries = segment_clauses(
+        markdown=markdown,
+        document_id="rmit",
+        policy_id="rmit",
+        source="published",
+    )
+    baseline_index = ClauseIndex(entries)
+
+    # Anchor path: what Task 3's segmenter emits.
+    anchors = structured_rules_segment("rmit", markdown)
+    anchors_by_id = {a["anchor_id"]: a for a in anchors}
+
+    # Every ClauseIndex clause is present as an Anchor with byte-identical text.
+    for clause_number, baseline in entries.items():
+        anchor = anchors_by_id.get(clause_number)
+        assert anchor is not None, f"missing anchor for {clause_number}"
+        assert anchor["text"] == baseline["text"], (
+            f"text drift for {clause_number}: "
+            f"anchor {anchor['text'][:40]!r} vs baseline "
+            f"{baseline['text'][:40]!r}"
+        )
+
+    # Spot-check a few well-known BNM clause_numbers explicitly, so a future
+    # regression flags loudly on named clauses instead of an aggregate diff.
+    for clause_number in ("RMiT 1.1", "RMiT 1.1(a)", "RMiT 1.2"):
+        baseline_entry = baseline_index.get(clause_number)
+        assert baseline_entry is not None
+        assert anchors_by_id[clause_number]["text"] == baseline_entry["text"]
+
+
 def test_segment_raises_unknown_doc_class():
-    # Module-level `segment` uses the module-level registry which is empty on
-    # import — Tasks 3-5 register the real strategies. Any doc_class raises.
-    with pytest.raises(UnknownDocClassError, match="structured-rules"):
+    # Task 3 registers `"structured-rules"` at import time; `"semi-structured"`
+    # and `"prose"` land in later tasks. Any unregistered doc_class raises.
+    with pytest.raises(UnknownDocClassError, match="semi-structured"):
         segment(
             document_id="doc-a",
             source_markdown="ignored",
-            doc_class="structured-rules",
+            doc_class="semi-structured",
         )
