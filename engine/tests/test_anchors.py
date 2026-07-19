@@ -167,6 +167,21 @@ def test_structured_rules_segment_wraps_clauses_as_anchors():
     assert second["text"] in _STRUCTURED_RULES_MARKDOWN
 
 
+def test_structured_rules_uses_policy_short_name_for_anchor_id():
+    # `"rmit"` maps to `"RMiT"` in POLICY_SHORT_NAMES — the anchor_id must use
+    # the canonical shortname (mixed case), NOT the raw lowercase document_id.
+    rmit_markdown = (
+        "1 Introduction\n\n"
+        "1.1 Financial institutions must invest in the required expertise.\n"
+    )
+
+    anchors = structured_rules_segment("rmit", rmit_markdown)
+
+    assert len(anchors) == 1
+    assert anchors[0]["anchor_id"] == "RMiT 1.1"
+    assert not anchors[0]["anchor_id"].startswith("rmit ")
+
+
 def test_segment_raises_unknown_doc_class():
     # Task 3 registers `"structured-rules"` at import time; `"semi-structured"`
     # and `"prose"` land in later tasks. Any unregistered doc_class raises.
