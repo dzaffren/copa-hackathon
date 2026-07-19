@@ -191,6 +191,21 @@ def test_structured_rules_raises_for_unknown_document_id():
         structured_rules_segment("not-a-real-doc", "1.1 Some clause text.\n")
 
 
+def test_structured_rules_registered_by_default():
+    # The module-level `segment(...)` uses the default registry, which Task 3
+    # populates at import time with the structured-rules strategy. No explicit
+    # `.register(...)` call by the caller is required.
+    anchors = segment(
+        document_id="outsourcing",
+        source_markdown=_STRUCTURED_RULES_MARKDOWN,
+        doc_class="structured-rules",
+    )
+
+    assert len(anchors) >= 1
+    assert all(a["doc_class"] == "structured-rules" for a in anchors)
+    assert anchors[0]["anchor_id"].startswith("Outsourcing ")
+
+
 def test_segment_raises_unknown_doc_class():
     # Task 3 registers `"structured-rules"` at import time; `"semi-structured"`
     # and `"prose"` land in later tasks. Any unregistered doc_class raises.
