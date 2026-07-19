@@ -10,11 +10,11 @@
       "summary": "Open finance's operational resilience obligations for ensuring continuity during disruptions, system downtime, API outages, and third-party failures directly embody the operational resilience themes and business continuity requirements discussed in the discussion paper.",
       "label": "aligns-with",
       "sentiment": null,
-      "source_clauses": [
+      "source_anchors": [
         "Open Finance 7.6(b)",
         "Open Finance 12.2"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 4.3",
         "Operational Resilience 3.3(a)",
         "Operational Resilience 2.9(b)"
@@ -24,11 +24,11 @@
       "summary": "Open finance's reliance on third-party service providers and cloud/outsourcing arrangements maps directly to the discussion paper's concerns on external dependency management and third-party oversight requirements.",
       "label": "aligns-with",
       "sentiment": null,
-      "source_clauses": [
+      "source_anchors": [
         "Open Finance 11.8",
         "Open Finance 12.2"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 4.5",
         "Operational Resilience 2.6",
         "Operational Resilience 4.4"
@@ -38,11 +38,11 @@
       "summary": "Open finance's cyber and API security control requirements correspond to the discussion paper's emphasis on managing cyber threats and vulnerabilities in software supply chains and interfaces.",
       "label": "aligns-with",
       "sentiment": null,
-      "source_clauses": [
+      "source_anchors": [
         "Open Finance 12.3",
         "Open Finance 11.5"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 2.4",
         "Operational Resilience 4.7",
         "Operational Resilience 2.3"
@@ -52,12 +52,12 @@
       "summary": "Open finance's requirement for board and senior management oversight of resilient and secure operations aligns with the discussion paper's call for board-level ownership and accountability for operational resilience.",
       "label": "aligns-with",
       "sentiment": null,
-      "source_clauses": [
+      "source_anchors": [
         "Open Finance 7.1",
         "Open Finance 7.3",
         "Open Finance 7.5"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 6.1",
         "Operational Resilience 3.4",
         "Operational Resilience 6.3"
@@ -67,13 +67,13 @@
       "summary": "Both documents rely on the same underlying policy documents (BCM, RMIT, Outsourcing, Risk Governance, Operational Risk) as the foundation for operational resilience and technology risk management.",
       "label": "aligns-with",
       "sentiment": null,
-      "source_clauses": [
+      "source_anchors": [
         "Open Finance 6.1(c)",
         "Open Finance 6.1(d)",
         "Open Finance 6.1(g)",
         "Open Finance 6.1(h)"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 4.2",
         "Operational Resilience 4.3",
         "Operational Resilience 4.5"
@@ -83,11 +83,11 @@
       "summary": "Open finance's independent review requirements relating to operational resilience of technology functions correspond to the discussion paper's emphasis on scenario testing and validation of recovery capabilities.",
       "label": "aligns-with",
       "sentiment": null,
-      "source_clauses": [
+      "source_anchors": [
         "Open Finance 12.5",
         "Open Finance 7.6(f)"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 2.9(e)",
         "Operational Resilience 3.3(e)",
         "Operational Resilience 5.3"
@@ -97,11 +97,11 @@
       "summary": "Open finance's concentration of participation on shared platforms and common data-sharing infrastructure amplifies the systemic and concentration risks the discussion paper identifies from interconnected shared infrastructures.",
       "label": "aligns-with",
       "sentiment": null,
-      "source_clauses": [
+      "source_anchors": [
         "Open Finance 8.6",
         "Open Finance 12.5"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 2.6",
         "Operational Resilience 2.6(a)",
         "Operational Resilience 5.5"
@@ -111,11 +111,11 @@
       "summary": "Open finance's uptime and availability requirements for platform participation reflect the discussion paper's low-tolerance-for-downtime expectations and consumer sensitivity to service outages.",
       "label": "aligns-with",
       "sentiment": null,
-      "source_clauses": [
+      "source_anchors": [
         "Open Finance 12.5",
         "Open Finance 12.2"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 2.5",
         "Operational Resilience 2.9(d)",
         "Operational Resilience 4.7"
@@ -127,41 +127,41 @@
       "summary": "Open finance's operational resilience obligations for ensuring continuity during disruptions, system downtime, API outages, and third-party failures directly embody the operational resilience themes and business continuity requirements discussed in the discussion paper.",
       "label": "aligns-with",
       "sentiment": null,
-      "source_clauses": [
+      "scope_note": "Open finance frames continuity around availability, integrity and confidentiality of data exchanged, whereas the discussion paper's continuity concept centres on identifying and preserving 'critical operations and/or services' more broadly; alignment is thematic rather than a one-to-one requirement mapping.",
+      "source_anchors": [
         "Open Finance 7.6(b)",
         "Open Finance 12.2"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 4.3",
         "Operational Resilience 3.3(a)",
         "Operational Resilience 2.9(b)"
-      ],
-      "scope_note": "Open finance frames continuity around availability, integrity and confidentiality of data exchanged, whereas the discussion paper's continuity concept centres on identifying and preserving 'critical operations and/or services' more broadly; alignment is thematic rather than a one-to-one requirement mapping."
+      ]
     },
     {
       "summary": "Open finance's reliance on third-party service providers and cloud/outsourcing arrangements maps directly to the discussion paper's concerns on external dependency management and third-party oversight requirements.",
       "label": "goes-beyond",
       "sentiment": null,
-      "source_clauses": [
+      "scope_note": "Open finance's third-party obligations are anchored to data privacy/confidentiality/security (via the Customer Information, RMIT and Outsourcing policy documents), while the discussion paper's third-party concern extends to substitutability, concentration and systemic risk which open finance does not explicitly address.",
+      "source_anchors": [
         "Open Finance 11.8",
         "Open Finance 12.2"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 4.5",
         "Operational Resilience 2.6",
         "Operational Resilience 4.4"
-      ],
-      "scope_note": "Open finance's third-party obligations are anchored to data privacy/confidentiality/security (via the Customer Information, RMIT and Outsourcing policy documents), while the discussion paper's third-party concern extends to substitutability, concentration and systemic risk which open finance does not explicitly address."
+      ]
     },
     {
       "summary": "Open finance's cyber and API security control requirements correspond to the discussion paper's emphasis on managing cyber threats and vulnerabilities in software supply chains and interfaces.",
       "label": "aligns-with",
       "sentiment": null,
-      "source_clauses": [
+      "source_anchors": [
         "Open Finance 12.3",
         "Open Finance 11.5"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 2.4",
         "Operational Resilience 4.7",
         "Operational Resilience 2.3"
@@ -171,104 +171,104 @@
       "summary": "Open finance's requirement for board and senior management oversight of resilient and secure operations aligns with the discussion paper's call for board-level ownership and accountability for operational resilience.",
       "label": "goes-beyond",
       "sentiment": null,
-      "source_clauses": [
+      "scope_note": "Open finance does not mandate a single ultimately-accountable person for operational resilience outcomes (cf. OpRes 6.3 Responsibility Mapping); it relies on general board/senior-management oversight applied to open finance activities.",
+      "source_anchors": [
         "Open Finance 7.1",
         "Open Finance 7.3",
         "Open Finance 7.5"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 6.1",
         "Operational Resilience 3.4",
         "Operational Resilience 6.3"
-      ],
-      "scope_note": "Open finance does not mandate a single ultimately-accountable person for operational resilience outcomes (cf. OpRes 6.3 Responsibility Mapping); it relies on general board/senior-management oversight applied to open finance activities."
+      ]
     },
     {
       "summary": "Both documents rely on the same underlying policy documents (BCM, RMIT, Outsourcing, Risk Governance, Operational Risk) as the foundation for operational resilience and technology risk management.",
       "label": "aligns-with",
       "sentiment": null,
-      "source_clauses": [
+      "scope_note": "The two documents cite differing effective/issuance dates for the same instruments (e.g. RMIT issued 1 June 2023 per Open Finance 6.1(h) vs 28 November 2025 per OpRes footnote 6); the shared foundation holds but versions may differ.",
+      "source_anchors": [
         "Open Finance 6.1(c)",
         "Open Finance 6.1(d)",
         "Open Finance 6.1(g)",
         "Open Finance 6.1(h)"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 4.2",
         "Operational Resilience 4.3",
         "Operational Resilience 4.5"
-      ],
-      "scope_note": "The two documents cite differing effective/issuance dates for the same instruments (e.g. RMIT issued 1 June 2023 per Open Finance 6.1(h) vs 28 November 2025 per OpRes footnote 6); the shared foundation holds but versions may differ."
+      ]
     },
     {
       "summary": "Open finance's independent review requirements relating to operational resilience of technology functions correspond to the discussion paper's emphasis on scenario testing and validation of recovery capabilities.",
       "label": "differs-on",
       "sentiment": "tighten",
-      "source_clauses": [
+      "scope_note": "Open finance requires independent review/audit and assurance coverage but does not prescribe severe-but-plausible scenario testing; the connection to OpRes scenario-testing themes is aspirational. OpRes 5.3 (board technical literacy) dropped as not supported by the cited open finance clauses.",
+      "source_anchors": [
         "Open Finance 12.5",
         "Open Finance 7.6(f)"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 2.9(e)",
         "Operational Resilience 3.3(e)"
-      ],
-      "scope_note": "Open finance requires independent review/audit and assurance coverage but does not prescribe severe-but-plausible scenario testing; the connection to OpRes scenario-testing themes is aspirational. OpRes 5.3 (board technical literacy) dropped as not supported by the cited open finance clauses."
+      ]
     },
     {
       "summary": "Open finance's concentration of participation on shared platforms and common data-sharing infrastructure amplifies the systemic and concentration risks the discussion paper identifies from interconnected shared infrastructures.",
       "label": "aligns-with",
       "sentiment": null,
-      "source_clauses": [
+      "scope_note": "This is an inferred systemic-risk linkage; open finance clauses describe interface/platform obligations rather than explicitly recognising concentration risk, so the mapping is analytical rather than textual.",
+      "source_anchors": [
         "Open Finance 8.6",
         "Open Finance 12.5"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 2.6",
         "Operational Resilience 2.6(a)",
         "Operational Resilience 5.5"
-      ],
-      "scope_note": "This is an inferred systemic-risk linkage; open finance clauses describe interface/platform obligations rather than explicitly recognising concentration risk, so the mapping is analytical rather than textual."
+      ]
     },
     {
       "summary": "Open finance's uptime and availability requirements for platform participation reflect the discussion paper's low-tolerance-for-downtime expectations and consumer sensitivity to service outages.",
       "label": "differs-on",
       "sentiment": "tighten",
-      "source_clauses": [
+      "scope_note": "Open finance sets uptime requirements via platform membership rules rather than defining impact tolerances; the discussion paper's impact-tolerance/MTD/RTO concepts (OpRes 2.9(d)) are broader than open finance's uptime obligations.",
+      "source_anchors": [
         "Open Finance 12.5",
         "Open Finance 12.2"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 2.5",
         "Operational Resilience 2.9(d)",
         "Operational Resilience 4.7"
-      ],
-      "scope_note": "Open finance sets uptime requirements via platform membership rules rather than defining impact tolerances; the discussion paper's impact-tolerance/MTD/RTO concepts (OpRes 2.9(d)) are broader than open finance's uptime obligations."
+      ]
     },
     {
       "summary": "Open finance's customer information breach handling and incident response plan requirements correspond to the discussion paper's emphasis on effective incident response, timely escalation, and remediation of weaknesses.",
       "label": "differs-on",
       "sentiment": "tighten",
-      "source_clauses": [
+      "scope_note": "Open finance breach handling is scoped specifically to customer information breaches under the PDPA and Customer Information policy document, narrower than the discussion paper's general operational incident response and continuous-learning themes.",
+      "source_anchors": [
         "Open Finance 11.11",
         "Open Finance 11.12",
         "Open Finance 7.6(g)"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 6.4(d)",
         "Operational Resilience 6.4(f)",
         "Operational Resilience 2.9(g)"
-      ],
-      "scope_note": "Open finance breach handling is scoped specifically to customer information breaches under the PDPA and Customer Information policy document, narrower than the discussion paper's general operational incident response and continuous-learning themes."
+      ]
     },
     {
       "summary": "Open finance's requirement to establish and maintain business continuity plans covering service continuity in the event of disruptions maps to the discussion paper's reliance on the BCM policy document for continuity of critical business functions.",
       "label": "aligns-with",
       "sentiment": null,
-      "source_clauses": [
+      "source_anchors": [
         "Open Finance 7.6(b)",
         "Open Finance 6.1(g)"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 4.3",
         "Operational Resilience 4.4",
         "Operational Resilience 4.12(a)"
@@ -278,31 +278,31 @@
       "summary": "Open finance's requirement to ensure data consumers apply safeguards at least equivalent to their own, and to manage risks posed to and by other participants, reflects the discussion paper's theme of mapping and managing internal and external interdependencies across interconnected institutions.",
       "label": "differs-on",
       "sentiment": "tighten",
-      "source_clauses": [
+      "scope_note": "Open finance's dependency concern is data-flow specific (risks arising from information received from data providers and posed to data consumers) rather than the full people/process/technology/facilities mapping envisaged in OpRes 3.3(b).",
+      "source_anchors": [
         "Open Finance 11.6",
         "Open Finance 7.5"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 3.3(b)",
         "Operational Resilience 2.9(c)",
         "Operational Resilience 4.4"
-      ],
-      "scope_note": "Open finance's dependency concern is data-flow specific (risks arising from information received from data providers and posed to data consumers) rather than the full people/process/technology/facilities mapping envisaged in OpRes 3.3(b)."
+      ]
     },
     {
       "summary": "Open finance's framing of secure, resilient data-sharing infrastructure as foundational to trust and resilience in an increasingly digital financial system echoes the discussion paper's context of rising digitalisation, deeper dependency chains, and the imperative to sustain continuity of essential digital services.",
       "label": "aligns-with",
       "sentiment": null,
-      "source_clauses": [
+      "scope_note": "Contextual/thematic alignment on digitalisation and resilience objectives rather than an operative requirement mapping.",
+      "source_anchors": [
         "Open Finance 1.1",
         "Open Finance 1.3"
       ],
-      "target_clauses": [
+      "target_anchors": [
         "Operational Resilience 2.1",
         "Operational Resilience 2.3",
         "Operational Resilience 7.1"
-      ],
-      "scope_note": "Contextual/thematic alignment on digitalisation and resilience objectives rather than an operative requirement mapping."
+      ]
     }
   ],
   "validation": [
@@ -310,349 +310,349 @@
       "summary": "Open finance's operational resilience obligations for ensuring continuity during disruptions, system downtime, API outages, and third-party failures directly embody the operational resilience themes and business continuity requirements discussed in the discussion paper.",
       "label": "aligns-with",
       "sentiment": null,
-      "cited_clauses": [
+      "supported": true,
+      "cited_anchors": [
         {
-          "clause_number": "Open Finance 7.6(b)",
+          "anchor_id": "Open Finance 7.6(b)",
           "resolved": true
         },
         {
-          "clause_number": "Open Finance 12.2",
+          "anchor_id": "Open Finance 12.2",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 4.3",
+          "anchor_id": "Operational Resilience 4.3",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 3.3(a)",
+          "anchor_id": "Operational Resilience 3.3(a)",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 2.9(b)",
+          "anchor_id": "Operational Resilience 2.9(b)",
           "resolved": true
         }
-      ],
-      "supported": true
+      ]
     },
     {
       "summary": "Open finance's reliance on third-party service providers and cloud/outsourcing arrangements maps directly to the discussion paper's concerns on external dependency management and third-party oversight requirements.",
       "label": "goes-beyond",
       "sentiment": null,
-      "cited_clauses": [
+      "supported": true,
+      "cited_anchors": [
         {
-          "clause_number": "Open Finance 11.8",
+          "anchor_id": "Open Finance 11.8",
           "resolved": true
         },
         {
-          "clause_number": "Open Finance 12.2",
+          "anchor_id": "Open Finance 12.2",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 4.5",
+          "anchor_id": "Operational Resilience 4.5",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 2.6",
+          "anchor_id": "Operational Resilience 2.6",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 4.4",
+          "anchor_id": "Operational Resilience 4.4",
           "resolved": true
         }
-      ],
-      "supported": true
+      ]
     },
     {
       "summary": "Open finance's cyber and API security control requirements correspond to the discussion paper's emphasis on managing cyber threats and vulnerabilities in software supply chains and interfaces.",
       "label": "aligns-with",
       "sentiment": null,
-      "cited_clauses": [
+      "supported": true,
+      "cited_anchors": [
         {
-          "clause_number": "Open Finance 12.3",
+          "anchor_id": "Open Finance 12.3",
           "resolved": true
         },
         {
-          "clause_number": "Open Finance 11.5",
+          "anchor_id": "Open Finance 11.5",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 2.4",
+          "anchor_id": "Operational Resilience 2.4",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 4.7",
+          "anchor_id": "Operational Resilience 4.7",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 2.3",
+          "anchor_id": "Operational Resilience 2.3",
           "resolved": true
         }
-      ],
-      "supported": true
+      ]
     },
     {
       "summary": "Open finance's requirement for board and senior management oversight of resilient and secure operations aligns with the discussion paper's call for board-level ownership and accountability for operational resilience.",
       "label": "goes-beyond",
       "sentiment": null,
-      "cited_clauses": [
+      "supported": true,
+      "cited_anchors": [
         {
-          "clause_number": "Open Finance 7.1",
+          "anchor_id": "Open Finance 7.1",
           "resolved": true
         },
         {
-          "clause_number": "Open Finance 7.3",
+          "anchor_id": "Open Finance 7.3",
           "resolved": true
         },
         {
-          "clause_number": "Open Finance 7.5",
+          "anchor_id": "Open Finance 7.5",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 6.1",
+          "anchor_id": "Operational Resilience 6.1",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 3.4",
+          "anchor_id": "Operational Resilience 3.4",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 6.3",
+          "anchor_id": "Operational Resilience 6.3",
           "resolved": true
         }
-      ],
-      "supported": true
+      ]
     },
     {
       "summary": "Both documents rely on the same underlying policy documents (BCM, RMIT, Outsourcing, Risk Governance, Operational Risk) as the foundation for operational resilience and technology risk management.",
       "label": "aligns-with",
       "sentiment": null,
-      "cited_clauses": [
+      "supported": true,
+      "cited_anchors": [
         {
-          "clause_number": "Open Finance 6.1(c)",
+          "anchor_id": "Open Finance 6.1(c)",
           "resolved": true
         },
         {
-          "clause_number": "Open Finance 6.1(d)",
+          "anchor_id": "Open Finance 6.1(d)",
           "resolved": true
         },
         {
-          "clause_number": "Open Finance 6.1(g)",
+          "anchor_id": "Open Finance 6.1(g)",
           "resolved": true
         },
         {
-          "clause_number": "Open Finance 6.1(h)",
+          "anchor_id": "Open Finance 6.1(h)",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 4.2",
+          "anchor_id": "Operational Resilience 4.2",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 4.3",
+          "anchor_id": "Operational Resilience 4.3",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 4.5",
+          "anchor_id": "Operational Resilience 4.5",
           "resolved": true
         }
-      ],
-      "supported": true
+      ]
     },
     {
       "summary": "Open finance's independent review requirements relating to operational resilience of technology functions correspond to the discussion paper's emphasis on scenario testing and validation of recovery capabilities.",
       "label": "differs-on",
       "sentiment": "tighten",
-      "cited_clauses": [
+      "supported": true,
+      "cited_anchors": [
         {
-          "clause_number": "Open Finance 12.5",
+          "anchor_id": "Open Finance 12.5",
           "resolved": true
         },
         {
-          "clause_number": "Open Finance 7.6(f)",
+          "anchor_id": "Open Finance 7.6(f)",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 2.9(e)",
+          "anchor_id": "Operational Resilience 2.9(e)",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 3.3(e)",
+          "anchor_id": "Operational Resilience 3.3(e)",
           "resolved": true
         }
-      ],
-      "supported": true
+      ]
     },
     {
       "summary": "Open finance's concentration of participation on shared platforms and common data-sharing infrastructure amplifies the systemic and concentration risks the discussion paper identifies from interconnected shared infrastructures.",
       "label": "aligns-with",
       "sentiment": null,
-      "cited_clauses": [
+      "supported": true,
+      "cited_anchors": [
         {
-          "clause_number": "Open Finance 8.6",
+          "anchor_id": "Open Finance 8.6",
           "resolved": true
         },
         {
-          "clause_number": "Open Finance 12.5",
+          "anchor_id": "Open Finance 12.5",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 2.6",
+          "anchor_id": "Operational Resilience 2.6",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 2.6(a)",
+          "anchor_id": "Operational Resilience 2.6(a)",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 5.5",
+          "anchor_id": "Operational Resilience 5.5",
           "resolved": true
         }
-      ],
-      "supported": true
+      ]
     },
     {
       "summary": "Open finance's uptime and availability requirements for platform participation reflect the discussion paper's low-tolerance-for-downtime expectations and consumer sensitivity to service outages.",
       "label": "differs-on",
       "sentiment": "tighten",
-      "cited_clauses": [
+      "supported": true,
+      "cited_anchors": [
         {
-          "clause_number": "Open Finance 12.5",
+          "anchor_id": "Open Finance 12.5",
           "resolved": true
         },
         {
-          "clause_number": "Open Finance 12.2",
+          "anchor_id": "Open Finance 12.2",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 2.5",
+          "anchor_id": "Operational Resilience 2.5",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 2.9(d)",
+          "anchor_id": "Operational Resilience 2.9(d)",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 4.7",
+          "anchor_id": "Operational Resilience 4.7",
           "resolved": true
         }
-      ],
-      "supported": true
+      ]
     },
     {
       "summary": "Open finance's customer information breach handling and incident response plan requirements correspond to the discussion paper's emphasis on effective incident response, timely escalation, and remediation of weaknesses.",
       "label": "differs-on",
       "sentiment": "tighten",
-      "cited_clauses": [
+      "supported": true,
+      "cited_anchors": [
         {
-          "clause_number": "Open Finance 11.11",
+          "anchor_id": "Open Finance 11.11",
           "resolved": true
         },
         {
-          "clause_number": "Open Finance 11.12",
+          "anchor_id": "Open Finance 11.12",
           "resolved": true
         },
         {
-          "clause_number": "Open Finance 7.6(g)",
+          "anchor_id": "Open Finance 7.6(g)",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 6.4(d)",
+          "anchor_id": "Operational Resilience 6.4(d)",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 6.4(f)",
+          "anchor_id": "Operational Resilience 6.4(f)",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 2.9(g)",
+          "anchor_id": "Operational Resilience 2.9(g)",
           "resolved": true
         }
-      ],
-      "supported": true
+      ]
     },
     {
       "summary": "Open finance's requirement to establish and maintain business continuity plans covering service continuity in the event of disruptions maps to the discussion paper's reliance on the BCM policy document for continuity of critical business functions.",
       "label": "aligns-with",
       "sentiment": null,
-      "cited_clauses": [
+      "supported": true,
+      "cited_anchors": [
         {
-          "clause_number": "Open Finance 7.6(b)",
+          "anchor_id": "Open Finance 7.6(b)",
           "resolved": true
         },
         {
-          "clause_number": "Open Finance 6.1(g)",
+          "anchor_id": "Open Finance 6.1(g)",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 4.3",
+          "anchor_id": "Operational Resilience 4.3",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 4.4",
+          "anchor_id": "Operational Resilience 4.4",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 4.12(a)",
+          "anchor_id": "Operational Resilience 4.12(a)",
           "resolved": true
         }
-      ],
-      "supported": true
+      ]
     },
     {
       "summary": "Open finance's requirement to ensure data consumers apply safeguards at least equivalent to their own, and to manage risks posed to and by other participants, reflects the discussion paper's theme of mapping and managing internal and external interdependencies across interconnected institutions.",
       "label": "differs-on",
       "sentiment": "tighten",
-      "cited_clauses": [
+      "supported": true,
+      "cited_anchors": [
         {
-          "clause_number": "Open Finance 11.6",
+          "anchor_id": "Open Finance 11.6",
           "resolved": true
         },
         {
-          "clause_number": "Open Finance 7.5",
+          "anchor_id": "Open Finance 7.5",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 3.3(b)",
+          "anchor_id": "Operational Resilience 3.3(b)",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 2.9(c)",
+          "anchor_id": "Operational Resilience 2.9(c)",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 4.4",
+          "anchor_id": "Operational Resilience 4.4",
           "resolved": true
         }
-      ],
-      "supported": true
+      ]
     },
     {
       "summary": "Open finance's framing of secure, resilient data-sharing infrastructure as foundational to trust and resilience in an increasingly digital financial system echoes the discussion paper's context of rising digitalisation, deeper dependency chains, and the imperative to sustain continuity of essential digital services.",
       "label": "aligns-with",
       "sentiment": null,
-      "cited_clauses": [
+      "supported": true,
+      "cited_anchors": [
         {
-          "clause_number": "Open Finance 1.1",
+          "anchor_id": "Open Finance 1.1",
           "resolved": true
         },
         {
-          "clause_number": "Open Finance 1.3",
+          "anchor_id": "Open Finance 1.3",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 2.1",
+          "anchor_id": "Operational Resilience 2.1",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 2.3",
+          "anchor_id": "Operational Resilience 2.3",
           "resolved": true
         },
         {
-          "clause_number": "Operational Resilience 7.1",
+          "anchor_id": "Operational Resilience 7.1",
           "resolved": true
         }
-      ],
-      "supported": true
+      ]
     }
   ]
 }
