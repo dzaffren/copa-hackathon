@@ -14,6 +14,7 @@ from engine.anchors import (
     AnchorTextNotFoundError,
     SegmenterRegistry,
     UnknownDocClassError,
+    UnknownDocumentIdError,
     segment,
     structured_rules_segment,
     verify_substring,
@@ -180,6 +181,14 @@ def test_structured_rules_uses_policy_short_name_for_anchor_id():
     assert len(anchors) == 1
     assert anchors[0]["anchor_id"] == "RMiT 1.1"
     assert not anchors[0]["anchor_id"].startswith("rmit ")
+
+
+def test_structured_rules_raises_for_unknown_document_id():
+    # A document_id with no entry in POLICY_SHORT_NAMES must raise a clear
+    # wrapped error, not a bare KeyError. Naming the offending document_id in
+    # the message is the "diagnose without a debugger" contract.
+    with pytest.raises(UnknownDocumentIdError, match="not-a-real-doc"):
+        structured_rules_segment("not-a-real-doc", "1.1 Some clause text.\n")
 
 
 def test_segment_raises_unknown_doc_class():
