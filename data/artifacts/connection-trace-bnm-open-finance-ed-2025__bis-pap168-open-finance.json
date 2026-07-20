@@ -1,0 +1,852 @@
+{
+  "model_id": "claude-opus-4-8",
+  "timestamp": "2026-07-19T10:35:03.848842+00:00",
+  "document_ids": [
+    "bnm-open-finance-ed-2025",
+    "bis-pap168-open-finance"
+  ],
+  "finder_output": [
+    {
+      "summary": "Both documents define open finance as a framework for permissioned/consent-driven sharing of customer financial information between data holders and third parties.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "BNM 11(a)(b)(c)(d)(e)(f)(g)",
+        "BNM 1.2"
+      ],
+      "target_anchors": [
+        "BIS Pap168 2",
+        "BIS Pap168 27"
+      ]
+    },
+    {
+      "summary": "Our framework mandates standardised, machine-readable API-based data transmission, consistent with BIS's finding that standardised APIs are the backbone of interoperable open finance ecosystems.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "BNM 2(a)",
+        "BNM 12.5"
+      ],
+      "target_anchors": [
+        "BIS Pap168 6",
+        "BIS Pap168 8"
+      ]
+    },
+    {
+      "summary": "We adopt a regulatory-mandate/prescriptive approach with binding standards and mandated FSPs, matching BIS's regulation-led prescriptive category.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "BNM 5.2",
+        "BNM 9",
+        "BNM 8"
+      ],
+      "target_anchors": [
+        "BIS Pap168 6",
+        "BIS Pap168 22"
+      ]
+    },
+    {
+      "summary": "Our framework emphasises financial inclusion as a goal, aligning with BIS's finding that inclusion is a top motivation for open finance frameworks.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "BNM 1.2",
+        "BNM 3",
+        "BNM 4"
+      ],
+      "target_anchors": [
+        "BIS Pap168 4",
+        "BIS Pap168 18"
+      ]
+    },
+    {
+      "summary": "We include single account view and credit underwriting use cases that BIS identifies as key open finance applications driving adoption and credit access.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "BNM 1.2",
+        "BNM 4"
+      ],
+      "target_anchors": [
+        "BIS Pap168 16"
+      ]
+    },
+    {
+      "summary": "Both stress security, cyber risk management and secure API/data transmission controls as foundational to open finance.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "BNM 12.2",
+        "BNM 11.2(a)(b)(c)(d)(a)(b)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 6",
+        "BIS Pap168 9"
+      ]
+    },
+    {
+      "summary": "We prescribe a detailed, granular consent regime (voluntary, revocable, time-limited, dashboard, deletion on expiry), which BIS treats only as a high-level building block without prescribing specifics.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "BNM 10(a)(i)(ii)(iii)(b)",
+        "BNM 8(c)(d)",
+        "BNM 10.6",
+        "BNM 11",
+        "BNM 6"
+      ],
+      "target_anchors": [
+        "BIS Pap168 9"
+      ]
+    },
+    {
+      "summary": "We set binding requirements for third-party service provider handling of customer information and secure disposal, which BIS does not address in prescriptive detail.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "BNM 11.8",
+        "BNM 11.9",
+        "BNM 11.10",
+        "BNM 11.2(a)(b)(c)(d)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 6"
+      ]
+    },
+    {
+      "summary": "We phase in obligations gradually via a multi-year timeline, consistent with BIS's observation that jurisdictions typically implement open finance in phases starting from open banking.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "BNM 1.5",
+        "BNM 4.1",
+        "BNM 9",
+        "BNM 14"
+      ],
+      "target_anchors": [
+        "BIS Pap168 26"
+      ]
+    },
+    {
+      "summary": "We specify board and senior management oversight obligations for open finance, an governance dimension BIS does not cover.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "BNM 7",
+        "BNM 7(b)(c)(d)(e)(f)(g)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 9"
+      ]
+    },
+    {
+      "summary": "BIS discusses cross-border data portability and interoperability challenges (Project Aperta), which our domestic-focused policy does not address.",
+      "label": "silent-on",
+      "source_anchors": [
+        "BNM 1.6"
+      ],
+      "target_anchors": [
+        "BIS Pap168 24"
+      ]
+    },
+    {
+      "summary": "BIS raises data access pricing/fees as an emerging policy issue, which our framework is silent on.",
+      "label": "silent-on",
+      "source_anchors": [
+        "BNM 8"
+      ],
+      "target_anchors": [
+        "BIS Pap168 21"
+      ]
+    },
+    {
+      "summary": "BIS notes payment initiation/write access (e.g. PSD2) drives faster adoption, whereas our framework is read-only information sharing without payment initiation.",
+      "label": "differs-on",
+      "sentiment": "neutral",
+      "source_anchors": [
+        "BNM 1.2",
+        "BNM 2(a)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 28"
+      ]
+    },
+    {
+      "summary": "BIS highlights low adoption and behavioural/awareness barriers, particularly for underserved groups; we address this only through optional guidance on inclusive interface design.",
+      "label": "silent-on",
+      "source_anchors": [
+        "BNM 2(a)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 15"
+      ]
+    },
+    {
+      "summary": "Our optional guidance encourages inclusive, accessible interface design for underserved segments, partially responsive to BIS's evidence on lower adoption among disadvantaged groups.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "BNM 8"
+      ],
+      "target_anchors": [
+        "BIS Pap168 6"
+      ]
+    }
+  ],
+  "critic_output": [
+    {
+      "summary": "Both documents define open finance as a framework for permissioned/consent-driven sharing of customer financial information between data holders and third parties.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "BNM 11(a)(b)(c)(d)(e)(f)(g)",
+        "BNM 1.2"
+      ],
+      "target_anchors": [
+        "BIS Pap168 2",
+        "BIS Pap168 27"
+      ]
+    },
+    {
+      "summary": "Our framework mandates standardised, machine-readable API-based data transmission, consistent with BIS's finding that standardised APIs are the backbone of interoperable open finance ecosystems.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "BNM 2(a)",
+        "BNM 12.5"
+      ],
+      "target_anchors": [
+        "BIS Pap168 6",
+        "BIS Pap168 8"
+      ]
+    },
+    {
+      "summary": "We adopt a regulatory-mandate/prescriptive approach with binding standards and mandated FSPs, matching BIS's regulation-led prescriptive category.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "BNM 5.2",
+        "BNM 9",
+        "BNM 8"
+      ],
+      "target_anchors": [
+        "BIS Pap168 6",
+        "BIS Pap168 22"
+      ],
+      "scope_note": "BNM binding standards ('S') apply to mandated FSPs per Appendix 1; BIS notes mandatory participation is not proven a necessary condition for a level playing field."
+    },
+    {
+      "summary": "Our framework emphasises financial inclusion as a goal, aligning with BIS's finding that inclusion is a top motivation for open finance frameworks.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "BNM 1.2",
+        "BNM 3",
+        "BNM 4"
+      ],
+      "target_anchors": [
+        "BIS Pap168 4",
+        "BIS Pap168 18"
+      ]
+    },
+    {
+      "summary": "We include single account view and credit underwriting use cases that BIS identifies as key open finance applications driving adoption and credit access.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "BNM 1.2",
+        "BNM 4"
+      ],
+      "target_anchors": [
+        "BIS Pap168 16"
+      ]
+    },
+    {
+      "summary": "Both stress security, cyber risk management and secure API/data transmission controls as foundational to open finance.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "BNM 12.2",
+        "BNM 11.2(a)(b)(c)(d)(a)(b)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 6",
+        "BIS Pap168 9"
+      ]
+    },
+    {
+      "summary": "We prescribe a detailed, granular consent regime (voluntary, revocable, time-limited, dashboard, deletion on expiry), which BIS treats only as a high-level building block without prescribing specifics.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "BNM 10(a)(i)(ii)(iii)(b)",
+        "BNM 8(c)(d)",
+        "BNM 10.6",
+        "BNM 11",
+        "BNM 6"
+      ],
+      "target_anchors": [
+        "BIS Pap168 9"
+      ],
+      "scope_note": "Revocation right is subject to exception where disclosure is necessary to comply with legal or contractual requirements; recurring consent capped at six months."
+    },
+    {
+      "summary": "We set binding requirements for third-party service provider handling of customer information and secure disposal, which BIS does not address in prescriptive detail.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "BNM 11.8",
+        "BNM 11.2(a)(b)(c)(d)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 6"
+      ],
+      "scope_note": "Dropped invented anchors BNM 11.9 and BNM 11.10, which do not exist in the provided anchor list."
+    },
+    {
+      "summary": "We phase in obligations gradually via a multi-year timeline, consistent with BIS's observation that jurisdictions typically implement open finance in phases starting from open banking.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "BNM 1.5",
+        "BNM 4.1",
+        "BNM 9",
+        "BNM 14"
+      ],
+      "target_anchors": [
+        "BIS Pap168 26"
+      ]
+    },
+    {
+      "summary": "We specify board and senior management oversight obligations for open finance, a governance dimension BIS does not cover in prescriptive detail.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "BNM 7",
+        "BNM 7(b)(c)(d)(e)(f)(g)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 9"
+      ]
+    },
+    {
+      "summary": "BIS discusses cross-border data portability and interoperability challenges (Project Aperta), which our framework references only aspirationally as a national/regional Open Data ambition without operational requirements.",
+      "label": "silent-on",
+      "source_anchors": [
+        "BNM 1.6"
+      ],
+      "target_anchors": [
+        "BIS Pap168 24"
+      ],
+      "scope_note": "BNM 1.6 aspires to regional data-sharing initiatives aligned with global standards but sets no cross-border portability rules."
+    },
+    {
+      "summary": "BIS raises data access pricing/fees as an emerging policy issue, which our framework does not address.",
+      "label": "silent-on",
+      "source_anchors": [
+        "BNM 8"
+      ],
+      "target_anchors": [
+        "BIS Pap168 21"
+      ]
+    },
+    {
+      "summary": "BIS notes payment initiation/write access (e.g. PSD2) drives faster adoption, whereas our framework is read-only information sharing without payment initiation.",
+      "label": "differs-on",
+      "sentiment": "neutral",
+      "source_anchors": [
+        "BNM 1.2",
+        "BNM 2(a)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 28"
+      ]
+    },
+    {
+      "summary": "BIS highlights low adoption and behavioural/awareness barriers, particularly for underserved groups; our framework addresses this only through optional guidance on inclusive interface design.",
+      "label": "silent-on",
+      "source_anchors": [
+        "BNM 8"
+      ],
+      "target_anchors": [
+        "BIS Pap168 15"
+      ]
+    },
+    {
+      "summary": "Our optional guidance encourages inclusive, accessible interface design for underserved segments (including persons with disabilities and low digital literacy), responsive to BIS's evidence on lower adoption among disadvantaged groups.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "BNM 8"
+      ],
+      "target_anchors": [
+        "BIS Pap168 15"
+      ],
+      "scope_note": "Corrected target from BIS Pap168 6 (which concerns risks generally) to BIS Pap168 15 on adoption barriers; note this is only 'G' guidance, not a binding standard."
+    },
+    {
+      "summary": "We require data consumers to apply safeguards to received customer information at least equivalent to those for their own information and prohibit sharing with third parties without explicit consent \u2014 a data protection reciprocity dimension BIS does not prescribe.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "BNM 11.2(a)(b)(c)(d)(a)(b)",
+        "BNM 11.8"
+      ],
+      "target_anchors": [
+        "BIS Pap168 6"
+      ]
+    },
+    {
+      "summary": "We mandate a customer breach handling and response plan with escalation and remedial procedures for open finance data breaches, which BIS identifies as a risk area but does not prescribe controls for.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "BNM 11.12",
+        "BNM 11.12(a)(b)(a)(b)(c)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 6"
+      ]
+    },
+    {
+      "summary": "BIS frames open finance largely as a competition/anti-data-monopoly remedy; our framework centres on secure, responsible data sharing and risk management balanced against innovation rather than competition policy per se.",
+      "label": "differs-on",
+      "sentiment": "neutral",
+      "source_anchors": [
+        "BNM 1.3",
+        "BNM 3.2"
+      ],
+      "target_anchors": [
+        "BIS Pap168 4"
+      ]
+    },
+    {
+      "summary": "BIS discusses centralised vs decentralised technical architectures as a jurisdictional design choice; our framework adopts a platform-operator/centralised platform model without articulating this as an explicit architectural policy choice.",
+      "label": "silent-on",
+      "source_anchors": [
+        "BNM 8"
+      ],
+      "target_anchors": [
+        "BIS Pap168 11"
+      ]
+    },
+    {
+      "summary": "We prohibit bundled/blanket consent and require voluntary, non-coerced consent that cannot be a precondition for a product/service \u2014 a consumer-protection safeguard BIS notes only generally under governance/consent layers.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "BNM 10(a)(i)(ii)(iii)(b)",
+        "BNM 11"
+      ],
+      "target_anchors": [
+        "BIS Pap168 9"
+      ]
+    }
+  ],
+  "validation": [
+    {
+      "summary": "Both documents define open finance as a framework for permissioned/consent-driven sharing of customer financial information between data holders and third parties.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 11(a)(b)(c)(d)(e)(f)(g)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 1.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 27",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Our framework mandates standardised, machine-readable API-based data transmission, consistent with BIS's finding that standardised APIs are the backbone of interoperable open finance ecosystems.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 2(a)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 12.5",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 6",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 8",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "We adopt a regulatory-mandate/prescriptive approach with binding standards and mandated FSPs, matching BIS's regulation-led prescriptive category.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 5.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 9",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 8",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 6",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 22",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Our framework emphasises financial inclusion as a goal, aligning with BIS's finding that inclusion is a top motivation for open finance frameworks.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 1.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 3",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 4",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 4",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 18",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "We include single account view and credit underwriting use cases that BIS identifies as key open finance applications driving adoption and credit access.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 1.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 4",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 16",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both stress security, cyber risk management and secure API/data transmission controls as foundational to open finance.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 12.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 11.2(a)(b)(c)(d)(a)(b)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 6",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 9",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "We prescribe a detailed, granular consent regime (voluntary, revocable, time-limited, dashboard, deletion on expiry), which BIS treats only as a high-level building block without prescribing specifics.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 10(a)(i)(ii)(iii)(b)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 8(c)(d)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 10.6",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 11",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 6",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 9",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "We set binding requirements for third-party service provider handling of customer information and secure disposal, which BIS does not address in prescriptive detail.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 11.8",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 11.2(a)(b)(c)(d)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 6",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "We phase in obligations gradually via a multi-year timeline, consistent with BIS's observation that jurisdictions typically implement open finance in phases starting from open banking.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 1.5",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 4.1",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 9",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 14",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 26",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "We specify board and senior management oversight obligations for open finance, a governance dimension BIS does not cover in prescriptive detail.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 7",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 7(b)(c)(d)(e)(f)(g)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 9",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "BIS discusses cross-border data portability and interoperability challenges (Project Aperta), which our framework references only aspirationally as a national/regional Open Data ambition without operational requirements.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 1.6",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 24",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "BIS raises data access pricing/fees as an emerging policy issue, which our framework does not address.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 8",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 21",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "BIS notes payment initiation/write access (e.g. PSD2) drives faster adoption, whereas our framework is read-only information sharing without payment initiation.",
+      "label": "differs-on",
+      "sentiment": "neutral",
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 1.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 2(a)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 28",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "BIS highlights low adoption and behavioural/awareness barriers, particularly for underserved groups; our framework addresses this only through optional guidance on inclusive interface design.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 8",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 15",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Our optional guidance encourages inclusive, accessible interface design for underserved segments (including persons with disabilities and low digital literacy), responsive to BIS's evidence on lower adoption among disadvantaged groups.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 8",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 15",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "We require data consumers to apply safeguards to received customer information at least equivalent to those for their own information and prohibit sharing with third parties without explicit consent \u2014 a data protection reciprocity dimension BIS does not prescribe.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 11.2(a)(b)(c)(d)(a)(b)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 11.8",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 6",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "We mandate a customer breach handling and response plan with escalation and remedial procedures for open finance data breaches, which BIS identifies as a risk area but does not prescribe controls for.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 11.12",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 11.12(a)(b)(a)(b)(c)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 6",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "BIS frames open finance largely as a competition/anti-data-monopoly remedy; our framework centres on secure, responsible data sharing and risk management balanced against innovation rather than competition policy per se.",
+      "label": "differs-on",
+      "sentiment": "neutral",
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 1.3",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 3.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 4",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "BIS discusses centralised vs decentralised technical architectures as a jurisdictional design choice; our framework adopts a platform-operator/centralised platform model without articulating this as an explicit architectural policy choice.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 8",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 11",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "We prohibit bundled/blanket consent and require voluntary, non-coerced consent that cannot be a precondition for a product/service \u2014 a consumer-protection safeguard BIS notes only generally under governance/consent layers.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "BNM 10(a)(i)(ii)(iii)(b)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BNM 11",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 9",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    }
+  ]
+}

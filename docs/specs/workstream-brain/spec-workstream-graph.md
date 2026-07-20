@@ -248,6 +248,45 @@ Then the second edge row is removed
   And **Add to graph** remains available because at least one edge is still declared
 ```
 
+### Scenario: Aisyah adds a linkage between two existing nodes from the node detail panel
+
+```gherkin
+Given Aisyah is on the Operational Resilience v0.3 workstream graph
+  And the NODE DETAIL panel is showing the HKMA SPM OR-2 node
+When she clicks the **+ Add linkage** button in the node detail panel
+Then an ADD LINKAGE dialog opens
+  And the dialog header reads "Add linkage from HKMA SPM OR-2"
+  And she sees a `Target node` select populated with every other node on the workstream except HKMA SPM OR-2
+  And she sees an `Edge type` select populated with the four structural types (`supersedes`, `references`, `contributes-to`, `parallel-to`)
+When she picks target "BCBS OpRes Principles 2021" and edge type `contributes-to`
+  And she clicks **Add linkage**
+Then the dialog closes
+  And a new `contributes-to` structural edge appears on the canvas between HKMA SPM OR-2 and BCBS OpRes Principles 2021
+  And the edge status is "not analysed"
+  And the NODE DETAIL panel refreshes to include BCBS OpRes Principles 2021 in the First-order neighbours section
+```
+
+### Scenario: Aisyah cannot create a self-edge
+
+```gherkin
+Given the ADD LINKAGE dialog is open with source "HKMA SPM OR-2"
+When Aisyah opens the `Target node` select
+Then HKMA SPM OR-2 is not present in the list of target options
+  And she cannot pick her own node as the target
+```
+
+### Scenario: Aisyah cannot duplicate an existing linkage
+
+```gherkin
+Given Aisyah is on the Operational Resilience v0.3 workstream graph
+  And a `contributes-to` edge already exists between HKMA SPM OR-2 and the Operational Resilience PD v0.3 node
+When Aisyah opens the ADD LINKAGE dialog from HKMA SPM OR-2
+  And she picks target "Operational Resilience PD v0.3" and edge type `contributes-to`
+  And she clicks **Add linkage**
+Then the tool rejects the submission with a "linkage already exists" message
+  And no duplicate edge appears on the canvas
+```
+
 ### Scenario Outline: Aisyah zooms the canvas
 
 ```gherkin
@@ -831,6 +870,53 @@ Kicks off finder→critic on the pair.
 }
 ```
 
+### `POST /api/workstreams/{workstream_id}/edges`
+
+Creates a new structural edge between two existing nodes. Used by the "Add
+linkage" affordance in the node detail panel — no file upload, no node
+creation, just a new edge.
+
+**Request:**
+
+```json
+{
+  "source_node_id": "hkma-spm-or-2",
+  "target_node_id": "bcbs-opres-2021",
+  "edge_type": "contributes-to"
+}
+```
+
+**Response 201:**
+
+```json
+{
+  "id": "e-hkma--bcbs",
+  "source": "hkma-spm-or-2",
+  "target": "bcbs-opres-2021",
+  "type": "contributes-to",
+  "analysed": false,
+  "finding_count": 0
+}
+```
+
+**Response 400 — self-edge:**
+
+```json
+{
+  "error": "SELF_EDGE_FORBIDDEN",
+  "message": "source_node_id and target_node_id must differ."
+}
+```
+
+**Response 409 — duplicate edge:**
+
+```json
+{
+  "error": "EDGE_ALREADY_EXISTS",
+  "message": "An edge of type 'contributes-to' already exists between 'hkma-spm-or-2' and 'bcbs-opres-2021'."
+}
+```
+
 ### Error table
 
 | Status | Code                   | Condition                                                            |
@@ -838,10 +924,12 @@ Kicks off finder→critic on the pair.
 | 400    | `EDGE_REQUIRED`        | Node create body has zero edges                                      |
 | 400    | `INVALID_NODE_TYPE`    | `node_type` not in the 7-flat set                                    |
 | 400    | `INVALID_EDGE_TYPE`    | Any edge row's `edge_type` not in the 4-structural set               |
+| 400    | `SELF_EDGE_FORBIDDEN`  | `POST /edges` with `source_node_id == target_node_id`                |
 | 404    | `WORKSTREAM_NOT_FOUND` | `workstream_id` missing under `data/workstreams/`                    |
-| 404    | `NODE_NOT_FOUND`       | `node_id` not in the workstream's `graph.json`                       |
+| 404    | `NODE_NOT_FOUND`       | `node_id` (source or target) not in the workstream's `graph.json`    |
 | 404    | `EDGE_NOT_FOUND`       | `edge_id` not in the workstream's `graph.json`                       |
 | 409    | `NODE_ORPHAN`          | Attempt to persist a node whose edges list is empty after validation |
+| 409    | `EDGE_ALREADY_EXISTS`  | `POST /edges` with (source, target, edge_type) already present       |
 
 ## Data Model
 
@@ -921,7 +1009,18 @@ scale(...)` on the SVG root.
   of first-order neighbours (each a shadcn `Badge` variant coloured by type);
   static "N/A in demo" second-order block; recent-activity list; `Collapsible`
   for the concepts placeholder; a bottom action `Button` reading `Open task`
-  or `Open source` conditional on node type.
+  or `Open source` conditional on node type; and a `+ Add linkage`
+  secondary `Button` that opens `AddLinkageDialog` pre-populated with the
+  current node as source.
+- `frontend/src/features/workstream-graph/AddLinkageDialog.tsx` — shadcn
+  `Dialog` hosting a react-hook-form + zod form. Two fields: `Select` for
+  `target_node_id` (options = every node in the workstream _except_ the
+  source, sorted by title) and `Select` for `edge_type` (4 structural
+  types). Submit `Button` reads `Add linkage` and is disabled until both
+  selects have a value. On submit, POSTs `/api/workstreams/{ws}/edges` and
+  invalidates the graph query on success. On 400 `SELF_EDGE_FORBIDDEN` or
+  409 `EDGE_ALREADY_EXISTS`, renders an inline error message in the dialog
+  without closing it.
 - `frontend/src/features/workstream-graph/EdgeDetailPanel.tsx` — shadcn `Card`
   header with pair title and a status `Badge`. If `status = not_analysed`,
   renders a single `Button` reading `Analyze linkages`. If `status =
@@ -961,6 +1060,10 @@ analysed`, renders one `Card` per finding with a semantic-label `Badge`, the
 - On successful `POST /api/workstreams/{workstream_id}/nodes`, invalidate
   `['workstream', workstreamId, 'graph']` so the canvas re-fetches and the
   new node appears.
+- On successful `POST /api/workstreams/{workstream_id}/edges`, invalidate
+  `['workstream', workstreamId, 'graph']` and `['node', workstreamId, sourceNodeId]`
+  so the canvas re-renders with the new edge and the source node's
+  first-order-neighbours list refreshes.
 - On successful `POST /api/workstreams/{workstream_id}/edges/{edge_id}/analyze`,
   invalidate `['edge', workstreamId, edgeId]` so `EdgeDetailPanel` re-renders
   with the finding cards.
@@ -1057,18 +1160,21 @@ Verification: `ls data/workstreams/opres-2026/findings/` shows one file;
 
 Files to modify:
 
-- `engine/api.py` — register the six
-  new routes on `create_app`. Add a `workstreams_root: Path` argument to the
-  factory (default `REPO_ROOT / "data" / "workstreams"`) so tests point it at
-  `tmp_path`.
+- `engine/api.py` — register the seven
+  new routes on `create_app` (five `GET` routes, `POST /nodes`,
+  `POST /edges`, `POST /edges/{id}/analyze`). Add a `workstreams_root: Path`
+  argument to the factory (default `REPO_ROOT / "data" / "workstreams"`) so
+  tests point it at `tmp_path`.
 
 Files to create:
 
 - `engine/workstreams.py` — helpers
   for reading/writing `workstream.json`, `graph.json`, and
-  `findings/{edge_id}.json`. Node-type and edge-type validation lives here.
+  `findings/{edge_id}.json`. Node-type and edge-type validation lives here,
+  plus `add_edge(...)` helper that enforces the self-edge and
+  duplicate-edge invariants.
 - `engine/tests/test_api_workstreams.py`
-  — unit tests for the six new routes (see "Test Scenarios" below).
+  — unit tests for the seven new routes (see "Test Scenarios" below).
 
 Verification: `pytest engine/tests/test_api_workstreams.py -v` all green.
 
@@ -1106,7 +1212,32 @@ Files to modify:
 Verification: submit disabled with zero edge rows; submit re-enabled after
 adding one complete row; new node appears on canvas after save.
 
-### Task 6 — Wire zoom controls (SEQUENTIAL after Task 4, small)
+### Task 6 — Wire the Add-linkage dialog on the node detail panel (SEQUENTIAL after Task 4, small)
+
+Files to create:
+
+- `frontend/src/features/workstream-graph/AddLinkageDialog.tsx`
+- `frontend/src/features/workstream-graph/addLinkageSchema.ts`
+  (zod schema; `target_node_id` and `edge_type` both required; refine that
+  `target_node_id !== source_node_id`).
+
+Files to modify:
+
+- `NodeDetailPanel.tsx` — add a `+ Add linkage` secondary button next to the
+  `Open task` / `Open source` primary action; open `AddLinkageDialog`
+  pre-populated with the current node as source.
+- `WorkstreamGraphPage.tsx` — mount `AddLinkageDialog`; on success, invalidate
+  both `['workstream', workstreamId, 'graph']` and
+  `['node', workstreamId, sourceNodeId]` so the canvas re-renders and the
+  neighbours chip row refreshes.
+
+Verification: from any node's detail panel, clicking `+ Add linkage` opens
+the dialog with the source pre-populated; the target select omits the source
+node; submitting a valid pair produces a new edge on the canvas; submitting
+a duplicate (source, target, edge_type) triple renders an inline error
+inside the dialog and does not create a duplicate edge.
+
+### Task 7 — Wire zoom controls (SEQUENTIAL after Task 4, small)
 
 Files to modify:
 
@@ -1116,7 +1247,7 @@ Files to modify:
 Verification: zoom-in/out/reset all visibly change canvas scale; scale never
 exits `[0.5, 2.5]`.
 
-### Task 7 — Wire sidebar collapse and `+ New workstream` link (SEQUENTIAL after Task 4, small)
+### Task 8 — Wire sidebar collapse and `+ New workstream` link (SEQUENTIAL after Task 4, small)
 
 Files to modify:
 
@@ -1172,6 +1303,17 @@ Backend (pytest, `engine/tests/test_api_workstreams.py`):
   the endpoint returns the retired trace's findings; no network call is made
   (assert via a stub `finder_fn` that raises if called).
 - `test_POST_edge_analyze_writes_findings_file_and_flips_edge_analysed_flag`.
+- `test_POST_edge_creates_new_structural_edge_between_existing_nodes` — a
+  well-formed body persists the new edge to `graph.json` with
+  `analysed: false` and returns 201.
+- `test_POST_edge_rejects_self_edge_400_SELF_EDGE_FORBIDDEN` — request with
+  `source_node_id == target_node_id` returns 400 and does not touch
+  `graph.json`.
+- `test_POST_edge_rejects_duplicate_edge_409_EDGE_ALREADY_EXISTS` — creating
+  an edge whose (source, target, edge_type) triple already exists in
+  `graph.json` returns 409 and does not persist a duplicate.
+- `test_POST_edge_rejects_unknown_source_or_target_404_NODE_NOT_FOUND`.
+- `test_POST_edge_rejects_invalid_edge_type_400_INVALID_EDGE_TYPE`.
 
 Frontend (Vitest component tests, files colocated under
 `frontend/src/features/workstream-graph/`):
@@ -1179,10 +1321,14 @@ Frontend (Vitest component tests, files colocated under
 - `AddNodeDialog.test.tsx: submit button disabled when edge rows empty`.
 - `AddNodeDialog.test.tsx: submit button re-enables after adding one complete row`.
 - `AddNodeDialog.test.tsx: removing rows below one disables submit again`.
+- `AddLinkageDialog.test.tsx: submit disabled until both selects have a value`.
+- `AddLinkageDialog.test.tsx: target select omits the source node from its options`.
+- `AddLinkageDialog.test.tsx: 409 EDGE_ALREADY_EXISTS renders inline error without closing`.
 - `GraphCanvas.test.tsx: clicking a node dispatches showNode(nodeId)`.
 - `NodeDetailPanel.test.tsx: re-renders with clicked node's data when nodeId changes`.
 - `NodeDetailPanel.test.tsx: action button reads Open task for task node`.
 - `NodeDetailPanel.test.tsx: action button reads Open source for BCBS node`.
+- `NodeDetailPanel.test.tsx: + Add linkage button opens AddLinkageDialog with source pre-populated`.
 - `EdgeDetailPanel.test.tsx: unanalysed edge shows Analyze linkages button and no finding cards`.
 - `EdgeDetailPanel.test.tsx: analysed edge shows finding cards and no Analyze button`.
 - `GraphCanvas.test.tsx: zoom-in clamps at 2.5 after repeated clicks`.
@@ -1191,27 +1337,30 @@ Frontend (Vitest component tests, files colocated under
 
 ### Scenario-to-test mapping
 
-| Key Scenario (business)                                    | Test location                                                                                                                                                                |
-| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Aisyah opens her pre-seeded workstream                     | E2E `workstream-graph.spec.ts` + backend `test_GET_graph_returns_seeded_opres_workstream`                                                                                    |
-| Aisyah clicks the task node and sees its detail panel      | `NodeDetailPanel.test.tsx: action button reads Open task` + E2E                                                                                                              |
-| Aisyah clicks a resource node and sees its detail panel    | `NodeDetailPanel.test.tsx: action button reads Open source`                                                                                                                  |
-| Aisyah clicks a first-order neighbour chip to switch focus | `NodeDetailPanel.test.tsx: re-renders with clicked node's data`                                                                                                              |
-| Aisyah clicks an unanalysed edge                           | `EdgeDetailPanel.test.tsx: unanalysed edge shows Analyze linkages` + backend `test_GET_edge_detail_returns_not_analysed`                                                     |
-| Aisyah clicks an already-analysed edge                     | `EdgeDetailPanel.test.tsx: analysed edge shows finding cards` + backend `test_GET_edge_detail_returns_analysed_with_findings` + E2E                                          |
-| Aisyah adds a new anchor with one edge to her PD           | `AddNodeDialog.test.tsx: submit button re-enables` + backend `test_POST_node_writes_graph_and_returns_created_edges` + E2E                                                   |
-| Aisyah tries to add a node without declaring an edge       | `AddNodeDialog.test.tsx: submit disabled when edge rows empty` + backend `test_POST_node_rejects_empty_edges_400_EDGE_REQUIRED`                                              |
-| Aisyah adds multiple edges to a new node                   | `AddNodeDialog.test.tsx: multi-edge` (component) + backend `test_POST_node_writes_graph`                                                                                     |
-| Aisyah removes an edge row before submitting               | `AddNodeDialog.test.tsx: removing rows below one disables submit again`                                                                                                      |
-| Aisyah zooms the canvas (in/out/reset)                     | `GraphCanvas.test.tsx: zoom-in clamps` + `zoom-out clamps`                                                                                                                   |
-| Aisyah collapses the sidebar                               | `Sidebar.test.tsx: collapse toggle`                                                                                                                                          |
-| Aisyah expands the sidebar back                            | `Sidebar.test.tsx: collapse toggle` (round-trip)                                                                                                                             |
-| Aisyah opens the new-workstream screen from the sidebar    | `Sidebar.test.tsx: + New workstream navigates`                                                                                                                               |
-| Aisyah clicks the Institution map link                     | `Sidebar.test.tsx: institution map navigates`                                                                                                                                |
-| Aisyah opens the task screen from a task node              | E2E `workstream-graph.spec.ts`                                                                                                                                               |
-| Aisyah opens the source of a resource node                 | `NodeDetailPanel.test.tsx: Open source`                                                                                                                                      |
-| Aisyah switches to a different workstream from the sidebar | `Sidebar.test.tsx: workstream item navigates` + backend `test_GET_workstreams_lists_three`                                                                                   |
-| Aisyah runs analysis on an unanalysed edge                 | Backend `test_POST_edge_analyze_replays_retired_trace_for_opres_openfinance_pair` + backend `test_POST_edge_analyze_writes_findings_file_and_flips_edge_analysed_flag` + E2E |
+| Key Scenario (business)                                                     | Test location                                                                                                                                                                                                              |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Aisyah opens her pre-seeded workstream                                      | E2E `workstream-graph.spec.ts` + backend `test_GET_graph_returns_seeded_opres_workstream`                                                                                                                                  |
+| Aisyah clicks the task node and sees its detail panel                       | `NodeDetailPanel.test.tsx: action button reads Open task` + E2E                                                                                                                                                            |
+| Aisyah clicks a resource node and sees its detail panel                     | `NodeDetailPanel.test.tsx: action button reads Open source`                                                                                                                                                                |
+| Aisyah clicks a first-order neighbour chip to switch focus                  | `NodeDetailPanel.test.tsx: re-renders with clicked node's data`                                                                                                                                                            |
+| Aisyah clicks an unanalysed edge                                            | `EdgeDetailPanel.test.tsx: unanalysed edge shows Analyze linkages` + backend `test_GET_edge_detail_returns_not_analysed`                                                                                                   |
+| Aisyah clicks an already-analysed edge                                      | `EdgeDetailPanel.test.tsx: analysed edge shows finding cards` + backend `test_GET_edge_detail_returns_analysed_with_findings` + E2E                                                                                        |
+| Aisyah adds a new anchor with one edge to her PD                            | `AddNodeDialog.test.tsx: submit button re-enables` + backend `test_POST_node_writes_graph_and_returns_created_edges` + E2E                                                                                                 |
+| Aisyah tries to add a node without declaring an edge                        | `AddNodeDialog.test.tsx: submit disabled when edge rows empty` + backend `test_POST_node_rejects_empty_edges_400_EDGE_REQUIRED`                                                                                            |
+| Aisyah adds multiple edges to a new node                                    | `AddNodeDialog.test.tsx: multi-edge` (component) + backend `test_POST_node_writes_graph`                                                                                                                                   |
+| Aisyah removes an edge row before submitting                                | `AddNodeDialog.test.tsx: removing rows below one disables submit again`                                                                                                                                                    |
+| Aisyah adds a linkage between two existing nodes from the node detail panel | `NodeDetailPanel.test.tsx: + Add linkage button opens dialog` + `AddLinkageDialog.test.tsx: submit disabled until both selects have a value` + backend `test_POST_edge_creates_new_structural_edge_between_existing_nodes` |
+| Aisyah cannot create a self-edge                                            | `AddLinkageDialog.test.tsx: target select omits the source node` + backend `test_POST_edge_rejects_self_edge_400_SELF_EDGE_FORBIDDEN`                                                                                      |
+| Aisyah cannot duplicate an existing linkage                                 | `AddLinkageDialog.test.tsx: 409 EDGE_ALREADY_EXISTS renders inline error without closing` + backend `test_POST_edge_rejects_duplicate_edge_409_EDGE_ALREADY_EXISTS`                                                        |
+| Aisyah zooms the canvas (in/out/reset)                                      | `GraphCanvas.test.tsx: zoom-in clamps` + `zoom-out clamps`                                                                                                                                                                 |
+| Aisyah collapses the sidebar                                                | `Sidebar.test.tsx: collapse toggle`                                                                                                                                                                                        |
+| Aisyah expands the sidebar back                                             | `Sidebar.test.tsx: collapse toggle` (round-trip)                                                                                                                                                                           |
+| Aisyah opens the new-workstream screen from the sidebar                     | `Sidebar.test.tsx: + New workstream navigates`                                                                                                                                                                             |
+| Aisyah clicks the Institution map link                                      | `Sidebar.test.tsx: institution map navigates`                                                                                                                                                                              |
+| Aisyah opens the task screen from a task node                               | E2E `workstream-graph.spec.ts`                                                                                                                                                                                             |
+| Aisyah opens the source of a resource node                                  | `NodeDetailPanel.test.tsx: Open source`                                                                                                                                                                                    |
+| Aisyah switches to a different workstream from the sidebar                  | `Sidebar.test.tsx: workstream item navigates` + backend `test_GET_workstreams_lists_three`                                                                                                                                 |
+| Aisyah runs analysis on an unanalysed edge                                  | Backend `test_POST_edge_analyze_replays_retired_trace_for_opres_openfinance_pair` + backend `test_POST_edge_analyze_writes_findings_file_and_flips_edge_analysed_flag` + E2E                                               |
 
 ## Verification
 

@@ -1,0 +1,529 @@
+{
+  "edge_id": "e-ed--rmit",
+  "doc_a_id": "bnm-open-finance-ed-2025",
+  "doc_b_id": "bnm-rmit-nov25",
+  "findings": [
+    {
+      "summary": "Both documents require FSPs to transmit customer information through secure means, with open finance explicitly cross-referencing RMiT's secure transmission and authentication requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "BNM 11.2(a)(b)(c)(d)(a)(b)",
+          "anchor_label": "BNM 11.2(a)(b)(c)(d)(a)(b)",
+          "text": "S 11.5 An FSP shall ensure that any transmission of customer information through an\nopen finance arrangement is conducted through secure means, in line with\nrelevant requirements set out in the Policy Document on Risk Management in\nTechnology. Without limiting the generality of paragraph 11.4, a data provider\nshall authenticate the customer and authorise consent using a reliable and\neffective authentication procedure (e.g. multi-factor authentication) before\ngranting a data consumer access to the customer's information.\n\nS 11.6 An FSP that is a data consumer shall ensure that customer information received\nfrom another FSP through an open finance arrangement is subject to safeguards\nthat are at least equivalent to those applicable to the FSP's own customer\ninformation.\n\nS 11.7 An FSP shall regularly monitor the effectiveness of these controls to ensure that\nthey remain responsive to changing threats.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "RMiT 10.55",
+          "anchor_label": "RMiT 10.55",
+          "text": "A financial institution must employ a multi-factor authentication (MFA) that\ncan defend against social engineering attacks for authenticating user access\nto critical systems. The MFA must combine two or more of knowledge factors,\ninherent factors (e.g. biometric characteristics) or possession factors (e.g.\nsecurity keys, tokens).",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 10.53",
+          "anchor_label": "RMiT 10.53",
+          "text": "A financial institution must implement an access control policy for the\nidentification, authentication, and authorisation of all users to its IT assets\nand data. The level of granularity defined in the access control policy shall be\ncommensurate with the level of risk of unauthorised access to its IT assets.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "scope_note": "Open finance (S 11.5) cites the Policy Document on Risk Management in Technology for secure transmission and requires the data provider to authenticate the customer via a reliable procedure (e.g. MFA) before granting a data consumer access.",
+      "supported": true
+    },
+    {
+      "summary": "Open finance requires FSPs to adhere to regulatory processes in Part C of the RMiT policy for participation in open finance arrangements.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "BNM 12.4",
+          "anchor_label": "BNM 12.4",
+          "text": "An FSP shall adhere to relevant regulatory processes applicable to its\nparticipation in an open finance arrangement, in line with expectations as set out\nin Part C of the Policy Document on Risk Management in Technology, as may\nbe applicable.\n\nS",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "RMiT 16.1",
+          "anchor_label": "RMiT 16.1",
+          "text": "A financial institution must notify the Bank in accordance with the\nrequirements in paragraphs 16.2 to 16.7 prior to introducing new digital\nservices or enhancement to existing digital services.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 17.1",
+          "anchor_label": "RMiT 17.1",
+          "text": "A financial institution is required to consult the Bank prior to the first-time\nadoption of a public cloud or emerging technology for critical systems. During\nthe consultation, the financial institution must demonstrate that specific risks\nassociated with the use of these technologies have been adequately\nconsidered and addressed to the satisfaction of the Bank, in order to proceed\nwith the adoption of the public cloud for critical systems for the first time. The\nfinancial institution shall undertake the following prior to consulting the Bank\non its adoption of public cloud for critical systems:",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "scope_note": "BNM 12.4 defers to Part C of RMiT 'as may be applicable' rather than imposing its own notification/consultation process.",
+      "supported": true
+    },
+    {
+      "summary": "Both require board and senior management oversight of technology and open finance implementation, with prompt escalation of material issues.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "BNM 7",
+          "anchor_label": "BNM 7",
+          "text": "S 7.1\nThe board and senior management shall exercise effective oversight of an FSP's\nimplementation of arrangements relating to open finance to ensure its efficient,\nresilient and secure operations.\n\nS 7.2\nFor the avoidance of doubt, the board and senior management shall satisfy key\nresponsibilities arising from an FSP's participation in an open finance\narrangement, as may be applicable in relevant policy documents outlined in\nparagraph 6.1.",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "BNM 7(b)(c)(d)(e)(f)(g)",
+          "anchor_label": "BNM 7(b)(c)(d)(e)(f)(g)",
+          "text": "ensure that material issues and concerns relating to the FSP's open\nfinance arrangements are promptly escalated to the board, which include\nbut are not limited to breaches of customer information security and\nconfidentiality.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "RMiT 8.1",
+          "anchor_label": "RMiT 8.1",
+          "text": "The board must establish and approve the technology risk appetite which is\naligned with the financial institution's risk appetite statement. In doing so, the\nboard must-",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 8.4",
+          "anchor_label": "RMiT 8.4",
+          "text": "To promote effective discussion at the board level amidst a rapidly evolving\ntechnology and cyber risk landscape, the board must-",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 8.6",
+          "anchor_label": "RMiT 8.6",
+          "text": "The senior management shall bear primary responsibility for the day-to-day\nmanagement of technology risks including cyber risks. In fulfilling its\nresponsibilities, senior management must-",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "Open finance requires a breach handling and response plan for customer information incidents, aligning with RMiT's cyber incident response plan requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "BNM 11.12",
+          "anchor_label": "BNM 11.12",
+          "text": "breach handling and response plan in the event of theft, loss, misuse or\nunauthorised access, modification or disclosure of customer information\nassociated with an open finance arrangement. The plan must, at a minimum,\ninclude escalation procedures and a clear line of responsibility to contain the\ncustomer information breach and take remedial actions.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "RMiT 11.13",
+          "anchor_label": "RMiT 11.13",
+          "text": "A financial institution must establish and implement a comprehensive Cyber\nIncident Response Plan (CIRP). The CIRP must address the following:",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 11.12",
+          "anchor_label": "RMiT 11.12",
+          "text": "A financial institution must establish comprehensive cyber crisis\nmanagement policies and procedures that incorporate cyber-attack\nscenarios and responses in the organisation's overall crisis management\nplan, escalation processes, business continuity and disaster recovery\nplanning. This includes developing a clear communication plan for engaging\nshareholders, regulatory authorities, customers and employees in the event\nof a cyber incident.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "scope_note": "Open finance scopes the plan to breaches of customer information associated with an open finance arrangement; RMiT covers the broader enterprise CIRP.",
+      "supported": true
+    },
+    {
+      "summary": "Open finance extends technology operations management (IT controls, third-party management, operational resilience) to open finance activities, consistent with RMiT's technology risk management framework.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "BNM 12.2",
+          "anchor_label": "BNM 12.2",
+          "text": "An FSP shall ensure that its technology operations management practices are\nappropriately extended to support its open finance activities. This includes, but\nis not limited to, controls for ensuring effective and safe implementation of IT\nsystems, robust third-party service provider management, and operational\nresilience measures to ensure the availability, integrity and confidentiality of data\nexchanged through open finance arrangements.\n\nS 12.3 An FSP shall ensure that its cyber risk management capabilities and\ncybersecurity controls are also appropriately extended to govern, identify,\nprevent, detect, respond and address cyber risks associated with open finance\nactivities. This includes for the FSP to implement robust API security controls,\nstrengthening digital fraud detection and management, as well as take steps to\nsecure technology networks and internal systems from potential external risks\narising from the FSP's participation in an open finance arrangement.\n\nS",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "RMiT 9.2",
+          "anchor_label": "RMiT 9.2",
+          "text": "The TRMF must include the following:",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 10.5",
+          "anchor_label": "RMiT 10.5",
+          "text": "A financial institution must adopt a methodology for an effective and secure\nimplementation of IT systems. Key phases of System Development Life\nCycle (SDLC) shall include requirement, design, development, testing,\ndeployment, change management, maintenance and decommissioning, and\nintegrate with-",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 10.29",
+          "anchor_label": "RMiT 10.29",
+          "text": "A financial institution must ensure its system capacity needs are well-planned\nand managed with due regard to peak processing period, business growth\nplans and technology architecture changes.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "RMiT prescribes detailed service availability, uptime, and downtime resilience standards for critical systems and digital services, which open finance does not itself specify beyond deferring to platform operator requirements.",
+      "label": "silent-on",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "BNM 12.5",
+          "anchor_label": "BNM 12.5",
+          "text": "An FSP participating in an open finance arrangement shall also comply with\ntechnology and operational requirements of the open finance platform for which\nthe FSP is a member. This may include, but is not limited to, requirements in\nrelation to the user journey, API specifications, uptime requirements, operational\nprocedures and requirements for independent review relating to the operational\nresilience of its technology functions.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "RMiT 10.31",
+          "anchor_label": "RMiT 10.31",
+          "text": "A financial institution shall enhance the resilience of key digital services25 and\ndelivery channels26 through the following measures:",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 10.32",
+          "anchor_label": "RMiT 10.32",
+          "text": "For critical systems, where there is a reasonable expectation for immediate\ndelivery of service to customers or dealings with counterparties, a financial\ninstitution must ensure that these systems are designed for high availability\nwith a cumulative unplanned downtime affecting the interface with customers\nor counterparties of not more than 4 hours on a rolling 12 months basis and\na maximum tolerable downtime of 120 minutes per incident.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 10.35",
+          "anchor_label": "RMiT 10.35",
+          "text": "During an interruption of digital services or delivery channels, including\nperiods of performance degradation or intermittent failures, a financial\ninstitution shall respond promptly and effectively to minimise the impact on\nits customers. This includes but not limited to-",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "scope_note": "Open finance defers uptime/operational-resilience requirements to the platform operator rather than prescribing its own thresholds.",
+      "supported": true
+    },
+    {
+      "summary": "RMiT prescribes detailed cryptography, key management, and encryption standards that open finance does not itself address, deferring instead to RMiT via cross-reference.",
+      "label": "silent-on",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "BNM 11.2(a)(b)(c)(d)(a)(b)",
+          "anchor_label": "BNM 11.2(a)(b)(c)(d)(a)(b)",
+          "text": "S 11.5 An FSP shall ensure that any transmission of customer information through an\nopen finance arrangement is conducted through secure means, in line with\nrelevant requirements set out in the Policy Document on Risk Management in\nTechnology. Without limiting the generality of paragraph 11.4, a data provider\nshall authenticate the customer and authorise consent using a reliable and\neffective authentication procedure (e.g. multi-factor authentication) before\ngranting a data consumer access to the customer's information.\n\nS 11.6 An FSP that is a data consumer shall ensure that customer information received\nfrom another FSP through an open finance arrangement is subject to safeguards\nthat are at least equivalent to those applicable to the FSP's own customer\ninformation.\n\nS 11.7 An FSP shall regularly monitor the effectiveness of these controls to ensure that\nthey remain responsive to changing threats.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "RMiT 10.20",
+          "anchor_label": "RMiT 10.20",
+          "text": "A financial institution must establish a robust and resilient cryptography\npolicy to promote the adoption of strong cryptographic controls for protection\nof important data and information. This policy, at a minimum, shall address\nrequirements for-",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 10.21",
+          "anchor_label": "RMiT 10.21",
+          "text": "A financial institution must conduct due diligence and evaluate the\ncryptographic controls associated with the technology used in order to\nprotect the confidentiality, integrity, authentication, authorisation and non-\nrepudiation of information. Additionally, a financial institution must ensure the\nfollowing:",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 10.22",
+          "anchor_label": "RMiT 10.22",
+          "text": "A financial institution must ensure cryptographic controls are based on the\neffective implementation of suitable cryptographic protocols. The protocols\nshall include secret and public cryptographic key protocols, both of which\nshall reflect a high degree of protection to the applicable secret or private\ncryptographic keys. The selection of such protocols must be based on\nrecognised international standards and tested accordingly. Commensurate\nwith the level of risk, secret cryptographic key and private-cryptographic key\nstorage and encryption / decryption computation must be undertaken in a\nprotected environment, supported by a hardware security module (HSM),\ntrusted execution environment (TEE) or similarly secured devices.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "RMiT sets detailed cloud services risk assessment and consultation requirements which open finance references only generally through cross-reference.",
+      "label": "silent-on",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "BNM 11.8",
+          "anchor_label": "BNM 11.8",
+          "text": "An FSP that is a data consumer shall ensure that any third-party service provider\ninvolved in handling customer information, whether related to an open finance\narrangement (including that associated with outsourcing or cloud computing\narrangements), complies with relevant requirements relating to data privacy,\nconfidentiality and security, as set out in the Policy Document on Management\nof Customer Information and Permitted Disclosures, the Policy Document on\nRisk Management and Information Technology, and the Policy Document on\nOutsourcing.\n\nS 11.9 An FSP shall ensure that customer information is not shared with any third-party\nservice provider without the customer's explicit consent, in line with the\nrequirements stipulated in paragraph 10.1 of this Policy Document.\n\nS 11.10 For the purposes of paragraph 11.8, an FSP shall ensure the obligation to\nsafeguard customer information is adequately reflected in the service level\nagreement with the third-party service provider, in line with paragraph 12.4 of the\nPolicy Document on Management of Customer Information and Permitted\nDisclosures.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "RMiT 10.50",
+          "anchor_label": "RMiT 10.50",
+          "text": "A financial institution must fully understand the inherent risk of adopting cloud\nservices. In this regard, a financial institution shall conduct a comprehensive\nrisk assessment prior to cloud adoption which considers the inherent\narchitecture of cloud services that leverages on the sharing of resources and\nservices across multiple tenants over the Internet. The assessment must\nspecifically address risks associated with the following:",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 10.51",
+          "anchor_label": "RMiT 10.51",
+          "text": "For critical systems hosted on a public cloud32, a financial institution is\nexpected to consider common key risks and control measures as specified\nin Appendix 10. A financial institution that relies on alternative risk\nmanagement practices that depart from the measures outlined in Appendix\n10 is expected to be prepared to explain and demonstrate to the Bank that\n\nthese alternative practices are at least as effective as, or superior to, the\nmeasures in Appendix 10.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 17.1",
+          "anchor_label": "RMiT 17.1",
+          "text": "A financial institution is required to consult the Bank prior to the first-time\nadoption of a public cloud or emerging technology for critical systems. During\nthe consultation, the financial institution must demonstrate that specific risks\nassociated with the use of these technologies have been adequately\nconsidered and addressed to the satisfaction of the Bank, in order to proceed\nwith the adoption of the public cloud for critical systems for the first time. The\nfinancial institution shall undertake the following prior to consulting the Bank\non its adoption of public cloud for critical systems:",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "Open finance imposes detailed customer consent requirements (voluntary, revocable, time-limited, consent dashboard) for data sharing that RMiT does not address.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "BNM 10(a)(i)(ii)(iii)(b)",
+          "anchor_label": "BNM 10(a)(i)(ii)(iii)(b)",
+          "text": "Voluntary7 - The data consumer shall not, as a condition of providing a\nfinancial product/service, compel, coerce or mislead a customer to give\nconsent of their information to third parties beyond what is necessary for\nthe provision of the financial product/service or the performance of the\ncontract with the customer. The data consumer is prohibited from\nobtaining a customer's consent by asking the customer to indicate consent\nto a statement or term that combines agreement to the disclosure of their\ninformation with other matters in a single statement of consent.8 For the\navoidance of doubt, bundled or blanket consent, such as asking the\ncustomer to indicate consent to a statement or term that combines\nagreement to the disclosure of their information with other matters in a",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "BNM 8(c)(d)",
+          "anchor_label": "BNM 8(c)(d)",
+          "text": "Revocable upon request - A customer must be allowed to revoke their\nconsent given for the disclosure of information at any time unless such\ndisclosure is necessary for the data consumer to comply with any legal or\ncontractual requirements. Furthermore, the customer must be informed of\ntheir rights to revoke the consent and how to effect such revocation of\nconsent. The process for revoking consent must be as straightforward as\nit was to obtain the consent.",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "BNM 10.6",
+          "anchor_label": "BNM 10.6",
+          "text": "Where consent is obtained for the purpose of one-time data access, a data\nconsumer shall ensure that such consent is used strictly to retrieve customer\ninformation on a single occasion only, in accordance with the specific purpose for\nwhich the consent was granted. For the avoidance of doubt, such consent shall\nexpire immediately once the information consented for access has been retrieved\nby the data consumer.\n\nS 10.7 Where consent is obtained for the purpose of recurring data access (including\ncontinuous or repeated access to customer information for activities such as\npersonal financial management), a data consumer shall ensure that such\nconsent remains valid for no longer than six months from the date it was granted,\nunless revoked earlier by the customer.\n\nS 10.8 Upon the expiry of the consent period, the data consumer shall cease all access\nto customer information unless a renewed consent is obtained from the\ncustomer. The renewed consent shall be obtained in the same manner and\nsubject to the same conditions applicable to the original consent as specified in\nparagraph 10.1.\n\nS 10.9\nThe data consumer shall issue timely notifications to the customer on the\nupcoming expiry of consent, in accordance with paragraph 10.3, and where\nappropriate or relevant, notify the customer of the option to renew the consent.\n\nS 10.10 Where consent is not renewed, the data consumer shall delete all customer\ninformation obtained under the expired consent, unless retention is permitted or\nrequired under applicable laws or regulatory requirements.",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "BNM 11.2(a)(b)(c)(d)",
+          "anchor_label": "BNM 11.2(a)(b)(c)(d)",
+          "text": "mandate secure disposal of customer information upon expiry of its use.\n\nS 11.3 An FSP shall continually review its data governance and privacy policies to\nensure that they remain adequate, relevant and operate effectively in response\nto changes in the operating environment.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "RMiT 12.1",
+          "anchor_label": "RMiT 12.1",
+          "text": "Securing digital services is an integral part of financial institution's risk\nmanagement. A financial institution must expand its CRF to implement robust\ntechnology security controls in providing digital services which assure the\nfollowing:",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "scope_note": "RMiT 12.1 addresses authentication/authorization of transactions but not consent lifecycle governance; consent revocation is subject to legal/contractual retention exceptions (BNM 8(c)(d)).",
+      "supported": true
+    },
+    {
+      "summary": "Open finance requires data consumers to apply safeguards to received customer information at least equivalent to those for own customer information, extending beyond RMiT's general information security controls.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "BNM 11.8",
+          "anchor_label": "BNM 11.8",
+          "text": "An FSP that is a data consumer shall ensure that any third-party service provider\ninvolved in handling customer information, whether related to an open finance\narrangement (including that associated with outsourcing or cloud computing\narrangements), complies with relevant requirements relating to data privacy,\nconfidentiality and security, as set out in the Policy Document on Management\nof Customer Information and Permitted Disclosures, the Policy Document on\nRisk Management and Information Technology, and the Policy Document on\nOutsourcing.\n\nS 11.9 An FSP shall ensure that customer information is not shared with any third-party\nservice provider without the customer's explicit consent, in line with the\nrequirements stipulated in paragraph 10.1 of this Policy Document.\n\nS 11.10 For the purposes of paragraph 11.8, an FSP shall ensure the obligation to\nsafeguard customer information is adequately reflected in the service level\nagreement with the third-party service provider, in line with paragraph 12.4 of the\nPolicy Document on Management of Customer Information and Permitted\nDisclosures.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "RMiT 12.1",
+          "anchor_label": "RMiT 12.1",
+          "text": "Securing digital services is an integral part of financial institution's risk\nmanagement. A financial institution must expand its CRF to implement robust\ntechnology security controls in providing digital services which assure the\nfollowing:",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 10.52",
+          "anchor_label": "RMiT 10.52",
+          "text": "A financial institution must implement appropriate safeguards on customer\nand counterparty information and proprietary data when using cloud services\nto protect against unauthorised disclosure and access. This shall include\nretaining ownership, control and management of all data pertaining to\ncustomer and counterparty information, proprietary data and services hosted\non the cloud, including the relevant cryptographic keys management.\n\n## Access Control",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "Open finance establishes standardised machine-readable API-based data sharing and single account view interfaces for mandated FSPs, a use case not covered by RMiT.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "BNM 2(a)",
+          "anchor_label": "BNM 2(a)",
+          "text": "interfaces that allow customers to direct the platform to request relevant\ninformation from other data providers through the platform in a machine-\nreadable and standardised format,4 in lieu of traditional methods of\nsubmitting documents (e.g. manual upload, emailing documents), for\nrelevant processes (e.g. customer onboarding, on-going due diligence);\nand",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "BNM 4",
+          "anchor_label": "BNM 4",
+          "text": "b) Single account view, where the mandated FSP offers, as part of its internet\nbanking and mobile banking interfaces, the option for a customer to\ndisplay relevant information from their accounts with other data providers\nthrough the platform.\n\nG 8.7 An FSP participating in an open finance platform as a data consumer may\nconsider adopting principles of inclusivity, accessibility and usability when\ndesigning customer-facing interfaces. Particular attention may be given to\nunderserved segments (including individuals with basic digital literacy and\npersons with disabilities) who may face challenges with overly sophisticated\ninterfaces.",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "BNM 8",
+          "anchor_label": "BNM 8",
+          "text": "S 8.1\nAn FSP may participate2 as a data provider or a data consumer on an open\nfinance platform, subject to meeting relevant requirements in this Policy\nDocument and that specified by the platform operator.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "RMiT 12.1",
+          "anchor_label": "RMiT 12.1",
+          "text": "Securing digital services is an integral part of financial institution's risk\nmanagement. A financial institution must expand its CRF to implement robust\ntechnology security controls in providing digital services which assure the\nfollowing:",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "Both documents draw legal authority from the same statutory provisions (FSA, IFSA, DFIA) with identical S/G definitional conventions, though open finance omits MSBA.",
+      "label": "differs-on",
+      "sentiment": "neutral",
+      "source_anchors": [
+        {
+          "anchor_id": "BNM 3.2",
+          "anchor_label": "BNM 3.2",
+          "text": "The guidance in this Policy Document is issued pursuant to section 266 of the\nFSA, section 277 of the IFSA and section 126 of the DFIA.",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "BNM 5.2",
+          "anchor_label": "BNM 5.2",
+          "text": "\"S\" denotes a standard, an obligation, a requirement, specification, direction,\ncondition and any interpretative, supplemental and transitional provisions that\nmust be complied with. Non-compliance may result in enforcement action;\n\n\"G\" denotes guidance which may consist of statements or information intended\nto promote common understanding and advice or recommendations that are\nencouraged to be adopted;\n\n\"banking institution\" refers to a licensed bank, licensed investment bank or\nlicensed Islamic bank;\n\n\"banking group\" refers to a group comprising a banking institution and other\nbanking institutions that control, or are controlled by, or are under common\ncontrol with, the banking institution;\n\n\"board\" refers to the board of directors of an FSP, including a committee of the\nboard where the responsibilities of the board set out in this Policy Document\nhave been delegated to such a committee;\n\n\"customer\" refers to any person who uses, has used or may be intending to\nuse1 any financial service or product offered by any FSP;\n\n\"customer information\" refers to any information relating to the affairs or the\naccount of any customer of any FSP in whatever form, including in the form of a\nrecord, book, register, correspondence, other document or material;\n\n\"data provider\" refers to an FSP that holds customer information and is\nresponsible for responding to any authorised information sharing request\ninitiated by the customer in relation to an open finance arrangement, by making\navailable to the corresponding data consumer the customer information\nspecified;\n\n\"data consumer\" refers to an FSP that is authorised by the customer to access\ntheir information from a data provider upon obtaining customer's consent for the",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "RMiT 3.2",
+          "anchor_label": "RMiT 3.2",
+          "text": "The guidance in this policy document is issued pursuant to section 266 of the\nFSA, section 277 of the IFSA, section 126 of the DFIA and section 74 of the\nMSBA.\n\n### 4 Effective date",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 5.2",
+          "anchor_label": "RMiT 5.2",
+          "text": "For purposes of this policy document-\n\n\"S\" denotes a standard, an obligation, a requirement, specification, direction,\ncondition and any interpretative, supplemental and transitional provisions that\nmust be complied with. Non-compliance may result in enforcement action;\n\n\"G\" denotes guidance which may consist of statements or information\nintended to promote common understanding and advice or recommendations\nthat are encouraged to be adopted;",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "scope_note": "RMiT additionally covers MSBA (money services business) which open finance does not; applicability scopes differ accordingly.",
+      "supported": true
+    },
+    {
+      "summary": "RMiT prescribes detailed access control principles (deny-all, least privilege, user access matrix, activity logging) that open finance does not itself specify, relying instead on the reliable authentication procedure in its transmission clause.",
+      "label": "silent-on",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "BNM 11.2(a)(b)(c)(d)(a)(b)",
+          "anchor_label": "BNM 11.2(a)(b)(c)(d)(a)(b)",
+          "text": "S 11.5 An FSP shall ensure that any transmission of customer information through an\nopen finance arrangement is conducted through secure means, in line with\nrelevant requirements set out in the Policy Document on Risk Management in\nTechnology. Without limiting the generality of paragraph 11.4, a data provider\nshall authenticate the customer and authorise consent using a reliable and\neffective authentication procedure (e.g. multi-factor authentication) before\ngranting a data consumer access to the customer's information.\n\nS 11.6 An FSP that is a data consumer shall ensure that customer information received\nfrom another FSP through an open finance arrangement is subject to safeguards\nthat are at least equivalent to those applicable to the FSP's own customer\ninformation.\n\nS 11.7 An FSP shall regularly monitor the effectiveness of these controls to ensure that\nthey remain responsive to changing threats.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "RMiT 10.54",
+          "anchor_label": "RMiT 10.54",
+          "text": "A financial institution shall adhere to the following principles:",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 10.56",
+          "anchor_label": "RMiT 10.56",
+          "text": "A financial institution must establish a user access matrix to outline access\nrights, user roles or profiles, and the authorising and approving authorities.\nThe access matrix must be periodically reviewed and updated.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 10.57",
+          "anchor_label": "RMiT 10.57",
+          "text": "A financial institution must ensure-",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "RMiT mandates cyber incident notification to the Bank and industry threat intelligence sharing, which open finance's breach handling clauses reference only through cross-referenced policy documents rather than prescribing directly.",
+      "label": "silent-on",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "BNM 11.12",
+          "anchor_label": "BNM 11.12",
+          "text": "breach handling and response plan in the event of theft, loss, misuse or\nunauthorised access, modification or disclosure of customer information\nassociated with an open finance arrangement. The plan must, at a minimum,\ninclude escalation procedures and a clear line of responsibility to contain the\ncustomer information breach and take remedial actions.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "RMiT 11.18",
+          "anchor_label": "RMiT 11.18",
+          "text": "A financial institution is required to notify the Bank of cyber incidents in\nadherence to the Bank's policy documents on Operational Risk Reporting -\nPart C, Business Continuity Management - Part C, Merchant Acquiring\nServices - paragraphs 19.25 to 19.26 and any other relevant policy\ndocuments specified by the Bank.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 11.19",
+          "anchor_label": "RMiT 11.19",
+          "text": "Subject to the applicable data protection laws, a financial institution must\nshare cyber threat intelligence information with the industry on a timely basis\nvia the relevant sharing platforms developed by the Bank, the industry, or law\nenforcement agencies. In addition, the financial institution must allocate\nresources to participate in any industry-wide initiatives aimed at improving\ncollective threat intelligence capabilities.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "RMiT 11.20",
+          "anchor_label": "RMiT 11.20",
+          "text": "A financial institution shall collaborate and cooperate closely with relevant\nstakeholders and authorities in combating cyber threats.\n\nThe rest of the page is intentionally left as blank\n\n### 12 Digital Services\n\n#### Security of Digital Services",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    }
+  ],
+  "unsupported": [
+    {
+      "summary": "Open finance requires cyber risk management capabilities including API security controls and fraud detection to be extended to open finance activities, aligning with RMiT's cybersecurity operations and digital fraud requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "message": "No matching clause found",
+      "supported": false
+    },
+    {
+      "summary": "Open finance requires third-party service providers handling customer information to comply with data privacy, security, and outsourcing requirements including cross-referenced RMiT provisions.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "message": "No matching clause found",
+      "supported": false
+    },
+    {
+      "summary": "Open finance requires an FSP that is a data consumer to ensure any third-party service provider handling customer information complies with equivalent handling of consent before disclosure, but does not itself provide the detailed continuous third-party cyber posture monitoring, due diligence, and SLA content mandated by RMiT.",
+      "label": "silent-on",
+      "sentiment": null,
+      "message": "No matching clause found",
+      "supported": false
+    },
+    {
+      "summary": "Open finance requires an FSP data consumer to delete or securely dispose of customer information on consent expiry/non-renewal (subject to legal retention), a data lifecycle/disposal obligation not addressed in RMiT.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "message": "No matching clause found",
+      "supported": false
+    },
+    {
+      "summary": "Both encourage inclusive/accessible design for customer-facing interfaces, with open finance offering guidance on underserved segments and RMiT addressing ethical and inclusive use of technology.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "message": "No matching clause found",
+      "supported": false
+    },
+    {
+      "summary": "RMiT requires regular staff and board security awareness/education programmes, which open finance does not itself prescribe for open finance activities.",
+      "label": "silent-on",
+      "sentiment": null,
+      "message": "No matching clause found",
+      "supported": false
+    }
+  ]
+}
