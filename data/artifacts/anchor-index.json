@@ -1,5 +1,713 @@
 [
   {
+    "anchor_id": "BNM (a)(b)(c)(d)",
+    "anchor_label": "BNM (a)(b)(c)(d)",
+    "text": "",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Applicable to -",
+      "(a) Anneka Ng (annekang@bnm.gov.my)",
+      "(a)(b) Elysia Lim (elysia@bnm.gov.my)",
+      "(a)(b)(c) Joshua Chin (joshuacsk@bnm.gov.my)"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 1.1",
+    "anchor_label": "BNM 1.1",
+    "text": "As the financial sector continues to evolve in the digital age, the volume of\ncustomer information processed has grown significantly alongside the\nincreasing shift of transactions to digital platforms. This underscores the\nimportance of having strong infrastructures that enable the secure access,\nsharing and processing of financial information, which is a critical foundation for\nmaintaining trust and resilience in an increasingly digital financial system.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Applicable to -",
+      "PART A OVERVIEW",
+      "1 Introduction"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 1.2",
+    "anchor_label": "BNM 1.2",
+    "text": "Open finance plays a pivotal role in advancing this vision by offering customers\na safer and more structured framework for sharing their financial information\ncompared to existing data-sharing arrangements in Malaysia. By enabling\nconsent-driven information sharing, open finance provides customers with\ngreater control over their personal financial information, allowing them to actively\ndetermine and manage how their information is shared, accessed and used.\nBeyond empowering customers, open finance unlocks data-driven innovation\nthat enables customers to make better-informed decisions about their finances,\nfacilitates the delivery of more personalised financial services and promotes\ngreater financial inclusion as illustrated in Diagram 1.\n\n<figure>\n<figcaption>Diagram 1</figcaption>\n\nIllustrative* potential use cases\n\nSingle account view, including\npersonal financial management\n\nCredit underwriting through\nreal-time and accurate financial\ninformation\n\nFully digital submission and\ntransmission of documents in\nlieu of manual processes (e.g.\nemail and webform)\n\n</figure>\n\nBenefits for consumers\n\nBenefits to financial industry\n\nFinancial\ninclusion and\naccess\n\nBetter informed\ncustomer\ndecisions\n\nBetter user\nexperience and\nconvenience\n\nOpportunities to\ngrow business\nand partnerships\n\nOperational\nefficiency\n\nRisk\nmanagement and\nfraud detection\n\n*Use cases listed are for illustrative purposes only and are not exhaustive nor indicative of endorsement from BNM.\n\n.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Applicable to -",
+      "PART A OVERVIEW",
+      "1 Introduction"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 1.3",
+    "anchor_label": "BNM 1.3",
+    "text": "This Policy Document sets out the regulatory framework for open finance which\nseeks to ensure that it is implemented in an efficient, resilient and secure\nfashion. In addition to ensuring that the sharing of data is conducted in full\ncompliance with the Personal Data Protection Act 2010 and other relevant data\nprivacy and protection requirements, the Policy Document seeks to promote\nresponsible data sharing that strikes an appropriate balance between financial\ninnovation and prudent management of risks.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Applicable to -",
+      "PART A OVERVIEW",
+      "1 Introduction"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 1.4(a)(b)(c)(d)(e)(f)",
+    "anchor_label": "BNM 1.4(a)(b)(c)(d)(e)(f)",
+    "text": "the management of technology and cyber risks associated with open\nfinance.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Applicable to -",
+      "PART A OVERVIEW",
+      "1 Introduction",
+      "1.4",
+      "1.4(a) the criteria under which financial service providers are mandated to",
+      "1.4(a)(b)",
+      "1.4(a)(b)(c)",
+      "1.4(a)(b)(c)(d)",
+      "1.4(a)(b)(c)(d)(e)"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 1.5",
+    "anchor_label": "BNM 1.5",
+    "text": "Building an open finance ecosystem will be a multi-year journey and requires\ncollective action from all stakeholders to ensure its orderly and secure\nimplementation. As such, BNM will gradually phase in the requirements in this\nPolicy Document. This allows for orderly adoption by the industry, while enabling\ncustomers and other ecosystem stakeholders to develop familiarity and\nconfidence in open finance.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Applicable to -",
+      "PART A OVERVIEW",
+      "1 Introduction"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 1.6",
+    "anchor_label": "BNM 1.6",
+    "text": "BNM also envisions that the principles underpinning open finance will support\nbroader arrangements for more open and secure data sharing beyond the\nfinancial industry. As set out in the Financial Sector Blueprint 2022-2026, BNM\nand the financial sector will continue to collaborate with stakeholders in other\nsectors and industries, including with the public sector, to support and champion\nefforts to foster a thriving Open Data ecosystem at the national level. Such\nefforts will focus on improving accessibility to public data under the\nGovernment's open data initiatives through a standardised approach to data\n\ngovernance, and supporting regional level data sharing initiatives by advancing\nbest practices aligned with global standards and policies.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Applicable to -",
+      "PART A OVERVIEW",
+      "1 Introduction"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 2.1",
+    "anchor_label": "BNM 2.1",
+    "text": "This Policy Document is applicable to all FSPs as defined in paragraph 5.2.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Applicable to -",
+      "PART A OVERVIEW",
+      "Question 1",
+      "2 Applicability"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 3.1(a)(b)(c)",
+    "anchor_label": "BNM 3.1(a)(b)(c)",
+    "text": "(DFIA).",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Applicable to -",
+      "PART A OVERVIEW",
+      "Question 1",
+      "3 Legal provision",
+      "3.1",
+      "3.1(a)",
+      "3.1(a)(b) sections 57 and 135 of the Islamic Financial Services Act 2013 (IFSA);"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 3.2",
+    "anchor_label": "BNM 3.2",
+    "text": "The guidance in this Policy Document is issued pursuant to section 266 of the\nFSA, section 277 of the IFSA and section 126 of the DFIA.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Applicable to -",
+      "PART A OVERVIEW",
+      "Question 1",
+      "3 Legal provision"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 4.1",
+    "anchor_label": "BNM 4.1",
+    "text": "This Policy Document comes into effect on 1 January 2027, subject to the\ntransition arrangements set out in paragraph 9.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Applicable to -",
+      "PART A OVERVIEW",
+      "Question 1",
+      "4 Effective date"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 5.1",
+    "anchor_label": "BNM 5.1",
+    "text": "The terms and expressions used in this Policy Document shall have the same\nmeanings assigned to them in the FSA, IFSA and DFIA, as the case may be,\nunless otherwise defined in this Policy Document.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Applicable to -",
+      "PART A OVERVIEW",
+      "Question 1",
+      "5 Interpretation"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 5.2",
+    "anchor_label": "BNM 5.2",
+    "text": "\"S\" denotes a standard, an obligation, a requirement, specification, direction,\ncondition and any interpretative, supplemental and transitional provisions that\nmust be complied with. Non-compliance may result in enforcement action;\n\n\"G\" denotes guidance which may consist of statements or information intended\nto promote common understanding and advice or recommendations that are\nencouraged to be adopted;\n\n\"banking institution\" refers to a licensed bank, licensed investment bank or\nlicensed Islamic bank;\n\n\"banking group\" refers to a group comprising a banking institution and other\nbanking institutions that control, or are controlled by, or are under common\ncontrol with, the banking institution;\n\n\"board\" refers to the board of directors of an FSP, including a committee of the\nboard where the responsibilities of the board set out in this Policy Document\nhave been delegated to such a committee;\n\n\"customer\" refers to any person who uses, has used or may be intending to\nuse1 any financial service or product offered by any FSP;\n\n\"customer information\" refers to any information relating to the affairs or the\naccount of any customer of any FSP in whatever form, including in the form of a\nrecord, book, register, correspondence, other document or material;\n\n\"data provider\" refers to an FSP that holds customer information and is\nresponsible for responding to any authorised information sharing request\ninitiated by the customer in relation to an open finance arrangement, by making\navailable to the corresponding data consumer the customer information\nspecified;\n\n\"data consumer\" refers to an FSP that is authorised by the customer to access\ntheir information from a data provider upon obtaining customer's consent for the",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Applicable to -",
+      "PART A OVERVIEW",
+      "Question 1",
+      "5 Interpretation"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 1",
+    "anchor_label": "BNM 1",
+    "text": "information to the FSP for purposes of using the FSP's financial service or product, including a person\nwho subsequently withdraws their application or whose application has been rejected by the FSP.\n\nprovision of any financial product or service in relation to an open finance\narrangement;\n\n\"electronic money\" or \"e-money\" refers to a payment instrument or Islamic\npayment instrument as defined in the Policy Document on Electronic Money;\n\n\"e-money issuer\" or \"EMI\" refers to a person approved by BNM under section",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Applicable to -",
+      "PART A OVERVIEW",
+      "Question 1"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 11(a)(b)(c)(d)(e)(f)(g)",
+    "anchor_label": "BNM 11(a)(b)(c)(d)(e)(f)(g)",
+    "text": "an eligible EMI;\n\n\"individual customer\" refers to a natural person aged 18 years and above, in\nrespect of accounts which are under the sole control of that one person;\n\n\"mandated financial service provider\" or \"mandated FSP\" refers to an FSP\nas specified in Appendix 1;\n\n\"scope of prescribed information\" refers to the scope of personal financial\ninformation relating to a customer that a data provider is obligated to share with\na data consumer subject to the customer's consent as specified in Appendix 1;\n\n\"small and medium enterprise\" or \"SME\" refers to an entity defined as such\nin the Guideline for New SME Definition issued by the SME Corporation\nMalaysia in October 2013, as amended or modified from time to time;\n\n\"senior management\" refers to the chief executive officer and senior officers\nof an FSP;\n\n\"open finance\" refers to a framework that enables permissioned sharing of\ncustomer information between a data provider and a data consumer in a secure,\nopen, accessible, interoperable, and timely manner;\n\n\"open finance arrangement\" refers to a contractual relationship established\nbetween a data provider and a data consumer to enable the permissioned\nsharing of customer information through an open finance platform;\n\n\"open finance platform\" or \"platform\" refers to a technical infrastructure,\nsystem or utility that enables consent capture and secure transmission of\ncustomer information in an open finance arrangement;\n\n\"open finance platform operator\" or \"platform operator\" refers to any person\nwho operates an open finance platform;\n\n\"third-party service provider\" refers to an external entity providing services to\nan FSP that involves the handling of customer information, whether or not those\nservices are in relation to open finance.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Applicable to -",
+      "PART A OVERVIEW",
+      "Question 1",
+      "11 or section $1 5 \\left( 1 \\right) \\left( e \\right)$ of the FSA or section 11 of the IFSA to issue e-money;",
+      "11(a)",
+      "11(a)(b)",
+      "11(a)(b)(c)",
+      "11(a)(b)(c)(d)",
+      "11(a)(b)(c)(d)(e)",
+      "11(a)(b)(c)(d)(e)(f)"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 6.1(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)(l)(m)(n)(o)",
+    "anchor_label": "BNM 6.1(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)(l)(m)(n)(o)",
+    "text": "Disclosures issued on 31 October 2025.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Applicable to -",
+      "PART A OVERVIEW",
+      "Question 1",
+      "6 Related policy documents and legal instruments",
+      "6.1",
+      "6.1(a)",
+      "6.1(a)(b) Guidelines on Data Management and MIS Framework for Development",
+      "6.1(a)(b)(c)",
+      "6.1(a)(b)(c)(d)",
+      "6.1(a)(b)(c)(d)(e) Notification on Measures to Combat Fraud Monetised via Internet Banking",
+      "6.1(a)(b)(c)(d)(e)(f)",
+      "6.1(a)(b)(c)(d)(e)(f)(g) Policy Document on Business Continuity Management issued on 19",
+      "6.1(a)(b)(c)(d)(e)(f)(g)(h)",
+      "6.1(a)(b)(c)(d)(e)(f)(g)(h)(i)",
+      "6.1(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)",
+      "6.1(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)",
+      "6.1(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)(l)",
+      "6.1(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)(l)(m)",
+      "6.1(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)(l)(m)(n) Policy Document on Complaints Handling issued on 28 March 2025;"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 6.2(Amendment)",
+    "anchor_label": "BNM 6.2(Amendment)",
+    "text": "under such law.\n\nThe rest of the page is intentionally left as blank",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Applicable to -",
+      "PART A OVERVIEW",
+      "Question 1",
+      "6 Related policy documents and legal instruments",
+      "6.2"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 7",
+    "anchor_label": "BNM 7",
+    "text": "S 7.1\nThe board and senior management shall exercise effective oversight of an FSP's\nimplementation of arrangements relating to open finance to ensure its efficient,\nresilient and secure operations.\n\nS 7.2\nFor the avoidance of doubt, the board and senior management shall satisfy key\nresponsibilities arising from an FSP's participation in an open finance\narrangement, as may be applicable in relevant policy documents outlined in\nparagraph 6.1.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "PART B POLICY REQUIREMENTS"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 7(b)(c)(d)(e)(f)(g)",
+    "anchor_label": "BNM 7(b)(c)(d)(e)(f)(g)",
+    "text": "ensure that material issues and concerns relating to the FSP's open\nfinance arrangements are promptly escalated to the board, which include\nbut are not limited to breaches of customer information security and\nconfidentiality.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "PART B POLICY REQUIREMENTS",
+      "Responsibilities of the senior management",
+      "7(b)",
+      "7(b)(c) conduct due diligence and oversight to ensure only consented customer",
+      "7(b)(c)(d)",
+      "7(b)(c)(d)(e)",
+      "7(b)(c)(d)(e)(f)"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 8",
+    "anchor_label": "BNM 8",
+    "text": "S 8.1\nAn FSP may participate2 as a data provider or a data consumer on an open\nfinance platform, subject to meeting relevant requirements in this Policy\nDocument and that specified by the platform operator.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "PART B POLICY REQUIREMENTS",
+      "Responsibilities of the senior management"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 2(a)",
+    "anchor_label": "BNM 2(a)",
+    "text": "interfaces that allow customers to direct the platform to request relevant\ninformation from other data providers through the platform in a machine-\nreadable and standardised format,4 in lieu of traditional methods of\nsubmitting documents (e.g. manual upload, emailing documents), for\nrelevant processes (e.g. customer onboarding, on-going due diligence);\nand",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "PART B POLICY REQUIREMENTS",
+      "G 8.2 Where feasible, an FSP should endeavour to adopt open finance as the",
+      "2 This includes mandated FSPs that wish to participate ahead of their timeline for commencement of"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 3",
+    "anchor_label": "BNM 3",
+    "text": "",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "PART B POLICY REQUIREMENTS",
+      "G 8.2 Where feasible, an FSP should endeavour to adopt open finance as the"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 4",
+    "anchor_label": "BNM 4",
+    "text": "b) Single account view, where the mandated FSP offers, as part of its internet\nbanking and mobile banking interfaces, the option for a customer to\ndisplay relevant information from their accounts with other data providers\nthrough the platform.\n\nG 8.7 An FSP participating in an open finance platform as a data consumer may\nconsider adopting principles of inclusivity, accessibility and usability when\ndesigning customer-facing interfaces. Particular attention may be given to\nunderserved segments (including individuals with basic digital literacy and\npersons with disabilities) who may face challenges with overly sophisticated\ninterfaces.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "PART B POLICY REQUIREMENTS",
+      "G 8.2 Where feasible, an FSP should endeavour to adopt open finance as the"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 9",
+    "anchor_label": "BNM 9",
+    "text": "S 9.1\nThe obligations of a mandated FSP as specified under paragraph 8.4 shall\ncommence in accordance with the timeline specified in Appendix 2.\n\nS 9.2\nA mandated FSP shall commence its obligation under paragraph 8.6 to provide\ndocument submission and single account view interfaces by 1 January 2028 or\n\nthe date on which the FSP's obligations under paragraph 8.4 commence,\nwhichever is later.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "PART B POLICY REQUIREMENTS",
+      "G 8.2 Where feasible, an FSP should endeavour to adopt open finance as the",
+      "Question 4"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 5",
+    "anchor_label": "BNM 5",
+    "text": "for individual and SME customers, except credit card.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Question 8"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 10",
+    "anchor_label": "BNM 10",
+    "text": "",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "Question 8"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 10(a)(i)(ii)(iii)(b)",
+    "anchor_label": "BNM 10(a)(i)(ii)(iii)(b)",
+    "text": "Voluntary7 - The data consumer shall not, as a condition of providing a\nfinancial product/service, compel, coerce or mislead a customer to give\nconsent of their information to third parties beyond what is necessary for\nthe provision of the financial product/service or the performance of the\ncontract with the customer. The data consumer is prohibited from\nobtaining a customer's consent by asking the customer to indicate consent\nto a statement or term that combines agreement to the disclosure of their\ninformation with other matters in a single statement of consent.8 For the\navoidance of doubt, bundled or blanket consent, such as asking the\ncustomer to indicate consent to a statement or term that combines\nagreement to the disclosure of their information with other matters in a",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "A. Obtaining consent",
+      "10(a) Specific6 - The terms seeking a customer's consent are clear, concise",
+      "10(a)(i)",
+      "10(a)(i)(ii) the purpose of such disclosure; and",
+      "10(a)(i)(ii)(iii)"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 6",
+    "anchor_label": "BNM 6",
+    "text": "separate and distinct consent must be obtained by the data consumer before disclosing the customer's\ninformation to a third party engaged (e.g. data analytics partner) to support the offering of that product\nor service.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "A. Obtaining consent"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 8(c)(d)",
+    "anchor_label": "BNM 8(c)(d)",
+    "text": "Revocable upon request - A customer must be allowed to revoke their\nconsent given for the disclosure of information at any time unless such\ndisclosure is necessary for the data consumer to comply with any legal or\ncontractual requirements. Furthermore, the customer must be informed of\ntheir rights to revoke the consent and how to effect such revocation of\nconsent. The process for revoking consent must be as straightforward as\nit was to obtain the consent.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "A. Obtaining consent",
+      "8 Where consent is sought as a condition for the provision of a financial product/service, the consent",
+      "8(c)"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 8(c)(d)(a)(b)(c)(a)(b)",
+    "anchor_label": "BNM 8(c)(d)(a)(b)(c)(a)(b)",
+    "text": "",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "B. Managing and monitoring consent",
+      "8(c)(d)(a) view all active and past consent granted, subject to the period determined",
+      "8(c)(d)(a)(b) review the scope (i.e. type of information shared), purpose and duration",
+      "8(c)(d)(a)(b)(c)",
+      "8(c)(d)(a)(b)(c)(a)"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 11",
+    "anchor_label": "BNM 11",
+    "text": "\"explicit and deliberate\" consent by a customer as there is no way to definitively establish that the\ncustomer consented to the pre-ticked box and the applicable statement/term.\n\nS 10.4 An FSP shall ensure that the consent dashboard reflects the real-time status of\nconsent and is updated immediately upon any renewal, revocation or expiration\nof consent.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "B. Managing and monitoring consent"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 10.6",
+    "anchor_label": "BNM 10.6",
+    "text": "Where consent is obtained for the purpose of one-time data access, a data\nconsumer shall ensure that such consent is used strictly to retrieve customer\ninformation on a single occasion only, in accordance with the specific purpose for\nwhich the consent was granted. For the avoidance of doubt, such consent shall\nexpire immediately once the information consented for access has been retrieved\nby the data consumer.\n\nS 10.7 Where consent is obtained for the purpose of recurring data access (including\ncontinuous or repeated access to customer information for activities such as\npersonal financial management), a data consumer shall ensure that such\nconsent remains valid for no longer than six months from the date it was granted,\nunless revoked earlier by the customer.\n\nS 10.8 Upon the expiry of the consent period, the data consumer shall cease all access\nto customer information unless a renewed consent is obtained from the\ncustomer. The renewed consent shall be obtained in the same manner and\nsubject to the same conditions applicable to the original consent as specified in\nparagraph 10.1.\n\nS 10.9\nThe data consumer shall issue timely notifications to the customer on the\nupcoming expiry of consent, in accordance with paragraph 10.3, and where\nappropriate or relevant, notify the customer of the option to renew the consent.\n\nS 10.10 Where consent is not renewed, the data consumer shall delete all customer\ninformation obtained under the expired consent, unless retention is permitted or\nrequired under applicable laws or regulatory requirements.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "Open Finance Exposure Draft",
+      "C. Consent validity, expiry and renewal"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 11.2(a)(b)(c)(d)",
+    "anchor_label": "BNM 11.2(a)(b)(c)(d)",
+    "text": "mandate secure disposal of customer information upon expiry of its use.\n\nS 11.3 An FSP shall continually review its data governance and privacy policies to\nensure that they remain adequate, relevant and operate effectively in response\nto changes in the operating environment.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "D. Consent revocation",
+      "A. Management of customer information",
+      "11.2 In addition to paragraph 11.1, the data governance and privacy policies and",
+      "11.2(a)",
+      "11.2(a)(b) prohibit the use or disclosure of customer information beyond the",
+      "11.2(a)(b)(c)"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 11.2(a)(b)(c)(d)(a)(b)",
+    "anchor_label": "BNM 11.2(a)(b)(c)(d)(a)(b)",
+    "text": "S 11.5 An FSP shall ensure that any transmission of customer information through an\nopen finance arrangement is conducted through secure means, in line with\nrelevant requirements set out in the Policy Document on Risk Management in\nTechnology. Without limiting the generality of paragraph 11.4, a data provider\nshall authenticate the customer and authorise consent using a reliable and\neffective authentication procedure (e.g. multi-factor authentication) before\ngranting a data consumer access to the customer's information.\n\nS 11.6 An FSP that is a data consumer shall ensure that customer information received\nfrom another FSP through an open finance arrangement is subject to safeguards\nthat are at least equivalent to those applicable to the FSP's own customer\ninformation.\n\nS 11.7 An FSP shall regularly monitor the effectiveness of these controls to ensure that\nthey remain responsive to changing threats.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "D. Consent revocation",
+      "A. Management of customer information",
+      "Data security",
+      "11.2(a)(b)(c)(d)(a) prevent theft, loss, misuse or unauthorised access, modification or"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 11.8",
+    "anchor_label": "BNM 11.8",
+    "text": "An FSP that is a data consumer shall ensure that any third-party service provider\ninvolved in handling customer information, whether related to an open finance\narrangement (including that associated with outsourcing or cloud computing\narrangements), complies with relevant requirements relating to data privacy,\nconfidentiality and security, as set out in the Policy Document on Management\nof Customer Information and Permitted Disclosures, the Policy Document on\nRisk Management and Information Technology, and the Policy Document on\nOutsourcing.\n\nS 11.9 An FSP shall ensure that customer information is not shared with any third-party\nservice provider without the customer's explicit consent, in line with the\nrequirements stipulated in paragraph 10.1 of this Policy Document.\n\nS 11.10 For the purposes of paragraph 11.8, an FSP shall ensure the obligation to\nsafeguard customer information is adequately reflected in the service level\nagreement with the third-party service provider, in line with paragraph 12.4 of the\nPolicy Document on Management of Customer Information and Permitted\nDisclosures.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "D. Consent revocation",
+      "A. Management of customer information",
+      "Third-party arrangements"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 11.12",
+    "anchor_label": "BNM 11.12",
+    "text": "breach handling and response plan in the event of theft, loss, misuse or\nunauthorised access, modification or disclosure of customer information\nassociated with an open finance arrangement. The plan must, at a minimum,\ninclude escalation procedures and a clear line of responsibility to contain the\ncustomer information breach and take remedial actions.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "D. Consent revocation",
+      "A. Management of customer information",
+      "Third-party arrangements",
+      "Customer information breaches"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 11.12(a)(b)(a)(b)(c)",
+    "anchor_label": "BNM 11.12(a)(b)(a)(b)(c)",
+    "text": "assistance, complaints handling and redress mechanisms.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "D. Consent revocation",
+      "Other business conduct requirements",
+      "11.12(a) providing a customer with relevant, clear and timely information, including",
+      "11.12(a)(b) ensuring that services associated with an open finance arrangement are",
+      "11.12(a)(b)(a) introduce customers to the concept of open finance including how their",
+      "11.12(a)(b)(a)(b) provide clear, step-by-step instructions on how to grant, manage and"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 12.2",
+    "anchor_label": "BNM 12.2",
+    "text": "An FSP shall ensure that its technology operations management practices are\nappropriately extended to support its open finance activities. This includes, but\nis not limited to, controls for ensuring effective and safe implementation of IT\nsystems, robust third-party service provider management, and operational\nresilience measures to ensure the availability, integrity and confidentiality of data\nexchanged through open finance arrangements.\n\nS 12.3 An FSP shall ensure that its cyber risk management capabilities and\ncybersecurity controls are also appropriately extended to govern, identify,\nprevent, detect, respond and address cyber risks associated with open finance\nactivities. This includes for the FSP to implement robust API security controls,\nstrengthening digital fraud detection and management, as well as take steps to\nsecure technology networks and internal systems from potential external risks\narising from the FSP's participation in an open finance arrangement.\n\nS",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "D. Consent revocation",
+      "Other business conduct requirements",
+      "Question 11",
+      "12 Management of technology risk"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 12.4",
+    "anchor_label": "BNM 12.4",
+    "text": "An FSP shall adhere to relevant regulatory processes applicable to its\nparticipation in an open finance arrangement, in line with expectations as set out\nin Part C of the Policy Document on Risk Management in Technology, as may\nbe applicable.\n\nS",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "D. Consent revocation",
+      "Other business conduct requirements",
+      "Question 11",
+      "12 Management of technology risk"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 12.5",
+    "anchor_label": "BNM 12.5",
+    "text": "An FSP participating in an open finance arrangement shall also comply with\ntechnology and operational requirements of the open finance platform for which\nthe FSP is a member. This may include, but is not limited to, requirements in\nrelation to the user journey, API specifications, uptime requirements, operational\nprocedures and requirements for independent review relating to the operational\nresilience of its technology functions.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "D. Consent revocation",
+      "Other business conduct requirements",
+      "Question 11",
+      "12 Management of technology risk"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 12.5(a)(b)(c)",
+    "anchor_label": "BNM 12.5(a)(b)(c)",
+    "text": "an eligible EMI operating a network-based e-money solution with an\naggregate distinct count of active users 13 larger than five million.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "PART C APPENDICES",
+      "Appendix 1 Definition of mandated FSP and scope of prescribed information",
+      "12.5(a) a licensed bank, or a licensed Islamic bank, with an aggregate distinct",
+      "12.5(a)(b)"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 12.5(a)(b)(c)(a)(b)",
+    "anchor_label": "BNM 12.5(a)(b)(c)(a)(b)",
+    "text": "the current outstanding balance of an account.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "PART C APPENDICES",
+      "Appendix 1 Definition of mandated FSP and scope of prescribed information",
+      "2. A scope of prescribed information refers to -",
+      "12.5(a)(b)(c)(a) transaction information for the most recent 12 months including the date,"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 12",
+    "anchor_label": "BNM 12",
+    "text": "",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "PART C APPENDICES",
+      "Appendix 1 Definition of mandated FSP and scope of prescribed information",
+      "2. A scope of prescribed information refers to -"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 13",
+    "anchor_label": "BNM 13",
+    "text": "",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "PART C APPENDICES",
+      "Appendix 1 Definition of mandated FSP and scope of prescribed information",
+      "2. A scope of prescribed information refers to -"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "BNM 14",
+    "anchor_label": "BNM 14",
+    "text": "sharing by a mandated FSP whose obligation to commence as a data provider\nfalls on or after 1 January 2028 shall include both individual and SME customers.",
+    "doc_class": "semi-structured",
+    "document_id": "bnm-open-finance-ed-2025",
+    "heading_path": [
+      "PART C APPENDICES",
+      "Appendix 2 Transition arrangements"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
     "anchor_id": "BCM 1.1",
     "anchor_label": "BCM 1.1",
     "text": "Operational resilience of financial institutions is critical to ensure continuity in the\nprovision of financial services through periods of disruptions, maintain orderly\nmarket conditions and sustain public confidence in the financial system.",
