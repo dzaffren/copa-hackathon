@@ -5,10 +5,10 @@
       "title": "BNM Exposure Draft on Open Finance (2025)",
       "jurisdiction": "MY",
       "issuer": "BNM",
-      "doc_class": "semi-structured",
+      "doc_class": "structured-rules",
       "source_path": "data/corpus/open-finance/ED_Open_Finance_2025.pdf",
       "in_mvp1": true,
-      "notes": "Primary MVP1 demo document — the workstream drafter's target policy. Classified semi-structured (rather than structured-rules) because engine/clauses.py POLICY_SHORT_NAMES does not include a mapping for open-finance-ed; the heading-walker segmenter produces usable anchors keyed by numeric-path. Reclassify to structured-rules once POLICY_SHORT_NAMES is extended for open-finance docs."
+      "notes": "Primary MVP1 demo document — the workstream drafter's target policy. Anchor IDs keyed 'Open Finance ED {n.m}' via POLICY_SHORT_NAMES."
     },
     {
       "document_id": "bnm-e-money-pd-2025",

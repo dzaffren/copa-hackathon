@@ -1,436 +1,606 @@
 {
   "model_id": "claude-opus-4-8",
-  "timestamp": "2026-07-19T10:36:44.899525+00:00",
+  "timestamp": "2026-07-21T12:21:23.198923+00:00",
   "document_ids": [
     "bnm-open-finance-ed-2025",
     "hkma-open-api-framework-2018"
   ],
   "finder_output": [
     {
-      "summary": "Both frameworks establish a phased, gradual implementation approach for open finance/API adoption to allow orderly industry adoption.",
+      "summary": "Both frameworks establish a regulatory framework for open finance/API-based data sharing to enable secure, innovative financial services.",
       "label": "aligns-with",
       "source_anchors": [
-        "BNM 1.5"
+        "Open Finance ED 1.3",
+        "Open Finance ED 1.2"
       ],
       "target_anchors": [
-        "HKMA OpenAPI 8.1",
-        "HKMA OpenAPI 10",
-        "HKMA OpenAPI 13"
-      ]
-    },
-    {
-      "summary": "BNM mandates open finance participation for mandated FSPs with binding standards and enforcement, whereas HKMA deliberately adopts a collaborative, non-mandatory approach.",
-      "label": "differs-on",
-      "sentiment": "tighten",
-      "source_anchors": [
-        "BNM 9",
-        "BNM 8",
-        "BNM 14"
-      ],
-      "target_anchors": [
-        "HKMA OpenAPI 8.2",
-        "HKMA OpenAPI 8.3"
-      ]
-    },
-    {
-      "summary": "Both address secure data transmission and authentication, but BNM references its Risk Management in Technology policy while HKMA prescribes specific technologies (X.509, TLS, OAuth 2.0).",
-      "label": "differs-on",
-      "sentiment": "neutral",
-      "source_anchors": [
-        "BNM 11.2(a)(b)(c)(d)(a)(b)",
-        "BNM 12.3"
-      ],
-      "target_anchors": [
-        "HKMA OpenAPI 58(REST)",
-        "HKMA OpenAPI 26",
-        "HKMA OpenAPI 27"
-      ]
-    },
-    {
-      "summary": "Both scale security/protection requirements to the sensitivity of data being accessed.",
-      "label": "aligns-with",
-      "source_anchors": [
-        "BNM 11.6",
-        "BNM 11.7"
-      ],
-      "target_anchors": [
-        "HKMA OpenAPI 12",
-        "HKMA OpenAPI 13"
-      ]
-    },
-    {
-      "summary": "BNM sets detailed, binding consent requirements (voluntary, revocable, explicit, no bundled/blanket consent, consent dashboards, expiry periods) that HKMA's high-level framework does not cover.",
-      "label": "goes-beyond",
-      "source_anchors": [
-        "BNM 10(a)(i)(ii)(iii)(b)",
-        "BNM 8(c)(d)",
-        "BNM 11",
-        "BNM 10.6",
-        "BNM 10.7",
-        "BNM 10.8",
-        "BNM 10.9",
-        "BNM 10.10"
-      ],
-      "target_anchors": [
+        "HKMA OpenAPI 4.2",
         "HKMA OpenAPI 6"
       ]
     },
     {
-      "summary": "BNM requires deletion/secure disposal of customer information upon consent expiry, which HKMA's framework does not address.",
-      "label": "goes-beyond",
+      "summary": "Our framework mandates participation of qualifying FSPs as data providers and consumers, whereas HKMA adopts a collaborative, voluntary approach rather than mandating participation.",
+      "label": "differs-on",
+      "sentiment": "tighten",
       "source_anchors": [
-        "BNM 10.10",
-        "BNM 11.2(a)(b)(c)(d)"
+        "Open Finance ED 1.4(a)",
+        "Open Finance ED 8.4",
+        "Open Finance ED 8.6"
       ],
-      "target_anchors": []
+      "target_anchors": [
+        "HKMA OpenAPI 8.1",
+        "HKMA OpenAPI 8.2"
+      ],
+      "scope_note": "HKMA notes mandatory approach in EU/UK/Australia but opts for collaborative phased approach; expects but does not compel banks to implement."
     },
     {
-      "summary": "Both require third-party/TSP governance and safeguards over data handling, but HKMA elaborates due-diligence models (central entity, common baseline) while BNM cross-references outsourcing and customer-information policies.",
+      "summary": "Both adopt a phased, multi-year implementation approach to allow orderly adoption by industry.",
       "label": "aligns-with",
       "source_anchors": [
-        "BNM 11.8",
-        "BNM 11.9",
-        "BNM 11.10",
-        "BNM 12.2"
+        "Open Finance ED 1.5",
+        "Open Finance ED 9.1",
+        "Open Finance ED 9.2"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 8.2",
+        "HKMA OpenAPI 10",
+        "HKMA OpenAPI 13",
+        "HKMA OpenAPI 18"
+      ]
+    },
+    {
+      "summary": "Our framework prescribes fixed calendar-based commencement dates for mandated obligations, whereas HKMA sets phased timelines relative to publication with later phases deferred and flexible.",
+      "label": "differs-on",
+      "sentiment": "tighten",
+      "source_anchors": [
+        "Open Finance ED 4.1",
+        "Open Finance ED 9.2"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 18",
+        "HKMA OpenAPI 19"
+      ]
+    },
+    {
+      "summary": "Our framework prescribes a detailed consent lifecycle (specific/voluntary consent, dashboard, expiry, renewal, revocation), whereas HKMA only requires customer authorisation with limited detail.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 10.1",
+        "Open Finance ED 10.1(a)",
+        "Open Finance ED 10.1(b)",
+        "Open Finance ED 10.2",
+        "Open Finance ED 10.5",
+        "Open Finance ED 10.7",
+        "Open Finance ED 10.11"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 12",
+        "HKMA OpenAPI 11.4"
+      ],
+      "scope_note": "HKMA references authorisation of customers via OAuth 2.0 but not a full consent lifecycle framework."
+    },
+    {
+      "summary": "Both require strong data security safeguards including authentication, integrity and confidentiality controls for information sharing.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 11.4",
+        "Open Finance ED 11.5"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 12",
+        "HKMA OpenAPI 27",
+        "HKMA OpenAPI 58(REST)"
+      ]
+    },
+    {
+      "summary": "HKMA prescribes specific technical/security standards (REST, JSON, X.509, TLS, OAuth 2.0) whereas our framework defers to separate risk-management-in-technology policy documents without prescribing standards.",
+      "label": "silent-on",
+      "source_anchors": [
+        "Open Finance ED 11.5",
+        "Open Finance ED 12.1"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 26",
+        "HKMA OpenAPI 58(REST)"
+      ]
+    },
+    {
+      "summary": "HKMA prescribes a detailed TSP governance model with onboarding checks, common baseline and ongoing monitoring for third parties, whereas our framework relies on general third-party/outsourcing requirements.",
+      "label": "silent-on",
+      "source_anchors": [
+        "Open Finance ED 11.8",
+        "Open Finance ED 11.10"
       ],
       "target_anchors": [
         "HKMA OpenAPI 29",
         "HKMA OpenAPI 30.1",
-        "HKMA OpenAPI 30.2",
-        "HKMA OpenAPI 30.3",
+        "HKMA OpenAPI 31.1",
         "HKMA OpenAPI 40.1",
         "HKMA OpenAPI 40.2",
-        "HKMA OpenAPI 46",
-        "HKMA OpenAPI 47"
-      ]
+        "HKMA OpenAPI 45"
+      ],
+      "scope_note": "HKMA's TSP-centric model reflects bank-partner architecture; our framework operates on an FSP-to-FSP platform model."
     },
     {
-      "summary": "HKMA specifies liability arrangements between banks and TSPs to protect customers in cases of loss, which BNM's document does not cover.",
-      "label": "silent-on",
-      "source_anchors": [],
+      "summary": "Both require clear allocation of liability and responsibilities between parties to protect customers from loss.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 11.13",
+        "Open Finance ED 11.14"
+      ],
       "target_anchors": [
         "HKMA OpenAPI 50",
         "HKMA OpenAPI 51"
       ]
     },
     {
-      "summary": "HKMA requires banks to publish lists of partnering TSPs and monitor for scams/impersonation to protect the public, an area not addressed by BNM.",
-      "label": "silent-on",
-      "source_anchors": [],
-      "target_anchors": [
-        "HKMA OpenAPI 48",
-        "HKMA OpenAPI 49"
-      ]
-    },
-    {
-      "summary": "Both share the vision of using open finance/APIs to spur innovation, improve customer experience and promote financial inclusion.",
-      "label": "aligns-with",
-      "source_anchors": [
-        "BNM 1.2",
-        "BNM 1.1"
-      ],
-      "target_anchors": [
-        "HKMA OpenAPI 4.1",
-        "HKMA OpenAPI 4.2",
-        "HKMA OpenAPI 8.1"
-      ]
-    },
-    {
-      "summary": "Both provide for document submission and single-account-view use cases, though BNM makes them binding obligations with fixed timelines while HKMA lists them as high-level API function categories.",
+      "summary": "Both require a consent/API dashboard, though our dashboard is for customer consent management while HKMA's is a central repository of Open APIs for TSP access.",
       "label": "differs-on",
-      "sentiment": "tighten",
+      "sentiment": "neutral",
       "source_anchors": [
-        "BNM 2(a)",
-        "BNM 4",
-        "BNM 9"
+        "Open Finance ED 10.2"
       ],
       "target_anchors": [
-        "HKMA OpenAPI 11.2",
-        "HKMA OpenAPI 11.3",
-        "HKMA OpenAPI 8.4"
+        "HKMA OpenAPI 52.1"
       ]
     },
     {
-      "summary": "Both require board/senior management or governance oversight, but BNM imposes explicit board oversight and escalation duties while HKMA relies on committee-led continuous development.",
-      "label": "goes-beyond",
-      "source_anchors": [
-        "BNM 7",
-        "BNM 7(b)(c)(d)(e)(f)(g)"
-      ],
-      "target_anchors": [
-        "HKMA OpenAPI 57",
-        "HKMA OpenAPI 55"
-      ]
-    },
-    {
-      "summary": "BNM requires customer breach handling and response plans with escalation and remedial procedures, which HKMA does not cover beyond scam monitoring.",
-      "label": "goes-beyond",
-      "source_anchors": [
-        "BNM 11.12",
-        "BNM 11.12(a)(b)(a)(b)(c)"
-      ],
-      "target_anchors": []
-    },
-    {
-      "summary": "Both leverage industry/international standards and interoperable, standardised formats to ensure ease of implementation.",
+      "summary": "Both emphasise board/senior management governance and effective risk management over open finance/API activities.",
       "label": "aligns-with",
       "source_anchors": [
-        "BNM 2(a)",
-        "BNM 12.5"
+        "Open Finance ED 7.1",
+        "Open Finance ED 7.3",
+        "Open Finance ED 7.5"
       ],
       "target_anchors": [
-        "HKMA OpenAPI 8.5",
-        "HKMA OpenAPI 22",
-        "HKMA OpenAPI 28"
+        "HKMA OpenAPI 27",
+        "HKMA OpenAPI 45"
+      ]
+    },
+    {
+      "summary": "Both scope the initial functions/information around account information and transaction data, and support document submission/account view use cases.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 8.6(a)",
+        "Open Finance ED 12.5(a)",
+        "Open Finance ED 12.5(b)"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 11.3",
+        "HKMA OpenAPI 11.4",
+        "HKMA OpenAPI 11.1"
+      ]
+    },
+    {
+      "summary": "Our framework mandates secure deletion of customer information upon consent expiry/revocation, whereas HKMA does not address data deletion obligations.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 10.10",
+        "Open Finance ED 10.13",
+        "Open Finance ED 11.2(d)"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 6"
+      ]
+    },
+    {
+      "summary": "Our framework requires detailed complaints handling and redress mechanisms for open finance disputes, whereas HKMA only references the Code of Banking Practice for unauthorised transactions.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 11.15",
+        "Open Finance ED 11.16",
+        "Open Finance ED 11.17"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 50"
+      ]
+    },
+    {
+      "summary": "Both envision an ongoing body/collaboration for continuous development and review of the framework and ecosystem, and broader ecosystem building.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 1.6"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 55",
+        "HKMA OpenAPI 56",
+        "HKMA OpenAPI 58"
+      ]
+    },
+    {
+      "summary": "Both emphasise inclusivity, accessibility and consumer education to support customer understanding and adoption of open finance/APIs.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 8.7",
+        "Open Finance ED 11.18",
+        "Open Finance ED 11.20"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 53"
       ]
     }
   ],
   "critic_output": [
     {
-      "summary": "Both frameworks establish a phased, gradual implementation approach for open finance/API adoption to allow orderly industry adoption.",
+      "summary": "Both frameworks establish a regulatory framework for open finance/API-based data sharing to enable secure, innovative financial services.",
       "label": "aligns-with",
       "source_anchors": [
-        "BNM 1.5"
+        "Open Finance ED 1.3",
+        "Open Finance ED 1.2"
       ],
       "target_anchors": [
-        "HKMA OpenAPI 8.1",
-        "HKMA OpenAPI 10",
-        "HKMA OpenAPI 13"
-      ],
-      "scope_note": "BNM phases in binding requirements per Appendix 2 timelines; HKMA phases by risk-based category with recommended (not mandatory) timelines."
+        "HKMA OpenAPI 4.2",
+        "HKMA OpenAPI 6"
+      ]
     },
     {
-      "summary": "BNM mandates open finance participation for mandated FSPs with binding standards and enforcement, whereas HKMA deliberately adopts a collaborative, non-mandatory approach.",
+      "summary": "Our framework mandates participation of qualifying FSPs as data providers and consumers, whereas HKMA adopts a collaborative, voluntary approach rather than mandating participation.",
       "label": "differs-on",
       "sentiment": "tighten",
       "source_anchors": [
-        "BNM 9",
-        "BNM 8",
-        "BNM 14"
+        "Open Finance ED 1.4(a)",
+        "Open Finance ED 8.4",
+        "Open Finance ED 8.6"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 8.1",
+        "HKMA OpenAPI 8.2"
+      ],
+      "scope_note": "HKMA notes mandatory approach in EU/UK/Australia but opts for collaborative phased approach; expects but does not compel banks to implement. HKMA reserves the right to consider new regulatory measures later."
+    },
+    {
+      "summary": "Both adopt a phased, multi-year implementation approach to allow orderly adoption by industry.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 1.5",
+        "Open Finance ED 9.1",
+        "Open Finance ED 9.2"
       ],
       "target_anchors": [
         "HKMA OpenAPI 8.2",
-        "HKMA OpenAPI 8.3"
-      ],
-      "scope_note": "BNM 8.1 participation as data provider/consumer is voluntary generally; the mandatory element applies specifically to mandated FSPs per Appendix 1. HKMA explicitly noted but declined the EU/UK/Australia mandatory approach."
+        "HKMA OpenAPI 10",
+        "HKMA OpenAPI 13",
+        "HKMA OpenAPI 18"
+      ]
     },
     {
-      "summary": "Both address secure data transmission and authentication, but BNM references its Risk Management in Technology policy while HKMA prescribes specific technologies (X.509, TLS, OAuth 2.0).",
+      "summary": "Our framework prescribes fixed calendar-based commencement dates for mandated obligations, whereas HKMA sets phased timelines relative to publication with later phases deferred and flexible.",
       "label": "differs-on",
-      "sentiment": "neutral",
+      "sentiment": "tighten",
       "source_anchors": [
-        "BNM 11.2(a)(b)(c)(d)(a)(b)",
-        "BNM 12.3"
+        "Open Finance ED 4.1",
+        "Open Finance ED 9.2"
       ],
       "target_anchors": [
-        "HKMA OpenAPI 58(REST)",
-        "HKMA OpenAPI 26",
-        "HKMA OpenAPI 27"
+        "HKMA OpenAPI 18",
+        "HKMA OpenAPI 19"
       ],
-      "scope_note": "BNM requires MFA and reliable authentication by reference to external policy; HKMA recommends specific standards but still permits banks' own risk-based methods (B7)."
+      "scope_note": "HKMA permits individual banks to advance ahead of the latest expected dates; our dates are firm subject to transition arrangements in paragraph 9."
     },
     {
-      "summary": "Both scale security/protection requirements to the sensitivity of data being accessed.",
-      "label": "aligns-with",
+      "summary": "Our framework prescribes a detailed consent lifecycle (specific/voluntary consent, dashboard, expiry, renewal, revocation), whereas HKMA only requires customer authorisation with limited detail.",
+      "label": "goes-beyond",
       "source_anchors": [
-        "BNM 11.6",
-        "BNM 11.7"
+        "Open Finance ED 10.1",
+        "Open Finance ED 10.1(a)",
+        "Open Finance ED 10.1(b)",
+        "Open Finance ED 10.2",
+        "Open Finance ED 10.5",
+        "Open Finance ED 10.7",
+        "Open Finance ED 10.11"
       ],
       "target_anchors": [
         "HKMA OpenAPI 12",
-        "HKMA OpenAPI 13"
+        "HKMA OpenAPI 11.4"
       ],
-      "scope_note": "BNM frames this as equivalent-safeguards-and-monitoring; HKMA explicitly ties progressive protection to the four categories' increasing data sensitivity."
+      "scope_note": "HKMA references authorisation of customers via OAuth 2.0 (B7) but not a full consent lifecycle framework."
     },
     {
-      "summary": "BNM sets detailed, binding consent requirements (voluntary, revocable, explicit, no bundled/blanket consent, consent dashboards, expiry periods) that HKMA's high-level framework does not cover.",
-      "label": "goes-beyond",
-      "source_anchors": [
-        "BNM 10(a)(i)(ii)(iii)(b)",
-        "BNM 8(c)(d)",
-        "BNM 11",
-        "BNM 10.6",
-        "BNM 10.7",
-        "BNM 10.8",
-        "BNM 10.9",
-        "BNM 10.10"
-      ],
-      "target_anchors": [
-        "HKMA OpenAPI 6"
-      ],
-      "scope_note": "HKMA only references the need for authorisation of customers (para 12 / B7 OAuth) without detailed consent-lifecycle rules. Revocation right subject to legal/contractual necessity exceptions (BNM 8(c)(d)); recurring consent capped at six months."
-    },
-    {
-      "summary": "BNM requires deletion/secure disposal of customer information upon consent expiry, which HKMA's framework does not address.",
-      "label": "goes-beyond",
-      "source_anchors": [
-        "BNM 10.10",
-        "BNM 11.2(a)(b)(c)(d)"
-      ],
-      "target_anchors": [],
-      "scope_note": "Deletion obligation subject to retention permitted or required under applicable laws or regulatory requirements."
-    },
-    {
-      "summary": "Both require third-party/TSP governance and safeguards over data handling, but HKMA elaborates due-diligence models (central entity, common baseline) while BNM cross-references outsourcing and customer-information policies.",
+      "summary": "Both require strong data security safeguards including authentication, integrity and confidentiality controls for information sharing.",
       "label": "aligns-with",
       "source_anchors": [
-        "BNM 11.8",
-        "BNM 11.9",
-        "BNM 11.10",
-        "BNM 12.2"
+        "Open Finance ED 11.4",
+        "Open Finance ED 11.5"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 12",
+        "HKMA OpenAPI 27",
+        "HKMA OpenAPI 58(REST)"
+      ]
+    },
+    {
+      "summary": "HKMA prescribes specific technical/security standards (REST, JSON, X.509, TLS, OAuth 2.0) whereas our framework defers to separate risk-management-in-technology policy documents without prescribing standards itself.",
+      "label": "silent-on",
+      "source_anchors": [
+        "Open Finance ED 11.5",
+        "Open Finance ED 12.1"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 26",
+        "HKMA OpenAPI 58(REST)"
+      ],
+      "scope_note": "Our framework's requirement to use secure means and comply with RMiT effectively covers the objective, but the specific named standards are only in the HKMA framework; HKMA itself treats these as recommendations, not exhaustive."
+    },
+    {
+      "summary": "HKMA prescribes a detailed TSP governance model with onboarding checks, common baseline and ongoing monitoring for third parties, whereas our framework relies on general third-party/outsourcing requirements.",
+      "label": "silent-on",
+      "source_anchors": [
+        "Open Finance ED 11.8",
+        "Open Finance ED 11.10"
       ],
       "target_anchors": [
         "HKMA OpenAPI 29",
         "HKMA OpenAPI 30.1",
-        "HKMA OpenAPI 30.2",
-        "HKMA OpenAPI 30.3",
+        "HKMA OpenAPI 31.1",
         "HKMA OpenAPI 40.1",
         "HKMA OpenAPI 40.2",
-        "HKMA OpenAPI 46",
-        "HKMA OpenAPI 47"
+        "HKMA OpenAPI 45"
       ],
-      "scope_note": "HKMA's comprehensive TSP governance is only required for Phase II and beyond; Phase I needs only a simple registration process (HKMA 33)."
+      "scope_note": "HKMA's TSP-centric model reflects bank-partner architecture; our framework operates on an FSP-to-FSP platform model, so the granular TSP onboarding regime is not mirrored on our side."
     },
     {
-      "summary": "HKMA specifies liability arrangements between banks and TSPs to protect customers in cases of loss, which BNM's document does not cover.",
-      "label": "silent-on",
-      "source_anchors": [],
+      "summary": "Both require clear allocation of liability and responsibilities between parties to protect customers from loss.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 11.13",
+        "Open Finance ED 11.14"
+      ],
       "target_anchors": [
         "HKMA OpenAPI 50",
         "HKMA OpenAPI 51"
       ]
     },
     {
-      "summary": "HKMA requires banks to publish lists of partnering TSPs and monitor for scams/impersonation to protect the public, an area not addressed by BNM.",
-      "label": "silent-on",
-      "source_anchors": [],
-      "target_anchors": [
-        "HKMA OpenAPI 48",
-        "HKMA OpenAPI 49"
-      ],
-      "scope_note": "HKMA publication obligation applies to Phase II and beyond."
-    },
-    {
-      "summary": "Both share the vision of using open finance/APIs to spur innovation, improve customer experience and promote financial inclusion.",
-      "label": "aligns-with",
+      "summary": "Both require a dashboard, though our dashboard is for customer consent management while HKMA's is a central repository of Open APIs for TSP access \u2014 different purposes on different axes.",
+      "label": "differs-on",
+      "sentiment": "neutral",
       "source_anchors": [
-        "BNM 1.2",
-        "BNM 1.1"
+        "Open Finance ED 10.2"
       ],
       "target_anchors": [
-        "HKMA OpenAPI 4.1",
-        "HKMA OpenAPI 4.2",
-        "HKMA OpenAPI 8.1"
+        "HKMA OpenAPI 52.1"
       ]
     },
     {
-      "summary": "Both provide for document submission and single-account-view use cases, though BNM makes them binding obligations with fixed timelines while HKMA lists them as high-level API function categories.",
+      "summary": "Both emphasise board/senior management governance and effective risk management over open finance/API activities.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 7.1",
+        "Open Finance ED 7.3",
+        "Open Finance ED 7.5"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 27",
+        "HKMA OpenAPI 45"
+      ]
+    },
+    {
+      "summary": "Both scope the initial functions/information around account information and transaction data, and support document submission/account view use cases.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 8.6(a)",
+        "Open Finance ED 12.5(a)",
+        "Open Finance ED 12.5(b)"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 11.3",
+        "HKMA OpenAPI 11.4",
+        "HKMA OpenAPI 11.1"
+      ]
+    },
+    {
+      "summary": "Our framework mandates secure deletion of customer information upon consent expiry/revocation, whereas HKMA does not address data deletion obligations.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 10.10",
+        "Open Finance ED 10.13",
+        "Open Finance ED 11.2(d)"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 6"
+      ]
+    },
+    {
+      "summary": "Our framework requires detailed complaints handling and redress mechanisms for open finance disputes, whereas HKMA only references the Code of Banking Practice for unauthorised transactions.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 11.15",
+        "Open Finance ED 11.16",
+        "Open Finance ED 11.17"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 50"
+      ]
+    },
+    {
+      "summary": "Both envision an ongoing body/collaboration for continuous development and review of the framework and ecosystem, and broader ecosystem building.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 1.6"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 55",
+        "HKMA OpenAPI 56",
+        "HKMA OpenAPI 58"
+      ]
+    },
+    {
+      "summary": "Both emphasise inclusivity, accessibility and consumer education to support customer understanding and adoption of open finance/APIs.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 8.7",
+        "Open Finance ED 11.18",
+        "Open Finance ED 11.20"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 53"
+      ],
+      "scope_note": "Our provisions are framed as encouragements ('where practicable', 'may') rather than firm obligations; HKMA's consumer education is a facilitation activity by the regulator."
+    },
+    {
+      "summary": "Our framework requires customer explicit consent before any third-party service provider handles customer information, whereas HKMA requires TSPs to be explicit that data collection is not carried out by banks and to comply with applicable data-protection laws.",
       "label": "differs-on",
       "sentiment": "tighten",
       "source_anchors": [
-        "BNM 2(a)",
-        "BNM 4",
-        "BNM 9"
+        "Open Finance ED 11.9",
+        "Open Finance ED 11.8"
       ],
       "target_anchors": [
-        "HKMA OpenAPI 11.2",
-        "HKMA OpenAPI 11.3",
-        "HKMA OpenAPI 8.4"
+        "HKMA OpenAPI 34.3.2(i)"
       ],
-      "scope_note": "BNM single account view / document submission obligation commences by 1 January 2028 or when para 8.4 obligations commence, whichever is later, and covers individual and SME customers except credit card."
+      "scope_note": "Our framework requires explicit customer consent for third-party sharing; HKMA focuses on TSP transparency and legal compliance rather than a consent gate."
     },
     {
-      "summary": "Both require board/senior management or governance oversight, but BNM imposes explicit board oversight and escalation duties while HKMA relies on committee-led continuous development.",
-      "label": "goes-beyond",
-      "source_anchors": [
-        "BNM 7",
-        "BNM 7(b)(c)(d)(e)(f)(g)"
-      ],
-      "target_anchors": [
-        "HKMA OpenAPI 57",
-        "HKMA OpenAPI 55"
-      ],
-      "scope_note": "HKMA's governance body is industry/committee-level continuous-development oversight, not firm-level board accountability, so this is a genuine coverage gap on our side going beyond."
-    },
-    {
-      "summary": "BNM requires customer breach handling and response plans with escalation and remedial procedures, which HKMA does not cover beyond scam monitoring.",
-      "label": "goes-beyond",
-      "source_anchors": [
-        "BNM 11.12",
-        "BNM 11.12(a)(b)(a)(b)(c)"
-      ],
-      "target_anchors": []
-    },
-    {
-      "summary": "Both leverage industry/international standards and interoperable, standardised formats to ensure ease of implementation.",
+      "summary": "Both require customer authentication before granting access to protected data, with HKMA prescribing bank's own methods/multi-factor and our framework requiring reliable authentication such as multi-factor authentication.",
       "label": "aligns-with",
       "source_anchors": [
-        "BNM 2(a)",
-        "BNM 12.5"
+        "Open Finance ED 11.5"
       ],
       "target_anchors": [
-        "HKMA OpenAPI 8.5",
-        "HKMA OpenAPI 22",
-        "HKMA OpenAPI 28"
+        "HKMA OpenAPI 58(REST)"
+      ],
+      "scope_note": "HKMA B7 leaves authentication of customers to banks' own risk-based methods; our framework similarly cites MFA as an example."
+    },
+    {
+      "summary": "Our framework requires extensive consent record-keeping and auditable logs retained for seven years plus customer access to data access logs, whereas HKMA does not prescribe consent/audit record retention.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 10.18",
+        "Open Finance ED 10.19",
+        "Open Finance ED 10.20"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 6"
       ]
     },
     {
-      "summary": "BNM requires data consumers to apply safeguards at least equivalent to those for their own customer information; HKMA does not impose an equivalence standard on TSP-received data.",
+      "summary": "Our framework requires business continuity and operational resilience measures (API outages, downtime, third-party failures) for open finance activities, which HKMA does not address in equivalent detail.",
       "label": "goes-beyond",
       "source_anchors": [
-        "BNM 11.6"
+        "Open Finance ED 7.6(b)",
+        "Open Finance ED 12.2"
       ],
-      "target_anchors": []
-    },
-    {
-      "summary": "BNM encourages inclusive, accessible interface design for underserved segments (basic digital literacy, persons with disabilities), which HKMA's framework does not address.",
-      "label": "goes-beyond",
-      "source_anchors": [
-        "BNM 8.7"
-      ],
-      "target_anchors": []
-    },
-    {
-      "summary": "HKMA requires banks to submit implementation road maps to the regulator and plans to publish summaries, a specific supervisory reporting expectation not present in BNM's framework.",
-      "label": "silent-on",
-      "source_anchors": [],
       "target_anchors": [
-        "HKMA OpenAPI 23",
-        "HKMA OpenAPI 25"
+        "HKMA OpenAPI 27"
       ]
     },
     {
-      "summary": "HKMA recommends providing a testing environment with (possibly artificial) customer data and a single-point-of-reference dashboard/repository of Open APIs to facilitate TSP adoption, which BNM does not address.",
+      "summary": "HKMA requires banks to publish a list of partnering TSPs and monitor the internet for fraudulent parties impersonating partners, an obligation our framework does not include.",
       "label": "silent-on",
-      "source_anchors": [],
+      "source_anchors": [
+        "Open Finance ED 11.19"
+      ],
       "target_anchors": [
-        "HKMA OpenAPI 52.1",
+        "HKMA OpenAPI 48",
+        "HKMA OpenAPI 49"
+      ]
+    },
+    {
+      "summary": "HKMA requires banks to publish data dictionaries/specifications and provide testing environments to assist TSPs, whereas our framework defers API/data specifications to the platform operator without prescribing publication obligations on the FSP.",
+      "label": "silent-on",
+      "source_anchors": [
+        "Open Finance ED 12.5"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 28",
+        "HKMA OpenAPI 52.3",
         "HKMA OpenAPI 52.4"
       ]
     },
     {
-      "summary": "Both anchor data sharing within a broader legal/regulatory data-protection framework, BNM via the Personal Data Protection Act 2010 and HKMA via applicable personal data protection laws and guidance.",
-      "label": "aligns-with",
+      "summary": "Our framework prohibits differential treatment of customers based on their consent decision, protecting against exclusion risk \u2014 a consumer-conduct protection HKMA does not address.",
+      "label": "goes-beyond",
       "source_anchors": [
-        "BNM 1.3"
+        "Open Finance ED 11.19(b)"
       ],
       "target_anchors": [
-        "HKMA OpenAPI 34.3.2(i)"
+        "HKMA OpenAPI 50"
+      ]
+    },
+    {
+      "summary": "Both require voluntary/limited data sharing scoped to purpose, but our framework additionally allows voluntary sharing of information beyond the prescribed scope with explicit consent, mirroring HKMA's principle that banks may advance beyond specified categories.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 8.5"
+      ],
+      "target_anchors": [
+        "HKMA OpenAPI 19",
+        "HKMA OpenAPI 25"
       ]
     }
   ],
   "validation": [
     {
-      "summary": "Both frameworks establish a phased, gradual implementation approach for open finance/API adoption to allow orderly industry adoption.",
+      "summary": "Both frameworks establish a regulatory framework for open finance/API-based data sharing to enable secure, innovative financial services.",
       "label": "aligns-with",
       "sentiment": null,
       "cited_anchors": [
         {
-          "anchor_id": "BNM 1.5",
+          "anchor_id": "Open Finance ED 1.3",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 1.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 4.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 6",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Our framework mandates participation of qualifying FSPs as data providers and consumers, whereas HKMA adopts a collaborative, voluntary approach rather than mandating participation.",
+      "label": "differs-on",
+      "sentiment": "tighten",
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 1.4(a)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 8.4",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 8.6",
           "resolved": true
         },
         {
           "anchor_id": "HKMA OpenAPI 8.1",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 8.2",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both adopt a phased, multi-year implementation approach to allow orderly adoption by industry.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 1.5",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 9.1",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 9.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 8.2",
           "resolved": true
         },
         {
@@ -440,53 +610,121 @@
         {
           "anchor_id": "HKMA OpenAPI 13",
           "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 18",
+          "resolved": true
         }
       ],
       "supported": true
     },
     {
-      "summary": "BNM mandates open finance participation for mandated FSPs with binding standards and enforcement, whereas HKMA deliberately adopts a collaborative, non-mandatory approach.",
+      "summary": "Our framework prescribes fixed calendar-based commencement dates for mandated obligations, whereas HKMA sets phased timelines relative to publication with later phases deferred and flexible.",
       "label": "differs-on",
       "sentiment": "tighten",
       "cited_anchors": [
         {
-          "anchor_id": "BNM 9",
+          "anchor_id": "Open Finance ED 4.1",
           "resolved": true
         },
         {
-          "anchor_id": "BNM 8",
+          "anchor_id": "Open Finance ED 9.2",
           "resolved": true
         },
         {
-          "anchor_id": "BNM 14",
+          "anchor_id": "HKMA OpenAPI 18",
           "resolved": true
         },
         {
-          "anchor_id": "HKMA OpenAPI 8.2",
-          "resolved": true
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 8.3",
+          "anchor_id": "HKMA OpenAPI 19",
           "resolved": true
         }
       ],
       "supported": true
     },
     {
-      "summary": "Both address secure data transmission and authentication, but BNM references its Risk Management in Technology policy while HKMA prescribes specific technologies (X.509, TLS, OAuth 2.0).",
-      "label": "differs-on",
-      "sentiment": "neutral",
+      "summary": "Our framework prescribes a detailed consent lifecycle (specific/voluntary consent, dashboard, expiry, renewal, revocation), whereas HKMA only requires customer authorisation with limited detail.",
+      "label": "goes-beyond",
+      "sentiment": null,
       "cited_anchors": [
         {
-          "anchor_id": "BNM 11.2(a)(b)(c)(d)(a)(b)",
+          "anchor_id": "Open Finance ED 10.1",
           "resolved": true
         },
         {
-          "anchor_id": "BNM 12.3",
-          "resolved": false
+          "anchor_id": "Open Finance ED 10.1(a)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.1(b)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.5",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.7",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.11",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 12",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 11.4",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require strong data security safeguards including authentication, integrity and confidentiality controls for information sharing.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.4",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.5",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 12",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 27",
+          "resolved": true
         },
         {
           "anchor_id": "HKMA OpenAPI 58(REST)",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "HKMA prescribes specific technical/security standards (REST, JSON, X.509, TLS, OAuth 2.0) whereas our framework defers to separate risk-management-in-technology policy documents without prescribing standards itself.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.5",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 12.1",
           "resolved": true
         },
         {
@@ -494,115 +732,23 @@
           "resolved": true
         },
         {
-          "anchor_id": "HKMA OpenAPI 27",
+          "anchor_id": "HKMA OpenAPI 58(REST)",
           "resolved": true
         }
       ],
-      "supported": false
+      "supported": true
     },
     {
-      "summary": "Both scale security/protection requirements to the sensitivity of data being accessed.",
-      "label": "aligns-with",
+      "summary": "HKMA prescribes a detailed TSP governance model with onboarding checks, common baseline and ongoing monitoring for third parties, whereas our framework relies on general third-party/outsourcing requirements.",
+      "label": "silent-on",
       "sentiment": null,
       "cited_anchors": [
         {
-          "anchor_id": "BNM 11.6",
-          "resolved": false
-        },
-        {
-          "anchor_id": "BNM 11.7",
-          "resolved": false
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 12",
+          "anchor_id": "Open Finance ED 11.8",
           "resolved": true
         },
         {
-          "anchor_id": "HKMA OpenAPI 13",
-          "resolved": true
-        }
-      ],
-      "supported": false
-    },
-    {
-      "summary": "BNM sets detailed, binding consent requirements (voluntary, revocable, explicit, no bundled/blanket consent, consent dashboards, expiry periods) that HKMA's high-level framework does not cover.",
-      "label": "goes-beyond",
-      "sentiment": null,
-      "cited_anchors": [
-        {
-          "anchor_id": "BNM 10(a)(i)(ii)(iii)(b)",
-          "resolved": true
-        },
-        {
-          "anchor_id": "BNM 8(c)(d)",
-          "resolved": true
-        },
-        {
-          "anchor_id": "BNM 11",
-          "resolved": true
-        },
-        {
-          "anchor_id": "BNM 10.6",
-          "resolved": true
-        },
-        {
-          "anchor_id": "BNM 10.7",
-          "resolved": false
-        },
-        {
-          "anchor_id": "BNM 10.8",
-          "resolved": false
-        },
-        {
-          "anchor_id": "BNM 10.9",
-          "resolved": false
-        },
-        {
-          "anchor_id": "BNM 10.10",
-          "resolved": false
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 6",
-          "resolved": true
-        }
-      ],
-      "supported": false
-    },
-    {
-      "summary": "BNM requires deletion/secure disposal of customer information upon consent expiry, which HKMA's framework does not address.",
-      "label": "goes-beyond",
-      "sentiment": null,
-      "cited_anchors": [
-        {
-          "anchor_id": "BNM 10.10",
-          "resolved": false
-        },
-        {
-          "anchor_id": "BNM 11.2(a)(b)(c)(d)",
-          "resolved": true
-        }
-      ],
-      "supported": false
-    },
-    {
-      "summary": "Both require third-party/TSP governance and safeguards over data handling, but HKMA elaborates due-diligence models (central entity, common baseline) while BNM cross-references outsourcing and customer-information policies.",
-      "label": "aligns-with",
-      "sentiment": null,
-      "cited_anchors": [
-        {
-          "anchor_id": "BNM 11.8",
-          "resolved": true
-        },
-        {
-          "anchor_id": "BNM 11.9",
-          "resolved": false
-        },
-        {
-          "anchor_id": "BNM 11.10",
-          "resolved": false
-        },
-        {
-          "anchor_id": "BNM 12.2",
+          "anchor_id": "Open Finance ED 11.10",
           "resolved": true
         },
         {
@@ -614,11 +760,7 @@
           "resolved": true
         },
         {
-          "anchor_id": "HKMA OpenAPI 30.2",
-          "resolved": true
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 30.3",
+          "anchor_id": "HKMA OpenAPI 31.1",
           "resolved": true
         },
         {
@@ -630,21 +772,25 @@
           "resolved": true
         },
         {
-          "anchor_id": "HKMA OpenAPI 46",
-          "resolved": true
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 47",
+          "anchor_id": "HKMA OpenAPI 45",
           "resolved": true
         }
       ],
-      "supported": false
+      "supported": true
     },
     {
-      "summary": "HKMA specifies liability arrangements between banks and TSPs to protect customers in cases of loss, which BNM's document does not cover.",
-      "label": "silent-on",
+      "summary": "Both require clear allocation of liability and responsibilities between parties to protect customers from loss.",
+      "label": "aligns-with",
       "sentiment": null,
       "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.13",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.14",
+          "resolved": true
+        },
         {
           "anchor_id": "HKMA OpenAPI 50",
           "resolved": true
@@ -657,10 +803,266 @@
       "supported": true
     },
     {
-      "summary": "HKMA requires banks to publish lists of partnering TSPs and monitor for scams/impersonation to protect the public, an area not addressed by BNM.",
+      "summary": "Both require a dashboard, though our dashboard is for customer consent management while HKMA's is a central repository of Open APIs for TSP access \u2014 different purposes on different axes.",
+      "label": "differs-on",
+      "sentiment": "neutral",
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 10.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 52.1",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both emphasise board/senior management governance and effective risk management over open finance/API activities.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 7.1",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 7.3",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 7.5",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 27",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 45",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both scope the initial functions/information around account information and transaction data, and support document submission/account view use cases.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 8.6(a)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 12.5(a)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 12.5(b)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 11.3",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 11.4",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 11.1",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Our framework mandates secure deletion of customer information upon consent expiry/revocation, whereas HKMA does not address data deletion obligations.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 10.10",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.13",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.2(d)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 6",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Our framework requires detailed complaints handling and redress mechanisms for open finance disputes, whereas HKMA only references the Code of Banking Practice for unauthorised transactions.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.15",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.16",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.17",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 50",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both envision an ongoing body/collaboration for continuous development and review of the framework and ecosystem, and broader ecosystem building.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 1.6",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 55",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 56",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 58",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both emphasise inclusivity, accessibility and consumer education to support customer understanding and adoption of open finance/APIs.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 8.7",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.18",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.20",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 53",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Our framework requires customer explicit consent before any third-party service provider handles customer information, whereas HKMA requires TSPs to be explicit that data collection is not carried out by banks and to comply with applicable data-protection laws.",
+      "label": "differs-on",
+      "sentiment": "tighten",
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.9",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.8",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 34.3.2(i)",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require customer authentication before granting access to protected data, with HKMA prescribing bank's own methods/multi-factor and our framework requiring reliable authentication such as multi-factor authentication.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.5",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 58(REST)",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Our framework requires extensive consent record-keeping and auditable logs retained for seven years plus customer access to data access logs, whereas HKMA does not prescribe consent/audit record retention.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 10.18",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.19",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.20",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 6",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Our framework requires business continuity and operational resilience measures (API outages, downtime, third-party failures) for open finance activities, which HKMA does not address in equivalent detail.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 7.6(b)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 12.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 27",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "HKMA requires banks to publish a list of partnering TSPs and monitor the internet for fraudulent parties impersonating partners, an obligation our framework does not include.",
       "label": "silent-on",
       "sentiment": null,
       "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.19",
+          "resolved": true
+        },
         {
           "anchor_id": "HKMA OpenAPI 48",
           "resolved": true
@@ -673,180 +1075,20 @@
       "supported": true
     },
     {
-      "summary": "Both share the vision of using open finance/APIs to spur innovation, improve customer experience and promote financial inclusion.",
-      "label": "aligns-with",
+      "summary": "HKMA requires banks to publish data dictionaries/specifications and provide testing environments to assist TSPs, whereas our framework defers API/data specifications to the platform operator without prescribing publication obligations on the FSP.",
+      "label": "silent-on",
       "sentiment": null,
       "cited_anchors": [
         {
-          "anchor_id": "BNM 1.2",
-          "resolved": true
-        },
-        {
-          "anchor_id": "BNM 1.1",
-          "resolved": true
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 4.1",
-          "resolved": true
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 4.2",
-          "resolved": true
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 8.1",
-          "resolved": true
-        }
-      ],
-      "supported": true
-    },
-    {
-      "summary": "Both provide for document submission and single-account-view use cases, though BNM makes them binding obligations with fixed timelines while HKMA lists them as high-level API function categories.",
-      "label": "differs-on",
-      "sentiment": "tighten",
-      "cited_anchors": [
-        {
-          "anchor_id": "BNM 2(a)",
-          "resolved": true
-        },
-        {
-          "anchor_id": "BNM 4",
-          "resolved": true
-        },
-        {
-          "anchor_id": "BNM 9",
-          "resolved": true
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 11.2",
-          "resolved": true
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 11.3",
-          "resolved": true
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 8.4",
-          "resolved": true
-        }
-      ],
-      "supported": true
-    },
-    {
-      "summary": "Both require board/senior management or governance oversight, but BNM imposes explicit board oversight and escalation duties while HKMA relies on committee-led continuous development.",
-      "label": "goes-beyond",
-      "sentiment": null,
-      "cited_anchors": [
-        {
-          "anchor_id": "BNM 7",
-          "resolved": true
-        },
-        {
-          "anchor_id": "BNM 7(b)(c)(d)(e)(f)(g)",
-          "resolved": true
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 57",
-          "resolved": true
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 55",
-          "resolved": true
-        }
-      ],
-      "supported": true
-    },
-    {
-      "summary": "BNM requires customer breach handling and response plans with escalation and remedial procedures, which HKMA does not cover beyond scam monitoring.",
-      "label": "goes-beyond",
-      "sentiment": null,
-      "cited_anchors": [
-        {
-          "anchor_id": "BNM 11.12",
-          "resolved": true
-        },
-        {
-          "anchor_id": "BNM 11.12(a)(b)(a)(b)(c)",
-          "resolved": true
-        }
-      ],
-      "supported": true
-    },
-    {
-      "summary": "Both leverage industry/international standards and interoperable, standardised formats to ensure ease of implementation.",
-      "label": "aligns-with",
-      "sentiment": null,
-      "cited_anchors": [
-        {
-          "anchor_id": "BNM 2(a)",
-          "resolved": true
-        },
-        {
-          "anchor_id": "BNM 12.5",
-          "resolved": true
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 8.5",
-          "resolved": true
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 22",
+          "anchor_id": "Open Finance ED 12.5",
           "resolved": true
         },
         {
           "anchor_id": "HKMA OpenAPI 28",
           "resolved": true
-        }
-      ],
-      "supported": true
-    },
-    {
-      "summary": "BNM requires data consumers to apply safeguards at least equivalent to those for their own customer information; HKMA does not impose an equivalence standard on TSP-received data.",
-      "label": "goes-beyond",
-      "sentiment": null,
-      "cited_anchors": [
-        {
-          "anchor_id": "BNM 11.6",
-          "resolved": false
-        }
-      ],
-      "supported": false
-    },
-    {
-      "summary": "BNM encourages inclusive, accessible interface design for underserved segments (basic digital literacy, persons with disabilities), which HKMA's framework does not address.",
-      "label": "goes-beyond",
-      "sentiment": null,
-      "cited_anchors": [
-        {
-          "anchor_id": "BNM 8.7",
-          "resolved": false
-        }
-      ],
-      "supported": false
-    },
-    {
-      "summary": "HKMA requires banks to submit implementation road maps to the regulator and plans to publish summaries, a specific supervisory reporting expectation not present in BNM's framework.",
-      "label": "silent-on",
-      "sentiment": null,
-      "cited_anchors": [
-        {
-          "anchor_id": "HKMA OpenAPI 23",
-          "resolved": true
         },
         {
-          "anchor_id": "HKMA OpenAPI 25",
-          "resolved": true
-        }
-      ],
-      "supported": true
-    },
-    {
-      "summary": "HKMA recommends providing a testing environment with (possibly artificial) customer data and a single-point-of-reference dashboard/repository of Open APIs to facilitate TSP adoption, which BNM does not address.",
-      "label": "silent-on",
-      "sentiment": null,
-      "cited_anchors": [
-        {
-          "anchor_id": "HKMA OpenAPI 52.1",
+          "anchor_id": "HKMA OpenAPI 52.3",
           "resolved": true
         },
         {
@@ -857,16 +1099,36 @@
       "supported": true
     },
     {
-      "summary": "Both anchor data sharing within a broader legal/regulatory data-protection framework, BNM via the Personal Data Protection Act 2010 and HKMA via applicable personal data protection laws and guidance.",
+      "summary": "Our framework prohibits differential treatment of customers based on their consent decision, protecting against exclusion risk \u2014 a consumer-conduct protection HKMA does not address.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.19(b)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 50",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require voluntary/limited data sharing scoped to purpose, but our framework additionally allows voluntary sharing of information beyond the prescribed scope with explicit consent, mirroring HKMA's principle that banks may advance beyond specified categories.",
       "label": "aligns-with",
       "sentiment": null,
       "cited_anchors": [
         {
-          "anchor_id": "BNM 1.3",
+          "anchor_id": "Open Finance ED 8.5",
           "resolved": true
         },
         {
-          "anchor_id": "HKMA OpenAPI 34.3.2(i)",
+          "anchor_id": "HKMA OpenAPI 19",
+          "resolved": true
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 25",
           "resolved": true
         }
       ],

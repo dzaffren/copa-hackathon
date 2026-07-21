@@ -4,138 +4,21 @@
   "doc_b_id": "bis-pap168-open-finance",
   "findings": [
     {
-      "summary": "Both documents define open finance as a framework for permissioned/consent-driven sharing of customer financial information between data holders and third parties.",
+      "summary": "Both documents adopt a consent-driven, customer-permissioned model as the foundation for secure financial data sharing.",
       "label": "aligns-with",
       "sentiment": null,
       "source_anchors": [
         {
-          "anchor_id": "BNM 11(a)(b)(c)(d)(e)(f)(g)",
-          "anchor_label": "BNM 11(a)(b)(c)(d)(e)(f)(g)",
-          "text": "an eligible EMI;\n\n\"individual customer\" refers to a natural person aged 18 years and above, in\nrespect of accounts which are under the sole control of that one person;\n\n\"mandated financial service provider\" or \"mandated FSP\" refers to an FSP\nas specified in Appendix 1;\n\n\"scope of prescribed information\" refers to the scope of personal financial\ninformation relating to a customer that a data provider is obligated to share with\na data consumer subject to the customer's consent as specified in Appendix 1;\n\n\"small and medium enterprise\" or \"SME\" refers to an entity defined as such\nin the Guideline for New SME Definition issued by the SME Corporation\nMalaysia in October 2013, as amended or modified from time to time;\n\n\"senior management\" refers to the chief executive officer and senior officers\nof an FSP;\n\n\"open finance\" refers to a framework that enables permissioned sharing of\ncustomer information between a data provider and a data consumer in a secure,\nopen, accessible, interoperable, and timely manner;\n\n\"open finance arrangement\" refers to a contractual relationship established\nbetween a data provider and a data consumer to enable the permissioned\nsharing of customer information through an open finance platform;\n\n\"open finance platform\" or \"platform\" refers to a technical infrastructure,\nsystem or utility that enables consent capture and secure transmission of\ncustomer information in an open finance arrangement;\n\n\"open finance platform operator\" or \"platform operator\" refers to any person\nwho operates an open finance platform;\n\n\"third-party service provider\" refers to an external entity providing services to\nan FSP that involves the handling of customer information, whether or not those\nservices are in relation to open finance.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 1.2",
-          "anchor_label": "BNM 1.2",
+          "anchor_id": "Open Finance ED 1.2",
+          "anchor_label": "Open Finance ED 1.2",
           "text": "Open finance plays a pivotal role in advancing this vision by offering customers\na safer and more structured framework for sharing their financial information\ncompared to existing data-sharing arrangements in Malaysia. By enabling\nconsent-driven information sharing, open finance provides customers with\ngreater control over their personal financial information, allowing them to actively\ndetermine and manage how their information is shared, accessed and used.\nBeyond empowering customers, open finance unlocks data-driven innovation\nthat enables customers to make better-informed decisions about their finances,\nfacilitates the delivery of more personalised financial services and promotes\ngreater financial inclusion as illustrated in Diagram 1.\n\n<figure>\n<figcaption>Diagram 1</figcaption>\n\nIllustrative* potential use cases\n\nSingle account view, including\npersonal financial management\n\nCredit underwriting through\nreal-time and accurate financial\ninformation\n\nFully digital submission and\ntransmission of documents in\nlieu of manual processes (e.g.\nemail and webform)\n\n</figure>\n\nBenefits for consumers\n\nBenefits to financial industry\n\nFinancial\ninclusion and\naccess\n\nBetter informed\ncustomer\ndecisions\n\nBetter user\nexperience and\nconvenience\n\nOpportunities to\ngrow business\nand partnerships\n\nOperational\nefficiency\n\nRisk\nmanagement and\nfraud detection\n\n*Use cases listed are for illustrative purposes only and are not exhaustive nor indicative of endorsement from BNM.\n\n.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "target_anchors": [
-        {
-          "anchor_id": "BIS Pap168 2",
-          "anchor_label": "BIS Pap168 2",
-          "text": "Throughout this paper, \"open finance\" refers to both open banking and broader open finance\ninitiatives. Whereas open banking focuses primarily on bank accounts, open finance extends further\nto cover a broader range of financial products, including insurance, securities and mortgages. An\neven broader concept, used in some cases, is \"open data\", which may cover customer-permissioned\ndata sharing in other industries beyond the financial sector - such as healthcare, utilities,\ntelecommunications or taxes. See Graph A.1 in the appendix.",
-          "doc_class": "semi-structured"
+          "doc_class": "structured-rules"
         },
         {
-          "anchor_id": "BIS Pap168 27",
-          "anchor_label": "BIS Pap168 27",
-          "text": "There are several other definitions of open banking and open finance. The Geneva Report for World\nEconomy describes \"open banking\" as a consumer right to access and share banking data (Petralia\net al (2019)). The Basel Committee's 2019 report similarly defined open banking as banks sharing\ncustomer-permissioned data with third parties (BCBS (2019). The World Bank, International Monetary\nFund (IMF), Bank for International Settlements (BIS) and CGAP define open finance as an innovation\nthat facilitates customer-permissioned access to and use of customer data held by financial\ninstitutions in order to provide new and enhanced services and develop innovative business models\n(CGAP et al (2024)).",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "scope_note": null,
-      "supported": true
-    },
-    {
-      "summary": "Our framework mandates standardised, machine-readable API-based data transmission, consistent with BIS's finding that standardised APIs are the backbone of interoperable open finance ecosystems.",
-      "label": "aligns-with",
-      "sentiment": null,
-      "source_anchors": [
-        {
-          "anchor_id": "BNM 2(a)",
-          "anchor_label": "BNM 2(a)",
-          "text": "interfaces that allow customers to direct the platform to request relevant\ninformation from other data providers through the platform in a machine-\nreadable and standardised format,4 in lieu of traditional methods of\nsubmitting documents (e.g. manual upload, emailing documents), for\nrelevant processes (e.g. customer onboarding, on-going due diligence);\nand",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 12.5",
-          "anchor_label": "BNM 12.5",
-          "text": "An FSP participating in an open finance arrangement shall also comply with\ntechnology and operational requirements of the open finance platform for which\nthe FSP is a member. This may include, but is not limited to, requirements in\nrelation to the user journey, API specifications, uptime requirements, operational\nprocedures and requirements for independent review relating to the operational\nresilience of its technology functions.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "target_anchors": [
-        {
-          "anchor_id": "BIS Pap168 6",
-          "anchor_label": "BIS Pap168 6",
-          "text": "Risks include cyber threats, privacy breaches, data misuse, algorithmic bias, market concentration and\nunclear accountability that can undermine consumer protection and ecosystem stability if not\ngoverned effectively (Bonvino and Giorgino (2026).\n\nsuch as \"screen scraping\" or \"reverse engineering\", which allowed their customers to\ntransfer data into their budgeting, lending and payment apps.7 As concerns around\npersistent data monopolies in the financial sector gained traction, calls grew for\nconsumer-permissioned data sharing via standardised application programming\ninterfaces (APIs), either through regulatory intervention or through private\ninitiatives.8\n\nRather than relying on screen scraping, reverse engineering or bilateral file\ntransfers, APIs allow systems to communicate automatically. This communication\ntakes place under clear technical rules that specify how requests are made (eg for\naccount balances or payment initiation) and how responses are returned. This ensures\nthat customer-permissioned data are shared in a consistent, secure and auditable\nway, while banks retain control over authentication, monitoring and access\nmanagement. APIs form the backbone of scalable and interoperable open finance\necosystems and are the primary mechanism through which third-party providers can\naccess and exchange data with larger financial institutions. Standardised APIs go one\nstep further by simplifying integration for all stakeholders, enabling broad\nparticipation, lowering technical barriers for new financial services providers and\nminimising duplication of effort.9\n\nJurisdictions have followed a diverse set of approaches to open banking and\nopen finance, driven by their unique goals. These approaches can be classified into\nthree broad categories: (i) regulatory-driven prescriptive approaches, requiring banks\nto share customer-permissioned data using eg unified technical API standards and\nthird parties to register with supervisors; (ii) facilitative approaches, where authorities\npublish guidelines and recommended practices;10 and (iii) market-driven approaches,\nwhere no explicit rules require or prohibit data sharing. In the third case, the\necosystem evolves largely through commercial private sector arrangements (BCBS\n(2019)). The choice of regulatory approaches can depend on various factors, including",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BIS Pap168 8",
-          "anchor_label": "BIS Pap168 8",
-          "text": "APIs are the \"set of routines, protocols and tools for building software applications\" that provide\nstandardised interfaces for secure data exchange between banks and third parties (BCBS (2019)).",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "scope_note": null,
-      "supported": true
-    },
-    {
-      "summary": "We adopt a regulatory-mandate/prescriptive approach with binding standards and mandated FSPs, matching BIS's regulation-led prescriptive category.",
-      "label": "aligns-with",
-      "sentiment": null,
-      "source_anchors": [
-        {
-          "anchor_id": "BNM 5.2",
-          "anchor_label": "BNM 5.2",
-          "text": "\"S\" denotes a standard, an obligation, a requirement, specification, direction,\ncondition and any interpretative, supplemental and transitional provisions that\nmust be complied with. Non-compliance may result in enforcement action;\n\n\"G\" denotes guidance which may consist of statements or information intended\nto promote common understanding and advice or recommendations that are\nencouraged to be adopted;\n\n\"banking institution\" refers to a licensed bank, licensed investment bank or\nlicensed Islamic bank;\n\n\"banking group\" refers to a group comprising a banking institution and other\nbanking institutions that control, or are controlled by, or are under common\ncontrol with, the banking institution;\n\n\"board\" refers to the board of directors of an FSP, including a committee of the\nboard where the responsibilities of the board set out in this Policy Document\nhave been delegated to such a committee;\n\n\"customer\" refers to any person who uses, has used or may be intending to\nuse1 any financial service or product offered by any FSP;\n\n\"customer information\" refers to any information relating to the affairs or the\naccount of any customer of any FSP in whatever form, including in the form of a\nrecord, book, register, correspondence, other document or material;\n\n\"data provider\" refers to an FSP that holds customer information and is\nresponsible for responding to any authorised information sharing request\ninitiated by the customer in relation to an open finance arrangement, by making\navailable to the corresponding data consumer the customer information\nspecified;\n\n\"data consumer\" refers to an FSP that is authorised by the customer to access\ntheir information from a data provider upon obtaining customer's consent for the",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 9",
-          "anchor_label": "BNM 9",
-          "text": "S 9.1\nThe obligations of a mandated FSP as specified under paragraph 8.4 shall\ncommence in accordance with the timeline specified in Appendix 2.\n\nS 9.2\nA mandated FSP shall commence its obligation under paragraph 8.6 to provide\ndocument submission and single account view interfaces by 1 January 2028 or\n\nthe date on which the FSP's obligations under paragraph 8.4 commence,\nwhichever is later.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 8",
-          "anchor_label": "BNM 8",
-          "text": "S 8.1\nAn FSP may participate2 as a data provider or a data consumer on an open\nfinance platform, subject to meeting relevant requirements in this Policy\nDocument and that specified by the platform operator.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "target_anchors": [
-        {
-          "anchor_id": "BIS Pap168 6",
-          "anchor_label": "BIS Pap168 6",
-          "text": "Risks include cyber threats, privacy breaches, data misuse, algorithmic bias, market concentration and\nunclear accountability that can undermine consumer protection and ecosystem stability if not\ngoverned effectively (Bonvino and Giorgino (2026).\n\nsuch as \"screen scraping\" or \"reverse engineering\", which allowed their customers to\ntransfer data into their budgeting, lending and payment apps.7 As concerns around\npersistent data monopolies in the financial sector gained traction, calls grew for\nconsumer-permissioned data sharing via standardised application programming\ninterfaces (APIs), either through regulatory intervention or through private\ninitiatives.8\n\nRather than relying on screen scraping, reverse engineering or bilateral file\ntransfers, APIs allow systems to communicate automatically. This communication\ntakes place under clear technical rules that specify how requests are made (eg for\naccount balances or payment initiation) and how responses are returned. This ensures\nthat customer-permissioned data are shared in a consistent, secure and auditable\nway, while banks retain control over authentication, monitoring and access\nmanagement. APIs form the backbone of scalable and interoperable open finance\necosystems and are the primary mechanism through which third-party providers can\naccess and exchange data with larger financial institutions. Standardised APIs go one\nstep further by simplifying integration for all stakeholders, enabling broad\nparticipation, lowering technical barriers for new financial services providers and\nminimising duplication of effort.9\n\nJurisdictions have followed a diverse set of approaches to open banking and\nopen finance, driven by their unique goals. These approaches can be classified into\nthree broad categories: (i) regulatory-driven prescriptive approaches, requiring banks\nto share customer-permissioned data using eg unified technical API standards and\nthird parties to register with supervisors; (ii) facilitative approaches, where authorities\npublish guidelines and recommended practices;10 and (iii) market-driven approaches,\nwhere no explicit rules require or prohibit data sharing. In the third case, the\necosystem evolves largely through commercial private sector arrangements (BCBS\n(2019)). The choice of regulatory approaches can depend on various factors, including",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BIS Pap168 22",
-          "anchor_label": "BIS Pap168 22",
-          "text": "One approach adopted in certain jurisdictions is to make participation mandatory. While this\napproach has generally helped address the historical concentration of data among incumbents, there\nis currently no evidence to suggest that it is a necessary condition for achieving a level playing field.\n\nnational API infrastructures and data sharing practices may not be sufficient for\nindividuals and businesses that straddle borders to access financial services in line\nwith their needs. Supporting cross-border access to financial services requires striking\na balance between data sovereignty imperatives and interoperability between\ndomestic open finance infrastructures, alignment on technical standards, consent\nmanagement systems and governance models to enable secure and user-\npermissioned cross-border portability of financial data.24 Bonvino and Giorgino\n(2026) argue that the open finance ecosystem can unlock greater innovation,\ncompetition and long-term sustainability when all stakeholders actively collaborate\nand co-evolve by harmonising standards, sharing data responsibly and jointly\ndeveloping infrastructure and governance frameworks. The challenges of doing this\nare, naturally, even greater for stakeholders in different jurisdictions.\n\nMeanwhile, ensuring wide participation in open finance and addressing\nstructural (behavioural) barriers to adoption remain key. Evidence from Brazil shows\nthat adoption is lower among less-educated and low-income individuals (CGAP\n(2023)). Adoption rates also vary by gender, with men more likely to use open finance\nthan women.25 In other cases, willingness to share data remains limited even when\nbenefits are clearly presented. For example, when respondents were shown potential\nadvantages such as improved loan terms or higher credit limits, only 27% indicated\nthat they would share data to obtain those benefits (CGAP (2023). $I n \\quad I n d i a , a \\quad C G A P$\nsurvey shows similar trends. Of approximately 2,000 smartphone users, only 12% were\nfamiliar with account aggregators and 20% were willing to share financial data\n(Salman and Fernandez Vidal (2024). Both awareness and willingness were markedly\nlower among women, rural residents and individuals with lower levels of education.\nAmong loan applicants, only 10% reported using the account aggregator mechanism\ndespite significant efficiency gains reported by financial service providers.\n\nFinally, data access pricing is emerging as an important next stage in the\nevolution of open finance policies. Recent policy discussions have focused on how\ndata should be valued and priced. For example, in 2025 JPMorgan introduced fees\nfor third-party providers to access its consumer data, prompting renewed attention\nto the economic implications of data sharing arrangements (Shevlin (2025). In the\nEU, ongoing deliberations on the scope of the Financial Data Access (FiDA) regulation,\nincluding proposals to exclude certain large technology firms, reflect broader\nconcerns about market structure, eligibility criteria and reciprocity of access (Moens\nand Tamma (2025)). The proposed FiDA regulation represents a transformative but\nchallenging shift towards an EU-wide open data economy. It would significantly\nexpand PSD2 by mandating real-time access to a broad range of financial data, with\nthe aim of empowering customers and stimulating innovation (Euro Banking\nAssociation (2025). These developments have revived debates over whether\nmeasures perceived as protecting incumbent institutions could inadvertently limit\ncompetition and innovation. An opposing view is that pricing mechanisms can be\nviewed as legitimate compensation for the maintenance of proprietary infrastructure,",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "scope_note": "BNM binding standards ('S') apply to mandated FSPs per Appendix 1; BIS notes mandatory participation is not proven a necessary condition for a level playing field.",
-      "supported": true
-    },
-    {
-      "summary": "Our framework emphasises financial inclusion as a goal, aligning with BIS's finding that inclusion is a top motivation for open finance frameworks.",
-      "label": "aligns-with",
-      "sentiment": null,
-      "source_anchors": [
-        {
-          "anchor_id": "BNM 1.2",
-          "anchor_label": "BNM 1.2",
-          "text": "Open finance plays a pivotal role in advancing this vision by offering customers\na safer and more structured framework for sharing their financial information\ncompared to existing data-sharing arrangements in Malaysia. By enabling\nconsent-driven information sharing, open finance provides customers with\ngreater control over their personal financial information, allowing them to actively\ndetermine and manage how their information is shared, accessed and used.\nBeyond empowering customers, open finance unlocks data-driven innovation\nthat enables customers to make better-informed decisions about their finances,\nfacilitates the delivery of more personalised financial services and promotes\ngreater financial inclusion as illustrated in Diagram 1.\n\n<figure>\n<figcaption>Diagram 1</figcaption>\n\nIllustrative* potential use cases\n\nSingle account view, including\npersonal financial management\n\nCredit underwriting through\nreal-time and accurate financial\ninformation\n\nFully digital submission and\ntransmission of documents in\nlieu of manual processes (e.g.\nemail and webform)\n\n</figure>\n\nBenefits for consumers\n\nBenefits to financial industry\n\nFinancial\ninclusion and\naccess\n\nBetter informed\ncustomer\ndecisions\n\nBetter user\nexperience and\nconvenience\n\nOpportunities to\ngrow business\nand partnerships\n\nOperational\nefficiency\n\nRisk\nmanagement and\nfraud detection\n\n*Use cases listed are for illustrative purposes only and are not exhaustive nor indicative of endorsement from BNM.\n\n.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 3",
-          "anchor_label": "BNM 3",
-          "text": "",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 4",
-          "anchor_label": "BNM 4",
-          "text": "b) Single account view, where the mandated FSP offers, as part of its internet\nbanking and mobile banking interfaces, the option for a customer to\ndisplay relevant information from their accounts with other data providers\nthrough the platform.\n\nG 8.7 An FSP participating in an open finance platform as a data consumer may\nconsider adopting principles of inclusivity, accessibility and usability when\ndesigning customer-facing interfaces. Particular attention may be given to\nunderserved segments (including individuals with basic digital literacy and\npersons with disabilities) who may face challenges with overly sophisticated\ninterfaces.",
-          "doc_class": "semi-structured"
+          "anchor_id": "Open Finance ED 10.1",
+          "anchor_label": "Open Finance ED 10.1",
+          "text": "An FSP participating in an open finance arrangement, whether in its capacity as\na data provider or a data consumer, shall ensure that a secure, verifiable and\ndigital mechanism is in place to obtain consent from a customer prior to\ndisclosing, accessing or processing any customer information. In line with the\nPDPA and paragraph 13.1 (item 8) of the Policy Document on Management of\nCustomer Information and Permitted Disclosures, consent shall be sought and\nobtained in the following manner:",
+          "doc_class": "structured-rules"
         }
       ],
       "target_anchors": [
@@ -144,40 +27,133 @@
           "anchor_label": "BIS Pap168 4",
           "text": "Meanwhile, 52% of Alliance for Financial Inclusion (AFI) members (spanning 88 countries) are still in\nthe initial exploration phase of open finance, and 4% have fully implemented frameworks (AFI Digital\nFinancial Services Working Group (2024)). Members' top motivations include improving financial\ninclusion and customer choice (each 21%), followed by innovation (20%) and enhanced competition\n(16%) (AFI (2025). Regulation has been an enabler of such frameworks and is not just a reaction to\ninnovation (OECD (2024)).\n\nOpen finance policies emerged largely as a response to the growing concerns\nabout data monopolies and lack of competition in payment markets. Large financial\ninstitutions generate and control vast amounts of data, which can then feed into\nimproving existing services and providing new ones. New services can generate even\nmore data, which can be used to further entrench market dominance by large\nfinancial institutions.5 This can create barriers to competition and innovation. Open\nfinance seeks to break this loop by promoting data portability and interoperability,\nallowing consumers to share their financial data securely with third-party providers\n(see Vives (2019)). This shift aligns with broader efforts to create a more inclusive,\ncompetitive financial ecosystem while addressing the risks posed by data-driven\nmonopolies.6\n\nIn this paper, we provide evidence on the international experience with open\nfinance. We draw on new data from jurisdictions with advanced open finance\nframeworks, as well as from academic research. We show that in some jurisdictions\nwhere open finance frameworks are operational, they have facilitated the entry of new\ntypes of intermediaries, like third-party financial technology (fintech) firms and large\ntechnology companies (big techs). Open finance has also promoted greater customer\nchoice through tailored financial products and services and enhanced access for\nindividuals and firms to financial services, notably new payment methods, and credit.\nWhile there are certainly challenges in implementation, and policy frameworks have\nhad to adapt to experience, early evidence has been broadly positive.\n\nWe contribute to the literature on open banking and open finance (see eg Xie\nand Hu (2024) and Jeng (2023) by collecting this international evidence in one place.\nThis complements studies that focus on one jurisdiction (eg Alok et al (2024), Babina\net al (2025) and World Bank (2024)). We also shed light on whether theoretical\npredictions (eg Jones and Tonetti (2020), He et al (2023) and Goldstein et al (2023))\nare borne out in practice. We show that, in some cases, there are measurable changes\nin jurisdictions with open finance. But additional work will be needed to better\nunderstand that causal impact of policies and further effects as these frameworks are\nrolled out and adapted.\n\nThe paper is organised as follows. Section 2 outlines the origins of open banking\nand open finance initiatives. Section 3 presents international evidence on the\nadoption of open finance and describes its impact on competition, entry of new\nproviders, venture capital (VC) investment and access to credit. Section 4 discusses\nchallenges and lessons to date. Finally, section 5 concludes.",
           "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": "Our document operationalises this with binding specific/voluntary consent standards; BIS treats it as a descriptive feature of frameworks.",
+      "supported": true
+    },
+    {
+      "summary": "Our framework mandates specific participation via a customer-count threshold, aligning with the mandatory-participation approach BIS notes some jurisdictions adopt.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 1.4(a)",
+          "anchor_label": "Open Finance ED 1.4(a)",
+          "text": "the criteria under which financial service providers are mandated to\nparticipate as data providers and data consumers in open finance, guided\nby the principle of reciprocity;",
+          "doc_class": "structured-rules"
         },
+        {
+          "anchor_id": "Open Finance ED 8.4",
+          "anchor_label": "Open Finance ED 8.4",
+          "text": "A mandated FSP shall participate in an open finance platform as a data provider.\nUpon receiving a customer's request to share their information through the\nplatform, the FSP shall make available the scope of prescribed information to the\nrelevant data consumer, subject to the scope of consent granted by the\ncustomer, as outlined in paragraph 10.1.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 12.5(c)",
+          "anchor_label": "Open Finance ED 12.5(c)",
+          "text": "an eligible EMI operating a network-based e-money solution with an\naggregate distinct count of active users 13 larger than five million.\n\n### 2. A scope of prescribed information refers to -",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "BIS Pap168 22",
+          "anchor_label": "BIS Pap168 22",
+          "text": "One approach adopted in certain jurisdictions is to make participation mandatory. While this\napproach has generally helped address the historical concentration of data among incumbents, there\nis currently no evidence to suggest that it is a necessary condition for achieving a level playing field.\n\nnational API infrastructures and data sharing practices may not be sufficient for\nindividuals and businesses that straddle borders to access financial services in line\nwith their needs. Supporting cross-border access to financial services requires striking\na balance between data sovereignty imperatives and interoperability between\ndomestic open finance infrastructures, alignment on technical standards, consent\nmanagement systems and governance models to enable secure and user-\npermissioned cross-border portability of financial data.24 Bonvino and Giorgino\n(2026) argue that the open finance ecosystem can unlock greater innovation,\ncompetition and long-term sustainability when all stakeholders actively collaborate\nand co-evolve by harmonising standards, sharing data responsibly and jointly\ndeveloping infrastructure and governance frameworks. The challenges of doing this\nare, naturally, even greater for stakeholders in different jurisdictions.\n\nMeanwhile, ensuring wide participation in open finance and addressing\nstructural (behavioural) barriers to adoption remain key. Evidence from Brazil shows\nthat adoption is lower among less-educated and low-income individuals (CGAP\n(2023)). Adoption rates also vary by gender, with men more likely to use open finance\nthan women.25 In other cases, willingness to share data remains limited even when\nbenefits are clearly presented. For example, when respondents were shown potential\nadvantages such as improved loan terms or higher credit limits, only 27% indicated\nthat they would share data to obtain those benefits (CGAP (2023). $I n \\quad I n d i a , a \\quad C G A P$\nsurvey shows similar trends. Of approximately 2,000 smartphone users, only 12% were\nfamiliar with account aggregators and 20% were willing to share financial data\n(Salman and Fernandez Vidal (2024). Both awareness and willingness were markedly\nlower among women, rural residents and individuals with lower levels of education.\nAmong loan applicants, only 10% reported using the account aggregator mechanism\ndespite significant efficiency gains reported by financial service providers.\n\nFinally, data access pricing is emerging as an important next stage in the\nevolution of open finance policies. Recent policy discussions have focused on how\ndata should be valued and priced. For example, in 2025 JPMorgan introduced fees\nfor third-party providers to access its consumer data, prompting renewed attention\nto the economic implications of data sharing arrangements (Shevlin (2025). In the\nEU, ongoing deliberations on the scope of the Financial Data Access (FiDA) regulation,\nincluding proposals to exclude certain large technology firms, reflect broader\nconcerns about market structure, eligibility criteria and reciprocity of access (Moens\nand Tamma (2025)). The proposed FiDA regulation represents a transformative but\nchallenging shift towards an EU-wide open data economy. It would significantly\nexpand PSD2 by mandating real-time access to a broad range of financial data, with\nthe aim of empowering customers and stimulating innovation (Euro Banking\nAssociation (2025). These developments have revived debates over whether\nmeasures perceived as protecting incumbent institutions could inadvertently limit\ncompetition and innovation. An opposing view is that pricing mechanisms can be\nviewed as legitimate compensation for the maintenance of proprietary infrastructure,",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": "BIS observes mandatory participation is used but notes no evidence it is a necessary condition for a level playing field.",
+      "supported": true
+    },
+    {
+      "summary": "Both treat standardised APIs as the primary secure mechanism for open finance data exchange.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 8.6(a)",
+          "anchor_label": "Open Finance ED 8.6(a)",
+          "text": "Document submission, where the mandated FSP offers appropriate\ninterfaces that allow customers to direct the platform to request relevant\ninformation from other data providers through the platform in a machine-\nreadable and standardised format,4 in lieu of traditional methods of\nsubmitting documents (e.g. manual upload, emailing documents), for\nrelevant processes (e.g. customer onboarding, on-going due diligence);\nand",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 12.3",
+          "anchor_label": "Open Finance ED 12.3",
+          "text": "An FSP shall ensure that its cyber risk management capabilities and\ncybersecurity controls are also appropriately extended to govern, identify,\nprevent, detect, respond and address cyber risks associated with open finance\nactivities. This includes for the FSP to implement robust API security controls,\nstrengthening digital fraud detection and management, as well as take steps to\nsecure technology networks and internal systems from potential external risks\narising from the FSP's participation in an open finance arrangement.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "BIS Pap168 7",
+          "anchor_label": "BIS Pap168 7",
+          "text": "Screen scraping refers to the practice of using customers' online banking credentials, with their\nconsent, to log into on their behalf and extract data directly from a bank (or financial institution)\nwebsite. Reverse engineering involves analysing existing banking interfaces or software to replicate\ntheir functionality or enable data access without relying on official documentation or standardised\nAPIs. This is often used by third parties prior to the introduction of open banking frameworks.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": "BIS anchor 7 describes screen scraping/reverse engineering; the API-standardisation argument is stronger against BIS Pap168 8 and 9. Kept but note the standardised-API framing sits in adjacent BIS anchors.",
+      "supported": true
+    },
+    {
+      "summary": "Our framework is a regulatory-driven prescriptive approach with unified technical standards, matching one of the three approaches BIS classifies.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 1.3",
+          "anchor_label": "Open Finance ED 1.3",
+          "text": "This Policy Document sets out the regulatory framework for open finance which\nseeks to ensure that it is implemented in an efficient, resilient and secure\nfashion. In addition to ensuring that the sharing of data is conducted in full\ncompliance with the Personal Data Protection Act 2010 and other relevant data\nprivacy and protection requirements, the Policy Document seeks to promote\nresponsible data sharing that strikes an appropriate balance between financial\ninnovation and prudent management of risks.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 8.3",
+          "anchor_label": "Open Finance ED 8.3",
+          "text": "Any sharing of customer information on an open finance platform by an FSP\neither as a data provider or data consumer shall be made in accordance with\nrelevant rules, standards and operating procedures, as the case may be, of the\nopen finance platform.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "BIS Pap168 27",
+          "anchor_label": "BIS Pap168 27",
+          "text": "There are several other definitions of open banking and open finance. The Geneva Report for World\nEconomy describes \"open banking\" as a consumer right to access and share banking data (Petralia\net al (2019)). The Basel Committee's 2019 report similarly defined open banking as banks sharing\ncustomer-permissioned data with third parties (BCBS (2019). The World Bank, International Monetary\nFund (IMF), Bank for International Settlements (BIS) and CGAP define open finance as an innovation\nthat facilitates customer-permissioned access to and use of customer data held by financial\ninstitutions in order to provide new and enhanced services and develop innovative business models\n(CGAP et al (2024)).",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": "Dropped BIS Pap168 6 (which concerns data-monopoly origins, not approach classification); the prescriptive-approach taxonomy is the accurate anchor.",
+      "supported": true
+    },
+    {
+      "summary": "Both emphasise financial inclusion as a core objective of open finance.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 8.7",
+          "anchor_label": "Open Finance ED 8.7",
+          "text": "An FSP participating in an open finance platform as a data consumer may\nconsider adopting principles of inclusivity, accessibility and usability when\ndesigning customer-facing interfaces. Particular attention may be given to\nunderserved segments (including individuals with basic digital literacy and\npersons with disabilities) who may face challenges with overly sophisticated\ninterfaces.\n\n#### Question 2\n\nThe proposed participation requirement specified in Appendix 1 is intended to secure\na critical mass of participation from the outset and ensure meaningful value creation\nfor customers and the financial industry. In your $\\mathrm { v i e w } ,$ is the proposed threshold\nreasonable and proportionate? If not, what alternative threshold(s) or approach would\nyou suggest and why?\n\n#### Question 3\n\nWhat are your views on the proposed interfaces that a mandated data consumer is\nrequired to develop and operate as specified in paragraph 8.6? Please highlight any\ndesign, implementation and operational considerations of such interfaces including\nany potential challenges.\n\n#### Question 4\n\nDoes the scope of prescribed information as specified in Appendix 1 sufficiently\nsupport the development of open finance use cases? If not, what additional customer\ninformation should BNM require data providers to share?\n\n### 9 Transition arrangements",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 11.19(b)",
+          "anchor_label": "Open Finance ED 11.19(b)",
+          "text": "ensuring that services associated with an open finance arrangement are\nrendered in a manner that ensure fair treatment and equitable access for\ncustomers, in accordance with the Policy Document on Fair Treatment of\nFinancial Consumers. This includes for the FSP to manage relevant risks\nand potential harm (e.g. exclusion risk), including by implementing\nappropriate safeguards. For the avoidance of doubt, the FSP shall not\nrestrict, deter, influence or impose differential treatment on any customer\nsolely due to their decision to grant or withhold their consent under an\nopen finance arrangement, except where it materially affects their\neligibility for such products or services.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
         {
           "anchor_id": "BIS Pap168 18",
           "anchor_label": "BIS Pap168 18",
           "text": "Financial inclusion can be defined as universal access to, and use of, a wide range of reasonably priced\nfinancial services. While this is often equated with access for individuals or households to transaction\naccounts, it neglects the much wider issues of access for individuals, households and (small)\nbusinesses to the full range of financial services. See Frost et al (2021).",
           "doc_class": "semi-structured"
-        }
-      ],
-      "scope_note": null,
-      "supported": true
-    },
-    {
-      "summary": "We include single account view and credit underwriting use cases that BIS identifies as key open finance applications driving adoption and credit access.",
-      "label": "aligns-with",
-      "sentiment": null,
-      "source_anchors": [
-        {
-          "anchor_id": "BNM 1.2",
-          "anchor_label": "BNM 1.2",
-          "text": "Open finance plays a pivotal role in advancing this vision by offering customers\na safer and more structured framework for sharing their financial information\ncompared to existing data-sharing arrangements in Malaysia. By enabling\nconsent-driven information sharing, open finance provides customers with\ngreater control over their personal financial information, allowing them to actively\ndetermine and manage how their information is shared, accessed and used.\nBeyond empowering customers, open finance unlocks data-driven innovation\nthat enables customers to make better-informed decisions about their finances,\nfacilitates the delivery of more personalised financial services and promotes\ngreater financial inclusion as illustrated in Diagram 1.\n\n<figure>\n<figcaption>Diagram 1</figcaption>\n\nIllustrative* potential use cases\n\nSingle account view, including\npersonal financial management\n\nCredit underwriting through\nreal-time and accurate financial\ninformation\n\nFully digital submission and\ntransmission of documents in\nlieu of manual processes (e.g.\nemail and webform)\n\n</figure>\n\nBenefits for consumers\n\nBenefits to financial industry\n\nFinancial\ninclusion and\naccess\n\nBetter informed\ncustomer\ndecisions\n\nBetter user\nexperience and\nconvenience\n\nOpportunities to\ngrow business\nand partnerships\n\nOperational\nefficiency\n\nRisk\nmanagement and\nfraud detection\n\n*Use cases listed are for illustrative purposes only and are not exhaustive nor indicative of endorsement from BNM.\n\n.",
-          "doc_class": "semi-structured"
         },
         {
-          "anchor_id": "BNM 4",
-          "anchor_label": "BNM 4",
-          "text": "b) Single account view, where the mandated FSP offers, as part of its internet\nbanking and mobile banking interfaces, the option for a customer to\ndisplay relevant information from their accounts with other data providers\nthrough the platform.\n\nG 8.7 An FSP participating in an open finance platform as a data consumer may\nconsider adopting principles of inclusivity, accessibility and usability when\ndesigning customer-facing interfaces. Particular attention may be given to\nunderserved segments (including individuals with basic digital literacy and\npersons with disabilities) who may face challenges with overly sophisticated\ninterfaces.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "target_anchors": [
-        {
-          "anchor_id": "BIS Pap168 16",
-          "anchor_label": "BIS Pap168 16",
-          "text": "Recent theoretical work also shows that open banking and open finance can enhance competition in\ncredit markets but increase prices in payments markets. See Akoğuz et al (2025). This points to the\nneed to account for cross-market spillovers when analysing the global effects of open banking\npolicies.",
+          "anchor_id": "BIS Pap168 4",
+          "anchor_label": "BIS Pap168 4",
+          "text": "Meanwhile, 52% of Alliance for Financial Inclusion (AFI) members (spanning 88 countries) are still in\nthe initial exploration phase of open finance, and 4% have fully implemented frameworks (AFI Digital\nFinancial Services Working Group (2024)). Members' top motivations include improving financial\ninclusion and customer choice (each 21%), followed by innovation (20%) and enhanced competition\n(16%) (AFI (2025). Regulation has been an enabler of such frameworks and is not just a reaction to\ninnovation (OECD (2024)).\n\nOpen finance policies emerged largely as a response to the growing concerns\nabout data monopolies and lack of competition in payment markets. Large financial\ninstitutions generate and control vast amounts of data, which can then feed into\nimproving existing services and providing new ones. New services can generate even\nmore data, which can be used to further entrench market dominance by large\nfinancial institutions.5 This can create barriers to competition and innovation. Open\nfinance seeks to break this loop by promoting data portability and interoperability,\nallowing consumers to share their financial data securely with third-party providers\n(see Vives (2019)). This shift aligns with broader efforts to create a more inclusive,\ncompetitive financial ecosystem while addressing the risks posed by data-driven\nmonopolies.6\n\nIn this paper, we provide evidence on the international experience with open\nfinance. We draw on new data from jurisdictions with advanced open finance\nframeworks, as well as from academic research. We show that in some jurisdictions\nwhere open finance frameworks are operational, they have facilitated the entry of new\ntypes of intermediaries, like third-party financial technology (fintech) firms and large\ntechnology companies (big techs). Open finance has also promoted greater customer\nchoice through tailored financial products and services and enhanced access for\nindividuals and firms to financial services, notably new payment methods, and credit.\nWhile there are certainly challenges in implementation, and policy frameworks have\nhad to adapt to experience, early evidence has been broadly positive.\n\nWe contribute to the literature on open banking and open finance (see eg Xie\nand Hu (2024) and Jeng (2023) by collecting this international evidence in one place.\nThis complements studies that focus on one jurisdiction (eg Alok et al (2024), Babina\net al (2025) and World Bank (2024)). We also shed light on whether theoretical\npredictions (eg Jones and Tonetti (2020), He et al (2023) and Goldstein et al (2023))\nare borne out in practice. We show that, in some cases, there are measurable changes\nin jurisdictions with open finance. But additional work will be needed to better\nunderstand that causal impact of policies and further effects as these frameworks are\nrolled out and adapted.\n\nThe paper is organised as follows. Section 2 outlines the origins of open banking\nand open finance initiatives. Section 3 presents international evidence on the\nadoption of open finance and describes its impact on competition, entry of new\nproviders, venture capital (VC) investment and access to credit. Section 4 discusses\nchallenges and lessons to date. Finally, section 5 concludes.",
           "doc_class": "semi-structured"
         }
       ],
@@ -185,103 +161,68 @@
       "supported": true
     },
     {
-      "summary": "Both stress security, cyber risk management and secure API/data transmission controls as foundational to open finance.",
-      "label": "aligns-with",
-      "sentiment": null,
-      "source_anchors": [
-        {
-          "anchor_id": "BNM 12.2",
-          "anchor_label": "BNM 12.2",
-          "text": "An FSP shall ensure that its technology operations management practices are\nappropriately extended to support its open finance activities. This includes, but\nis not limited to, controls for ensuring effective and safe implementation of IT\nsystems, robust third-party service provider management, and operational\nresilience measures to ensure the availability, integrity and confidentiality of data\nexchanged through open finance arrangements.\n\nS 12.3 An FSP shall ensure that its cyber risk management capabilities and\ncybersecurity controls are also appropriately extended to govern, identify,\nprevent, detect, respond and address cyber risks associated with open finance\nactivities. This includes for the FSP to implement robust API security controls,\nstrengthening digital fraud detection and management, as well as take steps to\nsecure technology networks and internal systems from potential external risks\narising from the FSP's participation in an open finance arrangement.\n\nS",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 11.2(a)(b)(c)(d)(a)(b)",
-          "anchor_label": "BNM 11.2(a)(b)(c)(d)(a)(b)",
-          "text": "S 11.5 An FSP shall ensure that any transmission of customer information through an\nopen finance arrangement is conducted through secure means, in line with\nrelevant requirements set out in the Policy Document on Risk Management in\nTechnology. Without limiting the generality of paragraph 11.4, a data provider\nshall authenticate the customer and authorise consent using a reliable and\neffective authentication procedure (e.g. multi-factor authentication) before\ngranting a data consumer access to the customer's information.\n\nS 11.6 An FSP that is a data consumer shall ensure that customer information received\nfrom another FSP through an open finance arrangement is subject to safeguards\nthat are at least equivalent to those applicable to the FSP's own customer\ninformation.\n\nS 11.7 An FSP shall regularly monitor the effectiveness of these controls to ensure that\nthey remain responsive to changing threats.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "target_anchors": [
-        {
-          "anchor_id": "BIS Pap168 6",
-          "anchor_label": "BIS Pap168 6",
-          "text": "Risks include cyber threats, privacy breaches, data misuse, algorithmic bias, market concentration and\nunclear accountability that can undermine consumer protection and ecosystem stability if not\ngoverned effectively (Bonvino and Giorgino (2026).\n\nsuch as \"screen scraping\" or \"reverse engineering\", which allowed their customers to\ntransfer data into their budgeting, lending and payment apps.7 As concerns around\npersistent data monopolies in the financial sector gained traction, calls grew for\nconsumer-permissioned data sharing via standardised application programming\ninterfaces (APIs), either through regulatory intervention or through private\ninitiatives.8\n\nRather than relying on screen scraping, reverse engineering or bilateral file\ntransfers, APIs allow systems to communicate automatically. This communication\ntakes place under clear technical rules that specify how requests are made (eg for\naccount balances or payment initiation) and how responses are returned. This ensures\nthat customer-permissioned data are shared in a consistent, secure and auditable\nway, while banks retain control over authentication, monitoring and access\nmanagement. APIs form the backbone of scalable and interoperable open finance\necosystems and are the primary mechanism through which third-party providers can\naccess and exchange data with larger financial institutions. Standardised APIs go one\nstep further by simplifying integration for all stakeholders, enabling broad\nparticipation, lowering technical barriers for new financial services providers and\nminimising duplication of effort.9\n\nJurisdictions have followed a diverse set of approaches to open banking and\nopen finance, driven by their unique goals. These approaches can be classified into\nthree broad categories: (i) regulatory-driven prescriptive approaches, requiring banks\nto share customer-permissioned data using eg unified technical API standards and\nthird parties to register with supervisors; (ii) facilitative approaches, where authorities\npublish guidelines and recommended practices;10 and (iii) market-driven approaches,\nwhere no explicit rules require or prohibit data sharing. In the third case, the\necosystem evolves largely through commercial private sector arrangements (BCBS\n(2019)). The choice of regulatory approaches can depend on various factors, including",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BIS Pap168 9",
-          "anchor_label": "BIS Pap168 9",
-          "text": "Open banking and open finance can serve as so-called digital public infrastructure (DPI) by providing\nshared, interoperable rails that enable secure data exchange and service connectivity across financial\nparticipants. Built on technical building blocks such as open API standards, digital identity and\nconsent layers, trust and governance frameworks, and connectivity and aggregation services, these\ninfrastructures support reliable data portability and service interoperability. By embedding common\nprotocols for authentication, authorisation and data management, open finance can act as\nfoundational digital infrastructure. This supports enhancing competition, inclusion and innovation\nwhile maintaining user trust and financial system resilience. For insights on this in the Indian context,\nsee D'Silva et al (2019).",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "scope_note": null,
-      "supported": true
-    },
-    {
-      "summary": "We prescribe a detailed, granular consent regime (voluntary, revocable, time-limited, dashboard, deletion on expiry), which BIS treats only as a high-level building block without prescribing specifics.",
+      "summary": "We set detailed prescriptive requirements on consent lifecycle, deletion, and record-keeping, whereas BIS only discusses adoption evidence and general portability challenges without such operational rules.",
       "label": "goes-beyond",
       "sentiment": null,
       "source_anchors": [
         {
-          "anchor_id": "BNM 10(a)(i)(ii)(iii)(b)",
-          "anchor_label": "BNM 10(a)(i)(ii)(iii)(b)",
-          "text": "Voluntary7 - The data consumer shall not, as a condition of providing a\nfinancial product/service, compel, coerce or mislead a customer to give\nconsent of their information to third parties beyond what is necessary for\nthe provision of the financial product/service or the performance of the\ncontract with the customer. The data consumer is prohibited from\nobtaining a customer's consent by asking the customer to indicate consent\nto a statement or term that combines agreement to the disclosure of their\ninformation with other matters in a single statement of consent.8 For the\navoidance of doubt, bundled or blanket consent, such as asking the\ncustomer to indicate consent to a statement or term that combines\nagreement to the disclosure of their information with other matters in a",
-          "doc_class": "semi-structured"
+          "anchor_id": "Open Finance ED 10.5",
+          "anchor_label": "Open Finance ED 10.5",
+          "text": "A data consumer shall ensure that any customer consent granted under an open\nfinance arrangement is time-bound and remains valid only for the duration\nnecessary to fulfil the specific purpose for which it was granted.",
+          "doc_class": "structured-rules"
         },
         {
-          "anchor_id": "BNM 8(c)(d)",
-          "anchor_label": "BNM 8(c)(d)",
-          "text": "Revocable upon request - A customer must be allowed to revoke their\nconsent given for the disclosure of information at any time unless such\ndisclosure is necessary for the data consumer to comply with any legal or\ncontractual requirements. Furthermore, the customer must be informed of\ntheir rights to revoke the consent and how to effect such revocation of\nconsent. The process for revoking consent must be as straightforward as\nit was to obtain the consent.",
-          "doc_class": "semi-structured"
+          "anchor_id": "Open Finance ED 10.7",
+          "anchor_label": "Open Finance ED 10.7",
+          "text": "Where consent is obtained for the purpose of recurring data access (including\ncontinuous or repeated access to customer information for activities such as\npersonal financial management), a data consumer shall ensure that such\nconsent remains valid for no longer than six months from the date it was granted,\nunless revoked earlier by the customer.",
+          "doc_class": "structured-rules"
         },
         {
-          "anchor_id": "BNM 10.6",
-          "anchor_label": "BNM 10.6",
-          "text": "Where consent is obtained for the purpose of one-time data access, a data\nconsumer shall ensure that such consent is used strictly to retrieve customer\ninformation on a single occasion only, in accordance with the specific purpose for\nwhich the consent was granted. For the avoidance of doubt, such consent shall\nexpire immediately once the information consented for access has been retrieved\nby the data consumer.\n\nS 10.7 Where consent is obtained for the purpose of recurring data access (including\ncontinuous or repeated access to customer information for activities such as\npersonal financial management), a data consumer shall ensure that such\nconsent remains valid for no longer than six months from the date it was granted,\nunless revoked earlier by the customer.\n\nS 10.8 Upon the expiry of the consent period, the data consumer shall cease all access\nto customer information unless a renewed consent is obtained from the\ncustomer. The renewed consent shall be obtained in the same manner and\nsubject to the same conditions applicable to the original consent as specified in\nparagraph 10.1.\n\nS 10.9\nThe data consumer shall issue timely notifications to the customer on the\nupcoming expiry of consent, in accordance with paragraph 10.3, and where\nappropriate or relevant, notify the customer of the option to renew the consent.\n\nS 10.10 Where consent is not renewed, the data consumer shall delete all customer\ninformation obtained under the expired consent, unless retention is permitted or\nrequired under applicable laws or regulatory requirements.",
-          "doc_class": "semi-structured"
+          "anchor_id": "Open Finance ED 10.10",
+          "anchor_label": "Open Finance ED 10.10",
+          "text": "Where consent is not renewed, the data consumer shall delete all customer\ninformation obtained under the expired consent, unless retention is permitted or\nrequired under applicable laws or regulatory requirements.\n\n# D. Consent revocation",
+          "doc_class": "structured-rules"
         },
         {
-          "anchor_id": "BNM 11",
-          "anchor_label": "BNM 11",
-          "text": "\"explicit and deliberate\" consent by a customer as there is no way to definitively establish that the\ncustomer consented to the pre-ticked box and the applicable statement/term.\n\nS 10.4 An FSP shall ensure that the consent dashboard reflects the real-time status of\nconsent and is updated immediately upon any renewal, revocation or expiration\nof consent.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 6",
-          "anchor_label": "BNM 6",
-          "text": "separate and distinct consent must be obtained by the data consumer before disclosing the customer's\ninformation to a third party engaged (e.g. data analytics partner) to support the offering of that product\nor service.",
-          "doc_class": "semi-structured"
+          "anchor_id": "Open Finance ED 10.18",
+          "anchor_label": "Open Finance ED 10.18",
+          "text": "An FSP shall log all consent records and actions, including obtaining, revoking\nand renewing consent, in an auditable format and retain such records for a\n\nminimum period of seven years.",
+          "doc_class": "structured-rules"
         }
       ],
       "target_anchors": [
         {
-          "anchor_id": "BIS Pap168 9",
-          "anchor_label": "BIS Pap168 9",
-          "text": "Open banking and open finance can serve as so-called digital public infrastructure (DPI) by providing\nshared, interoperable rails that enable secure data exchange and service connectivity across financial\nparticipants. Built on technical building blocks such as open API standards, digital identity and\nconsent layers, trust and governance frameworks, and connectivity and aggregation services, these\ninfrastructures support reliable data portability and service interoperability. By embedding common\nprotocols for authentication, authorisation and data management, open finance can act as\nfoundational digital infrastructure. This supports enhancing competition, inclusion and innovation\nwhile maintaining user trust and financial system resilience. For insights on this in the Indian context,\nsee D'Silva et al (2019).",
+          "anchor_id": "BIS Pap168 15",
+          "anchor_label": "BIS Pap168 15",
+          "text": "Reimsbach-Kounatze and Molnar (2024) offer additional evidence explaining why the uptake of data\nportability remains limited despite the presence of formal portability rights. Survey findings indicate\nthat both awareness and actual usage of such rights under general data protection frameworks are\nlow. Users are frequently discouraged by the complexity of the processes involved, concerns about\npotential risks and the effort required to actively manage data transfers. In contrast, open banking\nregimes have achieved significantly higher levels of usage by embedding data portability in\nstandardised, API-based mechanisms that operate seamlessly in the background and are directly\nconnected to specific services. This distinction between user-driven portability and integrated,\nservice-oriented data sharing helps clarify why the mere existence of formal rights has not resulted\nin widespread adoption.",
           "doc_class": "semi-structured"
         }
       ],
-      "scope_note": "Revocation right is subject to exception where disclosure is necessary to comply with legal or contractual requirements; recurring consent capped at six months.",
+      "scope_note": null,
       "supported": true
     },
     {
-      "summary": "We set binding requirements for third-party service provider handling of customer information and secure disposal, which BIS does not address in prescriptive detail.",
+      "summary": "We prescribe detailed customer protection, liability, and complaints-handling requirements, which BIS raises only as risks needing governance without specific rules.",
       "label": "goes-beyond",
       "sentiment": null,
       "source_anchors": [
         {
-          "anchor_id": "BNM 11.8",
-          "anchor_label": "BNM 11.8",
-          "text": "An FSP that is a data consumer shall ensure that any third-party service provider\ninvolved in handling customer information, whether related to an open finance\narrangement (including that associated with outsourcing or cloud computing\narrangements), complies with relevant requirements relating to data privacy,\nconfidentiality and security, as set out in the Policy Document on Management\nof Customer Information and Permitted Disclosures, the Policy Document on\nRisk Management and Information Technology, and the Policy Document on\nOutsourcing.\n\nS 11.9 An FSP shall ensure that customer information is not shared with any third-party\nservice provider without the customer's explicit consent, in line with the\nrequirements stipulated in paragraph 10.1 of this Policy Document.\n\nS 11.10 For the purposes of paragraph 11.8, an FSP shall ensure the obligation to\nsafeguard customer information is adequately reflected in the service level\nagreement with the third-party service provider, in line with paragraph 12.4 of the\nPolicy Document on Management of Customer Information and Permitted\nDisclosures.",
-          "doc_class": "semi-structured"
+          "anchor_id": "Open Finance ED 11.13",
+          "anchor_label": "Open Finance ED 11.13",
+          "text": "An FSP shall ensure that the accountabilities and responsibilities in relation to\n\nits participation in an open finance arrangement are clearly stipulated, and that\nsuch responsibilities include ensuring customers do not suffer loss or detriment\nas a result of weaknesses, failures or misconduct on the part of the FSP.",
+          "doc_class": "structured-rules"
         },
         {
-          "anchor_id": "BNM 11.2(a)(b)(c)(d)",
-          "anchor_label": "BNM 11.2(a)(b)(c)(d)",
-          "text": "mandate secure disposal of customer information upon expiry of its use.\n\nS 11.3 An FSP shall continually review its data governance and privacy policies to\nensure that they remain adequate, relevant and operate effectively in response\nto changes in the operating environment.",
-          "doc_class": "semi-structured"
+          "anchor_id": "Open Finance ED 11.14",
+          "anchor_label": "Open Finance ED 11.14",
+          "text": "In relation to paragraph 11.13, an FSP shall ensure that the open finance\narrangement includes a clear delineation of responsibilities between all parties,\nparticularly with respect to the handling and resolution of customer complaints\nand disputes, and that each party shall be liable for acts or omissions within their\ncontrol.\n\n### Complaints handling and redress",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 11.15",
+          "anchor_label": "Open Finance ED 11.15",
+          "text": "In line with paragraph 8.1 of the Policy Document on Complaints Handling, an\nFSP shall formulate and implement effective and transparent complaints\nhandling policies, procedures and processes for timely and fair handling of\ncustomer complaints arising from any open finance activities.",
+          "doc_class": "structured-rules"
         }
       ],
       "target_anchors": [
@@ -292,89 +233,19 @@
           "doc_class": "semi-structured"
         }
       ],
-      "scope_note": "Dropped invented anchors BNM 11.9 and BNM 11.10, which do not exist in the provided anchor list.",
-      "supported": true
-    },
-    {
-      "summary": "We phase in obligations gradually via a multi-year timeline, consistent with BIS's observation that jurisdictions typically implement open finance in phases starting from open banking.",
-      "label": "aligns-with",
-      "sentiment": null,
-      "source_anchors": [
-        {
-          "anchor_id": "BNM 1.5",
-          "anchor_label": "BNM 1.5",
-          "text": "Building an open finance ecosystem will be a multi-year journey and requires\ncollective action from all stakeholders to ensure its orderly and secure\nimplementation. As such, BNM will gradually phase in the requirements in this\nPolicy Document. This allows for orderly adoption by the industry, while enabling\ncustomers and other ecosystem stakeholders to develop familiarity and\nconfidence in open finance.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 4.1",
-          "anchor_label": "BNM 4.1",
-          "text": "This Policy Document comes into effect on 1 January 2027, subject to the\ntransition arrangements set out in paragraph 9.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 9",
-          "anchor_label": "BNM 9",
-          "text": "S 9.1\nThe obligations of a mandated FSP as specified under paragraph 8.4 shall\ncommence in accordance with the timeline specified in Appendix 2.\n\nS 9.2\nA mandated FSP shall commence its obligation under paragraph 8.6 to provide\ndocument submission and single account view interfaces by 1 January 2028 or\n\nthe date on which the FSP's obligations under paragraph 8.4 commence,\nwhichever is later.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 14",
-          "anchor_label": "BNM 14",
-          "text": "sharing by a mandated FSP whose obligation to commence as a data provider\nfalls on or after 1 January 2028 shall include both individual and SME customers.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "target_anchors": [
-        {
-          "anchor_id": "BIS Pap168 26",
-          "anchor_label": "BIS Pap168 26",
-          "text": "See Graph A.3 in the appendix for a timeline of implementation in different jurisdictions. In some\njurisdictions, eg India, the ecosystem is beginning to mature and show a wider variety of providers\nand use cases (see Graph A.4 in the appendix). As more jurisdictions launch open banking and open\nfinance frameworks and as these are adopted, the evidence base will grow further.",
-          "doc_class": "semi-structured"
-        }
-      ],
       "scope_note": null,
       "supported": true
     },
     {
-      "summary": "We specify board and senior management oversight obligations for open finance, a governance dimension BIS does not cover in prescriptive detail.",
-      "label": "goes-beyond",
-      "sentiment": null,
-      "source_anchors": [
-        {
-          "anchor_id": "BNM 7",
-          "anchor_label": "BNM 7",
-          "text": "S 7.1\nThe board and senior management shall exercise effective oversight of an FSP's\nimplementation of arrangements relating to open finance to ensure its efficient,\nresilient and secure operations.\n\nS 7.2\nFor the avoidance of doubt, the board and senior management shall satisfy key\nresponsibilities arising from an FSP's participation in an open finance\narrangement, as may be applicable in relevant policy documents outlined in\nparagraph 6.1.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 7(b)(c)(d)(e)(f)(g)",
-          "anchor_label": "BNM 7(b)(c)(d)(e)(f)(g)",
-          "text": "ensure that material issues and concerns relating to the FSP's open\nfinance arrangements are promptly escalated to the board, which include\nbut are not limited to breaches of customer information security and\nconfidentiality.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "target_anchors": [
-        {
-          "anchor_id": "BIS Pap168 9",
-          "anchor_label": "BIS Pap168 9",
-          "text": "Open banking and open finance can serve as so-called digital public infrastructure (DPI) by providing\nshared, interoperable rails that enable secure data exchange and service connectivity across financial\nparticipants. Built on technical building blocks such as open API standards, digital identity and\nconsent layers, trust and governance frameworks, and connectivity and aggregation services, these\ninfrastructures support reliable data portability and service interoperability. By embedding common\nprotocols for authentication, authorisation and data management, open finance can act as\nfoundational digital infrastructure. This supports enhancing competition, inclusion and innovation\nwhile maintaining user trust and financial system resilience. For insights on this in the Indian context,\nsee D'Silva et al (2019).",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "scope_note": null,
-      "supported": true
-    },
-    {
-      "summary": "BIS discusses cross-border data portability and interoperability challenges (Project Aperta), which our framework references only aspirationally as a national/regional Open Data ambition without operational requirements.",
+      "summary": "BIS discusses data access pricing and reciprocity of access as an emerging policy stage; our document invokes reciprocity as a participation principle but is silent on pricing/compensation for data access.",
       "label": "silent-on",
       "sentiment": null,
       "source_anchors": [
         {
-          "anchor_id": "BNM 1.6",
-          "anchor_label": "BNM 1.6",
-          "text": "BNM also envisions that the principles underpinning open finance will support\nbroader arrangements for more open and secure data sharing beyond the\nfinancial industry. As set out in the Financial Sector Blueprint 2022-2026, BNM\nand the financial sector will continue to collaborate with stakeholders in other\nsectors and industries, including with the public sector, to support and champion\nefforts to foster a thriving Open Data ecosystem at the national level. Such\nefforts will focus on improving accessibility to public data under the\nGovernment's open data initiatives through a standardised approach to data\n\ngovernance, and supporting regional level data sharing initiatives by advancing\nbest practices aligned with global standards and policies.",
-          "doc_class": "semi-structured"
+          "anchor_id": "Open Finance ED 1.4(a)",
+          "anchor_label": "Open Finance ED 1.4(a)",
+          "text": "the criteria under which financial service providers are mandated to\nparticipate as data providers and data consumers in open finance, guided\nby the principle of reciprocity;",
+          "doc_class": "structured-rules"
         }
       ],
       "target_anchors": [
@@ -385,48 +256,42 @@
           "doc_class": "semi-structured"
         }
       ],
-      "scope_note": "BNM 1.6 aspires to regional data-sharing initiatives aligned with global standards but sets no cross-border portability rules.",
+      "scope_note": "The pricing/FiDA reciprocity discussion is primarily in the unnumbered FiDA passage; BIS Pap168 24 covers cross-border interoperability. Our document offers no data-pricing regime.",
       "supported": true
     },
     {
-      "summary": "BIS raises data access pricing/fees as an emerging policy issue, which our framework does not address.",
+      "summary": "BIS highlights cross-border data portability and interoperability of open finance infrastructures, which our document mentions only aspirationally for national open data without operational requirements.",
       "label": "silent-on",
       "sentiment": null,
       "source_anchors": [
         {
-          "anchor_id": "BNM 8",
-          "anchor_label": "BNM 8",
-          "text": "S 8.1\nAn FSP may participate2 as a data provider or a data consumer on an open\nfinance platform, subject to meeting relevant requirements in this Policy\nDocument and that specified by the platform operator.",
-          "doc_class": "semi-structured"
+          "anchor_id": "Open Finance ED 1.6",
+          "anchor_label": "Open Finance ED 1.6",
+          "text": "BNM also envisions that the principles underpinning open finance will support\nbroader arrangements for more open and secure data sharing beyond the\nfinancial industry. As set out in the Financial Sector Blueprint 2022-2026, BNM\nand the financial sector will continue to collaborate with stakeholders in other\nsectors and industries, including with the public sector, to support and champion\nefforts to foster a thriving Open Data ecosystem at the national level. Such\nefforts will focus on improving accessibility to public data under the\nGovernment's open data initiatives through a standardised approach to data\n\ngovernance, and supporting regional level data sharing initiatives by advancing\nbest practices aligned with global standards and policies.\n\n##### Question 1\n\nBeyond the use cases illustrated in Diagram 1, how do you envisage the sharing of\ncustomer information facilitated through open finance being leveraged to enhance\naccess to financial services, improve affordability and drive inclusion outcomes for\ncustomers? Please provide examples of potential use cases, anticipated benefits and\nany preconditions necessary to enable such outcomes.\n\n#### 2 Applicability",
+          "doc_class": "structured-rules"
         }
       ],
       "target_anchors": [
         {
-          "anchor_id": "BIS Pap168 21",
-          "anchor_label": "BIS Pap168 21",
-          "text": "Murray and Buckenham (2025) note that some of these challenges have complicated the shift\ntowards a fully functioning open finance system in the UK, for instance.",
+          "anchor_id": "BIS Pap168 24",
+          "anchor_label": "BIS Pap168 24",
+          "text": "Project Aperta by the BIS Innovation Hub explores innovative approaches to global interoperability,\noffering harmonised features, functionalities, use cases, security protocols, operating procedures and\ntrust frameworks to support cross-border data portability in open finance.",
           "doc_class": "semi-structured"
         }
       ],
-      "scope_note": null,
+      "scope_note": "Our document references regional data-sharing and global-standard alignment only as future collaboration, not as binding cross-border portability requirements.",
       "supported": true
     },
     {
-      "summary": "BIS notes payment initiation/write access (e.g. PSD2) drives faster adoption, whereas our framework is read-only information sharing without payment initiation.",
-      "label": "differs-on",
-      "sentiment": "neutral",
+      "summary": "BIS notes payment initiation (write access) drives faster adoption, whereas our mandated scope focuses on read-only data sharing (document submission and account view) without payment initiation.",
+      "label": "silent-on",
+      "sentiment": null,
       "source_anchors": [
         {
-          "anchor_id": "BNM 1.2",
-          "anchor_label": "BNM 1.2",
-          "text": "Open finance plays a pivotal role in advancing this vision by offering customers\na safer and more structured framework for sharing their financial information\ncompared to existing data-sharing arrangements in Malaysia. By enabling\nconsent-driven information sharing, open finance provides customers with\ngreater control over their personal financial information, allowing them to actively\ndetermine and manage how their information is shared, accessed and used.\nBeyond empowering customers, open finance unlocks data-driven innovation\nthat enables customers to make better-informed decisions about their finances,\nfacilitates the delivery of more personalised financial services and promotes\ngreater financial inclusion as illustrated in Diagram 1.\n\n<figure>\n<figcaption>Diagram 1</figcaption>\n\nIllustrative* potential use cases\n\nSingle account view, including\npersonal financial management\n\nCredit underwriting through\nreal-time and accurate financial\ninformation\n\nFully digital submission and\ntransmission of documents in\nlieu of manual processes (e.g.\nemail and webform)\n\n</figure>\n\nBenefits for consumers\n\nBenefits to financial industry\n\nFinancial\ninclusion and\naccess\n\nBetter informed\ncustomer\ndecisions\n\nBetter user\nexperience and\nconvenience\n\nOpportunities to\ngrow business\nand partnerships\n\nOperational\nefficiency\n\nRisk\nmanagement and\nfraud detection\n\n*Use cases listed are for illustrative purposes only and are not exhaustive nor indicative of endorsement from BNM.\n\n.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 2(a)",
-          "anchor_label": "BNM 2(a)",
-          "text": "interfaces that allow customers to direct the platform to request relevant\ninformation from other data providers through the platform in a machine-\nreadable and standardised format,4 in lieu of traditional methods of\nsubmitting documents (e.g. manual upload, emailing documents), for\nrelevant processes (e.g. customer onboarding, on-going due diligence);\nand",
-          "doc_class": "semi-structured"
+          "anchor_id": "Open Finance ED 8.6(a)",
+          "anchor_label": "Open Finance ED 8.6(a)",
+          "text": "Document submission, where the mandated FSP offers appropriate\ninterfaces that allow customers to direct the platform to request relevant\ninformation from other data providers through the platform in a machine-\nreadable and standardised format,4 in lieu of traditional methods of\nsubmitting documents (e.g. manual upload, emailing documents), for\nrelevant processes (e.g. customer onboarding, on-going due diligence);\nand",
+          "doc_class": "structured-rules"
         }
       ],
       "target_anchors": [
@@ -441,125 +306,15 @@
       "supported": true
     },
     {
-      "summary": "BIS highlights low adoption and behavioural/awareness barriers, particularly for underserved groups; our framework addresses this only through optional guidance on inclusive interface design.",
+      "summary": "BIS presents international adoption evidence and structural/behavioural barriers to uptake, which our policy document does not address empirically.",
       "label": "silent-on",
       "sentiment": null,
       "source_anchors": [
         {
-          "anchor_id": "BNM 8",
-          "anchor_label": "BNM 8",
-          "text": "S 8.1\nAn FSP may participate2 as a data provider or a data consumer on an open\nfinance platform, subject to meeting relevant requirements in this Policy\nDocument and that specified by the platform operator.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "target_anchors": [
-        {
-          "anchor_id": "BIS Pap168 15",
-          "anchor_label": "BIS Pap168 15",
-          "text": "Reimsbach-Kounatze and Molnar (2024) offer additional evidence explaining why the uptake of data\nportability remains limited despite the presence of formal portability rights. Survey findings indicate\nthat both awareness and actual usage of such rights under general data protection frameworks are\nlow. Users are frequently discouraged by the complexity of the processes involved, concerns about\npotential risks and the effort required to actively manage data transfers. In contrast, open banking\nregimes have achieved significantly higher levels of usage by embedding data portability in\nstandardised, API-based mechanisms that operate seamlessly in the background and are directly\nconnected to specific services. This distinction between user-driven portability and integrated,\nservice-oriented data sharing helps clarify why the mere existence of formal rights has not resulted\nin widespread adoption.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "scope_note": null,
-      "supported": true
-    },
-    {
-      "summary": "Our optional guidance encourages inclusive, accessible interface design for underserved segments (including persons with disabilities and low digital literacy), responsive to BIS's evidence on lower adoption among disadvantaged groups.",
-      "label": "goes-beyond",
-      "sentiment": null,
-      "source_anchors": [
-        {
-          "anchor_id": "BNM 8",
-          "anchor_label": "BNM 8",
-          "text": "S 8.1\nAn FSP may participate2 as a data provider or a data consumer on an open\nfinance platform, subject to meeting relevant requirements in this Policy\nDocument and that specified by the platform operator.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "target_anchors": [
-        {
-          "anchor_id": "BIS Pap168 15",
-          "anchor_label": "BIS Pap168 15",
-          "text": "Reimsbach-Kounatze and Molnar (2024) offer additional evidence explaining why the uptake of data\nportability remains limited despite the presence of formal portability rights. Survey findings indicate\nthat both awareness and actual usage of such rights under general data protection frameworks are\nlow. Users are frequently discouraged by the complexity of the processes involved, concerns about\npotential risks and the effort required to actively manage data transfers. In contrast, open banking\nregimes have achieved significantly higher levels of usage by embedding data portability in\nstandardised, API-based mechanisms that operate seamlessly in the background and are directly\nconnected to specific services. This distinction between user-driven portability and integrated,\nservice-oriented data sharing helps clarify why the mere existence of formal rights has not resulted\nin widespread adoption.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "scope_note": "Corrected target from BIS Pap168 6 (which concerns risks generally) to BIS Pap168 15 on adoption barriers; note this is only 'G' guidance, not a binding standard.",
-      "supported": true
-    },
-    {
-      "summary": "We require data consumers to apply safeguards to received customer information at least equivalent to those for their own information and prohibit sharing with third parties without explicit consent — a data protection reciprocity dimension BIS does not prescribe.",
-      "label": "goes-beyond",
-      "sentiment": null,
-      "source_anchors": [
-        {
-          "anchor_id": "BNM 11.2(a)(b)(c)(d)(a)(b)",
-          "anchor_label": "BNM 11.2(a)(b)(c)(d)(a)(b)",
-          "text": "S 11.5 An FSP shall ensure that any transmission of customer information through an\nopen finance arrangement is conducted through secure means, in line with\nrelevant requirements set out in the Policy Document on Risk Management in\nTechnology. Without limiting the generality of paragraph 11.4, a data provider\nshall authenticate the customer and authorise consent using a reliable and\neffective authentication procedure (e.g. multi-factor authentication) before\ngranting a data consumer access to the customer's information.\n\nS 11.6 An FSP that is a data consumer shall ensure that customer information received\nfrom another FSP through an open finance arrangement is subject to safeguards\nthat are at least equivalent to those applicable to the FSP's own customer\ninformation.\n\nS 11.7 An FSP shall regularly monitor the effectiveness of these controls to ensure that\nthey remain responsive to changing threats.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 11.8",
-          "anchor_label": "BNM 11.8",
-          "text": "An FSP that is a data consumer shall ensure that any third-party service provider\ninvolved in handling customer information, whether related to an open finance\narrangement (including that associated with outsourcing or cloud computing\narrangements), complies with relevant requirements relating to data privacy,\nconfidentiality and security, as set out in the Policy Document on Management\nof Customer Information and Permitted Disclosures, the Policy Document on\nRisk Management and Information Technology, and the Policy Document on\nOutsourcing.\n\nS 11.9 An FSP shall ensure that customer information is not shared with any third-party\nservice provider without the customer's explicit consent, in line with the\nrequirements stipulated in paragraph 10.1 of this Policy Document.\n\nS 11.10 For the purposes of paragraph 11.8, an FSP shall ensure the obligation to\nsafeguard customer information is adequately reflected in the service level\nagreement with the third-party service provider, in line with paragraph 12.4 of the\nPolicy Document on Management of Customer Information and Permitted\nDisclosures.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "target_anchors": [
-        {
-          "anchor_id": "BIS Pap168 6",
-          "anchor_label": "BIS Pap168 6",
-          "text": "Risks include cyber threats, privacy breaches, data misuse, algorithmic bias, market concentration and\nunclear accountability that can undermine consumer protection and ecosystem stability if not\ngoverned effectively (Bonvino and Giorgino (2026).\n\nsuch as \"screen scraping\" or \"reverse engineering\", which allowed their customers to\ntransfer data into their budgeting, lending and payment apps.7 As concerns around\npersistent data monopolies in the financial sector gained traction, calls grew for\nconsumer-permissioned data sharing via standardised application programming\ninterfaces (APIs), either through regulatory intervention or through private\ninitiatives.8\n\nRather than relying on screen scraping, reverse engineering or bilateral file\ntransfers, APIs allow systems to communicate automatically. This communication\ntakes place under clear technical rules that specify how requests are made (eg for\naccount balances or payment initiation) and how responses are returned. This ensures\nthat customer-permissioned data are shared in a consistent, secure and auditable\nway, while banks retain control over authentication, monitoring and access\nmanagement. APIs form the backbone of scalable and interoperable open finance\necosystems and are the primary mechanism through which third-party providers can\naccess and exchange data with larger financial institutions. Standardised APIs go one\nstep further by simplifying integration for all stakeholders, enabling broad\nparticipation, lowering technical barriers for new financial services providers and\nminimising duplication of effort.9\n\nJurisdictions have followed a diverse set of approaches to open banking and\nopen finance, driven by their unique goals. These approaches can be classified into\nthree broad categories: (i) regulatory-driven prescriptive approaches, requiring banks\nto share customer-permissioned data using eg unified technical API standards and\nthird parties to register with supervisors; (ii) facilitative approaches, where authorities\npublish guidelines and recommended practices;10 and (iii) market-driven approaches,\nwhere no explicit rules require or prohibit data sharing. In the third case, the\necosystem evolves largely through commercial private sector arrangements (BCBS\n(2019)). The choice of regulatory approaches can depend on various factors, including",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "scope_note": null,
-      "supported": true
-    },
-    {
-      "summary": "We mandate a customer breach handling and response plan with escalation and remedial procedures for open finance data breaches, which BIS identifies as a risk area but does not prescribe controls for.",
-      "label": "goes-beyond",
-      "sentiment": null,
-      "source_anchors": [
-        {
-          "anchor_id": "BNM 11.12",
-          "anchor_label": "BNM 11.12",
-          "text": "breach handling and response plan in the event of theft, loss, misuse or\nunauthorised access, modification or disclosure of customer information\nassociated with an open finance arrangement. The plan must, at a minimum,\ninclude escalation procedures and a clear line of responsibility to contain the\ncustomer information breach and take remedial actions.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 11.12(a)(b)(a)(b)(c)",
-          "anchor_label": "BNM 11.12(a)(b)(a)(b)(c)",
-          "text": "assistance, complaints handling and redress mechanisms.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "target_anchors": [
-        {
-          "anchor_id": "BIS Pap168 6",
-          "anchor_label": "BIS Pap168 6",
-          "text": "Risks include cyber threats, privacy breaches, data misuse, algorithmic bias, market concentration and\nunclear accountability that can undermine consumer protection and ecosystem stability if not\ngoverned effectively (Bonvino and Giorgino (2026).\n\nsuch as \"screen scraping\" or \"reverse engineering\", which allowed their customers to\ntransfer data into their budgeting, lending and payment apps.7 As concerns around\npersistent data monopolies in the financial sector gained traction, calls grew for\nconsumer-permissioned data sharing via standardised application programming\ninterfaces (APIs), either through regulatory intervention or through private\ninitiatives.8\n\nRather than relying on screen scraping, reverse engineering or bilateral file\ntransfers, APIs allow systems to communicate automatically. This communication\ntakes place under clear technical rules that specify how requests are made (eg for\naccount balances or payment initiation) and how responses are returned. This ensures\nthat customer-permissioned data are shared in a consistent, secure and auditable\nway, while banks retain control over authentication, monitoring and access\nmanagement. APIs form the backbone of scalable and interoperable open finance\necosystems and are the primary mechanism through which third-party providers can\naccess and exchange data with larger financial institutions. Standardised APIs go one\nstep further by simplifying integration for all stakeholders, enabling broad\nparticipation, lowering technical barriers for new financial services providers and\nminimising duplication of effort.9\n\nJurisdictions have followed a diverse set of approaches to open banking and\nopen finance, driven by their unique goals. These approaches can be classified into\nthree broad categories: (i) regulatory-driven prescriptive approaches, requiring banks\nto share customer-permissioned data using eg unified technical API standards and\nthird parties to register with supervisors; (ii) facilitative approaches, where authorities\npublish guidelines and recommended practices;10 and (iii) market-driven approaches,\nwhere no explicit rules require or prohibit data sharing. In the third case, the\necosystem evolves largely through commercial private sector arrangements (BCBS\n(2019)). The choice of regulatory approaches can depend on various factors, including",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "scope_note": null,
-      "supported": true
-    },
-    {
-      "summary": "BIS frames open finance largely as a competition/anti-data-monopoly remedy; our framework centres on secure, responsible data sharing and risk management balanced against innovation rather than competition policy per se.",
-      "label": "differs-on",
-      "sentiment": "neutral",
-      "source_anchors": [
-        {
-          "anchor_id": "BNM 1.3",
-          "anchor_label": "BNM 1.3",
-          "text": "This Policy Document sets out the regulatory framework for open finance which\nseeks to ensure that it is implemented in an efficient, resilient and secure\nfashion. In addition to ensuring that the sharing of data is conducted in full\ncompliance with the Personal Data Protection Act 2010 and other relevant data\nprivacy and protection requirements, the Policy Document seeks to promote\nresponsible data sharing that strikes an appropriate balance between financial\ninnovation and prudent management of risks.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 3.2",
-          "anchor_label": "BNM 3.2",
-          "text": "The guidance in this Policy Document is issued pursuant to section 266 of the\nFSA, section 277 of the IFSA and section 126 of the DFIA.",
-          "doc_class": "semi-structured"
+          "anchor_id": "Open Finance ED 1.5",
+          "anchor_label": "Open Finance ED 1.5",
+          "text": "Building an open finance ecosystem will be a multi-year journey and requires\ncollective action from all stakeholders to ensure its orderly and secure\nimplementation. As such, BNM will gradually phase in the requirements in this\nPolicy Document. This allows for orderly adoption by the industry, while enabling\ncustomers and other ecosystem stakeholders to develop familiarity and\nconfidence in open finance.",
+          "doc_class": "structured-rules"
         }
       ],
       "target_anchors": [
@@ -574,22 +329,28 @@
       "supported": true
     },
     {
-      "summary": "BIS discusses centralised vs decentralised technical architectures as a jurisdictional design choice; our framework adopts a platform-operator/centralised platform model without articulating this as an explicit architectural policy choice.",
-      "label": "silent-on",
+      "summary": "We require secure authentication (e.g. multi-factor) and technical/operational safeguards before granting data access; BIS notes banks retain control over authentication, monitoring and access management as an API design principle.",
+      "label": "aligns-with",
       "sentiment": null,
       "source_anchors": [
         {
-          "anchor_id": "BNM 8",
-          "anchor_label": "BNM 8",
-          "text": "S 8.1\nAn FSP may participate2 as a data provider or a data consumer on an open\nfinance platform, subject to meeting relevant requirements in this Policy\nDocument and that specified by the platform operator.",
-          "doc_class": "semi-structured"
+          "anchor_id": "Open Finance ED 11.5",
+          "anchor_label": "Open Finance ED 11.5",
+          "text": "An FSP shall ensure that any transmission of customer information through an\nopen finance arrangement is conducted through secure means, in line with\nrelevant requirements set out in the Policy Document on Risk Management in\nTechnology. Without limiting the generality of paragraph 11.4, a data provider\nshall authenticate the customer and authorise consent using a reliable and\neffective authentication procedure (e.g. multi-factor authentication) before\ngranting a data consumer access to the customer's information.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 11.4",
+          "anchor_label": "Open Finance ED 11.4",
+          "text": "In line with paragraph 10.12 of the Policy Document on Management of\nCustomer Information and Permitted Disclosures, an FSP shall implement\ntechnical and operational safeguards to -",
+          "doc_class": "structured-rules"
         }
       ],
       "target_anchors": [
         {
-          "anchor_id": "BIS Pap168 11",
-          "anchor_label": "BIS Pap168 11",
-          "text": "In a centralised architecture, as in India and Türkiye, a single entity or common infrastructure\nmanages key functions such as directories, trust/identity verification or data switching between\nproviders (eg financial institutions) and recipients (eg third-party providers), simplifying participation\nand interoperability but creating dependency on that central node. By contrast, a decentralised\narchitecture, as seen in Europe's PSD2 implementation and Brazil's open finance model, relies on\ndirect bilateral connections via standardised APIs between data holders and users, offering greater\nflexibility but potentially raising coordination costs and implementation burdens for each ecosystem\nparticipant (World Bank (2024).\n\ndo not always use comparable definitions, data on users and API calls can be\nillustrative. 12\n\nAmong the G20 jurisdictions for which data are available - Australia, Brazil, India,\nKorea, the UK, Türkiye and the US - Korea has the highest open finance adoption\n(Graph 1.A), with 36 million subscribers, 194 million registered accounts and an\naverage of 20 API calls per person per month as of December 2023.13 The swift\nadvance in Korea may be driven by its mature digital payments ecosystem and the\nwidespread use of personal finance management apps, which had already integrated\nwith earlier forms of open banking (CCAF (2025), World Bank (2024). Per capita use",
+          "anchor_id": "BIS Pap168 7",
+          "anchor_label": "BIS Pap168 7",
+          "text": "Screen scraping refers to the practice of using customers' online banking credentials, with their\nconsent, to log into on their behalf and extract data directly from a bank (or financial institution)\nwebsite. Reverse engineering involves analysing existing banking interfaces or software to replicate\ntheir functionality or enable data access without relying on official documentation or standardised\nAPIs. This is often used by third parties prior to the introduction of open banking frameworks.",
           "doc_class": "semi-structured"
         }
       ],
@@ -597,21 +358,114 @@
       "supported": true
     },
     {
-      "summary": "We prohibit bundled/blanket consent and require voluntary, non-coerced consent that cannot be a precondition for a product/service — a consumer-protection safeguard BIS notes only generally under governance/consent layers.",
+      "summary": "We impose voluntary, non-bundled consent and prohibit coercing consent as a condition of service; BIS describes low willingness to share data and behavioural barriers but sets no anti-coercion rules.",
       "label": "goes-beyond",
       "sentiment": null,
       "source_anchors": [
         {
-          "anchor_id": "BNM 10(a)(i)(ii)(iii)(b)",
-          "anchor_label": "BNM 10(a)(i)(ii)(iii)(b)",
+          "anchor_id": "Open Finance ED 10.1(b)",
+          "anchor_label": "Open Finance ED 10.1(b)",
           "text": "Voluntary7 - The data consumer shall not, as a condition of providing a\nfinancial product/service, compel, coerce or mislead a customer to give\nconsent of their information to third parties beyond what is necessary for\nthe provision of the financial product/service or the performance of the\ncontract with the customer. The data consumer is prohibited from\nobtaining a customer's consent by asking the customer to indicate consent\nto a statement or term that combines agreement to the disclosure of their\ninformation with other matters in a single statement of consent.8 For the\navoidance of doubt, bundled or blanket consent, such as asking the\ncustomer to indicate consent to a statement or term that combines\nagreement to the disclosure of their information with other matters in a",
-          "doc_class": "semi-structured"
+          "doc_class": "structured-rules"
         },
         {
-          "anchor_id": "BNM 11",
-          "anchor_label": "BNM 11",
-          "text": "\"explicit and deliberate\" consent by a customer as there is no way to definitively establish that the\ncustomer consented to the pre-ticked box and the applicable statement/term.\n\nS 10.4 An FSP shall ensure that the consent dashboard reflects the real-time status of\nconsent and is updated immediately upon any renewal, revocation or expiration\nof consent.",
+          "anchor_id": "Open Finance ED 11.19(b)",
+          "anchor_label": "Open Finance ED 11.19(b)",
+          "text": "ensuring that services associated with an open finance arrangement are\nrendered in a manner that ensure fair treatment and equitable access for\ncustomers, in accordance with the Policy Document on Fair Treatment of\nFinancial Consumers. This includes for the FSP to manage relevant risks\nand potential harm (e.g. exclusion risk), including by implementing\nappropriate safeguards. For the avoidance of doubt, the FSP shall not\nrestrict, deter, influence or impose differential treatment on any customer\nsolely due to their decision to grant or withhold their consent under an\nopen finance arrangement, except where it materially affects their\neligibility for such products or services.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "BIS Pap168 15",
+          "anchor_label": "BIS Pap168 15",
+          "text": "Reimsbach-Kounatze and Molnar (2024) offer additional evidence explaining why the uptake of data\nportability remains limited despite the presence of formal portability rights. Survey findings indicate\nthat both awareness and actual usage of such rights under general data protection frameworks are\nlow. Users are frequently discouraged by the complexity of the processes involved, concerns about\npotential risks and the effort required to actively manage data transfers. In contrast, open banking\nregimes have achieved significantly higher levels of usage by embedding data portability in\nstandardised, API-based mechanisms that operate seamlessly in the background and are directly\nconnected to specific services. This distinction between user-driven portability and integrated,\nservice-oriented data sharing helps clarify why the mere existence of formal rights has not resulted\nin widespread adoption.",
           "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "We adopt a phased, multi-year mandated rollout with fixed commencement dates, aligning with BIS's observation that jurisdictions typically begin with open banking and phase in broader open finance over time.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 1.5",
+          "anchor_label": "Open Finance ED 1.5",
+          "text": "Building an open finance ecosystem will be a multi-year journey and requires\ncollective action from all stakeholders to ensure its orderly and secure\nimplementation. As such, BNM will gradually phase in the requirements in this\nPolicy Document. This allows for orderly adoption by the industry, while enabling\ncustomers and other ecosystem stakeholders to develop familiarity and\nconfidence in open finance.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 9.1",
+          "anchor_label": "Open Finance ED 9.1",
+          "text": "The obligations of a mandated FSP as specified under paragraph 8.4 shall\ncommence in accordance with the timeline specified in Appendix 2.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 9.2",
+          "anchor_label": "Open Finance ED 9.2",
+          "text": "A mandated FSP shall commence its obligation under paragraph 8.6 to provide\ndocument submission and single account view interfaces by 1 January 2028 or\n\nthe date on which the FSP's obligations under paragraph 8.4 commence,\nwhichever is later.\n\n## Question 5\n\nFor licensed banks and licensed Islamic banks, do you anticipate that your institution,\nwhether at an entity level or at the banking group level, will fall within the thresholds\nfor the commencement of obligations as a data provider and data consumer by 1\nJanuary 2027 and/or 1 January 2028 as specified in Appendix 2? If yes, please\nindicate whether at entity or banking group level.\n\n## Question 6\n\nWhat are your views on the proposed implementation timeline and phased approach\noutlined in Appendix 2 of this Exposure Draft? What operational or technical\nchallenges do you foresee in developing the required technical interfaces as both\ndata provider and data consumer in meeting the proposed timeline?\n\nIf the proposed timeline and/or phasing is deemed unfeasible, BNM invites feedback\non -\n\na) Potential challenges or constraints, including those related to technical and\noperational issues or customer readiness;\n\nb) Other considerations that BNM should take into account in finalising the phasing\nof implementation; and\n\nc) Recommendations to support timely institutional and customer readiness,\nincluding alternative timelines to facilitate a more inclusive and effective\nimplementation.\n\n## Question 7\n\nShould BNM consider additional criteria beyond the customer count threshold (e.g.\ncompliance history, data breach management record, system readiness and other\noperational factors) when determining the mandated? If so, what specific criteria\nshould be included?\n\n## Question 8\n\nShould a mandated FSP be required to share credit data5 immediately upon the\ncommencement of its obligation to participate in open finance? BNM invites feedback\non the benefits and potential concerns arising from such a requirement.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "BIS Pap168 26",
+          "anchor_label": "BIS Pap168 26",
+          "text": "See Graph A.3 in the appendix for a timeline of implementation in different jurisdictions. In some\njurisdictions, eg India, the ecosystem is beginning to mature and show a wider variety of providers\nand use cases (see Graph A.4 in the appendix). As more jurisdictions launch open banking and open\nfinance frameworks and as these are adopted, the evidence base will grow further.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "We prescribe binding cyber, API-security and operational-resilience controls for open finance activities; BIS identifies cyber threats and privacy breaches as risks to be governed but sets no specific control requirements.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 12.3",
+          "anchor_label": "Open Finance ED 12.3",
+          "text": "An FSP shall ensure that its cyber risk management capabilities and\ncybersecurity controls are also appropriately extended to govern, identify,\nprevent, detect, respond and address cyber risks associated with open finance\nactivities. This includes for the FSP to implement robust API security controls,\nstrengthening digital fraud detection and management, as well as take steps to\nsecure technology networks and internal systems from potential external risks\narising from the FSP's participation in an open finance arrangement.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 11.12",
+          "anchor_label": "Open Finance ED 11.12",
+          "text": "In relation to paragraph 11.11, an FSP shall have in place a customer information\nbreach handling and response plan in the event of theft, loss, misuse or\nunauthorised access, modification or disclosure of customer information\nassociated with an open finance arrangement. The plan must, at a minimum,\ninclude escalation procedures and a clear line of responsibility to contain the\ncustomer information breach and take remedial actions.\n\n## Handling disputes and complaints\n\nClear accountability and liability",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "BIS Pap168 6",
+          "anchor_label": "BIS Pap168 6",
+          "text": "Risks include cyber threats, privacy breaches, data misuse, algorithmic bias, market concentration and\nunclear accountability that can undermine consumer protection and ecosystem stability if not\ngoverned effectively (Bonvino and Giorgino (2026).\n\nsuch as \"screen scraping\" or \"reverse engineering\", which allowed their customers to\ntransfer data into their budgeting, lending and payment apps.7 As concerns around\npersistent data monopolies in the financial sector gained traction, calls grew for\nconsumer-permissioned data sharing via standardised application programming\ninterfaces (APIs), either through regulatory intervention or through private\ninitiatives.8\n\nRather than relying on screen scraping, reverse engineering or bilateral file\ntransfers, APIs allow systems to communicate automatically. This communication\ntakes place under clear technical rules that specify how requests are made (eg for\naccount balances or payment initiation) and how responses are returned. This ensures\nthat customer-permissioned data are shared in a consistent, secure and auditable\nway, while banks retain control over authentication, monitoring and access\nmanagement. APIs form the backbone of scalable and interoperable open finance\necosystems and are the primary mechanism through which third-party providers can\naccess and exchange data with larger financial institutions. Standardised APIs go one\nstep further by simplifying integration for all stakeholders, enabling broad\nparticipation, lowering technical barriers for new financial services providers and\nminimising duplication of effort.9\n\nJurisdictions have followed a diverse set of approaches to open banking and\nopen finance, driven by their unique goals. These approaches can be classified into\nthree broad categories: (i) regulatory-driven prescriptive approaches, requiring banks\nto share customer-permissioned data using eg unified technical API standards and\nthird parties to register with supervisors; (ii) facilitative approaches, where authorities\npublish guidelines and recommended practices;10 and (iii) market-driven approaches,\nwhere no explicit rules require or prohibit data sharing. In the third case, the\necosystem evolves largely through commercial private sector arrangements (BCBS\n(2019)). The choice of regulatory approaches can depend on various factors, including",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "We frame open finance as digital public infrastructure enabling national/regional data sharing and interoperability, consistent with BIS's characterisation of open finance as DPI built on shared API, identity, consent and governance layers.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 1.6",
+          "anchor_label": "Open Finance ED 1.6",
+          "text": "BNM also envisions that the principles underpinning open finance will support\nbroader arrangements for more open and secure data sharing beyond the\nfinancial industry. As set out in the Financial Sector Blueprint 2022-2026, BNM\nand the financial sector will continue to collaborate with stakeholders in other\nsectors and industries, including with the public sector, to support and champion\nefforts to foster a thriving Open Data ecosystem at the national level. Such\nefforts will focus on improving accessibility to public data under the\nGovernment's open data initiatives through a standardised approach to data\n\ngovernance, and supporting regional level data sharing initiatives by advancing\nbest practices aligned with global standards and policies.\n\n##### Question 1\n\nBeyond the use cases illustrated in Diagram 1, how do you envisage the sharing of\ncustomer information facilitated through open finance being leveraged to enhance\naccess to financial services, improve affordability and drive inclusion outcomes for\ncustomers? Please provide examples of potential use cases, anticipated benefits and\nany preconditions necessary to enable such outcomes.\n\n#### 2 Applicability",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 1.1",
+          "anchor_label": "Open Finance ED 1.1",
+          "text": "As the financial sector continues to evolve in the digital age, the volume of\ncustomer information processed has grown significantly alongside the\nincreasing shift of transactions to digital platforms. This underscores the\nimportance of having strong infrastructures that enable the secure access,\nsharing and processing of financial information, which is a critical foundation for\nmaintaining trust and resilience in an increasingly digital financial system.",
+          "doc_class": "structured-rules"
         }
       ],
       "target_anchors": [

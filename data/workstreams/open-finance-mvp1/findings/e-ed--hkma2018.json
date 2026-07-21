@@ -4,15 +4,62 @@
   "doc_b_id": "hkma-open-api-framework-2018",
   "findings": [
     {
-      "summary": "Both frameworks establish a phased, gradual implementation approach for open finance/API adoption to allow orderly industry adoption.",
+      "summary": "Both frameworks establish a regulatory framework for open finance/API-based data sharing to enable secure, innovative financial services.",
       "label": "aligns-with",
       "sentiment": null,
       "source_anchors": [
         {
-          "anchor_id": "BNM 1.5",
-          "anchor_label": "BNM 1.5",
-          "text": "Building an open finance ecosystem will be a multi-year journey and requires\ncollective action from all stakeholders to ensure its orderly and secure\nimplementation. As such, BNM will gradually phase in the requirements in this\nPolicy Document. This allows for orderly adoption by the industry, while enabling\ncustomers and other ecosystem stakeholders to develop familiarity and\nconfidence in open finance.",
+          "anchor_id": "Open Finance ED 1.3",
+          "anchor_label": "Open Finance ED 1.3",
+          "text": "This Policy Document sets out the regulatory framework for open finance which\nseeks to ensure that it is implemented in an efficient, resilient and secure\nfashion. In addition to ensuring that the sharing of data is conducted in full\ncompliance with the Personal Data Protection Act 2010 and other relevant data\nprivacy and protection requirements, the Policy Document seeks to promote\nresponsible data sharing that strikes an appropriate balance between financial\ninnovation and prudent management of risks.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 1.2",
+          "anchor_label": "Open Finance ED 1.2",
+          "text": "Open finance plays a pivotal role in advancing this vision by offering customers\na safer and more structured framework for sharing their financial information\ncompared to existing data-sharing arrangements in Malaysia. By enabling\nconsent-driven information sharing, open finance provides customers with\ngreater control over their personal financial information, allowing them to actively\ndetermine and manage how their information is shared, accessed and used.\nBeyond empowering customers, open finance unlocks data-driven innovation\nthat enables customers to make better-informed decisions about their finances,\nfacilitates the delivery of more personalised financial services and promotes\ngreater financial inclusion as illustrated in Diagram 1.\n\n<figure>\n<figcaption>Diagram 1</figcaption>\n\nIllustrative* potential use cases\n\nSingle account view, including\npersonal financial management\n\nCredit underwriting through\nreal-time and accurate financial\ninformation\n\nFully digital submission and\ntransmission of documents in\nlieu of manual processes (e.g.\nemail and webform)\n\n</figure>\n\nBenefits for consumers\n\nBenefits to financial industry\n\nFinancial\ninclusion and\naccess\n\nBetter informed\ncustomer\ndecisions\n\nBetter user\nexperience and\nconvenience\n\nOpportunities to\ngrow business\nand partnerships\n\nOperational\nefficiency\n\nRisk\nmanagement and\nfraud detection\n\n*Use cases listed are for illustrative purposes only and are not exhaustive nor indicative of endorsement from BNM.\n\n.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "HKMA OpenAPI 4.2",
+          "anchor_label": "HKMA OpenAPI 4.2",
+          "text": "provide a secure, controlled and convenient operating\nenvironment to allow banks and their partners1 (called\nthird party service providers, or TSPs, in this\nframework), to work together and develop\ninnovative/integrated banking services that improve\ncustomer experience; and",
           "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 6",
+          "anchor_label": "HKMA OpenAPI 6",
+          "text": "APIs enable secure, controlled, cost-effective and granular access\nto data and/or functionality of systems. Open APIs, in the context\nof this document, refer to APIs that allow third party access to\nsystems belonging to an organisation. However, Open APIs for\nthe banking industry do not necessarily mean that any third party\ncan freely access a bank's system without restriction, because\nbanks still need to ensure adequate controls such as security and\nconsumer protection.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "Our framework mandates participation of qualifying FSPs as data providers and consumers, whereas HKMA adopts a collaborative, voluntary approach rather than mandating participation.",
+      "label": "differs-on",
+      "sentiment": "tighten",
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 1.4(a)",
+          "anchor_label": "Open Finance ED 1.4(a)",
+          "text": "the criteria under which financial service providers are mandated to\nparticipate as data providers and data consumers in open finance, guided\nby the principle of reciprocity;",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 8.4",
+          "anchor_label": "Open Finance ED 8.4",
+          "text": "A mandated FSP shall participate in an open finance platform as a data provider.\nUpon receiving a customer's request to share their information through the\nplatform, the FSP shall make available the scope of prescribed information to the\nrelevant data consumer, subject to the scope of consent granted by the\ncustomer, as outlined in paragraph 10.1.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 8.6",
+          "anchor_label": "Open Finance ED 8.6",
+          "text": "A mandated FSP shall also participate in an open finance platform as a data\nconsumer. In this regard, the mandated FSP shall establish, develop and\nmaintain interfaces that allow customers to interact with the platform and give\npermission to retrieve the customer's information from other data providers\nthrough the FSP as a data consumer. In its role as a data consumer, the\nmandated FSP shall develop and operate, at a minimum, the following\ninterfaces:",
+          "doc_class": "structured-rules"
         }
       ],
       "target_anchors": [
@@ -20,6 +67,47 @@
           "anchor_id": "HKMA OpenAPI 8.1",
           "anchor_label": "HKMA OpenAPI 8.1",
           "text": "The implementation of Open API would bring many\nbenefits and efficiency gain to the banking industry and\nto its customers. Feedback from the banking industry\nindicates that it is desirable to implement Open APIs to\nprovide better services to satisfy the demands of its\ncustomers. Banks are therefore expected to implement the\nOpen API framework in the timeline set out in the\nframework. The HKMA will monitor the implementation\nclosely, and act accordingly to ensure market adoption\nand encourage use cases.",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 8.2",
+          "anchor_label": "HKMA OpenAPI 8.2",
+          "text": "The HKMA has taken note of the mandatory approach\nadopted by some jurisdictions such as the EU, the UK\nand Australia but has decided that a collaborative and\nphased approach is an appropriate approach for Hong\nKong for the time being. The HKMA will monitor the\nprogress of Open API implementation in Hong Kong and\nfurther consider the need for new regulatory measures if\nnecessary.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": "HKMA notes mandatory approach in EU/UK/Australia but opts for collaborative phased approach; expects but does not compel banks to implement. HKMA reserves the right to consider new regulatory measures later.",
+      "supported": true
+    },
+    {
+      "summary": "Both adopt a phased, multi-year implementation approach to allow orderly adoption by industry.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 1.5",
+          "anchor_label": "Open Finance ED 1.5",
+          "text": "Building an open finance ecosystem will be a multi-year journey and requires\ncollective action from all stakeholders to ensure its orderly and secure\nimplementation. As such, BNM will gradually phase in the requirements in this\nPolicy Document. This allows for orderly adoption by the industry, while enabling\ncustomers and other ecosystem stakeholders to develop familiarity and\nconfidence in open finance.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 9.1",
+          "anchor_label": "Open Finance ED 9.1",
+          "text": "The obligations of a mandated FSP as specified under paragraph 8.4 shall\ncommence in accordance with the timeline specified in Appendix 2.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 9.2",
+          "anchor_label": "Open Finance ED 9.2",
+          "text": "A mandated FSP shall commence its obligation under paragraph 8.6 to provide\ndocument submission and single account view interfaces by 1 January 2028 or\n\nthe date on which the FSP's obligations under paragraph 8.4 commence,\nwhichever is later.\n\n## Question 5\n\nFor licensed banks and licensed Islamic banks, do you anticipate that your institution,\nwhether at an entity level or at the banking group level, will fall within the thresholds\nfor the commencement of obligations as a data provider and data consumer by 1\nJanuary 2027 and/or 1 January 2028 as specified in Appendix 2? If yes, please\nindicate whether at entity or banking group level.\n\n## Question 6\n\nWhat are your views on the proposed implementation timeline and phased approach\noutlined in Appendix 2 of this Exposure Draft? What operational or technical\nchallenges do you foresee in developing the required technical interfaces as both\ndata provider and data consumer in meeting the proposed timeline?\n\nIf the proposed timeline and/or phasing is deemed unfeasible, BNM invites feedback\non -\n\na) Potential challenges or constraints, including those related to technical and\noperational issues or customer readiness;\n\nb) Other considerations that BNM should take into account in finalising the phasing\nof implementation; and\n\nc) Recommendations to support timely institutional and customer readiness,\nincluding alternative timelines to facilitate a more inclusive and effective\nimplementation.\n\n## Question 7\n\nShould BNM consider additional criteria beyond the customer count threshold (e.g.\ncompliance history, data breach management record, system readiness and other\noperational factors) when determining the mandated? If so, what specific criteria\nshould be included?\n\n## Question 8\n\nShould a mandated FSP be required to share credit data5 immediately upon the\ncommencement of its obligation to participate in open finance? BNM invites feedback\non the benefits and potential concerns arising from such a requirement.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "HKMA OpenAPI 8.2",
+          "anchor_label": "HKMA OpenAPI 8.2",
+          "text": "The HKMA has taken note of the mandatory approach\nadopted by some jurisdictions such as the EU, the UK\nand Australia but has decided that a collaborative and\nphased approach is an appropriate approach for Hong\nKong for the time being. The HKMA will monitor the\nprogress of Open API implementation in Hong Kong and\nfurther consider the need for new regulatory measures if\nnecessary.",
           "doc_class": "semi-structured"
         },
         {
@@ -33,57 +121,270 @@
           "anchor_label": "HKMA OpenAPI 13",
           "text": "Owing to the increased sensitivity of data and therefore the\nincreased risks involved in each subsequent category, the\nprotective measures required will be more complicated. Therefore,\n\na four-phased approach matching the four categories of Open API,\nis recommended.\n\nIt is envisaged that the deployment of Product and service\ninformation will be similar to an open data initiative which the\ninformation technology industry is already familiar with. The\nimplementation and timeline for the deployment should therefore\nbe relatively simple and short.\n\nSubsequent phases of Open APIs would involve more\nsophisticated technology, security and authentication\ninfrastructure, and therefore may require more development\nefforts. However, as banks would have accumulated experience in\nprior phases, timelines of the subsequent phases are not expected\nto be disproportionately long.\n\nBased on the comments received from the consultation, the\nproposed six-month timeline after the publication of this\nframework for launching Product and service information\n(referred as Phase I) Open APIs by banks remains. The proposed\n12-month timeline for Subscription and new applications\n(referred as Phase II) is relaxed to 12 - 15 months to allow the\nindustry more time for preparation.\n\nFor the subsequent phases, Open APIs would allow even more\ninnovative and convenient services. As the complexity and risk of\nopening up data of all customers increase, the technology and\ninfrastructure to support, monitor and secure the Open API access\nbecome more complex and critical. The HKMA will therefore\nclosely monitor the situation and take into consideration local and\ninternational developments, and decide the timeline with the\nindustry during the coming 12 months.",
           "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 18",
+          "anchor_label": "HKMA OpenAPI 18",
+          "text": "<table>\n<tr>\n<th>Phase</th>\n<th>Categories of Open APIS</th>\n<th>Timeline after the publication of this Open API framework</th>\n</tr>\n<tr>\n<td>I</td>\n<td>Product and service information</td>\n<td>Six months</td>\n</tr>\n<tr>\n<td>II</td>\n<td>Subscription and new applications for product/service</td>\n<td>12 - 15 months</td>\n</tr>\n<tr>\n<td>III</td>\n<td>Account information</td>\n<td>To be set out within the next 12 months</td>\n</tr>\n<tr>\n<td>IV</td>\n<td>Transactions</td>\n<td>To be set out within the next 12 months</td>\n</tr>\n</table>",
+          "doc_class": "semi-structured"
         }
       ],
-      "scope_note": "BNM phases in binding requirements per Appendix 2 timelines; HKMA phases by risk-based category with recommended (not mandatory) timelines.",
+      "scope_note": null,
       "supported": true
     },
     {
-      "summary": "BNM mandates open finance participation for mandated FSPs with binding standards and enforcement, whereas HKMA deliberately adopts a collaborative, non-mandatory approach.",
+      "summary": "Our framework prescribes fixed calendar-based commencement dates for mandated obligations, whereas HKMA sets phased timelines relative to publication with later phases deferred and flexible.",
       "label": "differs-on",
       "sentiment": "tighten",
       "source_anchors": [
         {
-          "anchor_id": "BNM 9",
-          "anchor_label": "BNM 9",
-          "text": "S 9.1\nThe obligations of a mandated FSP as specified under paragraph 8.4 shall\ncommence in accordance with the timeline specified in Appendix 2.\n\nS 9.2\nA mandated FSP shall commence its obligation under paragraph 8.6 to provide\ndocument submission and single account view interfaces by 1 January 2028 or\n\nthe date on which the FSP's obligations under paragraph 8.4 commence,\nwhichever is later.",
-          "doc_class": "semi-structured"
+          "anchor_id": "Open Finance ED 4.1",
+          "anchor_label": "Open Finance ED 4.1",
+          "text": "This Policy Document comes into effect on 1 January 2027, subject to the\ntransition arrangements set out in paragraph 9.\n\n#### 5 Interpretation",
+          "doc_class": "structured-rules"
         },
         {
-          "anchor_id": "BNM 8",
-          "anchor_label": "BNM 8",
-          "text": "S 8.1\nAn FSP may participate2 as a data provider or a data consumer on an open\nfinance platform, subject to meeting relevant requirements in this Policy\nDocument and that specified by the platform operator.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 14",
-          "anchor_label": "BNM 14",
-          "text": "sharing by a mandated FSP whose obligation to commence as a data provider\nfalls on or after 1 January 2028 shall include both individual and SME customers.",
-          "doc_class": "semi-structured"
+          "anchor_id": "Open Finance ED 9.2",
+          "anchor_label": "Open Finance ED 9.2",
+          "text": "A mandated FSP shall commence its obligation under paragraph 8.6 to provide\ndocument submission and single account view interfaces by 1 January 2028 or\n\nthe date on which the FSP's obligations under paragraph 8.4 commence,\nwhichever is later.\n\n## Question 5\n\nFor licensed banks and licensed Islamic banks, do you anticipate that your institution,\nwhether at an entity level or at the banking group level, will fall within the thresholds\nfor the commencement of obligations as a data provider and data consumer by 1\nJanuary 2027 and/or 1 January 2028 as specified in Appendix 2? If yes, please\nindicate whether at entity or banking group level.\n\n## Question 6\n\nWhat are your views on the proposed implementation timeline and phased approach\noutlined in Appendix 2 of this Exposure Draft? What operational or technical\nchallenges do you foresee in developing the required technical interfaces as both\ndata provider and data consumer in meeting the proposed timeline?\n\nIf the proposed timeline and/or phasing is deemed unfeasible, BNM invites feedback\non -\n\na) Potential challenges or constraints, including those related to technical and\noperational issues or customer readiness;\n\nb) Other considerations that BNM should take into account in finalising the phasing\nof implementation; and\n\nc) Recommendations to support timely institutional and customer readiness,\nincluding alternative timelines to facilitate a more inclusive and effective\nimplementation.\n\n## Question 7\n\nShould BNM consider additional criteria beyond the customer count threshold (e.g.\ncompliance history, data breach management record, system readiness and other\noperational factors) when determining the mandated? If so, what specific criteria\nshould be included?\n\n## Question 8\n\nShould a mandated FSP be required to share credit data5 immediately upon the\ncommencement of its obligation to participate in open finance? BNM invites feedback\non the benefits and potential concerns arising from such a requirement.",
+          "doc_class": "structured-rules"
         }
       ],
       "target_anchors": [
         {
-          "anchor_id": "HKMA OpenAPI 8.2",
-          "anchor_label": "HKMA OpenAPI 8.2",
-          "text": "The HKMA has taken note of the mandatory approach\nadopted by some jurisdictions such as the EU, the UK\nand Australia but has decided that a collaborative and\nphased approach is an appropriate approach for Hong\nKong for the time being. The HKMA will monitor the\nprogress of Open API implementation in Hong Kong and\nfurther consider the need for new regulatory measures if\nnecessary.",
+          "anchor_id": "HKMA OpenAPI 18",
+          "anchor_label": "HKMA OpenAPI 18",
+          "text": "<table>\n<tr>\n<th>Phase</th>\n<th>Categories of Open APIS</th>\n<th>Timeline after the publication of this Open API framework</th>\n</tr>\n<tr>\n<td>I</td>\n<td>Product and service information</td>\n<td>Six months</td>\n</tr>\n<tr>\n<td>II</td>\n<td>Subscription and new applications for product/service</td>\n<td>12 - 15 months</td>\n</tr>\n<tr>\n<td>III</td>\n<td>Account information</td>\n<td>To be set out within the next 12 months</td>\n</tr>\n<tr>\n<td>IV</td>\n<td>Transactions</td>\n<td>To be set out within the next 12 months</td>\n</tr>\n</table>",
           "doc_class": "semi-structured"
         },
         {
-          "anchor_id": "HKMA OpenAPI 8.3",
-          "anchor_label": "HKMA OpenAPI 8.3",
-          "text": "The framework is intended to be high-level in order\nto allow banks the flexibility in implementing Open\nAPI as part of their strategy. The HKMA does not\nwish to prescribe how banks should adopt Open API\ndown to implementation steps.",
+          "anchor_id": "HKMA OpenAPI 19",
+          "anchor_label": "HKMA OpenAPI 19",
+          "text": "It should be noted that the suggested timeline above represents\nthe latest expected dates for banks to make available the Open\nAPIs indicated. Individual banks are welcome to advance their\nown programme, either for completion of individual phases or for\nintroducing Open APIs for those categories that have not yet been\nset out in the timeframe. For example, a bank may choose to\nmake available Open APIs for conducting transactions on their\nproducts and services during Phase I at the same time as they\nlaunch their Product and service information Open APIs.\nHowever these banks should ensure that commensurate level of\nprotections3 and suitable TSP governance arrangements are in\nplace with appropriate contracts to clearly define the\nresponsibility, liability, control and customer protections.\n\nOpen API functions",
           "doc_class": "semi-structured"
         }
       ],
-      "scope_note": "BNM 8.1 participation as data provider/consumer is voluntary generally; the mandatory element applies specifically to mandated FSPs per Appendix 1. HKMA explicitly noted but declined the EU/UK/Australia mandatory approach.",
+      "scope_note": "HKMA permits individual banks to advance ahead of the latest expected dates; our dates are firm subject to transition arrangements in paragraph 9.",
       "supported": true
     },
     {
-      "summary": "HKMA specifies liability arrangements between banks and TSPs to protect customers in cases of loss, which BNM's document does not cover.",
+      "summary": "Our framework prescribes a detailed consent lifecycle (specific/voluntary consent, dashboard, expiry, renewal, revocation), whereas HKMA only requires customer authorisation with limited detail.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 10.1",
+          "anchor_label": "Open Finance ED 10.1",
+          "text": "An FSP participating in an open finance arrangement, whether in its capacity as\na data provider or a data consumer, shall ensure that a secure, verifiable and\ndigital mechanism is in place to obtain consent from a customer prior to\ndisclosing, accessing or processing any customer information. In line with the\nPDPA and paragraph 13.1 (item 8) of the Policy Document on Management of\nCustomer Information and Permitted Disclosures, consent shall be sought and\nobtained in the following manner:",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 10.1(a)",
+          "anchor_label": "Open Finance ED 10.1(a)",
+          "text": "Specific6 - The terms seeking a customer's consent are clear, concise\nand written in plain language. The relevant terms must be specific in\nrelation to the following:",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 10.1(b)",
+          "anchor_label": "Open Finance ED 10.1(b)",
+          "text": "Voluntary7 - The data consumer shall not, as a condition of providing a\nfinancial product/service, compel, coerce or mislead a customer to give\nconsent of their information to third parties beyond what is necessary for\nthe provision of the financial product/service or the performance of the\ncontract with the customer. The data consumer is prohibited from\nobtaining a customer's consent by asking the customer to indicate consent\nto a statement or term that combines agreement to the disclosure of their\ninformation with other matters in a single statement of consent.8 For the\navoidance of doubt, bundled or blanket consent, such as asking the\ncustomer to indicate consent to a statement or term that combines\nagreement to the disclosure of their information with other matters in a",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 10.2",
+          "anchor_label": "Open Finance ED 10.2",
+          "text": "An FSP participating in an open finance arrangement, whether in its capacity as\na data provider or a data consumer, shall establish and maintain a digital\ndashboard accessible to the customer for the purpose of managing and\nmonitoring consent granted under the arrangement. This consent dashboard\nshall enable the customer to -",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 10.5",
+          "anchor_label": "Open Finance ED 10.5",
+          "text": "A data consumer shall ensure that any customer consent granted under an open\nfinance arrangement is time-bound and remains valid only for the duration\nnecessary to fulfil the specific purpose for which it was granted.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 10.7",
+          "anchor_label": "Open Finance ED 10.7",
+          "text": "Where consent is obtained for the purpose of recurring data access (including\ncontinuous or repeated access to customer information for activities such as\npersonal financial management), a data consumer shall ensure that such\nconsent remains valid for no longer than six months from the date it was granted,\nunless revoked earlier by the customer.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 10.11",
+          "anchor_label": "Open Finance ED 10.11",
+          "text": "Upon receipt of a customer's request to revoke consent under an open finance\narrangement, the data consumer shall immediately cease any access to\ncustomer information that was previously authorised under the revoked consent.\nThe data consumer shall also promptly notify the corresponding data provider of\nthe consent revoked.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "HKMA OpenAPI 12",
+          "anchor_label": "HKMA OpenAPI 12",
+          "text": "It was further agreed that the types of protection required for each\nof the four categories of Open API implementation should be in a\nprogressive manner as follows:\n\n<table>\n<tr>\n<th>Categories of Open API</th>\n<th>Protections required</th>\n</tr>\n<tr>\n<td>Product and service information</td>\n<td>· Authentication of bank sites · Integrity of data · Authentication of TSPs</td>\n</tr>\n<tr>\n<td>Subscription and new applications for product/service</td>\n<td>· Authentication of bank sites · Integrity and confidentiality of data · Authentication of TSPs</td>\n</tr>\n<tr>\n<td>Account information</td>\n<td>· Authentication of bank sites · Integrity and confidentiality of data</td>\n</tr>\n<tr>\n<td>Transactions</td>\n<td>· Authentication of TSPs · Authorisation of customers</td>\n</tr>\n</table>\n\nA phased approach",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 11.4",
+          "anchor_label": "HKMA OpenAPI 11.4",
+          "text": "Transactions - Banking transactions and payment or\nscheduled payments/transfer initiated by authenticated\ncustomers.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": "HKMA references authorisation of customers via OAuth 2.0 (B7) but not a full consent lifecycle framework.",
+      "supported": true
+    },
+    {
+      "summary": "Both require strong data security safeguards including authentication, integrity and confidentiality controls for information sharing.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.4",
+          "anchor_label": "Open Finance ED 11.4",
+          "text": "In line with paragraph 10.12 of the Policy Document on Management of\nCustomer Information and Permitted Disclosures, an FSP shall implement\ntechnical and operational safeguards to -",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 11.5",
+          "anchor_label": "Open Finance ED 11.5",
+          "text": "An FSP shall ensure that any transmission of customer information through an\nopen finance arrangement is conducted through secure means, in line with\nrelevant requirements set out in the Policy Document on Risk Management in\nTechnology. Without limiting the generality of paragraph 11.4, a data provider\nshall authenticate the customer and authorise consent using a reliable and\neffective authentication procedure (e.g. multi-factor authentication) before\ngranting a data consumer access to the customer's information.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "HKMA OpenAPI 12",
+          "anchor_label": "HKMA OpenAPI 12",
+          "text": "It was further agreed that the types of protection required for each\nof the four categories of Open API implementation should be in a\nprogressive manner as follows:\n\n<table>\n<tr>\n<th>Categories of Open API</th>\n<th>Protections required</th>\n</tr>\n<tr>\n<td>Product and service information</td>\n<td>· Authentication of bank sites · Integrity of data · Authentication of TSPs</td>\n</tr>\n<tr>\n<td>Subscription and new applications for product/service</td>\n<td>· Authentication of bank sites · Integrity and confidentiality of data · Authentication of TSPs</td>\n</tr>\n<tr>\n<td>Account information</td>\n<td>· Authentication of bank sites · Integrity and confidentiality of data</td>\n</tr>\n<tr>\n<td>Transactions</td>\n<td>· Authentication of TSPs · Authorisation of customers</td>\n</tr>\n</table>\n\nA phased approach",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 27",
+          "anchor_label": "HKMA OpenAPI 27",
+          "text": "While certain technical standards have been prescribed, they\ncannot be considered as the only standards that cover all security\nrequirements. Banks should always make reference to industry\nsound practices, relevant regulatory and internal requirements,\nand apply holistic controls on information and cybersecurity\nbased on a risk- and principle-based approach to protect banks'\nsystems as well as bank and consumer data.",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 58(REST)",
+          "anchor_label": "HKMA OpenAPI 58(REST)",
+          "text": "common communication protocols in use for Open APIs. Under\nthese respective communication protocols, data formats of\nJavaScript Object Notation (JSON) and extensible Markup\nLanguage (XML) are usually used.\n\nB 3.\nDue to their practicality and wide acceptance by the industry,\nREST is recommended as the communication protocol and JSON\nas the data format.\n\nSecurity:\n\nB 4.\nSecurity, including authentication, integrity, confidentiality and\nauthorisation, is required for all four categories of Open APIs for\nthe reasons indicated in paragraph 12 in the main paper.\n\nB 5.\nFor authentication of bank sites and TSPs, and integrity and\nconfidentiality checks of data transmitted, properly registered and\nconfigured X.509 digital certificate is recommended to ensure\nthat product and service information is extracted from genuine\nbank sites.\n\nB 6.\nTransport Layer Security (TLS), on the other hand, provides\nintegrity checking and encryption protection to the data being\ntransmitted, regardless of whether it is transmitted from bank to\nTSP or vice versa.\n\nB 7.\n\nBanks should continue to apply the risk-based approach to use\ntheir own authentication methods (such as username/password\nand two-factor authentication where appropriate) for bank\ncustomers. They should only grant access privileges to TSPs on\ncustomers' requests. OAuth 2.0 is recommended as the\nauthorisation method as it is an industry standard.\n\nB 8.\nThe various recommended security protection requirements and\ntechnologies are summarised below:\n\n<table>\n<tr>\n<th>Protection required</th>\n<th>Technology</th>\n</tr>\n<tr>\n<td>Authentication of bank sites and TSPs</td>\n<td>X.509</td>\n</tr>\n<tr>\n<td>Integrity and confidentiality of data</td>\n<td>TLS</td>\n</tr>\n<tr>\n<td>Authentication of customers</td>\n<td>Bank's own method</td>\n</tr>\n<tr>\n<td>Authorisation of customers</td>\n<td>OAuth 2.0</td>\n</tr>\n</table>",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "HKMA prescribes specific technical/security standards (REST, JSON, X.509, TLS, OAuth 2.0) whereas our framework defers to separate risk-management-in-technology policy documents without prescribing standards itself.",
       "label": "silent-on",
       "sentiment": null,
-      "source_anchors": [],
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.5",
+          "anchor_label": "Open Finance ED 11.5",
+          "text": "An FSP shall ensure that any transmission of customer information through an\nopen finance arrangement is conducted through secure means, in line with\nrelevant requirements set out in the Policy Document on Risk Management in\nTechnology. Without limiting the generality of paragraph 11.4, a data provider\nshall authenticate the customer and authorise consent using a reliable and\neffective authentication procedure (e.g. multi-factor authentication) before\ngranting a data consumer access to the customer's information.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 12.1",
+          "anchor_label": "Open Finance ED 12.1",
+          "text": "An FSP shall ensure that relevant technology requirements in the Policy\nDocument on Risk Management in Technology and the Policy Document on\nTechnology Requirement for Payment Services Regulatees are observed in\n\nrespect of its open finance activities.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "HKMA OpenAPI 26",
+          "anchor_label": "HKMA OpenAPI 26",
+          "text": "Based on international practice and the feedback during the\nconsultation exercise, the recommended architecture and security\nstandards are listed in Annex B.",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 58(REST)",
+          "anchor_label": "HKMA OpenAPI 58(REST)",
+          "text": "common communication protocols in use for Open APIs. Under\nthese respective communication protocols, data formats of\nJavaScript Object Notation (JSON) and extensible Markup\nLanguage (XML) are usually used.\n\nB 3.\nDue to their practicality and wide acceptance by the industry,\nREST is recommended as the communication protocol and JSON\nas the data format.\n\nSecurity:\n\nB 4.\nSecurity, including authentication, integrity, confidentiality and\nauthorisation, is required for all four categories of Open APIs for\nthe reasons indicated in paragraph 12 in the main paper.\n\nB 5.\nFor authentication of bank sites and TSPs, and integrity and\nconfidentiality checks of data transmitted, properly registered and\nconfigured X.509 digital certificate is recommended to ensure\nthat product and service information is extracted from genuine\nbank sites.\n\nB 6.\nTransport Layer Security (TLS), on the other hand, provides\nintegrity checking and encryption protection to the data being\ntransmitted, regardless of whether it is transmitted from bank to\nTSP or vice versa.\n\nB 7.\n\nBanks should continue to apply the risk-based approach to use\ntheir own authentication methods (such as username/password\nand two-factor authentication where appropriate) for bank\ncustomers. They should only grant access privileges to TSPs on\ncustomers' requests. OAuth 2.0 is recommended as the\nauthorisation method as it is an industry standard.\n\nB 8.\nThe various recommended security protection requirements and\ntechnologies are summarised below:\n\n<table>\n<tr>\n<th>Protection required</th>\n<th>Technology</th>\n</tr>\n<tr>\n<td>Authentication of bank sites and TSPs</td>\n<td>X.509</td>\n</tr>\n<tr>\n<td>Integrity and confidentiality of data</td>\n<td>TLS</td>\n</tr>\n<tr>\n<td>Authentication of customers</td>\n<td>Bank's own method</td>\n</tr>\n<tr>\n<td>Authorisation of customers</td>\n<td>OAuth 2.0</td>\n</tr>\n</table>",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": "Our framework's requirement to use secure means and comply with RMiT effectively covers the objective, but the specific named standards are only in the HKMA framework; HKMA itself treats these as recommendations, not exhaustive.",
+      "supported": true
+    },
+    {
+      "summary": "HKMA prescribes a detailed TSP governance model with onboarding checks, common baseline and ongoing monitoring for third parties, whereas our framework relies on general third-party/outsourcing requirements.",
+      "label": "silent-on",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.8",
+          "anchor_label": "Open Finance ED 11.8",
+          "text": "An FSP that is a data consumer shall ensure that any third-party service provider\ninvolved in handling customer information, whether related to an open finance\narrangement (including that associated with outsourcing or cloud computing\narrangements), complies with relevant requirements relating to data privacy,\nconfidentiality and security, as set out in the Policy Document on Management\nof Customer Information and Permitted Disclosures, the Policy Document on\nRisk Management and Information Technology, and the Policy Document on\nOutsourcing.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 11.10",
+          "anchor_label": "Open Finance ED 11.10",
+          "text": "For the purposes of paragraph 11.8, an FSP shall ensure the obligation to\nsafeguard customer information is adequately reflected in the service level\nagreement with the third-party service provider, in line with paragraph 12.4 of the\nPolicy Document on Management of Customer Information and Permitted\nDisclosures.\n\n#### Customer information breaches",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "HKMA OpenAPI 29",
+          "anchor_label": "HKMA OpenAPI 29",
+          "text": "In order to strike a balance between innovation and customer\nprotection, it is preferred that TSPs offer solutions under a\npartnership arrangement with banks. Banks are therefore expected\nto adopt a formal TSP governance process.",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 30.1",
+          "anchor_label": "HKMA OpenAPI 30.1",
+          "text": "due diligence on bilateral engagements with TSPs\ncovering all aspects of TSP governance according to the\n\nnature of the engagement, and established policies and\nprocedures of the banks.",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 31.1",
+          "anchor_label": "HKMA OpenAPI 31.1",
+          "text": "The TSP governance processes for different categories of\nOpen APIs are summarised below:\n\n<table>\n<tr>\n<th>Open APIs</th>\n<th>TSP governance processes</th>\n</tr>\n<tr>\n<td rowspan=\"3\">Those specified under Phase I</td>\n<td>· Banks should establish simple TSP</td>\n</tr>\n<tr>\n<td>registration process with basic</td>\n</tr>\n<tr>\n<td>consumer protection measures in place.</td>\n</tr>\n<tr>\n<td>Those</td>\n<td>· Banks should have in place:</td>\n</tr>\n<tr>\n<td rowspan=\"4\">specified under Phase II and beyond</td>\n<td>i. onboarding checks on TSPs;</td>\n</tr>\n<tr>\n<td>ii. ongoing monitoring on TSPs;</td>\n</tr>\n<tr>\n<td>and</td>\n</tr>\n<tr>\n<td>iii. bilateral contractual relationship with TSPs.</td>\n</tr>\n</table>",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 40.1",
+          "anchor_label": "HKMA OpenAPI 40.1",
+          "text": "Business - Including financial soundness, reputation,\nquality of management, and appropriateness of business\noperations; and",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 40.2",
+          "anchor_label": "HKMA OpenAPI 40.2",
+          "text": "Risk management - Including capabilities and controls $o f$\nthe TSPs in the areas of risk management, business and\ntechnical expertise in the field, customer and data\nprotection measures (including the avoidance of\nexcessive collection of personal data), cybersecurity and\nIT controls (including, among others, confidentiality,\nintegrity and availability, monitoring and mitigation\nmeasures, and contingency planning).",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 45",
+          "anchor_label": "HKMA OpenAPI 45",
+          "text": "It is also suggested that there should be a risk-based ongoing\nmonitoring mechanism for banks to ensure that TSPs continue to\nmeet the relevant parts of the common baseline (or equivalent\nassessment) after the initial assessment process.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": "HKMA's TSP-centric model reflects bank-partner architecture; our framework operates on an FSP-to-FSP platform model, so the granular TSP onboarding regime is not mirrored on our side.",
+      "supported": true
+    },
+    {
+      "summary": "Both require clear allocation of liability and responsibilities between parties to protect customers from loss.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.13",
+          "anchor_label": "Open Finance ED 11.13",
+          "text": "An FSP shall ensure that the accountabilities and responsibilities in relation to\n\nits participation in an open finance arrangement are clearly stipulated, and that\nsuch responsibilities include ensuring customers do not suffer loss or detriment\nas a result of weaknesses, failures or misconduct on the part of the FSP.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 11.14",
+          "anchor_label": "Open Finance ED 11.14",
+          "text": "In relation to paragraph 11.13, an FSP shall ensure that the open finance\narrangement includes a clear delineation of responsibilities between all parties,\nparticularly with respect to the handling and resolution of customer complaints\nand disputes, and that each party shall be liable for acts or omissions within their\ncontrol.\n\n### Complaints handling and redress",
+          "doc_class": "structured-rules"
+        }
+      ],
       "target_anchors": [
         {
           "anchor_id": "HKMA OpenAPI 50",
@@ -102,10 +403,384 @@
       "supported": true
     },
     {
-      "summary": "HKMA requires banks to publish lists of partnering TSPs and monitor for scams/impersonation to protect the public, an area not addressed by BNM.",
+      "summary": "Both require a dashboard, though our dashboard is for customer consent management while HKMA's is a central repository of Open APIs for TSP access — different purposes on different axes.",
+      "label": "differs-on",
+      "sentiment": "neutral",
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 10.2",
+          "anchor_label": "Open Finance ED 10.2",
+          "text": "An FSP participating in an open finance arrangement, whether in its capacity as\na data provider or a data consumer, shall establish and maintain a digital\ndashboard accessible to the customer for the purpose of managing and\nmonitoring consent granted under the arrangement. This consent dashboard\nshall enable the customer to -",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "HKMA OpenAPI 52.1",
+          "anchor_label": "HKMA OpenAPI 52.1",
+          "text": "A single point of reference (may also be known as a\nrepository or a dashboard) of all Open APIs offered by\nbanks will facilitate ease of access by TSPs. During the\ndiscussion process, some banks suggested that it would\nbe desirable for the Data Studio of the Hong Kong\nScience and Technology Parks to take up this dashboard\nrole. Hence, it is recommended that all Open APIs from\nPhase I onwards are listed under the Data Studio.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "Both emphasise board/senior management governance and effective risk management over open finance/API activities.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 7.1",
+          "anchor_label": "Open Finance ED 7.1",
+          "text": "The board and senior management shall exercise effective oversight of an FSP's\nimplementation of arrangements relating to open finance to ensure its efficient,\nresilient and secure operations.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 7.3",
+          "anchor_label": "Open Finance ED 7.3",
+          "text": "The board shall ensure that a sound risk strategy and appropriate risk\nmanagement framework is in place and implemented effectively to manage any\noperational, technology, cyber, fraud, conduct or other risk arising from an FSP's\nparticipation in an open finance arrangement, in line with the FSP's risk appetite.\nThis includes for the board to evaluate the risks and opportunities arising from\nthe FSP's participation in an open finance arrangement, and consider how these\nfactors should be reflected in its strategies and business plan.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 7.5",
+          "anchor_label": "Open Finance ED 7.5",
+          "text": "Senior management shall be responsible for developing and implementing the\nframework for managing risk arising from an FSP's participation in an open\nfinance arrangement. The framework shall include policies, procedures and\nsystems that enables the identification, measurement, control and ongoing\nmonitoring of all relevant risks, including risks that the FSP is exposed to arising\nfrom information received from other data providers and that it poses to other\ndata consumers through information it provides.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "HKMA OpenAPI 27",
+          "anchor_label": "HKMA OpenAPI 27",
+          "text": "While certain technical standards have been prescribed, they\ncannot be considered as the only standards that cover all security\nrequirements. Banks should always make reference to industry\nsound practices, relevant regulatory and internal requirements,\nand apply holistic controls on information and cybersecurity\nbased on a risk- and principle-based approach to protect banks'\nsystems as well as bank and consumer data.",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 45",
+          "anchor_label": "HKMA OpenAPI 45",
+          "text": "It is also suggested that there should be a risk-based ongoing\nmonitoring mechanism for banks to ensure that TSPs continue to\nmeet the relevant parts of the common baseline (or equivalent\nassessment) after the initial assessment process.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "Both scope the initial functions/information around account information and transaction data, and support document submission/account view use cases.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 8.6(a)",
+          "anchor_label": "Open Finance ED 8.6(a)",
+          "text": "Document submission, where the mandated FSP offers appropriate\ninterfaces that allow customers to direct the platform to request relevant\ninformation from other data providers through the platform in a machine-\nreadable and standardised format,4 in lieu of traditional methods of\nsubmitting documents (e.g. manual upload, emailing documents), for\nrelevant processes (e.g. customer onboarding, on-going due diligence);\nand",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 12.5(a)",
+          "anchor_label": "Open Finance ED 12.5(a)",
+          "text": "transaction information for the most recent 12 months including the date,\ndescription, and value; and",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 12.5(b)",
+          "anchor_label": "Open Finance ED 12.5(b)",
+          "text": "the current outstanding balance of an account.\n\n",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "HKMA OpenAPI 11.3",
+          "anchor_label": "HKMA OpenAPI 11.3",
+          "text": "Account information - Retrieval and alteration (where\napplicable) of account information (balance, transaction\nhistory, limits, payment schedules, etc.) of authenticated\ncustomers for stand-alone or aggregated views; and",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 11.4",
+          "anchor_label": "HKMA OpenAPI 11.4",
+          "text": "Transactions - Banking transactions and payment or\nscheduled payments/transfer initiated by authenticated\ncustomers.",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 11.1",
+          "anchor_label": "HKMA OpenAPI 11.1",
+          "text": "Product and service information - \"Read-only\"\ninformation offered by banks on details of their products\nand services;",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "Our framework mandates secure deletion of customer information upon consent expiry/revocation, whereas HKMA does not address data deletion obligations.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 10.10",
+          "anchor_label": "Open Finance ED 10.10",
+          "text": "Where consent is not renewed, the data consumer shall delete all customer\ninformation obtained under the expired consent, unless retention is permitted or\nrequired under applicable laws or regulatory requirements.\n\n# D. Consent revocation",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 10.13",
+          "anchor_label": "Open Finance ED 10.13",
+          "text": "The data consumer shall, without undue delay, securely delete all customer\ninformation that was obtained under the withdrawn consent, unless retention is\nrequired under applicable laws or regulatory requirements.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 11.2(d)",
+          "anchor_label": "Open Finance ED 11.2(d)",
+          "text": "mandate secure disposal of customer information upon expiry of its use.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "HKMA OpenAPI 6",
+          "anchor_label": "HKMA OpenAPI 6",
+          "text": "APIs enable secure, controlled, cost-effective and granular access\nto data and/or functionality of systems. Open APIs, in the context\nof this document, refer to APIs that allow third party access to\nsystems belonging to an organisation. However, Open APIs for\nthe banking industry do not necessarily mean that any third party\ncan freely access a bank's system without restriction, because\nbanks still need to ensure adequate controls such as security and\nconsumer protection.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "Our framework requires detailed complaints handling and redress mechanisms for open finance disputes, whereas HKMA only references the Code of Banking Practice for unauthorised transactions.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.15",
+          "anchor_label": "Open Finance ED 11.15",
+          "text": "In line with paragraph 8.1 of the Policy Document on Complaints Handling, an\nFSP shall formulate and implement effective and transparent complaints\nhandling policies, procedures and processes for timely and fair handling of\ncustomer complaints arising from any open finance activities.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 11.16",
+          "anchor_label": "Open Finance ED 11.16",
+          "text": "For purposes of paragraph 11.15, an FSP shall ensure that the procedures\nincorporated in its complaint handling policies are compliant with the relevant\nrequirements set out in the Policy Document on Complaints Handling.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 11.17",
+          "anchor_label": "Open Finance ED 11.17",
+          "text": "Where a dispute involves more than one FSP, the parties shall collaborate to\nensure a coordinated and timely resolution, in line with relevant complaints\nhandling protocols as may be determined by the platform operator. Where there\nare no relevant protocols in place for dealing with disputes involving one or more\nFSP, the FSP that first receives the complaint shall lead the investigation and\nresolution process, unless the parties agree otherwise.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "HKMA OpenAPI 50",
+          "anchor_label": "HKMA OpenAPI 50",
+          "text": "In line with the relevant clause in the Code of Banking Practice, a\ncustomer should not be responsible for any direct loss suffered by\nhim/her as a result of unauthorised transactions conducted",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "Both envision an ongoing body/collaboration for continuous development and review of the framework and ecosystem, and broader ecosystem building.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 1.6",
+          "anchor_label": "Open Finance ED 1.6",
+          "text": "BNM also envisions that the principles underpinning open finance will support\nbroader arrangements for more open and secure data sharing beyond the\nfinancial industry. As set out in the Financial Sector Blueprint 2022-2026, BNM\nand the financial sector will continue to collaborate with stakeholders in other\nsectors and industries, including with the public sector, to support and champion\nefforts to foster a thriving Open Data ecosystem at the national level. Such\nefforts will focus on improving accessibility to public data under the\nGovernment's open data initiatives through a standardised approach to data\n\ngovernance, and supporting regional level data sharing initiatives by advancing\nbest practices aligned with global standards and policies.\n\n##### Question 1\n\nBeyond the use cases illustrated in Diagram 1, how do you envisage the sharing of\ncustomer information facilitated through open finance being leveraged to enhance\naccess to financial services, improve affordability and drive inclusion outcomes for\ncustomers? Please provide examples of potential use cases, anticipated benefits and\nany preconditions necessary to enable such outcomes.\n\n#### 2 Applicability",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "HKMA OpenAPI 55",
+          "anchor_label": "HKMA OpenAPI 55",
+          "text": "Once Open APIs have been implemented by banks, there needs to\nbe a body to review the relevance of the architecture, security and\ndata standards on an ongoing basis. The body may also take on\nother industry-wide tasks, such as coordination and consumer\neducation, where needed.\n\nIn the longer term, if harmonisation of Open $A P I$ functions is\ndesired by the industry, the body can also take on this task to\nwork with the industry to achieve interoperability.",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 56",
+          "anchor_label": "HKMA OpenAPI 56",
+          "text": "As the Open API ecosystem is a partnership between banks and\nTSPs, the body that work on the continuous development of Open\nAPIs is expected to maintain dialogues with the TSP community.",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 58",
+          "anchor_label": "HKMA OpenAPI 58",
+          "text": "As the Open API ecosystem is evolving, this Open API\nframework aims to provide a directional guide to help the\ncommencement of building the underlying fabric. The HKMA\nintends to work with the industry to review the framework from\ntime to time, create a sustainable ecosystem, and ensure the\nimplementation by banks and the development of innovation\nproducts to meet the needs of customers.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "Both emphasise inclusivity, accessibility and consumer education to support customer understanding and adoption of open finance/APIs.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 8.7",
+          "anchor_label": "Open Finance ED 8.7",
+          "text": "An FSP participating in an open finance platform as a data consumer may\nconsider adopting principles of inclusivity, accessibility and usability when\ndesigning customer-facing interfaces. Particular attention may be given to\nunderserved segments (including individuals with basic digital literacy and\npersons with disabilities) who may face challenges with overly sophisticated\ninterfaces.\n\n#### Question 2\n\nThe proposed participation requirement specified in Appendix 1 is intended to secure\na critical mass of participation from the outset and ensure meaningful value creation\nfor customers and the financial industry. In your $\\mathrm { v i e w } ,$ is the proposed threshold\nreasonable and proportionate? If not, what alternative threshold(s) or approach would\nyou suggest and why?\n\n#### Question 3\n\nWhat are your views on the proposed interfaces that a mandated data consumer is\nrequired to develop and operate as specified in paragraph 8.6? Please highlight any\ndesign, implementation and operational considerations of such interfaces including\nany potential challenges.\n\n#### Question 4\n\nDoes the scope of prescribed information as specified in Appendix 1 sufficiently\nsupport the development of open finance use cases? If not, what additional customer\ninformation should BNM require data providers to share?\n\n### 9 Transition arrangements",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 11.18",
+          "anchor_label": "Open Finance ED 11.18",
+          "text": "Where practicable, an FSP may endeavour to ensure channels made available\nfor customers to lodge complaints and access redress are customer-centric and\ninclusive. These channels should be designed to accommodate varying levels of\ndigital literacy, including providing customers with the option to interact with\nhuman personnel where needed.\n\n## Other business conduct requirements",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 11.20",
+          "anchor_label": "Open Finance ED 11.20",
+          "text": "Where practicable, an FSP may develop and make available a simplified digital\nand financial literacy guide to support customers in understanding and using\nproducts or services enabled by open finance in a safe manner. This guide\nshould be accessible and user-friendly, designed to accommodate varying levels\nof digital and financial literacy. It should -",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "HKMA OpenAPI 53",
+          "anchor_label": "HKMA OpenAPI 53",
+          "text": "The HKMA plans to facilitate adoption activities such as\npartnering with interested parties on promotion, and organising\neducational events and competitions on the use of Open APIs\namong the industry. The HKMA will also consider hosting\nseminars and workshops for banks and technology companies to\nshare use case ideas or experience gained elsewhere.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": "Our provisions are framed as encouragements ('where practicable', 'may') rather than firm obligations; HKMA's consumer education is a facilitation activity by the regulator.",
+      "supported": true
+    },
+    {
+      "summary": "Our framework requires customer explicit consent before any third-party service provider handles customer information, whereas HKMA requires TSPs to be explicit that data collection is not carried out by banks and to comply with applicable data-protection laws.",
+      "label": "differs-on",
+      "sentiment": "tighten",
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.9",
+          "anchor_label": "Open Finance ED 11.9",
+          "text": "An FSP shall ensure that customer information is not shared with any third-party\nservice provider without the customer's explicit consent, in line with the\nrequirements stipulated in paragraph 10.1 of this Policy Document.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 11.8",
+          "anchor_label": "Open Finance ED 11.8",
+          "text": "An FSP that is a data consumer shall ensure that any third-party service provider\ninvolved in handling customer information, whether related to an open finance\narrangement (including that associated with outsourcing or cloud computing\narrangements), complies with relevant requirements relating to data privacy,\nconfidentiality and security, as set out in the Policy Document on Management\nof Customer Information and Permitted Disclosures, the Policy Document on\nRisk Management and Information Technology, and the Policy Document on\nOutsourcing.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "HKMA OpenAPI 34.3.2(i)",
+          "anchor_label": "HKMA OpenAPI 34.3.2(i)",
+          "text": "explicit to their customers that the collection\nof personal data is neither carried out by banks\nnor directly related to bank business, and (iii)\ncomply with the applicable laws and guidance\non the protection of personal data; and",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": "Our framework requires explicit customer consent for third-party sharing; HKMA focuses on TSP transparency and legal compliance rather than a consent gate.",
+      "supported": true
+    },
+    {
+      "summary": "Both require customer authentication before granting access to protected data, with HKMA prescribing bank's own methods/multi-factor and our framework requiring reliable authentication such as multi-factor authentication.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.5",
+          "anchor_label": "Open Finance ED 11.5",
+          "text": "An FSP shall ensure that any transmission of customer information through an\nopen finance arrangement is conducted through secure means, in line with\nrelevant requirements set out in the Policy Document on Risk Management in\nTechnology. Without limiting the generality of paragraph 11.4, a data provider\nshall authenticate the customer and authorise consent using a reliable and\neffective authentication procedure (e.g. multi-factor authentication) before\ngranting a data consumer access to the customer's information.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "HKMA OpenAPI 58(REST)",
+          "anchor_label": "HKMA OpenAPI 58(REST)",
+          "text": "common communication protocols in use for Open APIs. Under\nthese respective communication protocols, data formats of\nJavaScript Object Notation (JSON) and extensible Markup\nLanguage (XML) are usually used.\n\nB 3.\nDue to their practicality and wide acceptance by the industry,\nREST is recommended as the communication protocol and JSON\nas the data format.\n\nSecurity:\n\nB 4.\nSecurity, including authentication, integrity, confidentiality and\nauthorisation, is required for all four categories of Open APIs for\nthe reasons indicated in paragraph 12 in the main paper.\n\nB 5.\nFor authentication of bank sites and TSPs, and integrity and\nconfidentiality checks of data transmitted, properly registered and\nconfigured X.509 digital certificate is recommended to ensure\nthat product and service information is extracted from genuine\nbank sites.\n\nB 6.\nTransport Layer Security (TLS), on the other hand, provides\nintegrity checking and encryption protection to the data being\ntransmitted, regardless of whether it is transmitted from bank to\nTSP or vice versa.\n\nB 7.\n\nBanks should continue to apply the risk-based approach to use\ntheir own authentication methods (such as username/password\nand two-factor authentication where appropriate) for bank\ncustomers. They should only grant access privileges to TSPs on\ncustomers' requests. OAuth 2.0 is recommended as the\nauthorisation method as it is an industry standard.\n\nB 8.\nThe various recommended security protection requirements and\ntechnologies are summarised below:\n\n<table>\n<tr>\n<th>Protection required</th>\n<th>Technology</th>\n</tr>\n<tr>\n<td>Authentication of bank sites and TSPs</td>\n<td>X.509</td>\n</tr>\n<tr>\n<td>Integrity and confidentiality of data</td>\n<td>TLS</td>\n</tr>\n<tr>\n<td>Authentication of customers</td>\n<td>Bank's own method</td>\n</tr>\n<tr>\n<td>Authorisation of customers</td>\n<td>OAuth 2.0</td>\n</tr>\n</table>",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": "HKMA B7 leaves authentication of customers to banks' own risk-based methods; our framework similarly cites MFA as an example.",
+      "supported": true
+    },
+    {
+      "summary": "Our framework requires extensive consent record-keeping and auditable logs retained for seven years plus customer access to data access logs, whereas HKMA does not prescribe consent/audit record retention.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 10.18",
+          "anchor_label": "Open Finance ED 10.18",
+          "text": "An FSP shall log all consent records and actions, including obtaining, revoking\nand renewing consent, in an auditable format and retain such records for a\n\nminimum period of seven years.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 10.19",
+          "anchor_label": "Open Finance ED 10.19",
+          "text": "In addition to paragraph 10.18, an FSP shall make available to customers\nrelevant data access logs, including when and by whom their information was\naccessed.",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 10.20",
+          "anchor_label": "Open Finance ED 10.20",
+          "text": "An FSP shall properly document the consent records and management\nprocesses, while ensuring that they are readily accessible for review upon\nrequested by BNM.\n\n### Question 9\n\nWhat are your views on the need for FSPs to securely delete customer information\nonce consent has expired or been revoked, taking into account that legal and\nregulatory obligations have already been considered? Beyond such obligations, what\nchallenges, if any, would arise in implementing such a requirement? Please also\nshare whether there are existing expectations within your organisation or financial\ngroup to do so, and if not, what current practices are in place for handling customer\ninformation when consent is revoked.\n\n### Question 10\n\nFor FSPs which are part of groups with operations in the European Union, what are\nthe operational practices, governance arrangements and technical mechanisms\nadopted to comply with the right to erasure under the General Data Protection\nRegulation (GDPR) - including on conditions and exceptions?\n\n# 11 Customer protection\n\n## A. Management of customer information\n\nData privacy and confidentiality",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "HKMA OpenAPI 6",
+          "anchor_label": "HKMA OpenAPI 6",
+          "text": "APIs enable secure, controlled, cost-effective and granular access\nto data and/or functionality of systems. Open APIs, in the context\nof this document, refer to APIs that allow third party access to\nsystems belonging to an organisation. However, Open APIs for\nthe banking industry do not necessarily mean that any third party\ncan freely access a bank's system without restriction, because\nbanks still need to ensure adequate controls such as security and\nconsumer protection.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "Our framework requires business continuity and operational resilience measures (API outages, downtime, third-party failures) for open finance activities, which HKMA does not address in equivalent detail.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 7.6(b)",
+          "anchor_label": "Open Finance ED 7.6(b)",
+          "text": "develop and ensure effective implementation of business continuity plans\nas well as safeguards that support the overall operational resilience of an\nFSP's participation in an open finance arrangement. This includes, but is\nnot limited to, ensuring the continuity of services in the event of\ndisruptions, system downtime, API outages, cyber risk incidents or third-\nparty failures;",
+          "doc_class": "structured-rules"
+        },
+        {
+          "anchor_id": "Open Finance ED 12.2",
+          "anchor_label": "Open Finance ED 12.2",
+          "text": "An FSP shall ensure that its technology operations management practices are\nappropriately extended to support its open finance activities. This includes, but\nis not limited to, controls for ensuring effective and safe implementation of IT\nsystems, robust third-party service provider management, and operational\nresilience measures to ensure the availability, integrity and confidentiality of data\nexchanged through open finance arrangements.",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "HKMA OpenAPI 27",
+          "anchor_label": "HKMA OpenAPI 27",
+          "text": "While certain technical standards have been prescribed, they\ncannot be considered as the only standards that cover all security\nrequirements. Banks should always make reference to industry\nsound practices, relevant regulatory and internal requirements,\nand apply holistic controls on information and cybersecurity\nbased on a risk- and principle-based approach to protect banks'\nsystems as well as bank and consumer data.",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "HKMA requires banks to publish a list of partnering TSPs and monitor the internet for fraudulent parties impersonating partners, an obligation our framework does not include.",
       "label": "silent-on",
       "sentiment": null,
-      "source_anchors": [],
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.19",
+          "anchor_label": "Open Finance ED 11.19",
+          "text": "An FSP shall ensure that the provision of any service arising from any open\nfinance arrangement is conducted in a way that engenders trust and confidence\nof customers. In this regard, the FSP shall observe relevant consumer and\nmarket conduct requirements, which include, but are not limited to -",
+          "doc_class": "structured-rules"
+        }
+      ],
       "target_anchors": [
         {
           "anchor_id": "HKMA OpenAPI 48",
@@ -120,227 +795,32 @@
           "doc_class": "semi-structured"
         }
       ],
-      "scope_note": "HKMA publication obligation applies to Phase II and beyond.",
-      "supported": true
-    },
-    {
-      "summary": "Both share the vision of using open finance/APIs to spur innovation, improve customer experience and promote financial inclusion.",
-      "label": "aligns-with",
-      "sentiment": null,
-      "source_anchors": [
-        {
-          "anchor_id": "BNM 1.2",
-          "anchor_label": "BNM 1.2",
-          "text": "Open finance plays a pivotal role in advancing this vision by offering customers\na safer and more structured framework for sharing their financial information\ncompared to existing data-sharing arrangements in Malaysia. By enabling\nconsent-driven information sharing, open finance provides customers with\ngreater control over their personal financial information, allowing them to actively\ndetermine and manage how their information is shared, accessed and used.\nBeyond empowering customers, open finance unlocks data-driven innovation\nthat enables customers to make better-informed decisions about their finances,\nfacilitates the delivery of more personalised financial services and promotes\ngreater financial inclusion as illustrated in Diagram 1.\n\n<figure>\n<figcaption>Diagram 1</figcaption>\n\nIllustrative* potential use cases\n\nSingle account view, including\npersonal financial management\n\nCredit underwriting through\nreal-time and accurate financial\ninformation\n\nFully digital submission and\ntransmission of documents in\nlieu of manual processes (e.g.\nemail and webform)\n\n</figure>\n\nBenefits for consumers\n\nBenefits to financial industry\n\nFinancial\ninclusion and\naccess\n\nBetter informed\ncustomer\ndecisions\n\nBetter user\nexperience and\nconvenience\n\nOpportunities to\ngrow business\nand partnerships\n\nOperational\nefficiency\n\nRisk\nmanagement and\nfraud detection\n\n*Use cases listed are for illustrative purposes only and are not exhaustive nor indicative of endorsement from BNM.\n\n.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 1.1",
-          "anchor_label": "BNM 1.1",
-          "text": "As the financial sector continues to evolve in the digital age, the volume of\ncustomer information processed has grown significantly alongside the\nincreasing shift of transactions to digital platforms. This underscores the\nimportance of having strong infrastructures that enable the secure access,\nsharing and processing of financial information, which is a critical foundation for\nmaintaining trust and resilience in an increasingly digital financial system.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "target_anchors": [
-        {
-          "anchor_id": "HKMA OpenAPI 4.1",
-          "anchor_label": "HKMA OpenAPI 4.1",
-          "text": "ensure the competitiveness and relevance of the banking\nsector;",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 4.2",
-          "anchor_label": "HKMA OpenAPI 4.2",
-          "text": "provide a secure, controlled and convenient operating\nenvironment to allow banks and their partners1 (called\nthird party service providers, or TSPs, in this\nframework), to work together and develop\ninnovative/integrated banking services that improve\ncustomer experience; and",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 8.1",
-          "anchor_label": "HKMA OpenAPI 8.1",
-          "text": "The implementation of Open API would bring many\nbenefits and efficiency gain to the banking industry and\nto its customers. Feedback from the banking industry\nindicates that it is desirable to implement Open APIs to\nprovide better services to satisfy the demands of its\ncustomers. Banks are therefore expected to implement the\nOpen API framework in the timeline set out in the\nframework. The HKMA will monitor the implementation\nclosely, and act accordingly to ensure market adoption\nand encourage use cases.",
-          "doc_class": "semi-structured"
-        }
-      ],
       "scope_note": null,
       "supported": true
     },
     {
-      "summary": "Both provide for document submission and single-account-view use cases, though BNM makes them binding obligations with fixed timelines while HKMA lists them as high-level API function categories.",
-      "label": "differs-on",
-      "sentiment": "tighten",
-      "source_anchors": [
-        {
-          "anchor_id": "BNM 2(a)",
-          "anchor_label": "BNM 2(a)",
-          "text": "interfaces that allow customers to direct the platform to request relevant\ninformation from other data providers through the platform in a machine-\nreadable and standardised format,4 in lieu of traditional methods of\nsubmitting documents (e.g. manual upload, emailing documents), for\nrelevant processes (e.g. customer onboarding, on-going due diligence);\nand",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 4",
-          "anchor_label": "BNM 4",
-          "text": "b) Single account view, where the mandated FSP offers, as part of its internet\nbanking and mobile banking interfaces, the option for a customer to\ndisplay relevant information from their accounts with other data providers\nthrough the platform.\n\nG 8.7 An FSP participating in an open finance platform as a data consumer may\nconsider adopting principles of inclusivity, accessibility and usability when\ndesigning customer-facing interfaces. Particular attention may be given to\nunderserved segments (including individuals with basic digital literacy and\npersons with disabilities) who may face challenges with overly sophisticated\ninterfaces.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 9",
-          "anchor_label": "BNM 9",
-          "text": "S 9.1\nThe obligations of a mandated FSP as specified under paragraph 8.4 shall\ncommence in accordance with the timeline specified in Appendix 2.\n\nS 9.2\nA mandated FSP shall commence its obligation under paragraph 8.6 to provide\ndocument submission and single account view interfaces by 1 January 2028 or\n\nthe date on which the FSP's obligations under paragraph 8.4 commence,\nwhichever is later.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "target_anchors": [
-        {
-          "anchor_id": "HKMA OpenAPI 11.2",
-          "anchor_label": "HKMA OpenAPI 11.2",
-          "text": "Subscription\nand\nnew\napplications\nfor\nproduct/service - Customer acquisition process such as\nallowing online submissions/application of credit cards,\nloans or other bank products;",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 11.3",
-          "anchor_label": "HKMA OpenAPI 11.3",
-          "text": "Account information - Retrieval and alteration (where\napplicable) of account information (balance, transaction\nhistory, limits, payment schedules, etc.) of authenticated\ncustomers for stand-alone or aggregated views; and",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 8.4",
-          "anchor_label": "HKMA OpenAPI 8.4",
-          "text": "High-level Open API functions have been selected on the\nbasis of their potential benefits to banks and customers,\nand identified in order of priority.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "scope_note": "BNM single account view / document submission obligation commences by 1 January 2028 or when para 8.4 obligations commence, whichever is later, and covers individual and SME customers except credit card.",
-      "supported": true
-    },
-    {
-      "summary": "Both require board/senior management or governance oversight, but BNM imposes explicit board oversight and escalation duties while HKMA relies on committee-led continuous development.",
-      "label": "goes-beyond",
+      "summary": "HKMA requires banks to publish data dictionaries/specifications and provide testing environments to assist TSPs, whereas our framework defers API/data specifications to the platform operator without prescribing publication obligations on the FSP.",
+      "label": "silent-on",
       "sentiment": null,
       "source_anchors": [
         {
-          "anchor_id": "BNM 7",
-          "anchor_label": "BNM 7",
-          "text": "S 7.1\nThe board and senior management shall exercise effective oversight of an FSP's\nimplementation of arrangements relating to open finance to ensure its efficient,\nresilient and secure operations.\n\nS 7.2\nFor the avoidance of doubt, the board and senior management shall satisfy key\nresponsibilities arising from an FSP's participation in an open finance\narrangement, as may be applicable in relevant policy documents outlined in\nparagraph 6.1.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 7(b)(c)(d)(e)(f)(g)",
-          "anchor_label": "BNM 7(b)(c)(d)(e)(f)(g)",
-          "text": "ensure that material issues and concerns relating to the FSP's open\nfinance arrangements are promptly escalated to the board, which include\nbut are not limited to breaches of customer information security and\nconfidentiality.",
-          "doc_class": "semi-structured"
+          "anchor_id": "Open Finance ED 12.5",
+          "anchor_label": "Open Finance ED 12.5",
+          "text": "An FSP participating in an open finance arrangement shall also comply with\ntechnology and operational requirements of the open finance platform for which\nthe FSP is a member. This may include, but is not limited to, requirements in\nrelation to the user journey, API specifications, uptime requirements, operational\nprocedures and requirements for independent review relating to the operational\nresilience of its technology functions.\n\n# PART C APPENDICES\n\n## Appendix 1 Definition of mandated FSP and scope of prescribed information\n\n1\\.\nA mandated FSP is an FSP that meets any of the following criteria:",
+          "doc_class": "structured-rules"
         }
       ],
       "target_anchors": [
-        {
-          "anchor_id": "HKMA OpenAPI 57",
-          "anchor_label": "HKMA OpenAPI 57",
-          "text": "The HKAB have expressed full support for Open APIs as one of\nthe HKMA's seven initiatives for \"A New Era of Smart Banking\"\nand confirmed that a committee will work on this continuous\ndevelopment of Open APIs with the HKMA to support the\nchanging needs of the industry as technology evolves.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 55",
-          "anchor_label": "HKMA OpenAPI 55",
-          "text": "Once Open APIs have been implemented by banks, there needs to\nbe a body to review the relevance of the architecture, security and\ndata standards on an ongoing basis. The body may also take on\nother industry-wide tasks, such as coordination and consumer\neducation, where needed.\n\nIn the longer term, if harmonisation of Open $A P I$ functions is\ndesired by the industry, the body can also take on this task to\nwork with the industry to achieve interoperability.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "scope_note": "HKMA's governance body is industry/committee-level continuous-development oversight, not firm-level board accountability, so this is a genuine coverage gap on our side going beyond.",
-      "supported": true
-    },
-    {
-      "summary": "BNM requires customer breach handling and response plans with escalation and remedial procedures, which HKMA does not cover beyond scam monitoring.",
-      "label": "goes-beyond",
-      "sentiment": null,
-      "source_anchors": [
-        {
-          "anchor_id": "BNM 11.12",
-          "anchor_label": "BNM 11.12",
-          "text": "breach handling and response plan in the event of theft, loss, misuse or\nunauthorised access, modification or disclosure of customer information\nassociated with an open finance arrangement. The plan must, at a minimum,\ninclude escalation procedures and a clear line of responsibility to contain the\ncustomer information breach and take remedial actions.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 11.12(a)(b)(a)(b)(c)",
-          "anchor_label": "BNM 11.12(a)(b)(a)(b)(c)",
-          "text": "assistance, complaints handling and redress mechanisms.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "target_anchors": [],
-      "scope_note": null,
-      "supported": true
-    },
-    {
-      "summary": "Both leverage industry/international standards and interoperable, standardised formats to ensure ease of implementation.",
-      "label": "aligns-with",
-      "sentiment": null,
-      "source_anchors": [
-        {
-          "anchor_id": "BNM 2(a)",
-          "anchor_label": "BNM 2(a)",
-          "text": "interfaces that allow customers to direct the platform to request relevant\ninformation from other data providers through the platform in a machine-\nreadable and standardised format,4 in lieu of traditional methods of\nsubmitting documents (e.g. manual upload, emailing documents), for\nrelevant processes (e.g. customer onboarding, on-going due diligence);\nand",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "BNM 12.5",
-          "anchor_label": "BNM 12.5",
-          "text": "An FSP participating in an open finance arrangement shall also comply with\ntechnology and operational requirements of the open finance platform for which\nthe FSP is a member. This may include, but is not limited to, requirements in\nrelation to the user journey, API specifications, uptime requirements, operational\nprocedures and requirements for independent review relating to the operational\nresilience of its technology functions.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "target_anchors": [
-        {
-          "anchor_id": "HKMA OpenAPI 8.5",
-          "anchor_label": "HKMA OpenAPI 8.5",
-          "text": "Existing international or industry practices have been\nleveraged in the framework in order to ensure ease of\nimplementation and speedy development of Open APIs.",
-          "doc_class": "semi-structured"
-        },
-        {
-          "anchor_id": "HKMA OpenAPI 22",
-          "anchor_label": "HKMA OpenAPI 22",
-          "text": "Taking into account the practices and experience of the UK,\nSingapore and Japan, and the feedback during the consultation\nexercise, high-level core-banking Open API functions are\nspecified for deployment and further set out in Annex $\\mathrm { A } .$",
-          "doc_class": "semi-structured"
-        },
         {
           "anchor_id": "HKMA OpenAPI 28",
           "anchor_label": "HKMA OpenAPI 28",
           "text": "To help speedy and timely implementation, banks may decide\ntheir own data specification. Banks, however, should publish such\ndefinition (often called \"data dictionary\") using industry practices\nnormally in use, such as OpenAPI Specification (also known as\nSwagger).",
           "doc_class": "semi-structured"
-        }
-      ],
-      "scope_note": null,
-      "supported": true
-    },
-    {
-      "summary": "HKMA requires banks to submit implementation road maps to the regulator and plans to publish summaries, a specific supervisory reporting expectation not present in BNM's framework.",
-      "label": "silent-on",
-      "sentiment": null,
-      "source_anchors": [],
-      "target_anchors": [
-        {
-          "anchor_id": "HKMA OpenAPI 23",
-          "anchor_label": "HKMA OpenAPI 23",
-          "text": "In this connection, banks are expected to provide the HKMA with\nroad maps of Open API implementation (Product and service\ninformation within two months, and Subscription and $n e w$\napplications within eight months from the publication of this\nframework). Banks are also expected to explain how their road\nmaps meet the general scope described in Annex $\\mathrm { A }$ (and in the\ncase of gaps, the reasons).",
-          "doc_class": "semi-structured"
         },
         {
-          "anchor_id": "HKMA OpenAPI 25",
-          "anchor_label": "HKMA OpenAPI 25",
-          "text": "The HKMA plans to publish a summary (covering at least the\nfunctions to implement and their timelines) of the road maps for\nindividual banks so that the industry can better plan for service\nofferings. The publication will also reduce the workload of banks\nin providing such information to individual prospective TSPs.\n\nBanks are always welcome to implement Open APIs ahead of\ntime or implement functions that have not been specified in this\nframework.",
-          "doc_class": "semi-structured"
-        }
-      ],
-      "scope_note": null,
-      "supported": true
-    },
-    {
-      "summary": "HKMA recommends providing a testing environment with (possibly artificial) customer data and a single-point-of-reference dashboard/repository of Open APIs to facilitate TSP adoption, which BNM does not address.",
-      "label": "silent-on",
-      "sentiment": null,
-      "source_anchors": [],
-      "target_anchors": [
-        {
-          "anchor_id": "HKMA OpenAPI 52.1",
-          "anchor_label": "HKMA OpenAPI 52.1",
-          "text": "A single point of reference (may also be known as a\nrepository or a dashboard) of all Open APIs offered by\nbanks will facilitate ease of access by TSPs. During the\ndiscussion process, some banks suggested that it would\nbe desirable for the Data Studio of the Hong Kong\nScience and Technology Parks to take up this dashboard\nrole. Hence, it is recommended that all Open APIs from\nPhase I onwards are listed under the Data Studio.",
+          "anchor_id": "HKMA OpenAPI 52.3",
+          "anchor_label": "HKMA OpenAPI 52.3",
+          "text": "For details on how to use each Open API, banks may host\nthe information on their own websites or leverage the\ndashboard. However, details of the Open API functions,\narchitecture, security and data definitions (as referred in\n\nAnnex B) should be clearly published using OpenAPI\nSpecification or similar standards when supported.",
           "doc_class": "semi-structured"
         },
         {
@@ -354,22 +834,51 @@
       "supported": true
     },
     {
-      "summary": "Both anchor data sharing within a broader legal/regulatory data-protection framework, BNM via the Personal Data Protection Act 2010 and HKMA via applicable personal data protection laws and guidance.",
-      "label": "aligns-with",
+      "summary": "Our framework prohibits differential treatment of customers based on their consent decision, protecting against exclusion risk — a consumer-conduct protection HKMA does not address.",
+      "label": "goes-beyond",
       "sentiment": null,
       "source_anchors": [
         {
-          "anchor_id": "BNM 1.3",
-          "anchor_label": "BNM 1.3",
-          "text": "This Policy Document sets out the regulatory framework for open finance which\nseeks to ensure that it is implemented in an efficient, resilient and secure\nfashion. In addition to ensuring that the sharing of data is conducted in full\ncompliance with the Personal Data Protection Act 2010 and other relevant data\nprivacy and protection requirements, the Policy Document seeks to promote\nresponsible data sharing that strikes an appropriate balance between financial\ninnovation and prudent management of risks.",
-          "doc_class": "semi-structured"
+          "anchor_id": "Open Finance ED 11.19(b)",
+          "anchor_label": "Open Finance ED 11.19(b)",
+          "text": "ensuring that services associated with an open finance arrangement are\nrendered in a manner that ensure fair treatment and equitable access for\ncustomers, in accordance with the Policy Document on Fair Treatment of\nFinancial Consumers. This includes for the FSP to manage relevant risks\nand potential harm (e.g. exclusion risk), including by implementing\nappropriate safeguards. For the avoidance of doubt, the FSP shall not\nrestrict, deter, influence or impose differential treatment on any customer\nsolely due to their decision to grant or withhold their consent under an\nopen finance arrangement, except where it materially affects their\neligibility for such products or services.",
+          "doc_class": "structured-rules"
         }
       ],
       "target_anchors": [
         {
-          "anchor_id": "HKMA OpenAPI 34.3.2(i)",
-          "anchor_label": "HKMA OpenAPI 34.3.2(i)",
-          "text": "explicit to their customers that the collection\nof personal data is neither carried out by banks\nnor directly related to bank business, and (iii)\ncomply with the applicable laws and guidance\non the protection of personal data; and",
+          "anchor_id": "HKMA OpenAPI 50",
+          "anchor_label": "HKMA OpenAPI 50",
+          "text": "In line with the relevant clause in the Code of Banking Practice, a\ncustomer should not be responsible for any direct loss suffered by\nhim/her as a result of unauthorised transactions conducted",
+          "doc_class": "semi-structured"
+        }
+      ],
+      "scope_note": null,
+      "supported": true
+    },
+    {
+      "summary": "Both require voluntary/limited data sharing scoped to purpose, but our framework additionally allows voluntary sharing of information beyond the prescribed scope with explicit consent, mirroring HKMA's principle that banks may advance beyond specified categories.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "source_anchors": [
+        {
+          "anchor_id": "Open Finance ED 8.5",
+          "anchor_label": "Open Finance ED 8.5",
+          "text": "Notwithstanding paragraph 8.4, where industry standards and technological\nsolutions permit, and with explicit consent obtained from the customer, a data\nprovider may facilitate the sharing of additional customer information data points\nbeyond the scope of prescribed information on a voluntary basis.3",
+          "doc_class": "structured-rules"
+        }
+      ],
+      "target_anchors": [
+        {
+          "anchor_id": "HKMA OpenAPI 19",
+          "anchor_label": "HKMA OpenAPI 19",
+          "text": "It should be noted that the suggested timeline above represents\nthe latest expected dates for banks to make available the Open\nAPIs indicated. Individual banks are welcome to advance their\nown programme, either for completion of individual phases or for\nintroducing Open APIs for those categories that have not yet been\nset out in the timeframe. For example, a bank may choose to\nmake available Open APIs for conducting transactions on their\nproducts and services during Phase I at the same time as they\nlaunch their Product and service information Open APIs.\nHowever these banks should ensure that commensurate level of\nprotections3 and suitable TSP governance arrangements are in\nplace with appropriate contracts to clearly define the\nresponsibility, liability, control and customer protections.\n\nOpen API functions",
+          "doc_class": "semi-structured"
+        },
+        {
+          "anchor_id": "HKMA OpenAPI 25",
+          "anchor_label": "HKMA OpenAPI 25",
+          "text": "The HKMA plans to publish a summary (covering at least the\nfunctions to implement and their timelines) of the road maps for\nindividual banks so that the industry can better plan for service\nofferings. The publication will also reduce the workload of banks\nin providing such information to individual prospective TSPs.\n\nBanks are always welcome to implement Open APIs ahead of\ntime or implement functions that have not been specified in this\nframework.",
           "doc_class": "semi-structured"
         }
       ],
@@ -377,55 +886,5 @@
       "supported": true
     }
   ],
-  "unsupported": [
-    {
-      "summary": "Both address secure data transmission and authentication, but BNM references its Risk Management in Technology policy while HKMA prescribes specific technologies (X.509, TLS, OAuth 2.0).",
-      "label": "differs-on",
-      "sentiment": "neutral",
-      "message": "No matching clause found",
-      "supported": false
-    },
-    {
-      "summary": "Both scale security/protection requirements to the sensitivity of data being accessed.",
-      "label": "aligns-with",
-      "sentiment": null,
-      "message": "No matching clause found",
-      "supported": false
-    },
-    {
-      "summary": "BNM sets detailed, binding consent requirements (voluntary, revocable, explicit, no bundled/blanket consent, consent dashboards, expiry periods) that HKMA's high-level framework does not cover.",
-      "label": "goes-beyond",
-      "sentiment": null,
-      "message": "No matching clause found",
-      "supported": false
-    },
-    {
-      "summary": "BNM requires deletion/secure disposal of customer information upon consent expiry, which HKMA's framework does not address.",
-      "label": "goes-beyond",
-      "sentiment": null,
-      "message": "No matching clause found",
-      "supported": false
-    },
-    {
-      "summary": "Both require third-party/TSP governance and safeguards over data handling, but HKMA elaborates due-diligence models (central entity, common baseline) while BNM cross-references outsourcing and customer-information policies.",
-      "label": "aligns-with",
-      "sentiment": null,
-      "message": "No matching clause found",
-      "supported": false
-    },
-    {
-      "summary": "BNM requires data consumers to apply safeguards at least equivalent to those for their own customer information; HKMA does not impose an equivalence standard on TSP-received data.",
-      "label": "goes-beyond",
-      "sentiment": null,
-      "message": "No matching clause found",
-      "supported": false
-    },
-    {
-      "summary": "BNM encourages inclusive, accessible interface design for underserved segments (basic digital literacy, persons with disabilities), which HKMA's framework does not address.",
-      "label": "goes-beyond",
-      "sentiment": null,
-      "message": "No matching clause found",
-      "supported": false
-    }
-  ]
+  "unsupported": []
 }
