@@ -40,7 +40,8 @@
           "at": "2026-07-12T16:42:00Z",
           "summary": "Suggested tightening §6.3 accountable officer language"
         }
-      ]
+      ],
+      "document_id": "opres-v1-2025-draft"
     },
     {
       "id": "opres-pd-v0-0",
@@ -105,7 +106,8 @@
       "issuer": "BNM",
       "short_type": "PD (in force)",
       "description": "BNM Risk Management in Technology policy document, reissued 28 November 2025.",
-      "source_url": "https://www.bnm.gov.my"
+      "source_url": "https://www.bnm.gov.my",
+      "document_id": "rmit-v2-2025"
     },
     {
       "id": "fsa-2013-143",
@@ -132,7 +134,8 @@
       "issuer": "BNM",
       "short_type": "DP",
       "description": "Operational Resilience Discussion Paper, December 2025 — the consultation the v0.3 PD draft follows.",
-      "source_url": null
+      "source_url": null,
+      "document_id": "opres-v1-2025-draft"
     }
   ],
   "edges": [
