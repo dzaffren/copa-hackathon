@@ -20,6 +20,7 @@ All writes are UTF-8 (the corpus carries glyphs that crash the cp1252 platform
 default on Windows — see docs/learnings/pattern-engine-artifact-writes-utf8.md).
 """
 
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -525,3 +526,28 @@ def canned_analysis(source_id: str, target_id: str) -> Optional[list[dict[str, A
     if frozenset({source_id, target_id}) == _DEMO_ANALYZE_PAIR:
         return [dict(f) for f in _DEMO_ANALYZE_FINDINGS]
     return None
+
+
+def connections_to_findings(result: dict[str, Any]) -> list[dict[str, Any]]:
+    """Adapt an `engine.connections.find_connections` result into the
+    workstream findings shape the Review/Task screens read.
+
+    Only supported connections (`result["connections"]`) become findings —
+    `result["unsupported"]` is dropped, preserving the never-invent guarantee.
+    Each finding is the connection dict plus a stable `id` (hash of summary +
+    cited clause numbers, so re-running yields the same id) and
+    `review_state: "pending"`.
+    """
+    findings: list[dict[str, Any]] = []
+    for conn in result.get("connections", []):
+        cited = [
+            c.get("clause_number", "")
+            for side in ("source_clauses", "target_clauses")
+            for c in conn.get(side) or []
+        ]
+        seed = conn.get("summary", "") + "|" + "|".join(cited)
+        finding = dict(conn)
+        finding["id"] = hashlib.sha1(seed.encode("utf-8")).hexdigest()[:12]
+        finding["review_state"] = "pending"
+        findings.append(finding)
+    return findings
