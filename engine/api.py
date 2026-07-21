@@ -475,15 +475,18 @@ def create_app(
                 "id": edge["source"],
                 "title": src.get("title", edge["source"]),
                 "node_type": src.get("node_type"),
+                "document_id": src.get("document_id"),
             },
             "target": {
                 "id": edge["target"],
                 "title": tgt.get("title", edge["target"]),
                 "node_type": tgt.get("node_type"),
+                "document_id": tgt.get("document_id"),
             },
             "edge_type": edge.get("edge_type"),
             "status": "analysed" if findings is not None else "not_analysed",
             "findings": findings or [],
+            "analysable": bool(src.get("document_id") and tgt.get("document_id")),
         }
 
     @app.post("/api/workstreams/{workstream_id}/nodes")

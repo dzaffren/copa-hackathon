@@ -191,6 +191,7 @@ export interface EdgeEndpoint {
   id: string;
   title: string;
   node_type: NodeType;
+  document_id: string | null;
 }
 
 export interface EdgeDetail {
@@ -200,6 +201,7 @@ export interface EdgeDetail {
   edge_type: EdgeType;
   status: "analysed" | "not_analysed";
   findings: Connection[];
+  analysable: boolean;
 }
 
 export interface CreateNodeEdge {

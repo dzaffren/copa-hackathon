@@ -68,6 +68,16 @@ def test_edge_with_unmapped_node_is_not_analysable(tmp_path):
     assert r.json()["code"] == "NOT_ANALYSABLE"
 
 
+def test_edge_detail_reports_analysable(tmp_path):
+    client = _client(tmp_path, lambda a, b, idx: {"connections": [], "unsupported": []})
+    live = client.get("/api/workstreams/opres-v2/edges/e-live").json()
+    assert live["analysable"] is True
+    assert live["source"]["document_id"] == "opres-v1-2025-draft"
+    noref = client.get("/api/workstreams/opres-v2/edges/e-noref").json()
+    assert noref["analysable"] is False
+    assert noref["target"]["document_id"] is None
+
+
 def test_finder_failure_returns_502_and_writes_nothing(tmp_path):
     def boom(a, b, idx):
         raise RuntimeError("no creds")
