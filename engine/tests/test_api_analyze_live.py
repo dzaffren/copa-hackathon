@@ -115,6 +115,45 @@ def test_same_document_analyze_returns_409_and_writes_nothing(tmp_path):
     assert not (root / "opres-v2" / "findings" / "e-samedoc.json").exists()
 
 
+def test_reanalyzing_an_analysed_edge_is_refused_by_default(tmp_path):
+    # An edge that already has findings is not silently overwritten: a second
+    # analyze must return 409 ALREADY_ANALYSED and leave the file untouched.
+    root = _ws(tmp_path)
+    calls = {"n": 0}
+
+    def fake_fn(a, b, idx):
+        calls["n"] += 1
+        return {"connections": [CONN], "unsupported": []}
+
+    client = TestClient(create_app(workstreams_dir=root, find_connections_fn=fake_fn))
+    first = client.post("/api/workstreams/opres-v2/edges/e-live/analyze")
+    assert first.status_code == 200 and first.json()["status"] == "analysed"
+    saved = (root / "opres-v2" / "findings" / "e-live.json").read_text("utf-8")
+
+    second = client.post("/api/workstreams/opres-v2/edges/e-live/analyze")
+    assert second.status_code == 409
+    assert second.json()["code"] == "ALREADY_ANALYSED"
+    assert calls["n"] == 1, "the finder must not run for a refused re-analyze"
+    assert (root / "opres-v2" / "findings" / "e-live.json").read_text("utf-8") == saved
+
+
+def test_force_true_overwrites_an_analysed_edge(tmp_path):
+    # The escape hatch: ?force=true re-runs the finder and replaces the findings.
+    root = _ws(tmp_path)
+    payloads = iter([
+        {"connections": [CONN], "unsupported": []},
+        {"connections": [CONN, CONN], "unsupported": []},
+    ])
+    client = TestClient(
+        create_app(workstreams_dir=root, find_connections_fn=lambda a, b, idx: next(payloads))
+    )
+    client.post("/api/workstreams/opres-v2/edges/e-live/analyze")
+    forced = client.post("/api/workstreams/opres-v2/edges/e-live/analyze?force=true")
+    assert forced.status_code == 200
+    assert forced.json()["status"] == "analysed"
+    assert forced.json()["findings_count"] == 2
+
+
 def test_empty_findings_are_not_persisted(tmp_path):
     # A live run that finds no linkages must NOT write an empty findings file
     # (that would one-way-flip the edge to "analysed · 0 linkages").

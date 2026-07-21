@@ -27,6 +27,13 @@ OPRES_OF_TRACE = (
     ARTIFACTS / "connection-trace-opres-v1-2025-draft__open-finance-v1-2025-ed.json"
 )
 
+# Every committed pairwise trace, discovered from disk. Re-resolving these
+# against the live index is the whole point of the suite; hard-coding one and
+# forgetting the rest is how #34's RMiT-side citations went unchecked (the
+# taxonomy suite only reads each trace's *frozen* `resolved` flag, which a
+# narrowing does not update). See test_all_committed_traces_still_resolve.
+TRACE_FILES = sorted(ARTIFACTS.glob("connection-trace-*.json"))
+
 # The OpRes DP × Open Finance ED trace cites 48 distinct clauses; 47 exist as
 # keys. `Operational Resilience 3.3(e)` does not — the offline rule-based
 # extractor does not split that sub-clause, where the Document Intelligence build
@@ -106,6 +113,48 @@ def test_opres_x_openfinance_trace_still_resolves(index):
         f"{len(unresolved)} clause(s) the trace cites are not in the index: "
         f"{sorted(unresolved)}. The trace is orphaned — rebuild the index for "
         f"its documents rather than weakening this test."
+    )
+
+
+def test_trace_discovery_found_the_known_traces(index):
+    """Guard the glob itself: if it silently matches nothing (a moved/renamed
+    artifacts dir), the parametrised re-resolution below would vacuously pass and
+    the whole suite would go green while checking nothing. Pin the floor to the
+    two committed backstops."""
+    names = {p.name for p in TRACE_FILES}
+    for expected in (
+        "connection-trace-opres-v1-2025-draft__open-finance-v1-2025-ed.json",
+        "connection-trace-rmit-v1-2023__rmit-v2-2025.json",
+    ):
+        assert expected in names, (
+            f"{expected} was not discovered under {ARTIFACTS}. Trace re-resolution "
+            f"only guards what it finds. Discovered: {sorted(names)}"
+        )
+
+
+@pytest.mark.parametrize("trace_path", TRACE_FILES, ids=lambda p: p.name)
+def test_all_committed_traces_still_resolve(trace_path, index):
+    """Every clause EVERY committed trace cites resolves to a real index key.
+
+    The generalisation of test_opres_x_openfinance_trace_still_resolves. That
+    test re-resolved one trace live; this covers the rest — most importantly the
+    278-citation RMiT supersession trace, which carries the demo's genuine
+    `conflicts-with` exhibit and was previously only checked against its own
+    frozen `resolved: true` flags. A narrowing that drops those flags is exactly
+    what stays invisible to a frozen-flag check and visible here.
+    """
+    trace = json.loads(trace_path.read_text(encoding="utf-8"))
+    cited = {
+        clause["clause_number"]
+        for entry in trace["validation"]
+        for clause in entry["cited_clauses"]
+    }
+    unresolved = {c for c in cited if c not in index} - KNOWN_UNRESOLVABLE
+
+    assert not unresolved, (
+        f"{len(unresolved)} clause(s) {trace_path.name} cites are not in the "
+        f"index: {sorted(unresolved)}. The trace is orphaned — rebuild the index "
+        f"for its documents rather than weakening this test."
     )
 
 

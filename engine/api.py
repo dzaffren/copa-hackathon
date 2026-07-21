@@ -531,7 +531,9 @@ def create_app(
         )
 
     @app.post("/api/workstreams/{workstream_id}/edges/{edge_id}/analyze")
-    def analyze_workstream_edge(workstream_id: str, edge_id: str) -> Any:
+    def analyze_workstream_edge(
+        workstream_id: str, edge_id: str, force: bool = False
+    ) -> Any:
         ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
         if ws_graph is None:
             return _ws_error(
@@ -572,6 +574,20 @@ def create_app(
                 409, "NOT_ANALYSABLE",
                 f"Both endpoints resolve to the same document ({src_doc}); "
                 f"there is nothing to compare.",
+            )
+        # Guard the curated backstops. An edge that already carries findings
+        # (e.g. the hand-verified 12-finding _cross demo climax) is not silently
+        # re-analysed: a live run would overwrite it — and, on a cross edge whose
+        # source/target orient opposite to how the trace was recorded, would
+        # replace it with directionally-inverted labels. Require an explicit
+        # ?force=true to overwrite; otherwise refuse and leave the file intact.
+        if not force and workstreams.edge_is_analysed(
+            workstreams_dir, workstream_id, edge_id
+        ):
+            return _ws_error(
+                409, "ALREADY_ANALYSED",
+                f"Edge {edge_id} already has findings; re-analysing would "
+                f"overwrite them. Retry with ?force=true to replace.",
             )
         clause_index = load_clause_index(artifacts_dir)
         try:

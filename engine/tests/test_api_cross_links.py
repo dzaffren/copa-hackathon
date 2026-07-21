@@ -198,6 +198,35 @@ def test_every_linkage_still_quotes_at_least_one_clause_per_side_except_one(tmp_
     assert mute == [5], f"Expected exactly finding[5] to have a mute side, got {mute}"
 
 
+def test_a_stray_analyze_cannot_destroy_the_demo_climax(tmp_path):
+    """The curated 12-finding cross backstop is the moment the demo turns on.
+
+    `/analyze` runs the live finder and overwrites on a non-empty result, so a
+    single stray POST during the demo would replace the hand-verified findings —
+    and, because the _cross edge's source (open-finance) orients opposite to how
+    the committed trace was recorded (doc_a = opres), a live re-run would return
+    directionally-inverted labels. The edge already has findings, so analyze must
+    refuse with 409 ALREADY_ANALYSED and leave the backstop byte-for-byte intact.
+    The finder is wired to blow up if it is ever reached on this path.
+    """
+    dst = tmp_path / "workstreams"
+    shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
+
+    def must_not_run(a, b, idx):
+        raise AssertionError("the finder ran on an already-analysed cross edge")
+
+    client = TestClient(create_app(workstreams_dir=dst, find_connections_fn=must_not_run))
+    path = dst / "_cross" / "findings" / f"{_CROSS_EDGE}.json"
+    before = path.read_text(encoding="utf-8")
+
+    res = client.post(f"/api/workstreams/_cross/edges/{_CROSS_EDGE}/analyze")
+    assert res.status_code == 409
+    assert res.json()["code"] == "ALREADY_ANALYSED"
+    assert path.read_text(encoding="utf-8") == before, "the demo backstop was mutated"
+    assert len(_links(client, _OPRES)[0:1]) == 1  # link still reads unchanged
+    assert _links(client, _OPRES)[0]["findings_count"] == 12
+
+
 def test_findings_use_only_the_five_label_taxonomy(tmp_path):
     _, dst = _make_client(tmp_path)
     findings = json.loads(
