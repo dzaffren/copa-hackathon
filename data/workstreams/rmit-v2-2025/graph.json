@@ -43,6 +43,15 @@
       "short_type": "Act",
       "description": "Financial Services Act 2013, section 143 — power to issue standards on prudential matters.",
       "source_url": "https://www.bnm.gov.my"
+    },
+    {
+      "id": "bnm-supervisory-letter-rmit-2025",
+      "node_type": "supervisory-letter",
+      "title": "Supervisory Letter — RMiT Implementation Guidance",
+      "issuer": "BNM",
+      "short_type": "Supervisory Letter",
+      "description": "BNM supervisory letter providing implementation guidance to financial institutions on RMiT requirements.",
+      "source_url": null
     }
   ],
   "edges": [
@@ -57,6 +66,12 @@
       "source": "rmit-pd-v2",
       "target": "fsa-2013-143",
       "edge_type": "references"
+    },
+    {
+      "id": "e-rmit_v2--supervisory_letter",
+      "source": "rmit-pd-v2",
+      "target": "bnm-supervisory-letter-rmit-2025",
+      "edge_type": "contributes-to"
     }
   ]
 }

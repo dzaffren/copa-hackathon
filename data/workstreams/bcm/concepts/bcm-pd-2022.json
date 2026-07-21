@@ -1,0 +1,19 @@
+{
+  "policy_owner": "Jarod N.",
+  "applicability": "Licensed banks, licensed Islamic banks, licensed investment banks and prescribed development financial institutions",
+  "empowerment_framework": "The requirements in this policy document are issued pursuant to-",
+  "requirement": "Based on the outcome of the RA and BIA, a financial institution must identify its CBFs and establish priorities for recovery.",
+  "issuance_date": "2022-12-19",
+  "effective_date": null,
+  "keywords": [
+    "business continuity",
+    "critical business functions",
+    "continuity of critical functions",
+    "operational resilience",
+    "recovery time objective",
+    "disaster recovery",
+    "crisis management"
+  ],
+  "legal_basis": ["FSA 2013", "IFSA 2013", "DFIA 2002"],
+  "ismp_classification": null
+}

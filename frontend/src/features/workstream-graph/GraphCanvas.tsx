@@ -1,25 +1,27 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import ForceGraph2D, { type ForceGraphMethods } from "react-force-graph-2d";
 import { Maximize, ZoomIn, ZoomOut } from "lucide-react";
 
 import type { GraphEdge, GraphNode } from "@/lib/types";
 import { edgeStyle, nodeStyle } from "./legend";
 
-const VIEW_W = 800;
-const VIEW_H = 620;
-const CENTER = { x: VIEW_W / 2, y: VIEW_H / 2 };
-const RADIUS = 220;
-const TASK_R = 44;
-const ANCHOR_R = 32;
+// --- Graph data mapped for react-force-graph-2d ----------------------------
+// The library mutates link.source / link.target from ids into node objects and
+// adds x/y to nodes during the simulation. We keep our own domain fields on
+// each object so the canvas renderer and click handlers stay typed.
 
-const MIN_SCALE = 0.5;
-const MAX_SCALE = 2.5;
-
-interface Placed {
-  x: number;
-  y: number;
-  r: number;
+interface FGNode extends GraphNode {
   isTask: boolean;
+  x?: number;
+  y?: number;
 }
+interface FGLink extends Omit<GraphEdge, "source" | "target"> {
+  source: string | FGNode;
+  target: string | FGNode;
+}
+
+const TASK_R = 13;
+const ANCHOR_R = 8;
 
 interface GraphCanvasProps {
   nodes: GraphNode[];
@@ -29,32 +31,8 @@ interface GraphCanvasProps {
   selectedEdgeId?: string | null;
   onSelectNode: (id: string) => void;
   onSelectEdge: (id: string) => void;
-}
-
-/** Radial layout: the primary task node at the centre, anchors evenly around. */
-function layout(
-  nodes: GraphNode[],
-  primaryTaskId: string | null,
-): Record<string, Placed> {
-  const positions: Record<string, Placed> = {};
-  const task =
-    nodes.find((n) => n.id === primaryTaskId) ??
-    nodes.find((n) => n.node_type === "task");
-  if (task) {
-    positions[task.id] = { x: CENTER.x, y: CENTER.y, r: TASK_R, isTask: true };
-  }
-  const others = nodes.filter((n) => n.id !== task?.id);
-  const count = Math.max(others.length, 1);
-  others.forEach((n, i) => {
-    const angle = ((-90 + (360 / count) * i) * Math.PI) / 180;
-    positions[n.id] = {
-      x: CENTER.x + RADIUS * Math.cos(angle),
-      y: CENTER.y + RADIUS * Math.sin(angle),
-      r: ANCHOR_R,
-      isTask: false,
-    };
-  });
-  return positions;
+  /** Highlight cross-workstream edges (institution map). Solid-colour override. */
+  crossLinkColor?: string;
 }
 
 function nodeLabel(n: GraphNode): string {
@@ -62,9 +40,12 @@ function nodeLabel(n: GraphNode): string {
 }
 
 /**
- * SVG canvas of one workstream: nodes as colour-coded circles keyed by node
- * type, edges as lines keyed by structural edge type (line style only — no
- * textual labels). Zoom is clamped to [0.5, 2.5]; pan/drag is not supported.
+ * The hero canvas: one force-directed graph of a workstream rendered with
+ * react-force-graph-2d. Nodes are colour-coded circles keyed by node type — the
+ * task node larger with a pulsing glow; edges are keyed by structural type,
+ * dashed when not yet analysed, with the edge type labelled at the midpoint and
+ * a findings-count badge when analysed. Zoom in / out / reset are provided;
+ * pan and drag come from the library.
  */
 export function GraphCanvas({
   nodes,
@@ -74,25 +55,149 @@ export function GraphCanvas({
   selectedEdgeId,
   onSelectNode,
   onSelectEdge,
+  crossLinkColor,
 }: GraphCanvasProps) {
-  const [scale, setScale] = useState(1);
-  const positions = useMemo(
-    () => layout(nodes, primaryTaskId),
-    [nodes, primaryTaskId],
+  const fgRef = useRef<ForceGraphMethods<FGNode, FGLink> | undefined>(undefined);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState({ width: 800, height: 600 });
+
+  const taskId = useMemo(() => {
+    if (primaryTaskId && nodes.some((n) => n.id === primaryTaskId)) {
+      return primaryTaskId;
+    }
+    return nodes.find((n) => n.node_type === "task")?.id ?? null;
+  }, [nodes, primaryTaskId]);
+
+  const data = useMemo(
+    () => ({
+      nodes: nodes.map<FGNode>((n) => ({ ...n, isTask: n.id === taskId })),
+      links: edges.map<FGLink>((e) => ({ ...e })),
+    }),
+    [nodes, edges, taskId],
   );
 
-  const zoomIn = () => setScale((s) => Math.min(MAX_SCALE, s * 1.25));
-  const zoomOut = () => setScale((s) => Math.max(MIN_SCALE, s * 0.8));
-  const resetZoom = () => setScale(1);
+  // Measure the container so the canvas fills it and re-fits on resize.
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const measure = () =>
+      setSize({ width: el.clientWidth, height: el.clientHeight });
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // d3 force config from the design brief: charge -300, link distance 150.
+  useEffect(() => {
+    const fg = fgRef.current;
+    if (!fg) return;
+    fg.d3Force("charge")?.strength(-300);
+    const link = fg.d3Force("link");
+    if (link && "distance" in link) {
+      (link as unknown as { distance: (d: number) => unknown }).distance(150);
+    }
+  }, [data]);
+
+  const drawNode = useCallback(
+    (node: FGNode, ctx: CanvasRenderingContext2D, globalScale: number) => {
+      const style = nodeStyle(node.node_type);
+      const r = node.isTask ? TASK_R : ANCHOR_R;
+      const x = node.x ?? 0;
+      const y = node.y ?? 0;
+      const selected = node.id === selectedNodeId;
+
+      // Pulsing glow — strong on the hero task node, a gentle halo elsewhere.
+      const t = performance.now() / 1000;
+      const pulse = 0.5 + 0.5 * Math.sin(t * 2);
+      const glow = node.isTask ? 8 + pulse * 10 : selected ? 8 : 3;
+      ctx.save();
+      ctx.shadowColor = style.stroke;
+      ctx.shadowBlur = glow;
+
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, 2 * Math.PI);
+      ctx.fillStyle = style.fill;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.lineWidth = selected ? 3 : node.isTask ? 2.5 : 1.5;
+      ctx.strokeStyle = selected ? "#e2e8f0" : style.stroke;
+      ctx.stroke();
+      ctx.restore();
+
+      // Label below the node, scaled to stay legible while zooming.
+      const fontSize = Math.max(9 / globalScale, node.isTask ? 4 : 3);
+      ctx.font = `${node.isTask ? 700 : 500} ${fontSize}px Inter, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      ctx.fillStyle = "#cbd5e1";
+      ctx.fillText(nodeLabel(node), x, y + r + 2);
+    },
+    [selectedNodeId],
+  );
+
+  const drawLink = useCallback(
+    (link: FGLink, ctx: CanvasRenderingContext2D, globalScale: number) => {
+      const s = link.source as FGNode;
+      const tg = link.target as FGNode;
+      if (!s || !tg || s.x == null || tg.x == null) return;
+      const style = edgeStyle(link.edge_type);
+      const selected = link.id === selectedEdgeId;
+      const stroke = crossLinkColor ?? style.stroke;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(s.x, s.y!);
+      ctx.lineTo(tg.x, tg.y!);
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = (selected ? 2.5 : 1.4) / globalScale;
+      // Not-analysed edges (and cross-links) read as dashed; analysed = solid.
+      const dashed = crossLinkColor ? [6, 4] : link.analysed ? [] : style.dash;
+      ctx.setLineDash(dashed.map((d) => d / globalScale));
+      ctx.globalAlpha = selected ? 1 : 0.75;
+      ctx.stroke();
+      ctx.restore();
+
+      // Midpoint: edge-type label, plus a findings-count badge when analysed.
+      const mx = (s.x + tg.x!) / 2;
+      const my = (s.y! + tg.y!) / 2;
+      const fontSize = Math.max(7.5 / globalScale, 2.6);
+      ctx.font = `500 ${fontSize}px Inter, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      if (link.analysed && link.findings_count > 0) {
+        const badge = `${link.findings_count}`;
+        ctx.fillStyle = "#34d399";
+        ctx.beginPath();
+        ctx.arc(mx, my, fontSize * 0.95, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.fillStyle = "#052e2b";
+        ctx.fillText(badge, mx, my);
+      } else if (globalScale > 1.2) {
+        ctx.fillStyle = "#64748b";
+        ctx.fillText(style.label, mx, my - fontSize);
+      }
+    },
+    [selectedEdgeId, crossLinkColor],
+  );
+
+  const zoomIn = () => fgRef.current?.zoom((fgRef.current?.zoom() ?? 1) * 1.3, 200);
+  const zoomOut = () =>
+    fgRef.current?.zoom((fgRef.current?.zoom() ?? 1) * 0.75, 200);
+  const resetZoom = () => fgRef.current?.zoomToFit(400, 60);
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-slate-50">
-      <div className="absolute right-3 top-3 z-10 flex flex-col overflow-hidden rounded-md border bg-white shadow-sm">
+    <div
+      ref={wrapRef}
+      data-testid="graph-canvas"
+      className="relative h-full w-full overflow-hidden bg-[#0b1220]"
+    >
+      <div className="absolute right-3 top-3 z-10 flex flex-col overflow-hidden rounded-lg border border-border/60 bg-card/80 shadow-sm backdrop-blur">
         <button
           type="button"
           aria-label="Zoom in"
           onClick={zoomIn}
-          className="p-2 text-gray-600 hover:bg-gray-50"
+          className="p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
         >
           <ZoomIn className="h-4 w-4" />
         </button>
@@ -100,7 +205,7 @@ export function GraphCanvas({
           type="button"
           aria-label="Zoom out"
           onClick={zoomOut}
-          className="border-t p-2 text-gray-600 hover:bg-gray-50"
+          className="border-t border-border/60 p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
         >
           <ZoomOut className="h-4 w-4" />
         </button>
@@ -108,101 +213,47 @@ export function GraphCanvas({
           type="button"
           aria-label="Reset zoom"
           onClick={resetZoom}
-          className="border-t p-2 text-gray-600 hover:bg-gray-50"
+          className="border-t border-border/60 p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
         >
           <Maximize className="h-4 w-4" />
         </button>
       </div>
 
-      <svg
-        viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
-        className="h-full w-full"
-        role="img"
-        aria-label="Workstream graph canvas"
-      >
-        <g
-          data-testid="zoom-group"
-          data-scale={scale}
-          style={{
-            transform: `scale(${scale})`,
-            transformOrigin: "center center",
-          }}
-        >
-          {edges.map((e) => {
-            const a = positions[e.source];
-            const b = positions[e.target];
-            if (!a || !b) return null;
-            const style = edgeStyle(e.edge_type);
-            const selected = e.id === selectedEdgeId;
-            return (
-              <g
-                key={e.id}
-                role="button"
-                aria-label={`edge ${e.edge_type} ${e.source} to ${e.target}`}
-                onClick={() => onSelectEdge(e.id)}
-                className="cursor-pointer"
-              >
-                {/* Fat transparent hit target so thin/dashed lines are clickable. */}
-                <line
-                  x1={a.x}
-                  y1={a.y}
-                  x2={b.x}
-                  y2={b.y}
-                  stroke="transparent"
-                  strokeWidth={16}
-                />
-                <line
-                  x1={a.x}
-                  y1={a.y}
-                  x2={b.x}
-                  y2={b.y}
-                  stroke={style.stroke}
-                  strokeWidth={selected ? 3.5 : 2}
-                  strokeDasharray={style.dash || undefined}
-                />
-              </g>
-            );
-          })}
-
-          {nodes.map((n) => {
-            const p = positions[n.id];
-            if (!p) return null;
-            const style = nodeStyle(n.node_type);
-            const selected = n.id === selectedNodeId;
-            return (
-              <g
-                key={n.id}
-                role="button"
-                aria-label={n.title}
-                onClick={() => onSelectNode(n.id)}
-                className="cursor-pointer"
-              >
-                <title>{n.title}</title>
-                <circle
-                  cx={p.x}
-                  cy={p.y}
-                  r={p.r}
-                  fill={style.fill}
-                  stroke={selected ? "#111827" : style.stroke}
-                  strokeWidth={selected ? 4 : 2.5}
-                />
-                <text
-                  x={p.x}
-                  y={p.y}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fontSize={p.isTask ? 12 : 10}
-                  fontWeight={700}
-                  fill={style.text}
-                  className="pointer-events-none select-none"
-                >
-                  {nodeLabel(n)}
-                </text>
-              </g>
-            );
-          })}
-        </g>
-      </svg>
+      <ForceGraph2D
+        ref={fgRef}
+        width={size.width}
+        height={size.height}
+        graphData={data}
+        backgroundColor="rgba(0,0,0,0)"
+        cooldownTicks={120}
+        onEngineStop={() => fgRef.current?.zoomToFit(400, 60)}
+        nodeRelSize={ANCHOR_R}
+        nodeLabel={(n) => (n as FGNode).title}
+        nodeCanvasObject={drawNode}
+        nodePointerAreaPaint={(node, color, ctx) => {
+          const n = node as FGNode;
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.arc(n.x ?? 0, n.y ?? 0, (n.isTask ? TASK_R : ANCHOR_R) + 2, 0, 2 * Math.PI);
+          ctx.fill();
+        }}
+        onNodeClick={(n) => onSelectNode((n as FGNode).id)}
+        linkCanvasObjectMode={() => "replace"}
+        linkCanvasObject={drawLink}
+        linkPointerAreaPaint={(link, color, ctx) => {
+          const l = link as FGLink;
+          const s = l.source as FGNode;
+          const tg = l.target as FGNode;
+          if (!s || !tg || s.x == null || tg.x == null) return;
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 8;
+          ctx.beginPath();
+          ctx.moveTo(s.x, s.y!);
+          ctx.lineTo(tg.x, tg.y!);
+          ctx.stroke();
+        }}
+        onLinkClick={(l) => onSelectEdge((l as FGLink).id)}
+      />
     </div>
   );
 }

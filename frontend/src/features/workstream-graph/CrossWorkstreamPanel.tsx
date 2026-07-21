@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, GitCompareArrows } from "lucide-react";
 
 import { fetchCrossLinks } from "@/lib/api";
 import { CROSS_STORE, type SemanticLabel } from "@/lib/types";
-import { labelStyle } from "@/features/task/semanticLabel";
+import { labelStyle } from "@/lib/labels";
 
 /** Linkages from this workstream's documents into another workstream's.
  *
@@ -33,12 +33,12 @@ export function CrossWorkstreamPanel({
     <section
       data-testid="cross-workstream-panel"
       aria-label="Cross-workstream linkages"
-      className="rounded-lg border border-amber-200 bg-amber-50/60 p-3"
+      className="rounded-xl border border-amber-400/30 bg-amber-400/[0.07] p-3"
     >
-      <h2 className="text-xs font-bold uppercase tracking-wider text-amber-900">
-        Cross-workstream
+      <h2 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-300">
+        <GitCompareArrows className="h-3.5 w-3.5" /> Cross-workstream
       </h2>
-      <p className="mt-0.5 text-[11px] leading-snug text-amber-800/80">
+      <p className="mt-0.5 text-[11px] leading-snug text-amber-200/70">
         Linkages into workstreams other teams are drafting in parallel.
       </p>
 
@@ -49,7 +49,7 @@ export function CrossWorkstreamPanel({
               to={`/workstreams/${CROSS_STORE}/edges/${link.id}/review`}
               data-testid="cross-link-card"
               data-far-workstream={link.far.workstream_id ?? undefined}
-              className="block rounded-md border border-amber-200 bg-white p-2.5 transition hover:border-amber-400"
+              className="block rounded-lg border border-amber-400/20 bg-card/60 p-2.5 transition hover:border-amber-400/50 hover:bg-card"
             >
               <div className="flex items-start justify-between gap-2">
                 <p className="text-sm font-semibold leading-snug">
@@ -75,7 +75,7 @@ export function CrossWorkstreamPanel({
                   ([label, n]) => (
                     <span
                       key={label}
-                      className={`rounded px-1 py-0.5 text-[10px] font-semibold ${labelStyle(label).pill}`}
+                      className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${labelStyle(label).pill}`}
                     >
                       {n} {label}
                     </span>
@@ -94,3 +94,5 @@ export function CrossWorkstreamPanel({
     </section>
   );
 }
+
+export default CrossWorkstreamPanel;

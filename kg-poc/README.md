@@ -5,6 +5,17 @@ NetworkX knowledge graph grounded in a MECE-7 ontology.
 
 **Design:** `../docs/superpowers/specs/2026-07-12-kg-ontology-pipeline-poc-design.md`
 
+**Ontology:** `ontology/classes.yaml` holds the MECE-7 *entity* classes (spans of
+text). `ontology/regulatory-profile.yaml` is an additive **document-level** layer
+— the regulatory profile a policy document carries (policy owner, applicability,
+legal basis, ISMP classification, empowerment, dates, keywords) and its typed
+relationships (owned-by, pursuant-to, classified-as, …). That layer's *live*
+implementation is the engine's metadata model (`../engine/concepts.py` +
+`../engine/workstreams.py` node/edge vocabulary), which powers Cross-Workstream
+Intelligence; this pipeline does not load it (it stays isolated). The MECE-7
+entity classes are unchanged — the new concepts are added alongside, not in
+place of them.
+
 ## Quickstart
 
 ```bash

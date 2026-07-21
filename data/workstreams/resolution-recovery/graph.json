@@ -1,0 +1,53 @@
+{
+  "nodes": [
+    {
+      "id": "rrp-pd-v0-1",
+      "node_type": "task",
+      "title": "Recovery Planning PD — v0.1",
+      "issuer": "BNM",
+      "short_type": "PD (draft)",
+      "source_name": "pd_Recovery Planning.pdf",
+      "format": ".docx",
+      "description": "Working draft revising the Recovery & Resolution Planning (RRP) framework policy document.",
+      "source_url": null,
+      "status": "in_progress",
+      "owner": { "id": "ps", "name": "Priya S." },
+      "reviewers": [{ "id": "ar", "name": "Aisyah R." }],
+      "clause_count": 0,
+      "last_edited_at": "2026-07-15T10:00:00Z",
+      "recent_activity": []
+    },
+    {
+      "id": "bcm-pd-2022",
+      "node_type": "internal-published",
+      "title": "BCM PD (19 Dec 2022)",
+      "issuer": "BNM",
+      "short_type": "PD",
+      "description": "Business Continuity Management policy document issued 19 December 2022 — overlaps the RRP framework on continuity of critical functions.",
+      "source_url": null
+    },
+    {
+      "id": "fsa-2013-143",
+      "node_type": "act-law",
+      "title": "FSA 2013 §143",
+      "issuer": "Parliament",
+      "short_type": "Act",
+      "description": "Financial Services Act 2013, section 143 — statutory basis for the RRP framework.",
+      "source_url": null
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-rrp_pd_v0_1--bcm_pd_2022",
+      "source": "rrp-pd-v0-1",
+      "target": "bcm-pd-2022",
+      "edge_type": "parallel-to"
+    },
+    {
+      "id": "e-rrp_pd_v0_1--fsa_2013_143",
+      "source": "rrp-pd-v0-1",
+      "target": "fsa-2013-143",
+      "edge_type": "references"
+    }
+  ]
+}

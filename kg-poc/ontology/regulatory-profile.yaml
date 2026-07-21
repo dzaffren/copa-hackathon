@@ -1,0 +1,139 @@
+# Regulatory-profile ontology layer (document-level).
+#
+# This is ADDITIVE to `classes.yaml` (the MECE-7 entity classes, which are
+# unchanged — RegulatoryBody, Party, Reference, Instrument, Requirement, Topic,
+# Process are all kept). Those seven classify *spans of text*. This file models
+# the *document* itself: the regulatory profile a policy document carries and
+# the typed relationships it participates in — the concepts Cross-Workstream
+# Intelligence compares across workstreams to detect overlap.
+#
+# STATUS: this layer is the target ontology. The LIVE implementation is the
+# engine's metadata model, not this pipeline: `engine/concepts.py`
+# (`CONCEPT_FIELDS`) holds the document concepts, and the graph node/edge
+# vocabulary (`engine/workstreams.py`) holds the document types + structural
+# relationships. This file is the documented spec that path realises; the
+# kg-poc pipeline does not load it (it stays isolated, per the project's
+# "engine metadata only" decision).
+#
+# HONESTY: every concept is either a verbatim clause quote from the document, a
+# value already carried structurally on the node, or a structured reference
+# already documented elsewhere in the corpus. A concept that cannot be honestly
+# derived is null, never guessed. `ismp_classification` has no offline source
+# (its authority is CAS's RH publication form, not held here) and is null
+# everywhere today — modelled, not faked.
+
+# --- Document types (the graph's node_type vocabulary, 8) --------------------
+document_types:
+  - name: task
+    test: Is this the editable working draft this workstream is producing?
+    examples: [OpRes PD v0.3, Recovery Planning PD v0.1]
+  - name: internal-published
+    test: Is this an in-force BNM policy document this workstream references?
+    examples: [BCM PD 2022, OpRes DP 2025]
+  - name: international-standard
+    test: Is this a cross-border standard the draft aligns to?
+    examples: [BCBS OpRes 2021, FSB 3rd-Party Toolkit, BCBS 239]
+  - name: peer-regulator
+    test: Is this another jurisdiction's regulator's instrument?
+    examples: [HKMA SPM OR-2, MAS Outsourcing Guidelines, EBA Outsourcing]
+  - name: act-law
+    test: Is this primary legislation — the statutory basis?
+    examples: [FSA 2013 §143, IFSA 2013, DFIA 2002]
+  - name: industry-input
+    test: Is this an industry body's position or submission?
+    examples: [ABM position paper]
+  - name: supervisory-letter
+    test: Is this a BNM supervisory communication giving implementation guidance?
+    examples: [Supervisory Letter — RMiT Implementation Guidance]
+  - name: others
+    test: Anything that does not fit the above.
+    examples: []
+
+# --- Document concepts (engine/concepts.py CONCEPT_FIELDS, 9) -----------------
+document_concepts:
+  - name: policy_owner
+    test: Who owns / is accountable for this document?
+    derived_from: node owner (structural)
+  - name: applicability
+    test: Which regulated entities does the document apply to?
+    derived_from: verbatim applicability/scope clause
+  - name: empowerment_framework
+    test: Under what provision is the document empowered/issued?
+    derived_from: verbatim "issued pursuant to" clause
+  - name: requirement
+    test: A headline obligation the document imposes.
+    derived_from: verbatim requirement clause
+  - name: issuance_date
+    test: When was the document issued?
+    derived_from: document metadata (structural)
+  - name: effective_date
+    test: When does the document take effect?
+    derived_from: document metadata (structural)
+  - name: keywords
+    test: The topics/domains the document concerns (list).
+    derived_from: topic tagging
+  - name: legal_basis
+    test: The Acts the document is issued under (list).
+    derived_from: structured Act references (like pursuant_to)
+  - name: ismp_classification
+    test: The BNM ISMP classification of the document.
+    derived_from: CAS RH publication form (NOT held offline — null today)
+
+# --- Relationships (Feature 4) -----------------------------------------------
+# How a Document relates to the entities/concepts above. Structural edges live
+# on the graph (edge_type); attribute relationships are realised as concept
+# fields on the document. Both are listed so the ontology is complete.
+relationships:
+  - name: owned-by
+    from: Document
+    to: Party (policy owner)
+    realised_as: concept.policy_owner
+  - name: applies-to
+    from: Document
+    to: Party / Institution
+    realised_as: concept.applicability
+  - name: pursuant-to
+    from: Document
+    to: Act
+    realised_as: node.pursuant_to / concept.legal_basis
+  - name: governed-by
+    from: Document
+    to: Empowerment framework
+    realised_as: concept.empowerment_framework
+  - name: classified-as
+    from: Document
+    to: ISMP classification
+    realised_as: concept.ismp_classification
+  - name: contains
+    from: Document
+    to: Requirement
+    realised_as: concept.requirement
+  - name: relates-to
+    from: Document
+    to: Topic
+    realised_as: concept.keywords
+  - name: effective-from
+    from: Document
+    to: Date
+    realised_as: concept.effective_date
+  - name: issued-on
+    from: Document
+    to: Date
+    realised_as: concept.issuance_date
+  # Structural document-to-document edges (engine/workstreams.py EDGE_TYPES):
+  - name: supersedes
+    from: Document
+    to: Document
+    realised_as: graph edge_type
+  - name: references
+    from: Document
+    to: Document
+    realised_as: graph edge_type
+  - name: contributes-to
+    from: Document
+    to: Document
+    realised_as: graph edge_type
+  - name: parallel-to
+    from: Document
+    to: Document (in another workstream)
+    realised_as: graph edge_type (cross-workstream)

@@ -40,13 +40,13 @@ export function ClausePane({
 
   return (
     <section
-      className="flex min-h-0 flex-col rounded-lg border border-gray-200 bg-white"
+      className="glass flex min-h-0 flex-col rounded-xl"
       aria-label={`${side} clauses`}
     >
-      <header className="border-b border-gray-200 px-4 py-3">
-        <h2 className="text-sm font-semibold text-gray-900">{title}</h2>
+      <header className="border-b border-border/60 px-4 py-3">
+        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
         {subtitle ? (
-          <p className="mt-0.5 text-xs text-gray-500">{subtitle}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
         ) : null}
       </header>
 
@@ -55,7 +55,7 @@ export function ClausePane({
         className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4"
       >
         {clauses.length === 0 ? (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             No clauses cited on this side — every finding is silent here.
           </p>
         ) : (
@@ -69,14 +69,14 @@ export function ClausePane({
                 className={[
                   "rounded-md border-l-4 px-3 py-2 transition-colors",
                   isLit
-                    ? "border-l-indigo-500 bg-indigo-50"
-                    : "border-l-transparent bg-gray-50",
+                    ? "border-l-cyan-400 bg-cyan-500/10 ring-1 ring-cyan-400/30"
+                    : "border-l-transparent bg-muted/20",
                 ].join(" ")}
               >
-                <p className="text-xs font-semibold text-gray-900">
+                <p className="text-xs font-semibold text-foreground">
                   {clause.clause_number}
                 </p>
-                <p className="mt-1 text-sm leading-relaxed text-gray-700">
+                <p className="mt-1 text-sm leading-relaxed text-foreground">
                   {clause.text}
                 </p>
               </article>

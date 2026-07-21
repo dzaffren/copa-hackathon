@@ -26,7 +26,7 @@ import re
 from pathlib import Path
 from typing import Any, Optional, Union
 
-# The seven flat node types and four structural edge types (spec Business Rules
+# The eight flat node types and four structural edge types (spec Business Rules
 # & Constraints). Type is picked once at add-time and validated here.
 NODE_TYPES: frozenset[str] = frozenset(
     {
@@ -36,6 +36,7 @@ NODE_TYPES: frozenset[str] = frozenset(
         "peer-regulator",
         "act-law",
         "industry-input",
+        "supervisory-letter",
         "others",
     }
 )
@@ -386,7 +387,7 @@ def validate_node_create(body: dict[str, Any]) -> Optional[tuple[int, str, str]]
         return (
             400,
             "INVALID_NODE_TYPE",
-            f"node_type must be one of the seven flat types, got "
+            f"node_type must be one of the eight flat types, got "
             f"{body.get('node_type')!r}",
         )
     edges = body.get("edges")

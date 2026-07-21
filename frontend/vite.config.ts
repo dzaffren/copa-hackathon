@@ -26,5 +26,13 @@ export default defineConfig({
     // Vitest owns the component/unit tests under src/. Playwright owns e2e/;
     // exclude it so the browser specs are never collected by vitest.
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    // react-force-graph-2d drives a real <canvas> that jsdom cannot back, so
+    // swap it for an accessible DOM stub in every test (see the mock module).
+    alias: {
+      "react-force-graph-2d": path.resolve(
+        __dirname,
+        "./src/test/mocks/react-force-graph-2d.tsx",
+      ),
+    },
   },
 });

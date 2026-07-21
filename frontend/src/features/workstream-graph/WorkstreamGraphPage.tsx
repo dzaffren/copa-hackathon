@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { fetchGraph } from "@/lib/api";
-import { Sidebar } from "./Sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { fetchGraph, fetchWorkstreams } from "@/lib/api";
 import { GraphCanvas } from "./GraphCanvas";
 import { NodeDetailPanel } from "./NodeDetailPanel";
 import { EdgeDetailPanel } from "./EdgeDetailPanel";
 import { CrossWorkstreamPanel } from "./CrossWorkstreamPanel";
+import { RegulatoryProfileCard } from "@/features/cross-intelligence/RegulatoryProfileCard";
 import { AddNodeDialog } from "./AddNodeDialog";
 import {
   EDGE_LEGEND,
@@ -25,22 +26,22 @@ type Selection =
 
 function LegendCard() {
   return (
-    <div className="absolute bottom-3 left-3 z-10 rounded-md border bg-white/95 p-3 text-[11px] shadow-sm">
+    <div className="glass absolute bottom-3 left-3 z-10 rounded-xl p-3 text-[11px] shadow-sm">
       <div className="grid grid-cols-2 gap-x-4 gap-y-1">
         {NODE_LEGEND_ORDER.map((t) => (
           <div key={t} className="flex items-center gap-1.5">
             <span
-              className="inline-block h-3 w-3 rounded-full border-2"
+              className="inline-block h-3 w-3 rounded-full"
               style={{
                 backgroundColor: NODE_LEGEND[t].fill,
-                borderColor: NODE_LEGEND[t].stroke,
+                boxShadow: `0 0 6px ${NODE_LEGEND[t].stroke}`,
               }}
             />
-            <span>{NODE_LEGEND[t].label}</span>
+            <span className="text-foreground/80">{NODE_LEGEND[t].label}</span>
           </div>
         ))}
       </div>
-      <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 border-t pt-2">
+      <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 border-t border-border/60 pt-2">
         {EDGE_LEGEND_ORDER.map((t) => (
           <div key={t} className="flex items-center gap-1.5">
             <svg width="22" height="8" aria-hidden>
@@ -51,10 +52,10 @@ function LegendCard() {
                 y2="4"
                 stroke={EDGE_LEGEND[t].stroke}
                 strokeWidth="2"
-                strokeDasharray={EDGE_LEGEND[t].dash || undefined}
+                strokeDasharray={EDGE_LEGEND[t].dash.join(" ") || undefined}
               />
             </svg>
-            <span>{EDGE_LEGEND[t].label}</span>
+            <span className="text-foreground/80">{EDGE_LEGEND[t].label}</span>
           </div>
         ))}
       </div>
@@ -77,20 +78,25 @@ export default function WorkstreamGraphPage() {
     queryFn: () => fetchGraph(workstreamId),
   });
 
-  return (
-    <div className="flex h-screen w-full overflow-hidden bg-white">
-      <Sidebar activeWorkstreamId={workstreamId} />
+  const { data: workstreams } = useQuery({
+    queryKey: ["workstreams"],
+    queryFn: fetchWorkstreams,
+  });
+  const name =
+    workstreams?.find((w) => w.id === workstreamId)?.name ?? workstreamId;
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between gap-4 border-b px-6 py-4">
+  return (
+    <>
+      <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-background">
+        <header className="flex items-center justify-between gap-4 border-b border-border/60 px-6 py-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <p className="text-xs font-semibold uppercase tracking-wider text-cyan-300/80">
               Workstream graph
             </p>
-            <h1 className="text-lg font-bold">{workstreamId}</h1>
+            <h1 className="text-lg font-bold">{name}</h1>
           </div>
           <Button
-            className="bg-indigo-600 hover:bg-indigo-700"
+            className="bg-cyan-500 text-slate-950 hover:bg-cyan-400"
             onClick={() => setAddOpen(true)}
           >
             <Plus /> Add node
@@ -102,9 +108,25 @@ export default function WorkstreamGraphPage() {
             {graphQuery.isPending ? (
               <div
                 role="status"
-                className="flex h-full items-center justify-center gap-2 text-sm text-muted-foreground"
+                aria-label="Loading graph"
+                className="absolute inset-0 grid place-items-center bg-[#0b1220]"
               >
-                <Loader2 className="h-4 w-4 animate-spin" /> Loading graph…
+                <div className="relative h-64 w-64">
+                  <Skeleton className="absolute left-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full" />
+                  {[0, 1, 2, 3, 4].map((i) => {
+                    const a = (-90 + i * 72) * (Math.PI / 180);
+                    return (
+                      <Skeleton
+                        key={i}
+                        className="absolute h-10 w-10 rounded-full"
+                        style={{
+                          left: `calc(50% + ${Math.cos(a) * 110}px - 20px)`,
+                          top: `calc(50% + ${Math.sin(a) * 110}px - 20px)`,
+                        }}
+                      />
+                    );
+                  })}
+                </div>
               </div>
             ) : graphQuery.isError ? (
               <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
@@ -121,20 +143,22 @@ export default function WorkstreamGraphPage() {
                 onSelectEdge={(id) => setSelection({ kind: "edge", id })}
               />
             )}
-            <LegendCard />
+            {!graphQuery.isPending && !graphQuery.isError && <LegendCard />}
           </main>
 
-          <div className="w-80 shrink-0 overflow-hidden border-l">
+          <div className="w-80 shrink-0 overflow-hidden border-l border-border/60 bg-card/30 backdrop-blur">
             {selection.kind === "node" ? (
               <NodeDetailPanel
                 workstreamId={workstreamId}
                 nodeId={selection.id}
+                onClose={() => setSelection({ kind: "none" })}
                 onSelectNode={(id) => setSelection({ kind: "node", id })}
               />
             ) : selection.kind === "edge" ? (
               <EdgeDetailPanel
                 workstreamId={workstreamId}
                 edgeId={selection.id}
+                onClose={() => setSelection({ kind: "none" })}
               />
             ) : (
               // Nothing selected: the rail leads with cross-workstream drift.
@@ -142,6 +166,7 @@ export default function WorkstreamGraphPage() {
               // reading their own workstream, so it should not need hunting for.
               <div className="flex h-full flex-col gap-3 overflow-y-auto p-3">
                 <CrossWorkstreamPanel workstreamId={workstreamId} />
+                <RegulatoryProfileCard workstreamId={workstreamId} />
                 <p className="px-3 text-center text-sm text-muted-foreground">
                   Select a node or edge to see its details.
                 </p>
@@ -157,6 +182,6 @@ export default function WorkstreamGraphPage() {
         open={addOpen}
         onOpenChange={setAddOpen}
       />
-    </div>
+    </>
   );
 }

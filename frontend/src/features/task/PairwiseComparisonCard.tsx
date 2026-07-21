@@ -40,8 +40,8 @@ export function PairwiseComparisonCard({
       : neighbours.filter((n) => n.node_id === selected);
 
   return (
-    <Card data-testid="pairwise-card" className="overflow-hidden">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3">
+    <Card data-testid="pairwise-card" className="glass overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 px-4 py-3">
         <div>
           <h2 className="text-sm font-semibold">
             Pairwise comparison{" "}
@@ -67,8 +67,7 @@ export function PairwiseComparisonCard({
                 label="All"
                 selected={selected === ALL}
                 onClick={() => setSelected(ALL)}
-                selectedClasses="border-indigo-600"
-                idleClasses="border-indigo-300 text-indigo-800"
+                idleClasses="border-cyan-400/40 text-cyan-300"
               />
               {neighbours.map((n) => {
                 const style = nodeTypeStyle(n.node_type);
@@ -102,7 +101,7 @@ export function PairwiseComparisonCard({
               />
             ))}
           </div>
-          <div className="border-t bg-muted/40 px-4 py-3 text-[11px] italic text-muted-foreground">
+          <div className="border-t border-border/60 bg-muted/20 px-4 py-3 text-[11px] italic text-muted-foreground">
             {analysedCount} of {neighbours.length} neighbours analysed
           </div>
         </>
@@ -132,9 +131,9 @@ function FilterChip({
       aria-pressed={selected}
       onClick={onClick}
       className={cn(
-        "rounded-md border-2 bg-white px-2 py-1 text-[11px] font-medium transition-colors",
+        "rounded-md border bg-card/40 px-2 py-1 text-[11px] font-medium transition-colors",
         selected
-          ? cn("border-indigo-800 bg-indigo-600 text-white", selectedClasses)
+          ? cn("border-cyan-400 bg-cyan-500 text-slate-950", selectedClasses)
           : idleClasses,
       )}
     >

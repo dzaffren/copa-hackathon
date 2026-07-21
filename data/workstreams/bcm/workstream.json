@@ -1,0 +1,12 @@
+{
+  "id": "bcm",
+  "name": "Business Continuity Management",
+  "deliverable_type": "Policy Document",
+  "role": "review",
+  "description": "BNM Business Continuity Management workstream, reviewing the BCM policy document (issued 19 December 2022) in parallel with the Resolution & Recovery Planning revision. The two overlap on continuity of critical functions.",
+  "primary_task_id": "bcm-pd-2022",
+  "target_publication": "2026-12-31",
+  "owner": { "id": "jn", "name": "Jarod N." },
+  "reviewers": [{ "id": "ar", "name": "Aisyah R." }],
+  "access": "department_wide"
+}

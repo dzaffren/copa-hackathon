@@ -1,16 +1,17 @@
 import type { EdgeType, NodeType } from "@/lib/types";
 
-// Colour + label maps for the graph canvas and detail panels. Mirrors the
-// legend in docs/poc/workstream-brain/workstream.html so the built screen reads
-// the same as the approved prototype.
+// Colour + label maps for the graph canvas and detail panels. Tuned for the
+// dark navy/slate theme (see index.css + CLAUDE.md): saturated node fills that
+// glow against the deep background, with translucent Tailwind badge classes for
+// the panels. One source of truth for every node/edge colour in the app.
 
 export interface NodeStyle {
   label: string;
-  /** SVG circle fill. */
+  /** Canvas circle fill — a saturated colour that reads on dark navy. */
   fill: string;
-  /** SVG circle stroke. */
+  /** Canvas circle stroke / halo colour. */
   stroke: string;
-  /** SVG label text colour. */
+  /** Canvas label text colour. */
   text: string;
   /** Tailwind classes for a node-type chip/badge in the panels. */
   badge: string;
@@ -19,67 +20,74 @@ export interface NodeStyle {
 export const NODE_LEGEND: Record<NodeType, NodeStyle> = {
   task: {
     label: "task",
-    fill: "#4f46e5",
-    stroke: "#312e81",
-    text: "#ffffff",
-    badge: "bg-indigo-600 text-white border-indigo-700",
+    fill: "#22d3ee", // bright cyan — the hero node
+    stroke: "#67e8f9",
+    text: "#e0faff",
+    badge: "bg-cyan-500/15 text-cyan-300 border-cyan-400/30",
   },
   "internal-published": {
     label: "internal-published",
-    fill: "#eef2ff",
-    stroke: "#6366f1",
-    text: "#312e81",
-    badge: "bg-indigo-100 text-indigo-800 border-indigo-300",
+    fill: "#34d399", // emerald
+    stroke: "#6ee7b7",
+    text: "#062a1e",
+    badge: "bg-emerald-500/15 text-emerald-300 border-emerald-400/30",
   },
   "international-standard": {
     label: "international-standard",
-    fill: "#fdf4ff",
-    stroke: "#c026d3",
-    text: "#86198f",
-    badge: "bg-fuchsia-100 text-fuchsia-800 border-fuchsia-300",
+    fill: "#fbbf24", // gold
+    stroke: "#fcd34d",
+    text: "#3a2606",
+    badge: "bg-amber-400/15 text-amber-300 border-amber-300/30",
   },
   "peer-regulator": {
     label: "peer-regulator",
-    fill: "#ecfeff",
-    stroke: "#0d9488",
-    text: "#134e4a",
-    badge: "bg-teal-100 text-teal-800 border-teal-300",
+    fill: "#fb7185", // coral
+    stroke: "#fda4af",
+    text: "#3a0b13",
+    badge: "bg-rose-500/15 text-rose-300 border-rose-400/30",
   },
   "act-law": {
     label: "act-law",
-    fill: "#fef3c7",
-    stroke: "#d97706",
-    text: "#92400e",
-    badge: "bg-amber-100 text-amber-800 border-amber-300",
+    fill: "#ef4444", // red
+    stroke: "#f87171",
+    text: "#fee2e2",
+    badge: "bg-red-500/15 text-red-300 border-red-400/30",
   },
   "industry-input": {
     label: "industry-input",
-    fill: "#ecfdf5",
-    stroke: "#059669",
-    text: "#065f46",
-    badge: "bg-emerald-100 text-emerald-800 border-emerald-300",
+    fill: "#2dd4bf", // teal
+    stroke: "#5eead4",
+    text: "#052e2b",
+    badge: "bg-teal-500/15 text-teal-300 border-teal-400/30",
+  },
+  "supervisory-letter": {
+    label: "supervisory-letter",
+    fill: "#a78bfa", // violet
+    stroke: "#c4b5fd",
+    text: "#1e1b3a",
+    badge: "bg-violet-500/15 text-violet-300 border-violet-400/30",
   },
   others: {
     label: "others",
-    fill: "#f3f4f6",
-    stroke: "#9ca3af",
-    text: "#374151",
-    badge: "bg-gray-100 text-gray-800 border-gray-300",
+    fill: "#94a3b8", // slate/gray
+    stroke: "#cbd5e1",
+    text: "#0b1220",
+    badge: "bg-slate-400/15 text-slate-300 border-slate-400/30",
   },
 };
 
 export interface EdgeStyle {
   label: string;
   stroke: string;
-  /** SVG stroke-dasharray; empty string for a solid line. */
-  dash: string;
+  /** Canvas line dash pattern (px on/off); empty for a solid line. */
+  dash: number[];
 }
 
 export const EDGE_LEGEND: Record<EdgeType, EdgeStyle> = {
-  supersedes: { label: "supersedes", stroke: "#dc2626", dash: "" },
-  references: { label: "references", stroke: "#0891b2", dash: "" },
-  "contributes-to": { label: "contributes-to", stroke: "#4f46e5", dash: "4 3" },
-  "parallel-to": { label: "parallel-to", stroke: "#6b7280", dash: "6 3" },
+  supersedes: { label: "supersedes", stroke: "#f87171", dash: [] },
+  references: { label: "references", stroke: "#38bdf8", dash: [] },
+  "contributes-to": { label: "contributes-to", stroke: "#818cf8", dash: [5, 4] },
+  "parallel-to": { label: "parallel-to", stroke: "#94a3b8", dash: [7, 4] },
 };
 
 const FALLBACK_NODE: NodeStyle = NODE_LEGEND.others;
@@ -100,6 +108,7 @@ export const NODE_LEGEND_ORDER: NodeType[] = [
   "peer-regulator",
   "act-law",
   "industry-input",
+  "supervisory-letter",
   "others",
 ];
 

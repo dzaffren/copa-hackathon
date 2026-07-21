@@ -17,11 +17,19 @@ import type {
   ReviewFinding,
   ReviewState,
   TaskResponse,
+  TaskWorkflow,
   WorkstreamGraph,
   WorkstreamSummary,
 } from "@/lib/types";
 
 // Mirrors data/workstreams/opres-v2/graph.json + findings/*.json exactly.
+
+const DRAFT_WORKFLOW: TaskWorkflow = {
+  status: "draft",
+  checker: null,
+  approved_by: null,
+  approved_at: null,
+};
 
 const TASK_V0_3: TaskResponse = {
   task: {
@@ -105,6 +113,7 @@ const TASK_V0_3: TaskResponse = {
       findings_count: 0,
     },
   ],
+  workflow: DRAFT_WORKFLOW,
   draft_empty: false,
 };
 
@@ -144,6 +153,7 @@ const TASK_V0_0: TaskResponse = {
       findings_count: 0,
     },
   ],
+  workflow: DRAFT_WORKFLOW,
   draft_empty: true,
 };
 
@@ -151,6 +161,14 @@ const TASKS: Record<string, TaskResponse> = {
   "opres-pd-v0-3": TASK_V0_3,
   "opres-pd-v0-0": TASK_V0_0,
 };
+
+// Mutable per-task workflow overrides, so a PATCH .../workflow round-trips
+// like the real file-backed store. Absent entry -> the task's seeded default.
+const taskWorkflow = new Map<string, TaskWorkflow>();
+
+export function resetTaskWorkflow() {
+  taskWorkflow.clear();
+}
 
 // Non-task nodes present in graph.json (used to assert NOT_A_TASK).
 const NODE_TYPES: Record<string, string> = {
@@ -603,6 +621,8 @@ function buildNodeDetail(nodeId: string): NodeDetail | null {
     short_type: node.short_type,
     description: node.description,
     source_url: node.source_url,
+    ismp_classification: null,
+    pursuant_to: null,
     first_order_neighbours: neighbourIds.map((id) => ({
       id,
       node_type: GRAPH_NODES[id].node_type,
@@ -807,9 +827,205 @@ const CROSS_LINK: CrossLink = {
   findings_count: 12,
   labels: { "aligns-with": 6, "differs-on": 4, "goes-beyond": 2 },
   counts: { total: 12, accepted: 0, dismissed: 0 },
+  classification: "divergent",
+  risk_level: "medium",
+  detected_at: "2026-07-11",
+  shared_attributes: {
+    legal_basis: ["FSA 2013"],
+    applicability: ["licensed banks"],
+    keywords: ["operational resilience"],
+    policy_owner: null,
+    ismp_classification: null,
+  },
+  reasons: [
+    "Both apply to licensed banks",
+    "Both issued under FSA 2013",
+    "Both address operational resilience",
+    "The linkages differ on 4 requirement(s)",
+  ],
 };
 
+// --- Per-linkage Maker-Checker (Phase 3) -----------------------------------
+// A minimal in-memory mirror of engine/linkage_review.py so the Review Queue's
+// transitions round-trip within a test. Reset in setup.ts's afterEach.
+const PEOPLE_BY_ID: Record<string, Person> = {
+  ar: { id: "ar", name: "Aisyah R." },
+  fm: { id: "fm", name: "Farid M." },
+  ps: { id: "ps", name: "Priya S." },
+  jn: { id: "jn", name: "Jarod N." },
+};
+
+const QUEUE_SEED = [
+  {
+    workstream_id: "_cross",
+    edge_id: "x-bcm_pd_2022--rrp_pd_v0_1",
+    finding_id: "x-bcm_pd_2022--rrp_pd_v0_1~0",
+    summary: "Both preserve continuity of critical functions",
+    label: "aligns-with" as const,
+    sentiment: null,
+    near: {
+      node_id: "bcm-pd-2022",
+      title: "BCM PD (19 Dec 2022)",
+      workstream_id: "bcm",
+      workstream_name: "Business Continuity Management",
+    },
+    far: {
+      node_id: "rrp-pd-v0-1",
+      title: "Recovery Planning PD — v0.1",
+      workstream_id: "resolution-recovery",
+      workstream_name: "Resolution & Recovery Planning",
+    },
+  },
+  {
+    workstream_id: "_cross",
+    edge_id: "x-open_finance_ed--opres_dp_2025",
+    finding_id: "x-open_finance_ed--opres_dp_2025~0",
+    summary: "Open finance board oversight goes beyond the DP",
+    label: "goes-beyond" as const,
+    sentiment: null,
+    near: {
+      node_id: "of-ed-2025",
+      title: "Open Finance ED",
+      workstream_id: "open-finance-ed",
+      workstream_name: "Open Finance ED · 2025",
+    },
+    far: {
+      node_id: "opres-dp-2025",
+      title: "OpRes DP (Dec 2025)",
+      workstream_id: "opres-v2",
+      workstream_name: "Operational Resilience v0.3",
+    },
+  },
+];
+
+const MSW_TRANSITIONS: Record<
+  string,
+  { from: string[]; to: string; role: "maker" | "checker" }
+> = {
+  claim: { from: ["ai_detected"], to: "maker_review", role: "maker" },
+  submit: { from: ["maker_review", "changes_requested"], to: "submitted_for_check", role: "maker" },
+  pick_up: { from: ["submitted_for_check"], to: "checker_review", role: "checker" },
+  approve: { from: ["checker_review"], to: "approved", role: "checker" },
+  reject: { from: ["checker_review"], to: "rejected", role: "checker" },
+  request_changes: { from: ["checker_review"], to: "changes_requested", role: "checker" },
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let linkageReviews: Record<string, any> = {};
+export function resetLinkageReview() {
+  linkageReviews = {};
+}
+function defaultRecord() {
+  return {
+    status: "ai_detected",
+    maker: null,
+    checker: null,
+    created_at: null,
+    checked_at: null,
+    comments: [],
+    audit: [],
+  };
+}
+function recordFor(findingId: string) {
+  return linkageReviews[findingId] ?? defaultRecord();
+}
+
 export const handlers = [
+  // Review Queue: cross-workstream linkages with their maker-checker status.
+  http.get("*/api/review-queue", () => {
+    const items = QUEUE_SEED.map((s) => {
+      const r = recordFor(s.finding_id);
+      return {
+        ...s,
+        status: r.status,
+        maker: r.maker,
+        checker: r.checker,
+        created_at: r.created_at,
+        checked_at: r.checked_at,
+      };
+    });
+    const counts: Record<string, number> = {
+      ai_detected: 0,
+      maker_review: 0,
+      submitted_for_check: 0,
+      checker_review: 0,
+      approved: 0,
+      rejected: 0,
+      changes_requested: 0,
+    };
+    for (const it of items) counts[it.status] = (counts[it.status] ?? 0) + 1;
+    return HttpResponse.json({ items, counts_by_status: counts });
+  }),
+
+  http.get(
+    "*/api/workstreams/:workstreamId/edges/:edgeId/linkage-review",
+    ({ params }) => {
+      const edgeId = params.edgeId as string;
+      const linkages = QUEUE_SEED.filter((s) => s.edge_id === edgeId).map((s) => ({
+        finding_id: s.finding_id,
+        summary: s.summary,
+        label: s.label,
+        sentiment: s.sentiment,
+        review: recordFor(s.finding_id),
+      }));
+      return HttpResponse.json({ edge_id: edgeId, linkages });
+    },
+  ),
+
+  http.patch(
+    "*/api/workstreams/:workstreamId/edges/:edgeId/findings/:findingId/linkage-review",
+    async ({ params, request }) => {
+      const findingId = params.findingId as string;
+      const body = (await request.json()) as {
+        action: string;
+        actor_id: string;
+        comment?: string;
+      };
+      const transition = MSW_TRANSITIONS[body.action];
+      if (!transition) return jsonError(400, "INVALID_ACTION", "Unknown action");
+      const actor = PEOPLE_BY_ID[body.actor_id];
+      if (!actor) return jsonError(400, "UNKNOWN_ACTOR", "Unknown actor");
+
+      const record = { ...recordFor(findingId) };
+      record.comments = [...record.comments];
+      record.audit = [...record.audit];
+      if (!transition.from.includes(record.status)) {
+        return jsonError(
+          400,
+          "INVALID_WORKFLOW_STATE",
+          `Action '${body.action}' not allowed from '${record.status}'`,
+        );
+      }
+      const at = new Date().toISOString();
+      if (body.action === "claim") {
+        record.maker = actor;
+        record.created_at = at;
+      } else if (body.action === "pick_up") {
+        if (record.maker && record.maker.id === actor.id) {
+          return jsonError(400, "SAME_ACTOR", "The checker cannot be the maker");
+        }
+        record.checker = actor;
+      }
+      if (transition.to === "approved" || transition.to === "rejected") {
+        record.checked_at = at;
+      }
+      if (body.comment) {
+        record.comments.push({ author: actor, at, text: body.comment });
+      }
+      record.audit.push({
+        actor,
+        action: body.action,
+        from: record.status,
+        to: transition.to,
+        at,
+        comment: body.comment ?? null,
+      });
+      record.status = transition.to;
+      linkageReviews[findingId] = record;
+      return HttpResponse.json({ finding_id: findingId, review: record });
+    },
+  ),
+
   // The _cross store is served by the ordinary review route. Two of the twelve
   // findings are enough to prove the screen reads them unchanged.
   http.get("*/api/workstreams/_cross/edges/:edgeId/review", ({ params }) => {
@@ -881,6 +1097,100 @@ export const handlers = [
       target_clauses: findings.flatMap((f) => f.target_clauses),
       findings,
       counts: reviewCounts(findings as never),
+    });
+  }),
+
+  // Aggregate cross-links (Overlap Alerts card + Cross-Workstream Intelligence
+  // metrics/list). Empty by default so the App smoke test's plain "/" render
+  // doesn't surface an alert; tests for those surfaces override this handler
+  // with `server.use(...)`.
+  http.get("*/api/cross-links", () => {
+    return HttpResponse.json({ links: [] });
+  }),
+
+  // Relationship detail (Cross-Workstream Intelligence panel). Serves the
+  // seeded link with both regulatory profiles, shared attributes, reasons and
+  // verbatim clause evidence.
+  http.get("*/api/cross-links/:edgeId", ({ params }) => {
+    const edgeId = params.edgeId as string;
+    return HttpResponse.json({
+      id: edgeId,
+      edge_type: "parallel-to",
+      detected_at: CROSS_LINK.detected_at,
+      classification: CROSS_LINK.classification,
+      risk_level: CROSS_LINK.risk_level,
+      near: {
+        node_id: "opres-dp-2025",
+        title: "OpRes DP (Dec 2025)",
+        node_type: "internal-published",
+        issuer: "BNM",
+        short_type: "DP",
+        description: null,
+        workstream_id: "opres-v2",
+        workstream_name: "Operational Resilience v0.3",
+        concepts: {
+          status: "available",
+          policy_owner: "Aisyah R.",
+          applicability: null,
+          empowerment_framework: null,
+          requirement: null,
+          issuance_date: null,
+          effective_date: null,
+          keywords: ["operational resilience"],
+          legal_basis: ["FSA 2013"],
+          ismp_classification: null,
+        },
+      },
+      far: {
+        node_id: "of-ed-2025",
+        title: "Open Finance ED — 18 Nov 2025",
+        node_type: "task",
+        issuer: "BNM",
+        short_type: "ED",
+        description: null,
+        workstream_id: "open-finance-ed",
+        workstream_name: "Open Finance ED · 2025",
+        concepts: {
+          status: "available",
+          policy_owner: "Jarod N.",
+          applicability: null,
+          empowerment_framework: null,
+          requirement: null,
+          issuance_date: "2025-11-18",
+          effective_date: null,
+          keywords: ["open finance", "operational resilience"],
+          legal_basis: ["FSA 2013"],
+          ismp_classification: null,
+        },
+      },
+      shared_attributes: CROSS_LINK.shared_attributes,
+      reasons: CROSS_LINK.reasons,
+      labels: CROSS_LINK.labels,
+      counts: CROSS_LINK.counts,
+      findings: [
+        {
+          id: `${edgeId}~0`,
+          review_state: "pending",
+          summary:
+            "Open finance's board oversight requirement goes beyond the DP's responsibility mapping",
+          label: "goes-beyond",
+          sentiment: null,
+          scope_note: "No single accountable person is mandated.",
+          supported: true,
+          source_clauses: [
+            {
+              clause_number: "Open Finance 7.1",
+              text: "The board and senior management shall exercise effective oversight of an FSP's implementation of open finance.",
+            },
+          ],
+          target_clauses: [
+            {
+              clause_number: "Operational Resilience 6.3",
+              text: "Responsibility Mapping identifies the person accountable for each critical operation.",
+            },
+          ],
+        },
+      ],
     });
   }),
 
@@ -1155,7 +1465,10 @@ export const handlers = [
     }
     const task = TASKS[nodeId];
     if (task) {
-      return HttpResponse.json(task);
+      return HttpResponse.json({
+        ...task,
+        workflow: taskWorkflow.get(nodeId) ?? task.workflow,
+      });
     }
     if (nodeId in NODE_TYPES) {
       return jsonError(
@@ -1170,6 +1483,47 @@ export const handlers = [
       `Node ${nodeId} not found in workstream ${workstreamId}`,
     );
   }),
+  http.patch(
+    "*/api/workstreams/:workstreamId/tasks/:nodeId/workflow",
+    async ({ params, request }) => {
+      const { nodeId } = params as { nodeId: string };
+      if (!(nodeId in TASKS)) {
+        return jsonError(400, "NOT_A_TASK", `Node ${nodeId} is not a task`);
+      }
+      const body = (await request.json()) as {
+        status?: string;
+        actor_id?: string;
+      };
+      if (
+        body.status !== "draft" &&
+        body.status !== "pending_review" &&
+        body.status !== "approved"
+      ) {
+        return jsonError(
+          400,
+          "INVALID_WORKFLOW_STATE",
+          `status must be draft|pending_review|approved, got ${body.status}`,
+        );
+      }
+      const actor = DIRECTORY.find((p) => p.id === body.actor_id);
+      if (!actor) {
+        return jsonError(
+          400,
+          "INVALID_ACTOR",
+          `actor_id ${body.actor_id} is not in the directory`,
+        );
+      }
+      const previous = taskWorkflow.get(nodeId) ?? TASKS[nodeId].workflow;
+      const workflow: TaskWorkflow = { ...previous, status: body.status };
+      if (body.status === "pending_review") workflow.checker = actor;
+      if (body.status === "approved") {
+        workflow.approved_by = actor;
+        workflow.approved_at = "2026-07-19T09:00:00Z";
+      }
+      taskWorkflow.set(nodeId, workflow);
+      return HttpResponse.json({ workflow });
+    },
+  ),
   http.get(
     "*/api/workstreams/:workstreamId/edges/:edgeId/findings",
     ({ params }) => {

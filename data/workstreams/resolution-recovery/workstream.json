@@ -1,0 +1,12 @@
+{
+  "id": "resolution-recovery",
+  "name": "Resolution & Recovery Planning",
+  "deliverable_type": "Policy Document",
+  "role": "review",
+  "description": "BNM Resolution & Recovery Planning workstream, revising the Recovery Planning policy document (RRP framework) in parallel with the Business Continuity Management review.",
+  "primary_task_id": "rrp-pd-v0-1",
+  "target_publication": "2026-09-30",
+  "owner": { "id": "ps", "name": "Priya S." },
+  "reviewers": [{ "id": "ar", "name": "Aisyah R." }],
+  "access": "department_wide"
+}

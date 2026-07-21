@@ -35,7 +35,17 @@ from fastapi.responses import JSONResponse
 from engine.clauses import load_clause_index
 from engine.connections import find_connections as _default_find_connections
 from engine.config import REPO_ROOT
-from engine import copilot_scripts, directory, drafts, findings, workstreams
+from engine import (
+    concepts,
+    copilot_scripts,
+    cross_intel,
+    directory,
+    drafts,
+    findings,
+    linkage_review,
+    tasks,
+    workstreams,
+)
 
 # The Workstream Brain fixture store (Task 1): one directory per workstream, each
 # holding a `graph.json` (`{"nodes": [...], "edges": [...]}`) and a `findings/`
@@ -74,6 +84,207 @@ def _workstream_name(workstreams_dir: Path, workstream_id: Optional[str]) -> Opt
         return None
     meta = workstreams.load_workstream(workstreams_dir, workstream_id)
     return meta.get("name") if meta else None
+
+
+def _cross_link_findings_summary(
+    workstreams_dir: Path, edge_id: str
+) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    """An edge's findings plus a tally by label. Shared by the per-workstream
+    and aggregate cross-links routes so the two never drift on how a link's
+    findings are read or counted."""
+    try:
+        edge_findings = findings.load(workstreams_dir, CROSS_STORE, edge_id)
+    except findings.FindingsNotAnalysedError:
+        edge_findings = []
+    labels: dict[str, int] = {}
+    for finding in edge_findings:
+        label = finding.get("label")
+        labels[label] = labels.get(label, 0) + 1
+    return edge_findings, labels
+
+
+def _all_cross_links(workstreams_dir: Path) -> list[dict[str, Any]]:
+    """Every cross-workstream link in the corpus, once each — not relative to
+    an asking workstream (the edge's own source side is `near`, target side is
+    `far`). Backs the aggregate `GET /api/cross-links` route (Overlap Alerts);
+    the per-workstream route below still reorients near/far relative to the
+    workstream asked about.
+    """
+    cross = workstreams.load_graph(workstreams_dir, CROSS_STORE)
+    if cross is None:
+        return []
+
+    nodes_by_id = {n["id"]: n for n in cross.get("nodes", [])}
+
+    def _side(node_id: str) -> dict[str, Any]:
+        node = nodes_by_id.get(node_id, {})
+        workstream_id = node.get("workstream_id")
+        return {
+            "node_id": node_id,
+            "title": node.get("title"),
+            "workstream_id": workstream_id,
+            "workstream_name": _workstream_name(workstreams_dir, workstream_id),
+        }
+
+    links: list[dict[str, Any]] = []
+    for edge in cross.get("edges", []):
+        edge_findings, labels = _cross_link_findings_summary(workstreams_dir, edge["id"])
+        near, far = _side(edge["source"]), _side(edge["target"])
+        links.append(
+            {
+                "id": edge["id"],
+                "edge_type": edge.get("edge_type"),
+                "near": near,
+                "far": far,
+                "findings_count": len(edge_findings),
+                "labels": labels,
+                "counts": findings.counts(edge_findings),
+                **_cross_intel_block(
+                    workstreams_dir,
+                    near["workstream_id"],
+                    near["node_id"],
+                    far["workstream_id"],
+                    far["node_id"],
+                    labels,
+                    edge,
+                ),
+            }
+        )
+    return links
+
+
+def _cross_intel_block(
+    workstreams_dir: Path,
+    near_workstream_id: Optional[str],
+    near_node_id: str,
+    far_workstream_id: Optional[str],
+    far_node_id: str,
+    labels: dict[str, int],
+    edge: dict[str, Any],
+) -> dict[str, Any]:
+    """The Cross-Workstream Intelligence enrichment shared by every cross-link
+    surface: what the two documents share, why the overlap was flagged, and how
+    the linkage labels roll up to a classification + risk level. Loads each
+    side's concept metadata (absent → empty, so a signal simply does not fire).
+    """
+    near_concepts = (
+        concepts.load_concepts(workstreams_dir, near_workstream_id, near_node_id)
+        if near_workstream_id
+        else None
+    ) or {}
+    far_concepts = (
+        concepts.load_concepts(workstreams_dir, far_workstream_id, far_node_id)
+        if far_workstream_id
+        else None
+    ) or {}
+    shared = cross_intel.shared_attributes(near_concepts, far_concepts)
+    classification, risk_level = cross_intel.classify(labels)
+    return {
+        "classification": classification,
+        "risk_level": risk_level,
+        "detected_at": edge.get("detected_at"),
+        "shared_attributes": shared,
+        "reasons": cross_intel.reasons(shared, labels),
+    }
+
+
+def _cross_profile(
+    workstreams_dir: Path, node: dict[str, Any], workstream_id: Optional[str]
+) -> dict[str, Any]:
+    """One side of a relationship-detail: the document plus its regulatory
+    profile (concept metadata), for the intelligence panel and comparison view.
+    """
+    node_concepts = (
+        concepts.load_concepts(workstreams_dir, workstream_id, node["id"])
+        if workstream_id
+        else None
+    )
+    return {
+        "node_id": node["id"],
+        "title": node.get("title"),
+        "node_type": node.get("node_type"),
+        "issuer": node.get("issuer"),
+        "short_type": node.get("short_type"),
+        "description": node.get("description"),
+        "workstream_id": workstream_id,
+        "workstream_name": _workstream_name(workstreams_dir, workstream_id),
+        "concepts": (
+            {"status": "available", **node_concepts}
+            if node_concepts is not None
+            else {"status": "placeholder", "message": "Concept extraction not enabled in MVP1"}
+        ),
+    }
+
+
+def _linkage_review_rows(
+    workstreams_dir: Path, workstream_id: str, edge_id: str
+) -> list[dict[str, Any]]:
+    """Every linkage on an edge, each with its finding summary + maker-checker
+    record (defaulted to ai_detected when never acted on). Shared by the
+    per-edge linkage-review route and the aggregate Review Queue."""
+    try:
+        edge_findings = findings.load(workstreams_dir, workstream_id, edge_id)
+    except findings.FindingsNotAnalysedError:
+        return []
+    records = linkage_review.load_edge(workstreams_dir, workstream_id, edge_id)
+    rows: list[dict[str, Any]] = []
+    for finding in edge_findings:
+        fid = finding["id"]
+        record = records.get(fid) or linkage_review.default_record()
+        rows.append(
+            {
+                "finding_id": fid,
+                "summary": finding.get("summary"),
+                "label": finding.get("label"),
+                "sentiment": finding.get("sentiment"),
+                "review": record,
+            }
+        )
+    return rows
+
+
+def _review_queue_items(workstreams_dir: Path) -> list[dict[str, Any]]:
+    """The Review Queue's working set: every cross-workstream linkage with its
+    maker-checker status and the two workstreams it spans. Cross-workstream
+    overlaps are the linkages that most need a human before FPWG, so the queue
+    is built over the `_cross` store."""
+    cross = workstreams.load_graph(workstreams_dir, CROSS_STORE)
+    if cross is None:
+        return []
+    nodes_by_id = {n["id"]: n for n in cross.get("nodes", [])}
+
+    def _side(node_id: str) -> dict[str, Any]:
+        node = nodes_by_id.get(node_id, {})
+        ws_id = node.get("workstream_id")
+        return {
+            "node_id": node_id,
+            "title": node.get("title"),
+            "workstream_id": ws_id,
+            "workstream_name": _workstream_name(workstreams_dir, ws_id),
+        }
+
+    items: list[dict[str, Any]] = []
+    for edge in cross.get("edges", []):
+        near, far = _side(edge["source"]), _side(edge["target"])
+        for row in _linkage_review_rows(workstreams_dir, CROSS_STORE, edge["id"]):
+            items.append(
+                {
+                    "workstream_id": CROSS_STORE,
+                    "edge_id": edge["id"],
+                    "finding_id": row["finding_id"],
+                    "summary": row["summary"],
+                    "label": row["label"],
+                    "sentiment": row["sentiment"],
+                    "near": near,
+                    "far": far,
+                    "status": row["review"]["status"],
+                    "maker": row["review"]["maker"],
+                    "checker": row["review"]["checker"],
+                    "created_at": row["review"]["created_at"],
+                    "checked_at": row["review"]["checked_at"],
+                }
+            )
+    return items
 
 def _ws_error(
     status_code: int, code: str, message: str, field: Optional[str] = None
@@ -123,6 +334,17 @@ def create_app(
         are required — every route is a projection over `workstreams_dir`.
     """
     app = FastAPI(title="Workstream Brain — read API")
+
+    # CORS: allow the Vite dev server and common local ports to reach the API.
+    from fastapi.middleware.cors import CORSMiddleware
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost:5173", "http://localhost:3000"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     workstreams_dir = Path(workstreams_dir)
 
@@ -201,8 +423,12 @@ def create_app(
                 "clause_count": clause_count,
                 "last_edited_at": node.get("last_edited_at"),
             }
+            workflow = tasks.load_workflow(
+                workstreams_dir, workstream_id, node_id, node.get("status")
+            )
             return {
                 "task": task,
+                "workflow": workflow,
                 "neighbours": neighbours,
                 "draft_empty": clause_count == 0,
             }
@@ -212,6 +438,59 @@ def create_app(
                 "INTERNAL_ERROR",
                 f"Failed to load task {node_id} in workstream {workstream_id}",
             )
+
+    @app.patch("/api/workstreams/{workstream_id}/tasks/{node_id}/workflow")
+    async def patch_task_workflow(
+        workstream_id: str, node_id: str, request: Request
+    ) -> Any:
+        """Move a task through Maker-Checker — Draft -> Pending Review -> Approved.
+
+        Mirrors `patch_finding_review_state`'s shape: validate the target
+        state, persist via `engine.tasks`, return the updated record. The
+        `actor_id` is whoever performed the transition — recorded as `checker`
+        on Pending Review, `approved_by` on Approved.
+        """
+        ws_graph = _load_workstream_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        nodes_by_id = {n["id"]: n for n in ws_graph.get("nodes", [])}
+        node = nodes_by_id.get(node_id)
+        if node is None:
+            return _ws_error(
+                404,
+                "NODE_NOT_FOUND",
+                f"Node {node_id} not found in workstream {workstream_id}",
+            )
+        if node.get("node_type") != "task":
+            return _ws_error(
+                400,
+                "NOT_A_TASK",
+                f"Node {node_id} is of type {node.get('node_type')}, not task",
+            )
+
+        body = await request.json()
+        status = body.get("status") if isinstance(body, dict) else None
+        if status not in tasks.WORKFLOW_STATES:
+            return _ws_error(
+                400,
+                "INVALID_WORKFLOW_STATE",
+                f"status must be one of {sorted(tasks.WORKFLOW_STATES)}, "
+                f"got {status!r}",
+            )
+
+        actor_id = body.get("actor_id") if isinstance(body, dict) else None
+        actor = directory.person(actor_id) if isinstance(actor_id, str) else None
+        if actor is None:
+            return _ws_error(
+                400, "INVALID_ACTOR", f"actor_id {actor_id!r} is not in the directory"
+            )
+
+        workflow = tasks.set_workflow(
+            workstreams_dir, workstream_id, node_id, node.get("status"), status, actor
+        )
+        return {"workflow": workflow}
 
     @app.get("/api/workstreams/{workstream_id}/edges/{edge_id}/findings")
     def get_workstream_edge_findings(workstream_id: str, edge_id: str) -> Any:
@@ -294,6 +573,19 @@ def create_app(
             )
         return record
 
+    @app.get("/api/cross-links")
+    def get_all_cross_links() -> Any:
+        """Every cross-workstream link in the corpus, regardless of workstream.
+
+        Backs the Home dashboard's Overlap Alerts card and the Institution
+        Map's banner — a proactive, always-visible surface for exactly the
+        drift this product exists to catch, so an overlap like BCM <->
+        Recovery Planning is seen before FPWG rather than after. Same link
+        shape as the per-workstream route below, just not scoped to one
+        workstream's point of view.
+        """
+        return {"links": _all_cross_links(workstreams_dir)}
+
     @app.get("/api/workstreams/{workstream_id}/cross-links")
     def get_cross_links(workstream_id: str) -> Any:
         """Linkages from this workstream's documents into another workstream's.
@@ -324,15 +616,9 @@ def create_app(
             if near_side is None:
                 continue  # this link does not touch the workstream being asked about
             near_id, far_id = near_side
-            try:
-                edge_findings = findings.load(workstreams_dir, CROSS_STORE, edge["id"])
-            except findings.FindingsNotAnalysedError:
-                edge_findings = []
-
-            labels: dict[str, int] = {}
-            for finding in edge_findings:
-                label = finding.get("label")
-                labels[label] = labels.get(label, 0) + 1
+            edge_findings, labels = _cross_link_findings_summary(
+                workstreams_dir, edge["id"]
+            )
 
             far_node = nodes_by_id.get(far_id, {})
             near_node = nodes_by_id.get(near_id, {})
@@ -356,9 +642,135 @@ def create_app(
                     "findings_count": len(edge_findings),
                     "labels": labels,
                     "counts": findings.counts(edge_findings),
+                    **_cross_intel_block(
+                        workstreams_dir,
+                        workstream_id,
+                        near_id,
+                        far_node.get("workstream_id"),
+                        far_id,
+                        labels,
+                        edge,
+                    ),
                 }
             )
         return {"links": links}
+
+    @app.get("/api/cross-links/{edge_id}")
+    def get_cross_link_detail(edge_id: str) -> Any:
+        """One cross-workstream relationship in full: both documents' regulatory
+        profiles, what they share, why it was flagged, the label rollup, and the
+        verbatim clause evidence on every linkage.
+
+        Backs the Cross-Workstream Intelligence relationship panel — the answer
+        to "which other workstream overlaps mine, and why", with the evidence to
+        act on it. Source side is `near`, target side is `far` (the same
+        orientation the review route serves the edge in).
+        """
+        cross = workstreams.load_graph(workstreams_dir, CROSS_STORE)
+        edge = (
+            next((e for e in cross.get("edges", []) if e["id"] == edge_id), None)
+            if cross
+            else None
+        )
+        if edge is None:
+            return _ws_error(
+                404, "CROSS_LINK_NOT_FOUND", f"Cross-workstream link {edge_id} not found"
+            )
+        nodes_by_id = {n["id"]: n for n in cross.get("nodes", [])}
+        near_node = nodes_by_id.get(edge["source"], {"id": edge["source"]})
+        far_node = nodes_by_id.get(edge["target"], {"id": edge["target"]})
+        near_ws = near_node.get("workstream_id") or edge.get("source_workstream_id")
+        far_ws = far_node.get("workstream_id") or edge.get("target_workstream_id")
+
+        edge_findings, labels = _cross_link_findings_summary(workstreams_dir, edge_id)
+        intel = _cross_intel_block(
+            workstreams_dir, near_ws, near_node["id"], far_ws, far_node["id"], labels, edge
+        )
+        return {
+            "id": edge_id,
+            "edge_type": edge.get("edge_type"),
+            "detected_at": intel["detected_at"],
+            "classification": intel["classification"],
+            "risk_level": intel["risk_level"],
+            "near": _cross_profile(workstreams_dir, near_node, near_ws),
+            "far": _cross_profile(workstreams_dir, far_node, far_ws),
+            "shared_attributes": intel["shared_attributes"],
+            "reasons": intel["reasons"],
+            "labels": labels,
+            "counts": findings.counts(edge_findings),
+            "findings": edge_findings,
+        }
+
+    @app.get("/api/review-queue")
+    def get_review_queue() -> Any:
+        """Every cross-workstream linkage that may need a human, with its
+        Maker-Checker status. Backs the Review Queue — the backlog a team clears
+        before a workstream reaches FPWG."""
+        items = _review_queue_items(workstreams_dir)
+        return {
+            "items": items,
+            "counts_by_status": linkage_review.counts_by_status(
+                [{"status": it["status"]} for it in items]
+            ),
+        }
+
+    @app.get("/api/workstreams/{workstream_id}/edges/{edge_id}/linkage-review")
+    def get_linkage_review(workstream_id: str, edge_id: str) -> Any:
+        """The Maker-Checker record for every linkage on an edge (defaulted to
+        ai_detected when never acted on)."""
+        if workstreams.load_graph(workstreams_dir, workstream_id) is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        return {
+            "edge_id": edge_id,
+            "linkages": _linkage_review_rows(workstreams_dir, workstream_id, edge_id),
+        }
+
+    @app.patch(
+        "/api/workstreams/{workstream_id}/edges/{edge_id}/findings/{finding_id}/linkage-review"
+    )
+    def patch_linkage_review(
+        workstream_id: str, edge_id: str, finding_id: str, body: dict[str, Any]
+    ) -> Any:
+        """Apply a Maker-Checker action to one linkage.
+
+        Body: `{action, actor_id, comment?}`. Validates the actor against the
+        directory and the finding against the edge, then runs the state-machine
+        transition (which enforces valid transitions + the maker≠checker rule).
+        """
+        action = body.get("action")
+        actor_id = body.get("actor_id")
+        comment = body.get("comment")
+
+        actor = directory.person(actor_id) if isinstance(actor_id, str) else None
+        if actor is None:
+            return _ws_error(400, "UNKNOWN_ACTOR", f"Unknown actor '{actor_id}'")
+
+        try:
+            edge_findings = findings.load(workstreams_dir, workstream_id, edge_id)
+        except findings.FindingsNotAnalysedError:
+            return _ws_error(
+                400, "EDGE_NOT_ANALYSED", f"Edge {edge_id} has not been analysed yet"
+            )
+        if not any(f["id"] == finding_id for f in edge_findings):
+            return _ws_error(
+                404, "FINDING_NOT_FOUND", f"Finding {finding_id} not found on {edge_id}"
+            )
+
+        try:
+            record = linkage_review.apply_action(
+                workstreams_dir,
+                workstream_id,
+                edge_id,
+                finding_id,
+                action,
+                actor,
+                comment if isinstance(comment, str) and comment.strip() else None,
+            )
+        except linkage_review.LinkageReviewError as exc:
+            return _ws_error(400, exc.code, exc.message)
+        return {"finding_id": finding_id, "review": record}
 
     @app.get("/api/workstreams/{workstream_id}/graph")
     def get_workstream_graph(workstream_id: str) -> Any:
@@ -432,6 +844,7 @@ def create_app(
             for nid in workstreams.neighbour_ids(edge_scope, node_id)
             if nid in all_by_id
         ]
+        node_concepts = concepts.load_concepts(workstreams_dir, workstream_id, node_id)
         return {
             "id": node["id"],
             "node_type": node.get("node_type"),
@@ -440,13 +853,19 @@ def create_app(
             "short_type": node.get("short_type"),
             "description": node.get("description"),
             "source_url": node.get("source_url"),
+            "ismp_classification": node.get("ismp_classification"),
+            "pursuant_to": node.get("pursuant_to"),
             "first_order_neighbours": first_order,
             "second_order_neighbours": {"status": "placeholder", "message": "N/A in demo"},
             "recent_activity": node.get("recent_activity", []),
-            "concepts": {
-                "status": "placeholder",
-                "message": "Concept extraction not enabled in MVP1",
-            },
+            "concepts": (
+                {"status": "available", **node_concepts}
+                if node_concepts is not None
+                else {
+                    "status": "placeholder",
+                    "message": "Concept extraction not enabled in MVP1",
+                }
+            ),
         }
 
     @app.get("/api/workstreams/{workstream_id}/edges/{edge_id}")

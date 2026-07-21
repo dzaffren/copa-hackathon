@@ -1,0 +1,39 @@
+{
+  "nodes": [
+    {
+      "id": "bcm-pd-2022",
+      "node_type": "task",
+      "title": "BCM PD (19 Dec 2022)",
+      "issuer": "BNM",
+      "short_type": "PD",
+      "source_name": "PD-BCM.pdf",
+      "format": ".pdf",
+      "description": "Business Continuity Management policy document issued 19 December 2022 — under review, overlapping the RRP framework on continuity of critical functions.",
+      "source_url": null,
+      "status": "in_progress",
+      "owner": { "id": "jn", "name": "Jarod N." },
+      "reviewers": [{ "id": "ar", "name": "Aisyah R." }],
+      "clause_count": 0,
+      "last_edited_at": "2026-07-14T09:00:00Z",
+      "recent_activity": [],
+      "pursuant_to": "FSA 2013 §143; IFSA 2013 §57; DFIA 2002"
+    },
+    {
+      "id": "fsa-2013-143",
+      "node_type": "act-law",
+      "title": "FSA 2013 §143",
+      "issuer": "Parliament",
+      "short_type": "Act",
+      "description": "Financial Services Act 2013, section 143 — power to issue standards, the statutory basis for the BCM policy document.",
+      "source_url": null
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-bcm_pd_2022--fsa_2013_143",
+      "source": "bcm-pd-2022",
+      "target": "fsa-2013-143",
+      "edge_type": "references"
+    }
+  ]
+}

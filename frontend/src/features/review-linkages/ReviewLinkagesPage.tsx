@@ -46,7 +46,7 @@ export function ReviewLinkagesPage() {
   }, [ordered, activeId]);
 
   if (isLoading) {
-    return <p className="p-6 text-sm text-gray-500">Loading review…</p>;
+    return <p className="p-6 text-sm text-muted-foreground">Loading review…</p>;
   }
 
   if (error) {
@@ -54,14 +54,14 @@ export function ReviewLinkagesPage() {
       error instanceof HttpError && error.code === "EDGE_NOT_ANALYSED";
     return (
       <div className="p-6">
-        <p className="text-sm text-gray-700">
+        <p className="text-sm text-foreground">
           {notAnalysed
             ? "This pair has not been analysed yet. Run Analyze linkages on the workstream graph first."
             : `Could not load this review: ${(error as Error).message}`}
         </p>
         <Link
           to={`/workstreams/${workstreamId}`}
-          className="mt-2 inline-block text-sm text-indigo-600 hover:underline"
+          className="mt-2 inline-block text-sm text-cyan-300 hover:underline"
         >
           Back to the workstream graph
         </Link>
@@ -72,30 +72,50 @@ export function ReviewLinkagesPage() {
   if (!data) return null;
 
   const { edge, counts } = data;
+  const pending = Math.max(0, counts.total - counts.accepted - counts.dismissed);
   const sourceLit = active?.source_clauses.map((c) => c.clause_number) ?? [];
   const targetLit = active?.target_clauses.map((c) => c.clause_number) ?? [];
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-4 p-4">
-      <header>
+      <header className="glass rounded-xl px-4 py-3">
         <Link
           to={`/workstreams/${workstreamId}`}
-          className="text-xs text-indigo-600 hover:underline"
+          className="text-xs text-cyan-300 hover:underline"
         >
-          ← {workstreamId}
+          ← Back to graph
         </Link>
-        <h1 className="mt-1 text-lg font-semibold text-gray-900">
-          {edge.source_node.title} ↔ {edge.target_node.title}
+        <h1 className="mt-1 text-lg font-semibold text-foreground">
+          {edge.source_node.title}{" "}
+          <span className="text-muted-foreground">↔</span>{" "}
+          {edge.target_node.title}
         </h1>
-        <p className="mt-0.5 text-sm text-gray-500">
-          <span data-testid="count-total">{counts.total} findings</span>
-          {" · "}
-          <span data-testid="count-accepted">{counts.accepted} accepted</span>
-          {" · "}
-          <span data-testid="count-dismissed">
+        <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs">
+          <span
+            data-testid="count-total"
+            className="rounded-full bg-accent/60 px-2 py-0.5 font-medium"
+          >
+            {counts.total} findings
+          </span>
+          <span
+            data-testid="count-accepted"
+            className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2 py-0.5 font-medium text-emerald-300"
+          >
+            {counts.accepted} accepted
+          </span>
+          <span
+            data-testid="count-pending"
+            className="rounded-full border border-amber-300/30 bg-amber-400/15 px-2 py-0.5 font-medium text-amber-300"
+          >
+            {pending} pending
+          </span>
+          <span
+            data-testid="count-dismissed"
+            className="rounded-full border border-slate-400/30 bg-slate-500/15 px-2 py-0.5 font-medium text-slate-300"
+          >
             {counts.dismissed} dismissed
           </span>
-        </p>
+        </div>
       </header>
 
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-[1fr_1fr_20rem]">
@@ -119,7 +139,7 @@ export function ReviewLinkagesPage() {
           aria-label="findings"
         >
           {ordered.length === 0 ? (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               No linkages found on this pair.
             </p>
           ) : (

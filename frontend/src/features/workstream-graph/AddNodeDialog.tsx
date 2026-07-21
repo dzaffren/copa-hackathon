@@ -11,18 +11,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import { createNode } from "@/lib/api";
 import type { EdgeType, GraphNode, NodeType } from "@/lib/types";
-
-const NODE_TYPE_OPTIONS: NodeType[] = [
-  "task",
-  "internal-published",
-  "international-standard",
-  "peer-regulator",
-  "act-law",
-  "industry-input",
-  "others",
-];
+import { NODE_LEGEND, NODE_LEGEND_ORDER } from "./legend";
 
 const EDGE_TYPE_OPTIONS: EdgeType[] = [
   "supersedes",
@@ -43,13 +35,15 @@ interface AddNodeDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const fieldClass = "w-full rounded-md border px-3 py-2 text-sm";
+const fieldClass =
+  "w-full rounded-md border border-border/70 bg-background/60 px-3 py-2 text-sm outline-none focus:border-cyan-400/60 focus:ring-1 focus:ring-cyan-400/40";
 
 /**
  * Add-node modal. A plain controlled form (consistent with the existing task
- * dialogs — no react-hook-form/zod dependency). "Add to graph" stays disabled
- * until a title is set and at least one complete edge row (target + type) is
- * declared, mirroring the server's EDGE_REQUIRED rule.
+ * dialogs — no react-hook-form/zod dependency). The node type is chosen from a
+ * colour-coded grid of the seven types. "Add to graph" stays disabled until a
+ * title is set and at least one complete edge row (target + type) is declared,
+ * mirroring the server's EDGE_REQUIRED rule.
  */
 export function AddNodeDialog({
   workstreamId,
@@ -113,7 +107,7 @@ export function AddNodeDialog({
         onOpenChange(o);
       }}
     >
-      <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
+      <DialogContent className="glass max-h-[90vh] max-w-lg overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add node</DialogTitle>
           <DialogDescription>
@@ -122,22 +116,44 @@ export function AddNodeDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-3">
-          <label className="block text-sm">
-            <span className="mb-1 block font-medium">Node type</span>
-            <select
-              className={fieldClass}
-              value={nodeType}
-              onChange={(e) => setNodeType(e.target.value as NodeType)}
+        <div className="space-y-4">
+          <div>
+            <span className="mb-1.5 block text-sm font-medium">Node type</span>
+            <div
+              role="radiogroup"
               aria-label="Node type"
+              className="grid grid-cols-2 gap-1.5 sm:grid-cols-3"
             >
-              {NODE_TYPE_OPTIONS.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
-          </label>
+              {NODE_LEGEND_ORDER.map((t) => {
+                const selected = t === nodeType;
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    aria-label={t}
+                    onClick={() => setNodeType(t)}
+                    className={cn(
+                      "flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-left text-[11px] font-medium transition",
+                      selected
+                        ? "border-cyan-400/60 bg-cyan-500/10 ring-1 ring-cyan-400/40"
+                        : "border-border/60 hover:bg-accent/50",
+                    )}
+                  >
+                    <span
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{
+                        backgroundColor: NODE_LEGEND[t].fill,
+                        boxShadow: `0 0 5px ${NODE_LEGEND[t].stroke}`,
+                      }}
+                    />
+                    <span className="truncate">{t}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           <label className="block text-sm">
             <span className="mb-1 block font-medium">Title</span>
@@ -176,14 +192,14 @@ export function AddNodeDialog({
             <span className="mb-1 block font-medium">Attachment</span>
             <input
               type="file"
-              className="block text-sm"
+              className="block text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-sm file:text-foreground"
               aria-label="Attachment"
               accept=".pdf,.docx"
             />
           </label>
 
           <div>
-            <div className="mb-1 flex items-center justify-between">
+            <div className="mb-1.5 flex items-center justify-between">
               <span className="text-sm font-medium">Edges</span>
               <Button
                 type="button"
@@ -236,7 +252,7 @@ export function AddNodeDialog({
                       type="button"
                       aria-label={`Remove edge ${i + 1}`}
                       onClick={() => removeRow(i)}
-                      className="rounded p-1 text-gray-400 hover:text-red-600"
+                      className="rounded p-1 text-muted-foreground hover:text-red-400"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -260,7 +276,7 @@ export function AddNodeDialog({
           </Button>
           <Button
             type="button"
-            className="bg-indigo-600 hover:bg-indigo-700"
+            className="bg-cyan-500 text-slate-950 hover:bg-cyan-400"
             disabled={!canSubmit || mutation.isPending}
             onClick={() => mutation.mutate()}
           >

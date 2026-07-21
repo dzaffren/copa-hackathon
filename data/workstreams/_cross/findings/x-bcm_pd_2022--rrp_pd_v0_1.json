@@ -1,0 +1,683 @@
+[
+  {
+    "summary": "Both documents share the objective of preserving continuity of critical functions to maintain orderly market conditions and public confidence in the financial system.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 1.1",
+        "text": "Operational resilience of financial institutions is critical to ensure continuity in the provision of financial services through periods of disruptions, maintain orderly market conditions and sustain public confidence in the financial system."
+      },
+      {
+        "clause_number": "BCM 1.3(c)",
+        "text": "preserve the continuity of critical business functions and essential services within a specified timeframe in the event of an operational disruption. ### 2 Applicability"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 1.2(i)",
+        "text": "preserve continuity of critical functions to support the financial intermediation process, orderly market conditions and maintain public confidence in the financial system;"
+      },
+      {
+        "clause_number": "Recovery Planning 11.10",
+        "text": "The continuity of critical functions and critical shared services is important to prevent potential systemic disruptions that could adversely impact the functioning of the real economy and financial stability, such as -"
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~0",
+    "review_state": "accepted"
+  },
+  {
+    "summary": "Both require identification of critical business functions/critical functions whose disruption threatens essential services and financial stability.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": "BCM defines CBFs from an operational continuity perspective (internal functions supporting essential services); Recovery Planning defines critical functions narrowly as those performed for third parties whose failure disrupts the real economy. Overlapping but not identical scoping.",
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 9.7",
+        "text": "Based on the outcome of the RA and BIA, a financial institution must identify its CBFs and establish priorities for recovery."
+      },
+      {
+        "clause_number": "BCM 9.8",
+        "text": "In determining CBFs, a financial institution may be guided by business functions which involve the following:"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 11.11",
+        "text": "A financial institution shall identify its critical functions, which refer to underlying operations, activities or services that are performed by a financial institution for third parties11 where the failure or discontinuance of such function would likely lead to the disruption of services that are essential for the functioning of the real economy and financial stability."
+      },
+      {
+        "clause_number": "Recovery Planning 11.12",
+        "text": "In identifying critical functions12, a financial institution must consider the impact of sudden discontinuance of the functions on customers, other financial institutions, financial markets, FMIs, and other relevant stakeholders that rely on the critical function, having regard to the following criteria -"
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~1",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both require board and senior management oversight of the respective framework, integrated with the overall risk appetite and risk management framework.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 8.1",
+        "text": "The board and senior management's roles on the business continuity of a financial institution are vital. The board and senior management must be responsible for the effective oversight and implementation of the BCM framework that is integrated with the overall risk management framework of the financial institution2."
+      },
+      {
+        "clause_number": "BCM 8.2",
+        "text": "In fulfilling its responsibilities under paragraph 8.1, the board must-"
+      },
+      {
+        "clause_number": "BCM 8.3",
+        "text": "In fulfilling its responsibilities under paragraph 8.1, the senior management must-"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 12.1",
+        "text": "A financial institution shall establish sound governance arrangements to oversee and manage the recovery planning process. A financial institution shall, at minimum, establish -"
+      },
+      {
+        "clause_number": "Recovery Planning 12.2",
+        "text": "The board of the financial institution shall exercise effective oversight on all aspects of the development, maintenance and implementation of the recovery plan. In doing so, the board shall, at minimum -"
+      },
+      {
+        "clause_number": "Recovery Planning 12.3",
+        "text": "The designated senior officer and the designated internal governing body shall be responsible for the development, maintenance, activation and implementation of recovery plan. In this capacity, the senior officer shall -"
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~2",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both require an independent party (internal audit or external) to review/assess the respective framework or plan.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": "BCM mandates internal audit coverage of BCM with an option to also engage an independent party; Recovery Planning requires an independent review (internal audit or qualified external party) at minimum after initial development or significant updates.",
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 8.8",
+        "text": "The internal audit of a financial institution is responsible for providing an independent assessment of the BCM framework. In fulfilling its responsibilities, the internal audit must-"
+      },
+      {
+        "clause_number": "BCM 8.9",
+        "text": "A financial institution may engage an independent party4 to audit the BCM framework."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 12.6",
+        "text": "A financial institution must ensure that the recovery plan is reviewed by an independent party, which may either be the internal audit function or an external party which is qualified and competent to conduct such review with the objective to provide independent assurance on the -"
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~3",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both require notification to the Bank upon activation/disruption, but BCM sets tiered timelines (2-48 hours by level of disruption) whereas recovery planning requires notification within 24 hours of activation plus advance notice.",
+    "label": "differs-on",
+    "sentiment": "neutral",
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 10.4",
+        "text": "A financial institution must notify the Bank of a disruption that is not a cyber incident within the respective timelines for the corresponding LoD, as set out in the table below: <table> <tr> <th>LoD</th> <th>Notification Timeline</th> </tr> <tr> <td>1</td> <td>Within 48 hours from the detection of the disruption for all information specified in the reporting template (Attachment 1) that is applicable to the disruption concerned</td> </tr> <tr> <td>2</td> <td>Within 24 hours from the detection of the disruption for all information specified in the reporting template (Attachment 1) that is applicable to the disruption concerned</td> </tr> <tr> <td>3, 4,5</td> <td>(a) Within 2 hours from the detection of the disruption for mandatory information specified in the reporting template (Attachment 1); and (b) Within 12 hours after the initial notification referred to in paragraph (a) for all remaining information specified in the reporting template (Attachment 1) that is applicable to the disruption concerned.</td> </tr> </table> #### Cyber incident"
+      },
+      {
+        "clause_number": "BCM 10.5",
+        "text": "For all cyber incidents, a financial institution must notify the Bank within 2 hours upon the confirmation 11 of the disruption. #### Requirements for all forms of disruptions"
+      },
+      {
+        "clause_number": "BCM 10.9",
+        "text": "As the information on disruptions could change as more details on the disruption come to light, a financial institution must progressively update the Bank with the latest information as it becomes available to facilitate appropriate response and intervention by the Bank, where necessary."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 12.8",
+        "text": "A financial institution shall inform the Bank in advance of its intentions to activate its recovery plan. In addition, the financial institution shall formally notify the Bank within 24 hours upon the activation of the recovery plan. In notifying the Bank, the financial institution shall include -"
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~4",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both require periodic testing of the respective plan to evaluate its effectiveness and improve preparedness.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": "BCM prescribes mandatory at-least-annual testing of BCP/DRP/CMP with detailed live-run requirements; Recovery Planning testing is a more flexible evolving framework (desktop simulations, fire drills, backtesting) without a fixed annual cadence.",
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 9.44",
+        "text": "A financial institution must have in place a rigorous testing program to evaluate the functionality and effectiveness of its BCM, readiness of staff and adequacy of resources in an event of a disruption. The testing program must cover the CMP, BCP and DRP of a financial institution."
+      },
+      {
+        "clause_number": "BCM 9.47",
+        "text": "A financial institution must conduct periodic testing of the following, at least annually:"
+      },
+      {
+        "clause_number": "BCM 9.51",
+        "text": "In designing and carrying out the testing, a financial institution must-"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 18.1",
+        "text": "Notwithstanding paragraph 17.1, a financial institution shall establish a framework to periodically test the efficacy of the recovery plan. These tests would serve to identify potential shortcomings in the plan, demonstrate how the arrangements set out in the plan would work in practice and ultimately improve overall crisis preparedness. Based on the findings and recommendations from these periodic tests, a financial institution shall identify additional preparatory measures and incorporate them into the recovery plan, as set out in paragraphs 17.1 and 17.2."
+      },
+      {
+        "clause_number": "Recovery Planning 18.2",
+        "text": "Financial institutions may perform these periodic tests by adopting approaches that best suit the financial institution's size, complexity and risk management framework. Testing approaches may include, but are not limited to desktop simulations, fire drills or 'live' simulations, and backtesting. Initially, a financial institution may opt to test specific parts of the recovery plan, such as:"
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~5",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both require a communication/crisis communication plan addressing stakeholders to maintain public confidence during stress.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 9.29",
+        "text": "A financial institution must formulate a crisis communication strategy and a crisis communication plan, which is incorporated in its CMP."
+      },
+      {
+        "clause_number": "BCM 9.30",
+        "text": "In the crisis communication plan, a financial institution must include-"
+      },
+      {
+        "clause_number": "BCM 9.32",
+        "text": "A financial institution must ensure that its crisis communication provides clarity to its stakeholders on the business continuity and recovery actions that would be taken to restore the CBFs and essential services."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 16.1",
+        "text": "Developing clear communication and disclosure strategies ensures that all relevant stakeholders are adequately informed throughout the recovery planning process in a timely manner. Such strategies enable the financial institution to be agile in its response which is vital in maintaining confidence of customers, counterparties and the public at large. #"
+      },
+      {
+        "clause_number": "Recovery Planning 16.2",
+        "text": "As part of the recovery plan, a financial institution shall develop a communication and disclosure plan that, at a minimum, takes into account the following -"
+      },
+      {
+        "clause_number": "Recovery Planning 16.3",
+        "text": "The communication and disclosure plan shall include, at minimum, the following -"
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~6",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both require assessment of intra-group and external interdependencies necessary for critical functions and consideration of contagion/systemic impact.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 9.34",
+        "text": "A financial institution must have in place processes& to identify and assess various internal and external interdependencies 9 (within and outside of the financial institution) that are necessary for the CBFs to operate, to minimise gaps and blind spots in BCM."
+      },
+      {
+        "clause_number": "BCM 9.35",
+        "text": "Where interdependencies exist, a financial institution must-"
+      },
+      {
+        "clause_number": "BCM 9.36",
+        "text": "For a financial institution that is a part of a financial group, the financial institution, when developing its BCM framework, must-"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 11.21",
+        "text": "A financial institution shall identify material dependencies and assess key risk transmission channels and the extent of potential contagion and systemic impact arising from the disruption or failure of such dependencies which may be financial, operational or legal in nature (Figure 2). Such information is necessary to assess the feasibility of recovery options, particularly in identifying"
+      },
+      {
+        "clause_number": "Recovery Planning 11.17",
+        "text": "Critical shared services refer to the underlying operations, activities or services that are performed for one or more covered entities, where the failure or discontinuance of such services would present a serious impediment or completely impair the performance of one or more critical functions. A financial institution shall identify critical shared services that are performed by an internal unit, a covered or related entity and/or outsourced to external providers."
+      },
+      {
+        "clause_number": "Recovery Planning 11.18",
+        "text": "In identifying critical shared services, a financial institution shall take into consideration the following criteria -"
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~7",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both require the respective plan to address outsourcing arrangements and comply with the Outsourcing policy document.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": "BCM imposes substantive contractual requirements on key service providers (aligned MTD/RTO, integrated testing participation, audit access); Recovery Planning only cross-references Outsourcing as a related instrument without equivalent operational BCP clauses. BCM is materially more detailed on this axis.",
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 9.24",
+        "text": "A financial institution must ensure that its CMP, BCP and DRP provide for all outsourcing arrangements and comply with the relevant requirements in the policy document on Outsourcing."
+      },
+      {
+        "clause_number": "BCM 9.25",
+        "text": "To enhance the effectiveness of BCM, a financial institution must incorporate the following requirements and clauses in contractual and outsourcing arrangements with key service providers, suppliers and counterparties:"
+      },
+      {
+        "clause_number": "BCM 9.41",
+        "text": "Where the alternate site or recovery site is managed or owned by a third party, a financial institution must ensure its outsourcing arrangements are in accordance with the policy document on Outsourcing, particularly the following:"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 6.1(e)",
+        "text": "Outsourcing;"
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~8",
+    "review_state": "pending"
+  },
+  {
+    "summary": "BCM addresses Islamic operations only lightly (consistency of assessment within a financial group), whereas Recovery Planning has extensive Shariah-specific requirements including Shariah Committee involvement and Shariah-contract feasibility for recovery options. Our side does not cover the Shariah dimension.",
+    "label": "silent-on",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 9.36",
+        "text": "For a financial institution that is a part of a financial group, the financial institution, when developing its BCM framework, must-"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 12.4",
+        "text": "For a recovery plan involving Islamic entities, a financial institution shall refer its recovery plan to its Shariah Committee and seek advice on Shariah requirements consistent with the Bank's Shariah Governance policy document. In the context of recovery plan, the Shariah Committee must -"
+      },
+      {
+        "clause_number": "Recovery Planning 8.5",
+        "text": "A financial institution must ensure that the recovery plan involving Islamic entities adheres to Shariah requirements, including matters specific to Islamic financial transactions which may have an impact on the development and implementation of the recovery plan. ## G <figure> <figcaption>Figure 1 - Stylised illustration of interlinkages between recovery planning components with risk appetite and risk management frameworks5</figcaption> Stress severity Normal stress beyond normal stress extreme stress Risk Appetite Framework Risk appetite Risk tolerance Risk capacity Recovery planning components Key business states Business as usual (BAU) Early warning phase Recovery phase Calibration of risk limits and recovery indicators Risk appetite limits Risk tolerance limits Non-viability Resolution phase triggered upon notice of non- viability by the Bank Early warning thresholds Recovery thresholds Risk management processes and governance BAU monitoring Intensified monitoring Development, approval and maintenance of recovery plan Escalation and activation of early warning phase or recovery phase Management actions and recovery options Implement actions or options to revert to desired risk levels ICAAP, contingency plan, business continuity plan Menu of recovery options </figure> ICAAP - Internal Capital Adequacy Assessment Process"
+      },
+      {
+        "clause_number": "Recovery Planning 14.11",
+        "text": "For recovery options involving Islamic entities, consideration shall be given by a financial institution to the following aspects when conducting the feasibility assessment -"
+      },
+      {
+        "clause_number": "Recovery Planning 11.15",
+        "text": "For financial institutions with significant Islamic operations, a financial institution may separately assess the criticality of the conventional and Islamic functions performed."
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~9",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Recovery planning requires scenario analysis using severe near-non-viability stress scenarios and recovery options to restore financial viability, a dimension not covered by BCM which focuses on operational continuity.",
+    "label": "silent-on",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 9.4",
+        "text": "For purposes of paragraph 9.3, examples of possible scenarios that may cause operational disruption are listed in Appendix 1."
+      },
+      {
+        "clause_number": "BCM 9.6",
+        "text": "In performing the RA and BIA, a financial institution must include the following consideration:"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 15.1",
+        "text": "The aim of scenario analysis is to assess under a range of stress scenarios -"
+      },
+      {
+        "clause_number": "Recovery Planning 15.2",
+        "text": "To conduct the analysis, a financial institution shall develop a set of stress scenarios, incorporating adverse events that are -"
+      },
+      {
+        "clause_number": "Recovery Planning 15.3",
+        "text": "The set of stress scenarios must be sufficiently diverse to ensure the relevance of the recovery plan under a range of adverse conditions. At minimum, a financial institution shall develop three stress scenarios, including-"
+      },
+      {
+        "clause_number": "Recovery Planning 14.1",
+        "text": "A financial institution shall develop and maintain a set of actionable and credible recovery options to restore financial soundness and preserve long-term viability of the financial institution, in particular SEs that carry out core business lines, critical functions or critical shared services. Such recovery options must be substantially within its direct control23, supported by a clear implementation plan, and capable of being executed within an appropriate timeframe to ensure"
+      },
+      {
+        "clause_number": "Recovery Planning 14.3",
+        "text": "In developing the set of recovery options, the financial institution must -"
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~10",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Recovery planning requires a recovery indicator framework with calibrated early warning and recovery thresholds, which BCM does not address.",
+    "label": "silent-on",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 9.10",
+        "text": "Based on the RA and BIA performed, a financial institution must determine the business continuity objectives for CBFs that correspond to varying levels of disruption as defined in paragraph 10.2. The business continuity objectives, which include the MTD and RTO, must -"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 13.1",
+        "text": "A financial institution shall establish a recovery indicator framework that sets out clearly defined criteria, thresholds, procedures and governance arrangements to facilitate timely monitoring, escalation, activation and implementation of the recovery plan. Such framework shall -"
+      },
+      {
+        "clause_number": "Recovery Planning 13.2",
+        "text": "A financial institution shall develop a suite of quantitative and qualitative recovery indicators that are -"
+      },
+      {
+        "clause_number": "Recovery Planning 13.6",
+        "text": "For each applicable recovery indicator, a financial institution shall establish an early warning and a recovery threshold to facilitate the implementation of recovery options under different stress scenarios. The calibration of these thresholds shall, at minimum, take into consideration -"
+      },
+      {
+        "clause_number": "Recovery Planning 13.7",
+        "text": "A financial institution shall calibrate -"
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~11",
+    "review_state": "pending"
+  },
+  {
+    "summary": "BCM requires detailed disaster recovery/alternate site technical requirements and recovery time objectives (MTD/RTO) for operational continuity, which recovery planning does not address.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 9.11",
+        "text": "A financial institution must set shorter MTD and RTO for business functions that have significant impact on customer services such as those listed in paragraph 9.14."
+      },
+      {
+        "clause_number": "BCM 9.12",
+        "text": "In determining the MTD and RTO, a financial institution must ensure that:"
+      },
+      {
+        "clause_number": "BCM 9.37",
+        "text": "A financial institution must set up its alternate site and recovery site that can be used if the business premise, infrastructure or systems supporting the CBFs become unavailable in the event of a disruption."
+      },
+      {
+        "clause_number": "BCM 9.39",
+        "text": "A financial institution must assess the suitability and capacity of the alternate site and recovery site to ensure that the sites are-"
+      },
+      {
+        "clause_number": "BCM 9.40",
+        "text": "For technology requirements, a financial institution must ensure that the IT systems and telecommunications network at the recovery site are-"
+      },
+      {
+        "clause_number": "BCM 9.48",
+        "text": "For the purpose of paragraph 9.47(b), a financial institution must ensure the following aspects of the DRP are tested:"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 14.3(e)",
+        "text": "provide for measures necessary to preserve the financial institution's business continuity capabilities to support the financial institution's operations and implementation of recovery options (e.g. staff and resources)25."
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~12",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Recovery planning requires identification of preparatory measures to improve efficacy of recovery options, which BCM does not cover.",
+    "label": "silent-on",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 9.26",
+        "text": "A financial institution must have in place processes to perform periodic reviews, validations and updates on the components of its BCM framework to ensure their continued relevance and effectiveness towards the evolving changes in the operating environment, business activities and risks, and to address gaps identified from testing exercises."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 17.1",
+        "text": "A financial institution shall identify preparatory measures that the financial institution has taken, will or may take, to improve the overall efficacy of the recovery plan. This includes but is not limited to measures aimed at overcoming the barriers to the efficacy of identified recovery options and preferred recovery strategies, i.e. preparatory measures identified pursuant to the feasibility assessment under paragraph 14.10."
+      },
+      {
+        "clause_number": "Recovery Planning 17.2",
+        "text": "In the recovery plan, a financial institution shall provide a reasonable plan for such preparatory measures, including the implementation timeline, target completion dates, resources required and estimated costs, and personnel responsible for the implementation of these measures. ## 18 Periodic review"
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~13",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Recovery Planning applies on a full consolidated/global basis (FHC or apex banking institution prepares a group plan), whereas BCM's group treatment is limited to consistency requirements within a financial group and modifications for foreign branches. Our side does not impose the consolidated group-plan submission requirement.",
+    "label": "silent-on",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 9.36",
+        "text": "For a financial institution that is a part of a financial group, the financial institution, when developing its BCM framework, must-"
+      },
+      {
+        "clause_number": "BCM 2.2",
+        "text": "For a financial institution operating as a foreign branch in Malaysia, the requirements in this policy document shall apply to the Malaysian branch with the following modifications:"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 7.1",
+        "text": "The requirements set out in this policy document shall apply to financial institutions on a consolidated basis and shall include the global operations4 of -"
+      },
+      {
+        "clause_number": "Recovery Planning 7.2",
+        "text": "For a financial group comprising multiple financial institutions operating in Malaysia, the financial holding company (FHC) or the apex banking institution of the group registered in Malaysia shall prepare a consolidated group recovery plan, which shall be submitted to the Bank in the manner stipulated in paragraph 9. S ## 8 General requirements"
+      },
+      {
+        "clause_number": "Recovery Planning 8.4",
+        "text": "In preparing a recovery plan, a financial institution shall take into account recovery plans developed by its foreign branches or subsidiaries (if any) as well as group-wide recovery plans developed by its parent entity (for locally- incorporated foreign financial institutions) to ensure coherence and alignment of recovery plans across jurisdictions."
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~14",
+    "review_state": "pending"
+  },
+  {
+    "summary": "BCM is issued pursuant to FSA, IFSA and additionally the DFIA (covering development financial institutions), whereas Recovery Planning is issued only under FSA and IFSA. Our side covers a broader institution scope.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 3.1",
+        "text": "The requirements in this policy document are issued pursuant to-"
+      },
+      {
+        "clause_number": "BCM 3.2",
+        "text": "The guidance in this policy document is issued pursuant to -"
+      },
+      {
+        "clause_number": "BCM 5.2",
+        "text": "For the purposes of this policy document- \"S\" denotes a standard, an obligation, requirement, specification, direction, condition and any interpretative, supplemental and transitional provisions that must be complied with. Non-compliance may result in enforcement actions; \"G\" denotes guidance which may consist of statements or information intended to promote common understanding and advice or recommendations that are encouraged to be adopted; \"alternate site\" refers to a site ready for use during a disruption to maintain the business continuity of the financial institution. A financial institution may have more than one alternate site. In some cases, an alternate site may involve facilities that are used for normal day-to-day operations but are able to accommodate additional business functions when a primary location becomes inoperable; \"board\" refers to the board of directors of a financial institution, including a committee of the board where responsibilities of the board as set out in this policy document have been delegated to such committee; \"business continuity\" refers to the ability of a financial institution to maintain continuity of its operations and services to its customers during an event of disruption; \"business continuity management\" or \"BCM\" refers to an enterprise-wide framework that encapsulates policies, processes and practices that ensure the continuous functioning of a financial institution during an event of disruption. It also prepares the financial institution to resume and restore its operations and services in a timely manner during an event of disruption, thus minimising any material impact to the financial institution; \"business continuity plan\" or \"BCP\" refers to a comprehensive action plan that documents the processes, procedures, systems and resources necessary to resume and restore the operations and services of a financial institution in the event of a disruption; \"business impact analysis\" or \"BIA\" refers to the process of measuring the quantitative and qualitative impact to the operations and services of a financial institution in the event of a disruption. It is used to identify recovery priorities and recovery strategies that are critical to develop a business continuity plan; \"call tree\" refers to a layered hierarchical communication model that graphically depicts the calling responsibilities and calling order used to contact senior management, employees, customers, vendors and other key contacts in the event of a disruption; \"communication protocol\" refers to established procedures of communication for a financial institution to implement internally and those that were agreed in advance between a financial institution and external parties. Such procedures typically include the methodology for transmitting, writing, and reading of data, for example:"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 3.1",
+        "text": "This policy document is issued pursuant to - a) sections 47(1), 143(1) and 266 of the Financial Services Act 2013 (FSA); and"
+      },
+      {
+        "clause_number": "Recovery Planning 5.2",
+        "text": "For the purpose of this policy document - \"S\" denotes a standard, an obligation, a requirement, specification, direction, condition and any interpretative, supplemental and transitional provisions that must be complied with. Non-compliance may result in enforcement action; \"G\" denotes guidance which may consist of statements or information intended to promote common understanding and advice or recommendations that are encouraged to be adopted; \"banking institution\" refers to a licensed bank, a licensed Islamic bank, and a licensed investment bank, collectively referred to as \"financial institution(s)\"; \"board\" refers to the board of directors of a financial institution; \"core business lines\" refers to business lines that are significant to a financial institution as described in paragraphs 11.7 and 11.8; \"covered entities\" refers to a financial institution and its financial and non- financial subsidiaries, including insurance or takaful subsidiaries as set out in paragraph 7.1; \"early warning phase\" refers to a phase when one or more early warning thresholds have been breached and a decision has been made by a financial institution to intensify monitoring or prepare to implement appropriate recovery options; \"early warning threshold\" refers to the threshold set for a recovery indicator that would alert/or prompt a financial institution of its deteriorating financial position. A breach of this threshold may form the basis for intensified monitoring or preparation to implement appropriate recovery options; \"financial group\" refers to a group of related corporations under a financial holding company or banking institution, as defined in the FSA and IFSA; \"FHC\" refers to a financial holding company approved by the Bank under section 112(3) of the FSA or section 124(3) of the IFSA; \"financial institution\" refers to a FHC, a licensed bank, a licensed Islamic bank, and a licensed investment bank, as the case may be; \"financial subsidiary\" refers to any entity, whether incorporated in or outside Malaysia, engaged predominantly in, or acquiring holdings in other entities engaged predominantly in, any of the following activities: banking, insurance, takaful, provision of credit, securities broking, fund management, asset management, leasing, and factoring and similar activities that are in connection with or for the purposes of the conduct of these activities; \"Islamic entity\" refers to the following: i. a licensed Islamic bank, or a licensed takaful operator, or ii. a licensed bank or licensed investment bank to which the Bank has granted its written approval under section 15(1)(a) of the FSA to carry on Islamic banking business; \"operational service\" refers to a service, activity or operation which does not generate direct revenue for a financial institution, but supports other revenue-generating business activities of that financial institution; \"preferred recovery strategy\" outlines a combination or sequence of feasible recovery options that a financial institution deems to be the most credible and effective to address a specific stress scenario developed for its recovery plan; \"recovery capacity\" refers to the ability of a financial institution to restore its financial viability following a significant financial deterioration using appropriate recovery options without the need for intervention by supervisory or resolution authorities; \"recovery indicators\" refer to a range of quantitative and qualitative indicators used to denote the degree of financial deterioration of a financial institution based on appropriate early warning and recovery thresholds as set out in paragraphs 13.2 and 13.3; \"recovery options\" refer to a range of actions and measures to maintain or restore viability and the financial position of a financial institution; \"recovery phase\" refers to a phase when one or more recovery thresholds have been breached and a decision has been made by the financial institution to activate the recovery plan; \"recovery plan\" refers to the plan prepared and maintained by a financial institution based on the requirements set out in this policy document and includes an overarching \"playbook\" that is developed, maintained and when necessary, executed by a financial institution to deal with severe stress events that threaten the financial institution's viability; \"recovery planning process\" refers to the entire lifecycle of the recovery plan, which comprises the development, approval, maintenance, monitoring, escalation, activation and implementation of the recovery plan; \"recovery threshold\" refers to the threshold set for a recovery indicator to indicate the point at which a financial institution's financial position has deteriorated to such an extent that appropriate recovery options may be necessary to restore the financial soundness and viability of a financial institution. A breach of this threshold may form the basis for the activation of the recovery plan; \"senior management\" refers to the senior officers of a financial institution; \"senior officers\" means a person having the authority and responsibility for planning, directing or controlling the activities of a financial institution including the chief executive officer, director, members of decision-making committees and other persons performing key functions such as risk management, compliance, internal audit or other functions as may be specified by the Bank under section 47 of the FSA or section 57 of the IFSA, as the case may be; \"significant entity (SE)\" refers to an entity within a financial group that meets any of the criteria set out in paragraph 11.4. ## 6 ### Related legal instruments and policy documents"
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~15",
+    "review_state": "pending"
+  },
+  {
+    "summary": "BCM explicitly cross-references the Recovery Planning policy document as a related instrument, and Recovery Planning cross-references Business Continuity Management, mutually acknowledging linkage.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 6.1(i)",
+        "text": "Recovery Planning issued on 28 July 2021;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 6.1(b)",
+        "text": "Business Continuity Management;"
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~16",
+    "review_state": "pending"
+  },
+  {
+    "summary": "BCM requires compliance with the more stringent requirement where other authorities impose overlapping BCM obligations on the same subject matter; Recovery Planning has no equivalent stringency-conflict resolution rule.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 8.10",
+        "text": "In addition to this policy document, a financial institution must also comply with guidelines, requirements and standard operating procedures in relation to BCM issued by other relevant authorities."
+      },
+      {
+        "clause_number": "BCM 8.11",
+        "text": "For purposes of paragraph 8.10, where there are requirements on the same subject matter, a financial institution must comply with the more stringent requirements, as the case may be. ### 9 BCM framework and methodology #### Risk assessment (RA), business impact analysis (BIA) and critical business functions (CBF)"
+      }
+    ],
+    "target_clauses": [],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~17",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Recovery Planning requires locally-incorporated foreign institutions to include recovery options involving parent/foreign-related-entity assistance only where contractually committed or in the group's home-submitted recovery plan; BCM has no comparable provision on parental financial support in its foreign-branch modifications.",
+    "label": "silent-on",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 2.2",
+        "text": "For a financial institution operating as a foreign branch in Malaysia, the requirements in this policy document shall apply to the Malaysian branch with the following modifications:"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 14.4",
+        "text": "A locally-incorporated foreign financial institution must include recovery options involving assistance from parents and/or foreign related entities but only if such assistance is"
+      },
+      {
+        "clause_number": "Recovery Planning 14.5",
+        "text": "A financial institution shall only consider access to central bank liquidity facilities (across all jurisdictions of operations) as a potential recovery option where such facilities are committed26. Nonetheless, this shall not be regarded as any form of ex ante application for, or approval of, any facility administered by the Bank."
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~18",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both require documented governance, processes and triggers to activate the respective response team/plan (CMT activation vs. recovery plan activation) with escalation to the board.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": "BCM triggers relate to operational crisis/disruption severity; Recovery Planning triggers relate to breach of recovery indicator thresholds signalling financial deterioration. Same governance axis, different trigger basis.",
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 8.7",
+        "text": "A financial institution must set up a Crisis Management Team (CMT) that comprises key representatives of the senior management to make key decisions during a crisis. The financial institution must ensure that the governance, processes and criteria/riggers to activate the CMT are set out clearly and are integrated with the BCM and risk management frameworks of the financial institution to preserve overall operational resilience. The CMT must undertake the following roles and responsibilities:"
+      },
+      {
+        "clause_number": "BCM 9.22",
+        "text": "A financial institution must also develop a CMP5 to guide and support the decision making by the CMT. The CMP must include the following:"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 12.7",
+        "text": "A financial institution shall escalate any breaches of recovery thresholds to senior management to (i) assess the nature and extent of the viability threat; and (ii) deliberate and decide on the next course of action. A breach in a recovery threshold will not automatically lead to the activation of the recovery phase or the implementation of recovery options. Rather, senior management, in consultation with the Board shall decide on whether to activate the recovery phase or implement recovery options. Senior management, in consultation with the board, shall also decide on whether to transition back to the early warning or BAU phase upon the successful implementation of recovery options."
+      },
+      {
+        "clause_number": "Recovery Planning 13.1",
+        "text": "A financial institution shall establish a recovery indicator framework that sets out clearly defined criteria, thresholds, procedures and governance arrangements to facilitate timely monitoring, escalation, activation and implementation of the recovery plan. Such framework shall -"
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~19",
+    "review_state": "pending"
+  },
+  {
+    "summary": "BCM requires post-event and post-test analysis reports communicated to the board and made available to the Bank, going beyond Recovery Planning which requires only that independent review results and material change details be reported to board and Bank.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 9.27",
+        "text": "In the event of an operational disruption, a financial institution must conduct a post-event review on the effectiveness of its CMP, BCP and DRP. The report must be communicated to the board and senior management for actions to be taken to address any identified gaps."
+      },
+      {
+        "clause_number": "BCM 9.53",
+        "text": "A financial institution must prepare a post-test analysis report to evaluate the testing outcomes against the testing goals. This is to ensure adequacy and integrity of testing, to identify problems and to develop the necessary corrective action plans. The test results and post-test analysis report must be communicated to the board in a timely manner and made available to the Bank upon request."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 12.6",
+        "text": "A financial institution must ensure that the recovery plan is reviewed by an independent party, which may either be the internal audit function or an external party which is qualified and competent to conduct such review with the objective to provide independent assurance on the -"
+      },
+      {
+        "clause_number": "Recovery Planning 18.1",
+        "text": "Notwithstanding paragraph 17.1, a financial institution shall establish a framework to periodically test the efficacy of the recovery plan. These tests would serve to identify potential shortcomings in the plan, demonstrate how the arrangements set out in the plan would work in practice and ultimately improve overall crisis preparedness. Based on the findings and recommendations from these periodic tests, a financial institution shall identify additional preparatory measures and incorporate them into the recovery plan, as set out in paragraphs 17.1 and 17.2."
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~20",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both require the plan/framework to be reviewed and updated upon material changes to structure, risk profile, or operations, with notification to the Bank.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": "Recovery Planning imposes a specific 14-day submission deadline for internally-approved changes; BCM requires annual review and update-on-material-change but without a fixed external submission deadline.",
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "BCM 9.9",
+        "text": "A financial institution must review its RA and BIA at least annually and when there are material changes to its CBFs driven by internal or external developments. ### Maximum tolerable downtime (MTD) and recovery time objective (RTO)"
+      },
+      {
+        "clause_number": "BCM 9.26",
+        "text": "A financial institution must have in place processes to perform periodic reviews, validations and updates on the components of its BCM framework to ensure their continued relevance and effectiveness towards the evolving changes in the operating environment, business activities and risks, and to address gaps identified from testing exercises."
+      },
+      {
+        "clause_number": "BCM 8.2(b)",
+        "text": "approve the BCM framework of the financial institution and ensure subsequent reviews are conducted at least annually;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "Recovery Planning 9.1",
+        "text": "updated and notify the Bank as and when there are material changes to its-"
+      },
+      {
+        "clause_number": "Recovery Planning 9.2",
+        "text": "A financial institution shall keep its recovery plan submitted under paragraph"
+      }
+    ],
+    "id": "x-bcm_pd_2022--rrp_pd_v0_1~21",
+    "review_state": "pending"
+  }
+]

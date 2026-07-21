@@ -38,8 +38,8 @@ export function LinkageRefCard({
       className={[
         "rounded-lg border p-3 text-left transition",
         style.card,
-        onSelect ? "cursor-pointer hover:border-gray-300" : "",
-        isActive ? "ring-2 ring-indigo-400" : "",
+        onSelect ? "cursor-pointer hover:border-cyan-400/40" : "",
+        isActive ? "ring-2 ring-cyan-400/70" : "",
       ].join(" ")}
     >
       <div className="flex flex-wrap items-center gap-1.5">

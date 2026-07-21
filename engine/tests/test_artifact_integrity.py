@@ -46,7 +46,10 @@ KNOWN_UNRESOLVABLE = {"Operational Resilience 3.3(e)"}
 # Rebuilding with Azure Document Intelligence is what fixes the offline case;
 # until then the projection renders hollow clauses as "No matching clause found"
 # rather than as an empty quote. RMiT is the control: it is DI-built, and 1/608
-# is what good looks like.
+# is what good looks like. BCM and Recovery Planning were indexed by replaying cached,
+# DI-quality ingest markdown (scripts/build_offline_replay_docs.py) rather than
+# the offline extractor, so they carry the same "1 hollow clause is normal"
+# baseline as RMiT, not the double-digit budgets of the offline-extracted drafts.
 MAX_HOLLOW = {
     "RMiT": 1,
     "Open Finance": 15,
@@ -55,6 +58,8 @@ MAX_HOLLOW = {
     # a single deeply-nested sub-item each (BCM 9.2(c), Recovery Planning
     # 11.8(c)) sits among populated siblings where DI missed the last leaf —
     # the documented long-tail drop, not offline degradation. 1/246 and 1/258.
+    "BCM": 1,
+    "Recovery": 1,
     "BCM": 1,
     "Recovery": 1,
 }

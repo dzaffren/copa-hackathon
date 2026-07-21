@@ -87,7 +87,7 @@ export function EditorPane({
 
   return (
     <section className="flex h-full flex-col" aria-label="Draft editor">
-      <div className="flex items-center justify-between border-b border-gray-200 px-3 py-1.5">
+      <div className="flex items-center justify-between border-b border-border/60 bg-card/30 px-3 py-1.5">
         {/* Toolbar is a visual signal only — MVP1 does not require these to
             function, and execCommand is deprecated. Kept non-functional rather
             than wired to something that half-works. */}
@@ -98,7 +98,7 @@ export function EditorPane({
               type="button"
               disabled
               title="Formatting is not wired up in this build"
-              className="h-6 w-6 rounded text-xs font-semibold text-gray-400"
+              className="h-6 w-6 rounded text-xs font-semibold text-muted-foreground"
             >
               {b}
             </button>
@@ -116,8 +116,10 @@ export function EditorPane({
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto bg-gray-100 p-4">
-        <div className="mx-auto max-w-2xl bg-white p-8 shadow-sm">
+      {/* A light "paper" document surface, floated on the dark app backdrop so
+          the serif draft reads like a real Word page regardless of theme. */}
+      <div className="flex-1 overflow-y-auto bg-[#0b1220] p-4">
+        <div className="mx-auto max-w-2xl rounded-sm bg-white p-8 text-slate-900 shadow-xl shadow-black/30">
           <div
             ref={ref}
             contentEditable
@@ -128,19 +130,19 @@ export function EditorPane({
             data-testid="draft-surface"
             onInput={(e) => onChange((e.target as HTMLDivElement).innerHTML)}
             className={[
-              "min-h-[420px] font-serif text-[15px] leading-relaxed outline-none",
+              "min-h-[420px] font-serif text-[15px] leading-relaxed text-slate-900 outline-none",
               "[&_h1]:mb-4 [&_h1]:text-2xl [&_h1]:font-bold",
-              "[&_h2]:mb-2 [&_h2]:mt-5 [&_h2]:text-xs [&_h2]:font-bold [&_h2]:tracking-wider [&_h2]:text-gray-500",
+              "[&_h2]:mb-2 [&_h2]:mt-5 [&_h2]:text-xs [&_h2]:font-bold [&_h2]:tracking-wider [&_h2]:text-slate-500",
               "[&_p]:mb-3",
               // The Copilot's provenance mark. Its `copilot-snippet` class
               // survives both sanitizers so the border reliably shows which
               // text the drafter did not write.
-              "[&_.copilot-snippet]:border-l-4 [&_.copilot-snippet]:border-indigo-400 [&_.copilot-snippet]:bg-indigo-50/40 [&_.copilot-snippet]:py-1 [&_.copilot-snippet]:pl-3",
+              "[&_.copilot-snippet]:border-l-4 [&_.copilot-snippet]:border-cyan-500 [&_.copilot-snippet]:bg-cyan-50 [&_.copilot-snippet]:py-1 [&_.copilot-snippet]:pl-3",
             ].join(" ")}
           />
 
           {callouts.length > 0 && (
-            <div className="mt-6 border-t border-dashed border-gray-200 pt-3">
+            <div className="mt-6 border-t border-dashed border-slate-200 pt-3">
               <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                 Accepted context
               </p>

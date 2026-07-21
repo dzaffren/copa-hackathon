@@ -88,8 +88,37 @@ def test_GET_node_detail_returns_first_order_neighbours_for_task_node(tmp_path):
         "status": "placeholder",
         "message": "N/A in demo",
     }
-    assert body["concepts"]["status"] == "placeholder"
     assert len(body["recent_activity"]) >= 1
+
+
+def test_GET_node_detail_concepts_placeholder_when_not_enriched(tmp_path):
+    """A node the offline enrichment script has not touched still gets the
+    MVP1 placeholder — never an error, never a guess."""
+    client, _ = _make_client(tmp_path)
+    body = client.get(f"/api/workstreams/{_OPRES}/nodes/bcbs-opres-2021").json()
+    assert body["concepts"] == {
+        "status": "placeholder",
+        "message": "Concept extraction not enabled in MVP1",
+    }
+    assert body["ismp_classification"] is None
+    assert body["pursuant_to"] is None
+
+
+def test_GET_node_detail_concepts_available_when_offline_enriched(tmp_path):
+    """opres-pd-v0-3 has been through scripts/enrich_node_metadata.py: its
+    statutory basis is derived from the real, supported FSA finding, and its
+    owner is reused verbatim rather than re-derived."""
+    client, _ = _make_client(tmp_path)
+    body = client.get(f"/api/workstreams/{_OPRES}/nodes/{_TASK}").json()
+    assert body["concepts"]["status"] == "available"
+    assert body["concepts"]["policy_owner"] == "Aisyah R."
+    assert body["concepts"]["empowerment_framework"] == (
+        "This policy document is issued pursuant to section 143(2) of the "
+        "Financial Services Act 2013."
+    )
+    # A field the enrichment script could not honestly derive stays null.
+    assert body["concepts"]["applicability"] is None
+    assert body["pursuant_to"] == "FSA 2013 §143"
 
 
 def test_GET_node_detail_resource_node_lists_only_primary_task(tmp_path):
@@ -137,6 +166,86 @@ def test_GET_edge_detail_unknown_edge_returns_404_EDGE_NOT_FOUND(tmp_path):
     res = client.get(f"/api/workstreams/{_OPRES}/edges/e-nope")
     assert res.status_code == 404
     assert res.json()["code"] == "EDGE_NOT_FOUND"
+
+
+# --- GET/PATCH /api/workstreams/{id}/tasks/{node_id}/workflow (Maker-Checker) -
+
+
+def test_GET_task_includes_default_draft_workflow_when_never_touched(tmp_path):
+    client, _ = _make_client(tmp_path)
+    body = client.get(f"/api/workstreams/{_OPRES}/tasks/{_TASK}").json()
+    assert body["workflow"] == {
+        "status": "draft",
+        "checker": None,
+        "approved_by": None,
+        "approved_at": None,
+    }
+
+
+def test_PATCH_workflow_to_pending_review_records_the_checker_and_persists(tmp_path):
+    client, dst = _make_client(tmp_path)
+    res = client.patch(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/workflow",
+        json={"status": "pending_review", "actor_id": "fm"},
+    )
+    assert res.status_code == 200
+    workflow = res.json()["workflow"]
+    assert workflow["status"] == "pending_review"
+    assert workflow["checker"] == {"id": "fm", "name": "Farid M."}
+
+    # Persisted — a fresh GET on the task sees the same workflow.
+    body = client.get(f"/api/workstreams/{_OPRES}/tasks/{_TASK}").json()
+    assert body["workflow"] == workflow
+    on_disk = json.loads(
+        (dst / _OPRES / "task_workflow" / f"{_TASK}.json").read_text(encoding="utf-8")
+    )
+    assert on_disk == workflow
+
+
+def test_PATCH_workflow_to_approved_records_who_and_when(tmp_path):
+    client, _ = _make_client(tmp_path)
+    client.patch(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/workflow",
+        json={"status": "pending_review", "actor_id": "fm"},
+    )
+    res = client.patch(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/workflow",
+        json={"status": "approved", "actor_id": "fm"},
+    )
+    workflow = res.json()["workflow"]
+    assert workflow["status"] == "approved"
+    assert workflow["approved_by"] == {"id": "fm", "name": "Farid M."}
+    assert workflow["approved_at"] is not None
+
+
+def test_PATCH_workflow_rejects_unknown_state_400_INVALID_WORKFLOW_STATE(tmp_path):
+    client, _ = _make_client(tmp_path)
+    res = client.patch(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/workflow",
+        json={"status": "done", "actor_id": "fm"},
+    )
+    assert res.status_code == 400
+    assert res.json()["code"] == "INVALID_WORKFLOW_STATE"
+
+
+def test_PATCH_workflow_rejects_unknown_actor_400_INVALID_ACTOR(tmp_path):
+    client, _ = _make_client(tmp_path)
+    res = client.patch(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/workflow",
+        json={"status": "pending_review", "actor_id": "ghost"},
+    )
+    assert res.status_code == 400
+    assert res.json()["code"] == "INVALID_ACTOR"
+
+
+def test_PATCH_workflow_on_non_task_node_returns_400_NOT_A_TASK(tmp_path):
+    client, _ = _make_client(tmp_path)
+    res = client.patch(
+        f"/api/workstreams/{_OPRES}/tasks/bcbs-opres-2021/workflow",
+        json={"status": "pending_review", "actor_id": "fm"},
+    )
+    assert res.status_code == 400
+    assert res.json()["code"] == "NOT_A_TASK"
 
 
 # --- POST /api/workstreams/{id}/nodes ---------------------------------------

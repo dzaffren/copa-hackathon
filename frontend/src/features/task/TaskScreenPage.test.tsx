@@ -30,9 +30,7 @@ describe("TaskScreenPage — landing", () => {
       screen.getByRole("link", { name: /Workstream graph/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(
-        "Working draft of the Policy Document following the 2025 Discussion Paper · 7 neighbour nodes defined at creation",
-      ),
+      screen.getByText("Aisyah R. · .docx · 7 neighbour nodes"),
     ).toBeInTheDocument();
 
     // Source card
@@ -183,6 +181,49 @@ describe("TaskScreenPage — assign dialog", () => {
     const dialog = await screen.findByRole("dialog");
     expect(within(dialog).getByText("Farid M.")).toBeInTheDocument();
     expect(within(dialog).getByText("Priya S.")).toBeInTheDocument();
+  });
+});
+
+describe("TaskScreenPage — Maker-Checker workflow", () => {
+  it("persists Draft -> Pending Review -> Approved, with an audit line on sign-off", async () => {
+    const user = userEvent.setup();
+    const first = renderApp(TASK_URL);
+    await screen.findByRole("heading", {
+      name: "Operational Resilience PD — v0.3",
+    });
+
+    expect(screen.getByText("Draft")).toBeInTheDocument();
+
+    // Assign to Checker moves it to Pending Review, persisted server-side.
+    await user.click(screen.getByRole("button", { name: /Assign/i }));
+    const assignDialog = await screen.findByRole("dialog");
+    await user.click(within(assignDialog).getByText("Farid M."));
+
+    expect(await screen.findByText("Pending Review")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Assign/i }),
+    ).not.toBeInTheDocument();
+
+    // Approve is now the available action, pre-attributed to the checker.
+    await user.click(screen.getByRole("button", { name: /Approve/i }));
+    const approveDialog = await screen.findByRole("dialog");
+    await user.click(
+      within(approveDialog).getByText(/Approve as Farid M\./i),
+    );
+
+    expect(await screen.findByText("Approved")).toBeInTheDocument();
+    expect(screen.getByText(/Approved by Farid M\./)).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Approve/i }),
+    ).not.toBeInTheDocument();
+
+    // Reload the screen — the workflow survived (not just local state).
+    first.unmount();
+    renderApp(TASK_URL);
+    await screen.findByRole("heading", {
+      name: "Operational Resilience PD — v0.3",
+    });
+    expect(await screen.findByText("Approved")).toBeInTheDocument();
   });
 });
 

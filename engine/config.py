@@ -50,17 +50,7 @@ DOCUMENTS = {
         # gated on this flag rather than wired globally (see engine/build.py).
         "normalise_glyphs": True,
     },
-    "rmit-v1-2023": {
-        "policy_id": "rmit",
-        "document_id": "rmit-v1-2023",
-        "title": "Risk Management in Technology (RMiT)",
-        "version": "v1 · 2023",
-        "effective_date": "2023-06-01",
-        "source_path": CORPUS_DIR / "PD-RMiT-June2023.pdf",
-        "source": "published",
-        "cluster": CLUSTER,
-    },
-    "rmit-v2-2025": {
+    "rmit-v1-2020": {
         "policy_id": "rmit",
         "document_id": "rmit-v2-2025",
         "title": "Risk Management in Technology (RMiT)",

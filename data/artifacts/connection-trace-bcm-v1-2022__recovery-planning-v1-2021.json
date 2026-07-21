@@ -1,0 +1,1084 @@
+{
+  "model_id": "claude-opus-4-8",
+  "timestamp": "2026-07-19T05:57:26.471629+00:00",
+  "document_ids": [
+    "bcm-v1-2022",
+    "recovery-planning-v1-2021"
+  ],
+  "finder_output": [
+    {
+      "summary": "Both documents share the objective of preserving continuity of critical functions to maintain orderly market conditions and public confidence in the financial system.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 1.1",
+        "BCM 1.3(c)"
+      ],
+      "target_clauses": [
+        "Recovery Planning 1.2(i)",
+        "Recovery Planning 11.10"
+      ]
+    },
+    {
+      "summary": "Both require identification of critical business functions/critical functions whose disruption threatens essential services and financial stability.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 9.7",
+        "BCM 9.8"
+      ],
+      "target_clauses": [
+        "Recovery Planning 11.11",
+        "Recovery Planning 11.12"
+      ]
+    },
+    {
+      "summary": "Both require board and senior management oversight of the respective framework, integrated with the overall risk appetite and risk management framework.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 8.1",
+        "BCM 8.2",
+        "BCM 8.3"
+      ],
+      "target_clauses": [
+        "Recovery Planning 12.1",
+        "Recovery Planning 12.2",
+        "Recovery Planning 12.3"
+      ]
+    },
+    {
+      "summary": "Both require an independent party (internal audit or external) to review/assess the respective framework or plan.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 8.8",
+        "BCM 8.9"
+      ],
+      "target_clauses": [
+        "Recovery Planning 12.6"
+      ]
+    },
+    {
+      "summary": "Both require notification to the Bank upon activation/disruption, but BCM sets tiered timelines (2-48 hours by level of disruption) whereas recovery planning requires notification within 24 hours of activation plus advance notice.",
+      "label": "differs-on",
+      "sentiment": "neutral",
+      "source_clauses": [
+        "BCM 10.4",
+        "BCM 10.5",
+        "BCM 10.9"
+      ],
+      "target_clauses": [
+        "Recovery Planning 12.8"
+      ]
+    },
+    {
+      "summary": "Both require periodic testing of the respective plan to evaluate its effectiveness and improve preparedness.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 9.44",
+        "BCM 9.47",
+        "BCM 9.51"
+      ],
+      "target_clauses": [
+        "Recovery Planning 18.1",
+        "Recovery Planning 18.2"
+      ]
+    },
+    {
+      "summary": "Both require a communication/crisis communication plan addressing stakeholders to maintain public confidence during stress.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 9.29",
+        "BCM 9.30",
+        "BCM 9.32"
+      ],
+      "target_clauses": [
+        "Recovery Planning 16.1",
+        "Recovery Planning 16.2",
+        "Recovery Planning 16.3"
+      ]
+    },
+    {
+      "summary": "Both require assessment of intra-group and external interdependencies necessary for critical functions and consideration of contagion/systemic impact.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 9.34",
+        "BCM 9.35",
+        "BCM 9.36"
+      ],
+      "target_clauses": [
+        "Recovery Planning 11.21",
+        "Recovery Planning 11.17",
+        "Recovery Planning 11.18"
+      ]
+    },
+    {
+      "summary": "Both require the respective plan to address outsourcing arrangements and comply with the Outsourcing policy document.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 9.24",
+        "BCM 9.25",
+        "BCM 9.41"
+      ],
+      "target_clauses": [
+        "Recovery Planning 6.1(e)"
+      ]
+    },
+    {
+      "summary": "Both require special treatment for Islamic entities/operations in developing the respective plan consistent with Shariah requirements.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 9.36"
+      ],
+      "target_clauses": [
+        "Recovery Planning 12.4",
+        "Recovery Planning 8.5",
+        "Recovery Planning 14.11"
+      ]
+    },
+    {
+      "summary": "Recovery planning requires scenario analysis using severe near-non-viability stress scenarios and recovery options to restore financial viability, a dimension not covered by BCM which focuses on operational continuity.",
+      "label": "silent-on",
+      "source_clauses": [
+        "BCM 9.4",
+        "BCM 9.6"
+      ],
+      "target_clauses": [
+        "Recovery Planning 15.1",
+        "Recovery Planning 15.2",
+        "Recovery Planning 15.3",
+        "Recovery Planning 14.1",
+        "Recovery Planning 14.3"
+      ]
+    },
+    {
+      "summary": "Recovery planning requires a recovery indicator framework with calibrated early warning and recovery thresholds, which BCM does not address.",
+      "label": "silent-on",
+      "source_clauses": [
+        "BCM 9.10"
+      ],
+      "target_clauses": [
+        "Recovery Planning 13.1",
+        "Recovery Planning 13.2",
+        "Recovery Planning 13.6",
+        "Recovery Planning 13.7"
+      ]
+    },
+    {
+      "summary": "BCM requires detailed disaster recovery/alternate site technical requirements and recovery time objectives (MTD/RTO) for operational continuity, which recovery planning does not address.",
+      "label": "goes-beyond",
+      "source_clauses": [
+        "BCM 9.11",
+        "BCM 9.12",
+        "BCM 9.37",
+        "BCM 9.39",
+        "BCM 9.40",
+        "BCM 9.48"
+      ],
+      "target_clauses": [
+        "Recovery Planning 14.3(e)"
+      ]
+    },
+    {
+      "summary": "Recovery planning requires identification of preparatory measures to improve efficacy of recovery options, which BCM does not cover.",
+      "label": "silent-on",
+      "source_clauses": [
+        "BCM 9.26"
+      ],
+      "target_clauses": [
+        "Recovery Planning 17.1",
+        "Recovery Planning 17.2"
+      ]
+    },
+    {
+      "summary": "Both apply on a consolidated/group basis and require consideration of group structure and coherence of plans across jurisdictions.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 9.36",
+        "BCM 2.2"
+      ],
+      "target_clauses": [
+        "Recovery Planning 7.1",
+        "Recovery Planning 7.2",
+        "Recovery Planning 8.4"
+      ]
+    },
+    {
+      "summary": "Both are issued pursuant to similar FSA and IFSA provisions, though BCM additionally invokes the DFIA covering development financial institutions.",
+      "label": "goes-beyond",
+      "source_clauses": [
+        "BCM 3.1",
+        "BCM 3.2",
+        "BCM 5.2"
+      ],
+      "target_clauses": [
+        "Recovery Planning 3.1",
+        "Recovery Planning 5.2"
+      ]
+    },
+    {
+      "summary": "BCM explicitly cross-references the Recovery Planning policy document as a related instrument, and Recovery Planning cross-references Business Continuity Management, mutually acknowledging linkage.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 6.1(i)"
+      ],
+      "target_clauses": [
+        "Recovery Planning 6.1(b)"
+      ]
+    }
+  ],
+  "critic_output": [
+    {
+      "summary": "Both documents share the objective of preserving continuity of critical functions to maintain orderly market conditions and public confidence in the financial system.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 1.1",
+        "BCM 1.3(c)"
+      ],
+      "target_clauses": [
+        "Recovery Planning 1.2(i)",
+        "Recovery Planning 11.10"
+      ]
+    },
+    {
+      "summary": "Both require identification of critical business functions/critical functions whose disruption threatens essential services and financial stability.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 9.7",
+        "BCM 9.8"
+      ],
+      "target_clauses": [
+        "Recovery Planning 11.11",
+        "Recovery Planning 11.12"
+      ],
+      "scope_note": "BCM defines CBFs from an operational continuity perspective (internal functions supporting essential services); Recovery Planning defines critical functions narrowly as those performed for third parties whose failure disrupts the real economy. Overlapping but not identical scoping."
+    },
+    {
+      "summary": "Both require board and senior management oversight of the respective framework, integrated with the overall risk appetite and risk management framework.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 8.1",
+        "BCM 8.2",
+        "BCM 8.3"
+      ],
+      "target_clauses": [
+        "Recovery Planning 12.1",
+        "Recovery Planning 12.2",
+        "Recovery Planning 12.3"
+      ]
+    },
+    {
+      "summary": "Both require an independent party (internal audit or external) to review/assess the respective framework or plan.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 8.8",
+        "BCM 8.9"
+      ],
+      "target_clauses": [
+        "Recovery Planning 12.6"
+      ],
+      "scope_note": "BCM mandates internal audit coverage of BCM with an option to also engage an independent party; Recovery Planning requires an independent review (internal audit or qualified external party) at minimum after initial development or significant updates."
+    },
+    {
+      "summary": "Both require notification to the Bank upon activation/disruption, but BCM sets tiered timelines (2-48 hours by level of disruption) whereas recovery planning requires notification within 24 hours of activation plus advance notice.",
+      "label": "differs-on",
+      "sentiment": "neutral",
+      "source_clauses": [
+        "BCM 10.4",
+        "BCM 10.5",
+        "BCM 10.9"
+      ],
+      "target_clauses": [
+        "Recovery Planning 12.8"
+      ]
+    },
+    {
+      "summary": "Both require periodic testing of the respective plan to evaluate its effectiveness and improve preparedness.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 9.44",
+        "BCM 9.47",
+        "BCM 9.51"
+      ],
+      "target_clauses": [
+        "Recovery Planning 18.1",
+        "Recovery Planning 18.2"
+      ],
+      "scope_note": "BCM prescribes mandatory at-least-annual testing of BCP/DRP/CMP with detailed live-run requirements; Recovery Planning testing is a more flexible evolving framework (desktop simulations, fire drills, backtesting) without a fixed annual cadence."
+    },
+    {
+      "summary": "Both require a communication/crisis communication plan addressing stakeholders to maintain public confidence during stress.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 9.29",
+        "BCM 9.30",
+        "BCM 9.32"
+      ],
+      "target_clauses": [
+        "Recovery Planning 16.1",
+        "Recovery Planning 16.2",
+        "Recovery Planning 16.3"
+      ]
+    },
+    {
+      "summary": "Both require assessment of intra-group and external interdependencies necessary for critical functions and consideration of contagion/systemic impact.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 9.34",
+        "BCM 9.35",
+        "BCM 9.36"
+      ],
+      "target_clauses": [
+        "Recovery Planning 11.21",
+        "Recovery Planning 11.17",
+        "Recovery Planning 11.18"
+      ]
+    },
+    {
+      "summary": "Both require the respective plan to address outsourcing arrangements and comply with the Outsourcing policy document.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 9.24",
+        "BCM 9.25",
+        "BCM 9.41"
+      ],
+      "target_clauses": [
+        "Recovery Planning 6.1(e)"
+      ],
+      "scope_note": "BCM imposes substantive contractual requirements on key service providers (aligned MTD/RTO, integrated testing participation, audit access); Recovery Planning only cross-references Outsourcing as a related instrument without equivalent operational BCP clauses. BCM is materially more detailed on this axis."
+    },
+    {
+      "summary": "BCM addresses Islamic operations only lightly (consistency of assessment within a financial group), whereas Recovery Planning has extensive Shariah-specific requirements including Shariah Committee involvement and Shariah-contract feasibility for recovery options. Our side does not cover the Shariah dimension.",
+      "label": "silent-on",
+      "source_clauses": [
+        "BCM 9.36"
+      ],
+      "target_clauses": [
+        "Recovery Planning 12.4",
+        "Recovery Planning 8.5",
+        "Recovery Planning 14.11",
+        "Recovery Planning 11.15"
+      ]
+    },
+    {
+      "summary": "Recovery planning requires scenario analysis using severe near-non-viability stress scenarios and recovery options to restore financial viability, a dimension not covered by BCM which focuses on operational continuity.",
+      "label": "silent-on",
+      "source_clauses": [
+        "BCM 9.4",
+        "BCM 9.6"
+      ],
+      "target_clauses": [
+        "Recovery Planning 15.1",
+        "Recovery Planning 15.2",
+        "Recovery Planning 15.3",
+        "Recovery Planning 14.1",
+        "Recovery Planning 14.3"
+      ]
+    },
+    {
+      "summary": "Recovery planning requires a recovery indicator framework with calibrated early warning and recovery thresholds, which BCM does not address.",
+      "label": "silent-on",
+      "source_clauses": [
+        "BCM 9.10"
+      ],
+      "target_clauses": [
+        "Recovery Planning 13.1",
+        "Recovery Planning 13.2",
+        "Recovery Planning 13.6",
+        "Recovery Planning 13.7"
+      ]
+    },
+    {
+      "summary": "BCM requires detailed disaster recovery/alternate site technical requirements and recovery time objectives (MTD/RTO) for operational continuity, which recovery planning does not address.",
+      "label": "goes-beyond",
+      "source_clauses": [
+        "BCM 9.11",
+        "BCM 9.12",
+        "BCM 9.37",
+        "BCM 9.39",
+        "BCM 9.40",
+        "BCM 9.48"
+      ],
+      "target_clauses": [
+        "Recovery Planning 14.3(e)"
+      ]
+    },
+    {
+      "summary": "Recovery planning requires identification of preparatory measures to improve efficacy of recovery options, which BCM does not cover.",
+      "label": "silent-on",
+      "source_clauses": [
+        "BCM 9.26"
+      ],
+      "target_clauses": [
+        "Recovery Planning 17.1",
+        "Recovery Planning 17.2"
+      ]
+    },
+    {
+      "summary": "Recovery Planning applies on a full consolidated/global basis (FHC or apex banking institution prepares a group plan), whereas BCM's group treatment is limited to consistency requirements within a financial group and modifications for foreign branches. Our side does not impose the consolidated group-plan submission requirement.",
+      "label": "silent-on",
+      "source_clauses": [
+        "BCM 9.36",
+        "BCM 2.2"
+      ],
+      "target_clauses": [
+        "Recovery Planning 7.1",
+        "Recovery Planning 7.2",
+        "Recovery Planning 8.4"
+      ]
+    },
+    {
+      "summary": "BCM is issued pursuant to FSA, IFSA and additionally the DFIA (covering development financial institutions), whereas Recovery Planning is issued only under FSA and IFSA. Our side covers a broader institution scope.",
+      "label": "goes-beyond",
+      "source_clauses": [
+        "BCM 3.1",
+        "BCM 3.2",
+        "BCM 5.2"
+      ],
+      "target_clauses": [
+        "Recovery Planning 3.1",
+        "Recovery Planning 5.2"
+      ]
+    },
+    {
+      "summary": "BCM explicitly cross-references the Recovery Planning policy document as a related instrument, and Recovery Planning cross-references Business Continuity Management, mutually acknowledging linkage.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 6.1(i)"
+      ],
+      "target_clauses": [
+        "Recovery Planning 6.1(b)"
+      ]
+    },
+    {
+      "summary": "BCM requires compliance with the more stringent requirement where other authorities impose overlapping BCM obligations on the same subject matter; Recovery Planning has no equivalent stringency-conflict resolution rule.",
+      "label": "goes-beyond",
+      "source_clauses": [
+        "BCM 8.10",
+        "BCM 8.11"
+      ],
+      "target_clauses": []
+    },
+    {
+      "summary": "Recovery Planning requires locally-incorporated foreign institutions to include recovery options involving parent/foreign-related-entity assistance only where contractually committed or in the group's home-submitted recovery plan; BCM has no comparable provision on parental financial support in its foreign-branch modifications.",
+      "label": "silent-on",
+      "source_clauses": [
+        "BCM 2.2"
+      ],
+      "target_clauses": [
+        "Recovery Planning 14.4",
+        "Recovery Planning 14.5"
+      ]
+    },
+    {
+      "summary": "Both require documented governance, processes and triggers to activate the respective response team/plan (CMT activation vs. recovery plan activation) with escalation to the board.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 8.7",
+        "BCM 9.22"
+      ],
+      "target_clauses": [
+        "Recovery Planning 12.7",
+        "Recovery Planning 13.1"
+      ],
+      "scope_note": "BCM triggers relate to operational crisis/disruption severity; Recovery Planning triggers relate to breach of recovery indicator thresholds signalling financial deterioration. Same governance axis, different trigger basis."
+    },
+    {
+      "summary": "BCM requires post-event and post-test analysis reports communicated to the board and made available to the Bank, going beyond Recovery Planning which requires only that independent review results and material change details be reported to board and Bank.",
+      "label": "goes-beyond",
+      "source_clauses": [
+        "BCM 9.27",
+        "BCM 9.53"
+      ],
+      "target_clauses": [
+        "Recovery Planning 12.6",
+        "Recovery Planning 18.1"
+      ]
+    },
+    {
+      "summary": "Both require the plan/framework to be reviewed and updated upon material changes to structure, risk profile, or operations, with notification to the Bank.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "BCM 9.9",
+        "BCM 9.26",
+        "BCM 8.2(b)"
+      ],
+      "target_clauses": [
+        "Recovery Planning 9.1",
+        "Recovery Planning 9.2"
+      ],
+      "scope_note": "Recovery Planning imposes a specific 14-day submission deadline for internally-approved changes; BCM requires annual review and update-on-material-change but without a fixed external submission deadline."
+    }
+  ],
+  "validation": [
+    {
+      "summary": "Both documents share the objective of preserving continuity of critical functions to maintain orderly market conditions and public confidence in the financial system.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 1.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 1.3(c)",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 1.2(i)",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 11.10",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require identification of critical business functions/critical functions whose disruption threatens essential services and financial stability.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 9.7",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.8",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 11.11",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 11.12",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require board and senior management oversight of the respective framework, integrated with the overall risk appetite and risk management framework.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 8.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 8.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 8.3",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 12.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 12.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 12.3",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require an independent party (internal audit or external) to review/assess the respective framework or plan.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 8.8",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 8.9",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 12.6",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require notification to the Bank upon activation/disruption, but BCM sets tiered timelines (2-48 hours by level of disruption) whereas recovery planning requires notification within 24 hours of activation plus advance notice.",
+      "label": "differs-on",
+      "sentiment": "neutral",
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 10.4",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 10.5",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 10.9",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 12.8",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require periodic testing of the respective plan to evaluate its effectiveness and improve preparedness.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 9.44",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.47",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.51",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 18.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 18.2",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require a communication/crisis communication plan addressing stakeholders to maintain public confidence during stress.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 9.29",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.30",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.32",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 16.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 16.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 16.3",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require assessment of intra-group and external interdependencies necessary for critical functions and consideration of contagion/systemic impact.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 9.34",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.35",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.36",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 11.21",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 11.17",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 11.18",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require the respective plan to address outsourcing arrangements and comply with the Outsourcing policy document.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 9.24",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.25",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.41",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 6.1(e)",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "BCM addresses Islamic operations only lightly (consistency of assessment within a financial group), whereas Recovery Planning has extensive Shariah-specific requirements including Shariah Committee involvement and Shariah-contract feasibility for recovery options. Our side does not cover the Shariah dimension.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 9.36",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 12.4",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 8.5",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 14.11",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 11.15",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Recovery planning requires scenario analysis using severe near-non-viability stress scenarios and recovery options to restore financial viability, a dimension not covered by BCM which focuses on operational continuity.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 9.4",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.6",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 15.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 15.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 15.3",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 14.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 14.3",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Recovery planning requires a recovery indicator framework with calibrated early warning and recovery thresholds, which BCM does not address.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 9.10",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 13.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 13.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 13.6",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 13.7",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "BCM requires detailed disaster recovery/alternate site technical requirements and recovery time objectives (MTD/RTO) for operational continuity, which recovery planning does not address.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 9.11",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.12",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.37",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.39",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.40",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.48",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 14.3(e)",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Recovery planning requires identification of preparatory measures to improve efficacy of recovery options, which BCM does not cover.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 9.26",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 17.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 17.2",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Recovery Planning applies on a full consolidated/global basis (FHC or apex banking institution prepares a group plan), whereas BCM's group treatment is limited to consistency requirements within a financial group and modifications for foreign branches. Our side does not impose the consolidated group-plan submission requirement.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 9.36",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 2.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 7.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 7.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 8.4",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "BCM is issued pursuant to FSA, IFSA and additionally the DFIA (covering development financial institutions), whereas Recovery Planning is issued only under FSA and IFSA. Our side covers a broader institution scope.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 3.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 3.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 5.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 3.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 5.2",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "BCM explicitly cross-references the Recovery Planning policy document as a related instrument, and Recovery Planning cross-references Business Continuity Management, mutually acknowledging linkage.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 6.1(i)",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 6.1(b)",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "BCM requires compliance with the more stringent requirement where other authorities impose overlapping BCM obligations on the same subject matter; Recovery Planning has no equivalent stringency-conflict resolution rule.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 8.10",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 8.11",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Recovery Planning requires locally-incorporated foreign institutions to include recovery options involving parent/foreign-related-entity assistance only where contractually committed or in the group's home-submitted recovery plan; BCM has no comparable provision on parental financial support in its foreign-branch modifications.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 2.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 14.4",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 14.5",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require documented governance, processes and triggers to activate the respective response team/plan (CMT activation vs. recovery plan activation) with escalation to the board.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 8.7",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.22",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 12.7",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 13.1",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "BCM requires post-event and post-test analysis reports communicated to the board and made available to the Bank, going beyond Recovery Planning which requires only that independent review results and material change details be reported to board and Bank.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 9.27",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.53",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 12.6",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 18.1",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require the plan/framework to be reviewed and updated upon material changes to structure, risk profile, or operations, with notification to the Bank.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "BCM 9.9",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.26",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 8.2(b)",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 9.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "Recovery Planning 9.2",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    }
+  ]
+}

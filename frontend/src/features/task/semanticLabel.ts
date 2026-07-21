@@ -1,62 +1,60 @@
-import type { SemanticLabel, Sentiment } from "@/lib/types";
+import type { SemanticLabel } from "@/lib/types";
+import { LABEL_STYLES } from "@/lib/labels";
+
+// Task-screen view of the five-label taxonomy. Pills come from the shared dark
+// palette in @/lib/labels; `card` and `calloutBorder` add the container accents
+// the task/drafting cards need on top of that. `labelText` is re-exported from
+// the shared module so there is exactly one sentiment-arrow implementation.
+export { labelText } from "@/lib/labels";
 
 export interface LabelStyle {
-  /** Label pill (bg + text). */
+  /** Label pill (bg + text + border). */
   pill: string;
   /** Analysed pair-card container accent. */
   card: string;
-  /** Left-border accent for the drafting workspace's inline callouts.
-   *
-   *  Derived from this same palette rather than the drafting spec's own colour
-   *  list, which asks for sky on `goes-beyond` where the app has long used
-   *  violet. One palette that disagrees with a spec beats two palettes that
-   *  disagree with each other. */
+  /** Left-border accent for the drafting workspace's inline callouts. */
   calloutBorder: string;
 }
 
-// The five-label taxonomy (aligns-with, differs-on, conflicts-with, silent-on,
-// goes-beyond) plus the neutral fallback.
-const LABEL_STYLES: Record<SemanticLabel, LabelStyle> = {
+const CARD_ACCENT: Record<
+  SemanticLabel,
+  { card: string; calloutBorder: string }
+> = {
   "aligns-with": {
-    pill: "bg-emerald-100 text-emerald-800",
-    card: "border-gray-200 bg-white",
+    card: "border-border/60 bg-card/50",
     calloutBorder: "border-emerald-400",
   },
   "differs-on": {
-    pill: "bg-indigo-100 text-indigo-800",
-    card: "border-gray-200 bg-white",
-    calloutBorder: "border-indigo-400",
+    card: "border-border/60 bg-card/50",
+    calloutBorder: "border-amber-400",
   },
   "conflicts-with": {
-    pill: "bg-red-100 text-red-800",
-    card: "border-red-200 bg-red-50",
+    card: "border-red-400/30 bg-red-500/[0.06]",
     calloutBorder: "border-red-400",
   },
   "silent-on": {
-    pill: "bg-slate-100 text-slate-700",
-    card: "border-gray-200 bg-white",
-    calloutBorder: "border-slate-300",
+    card: "border-border/60 bg-card/50",
+    calloutBorder: "border-sky-400",
   },
   "goes-beyond": {
-    pill: "bg-violet-100 text-violet-800",
-    card: "border-gray-200 bg-white",
+    card: "border-border/60 bg-card/50",
     calloutBorder: "border-violet-400",
   },
 };
 
 const FALLBACK: LabelStyle = {
-  pill: "bg-slate-100 text-slate-700",
-  card: "border-gray-200 bg-white",
+  pill: "bg-slate-500/15 text-slate-300 border border-slate-400/30",
+  card: "border-border/60 bg-card/50",
   calloutBorder: "border-slate-300",
 };
 
 export function labelStyle(label: SemanticLabel): LabelStyle {
-  return LABEL_STYLES[label] ?? FALLBACK;
-}
-
-/** "differs-on ↑" (tighten) / "differs-on ↓" (loosen); label alone otherwise. */
-export function labelText(label: SemanticLabel, sentiment: Sentiment): string {
-  if (label === "differs-on" && sentiment === "tighten") return "differs-on ↑";
-  if (label === "differs-on" && sentiment === "loosen") return "differs-on ↓";
-  return label;
+  const base = LABEL_STYLES[label];
+  const accent = CARD_ACCENT[label];
+  if (!base || !accent) return FALLBACK;
+  return {
+    pill: base.pill,
+    card: accent.card,
+    calloutBorder: accent.calloutBorder,
+  };
 }

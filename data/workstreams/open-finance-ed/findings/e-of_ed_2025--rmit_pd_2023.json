@@ -1,0 +1,597 @@
+[
+  {
+    "summary": "Both documents require secure transmission of customer information; open finance references RMiT for secure transmission and authentication.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 11.5",
+        "text": "An FSP shall ensure that any transmission of customer information through an\n\nopen  finance  arrangement  is  conducted  through  secure  means,  in  line  with\nrelevant requirements set out in the  Policy Document on Risk Management in\nTechnology.  Without  limiting  the  generality  of  paragraph 11.4, a  data  provider\n\nshall  authenticate  the  customer  and  authorise  consent  using  a  reliable  and\neffective  authentication  procedure  (e.g.  multi-factor  authentication)  before\n\ngranting a data consumer access to the customer’s information."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 10.66",
+        "text": "A financial institution must implement additional controls to authenticate\ndevices and users, authorise transactions and support non-repudiation and\naccountability for high-risk transactions or transactions above RM10,000.\nThese measures must include, at a minimum, the following:"
+      },
+      {
+        "clause_number": "RMiT 10.64",
+        "text": "A financial institution must implement robust technology security controls in\nproviding digital services which assure the following:"
+      }
+    ],
+    "scope_note": "Open Finance 11.5 explicitly incorporates the RMiT Policy Document for secure transmission means.",
+    "supported": true,
+    "id": "720907d933e8",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance mandates multi-factor authentication before granting data access, aligning with RMiT's MFA and authentication requirements for transactions.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 11.5",
+        "text": "An FSP shall ensure that any transmission of customer information through an\n\nopen  finance  arrangement  is  conducted  through  secure  means,  in  line  with\nrelevant requirements set out in the  Policy Document on Risk Management in\nTechnology.  Without  limiting  the  generality  of  paragraph 11.4, a  data  provider\n\nshall  authenticate  the  customer  and  authorise  consent  using  a  reliable  and\neffective  authentication  procedure  (e.g.  multi-factor  authentication)  before\n\ngranting a data consumer access to the customer’s information."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 10.67",
+        "text": "A financial institution must ensure the MFA solution used to authenticate\nfinancial transactions are adequately secure, which includes the following:"
+      },
+      {
+        "clause_number": "RMiT 10.68",
+        "text": "A financial institution must deploy MFA technology and channels that are more\nsecure than unencrypted short messaging service (SMS)."
+      },
+      {
+        "clause_number": "RMiT 10.65",
+        "text": "A financial institution must implement controls to authenticate and monitor all\nfinancial transactions. These controls, at a minimum, must be effective in\nmitigating man-in-the-middle attacks, transaction fraud, phishing and\ncompromise of application systems and information."
+      }
+    ],
+    "scope_note": "Open Finance cites MFA as an example ('e.g. multi-factor authentication') for authenticating customer/consent before access; RMiT prescribes detailed MFA requirements tied to transaction value thresholds (RM10,000).",
+    "supported": true,
+    "id": "b6eb8beef295",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance requires technical and operational safeguards to prevent unauthorised access and detect errors, aligning with RMiT's digital service security controls.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 11.4",
+        "text": "In  line  with  paragraph  10.12  of  the  Policy  Document  on  Management  of\n\nCustomer  Information  and  Permitted  Disclosures,  an  FSP  shall  implement\ntechnical and operational safeguards to –"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 10.64",
+        "text": "A financial institution must implement robust technology security controls in\nproviding digital services which assure the following:"
+      },
+      {
+        "clause_number": "RMiT 10.79",
+        "text": "A financial institution must perform continuous surveillance to assess the\nvulnerability of the operating system and the relevant technology platform used\nfor its digital delivery channels to security breaches and implement appropriate\ncorresponding safeguards. At a minimum, a financial institution must\nimplement sufficient logical and physical safeguards for the following\nchannels:"
+      }
+    ],
+    "scope_note": "Open Finance 11.4 references paragraph 10.12 of the Customer Information PD; the safeguard objectives (prevent theft/loss/misuse, detect/resolve errors) map to RMiT digital service security controls.",
+    "supported": true,
+    "id": "4122e9c502fc",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance defers to RMiT for cyber risk management and API security controls in open finance activities.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 12.3",
+        "text": "An  FSP  shall  ensure  that  its  cyber  risk  management  capabilities  and\n\ncybersecurity  controls  are  also  appropriately  extended  to  govern,  identify,\nprevent, detect, respond and address cyber risks associated with open finance\n\nactivities. This includes for the FSP to implement robust API security controls,\nstrengthening digital fraud detection and management, as well as take steps to\n\nsecure technology networks and internal systems from potential external risks\narising from the FSP’s participation in an open finance arrangement."
+      },
+      {
+        "clause_number": "Open Finance 12.1",
+        "text": "An  FSP  shall  ensure  that  relevant  technology  requirements  in  the  Policy\nDocument  on  Risk  Management  in  Technology  and  the  Policy  Document  on\n\nTechnology  Requirement  for  Payment  Services  Regulatees  are  observed  in\n\nIssued on: 18 November 2025\n\n\fOpen Finance\n\n25 of 28\n\nrespect of its open finance activities."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 11.4",
+        "text": "A financial institution that is designated as a National Critical Information\nInfrastructure (NCII) entity pursuant to the Cyber Security Act 2024 must\nensure compliance to the requirements and guidelines applicable to NCII,\nincluding any additional directives and standards issued by the National\nCyber Security Agency (NACSA)."
+      },
+      {
+        "clause_number": "RMiT 11.21",
+        "text": "A financial institution must ensure the following:"
+      },
+      {
+        "clause_number": "RMiT 11.22",
+        "text": "A financial institution must establish comprehensive cyber crisis management\npolicies and procedures that incorporate cyber-attack scenarios and\nresponses in the organisation's overall crisis management plan, escalation\nprocesses, business continuity and disaster recovery planning. This includes\ndeveloping a clear communication plan for engaging shareholders, regulatory\nauthorities, customers and employees in the event of a cyber-incident."
+      }
+    ],
+    "scope_note": "Open Finance 12.1 explicitly requires observance of the RMiT PD; 12.3 adds API-specific security controls and fraud detection for open finance.",
+    "supported": true,
+    "id": "9c01c24fd157",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance requires FSPs to extend technology operations and operational resilience to open finance activities, aligning with RMiT's technology risk framework provisions.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 12.2",
+        "text": "An FSP shall ensure that its technology operations management practices are\nappropriately extended to support its open finance activities. This includes, but\n\nis  not  limited  to,  controls  for ensuring  effective  and  safe  implementation  of  IT\nsystems,  robust  third-party  service  provider  management,  and  operational\n\nresilience measures to ensure the availability, integrity and confidentiality of data\nexchanged through open finance arrangements."
+      },
+      {
+        "clause_number": "Open Finance 12.4",
+        "text": "An  FSP  shall  adhere  to  relevant  regulatory  processes  applicable  to  its\n\nparticipation in an open finance arrangement, in line with expectations as set out\nin Part C of the Policy Document on Risk Management in Technology, as may\n\nbe applicable."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 8.8",
+        "text": "A financial institution's senior management must translate the board-approved\nTRMF and CRF into specific policies and procedures that are consistent with\nthe approved risk appetite and risk tolerance and supported by effective\nreporting and escalation procedures."
+      },
+      {
+        "clause_number": "RMiT 8.9",
+        "text": "The senior management must establish a cross-functional committee to\nprovide guidance on the financial institution's technology plans and operations.\nThe members of the committee must include senior management from both\ntechnology functions and major business units. The committee's\nresponsibilities shall include the following:"
+      }
+    ],
+    "scope_note": "Open Finance 12.4 references Part C of the RMiT PD; requirements are extensions of existing RMiT technology operations management to open finance.",
+    "supported": true,
+    "id": "6174c7a8818c",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance requires board and senior management oversight of risks arising from open finance participation, aligning with RMiT's governance responsibilities.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 7.1",
+        "text": "The board and senior management shall exercise effective oversight of an FSP’s\nimplementation of arrangements relating to open finance to ensure its efficient,\n\nresilient and secure operations."
+      },
+      {
+        "clause_number": "Open Finance 7.3",
+        "text": "The  board  shall  ensure  that  a  sound  risk  strategy  and  appropriate  risk\nmanagement framework is in place and implemented effectively to manage any\n\noperational, technology, cyber, fraud, conduct or other risk arising from an FSP’s\nparticipation in an open finance arrangement, in line with the FSP’s risk appetite.\n\nThis includes for the board to evaluate the risks and opportunities arising from\nthe FSP’s participation in an open finance arrangement, and consider how these\n\nfactors should be reflected in its strategies and business plan."
+      },
+      {
+        "clause_number": "Open Finance 7.5",
+        "text": "Senior management shall be responsible for developing and implementing the\n\nframework  for  managing  risk  arising  from  an  FSP’s  participation  in  an  open\nfinance  arrangement.  The  framework  shall  include  policies,  procedures  and\n\nsystems  that  enables  the  identification,  measurement,  control  and  ongoing\nmonitoring of all relevant risks, including risks that the FSP is exposed to arising\n\nfrom  information  received from  other  data  providers and  that  it  poses  to other\ndata consumers through information it provides."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 8.2",
+        "text": "The board must ensure and oversee the adequacy of the financial institution's\nIT and cybersecurity strategic plans covering a period of no less than three\nyears. These plans shall address the financial institution's requirements on\ninfrastructure, control measures to mitigate IT and cyber risk and financial and\nnon-financial resources, which are commensurate with the complexity of the\nfinancial institution's operations and changes in the risk profile as well as the\nbusiness environment. These plans shall be periodically reviewed, at least\nonce every three years."
+      },
+      {
+        "clause_number": "RMiT 8.8",
+        "text": "A financial institution's senior management must translate the board-approved\nTRMF and CRF into specific policies and procedures that are consistent with\nthe approved risk appetite and risk tolerance and supported by effective\nreporting and escalation procedures."
+      },
+      {
+        "clause_number": "RMiT 8.10",
+        "text": "Senior management must ensure the adequate allocation of resources to\nmaintain robust technology systems and appropriately skilled and competent\nstaff to support the effective management of technology risk."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "c9f3004d76ea",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance requires breach handling and response plans referencing customer information breaches, aligning with RMiT's cyber incident response plan requirements.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 11.12",
+        "text": "In relation to paragraph 11.11, an FSP shall have in place a customer information\nbreach  handling  and  response  plan  in  the  event  of  theft,  loss,  misuse  or\n\nunauthorised  access,  modification  or  disclosure  of  customer  information\nassociated  with  an  open  finance  arrangement.  The  plan  must,  at  a  minimum,\n\ninclude  escalation  procedures  and  a  clear  line  of  responsibility  to  contain  the\ncustomer information breach and take remedial actions.\n\nHandling disputes and complaints\n\nClear accountability and liability"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 11.23",
+        "text": "A financial institution must establish and implement a comprehensive Cyber\nIncident Response Plan (CIRP). The CIRP must address the following:"
+      },
+      {
+        "clause_number": "RMiT 11.22",
+        "text": "A financial institution must establish comprehensive cyber crisis management\npolicies and procedures that incorporate cyber-attack scenarios and\nresponses in the organisation's overall crisis management plan, escalation\nprocesses, business continuity and disaster recovery planning. This includes\ndeveloping a clear communication plan for engaging shareholders, regulatory\nauthorities, customers and employees in the event of a cyber-incident."
+      }
+    ],
+    "scope_note": "Open Finance 11.11 also routes breach compliance to the Customer Information PD and PDPA; the plan overlaps with RMiT CIRP for open-finance-associated breaches.",
+    "supported": true,
+    "id": "14b885295a06",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance requires access to customer information on a need-to-know basis, aligning with RMiT's least-privilege access control requirements.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 11.2",
+        "text": "In  addition  to  paragraph  11.1,  the  data  governance  and  privacy  policies  and\n\nprocedures shall at a minimum –\n\nIssued on: 18 November 2025\n\n\fOpen Finance\n\n21 of 28"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 10.53",
+        "text": "A financial institution must implement an access control policy for the\nidentification, authentication, and authorisation of all users to its IT assets\nand data. The level of granularity defined in the access control policy shall be\ncommensurate with the level of risk of unauthorised access to its IT assets."
+      },
+      {
+        "clause_number": "RMiT 10.58",
+        "text": "A financial institution must establish a user access matrix to outline access\nrights, user roles or profiles, and the authorising and approving authorities.\nThe access matrix must be periodically reviewed and updated."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "c4ade95b2e05",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance requires logging of consent records and data access logs for a minimum of seven years, whereas RMiT requires minimum three-year retention for activity and digital service logs.",
+    "label": "differs-on",
+    "sentiment": "tighten",
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 10.18",
+        "text": "An FSP shall log all consent records and actions, including obtaining, revoking\n\nand  renewing  consent,  in  an  auditable  format  and  retain  such  records  for  a\n\nIssued on: 18 November 2025\n\n\fOpen Finance\n\n20 of 28\n\nminimum period of seven years."
+      },
+      {
+        "clause_number": "Open Finance 10.19",
+        "text": "In  addition  to  paragraph  10.18,  an  FSP  shall  make  available  to  customers\nrelevant data access logs, including  when and by whom their information was\n\naccessed."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 10.59",
+        "text": "A financial institution must ensure-"
+      },
+      {
+        "clause_number": "RMiT 10.74",
+        "text": "A financial institution must ensure sufficient and relevant digital service logs\nare retained for investigations and forensic purposes for at least three years."
+      }
+    ],
+    "scope_note": "The two logging retention regimes address different record types (consent records vs. system/activity logs); open finance's 7-year minimum is stricter than RMiT's 3-year minimum where they overlap on customer-data access logging.",
+    "supported": true,
+    "id": "884054ff7c33",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance requires FSPs to ensure third-party service providers comply with data security requirements including RMiT, aligning with RMiT's third-party access safeguards.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 11.8",
+        "text": "An FSP that is a data consumer shall ensure that any third-party service provider\n\ninvolved in handling customer information, whether related to an open finance\narrangement  (including  that  associated  with  outsourcing  or  cloud  computing\n\narrangements),  complies  with  relevant  requirements  relating  to  data  privacy,\nconfidentiality and security, as set out in the Policy Document on Management\n\nof  Customer  Information  and  Permitted  Disclosures,  the  Policy  Document  on\nRisk  Management  and  Information  Technology,  and  the  Policy  Document  on\n\nOutsourcing."
+      },
+      {
+        "clause_number": "Open Finance 11.10",
+        "text": "For  the  purposes  of  paragraph  11.8,  an  FSP  shall  ensure  the  obligation  to\nsafeguard  customer  information  is  adequately  reflected  in  the  service  level\n\nagreement with the third-party service provider, in line with paragraph 12.4 of the\nPolicy  Document  on  Management  of  Customer  Information  and  Permitted\n\nDisclosures.\n\nCustomer information breaches"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 11.14",
+        "text": "A financial institution must ensure that relevant CERT members are\nconversant with the incident response plan and handling procedures and\nremain contactable at all times."
+      },
+      {
+        "clause_number": "RMiT 10.52",
+        "text": "A financial institution must implement appropriate safeguards on customer\nand counterparty information and proprietary data when using cloud services\nto protect against unauthorised disclosure and access. This shall include\nretaining ownership, control and management of all data pertaining to\ncustomer and counterparty information, proprietary data and services hosted\non the cloud, including the relevant cryptographic keys management.\n\n## Access Control"
+      }
+    ],
+    "scope_note": "Open Finance 11.8 explicitly requires third parties to comply with RMiT, the Customer Information PD and Outsourcing PD.",
+    "supported": true,
+    "id": "01ea31d3e3ad",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance mandates continuous monitoring of controls to remain responsive to changing threats, aligning with RMiT's continuous surveillance and monitoring requirements.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 11.7",
+        "text": "An FSP shall regularly monitor the effectiveness of these controls to ensure that\n\nthey remain responsive to changing threats.\n\nIssued on: 18 November 2025\n\n\fOpen Finance\n\n22 of 28\n\nThird-party arrangements"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 10.79",
+        "text": "A financial institution must perform continuous surveillance to assess the\nvulnerability of the operating system and the relevant technology platform used\nfor its digital delivery channels to security breaches and implement appropriate\ncorresponding safeguards. At a minimum, a financial institution must\nimplement sufficient logical and physical safeguards for the following\nchannels:"
+      },
+      {
+        "clause_number": "RMiT 11.18",
+        "text": "A financial institution is required to notify the Bank of cyber incidents in\nadherence to the Bank's policy documents on Operational Risk Reporting -\nPart C, Business Continuity Management - Part C, Merchant Acquiring\nServices - paragraphs 19.25 to 19.26 and any other relevant policy\ndocuments specified by the Bank."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "e8f167eb88a9",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance covers consent-driven customer data sharing lifecycle (obtaining, renewing, revoking, deleting), which RMiT does not address.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 10.1",
+        "text": "An FSP participating in an open finance arrangement, whether in its capacity as\n\na data provider or a data consumer, shall ensure that a secure, verifiable and\ndigital  mechanism  is  in  place  to  obtain  consent  from  a  customer  prior  to\n\ndisclosing,  accessing or processing  any  customer information.  In  line  with  the\nPDPA and paragraph 13.1 (item 8) of the Policy Document on Management of\n\nCustomer Information and Permitted Disclosures, consent shall be sought and\nobtained in the following manner:"
+      },
+      {
+        "clause_number": "Open Finance 10.11",
+        "text": "Upon receipt of a customer’s request to revoke consent under an open finance\n\narrangement,  the  data  consumer  shall  immediately  cease  any  access  to\ncustomer information that was previously authorised under the revoked consent.\n\nThe data consumer shall also promptly notify the corresponding data provider of\nthe consent revoked."
+      },
+      {
+        "clause_number": "Open Finance 10.13",
+        "text": "The  data  consumer  shall,  without  undue  delay,  securely  delete  all  customer\ninformation that was obtained under the withdrawn consent, unless retention is\n\nrequired under applicable laws or regulatory requirements."
+      },
+      {
+        "clause_number": "Open Finance 10.17",
+        "text": "Any  renewal  of  data  sharing  under  an  open  finance  arrangement  shall  be\n\npermitted only upon re-obtaining fresh consent from the customer. Such consent\nshall  be  obtained  in  the  same  manner  and  subject  to  the  same  conditions\n\napplicable to the original consent as specified in paragraph 10.1.\n\nE.  Record-keeping and audit"
+      }
+    ],
+    "target_clauses": [],
+    "scope_note": null,
+    "supported": true,
+    "id": "1c9271ccfe6c",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance covers customer complaints handling, redress and liability delineation for open finance arrangements, which RMiT does not address.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 11.13",
+        "text": "An FSP shall ensure that the accountabilities and responsibilities in relation to\n\nIssued on: 18 November 2025\n\n\fOpen Finance\n\n23 of 28\n\nits participation in an open finance arrangement are clearly stipulated, and that\nsuch responsibilities include ensuring customers do not suffer loss or detriment\n\nas a result of weaknesses, failures or misconduct on the part of the FSP."
+      },
+      {
+        "clause_number": "Open Finance 11.15",
+        "text": "In line with paragraph 8.1 of the Policy Document on Complaints Handling, an\n\nFSP  shall  formulate  and  implement  effective  and  transparent  complaints\nhandling  policies,  procedures  and  processes  for  timely  and  fair  handling  of\n\ncustomer complaints arising from any open finance activities."
+      },
+      {
+        "clause_number": "Open Finance 11.17",
+        "text": "Where  a dispute  involves  more  than  one  FSP,  the parties  shall  collaborate  to\nensure  a  coordinated  and  timely  resolution,  in  line  with  relevant  complaints\n\nhandling protocols as may be determined by the platform operator. Where there\nare no relevant protocols in place for dealing with disputes involving one or more\nFSP, the FSP that first receives the complaint shall lead the investigation and\n\nresolution process, unless the parties agree otherwise."
+      }
+    ],
+    "target_clauses": [],
+    "scope_note": null,
+    "supported": true,
+    "id": "5b9f2318a811",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance covers consumer conduct, fair treatment and financial literacy requirements which RMiT does not address.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 11.19",
+        "text": "An  FSP  shall  ensure  that  the  provision  of  any  service  arising  from  any  open\n\nfinance arrangement is conducted in a way that engenders trust and confidence\nof  customers.  In  this  regard,  the  FSP  shall  observe  relevant  consumer  and\n\nmarket conduct requirements, which include, but are not limited to –\n\nIssued on: 18 November 2025\n\n\fOpen Finance\n\n24 of 28"
+      },
+      {
+        "clause_number": "Open Finance 11.20",
+        "text": "Where practicable, an FSP may develop and make available a simplified digital\n\nand  financial  literacy  guide  to  support  customers  in  understanding  and  using\nproducts  or  services  enabled  by  open  finance  in  a  safe  manner.  This  guide\n\nshould be accessible and user-friendly, designed to accommodate varying levels\nof digital and financial literacy. It should –"
+      }
+    ],
+    "target_clauses": [],
+    "scope_note": null,
+    "supported": true,
+    "id": "7a37b72e7f05",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance mandates data retention schedules and secure disposal upon expiry of use, which relates to but goes beyond RMiT's data classification and data-state protection concerns.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 11.2",
+        "text": "In  addition  to  paragraph  11.1,  the  data  governance  and  privacy  policies  and\n\nprocedures shall at a minimum –\n\nIssued on: 18 November 2025\n\n\fOpen Finance\n\n21 of 28"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 11.14",
+        "text": "A financial institution must ensure that relevant CERT members are\nconversant with the incident response plan and handling procedures and\nremain contactable at all times."
+      },
+      {
+        "clause_number": "RMiT 11.15",
+        "text": "A financial institution shall establish a secure and reliable out-of-band\ncommunication infrastructure for both internal and external stakeholders to\nensure continued coordination and communication if the primary\ncommunication infrastructure is compromised or rendered unavailable during\na crisis."
+      }
+    ],
+    "scope_note": "RMiT addresses data classification and protection of data in-use/in-motion/at-rest but does not prescribe retention schedules or secure disposal on consent expiry; open finance adds these lifecycle disposal requirements.",
+    "supported": true,
+    "id": "1bcfce25b487",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance requires data providers to authenticate the customer and authorise consent via reliable authentication before granting access; RMiT prescribes device/user authentication, non-repudiation and biometric assurance requirements.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 11.5",
+        "text": "An FSP shall ensure that any transmission of customer information through an\n\nopen  finance  arrangement  is  conducted  through  secure  means,  in  line  with\nrelevant requirements set out in the  Policy Document on Risk Management in\nTechnology.  Without  limiting  the  generality  of  paragraph 11.4, a  data  provider\n\nshall  authenticate  the  customer  and  authorise  consent  using  a  reliable  and\neffective  authentication  procedure  (e.g.  multi-factor  authentication)  before\n\ngranting a data consumer access to the customer’s information."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 10.78",
+        "text": "A financial institution must ensure authentication processes using biometric\ntechnology are secure, highly resistant to spoofing and have a minimal false\nacceptance rate to ensure confidentiality, integrity and non-repudiation of\ntransactions."
+      },
+      {
+        "clause_number": "RMiT 10.70",
+        "text": "A financial institution must ensure that the security controls of MFA solutions\nincludes adherence to the following requirements:"
+      }
+    ],
+    "scope_note": "Complementary authentication assurance obligations; RMiT provides detailed anti-spoofing and code-binding standards that reinforce open finance's authentication requirement.",
+    "supported": true,
+    "id": "fc0e942204b8",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance requires FSPs to internally audit and extend external assurance to open finance activities and API integrations; RMiT addresses independent external assurance for e-banking/new services but not open finance specifically.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 7.6",
+        "text": "In discharging its responsibility in relation to paragraph 7.5, senior management\n\nshall –"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 14.5",
+        "text": "For the introduction of new services, and any enhancements to existing\nservices not listed in Appendix 6, the financial institution is required to\nundertake the following measures prior to notifying the Bank:"
+      },
+      {
+        "clause_number": "RMiT 14.6",
+        "text": "A financial institution must ensure that the independent external party\nproviding the assurance is competent and has a good track record. The\nassurance shall address the matters covered in, and comply with, Appendix 9."
+      }
+    ],
+    "scope_note": "Open finance extends audit/assurance coverage to open finance services and API integrations; RMiT's assurance regime targets e-banking/Internet insurance services and enhancements.",
+    "supported": true,
+    "id": "7d60a2d8e5e0",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMiT mandates a 24x7 Security Operations Centre and SIEM/log correlation infrastructure that open finance does not itself prescribe, relying instead on incorporation of the RMiT PD.",
+    "label": "silent-on",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 12.3",
+        "text": "An  FSP  shall  ensure  that  its  cyber  risk  management  capabilities  and\n\ncybersecurity  controls  are  also  appropriately  extended  to  govern,  identify,\nprevent, detect, respond and address cyber risks associated with open finance\n\nactivities. This includes for the FSP to implement robust API security controls,\nstrengthening digital fraud detection and management, as well as take steps to\n\nsecure technology networks and internal systems from potential external risks\narising from the FSP’s participation in an open finance arrangement."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 11.21",
+        "text": "A financial institution must ensure the following:"
+      },
+      {
+        "clause_number": "RMiT 11.18",
+        "text": "A financial institution is required to notify the Bank of cyber incidents in\nadherence to the Bank's policy documents on Operational Risk Reporting -\nPart C, Business Continuity Management - Part C, Merchant Acquiring\nServices - paragraphs 19.25 to 19.26 and any other relevant policy\ndocuments specified by the Bank."
+      }
+    ],
+    "scope_note": "Open finance does not directly require an SOC/SIEM; this is covered only by cross-reference to RMiT.",
+    "supported": true,
+    "id": "92652011a195",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMiT prescribes cryptographic key lifecycle management and encryption standards which open finance does not itself specify, relying on cross-reference to RMiT for secure transmission.",
+    "label": "silent-on",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 11.5",
+        "text": "An FSP shall ensure that any transmission of customer information through an\n\nopen  finance  arrangement  is  conducted  through  secure  means,  in  line  with\nrelevant requirements set out in the  Policy Document on Risk Management in\nTechnology.  Without  limiting  the  generality  of  paragraph 11.4, a  data  provider\n\nshall  authenticate  the  customer  and  authorise  consent  using  a  reliable  and\neffective  authentication  procedure  (e.g.  multi-factor  authentication)  before\n\ngranting a data consumer access to the customer’s information."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 10.16",
+        "text": "A financial institution must develop and implement robust policies to identify\nand reduce shadow IT19 risks.\n\n## Patch and End-of-Life System Management"
+      },
+      {
+        "clause_number": "RMiT 10.66",
+        "text": "A financial institution must implement additional controls to authenticate\ndevices and users, authorise transactions and support non-repudiation and\naccountability for high-risk transactions or transactions above RM10,000.\nThese measures must include, at a minimum, the following:"
+      }
+    ],
+    "scope_note": "Open finance requires secure means 'in line with' RMiT but is silent on encryption/key management specifics addressed in RMiT.",
+    "supported": true,
+    "id": "16ee4e135d78",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMiT requires cloud governance and cloud risk management framework for cloud adoption; open finance addresses third-party/cloud outsourcing only by cross-reference and does not set cloud-specific controls.",
+    "label": "silent-on",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 11.8",
+        "text": "An FSP that is a data consumer shall ensure that any third-party service provider\n\ninvolved in handling customer information, whether related to an open finance\narrangement  (including  that  associated  with  outsourcing  or  cloud  computing\n\narrangements),  complies  with  relevant  requirements  relating  to  data  privacy,\nconfidentiality and security, as set out in the Policy Document on Management\n\nof  Customer  Information  and  Permitted  Disclosures,  the  Policy  Document  on\nRisk  Management  and  Information  Technology,  and  the  Policy  Document  on\n\nOutsourcing."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 15.1(b)",
+        "text": "The senior management of a financial institution should develop and implement\na cloud risk management framework that integrates with existing outsourcing\nrisk management framework, technology risk management framework (TRMF)\nand cyber resilience framework (CRF), for the board's approval, proportionate\nto the materiality of cloud adoption in its business strategy, to assist in the\nidentification, monitoring and mitigating of risks arising from cloud adoption."
+      },
+      {
+        "clause_number": "RMiT 15.2(a)",
+        "text": "has consulted the Bank prior to adopting public cloud for critical systems\nfor the first time in accordance with paragraph 15.1, with no concerns\nraised by the Bank during the first-time consultation;"
+      }
+    ],
+    "scope_note": "Open finance defers to the Outsourcing PD and RMiT for cloud arrangements without prescribing cloud-specific requirements.",
+    "supported": true,
+    "id": "dab68fce34f0",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both documents are issued under the same statutory provisions (FSA, IFSA, DFIA).",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 3.1(a)",
+        "text": "sections 47 and 123 of the Financial Services Act 2013 (FSA);"
+      },
+      {
+        "clause_number": "Open Finance 3.1(b)",
+        "text": ""
+      },
+      {
+        "clause_number": "Open Finance 3.1(c)",
+        "text": "sections 57 and 135 of the  Islamic Financial Services Act 2013 (IFSA);\nand\n\nsections 41 and 42C of the Development Financial Institutions Act 2002\n(DFIA)."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 3.1(a)",
+        "text": "Sections 47(1) and 143(2) of the Financial Services Act 2013 (FSA);"
+      },
+      {
+        "clause_number": "RMiT 3.1(b)",
+        "text": "Sections $5 7 \\left( 1 \\right)$ and 155(2) of the Islamic Financial Services Act 2013\n(IFSA); and"
+      },
+      {
+        "clause_number": "RMiT 3.1(c)",
+        "text": "Sections $4 1 \\left( 1 \\right)$ and 116(1) of the Development Financial Institutions Act\n2002 (DFIA).\n\n#### 3.2 The guidance in this policy document are issued pursuant to section 266 of the FSA, section 277 of the IFSA and section 126 of the DFIA.\n\n### 4 Effective date"
+      }
+    ],
+    "scope_note": "Both cite the enforcement and guidance powers under FSA/IFSA/DFIA; open finance additionally invokes sections 47/123 while RMiT invokes 47/143.",
+    "supported": true,
+    "id": "e20f48893fa9",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance requires senior management to ensure business continuity and operational resilience for open finance (API outages, third-party failures), aligning with RMiT/BCM operational resilience concerns.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 7.6",
+        "text": "In discharging its responsibility in relation to paragraph 7.5, senior management\n\nshall –"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "RMiT 11.22",
+        "text": "A financial institution must establish comprehensive cyber crisis management\npolicies and procedures that incorporate cyber-attack scenarios and\nresponses in the organisation's overall crisis management plan, escalation\nprocesses, business continuity and disaster recovery planning. This includes\ndeveloping a clear communication plan for engaging shareholders, regulatory\nauthorities, customers and employees in the event of a cyber-incident."
+      },
+      {
+        "clause_number": "RMiT 11.25",
+        "text": "A financial institution must conduct an annual cyber drill exercise to test the\neffectiveness of its CIRP, based on various current and emerging threat\nscenarios (e.g. social engineering), with the involvement of key stakeholders\nincluding members of the board, senior management and relevant third party\nservice providers. The test scenarios must include scenarios designed to test:"
+      }
+    ],
+    "scope_note": "Open Finance 7.6(b) extends continuity/resilience plans to open finance disruptions; overlaps with RMiT crisis management and cyber drill requirements.",
+    "supported": true,
+    "id": "ae148b9d520b",
+    "review_state": "pending"
+  }
+]

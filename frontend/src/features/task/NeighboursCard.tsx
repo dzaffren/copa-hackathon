@@ -5,8 +5,8 @@ import { nodeTypeStyle } from "./nodeType";
 
 export function NeighboursCard({ neighbours }: { neighbours: Neighbour[] }) {
   return (
-    <Card data-testid="neighbours-card" className="overflow-hidden">
-      <div className="border-b px-4 py-3">
+    <Card data-testid="neighbours-card" className="glass overflow-hidden">
+      <div className="border-b border-border/60 px-4 py-3">
         <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
           Neighbour nodes{" "}
           <span className="font-normal text-muted-foreground/70">

@@ -10,6 +10,7 @@ export type NodeType =
   | "internal-published"
   | "act-law"
   | "industry-input"
+  | "supervisory-letter"
   | "others";
 
 export type EdgeType =
@@ -52,8 +53,20 @@ export interface Neighbour {
   findings_count: number;
 }
 
+export type TaskWorkflowStatus = "draft" | "pending_review" | "approved";
+
+/** The persisted Maker-Checker state for a task (`engine/tasks.py`) — the
+ *  single source of truth the frontend reads instead of re-deriving it. */
+export interface TaskWorkflow {
+  status: TaskWorkflowStatus;
+  checker: Person | null;
+  approved_by: Person | null;
+  approved_at: string | null;
+}
+
 export interface TaskResponse {
   task: Task;
+  workflow: TaskWorkflow;
   neighbours: Neighbour[];
   draft_empty: boolean;
 }
@@ -173,6 +186,31 @@ export interface Placeholder {
   message: string;
 }
 
+/** The seven concept fields, offline-enriched (scripts/enrich_node_metadata.py).
+ *  Each is either a verbatim clause quote or a value already on the node
+ *  (`owner`) — never invented. A field the enrichment could not derive is
+ *  `null`, not omitted, so the panel can render "not available" per field. */
+export interface ConceptsAvailable {
+  status: "available";
+  policy_owner: string | null;
+  applicability: string | null;
+  empowerment_framework: string | null;
+  requirement: string | null;
+  issuance_date: string | null;
+  effective_date: string | null;
+  /** A list of topic keywords once enriched (older side-files may carry a bare
+   *  string or null). */
+  keywords: string[] | string | null;
+  /** Acts the document is issued under, e.g. `["FSA 2013", "IFSA 2013"]` — a
+   *  shared Act is a strong cross-workstream overlap signal. May be absent on
+   *  side-files written before this field existed. */
+  legal_basis?: string[] | null;
+  /** BNM ISMP classification. No offline source exists yet (its authority is
+   *  CAS's RH publication form), so this is `null` today — the field is
+   *  present so the panel can render "pending" rather than hide the concept. */
+  ismp_classification?: string | null;
+}
+
 export interface NodeDetail {
   id: string;
   node_type: NodeType;
@@ -181,10 +219,14 @@ export interface NodeDetail {
   short_type: string | null;
   description: string | null;
   source_url: string | null;
+  /** Governance badges — present only once offline enrichment has run for
+   *  this node; `null` otherwise, never fabricated. */
+  ismp_classification: string | null;
+  pursuant_to: string | null;
   first_order_neighbours: NeighbourRef[];
   second_order_neighbours: Placeholder;
   recent_activity: RecentActivity[];
-  concepts: Placeholder;
+  concepts: Placeholder | ConceptsAvailable;
 }
 
 export interface EdgeEndpoint {
@@ -235,7 +277,10 @@ export interface CreateNodeResponse {
 
 export interface AnalyzeResponse {
   id: string;
-  status: "analysed";
+  /** The finder can genuinely surface nothing for a pair — see CLAUDE.md's
+   *  verbatim-citation rule ("no matching clause found" beats a fabricated
+   *  one). `no_matching_source` leaves the edge unanalysed and re-analysable. */
+  status: "analysed" | "no_matching_source";
   findings: Connection[];
   findings_count: number;
 }
@@ -386,6 +431,28 @@ export interface CrossLinkEnd {
   workstream_name?: string | null;
 }
 
+/** How a relationship's linkages roll up: a `conflicts-with` anywhere makes it
+ *  a conflict, `differs-on` divergent, `goes-beyond`/`silent-on` an overlap,
+ *  and only `aligns-with` aligned. Derived server-side (engine/cross_intel.py). */
+export type RelationshipClassification =
+  | "conflict"
+  | "divergent"
+  | "overlap"
+  | "aligned";
+
+export type RiskLevel = "high" | "medium" | "low";
+
+/** What two documents share — each the shared value itself (so the panel quotes
+ *  "FSA 2013, IFSA 2013"), never a bare boolean. A signal is present only when
+ *  both sides carry it. */
+export interface SharedAttributes {
+  legal_basis: string[];
+  applicability: string[];
+  keywords: string[];
+  policy_owner: string | null;
+  ismp_classification: string | null;
+}
+
 export interface CrossLink {
   id: string;
   edge_type: EdgeType;
@@ -396,10 +463,143 @@ export interface CrossLink {
    *  without fetching every finding. */
   labels: Partial<Record<SemanticLabel, number>>;
   counts: ReviewCounts;
+  /** Cross-Workstream Intelligence enrichment (engine/cross_intel.py). */
+  classification: RelationshipClassification;
+  risk_level: RiskLevel;
+  detected_at: string | null;
+  shared_attributes: SharedAttributes;
+  reasons: string[];
 }
 
 export interface CrossLinksResponse {
   links: CrossLink[];
+}
+
+/** One side of a relationship-detail: the document plus its regulatory profile
+ *  (concept metadata), for the intelligence panel and the comparison view. */
+export interface CrossProfile {
+  node_id: string;
+  title: string | null;
+  node_type: NodeType | null;
+  issuer: string | null;
+  short_type: string | null;
+  description: string | null;
+  workstream_id: string | null;
+  workstream_name: string | null;
+  concepts: Placeholder | ConceptsAvailable;
+}
+
+/** The full "why do these overlap, and what's the evidence" payload behind the
+ *  Cross-Workstream Intelligence relationship panel. */
+export interface CrossLinkDetail {
+  id: string;
+  edge_type: EdgeType;
+  detected_at: string | null;
+  classification: RelationshipClassification;
+  risk_level: RiskLevel;
+  near: CrossProfile;
+  far: CrossProfile;
+  shared_attributes: SharedAttributes;
+  reasons: string[];
+  labels: Partial<Record<SemanticLabel, number>>;
+  counts: ReviewCounts;
+  findings: ReviewFinding[];
+}
+
+// --- Per-linkage Maker-Checker workflow ------------------------------------
+
+/** The seven maker-checker statuses a linkage moves through
+ *  (engine/linkage_review.py). ai_detected → maker_review → submitted_for_check
+ *  → checker_review → approved | rejected | changes_requested (which loops back
+ *  to submitted_for_check). */
+export type LinkageStatus =
+  | "ai_detected"
+  | "maker_review"
+  | "submitted_for_check"
+  | "checker_review"
+  | "approved"
+  | "rejected"
+  | "changes_requested";
+
+/** The transition verbs the API accepts. */
+export type LinkageAction =
+  | "claim"
+  | "submit"
+  | "pick_up"
+  | "approve"
+  | "reject"
+  | "request_changes";
+
+export interface LinkageComment {
+  author: Person;
+  at: string;
+  text: string;
+}
+
+export interface LinkageAuditEntry {
+  actor: Person;
+  action: LinkageAction;
+  from: LinkageStatus;
+  to: LinkageStatus;
+  at: string;
+  comment: string | null;
+}
+
+/** A single linkage's maker-checker record — a real audit trail, not a flag. */
+export interface LinkageReviewRecord {
+  status: LinkageStatus;
+  maker: Person | null;
+  checker: Person | null;
+  created_at: string | null;
+  checked_at: string | null;
+  comments: LinkageComment[];
+  audit: LinkageAuditEntry[];
+}
+
+export interface LinkageReviewRow {
+  finding_id: string;
+  summary: string | null;
+  label: SemanticLabel;
+  sentiment: Sentiment;
+  review: LinkageReviewRecord;
+}
+
+export interface LinkageReviewResponse {
+  edge_id: string;
+  linkages: LinkageReviewRow[];
+}
+
+/** One row in the Review Queue: a cross-workstream linkage plus its status. */
+export interface ReviewQueueItem {
+  workstream_id: string;
+  edge_id: string;
+  finding_id: string;
+  summary: string | null;
+  label: SemanticLabel;
+  sentiment: Sentiment;
+  near: CrossLinkEnd;
+  far: CrossLinkEnd;
+  status: LinkageStatus;
+  maker: Person | null;
+  checker: Person | null;
+  created_at: string | null;
+  checked_at: string | null;
+}
+
+export interface ReviewQueueResponse {
+  items: ReviewQueueItem[];
+  counts_by_status: Record<LinkageStatus, number>;
+}
+
+export interface LinkageTransitionRequest {
+  action: LinkageAction;
+  actor_id: string;
+  comment?: string;
+}
+
+export interface LinkageTransitionResponse {
+  finding_id: string;
+  review: LinkageReviewRecord;
 }
 
 /** The store holding edges whose endpoints live in different workstreams. Not a

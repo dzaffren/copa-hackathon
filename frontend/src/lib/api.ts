@@ -7,16 +7,23 @@ import type {
   CreateNodeResponse,
   CreateWorkstreamRequest,
   CreateWorkstreamResponse,
+  CrossLinkDetail,
   CrossLinksResponse,
   DraftResponse,
   EdgeDetail,
+  LinkageReviewResponse,
+  LinkageTransitionRequest,
+  LinkageTransitionResponse,
   LinkagesResponse,
   Person,
+  ReviewQueueResponse,
   NodeDetail,
   PatchReviewStateResponse,
   ReviewResponse,
   ReviewState,
   TaskResponse,
+  TaskWorkflow,
+  TaskWorkflowStatus,
   WorkstreamGraph,
   WorkstreamSummary,
 } from "@/lib/types";
@@ -108,6 +115,18 @@ export function fetchEdgeFindings(
 ): Promise<Connection[]> {
   return getJson<Connection[]>(
     `${API_BASE}/api/workstreams/${workstreamId}/edges/${edgeId}/findings`,
+  );
+}
+
+export function setTaskWorkflow(
+  workstreamId: string,
+  nodeId: string,
+  status: TaskWorkflowStatus,
+  actorId: string,
+): Promise<{ workflow: TaskWorkflow }> {
+  return patchJson<{ workflow: TaskWorkflow }>(
+    `${API_BASE}/api/workstreams/${workstreamId}/tasks/${nodeId}/workflow`,
+    { status, actor_id: actorId },
   );
 }
 
@@ -280,6 +299,54 @@ export async function fetchCrossLinks(workstreamId: string) {
     `${API_BASE}/api/workstreams/${workstreamId}/cross-links`,
   );
   return body.links;
+}
+
+/** Every cross-workstream link in the corpus, regardless of workstream —
+ *  backs the Home dashboard's Overlap Alerts card and the Cross-Workstream
+ *  Intelligence page's metrics + relationship list. */
+export async function fetchAllCrossLinks() {
+  const body = await getJson<CrossLinksResponse>(`${API_BASE}/api/cross-links`);
+  return body.links;
+}
+
+/** One cross-workstream relationship in full: both regulatory profiles, what
+ *  they share, why it was flagged, and the verbatim clause evidence on every
+ *  linkage. Backs the Cross-Workstream Intelligence relationship panel. */
+export function fetchCrossLinkDetail(edgeId: string): Promise<CrossLinkDetail> {
+  return getJson<CrossLinkDetail>(`${API_BASE}/api/cross-links/${edgeId}`);
+}
+
+// --- Per-linkage Maker-Checker workflow ------------------------------------
+
+/** The Review Queue: every cross-workstream linkage with its maker-checker
+ *  status, plus a tally by status. */
+export function fetchReviewQueue(): Promise<ReviewQueueResponse> {
+  return getJson<ReviewQueueResponse>(`${API_BASE}/api/review-queue`);
+}
+
+/** Every linkage on an edge with its maker-checker record. */
+export function fetchLinkageReview(
+  workstreamId: string,
+  edgeId: string,
+): Promise<LinkageReviewResponse> {
+  return getJson<LinkageReviewResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/edges/${edgeId}/linkage-review`,
+  );
+}
+
+/** Apply a maker-checker action to one linkage (claim / submit / pick_up /
+ *  approve / reject / request_changes). The server enforces valid transitions
+ *  and the maker≠checker rule. */
+export function transitionLinkageReview(
+  workstreamId: string,
+  edgeId: string,
+  findingId: string,
+  body: LinkageTransitionRequest,
+): Promise<LinkageTransitionResponse> {
+  return patchJson<LinkageTransitionResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/edges/${edgeId}/findings/${findingId}/linkage-review`,
+    body,
+  );
 }
 
 export { HttpError };

@@ -176,3 +176,17 @@ Note this is _not_ `data/references/`, which is public and tracked.
   document IDs are disjoint and it breaks the one working trace. Legacy-path only:
   workstream-brain reads `data/workstreams/`, not `data/artifacts/`. See
   `docs/learnings/blocker-engine-build-silently-narrows-artifacts.md`.
+
+## Frontend conventions (Workstream Brain app)
+
+- **The frontend is `frontend/`** — Vite + React 18 + TypeScript + Tailwind + shadcn/ui.
+- **Graph library:** `react-force-graph-2d` for all interactive graph canvases.
+- **API base:** set `VITE_API_BASE` in `frontend/.env` (defaults to `http://localhost:8000`).
+- **State:** TanStack Query for all server state; no Redux/Zustand.
+- **Node types (8):** task, internal-published, international-standard, peer-regulator,
+  act-law, industry-input, supervisory-letter, others.
+- **Edge types (4):** supersedes, references, contributes-to, parallel-to.
+- **Finding labels (5):** aligns-with, differs-on, conflicts-with, silent-on, goes-beyond.
+- **Sentiment (3, differs-on only):** tighten, loosen, neutral.
+- **CORS:** FastAPI includes CORS middleware allowing origin `http://localhost:5173`.
+- **Dark mode:** default theme. Deep navy/slate, NOT pure black.

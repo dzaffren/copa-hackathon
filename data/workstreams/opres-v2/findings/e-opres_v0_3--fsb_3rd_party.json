@@ -1,0 +1,54 @@
+[
+  {
+    "summary": "Third-party register aligns with FSB Toolkit register expectations",
+    "label": "aligns-with",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "OpRes PD 4.5",
+        "text": "A financial institution shall maintain a register of arrangements with third-party service providers that support critical operations."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "FSB Toolkit Tool 2",
+        "text": "Financial institutions maintain a comprehensive register of third-party service relationships."
+      }
+    ]
+  },
+  {
+    "summary": "Draft mandates tested exit plans per critical provider, going beyond the FSB baseline",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "scope_note": "The FSB Toolkit expects dependency oversight but stops short of a tested per-provider exit plan.",
+    "supported": true,
+    "source_clauses": [
+      {
+        "clause_number": "OpRes PD 4.7",
+        "text": "A financial institution shall maintain a documented and periodically tested exit plan for each critical third-party service provider."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "FSB Toolkit Tool 6",
+        "text": "Financial institutions consider exit strategies for critical third-party service relationships."
+      }
+    ]
+  },
+  {
+    "summary": "FSB covers third-party concentration risk; the draft is silent on concentration",
+    "label": "silent-on",
+    "sentiment": null,
+    "scope_note": null,
+    "supported": true,
+    "source_clauses": [],
+    "target_clauses": [
+      {
+        "clause_number": "FSB Toolkit Tool 7",
+        "text": "Financial authorities monitor systemic third-party dependencies and concentration across the sector."
+      }
+    ]
+  }
+]

@@ -1,21 +1,82 @@
 import { Link, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { Loader2, PencilLine } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  GitBranch,
+  Link2,
+  Loader2,
+  PencilLine,
+  Sparkles,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { fetchTask, HttpError } from "@/lib/api";
+import { cn } from "@/lib/utils";
+import { fetchTask, setTaskWorkflow, HttpError } from "@/lib/api";
+import type { TaskWorkflowStatus } from "@/lib/types";
 import { SourceCard } from "./SourceCard";
 import { NeighboursCard } from "./NeighboursCard";
 import { PairwiseComparisonCard } from "./PairwiseComparisonCard";
 import { AssignDialog } from "./AssignDialog";
+import { ApproveDialog } from "./ApproveDialog";
+
+const STATUS_LABEL: Record<TaskWorkflowStatus, string> = {
+  draft: "Draft",
+  pending_review: "Pending Review",
+  approved: "Approved",
+};
+
+const STATUS_BADGE: Record<TaskWorkflowStatus, string> = {
+  draft: "bg-slate-500/15 text-slate-300 border border-slate-400/30",
+  pending_review: "bg-amber-400/15 text-amber-300 border border-amber-300/30",
+  approved: "bg-emerald-500/15 text-emerald-300 border border-emerald-400/30",
+};
+
+function formatApprovedAt(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function MetricTile({
+  icon,
+  value,
+  label,
+}: {
+  icon: React.ReactNode;
+  value: number;
+  label: string;
+}) {
+  return (
+    <div className="glass flex items-center gap-3 rounded-xl px-4 py-3">
+      <span className="grid h-9 w-9 place-items-center rounded-lg bg-accent/60 text-cyan-300">
+        {icon}
+      </span>
+      <div className="leading-tight">
+        <div className="text-lg font-bold">{value}</div>
+        <div className="text-[11px] text-muted-foreground">{label}</div>
+      </div>
+    </div>
+  );
+}
 
 export default function TaskScreenPage() {
   const { workstreamId = "", nodeId = "" } = useParams();
+  const queryClient = useQueryClient();
+  const queryKey = ["task", workstreamId, nodeId];
 
   const query = useQuery({
-    queryKey: ["task", workstreamId, nodeId],
+    queryKey,
     queryFn: () => fetchTask(workstreamId, nodeId),
+  });
+
+  const workflowMutation = useMutation({
+    mutationFn: (vars: { status: TaskWorkflowStatus; actorId: string }) =>
+      setTaskWorkflow(workstreamId, nodeId, vars.status, vars.actorId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey }),
   });
 
   const graphHref = `/workstreams/${workstreamId}`;
@@ -44,7 +105,7 @@ export default function TaskScreenPage() {
         <p className="mt-1 text-xs text-muted-foreground">{code}</p>
         <Link
           to={graphHref}
-          className="mt-4 inline-block text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+          className="mt-4 inline-block text-sm font-semibold text-cyan-300 hover:text-cyan-200"
         >
           ← Back to the workstream graph
         </Link>
@@ -52,38 +113,102 @@ export default function TaskScreenPage() {
     );
   }
 
-  const { task, neighbours, draft_empty } = query.data;
+  const { task, workflow, neighbours, draft_empty } = query.data;
+  const currentStatus = workflow.status;
+  const analysedCount = neighbours.filter((n) => n.analysed).length;
+  const findingsTotal = neighbours.reduce(
+    (sum, n) => sum + (n.findings_count ?? 0),
+    0,
+  );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b bg-white px-6 py-4">
+    <div className="h-full overflow-y-auto bg-background">
+      <header className="border-b border-border/60 bg-card/30 px-6 py-4 backdrop-blur">
         <div className="flex items-center justify-between gap-6">
           <div className="min-w-0">
             <div className="mb-1 flex items-center gap-2 text-xs text-muted-foreground">
-              <Link to={graphHref} className="hover:text-indigo-600">
+              <Link to={graphHref} className="hover:text-cyan-300">
                 ← Workstream graph
               </Link>
-              <span className="text-gray-300">/</span>
-              <span className="font-medium text-gray-700">Task</span>
+              <span>/</span>
+              <span className="font-medium text-foreground">Task</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge className="bg-indigo-100 uppercase tracking-wider text-indigo-800 hover:bg-indigo-100">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge className="border border-cyan-400/30 bg-cyan-500/15 uppercase tracking-wider text-cyan-300 hover:bg-cyan-500/15">
                 task
               </Badge>
               <h1 className="text-xl font-bold">{task.title}</h1>
+              <Badge
+                className={cn(
+                  "uppercase tracking-wide",
+                  STATUS_BADGE[currentStatus],
+                )}
+              >
+                {STATUS_LABEL[currentStatus]}
+              </Badge>
             </div>
             <p className="mt-1 text-sm text-muted-foreground">
-              {`${task.description} · ${neighbours.length} neighbour nodes defined at creation`}
+              {task.owner.name} · {task.format} · {neighbours.length} neighbour
+              nodes
             </p>
+            {currentStatus === "approved" && workflow.approved_by && (
+              <p className="mt-0.5 text-xs text-emerald-300">
+                Approved by {workflow.approved_by.name}
+                {workflow.approved_at &&
+                  ` · ${formatApprovedAt(workflow.approved_at)}`}
+              </p>
+            )}
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <AssignDialog />
-            <Button asChild className="bg-indigo-600 hover:bg-indigo-700">
+            {currentStatus === "draft" && (
+              <AssignDialog
+                members={task.reviewers}
+                onAssigned={(member) =>
+                  workflowMutation.mutate({
+                    status: "pending_review",
+                    actorId: member.id,
+                  })
+                }
+              />
+            )}
+            {currentStatus === "pending_review" && workflow.checker && (
+              <ApproveDialog
+                checker={workflow.checker}
+                onApproved={(approver) =>
+                  workflowMutation.mutate({
+                    status: "approved",
+                    actorId: approver.id,
+                  })
+                }
+              />
+            )}
+            <Button
+              asChild
+              className="bg-cyan-500 text-slate-950 hover:bg-cyan-400"
+            >
               <Link to={`/workstreams/${workstreamId}/tasks/${nodeId}/draft`}>
                 <PencilLine /> Open draft
               </Link>
             </Button>
           </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-3 gap-3 sm:max-w-xl">
+          <MetricTile
+            icon={<GitBranch className="h-4 w-4" />}
+            value={neighbours.length}
+            label="Neighbours"
+          />
+          <MetricTile
+            icon={<Sparkles className="h-4 w-4" />}
+            value={analysedCount}
+            label="Analysed"
+          />
+          <MetricTile
+            icon={<Link2 className="h-4 w-4" />}
+            value={findingsTotal}
+            label="Findings"
+          />
         </div>
       </header>
 

@@ -108,21 +108,26 @@ export function DraftingWorkspacePage() {
   }
 
   return (
-    <div className="flex h-screen flex-col">
-      <header className="border-b border-gray-200 px-4 py-2.5">
-        <Link
-          to={`/workstreams/${workstreamId}`}
-          className="text-xs font-semibold text-muted-foreground hover:text-foreground"
-        >
-          ← Workstream graph
-        </Link>
-        <h1 className="mt-0.5 text-lg font-bold">
-          {task.data?.task.title ?? "Working draft"}
-        </h1>
+    <div className="flex h-full flex-col">
+      <header className="flex items-center justify-between border-b border-border/60 bg-card/30 px-4 py-2.5 backdrop-blur">
+        <div>
+          <Link
+            to={`/workstreams/${workstreamId}`}
+            className="text-xs font-semibold text-muted-foreground hover:text-foreground"
+          >
+            ← Workstream graph
+          </Link>
+          <h1 className="mt-0.5 text-lg font-bold">
+            {task.data?.task.title ?? "Working draft"}
+          </h1>
+        </div>
+        <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-300">
+          Auto-saved
+        </span>
       </header>
 
       <div className="grid min-h-0 flex-1 grid-cols-12">
-        <aside className="col-span-5 flex min-h-0 flex-col border-r border-gray-200 p-3">
+        <aside className="col-span-5 flex min-h-0 flex-col border-r border-border/60 p-3">
           <div role="tablist" className="mb-3 flex gap-1">
             {tabs.map((t) => (
               <button
@@ -133,8 +138,8 @@ export function DraftingWorkspacePage() {
                 className={[
                   "rounded-md px-2.5 py-1.5 text-xs font-semibold transition",
                   tab === t.key
-                    ? "bg-gray-900 text-white"
-                    : "text-muted-foreground hover:bg-gray-100",
+                    ? "bg-cyan-500 text-slate-950"
+                    : "text-muted-foreground hover:bg-accent",
                 ].join(" ")}
               >
                 {t.label}
@@ -143,7 +148,7 @@ export function DraftingWorkspacePage() {
                     data-testid={`count-${t.key}`}
                     className={[
                       "ml-1.5 rounded-full px-1.5 py-0.5 text-[10px]",
-                      tab === t.key ? "bg-white/20" : "bg-gray-200",
+                      tab === t.key ? "bg-slate-950/20" : "bg-accent",
                     ].join(" ")}
                   >
                     {t.count}
@@ -157,7 +162,7 @@ export function DraftingWorkspacePage() {
             {tab === "reviewed" && (
               <div className="space-y-2" aria-label="Reviewed linkages">
                 {reviewedCards.length === 0 ? (
-                  <p className="rounded-lg bg-gray-50 p-3 text-sm text-muted-foreground">
+                  <p className="rounded-lg bg-muted/40 p-3 text-sm text-muted-foreground">
                     No accepted linkages yet. Findings you accept on the review
                     screen appear here, so the context you built up while
                     reviewing is next to the draft.
@@ -177,7 +182,7 @@ export function DraftingWorkspacePage() {
 
             {tab === "related" && (
               <div className="space-y-2" aria-label="Related linkages">
-                <p className="rounded-lg bg-gray-50 p-2.5 text-[12px] leading-snug text-muted-foreground">
+                <p className="rounded-lg bg-muted/40 p-2.5 text-[12px] leading-snug text-muted-foreground">
                   Linkages between your task's neighbour documents themselves —
                   useful when your draft is silent on a concept the neighbours
                   have already settled.
@@ -185,7 +190,7 @@ export function DraftingWorkspacePage() {
                 {relatedCards.length === 0 ? (
                   <p
                     data-testid="related-empty"
-                    className="rounded-lg border border-dashed border-gray-200 p-3 text-sm text-muted-foreground"
+                    className="rounded-lg border border-dashed border-border/60 p-3 text-sm text-muted-foreground"
                   >
                     No linkages between neighbour documents have been analysed
                     yet.

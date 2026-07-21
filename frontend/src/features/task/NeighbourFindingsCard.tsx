@@ -6,7 +6,7 @@ import { Loader2, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { fetchEdgeFindings } from "@/lib/api";
+import { analyzeEdge, fetchEdgeFindings } from "@/lib/api";
 import type { Connection, Neighbour } from "@/lib/types";
 import { nodeTypeStyle } from "./nodeType";
 import { labelStyle, labelText } from "./semanticLabel";
@@ -46,9 +46,12 @@ export function NeighbourFindingsCard({
     setAnalyzing(true);
     setNoLinkages(false);
     try {
-      const result = await fetchEdgeFindings(workstreamId, neighbour.edge_id);
-      if (result.length > 0) {
-        onAnalyzed(neighbour.edge_id, result);
+      // Run the real finder→critic analysis (not a re-read of already-stored
+      // findings, which is always empty for a pair that has never been
+      // analysed) — mirrors the graph screen's "Analyze linkages" action.
+      const result = await analyzeEdge(workstreamId, neighbour.edge_id);
+      if (result.status === "analysed" && result.findings.length > 0) {
+        onAnalyzed(neighbour.edge_id, result.findings);
       } else {
         setNoLinkages(true);
       }
@@ -74,12 +77,12 @@ export function NeighbourFindingsCard({
         data-testid="pair-card"
         data-neighbour={neighbour.node_id}
         data-analysed="false"
-        className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-3"
+        className="rounded-lg border-2 border-dashed border-border/70 bg-muted/20 p-3"
       >
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             {namePill}
-            <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">
+            <Badge className="border border-amber-300/30 bg-amber-400/15 text-amber-300 hover:bg-amber-400/15">
               not analysed
             </Badge>
           </div>
@@ -96,7 +99,7 @@ export function NeighbourFindingsCard({
         )}
         <Button
           size="sm"
-          className="mt-2 bg-indigo-600 hover:bg-indigo-700"
+          className="mt-2 bg-cyan-500 text-slate-950 hover:bg-cyan-400"
           onClick={handleAnalyze}
           disabled={analyzing}
         >
@@ -121,7 +124,7 @@ export function NeighbourFindingsCard({
       data-testid="pair-card"
       data-neighbour={neighbour.node_id}
       data-analysed="true"
-      className={cn("rounded-lg border p-3", style?.card ?? "border-gray-200")}
+      className={cn("rounded-lg border p-3", style?.card ?? "border-border/60 bg-card/50")}
     >
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-2">
@@ -143,7 +146,7 @@ export function NeighbourFindingsCard({
       </div>
 
       {headline ? (
-        <p className="text-sm font-semibold text-gray-900">
+        <p className="text-sm font-semibold text-foreground">
           {headline.summary}
         </p>
       ) : (
@@ -154,7 +157,7 @@ export function NeighbourFindingsCard({
 
       <Link
         to={reviewHref}
-        className="mt-2 inline-block text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+        className="mt-2 inline-block text-xs font-semibold text-cyan-300 hover:text-cyan-200"
       >
         Open in Review →
       </Link>

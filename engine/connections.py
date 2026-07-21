@@ -125,22 +125,6 @@ SENTIMENT_VALUES = ("tighten", "loosen", "neutral")
 _SENTIMENT_LABEL = "differs-on"
 
 
-def _normalize_clause_number(number: str) -> str:
-    """Repair a common LLM output slip: a sub-item citation with a missing
-    closing paren (e.g. ``"RMiT 17.1(a"`` → ``"RMiT 17.1(a)"``).
-
-    The finder/critic prompts include the fully-parenthesised form in their
-    clause context, but Claude occasionally drops the trailing ``)`` when
-    serialising to JSON. This normalisation is deliberately narrow: it ONLY
-    appends ``)`` when the string contains an unbalanced ``(`` — never rewrites
-    any other character, never invents a number. Anything else falls through
-    unchanged and is judged by the validator on its own merits.
-    """
-    if number.count("(") == number.count(")") + 1 and not number.endswith(")"):
-        return number + ")"
-    return number
-
-
 class ConnectionFindError(Exception):
     """Raised when connection-finding cannot proceed (e.g. no Foundry
     credentials for the real finder/critic seam)."""
@@ -237,12 +221,8 @@ def _validate_candidates(
         summary = candidate.get("summary", "")
         label = candidate.get("label")
         sentiment = candidate.get("sentiment")
-        source_numbers = [
-            _normalize_clause_number(n) for n in candidate.get("source_clauses", [])
-        ]
-        target_numbers = [
-            _normalize_clause_number(n) for n in candidate.get("target_clauses", [])
-        ]
+        source_numbers = candidate.get("source_clauses", [])
+        target_numbers = candidate.get("target_clauses", [])
 
         cited_results = [
             {"clause_number": number, "resolved": clause_index.get(number) is not None}
@@ -507,7 +487,9 @@ def _validate_label_and_sentiment(item: dict, index: int, raw: str) -> None:
         )
 
 
-def _finder_turn(doc_a_id: str, doc_b_id: str, clause_index: ClauseIndex) -> list[dict]:
+def _finder_turn(
+    doc_a_id: str, doc_b_id: str, clause_index: ClauseIndex
+) -> list[dict]:
     """Call the finder LLM (Azure AI Foundry) to propose candidate connections.
 
     Builds the two-document clause context, sends it with

@@ -1,54 +1,9 @@
-import { Link } from "react-router-dom";
-
-function Shell({
-  eyebrow,
-  title,
-  children,
-}: {
-  eyebrow: string;
-  title: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <div className="mx-auto max-w-3xl p-8">
-      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-        {eyebrow}
-      </p>
-      <h1 className="mt-1 text-2xl font-bold">{title}</h1>
-      <div className="mt-4 text-sm text-muted-foreground">{children}</div>
-    </div>
-  );
-}
-
-export function HomePage() {
-  return (
-    <Shell eyebrow="Workstream Brain" title="Workstream Brain">
-      <Link
-        className="font-semibold text-primary underline-offset-4 hover:underline"
-        to="/workstreams/opres-v2/tasks/opres-pd-v0-3"
-      >
-        Open the OpRes PD v0.3 task screen →
-      </Link>
-    </Shell>
-  );
-}
-
-// DraftingWorkspacePage is no longer a placeholder — see
-// @/features/drafting-workspace/DraftingWorkspacePage.
-
-// ReviewLinkagesPage is no longer a placeholder — see
-// @/features/review-linkages/ReviewLinkagesPage.
-
-// NewWorkstreamPage is no longer a placeholder — see
-// @/features/new-workstream/NewWorkstreamPage.
-
-export function InstitutionMapPage() {
-  return (
-    <Shell eyebrow="Institution map" title="Institution map">
-      <p>
-        The institution map is a separate epic. This placeholder confirms the
-        route resolves.
-      </p>
-    </Shell>
-  );
-}
+// All former placeholder screens now have real implementations:
+//   HomePage            → @/features/home/HomePage
+//   InstitutionMapPage  → @/features/institution-map/InstitutionMapPage
+//   DraftingWorkspacePage → @/features/drafting-workspace/DraftingWorkspacePage
+//   ReviewLinkagesPage    → @/features/review-linkages/ReviewLinkagesPage
+//   NewWorkstreamPage     → @/features/new-workstream/NewWorkstreamPage
+//
+// This file is intentionally left empty of components; kept as a breadcrumb.
+export {};

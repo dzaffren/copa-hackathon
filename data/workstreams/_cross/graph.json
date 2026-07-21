@@ -19,6 +19,24 @@
       "workstream_id": "opres-v2",
       "description": "Operational Resilience Discussion Paper, December 2025.",
       "document_id": "opres-v1-2025-draft"
+    },
+    {
+      "id": "bcm-pd-2022",
+      "node_type": "internal-published",
+      "title": "BCM PD (19 Dec 2022)",
+      "issuer": "BNM",
+      "short_type": "PD",
+      "workstream_id": "bcm",
+      "description": "Business Continuity Management policy document issued 19 December 2022."
+    },
+    {
+      "id": "rrp-pd-v0-1",
+      "node_type": "task",
+      "title": "Recovery Planning PD — v0.1",
+      "issuer": "BNM",
+      "short_type": "PD (draft)",
+      "workstream_id": "resolution-recovery",
+      "description": "Working draft revising the Recovery & Resolution Planning framework."
     }
   ],
   "edges": [
@@ -28,7 +46,17 @@
       "target": "opres-dp-2025",
       "edge_type": "parallel-to",
       "source_workstream_id": "open-finance-ed",
-      "target_workstream_id": "opres-v2"
+      "target_workstream_id": "opres-v2",
+      "detected_at": "2026-07-11"
+    },
+    {
+      "id": "x-bcm_pd_2022--rrp_pd_v0_1",
+      "source": "bcm-pd-2022",
+      "target": "rrp-pd-v0-1",
+      "edge_type": "parallel-to",
+      "source_workstream_id": "bcm",
+      "target_workstream_id": "resolution-recovery",
+      "detected_at": "2026-07-14"
     }
   ]
 }

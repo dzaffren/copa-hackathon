@@ -74,7 +74,7 @@ export function NewWorkstreamPage() {
   );
 
   return (
-    <div className="mx-auto max-w-2xl p-8">
+    <div className="mx-auto h-full max-w-2xl overflow-y-auto p-8">
       <Link
         to="/"
         className="text-xs font-semibold text-muted-foreground hover:text-foreground"
@@ -89,11 +89,11 @@ export function NewWorkstreamPage() {
 
       <form onSubmit={submit} className="mt-6 space-y-4" noValidate>
         {/* --- Basics --- */}
-        <section className="rounded-lg border border-gray-200 p-4">
+        <section className="glass rounded-xl p-4">
           <h2 className="text-sm font-bold">Basics</h2>
 
           <label className="mt-3 block">
-            <span className="text-xs font-semibold text-gray-700">
+            <span className="text-xs font-semibold text-foreground">
               Workstream name
             </span>
             <input
@@ -108,14 +108,15 @@ export function NewWorkstreamPage() {
               placeholder="Climate Risk PD v2 · 2026"
               className={[
                 "mt-1 w-full rounded-md border px-2 py-1.5 text-sm",
-                nameError ? "border-red-400" : "border-gray-200",
+                "bg-background/60 outline-none focus:border-cyan-400/60",
+                nameError ? "border-red-400" : "border-border/60",
               ].join(" ")}
             />
             {nameError && (
               <span
                 id="name-error"
                 role="alert"
-                className="mt-1 block text-xs text-red-600"
+                className="mt-1 block text-xs text-red-400"
               >
                 {nameError}
               </span>
@@ -123,20 +124,20 @@ export function NewWorkstreamPage() {
           </label>
 
           <label className="mt-3 block">
-            <span className="text-xs font-semibold text-gray-700">
+            <span className="text-xs font-semibold text-foreground">
               Short description
             </span>
             <input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               aria-label="Short description"
-              className="mt-1 w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm"
+              className="mt-1 w-full rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-cyan-400/60"
             />
           </label>
 
           <div className="mt-3 grid grid-cols-2 gap-3">
             <label className="block">
-              <span className="text-xs font-semibold text-gray-700">
+              <span className="text-xs font-semibold text-foreground">
                 Deliverable type
               </span>
               <select
@@ -145,7 +146,7 @@ export function NewWorkstreamPage() {
                   setDeliverableType(e.target.value as DeliverableTypeCode)
                 }
                 aria-label="Deliverable type"
-                className="mt-1 w-full rounded-md border border-gray-200 bg-white px-2 py-1.5 text-sm"
+                className="mt-1 w-full rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-cyan-400/60"
               >
                 {DELIVERABLE_TYPE_OPTIONS.map((o) => (
                   <option key={o.code} value={o.code}>
@@ -156,7 +157,7 @@ export function NewWorkstreamPage() {
             </label>
 
             <label className="block">
-              <span className="text-xs font-semibold text-gray-700">
+              <span className="text-xs font-semibold text-foreground">
                 Target publication
               </span>
               <input
@@ -164,20 +165,20 @@ export function NewWorkstreamPage() {
                 onChange={(e) => setTargetPublication(e.target.value)}
                 aria-label="Target publication"
                 placeholder="Q4 2026"
-                className="mt-1 w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm"
+                className="mt-1 w-full rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-cyan-400/60"
               />
             </label>
           </div>
         </section>
 
         {/* --- People --- */}
-        <section className="rounded-lg border border-gray-200 p-4">
+        <section className="glass rounded-xl p-4">
           <h2 className="text-sm font-bold">People</h2>
 
           <div className="mt-3">
-            <span className="text-xs font-semibold text-gray-700">Owner</span>
+            <span className="text-xs font-semibold text-foreground">Owner</span>
             <div className="mt-1 flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-[10px] font-bold text-indigo-700">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-cyan-500/20 text-[10px] font-bold text-cyan-300">
                 AR
               </span>
               <span className="text-sm">Aisyah R.</span>
@@ -186,7 +187,7 @@ export function NewWorkstreamPage() {
           </div>
 
           <div className="mt-3">
-            <span className="text-xs font-semibold text-gray-700">
+            <span className="text-xs font-semibold text-foreground">
               Reviewers
             </span>
             {reviewers.length > 0 && (
@@ -195,7 +196,7 @@ export function NewWorkstreamPage() {
                   <li
                     key={r.id}
                     data-testid="reviewer-pill"
-                    className="flex items-center gap-1 rounded-full bg-gray-100 py-0.5 pl-2 pr-1 text-xs"
+                    className="flex items-center gap-1 rounded-full bg-muted py-0.5 pl-2 pr-1 text-xs"
                   >
                     {r.name}
                     <button
@@ -221,7 +222,7 @@ export function NewWorkstreamPage() {
                     key={p.id}
                     type="button"
                     onClick={() => setReviewers((prev) => [...prev, p])}
-                    className="rounded-full border border-dashed border-gray-300 px-2 py-0.5 text-xs text-muted-foreground hover:border-indigo-400 hover:text-indigo-600"
+                    className="rounded-full border border-dashed border-border/70 px-2 py-0.5 text-xs text-muted-foreground hover:border-cyan-400/60 hover:text-cyan-300"
                   >
                     + {p.name}
                   </button>
@@ -236,7 +237,7 @@ export function NewWorkstreamPage() {
         </section>
 
         {/* --- Access --- */}
-        <fieldset className="rounded-lg border border-gray-200 p-4">
+        <fieldset className="glass rounded-xl p-4">
           <legend className="px-1 text-sm font-bold">Access</legend>
           {(
             [
@@ -272,7 +273,7 @@ export function NewWorkstreamPage() {
         </fieldset>
 
         {create.isError && !nameError && (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="text-sm text-red-400">
             {(create.error as Error).message}
           </p>
         )}
@@ -280,14 +281,14 @@ export function NewWorkstreamPage() {
         <div className="flex justify-end gap-2">
           <Link
             to="/"
-            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-semibold hover:bg-gray-50"
+            className="rounded-md border border-border/70 px-3 py-1.5 text-sm font-semibold hover:bg-accent"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={create.isPending}
-            className="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-50"
+            className="rounded-md bg-cyan-500 px-3 py-1.5 text-sm font-semibold text-slate-950 hover:bg-cyan-400 disabled:opacity-50"
           >
             {create.isPending ? "Creating…" : "Create workstream"}
           </button>

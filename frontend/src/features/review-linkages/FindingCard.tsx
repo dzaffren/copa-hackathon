@@ -15,7 +15,8 @@ interface FindingCardProps {
  *
  * Reuses the task screen's `semanticLabel` helpers rather than restating the
  * colour map: two label palettes that drift apart is a real failure mode this
- * repo has already been bitten by.
+ * repo has already been bitten by. Sentiment (tighten/loosen) is shown as a
+ * separate tag and ONLY on `differs-on`.
  */
 export function FindingCard({
   finding,
@@ -35,6 +36,12 @@ export function FindingCard({
   // rather than rendering a dangling arrow.
   const targetRef = finding.target_clauses[0]?.clause_number ?? "(silent)";
 
+  // Sentiment is only meaningful on differs-on (tighten/loosen).
+  const sentimentTag =
+    finding.label === "differs-on" && finding.sentiment
+      ? finding.sentiment
+      : null;
+
   return (
     <article
       data-testid="finding-card"
@@ -46,11 +53,11 @@ export function FindingCard({
       // selection or re-highlight the panes.
       onClick={isDismissed ? undefined : () => onSelect(finding)}
       className={[
-        "rounded-lg border p-3 text-left transition",
+        "rounded-xl border p-3 text-left transition",
         isDismissed
-          ? "cursor-default border-gray-200 bg-gray-50 opacity-60"
+          ? "cursor-default border-border/60 bg-muted/20 opacity-60"
           : "cursor-pointer " + style.card,
-        isActive && !isDismissed ? "ring-2 ring-indigo-400" : "",
+        isActive && !isDismissed ? "ring-2 ring-cyan-400/70" : "",
       ].join(" ")}
     >
       <div className="flex flex-wrap items-center gap-2">
@@ -59,29 +66,34 @@ export function FindingCard({
         >
           {labelText(finding.label, finding.sentiment)}
         </span>
+        {sentimentTag ? (
+          <span className="rounded-full border border-amber-300/30 bg-amber-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-300">
+            {sentimentTag}
+          </span>
+        ) : null}
         {isAccepted ? (
           <span
             data-testid="accepted-badge"
-            className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800"
+            className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-300"
           >
             accepted
           </span>
         ) : null}
         {isDismissed ? (
-          <span className="rounded-full bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-600">
+          <span className="rounded-full border border-slate-400/30 bg-slate-500/15 px-2 py-0.5 text-xs font-medium text-slate-300">
             dismissed
           </span>
         ) : null}
       </div>
 
-      <p className="mt-2 text-sm text-gray-900">{finding.summary}</p>
+      <p className="mt-2 text-sm text-foreground">{finding.summary}</p>
 
-      <p className="mt-1 font-mono text-xs text-gray-500">
+      <p className="mt-1 font-mono text-xs text-muted-foreground">
         {sourceRef} ↔ {targetRef}
       </p>
 
       {finding.scope_note ? (
-        <p className="mt-1 text-xs italic text-gray-500">
+        <p className="mt-1 text-xs italic text-muted-foreground">
           {finding.scope_note}
         </p>
       ) : null}
@@ -95,7 +107,7 @@ export function FindingCard({
               e.stopPropagation();
               onReopen(finding);
             }}
-            className="text-xs font-medium text-indigo-600 hover:underline disabled:opacity-50"
+            className="text-xs font-medium text-cyan-300 hover:underline disabled:opacity-50"
           >
             Reopen
           </button>
@@ -111,7 +123,7 @@ export function FindingCard({
                   e.stopPropagation();
                   onAccept(finding);
                 }}
-                className="rounded border border-emerald-300 px-2 py-1 text-xs font-medium text-emerald-800 hover:bg-emerald-50 disabled:opacity-50"
+                className="rounded-md border border-emerald-400/40 px-2 py-1 text-xs font-medium text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-50"
               >
                 Accept
               </button>
@@ -123,7 +135,7 @@ export function FindingCard({
                 e.stopPropagation();
                 onDismiss(finding);
               }}
-              className="rounded border border-gray-300 px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              className="rounded-md border border-border/70 px-2 py-1 text-xs font-medium text-foreground hover:bg-accent disabled:opacity-50"
             >
               Dismiss
             </button>

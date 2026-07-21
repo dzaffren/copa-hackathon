@@ -1,0 +1,427 @@
+{
+  "model_id": "claude-opus-4-8",
+  "timestamp": "2026-07-21T11:15:56.148448+00:00",
+  "document_ids": [
+    "open-finance-v1-2025-ed",
+    "bcm-v1-2022"
+  ],
+  "finder_output": [
+    {
+      "summary": "Both require operational resilience measures for continuity/availability of services, with open finance extending these to open finance arrangements while BCM sets the enterprise-wide framework.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Open Finance 12.2"
+      ],
+      "target_clauses": [
+        "BCM 1.2",
+        "BCM 1.3(c)"
+      ]
+    },
+    {
+      "summary": "Open finance requires board/senior management to ensure business continuity plans and operational resilience for open finance participation, aligning with BCM's board and senior management responsibilities for BCM oversight.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Open Finance 7.6(b)"
+      ],
+      "target_clauses": [
+        "BCM 8.1",
+        "BCM 8.2",
+        "BCM 8.3"
+      ]
+    },
+    {
+      "summary": "Open finance mandates third-party service provider risk management and SLAs for safeguarding customer information, while BCM requires BCP/continuity clauses in outsourcing/service provider arrangements \u2014 related but on different axes (data protection vs continuity).",
+      "label": "silent-on",
+      "source_clauses": [
+        "Open Finance 11.8",
+        "Open Finance 11.10"
+      ],
+      "target_clauses": [
+        "BCM 9.24",
+        "BCM 9.25",
+        "BCM 9.41"
+      ],
+      "scope_note": "Open finance covers third-party data safeguards; BCM covers third-party business continuity requirements which open finance does not detail."
+    },
+    {
+      "summary": "Open finance requires a breach handling and response plan with escalation procedures for customer information breaches, but does not address the broader disruption notification-to-Bank regime that BCM prescribes.",
+      "label": "silent-on",
+      "source_clauses": [
+        "Open Finance 11.12"
+      ],
+      "target_clauses": [
+        "BCM 10.4",
+        "BCM 10.5",
+        "BCM 10.6",
+        "BCM 10.9"
+      ],
+      "scope_note": "BCM sets timelines for notifying the Bank of cyber/non-cyber disruptions; open finance only requires internal breach response plans referencing the Customer Information PD."
+    }
+  ],
+  "critic_output": [
+    {
+      "summary": "Both require operational resilience measures for continuity/availability of services, with open finance extending these to open finance arrangements while BCM sets the enterprise-wide framework.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Open Finance 12.2"
+      ],
+      "target_clauses": [
+        "BCM 1.2",
+        "BCM 1.3(c)"
+      ],
+      "scope_note": "Open finance extends existing technology operations management and resilience practices to open finance activities rather than establishing a standalone BCM framework."
+    },
+    {
+      "summary": "Open finance requires board/senior management to ensure business continuity plans and operational resilience for open finance participation, aligning with BCM's board and senior management responsibilities for BCM oversight.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Open Finance 7.6(b)"
+      ],
+      "target_clauses": [
+        "BCM 8.1",
+        "BCM 8.2",
+        "BCM 8.3"
+      ],
+      "scope_note": "Open finance directs continuity of services in event of disruptions, system downtime, API outages, cyber incidents or third-party failures; BCM sets the general enterprise-wide board/senior management oversight duties."
+    },
+    {
+      "summary": "Open finance mandates third-party service provider risk management and SLAs for safeguarding customer information, while BCM requires BCP/continuity clauses in outsourcing/service provider arrangements. Our side does not address continuity requirements in third-party arrangements.",
+      "label": "silent-on",
+      "source_clauses": [
+        "Open Finance 11.8",
+        "Open Finance 11.10"
+      ],
+      "target_clauses": [
+        "BCM 9.24",
+        "BCM 9.25",
+        "BCM 9.41"
+      ],
+      "scope_note": "Open finance covers third-party data privacy/security safeguards and SLAs; BCM covers third-party BCP/MTD/RTO continuity requirements and key service provider participation in testing, which open finance does not detail. Note BCM's key service provider definition explicitly includes affiliates."
+    },
+    {
+      "summary": "Open finance requires a breach handling and response plan with escalation procedures for customer information breaches, but does not address the broader disruption notification-to-Bank regime that BCM prescribes.",
+      "label": "silent-on",
+      "source_clauses": [
+        "Open Finance 11.12"
+      ],
+      "target_clauses": [
+        "BCM 10.4",
+        "BCM 10.5",
+        "BCM 10.6",
+        "BCM 10.9"
+      ],
+      "scope_note": "BCM sets timelines for notifying the Bank of cyber/non-cyber disruptions (LoD-based, 2/12/24/48 hours); open finance only requires internal breach response plans referencing paragraph 11 of the Customer Information PD and the law (e.g. PDPA)."
+    },
+    {
+      "summary": "Both documents apply to FSPs/financial institutions defined by reference to the same enabling Acts (FSA/IFSA/DFIA) and are issued pursuant to those Acts.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Open Finance 3.1",
+        "Open Finance 2.1"
+      ],
+      "target_clauses": [
+        "BCM 3.1",
+        "BCM 2.1"
+      ],
+      "scope_note": "Both issued under FSA/IFSA/DFIA; scope of applicable entities differs slightly (open finance includes EMIs; BCM covers licensed persons, prescribed DFI institutions, approved e-money issuers and designated payment system operators)."
+    },
+    {
+      "summary": "Open finance requires board to ensure a sound risk strategy and risk management framework covering operational, technology, cyber, fraud and conduct risks; BCM requires the board to establish risk appetite and approve the BCM framework integrated with the overall risk management framework.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Open Finance 7.3"
+      ],
+      "target_clauses": [
+        "BCM 8.2(a)",
+        "BCM 8.2(b)",
+        "BCM 1.3(a)"
+      ]
+    },
+    {
+      "summary": "Open finance requires internal audit and external assurance to cover open finance activities and API integrations; BCM requires internal audit to cover BCM as an audit area and permits engaging an independent party.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Open Finance 7.6(f)"
+      ],
+      "target_clauses": [
+        "BCM 8.8",
+        "BCM 8.9"
+      ]
+    },
+    {
+      "summary": "Open finance requires FSPs to comply with the more general operational resilience and continuity provisions; but it does not prescribe recovery objectives such as MTD/RTO, essential services identification, or testing programs which BCM mandates in detail.",
+      "label": "silent-on",
+      "source_clauses": [
+        "Open Finance 12.2"
+      ],
+      "target_clauses": [
+        "BCM 9.10",
+        "BCM 9.14",
+        "BCM 9.47",
+        "BCM 9.17(c)"
+      ],
+      "scope_note": "BCM prescribes MTD/RTO, essential service continuity, and at-least-annual testing of BCP/DRP/CMP; open finance references availability/integrity/confidentiality but leaves the detailed recovery methodology to the BCM and RMiT policy documents."
+    },
+    {
+      "summary": "Open finance requires FSPs to escalate material issues including customer information security breaches to the board; BCM requires escalation/reporting of disruption status and post-event reviews to the board.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Open Finance 7.6(g)"
+      ],
+      "target_clauses": [
+        "BCM 8.7(e)",
+        "BCM 9.27"
+      ]
+    },
+    {
+      "summary": "Open finance both documents require compliance with other/more stringent applicable requirements when overlapping; open finance requires reading together with listed instruments while BCM requires compliance with the more stringent requirement.",
+      "label": "silent-on",
+      "source_clauses": [
+        "Open Finance 6.1"
+      ],
+      "target_clauses": [
+        "BCM 8.10",
+        "BCM 8.11"
+      ],
+      "scope_note": "BCM explicitly requires compliance with the more stringent requirement where overlapping obligations exist; open finance only requires reading together with related instruments without an express 'more stringent' rule."
+    }
+  ],
+  "validation": [
+    {
+      "summary": "Both require operational resilience measures for continuity/availability of services, with open finance extending these to open finance arrangements while BCM sets the enterprise-wide framework.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Open Finance 12.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 1.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 1.3(c)",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Open finance requires board/senior management to ensure business continuity plans and operational resilience for open finance participation, aligning with BCM's board and senior management responsibilities for BCM oversight.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Open Finance 7.6(b)",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 8.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 8.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 8.3",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Open finance mandates third-party service provider risk management and SLAs for safeguarding customer information, while BCM requires BCP/continuity clauses in outsourcing/service provider arrangements. Our side does not address continuity requirements in third-party arrangements.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Open Finance 11.8",
+          "resolved": true
+        },
+        {
+          "clause_number": "Open Finance 11.10",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.24",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.25",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.41",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Open finance requires a breach handling and response plan with escalation procedures for customer information breaches, but does not address the broader disruption notification-to-Bank regime that BCM prescribes.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Open Finance 11.12",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 10.4",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 10.5",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 10.6",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 10.9",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both documents apply to FSPs/financial institutions defined by reference to the same enabling Acts (FSA/IFSA/DFIA) and are issued pursuant to those Acts.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Open Finance 3.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "Open Finance 2.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 3.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 2.1",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Open finance requires board to ensure a sound risk strategy and risk management framework covering operational, technology, cyber, fraud and conduct risks; BCM requires the board to establish risk appetite and approve the BCM framework integrated with the overall risk management framework.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Open Finance 7.3",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 8.2(a)",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 8.2(b)",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 1.3(a)",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Open finance requires internal audit and external assurance to cover open finance activities and API integrations; BCM requires internal audit to cover BCM as an audit area and permits engaging an independent party.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Open Finance 7.6(f)",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 8.8",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 8.9",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Open finance requires FSPs to comply with the more general operational resilience and continuity provisions; but it does not prescribe recovery objectives such as MTD/RTO, essential services identification, or testing programs which BCM mandates in detail.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Open Finance 12.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.10",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.14",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.47",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.17(c)",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Open finance requires FSPs to escalate material issues including customer information security breaches to the board; BCM requires escalation/reporting of disruption status and post-event reviews to the board.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Open Finance 7.6(g)",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 8.7(e)",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 9.27",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Open finance both documents require compliance with other/more stringent applicable requirements when overlapping; open finance requires reading together with listed instruments while BCM requires compliance with the more stringent requirement.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Open Finance 6.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 8.10",
+          "resolved": true
+        },
+        {
+          "clause_number": "BCM 8.11",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    }
+  ]
+}

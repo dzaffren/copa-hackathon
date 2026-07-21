@@ -1,0 +1,288 @@
+[
+  {
+    "summary": "Both require operational resilience measures for continuity/availability of services, with open finance extending these to open finance arrangements while BCM sets the enterprise-wide framework.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 12.2",
+        "text": "An FSP shall ensure that its technology operations management practices are\nappropriately extended to support its open finance activities. This includes, but\n\nis  not  limited  to,  controls  for ensuring  effective  and  safe  implementation  of  IT\nsystems,  robust  third-party  service  provider  management,  and  operational\n\nresilience measures to ensure the availability, integrity and confidentiality of data\nexchanged through open finance arrangements."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "BCM 1.2",
+        "text": "Business continuity is an integral pillar of operational resilience. Business\ncontinuity management (BCM) entails an enterprise-wide framework, policies\nand processes that enable financial institutions to respond, recover and resume\noperations of critical business functions from operational disruptions that arise\nfrom internal or external risk events. Effective BCM can minimise operational,\nfinancial and reputational risks that can materially impact financial institutions."
+      },
+      {
+        "clause_number": "BCM 1.3(c)",
+        "text": "preserve the continuity of critical business functions and essential services\nwithin a specified timeframe in the event of an operational disruption.\n\n### 2 Applicability"
+      }
+    ],
+    "scope_note": "Open finance extends existing technology operations management and resilience practices to open finance activities rather than establishing a standalone BCM framework.",
+    "supported": true,
+    "id": "633106579e8a",
+    "review_state": "accepted"
+  },
+  {
+    "summary": "Open finance requires board/senior management to ensure business continuity plans and operational resilience for open finance participation, aligning with BCM's board and senior management responsibilities for BCM oversight.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 7.6(b)",
+        "text": "as well as safeguards that support the overall operational resilience of an\nFSP’s participation in an open finance arrangement. This includes, but is\n\nnot  limited  to,  ensuring  the  continuity  of  services  in  the  event  of\ndisruptions, system downtime, API outages, cyber risk incidents or third-\n\nparty failures;\nconduct due diligence and oversight to ensure only consented customer"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "BCM 8.1",
+        "text": "The board and senior management's roles on the business continuity of a\nfinancial institution are vital. The board and senior management must be\nresponsible for the effective oversight and implementation of the BCM framework\nthat is integrated with the overall risk management framework of the financial\ninstitution2."
+      },
+      {
+        "clause_number": "BCM 8.2",
+        "text": "In fulfilling its responsibilities under paragraph 8.1, the board must-"
+      },
+      {
+        "clause_number": "BCM 8.3",
+        "text": "In fulfilling its responsibilities under paragraph 8.1, the senior management\nmust-"
+      }
+    ],
+    "scope_note": "Open finance directs continuity of services in event of disruptions, system downtime, API outages, cyber incidents or third-party failures; BCM sets the general enterprise-wide board/senior management oversight duties.",
+    "supported": true,
+    "id": "81276b2c76f1",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance mandates third-party service provider risk management and SLAs for safeguarding customer information, while BCM requires BCP/continuity clauses in outsourcing/service provider arrangements. Our side does not address continuity requirements in third-party arrangements.",
+    "label": "silent-on",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 11.8",
+        "text": "An FSP that is a data consumer shall ensure that any third-party service provider\n\ninvolved in handling customer information, whether related to an open finance\narrangement  (including  that  associated  with  outsourcing  or  cloud  computing\n\narrangements),  complies  with  relevant  requirements  relating  to  data  privacy,\nconfidentiality and security, as set out in the Policy Document on Management\n\nof  Customer  Information  and  Permitted  Disclosures,  the  Policy  Document  on\nRisk  Management  and  Information  Technology,  and  the  Policy  Document  on\n\nOutsourcing."
+      },
+      {
+        "clause_number": "Open Finance 11.10",
+        "text": "For  the  purposes  of  paragraph  11.8,  an  FSP  shall  ensure  the  obligation  to\nsafeguard  customer  information  is  adequately  reflected  in  the  service  level\n\nagreement with the third-party service provider, in line with paragraph 12.4 of the\nPolicy  Document  on  Management  of  Customer  Information  and  Permitted\n\nDisclosures.\n\nCustomer information breaches"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "BCM 9.24",
+        "text": "A financial institution must ensure that its CMP, BCP and DRP provide for all\noutsourcing arrangements and comply with the relevant requirements in the\npolicy document on Outsourcing."
+      },
+      {
+        "clause_number": "BCM 9.25",
+        "text": "To enhance the effectiveness of BCM, a financial institution must incorporate the\nfollowing requirements and clauses in contractual and outsourcing\narrangements with key service providers, suppliers and counterparties:"
+      },
+      {
+        "clause_number": "BCM 9.41",
+        "text": "Where the alternate site or recovery site is managed or owned by a third party,\na financial institution must ensure its outsourcing arrangements are in\naccordance with the policy document on Outsourcing, particularly the following:"
+      }
+    ],
+    "scope_note": "Open finance covers third-party data privacy/security safeguards and SLAs; BCM covers third-party BCP/MTD/RTO continuity requirements and key service provider participation in testing, which open finance does not detail. Note BCM's key service provider definition explicitly includes affiliates.",
+    "supported": true,
+    "id": "ab90838874f2",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance requires a breach handling and response plan with escalation procedures for customer information breaches, but does not address the broader disruption notification-to-Bank regime that BCM prescribes.",
+    "label": "silent-on",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 11.12",
+        "text": "In relation to paragraph 11.11, an FSP shall have in place a customer information\nbreach  handling  and  response  plan  in  the  event  of  theft,  loss,  misuse  or\n\nunauthorised  access,  modification  or  disclosure  of  customer  information\nassociated  with  an  open  finance  arrangement.  The  plan  must,  at  a  minimum,\n\ninclude  escalation  procedures  and  a  clear  line  of  responsibility  to  contain  the\ncustomer information breach and take remedial actions.\n\nHandling disputes and complaints\n\nClear accountability and liability"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "BCM 10.4",
+        "text": "A financial institution must notify the Bank of a disruption that is not a cyber\nincident within the respective timelines for the corresponding LoD, as set out in\nthe table below:\n\n<table>\n<tr>\n<th>LoD</th>\n<th>Notification Timeline</th>\n</tr>\n<tr>\n<td>1</td>\n<td>Within 48 hours from the detection of the disruption for all information specified in the reporting template (Attachment 1) that is applicable to the disruption concerned</td>\n</tr>\n<tr>\n<td>2</td>\n<td>Within 24 hours from the detection of the disruption for all information specified in the reporting template (Attachment 1) that is applicable to the disruption concerned</td>\n</tr>\n<tr>\n<td>3, 4,5</td>\n<td>(a) Within 2 hours from the detection of the disruption for mandatory information specified in the reporting template (Attachment 1); and (b) Within 12 hours after the initial notification referred to in paragraph (a) for all remaining information specified in the reporting template (Attachment 1) that is applicable to the disruption concerned.</td>\n</tr>\n</table>\n\n#### Cyber incident"
+      },
+      {
+        "clause_number": "BCM 10.5",
+        "text": "For all cyber incidents, a financial institution must notify the Bank within 2 hours\nupon the confirmation 11 of the disruption.\n\n#### Requirements for all forms of disruptions"
+      },
+      {
+        "clause_number": "BCM 10.6",
+        "text": "A financial institution must notify the Bank of all non-cyber and cyber incidents\nvia the centralised email mylod@bnm.gov.my."
+      },
+      {
+        "clause_number": "BCM 10.9",
+        "text": "As the information on disruptions could change as more details on the disruption\ncome to light, a financial institution must progressively update the Bank with the\nlatest information as it becomes available to facilitate appropriate response and\nintervention by the Bank, where necessary."
+      }
+    ],
+    "scope_note": "BCM sets timelines for notifying the Bank of cyber/non-cyber disruptions (LoD-based, 2/12/24/48 hours); open finance only requires internal breach response plans referencing paragraph 11 of the Customer Information PD and the law (e.g. PDPA).",
+    "supported": true,
+    "id": "8b2d0d9a82e2",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both documents apply to FSPs/financial institutions defined by reference to the same enabling Acts (FSA/IFSA/DFIA) and are issued pursuant to those Acts.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 3.1",
+        "text": "The requirements in this Policy Document are issued pursuant to –"
+      },
+      {
+        "clause_number": "Open Finance 2.1",
+        "text": "This Policy Document is applicable to all FSPs as defined in paragraph 5.2.\n\n3\n\nLegal provision"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "BCM 3.1",
+        "text": "The requirements in this policy document are issued pursuant to-"
+      },
+      {
+        "clause_number": "BCM 2.1",
+        "text": "This policy document is applicable to financial institutions as defined in\nparagraph 5.2."
+      }
+    ],
+    "scope_note": "Both issued under FSA/IFSA/DFIA; scope of applicable entities differs slightly (open finance includes EMIs; BCM covers licensed persons, prescribed DFI institutions, approved e-money issuers and designated payment system operators).",
+    "supported": true,
+    "id": "5eca9a1bdb1a",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance requires board to ensure a sound risk strategy and risk management framework covering operational, technology, cyber, fraud and conduct risks; BCM requires the board to establish risk appetite and approve the BCM framework integrated with the overall risk management framework.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 7.3",
+        "text": "The  board  shall  ensure  that  a  sound  risk  strategy  and  appropriate  risk\nmanagement framework is in place and implemented effectively to manage any\n\noperational, technology, cyber, fraud, conduct or other risk arising from an FSP’s\nparticipation in an open finance arrangement, in line with the FSP’s risk appetite.\n\nThis includes for the board to evaluate the risks and opportunities arising from\nthe FSP’s participation in an open finance arrangement, and consider how these\n\nfactors should be reflected in its strategies and business plan."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "BCM 8.2(a)",
+        "text": "establish a clear risk appetite and risk management strategy governing the\nBCM framework;"
+      },
+      {
+        "clause_number": "BCM 8.2(b)",
+        "text": "approve the BCM framework of the financial institution and ensure\nsubsequent reviews are conducted at least annually;"
+      },
+      {
+        "clause_number": "BCM 1.3(a)",
+        "text": "facilitate the development and implementation of a robust BCM\nframework, policies and processes by financial institutions which are\nintegrated with their overall risk appetite and reinforce sound risk\nmanagement practices;"
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "62d219edaf9d",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance requires internal audit and external assurance to cover open finance activities and API integrations; BCM requires internal audit to cover BCM as an audit area and permits engaging an independent party.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 7.6(f)",
+        "text": "are extended to cover its open finance activities, including but not limited\nto coverage over its open finance-related services and API integrations;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "BCM 8.8",
+        "text": "The internal audit of a financial institution is responsible for providing an\nindependent assessment of the BCM framework. In fulfilling its responsibilities,\nthe internal audit must-"
+      },
+      {
+        "clause_number": "BCM 8.9",
+        "text": "A financial institution may engage an independent party4 to audit the BCM\nframework."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "ebcea06217b6",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance requires FSPs to comply with the more general operational resilience and continuity provisions; but it does not prescribe recovery objectives such as MTD/RTO, essential services identification, or testing programs which BCM mandates in detail.",
+    "label": "silent-on",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 12.2",
+        "text": "An FSP shall ensure that its technology operations management practices are\nappropriately extended to support its open finance activities. This includes, but\n\nis  not  limited  to,  controls  for ensuring  effective  and  safe  implementation  of  IT\nsystems,  robust  third-party  service  provider  management,  and  operational\n\nresilience measures to ensure the availability, integrity and confidentiality of data\nexchanged through open finance arrangements."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "BCM 9.10",
+        "text": "Based on the RA and BIA performed, a financial institution must determine the\nbusiness continuity objectives for CBFs that correspond to varying levels of\ndisruption as defined in paragraph 10.2. The business continuity objectives,\nwhich include the MTD and RTO, must -"
+      },
+      {
+        "clause_number": "BCM 9.14",
+        "text": "A financial institution must ensure continued availability of its essential services\nduring a disruption. Depending on its core business, these essential services\ninclude-"
+      },
+      {
+        "clause_number": "BCM 9.47",
+        "text": "A financial institution must conduct periodic testing of the following, at least\nannually:"
+      },
+      {
+        "clause_number": "BCM 9.17(c)",
+        "text": "maximum time for recovery for its essential services, including MTD and\nRTO;"
+      }
+    ],
+    "scope_note": "BCM prescribes MTD/RTO, essential service continuity, and at-least-annual testing of BCP/DRP/CMP; open finance references availability/integrity/confidentiality but leaves the detailed recovery methodology to the BCM and RMiT policy documents.",
+    "supported": true,
+    "id": "6d4f3675fdb5",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance requires FSPs to escalate material issues including customer information security breaches to the board; BCM requires escalation/reporting of disruption status and post-event reviews to the board.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 7.6(g)",
+        "text": "and\nensure  that  material  issues  and  concerns  relating  to  the  FSP’s  open\nfinance arrangements are promptly escalated to the board, which include\n\nbut  are  not  limited  to  breaches  of  customer  information  security  and\nconfidentiality.\n\n8\n\nParticipation and scope of information sharing"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "BCM 8.7(e)",
+        "text": "report to the board on the status of disruption and recovery efforts."
+      },
+      {
+        "clause_number": "BCM 9.27",
+        "text": "In the event of an operational disruption, a financial institution must conduct a\npost-event review on the effectiveness of its CMP, BCP and DRP. The report\nmust be communicated to the board and senior management for actions to be\ntaken to address any identified gaps."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "3831c400fd60",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Open finance both documents require compliance with other/more stringent applicable requirements when overlapping; open finance requires reading together with listed instruments while BCM requires compliance with the more stringent requirement.",
+    "label": "silent-on",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Open Finance 6.1",
+        "text": "Where applicable, this Policy Document must be read together with any relevant\nlegal  instruments,  policy  documents,  guidelines,  circulars  and  supplementary\n\ndocuments  that  have  been  issued  by  BNM,  including  any  amendments  or\nreissuance thereafter, in particular –"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "BCM 8.10",
+        "text": "In addition to this policy document, a financial institution must also comply with\nguidelines, requirements and standard operating procedures in relation to BCM\nissued by other relevant authorities."
+      },
+      {
+        "clause_number": "BCM 8.11",
+        "text": "For purposes of paragraph 8.10, where there are requirements on the same\nsubject matter, a financial institution must comply with the more stringent\nrequirements, as the case may be.\n\n### 9 BCM framework and methodology\n\n#### Risk assessment (RA), business impact analysis (BIA) and critical business functions (CBF)"
+      }
+    ],
+    "scope_note": "BCM explicitly requires compliance with the more stringent requirement where overlapping obligations exist; open finance only requires reading together with related instruments without an express 'more stringent' rule.",
+    "supported": true,
+    "id": "fa9c95d18d3f",
+    "review_state": "pending"
+  }
+]
