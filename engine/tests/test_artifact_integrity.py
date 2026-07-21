@@ -37,18 +37,26 @@ KNOWN_UNRESOLVABLE = {"Operational Resilience 3.3(e)"}
 # missing clause — a lookup "succeeds" and yields nothing, so a citation renders
 # as a clause number with no words under it. They exist because the offline
 # extractor mis-segments the two draft PDFs (their headings are full of footnote
-# debris), where Document Intelligence produced real prose.
+# debris), where Document Intelligence produced real prose. Even DI-built
+# documents carry a small long-tail of deeply-nested sub-items DI cannot anchor
+# (see BCM / Recovery Planning below) — so the budget is per-document, not zero.
 #
 # Ratios are pinned per document rather than asserted to be zero, because zero is
 # not reachable offline and a test that cannot pass is a test that gets deleted.
-# Rebuilding with Azure Document Intelligence is what fixes this; until then the
-# projection renders hollow clauses as "No matching clause found" rather than as
-# an empty quote. RMiT is the control: it is DI-built, and 1/608 is what good
-# looks like.
+# Rebuilding with Azure Document Intelligence is what fixes the offline case;
+# until then the projection renders hollow clauses as "No matching clause found"
+# rather than as an empty quote. RMiT is the control: it is DI-built, and 1/608
+# is what good looks like.
 MAX_HOLLOW = {
     "RMiT": 1,
     "Open Finance": 15,
     "Operational Resilience": 21,
+    # BCM and Recovery Planning are DI-built (same class as the RMiT control):
+    # a single deeply-nested sub-item each (BCM 9.2(c), Recovery Planning
+    # 11.8(c)) sits among populated siblings where DI missed the last leaf —
+    # the documented long-tail drop, not offline degradation. 1/246 and 1/258.
+    "BCM": 1,
+    "Recovery": 1,
 }
 
 
