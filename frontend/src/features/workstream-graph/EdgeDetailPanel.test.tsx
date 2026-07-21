@@ -36,4 +36,20 @@ describe("EdgeDetailPanel", () => {
     ).toBeNull();
     expect(screen.getByText(/3 linkage\(s\)/i)).toBeInTheDocument();
   });
+
+  it("disables Analyze when the edge is not analysable", async () => {
+    // e-opres_v0_3--fsb_3rd_party: fsb-3rd-party has no document_id, so the
+    // edge is not analysable even though it is unanalysed.
+    renderWithProviders(
+      <EdgeDetailPanel
+        workstreamId="opres-v2"
+        edgeId="e-opres_v0_3--fsb_3rd_party"
+      />,
+      "/workstreams/opres-v2",
+    );
+    const btn = await screen.findByRole("button", {
+      name: /analyze linkages/i,
+    });
+    expect(btn).toBeDisabled();
+  });
 });

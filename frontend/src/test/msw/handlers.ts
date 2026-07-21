@@ -344,6 +344,7 @@ const WORKSTREAMS: WorkstreamSummary[] = [
 interface GraphNodeFull extends GraphNode {
   description: string | null;
   source_url: string | null;
+  document_id: string | null;
 }
 
 const GRAPH_NODES: Record<string, GraphNodeFull> = {
@@ -355,6 +356,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     short_type: "PD (draft)",
     description: "Working draft of the OpRes Policy Document.",
     source_url: null,
+    document_id: "opres-v1-2025-draft",
   },
   "bcbs-opres-2021": {
     id: "bcbs-opres-2021",
@@ -365,6 +367,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     description:
       "Basel Committee Principles for Operational Resilience (2021).",
     source_url: "https://www.bis.org/bcbs/publ/d509.htm",
+    document_id: null,
   },
   "fsb-3rd-party": {
     id: "fsb-3rd-party",
@@ -374,6 +377,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     short_type: "Toolkit",
     description: "FSB third-party risk management toolkit (2023).",
     source_url: "https://www.fsb.org",
+    document_id: null,
   },
   "hkma-spm-or2": {
     id: "hkma-spm-or2",
@@ -383,6 +387,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     short_type: "SPM",
     description: "HKMA Supervisory Policy Manual OR-2.",
     source_url: "https://www.hkma.gov.hk",
+    document_id: null,
   },
   "rmit-pd-2025": {
     id: "rmit-pd-2025",
@@ -392,6 +397,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     short_type: "PD (in force)",
     description: "BNM RMiT policy document, reissued 28 Nov 2025.",
     source_url: "https://www.bnm.gov.my",
+    document_id: "rmit-v2-2025",
   },
   "fsa-2013-143": {
     id: "fsa-2013-143",
@@ -401,6 +407,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     short_type: "Act",
     description: "Financial Services Act 2013, section 143.",
     source_url: "https://www.bnm.gov.my",
+    document_id: null,
   },
   "abm-position": {
     id: "abm-position",
@@ -410,6 +417,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     short_type: "Position paper",
     description: "ABM position paper on operational resilience.",
     source_url: null,
+    document_id: null,
   },
   "opres-dp-2025": {
     id: "opres-dp-2025",
@@ -420,6 +428,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     description:
       "Operational Resilience Discussion Paper, December 2025 — the consultation the v0.3 PD draft follows.",
     source_url: null,
+    document_id: "opres-v1-2025-draft",
   },
 };
 
@@ -615,11 +624,22 @@ function buildEdgeDetail(edgeId: string): EdgeDetail | null {
   const tgt = GRAPH_NODES[edge.target];
   return {
     id: edge.id,
-    source: { id: src.id, title: src.title, node_type: src.node_type },
-    target: { id: tgt.id, title: tgt.title, node_type: tgt.node_type },
+    source: {
+      id: src.id,
+      title: src.title,
+      node_type: src.node_type,
+      document_id: src.document_id,
+    },
+    target: {
+      id: tgt.id,
+      title: tgt.title,
+      node_type: tgt.node_type,
+      document_id: tgt.document_id,
+    },
     edge_type: edge.edge_type,
     status: edge.analysed ? "analysed" : "not_analysed",
     findings: edge.analysed ? (FINDINGS[edgeId] ?? []) : [],
+    analysable: Boolean(src.document_id && tgt.document_id),
   };
 }
 
@@ -792,80 +812,77 @@ const CROSS_LINK: CrossLink = {
 export const handlers = [
   // The _cross store is served by the ordinary review route. Two of the twelve
   // findings are enough to prove the screen reads them unchanged.
-  http.get(
-    "*/api/workstreams/_cross/edges/:edgeId/review",
-    ({ params }) => {
-      const edgeId = params.edgeId as string;
-      const findings = [
-        {
-          summary:
-            "Open finance's requirement for board and senior management oversight goes beyond the discussion paper's responsibility mapping",
-          label: "goes-beyond" as const,
-          sentiment: null,
-          scope_note:
-            "Open finance does not mandate a single ultimately-accountable person for operational resilience outcomes.",
-          supported: true,
-          source_clauses: [
-            {
-              clause_number: "Open Finance 7.1",
-              text: "The board and senior management shall exercise effective oversight of an FSP's implementation of open finance.",
-            },
-          ],
-          target_clauses: [
-            {
-              clause_number: "Operational Resilience 6.3",
-              text: "Responsibility Mapping identifies the person accountable for each critical operation.",
-            },
-          ],
-        },
-        {
-          summary:
-            "Both documents rely on the same underlying policy documents but anchor to different RMiT versions",
-          label: "aligns-with" as const,
-          sentiment: null,
-          scope_note: null,
-          supported: true,
-          source_clauses: [
-            {
-              clause_number: "Open Finance 6.1(h)",
-              text: "Policy Document on Risk Management in Technology issued on 1 June",
-            },
-          ],
-          target_clauses: [
-            {
-              clause_number: "Operational Resilience 7.2",
-              text: "This Discussion Paper should be read together with the Risk Management in Technology policy document.",
-            },
-          ],
-        },
-      ].map((f, i) => ({
-        ...f,
-        id: `${edgeId}~${i}`,
-        review_state: reviewState.get(`${edgeId}~${i}`) ?? "pending",
-      }));
+  http.get("*/api/workstreams/_cross/edges/:edgeId/review", ({ params }) => {
+    const edgeId = params.edgeId as string;
+    const findings = [
+      {
+        summary:
+          "Open finance's requirement for board and senior management oversight goes beyond the discussion paper's responsibility mapping",
+        label: "goes-beyond" as const,
+        sentiment: null,
+        scope_note:
+          "Open finance does not mandate a single ultimately-accountable person for operational resilience outcomes.",
+        supported: true,
+        source_clauses: [
+          {
+            clause_number: "Open Finance 7.1",
+            text: "The board and senior management shall exercise effective oversight of an FSP's implementation of open finance.",
+          },
+        ],
+        target_clauses: [
+          {
+            clause_number: "Operational Resilience 6.3",
+            text: "Responsibility Mapping identifies the person accountable for each critical operation.",
+          },
+        ],
+      },
+      {
+        summary:
+          "Both documents rely on the same underlying policy documents but anchor to different RMiT versions",
+        label: "aligns-with" as const,
+        sentiment: null,
+        scope_note: null,
+        supported: true,
+        source_clauses: [
+          {
+            clause_number: "Open Finance 6.1(h)",
+            text: "Policy Document on Risk Management in Technology issued on 1 June",
+          },
+        ],
+        target_clauses: [
+          {
+            clause_number: "Operational Resilience 7.2",
+            text: "This Discussion Paper should be read together with the Risk Management in Technology policy document.",
+          },
+        ],
+      },
+    ].map((f, i) => ({
+      ...f,
+      id: `${edgeId}~${i}`,
+      review_state: reviewState.get(`${edgeId}~${i}`) ?? "pending",
+    }));
 
-      return HttpResponse.json({
-        edge: {
-          id: edgeId,
-          edge_type: "parallel-to",
-          source_node: {
-            id: "of-ed-2025",
-            title: "Open Finance ED — 18 Nov 2025",
-            node_type: "task",
-          },
-          target_node: {
-            id: "opres-dp-2025",
-            title: "OpRes DP (Dec 2025)",
-            node_type: "internal-published",
-          },
+    return HttpResponse.json({
+      edge: {
+        id: edgeId,
+        edge_type: "parallel-to",
+        source_node: {
+          id: "of-ed-2025",
+          title: "Open Finance ED — 18 Nov 2025",
+          node_type: "task",
         },
-        source_clauses: findings.flatMap((f) => f.source_clauses),
-        target_clauses: findings.flatMap((f) => f.target_clauses),
-        findings,
-        counts: reviewCounts(findings as never),
-      });
-    },
-  ),
+        target_node: {
+          id: "opres-dp-2025",
+          title: "OpRes DP (Dec 2025)",
+          node_type: "internal-published",
+        },
+      },
+      source_clauses: findings.flatMap((f) => f.source_clauses),
+      target_clauses: findings.flatMap((f) => f.target_clauses),
+      findings,
+      counts: reviewCounts(findings as never),
+    });
+  }),
 
   http.get("*/api/workstreams/:workstreamId/cross-links", ({ params }) => {
     // Only opres-v2 and open-finance-ed touch the seeded link.
@@ -930,8 +947,8 @@ export const handlers = [
       primary_task_id: null,
       target_publication: body.target_publication ?? null,
       owner: { id: "ar", name: "Aisyah R." },
-      reviewers: (body.reviewer_ids ?? []).map(
-        (rid) => DIRECTORY.find((d) => d.id === rid)!,
+      reviewers: (body.reviewer_ids ?? []).map((rid) =>
+        DIRECTORY.find((d) => d.id === rid)!,
       ),
       access: body.access,
       created_at: "2026-07-16T09:00:00Z",
@@ -987,20 +1004,23 @@ export const handlers = [
     },
   ),
 
-  http.get("*/api/workstreams/:workstreamId/tasks/:nodeId/draft", ({ params }) => {
-    const nodeId = params.nodeId as string;
-    if (!TASKS[nodeId]) {
-      return HttpResponse.json(
-        { code: "TASK_NOT_FOUND", message: `${nodeId} is not a task` },
-        { status: 404 },
-      );
-    }
-    return HttpResponse.json<DraftResponse>({
-      node_id: nodeId,
-      content_html: draftHtml,
-      last_saved_at: draftSavedAt,
-    });
-  }),
+  http.get(
+    "*/api/workstreams/:workstreamId/tasks/:nodeId/draft",
+    ({ params }) => {
+      const nodeId = params.nodeId as string;
+      if (!TASKS[nodeId]) {
+        return HttpResponse.json(
+          { code: "TASK_NOT_FOUND", message: `${nodeId} is not a task` },
+          { status: 404 },
+        );
+      }
+      return HttpResponse.json<DraftResponse>({
+        node_id: nodeId,
+        content_html: draftHtml,
+        last_saved_at: draftSavedAt,
+      });
+    },
+  ),
 
   http.put(
     "*/api/workstreams/:workstreamId/tasks/:nodeId/draft",
