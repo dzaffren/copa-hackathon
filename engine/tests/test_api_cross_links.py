@@ -22,7 +22,7 @@ _OF = "open-finance-ed"
 def _make_client(tmp_path):
     dst = tmp_path / "workstreams"
     shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
-    return TestClient(create_app(workstreams_dir=dst, analyze_delay=0)), dst
+    return TestClient(create_app(workstreams_dir=dst)), dst
 
 
 def _links(client, workstream_id):

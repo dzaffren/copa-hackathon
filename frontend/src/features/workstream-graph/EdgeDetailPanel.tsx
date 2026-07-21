@@ -62,6 +62,7 @@ export function EdgeDetailPanel({
 
   const edge = query.data;
   const analysed = edge.status === "analysed";
+  const analysable = edge.analysable;
 
   return (
     <Card className="flex h-full flex-col rounded-none border-0 border-l">
@@ -95,12 +96,13 @@ export function EdgeDetailPanel({
             </p>
             <Button
               className="w-full bg-indigo-600 hover:bg-indigo-700"
-              disabled={analyze.isPending}
+              disabled={analyze.isPending || !analysable}
               onClick={() => analyze.mutate()}
             >
               {analyze.isPending ? (
                 <>
-                  <Loader2 className="animate-spin" /> Analyzing…
+                  <Loader2 className="animate-spin" /> Analyzing… the AI is
+                  reading both documents
                 </>
               ) : (
                 <>
@@ -108,6 +110,18 @@ export function EdgeDetailPanel({
                 </>
               )}
             </Button>
+            {!analysable && (
+              <p className="text-xs text-muted-foreground">
+                Live analysis needs both documents ingested — this pair isn’t in
+                the corpus yet.
+              </p>
+            )}
+            {analyze.isError && (
+              <p className="text-xs text-red-600">
+                Analysis failed. Check the engine has model credentials, then
+                retry.
+              </p>
+            )}
           </div>
         ) : (
           edge.findings.map((f, i) => {

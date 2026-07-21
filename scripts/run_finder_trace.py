@@ -25,7 +25,7 @@ from engine.clauses import load_clause_index  # noqa: E402
 from engine.config import REPO_ROOT  # noqa: E402
 from engine.connections import find_connections  # noqa: E402
 
-DEFAULT_PAIR = ("rmit-v2-2026-draft", "outsourcing-v1-2019")
+DEFAULT_PAIR = ("rmit-v2-2025", "outsourcing-v1-2019")
 
 
 def main() -> None:
@@ -83,10 +83,11 @@ def main() -> None:
     trace = artifacts_dir / f"connection-trace-{pair}.json"
     print(f"Trace written: {trace}" if Path(trace).exists() else "Trace NOT found!")
 
-    # Hero check is only meaningful on the original RMiT<->Outsourcing pair,
-    # where the discovery brief hand-verified the 17.1<->12.1 conflict. For any
-    # other pair (e.g. cross-workstream probes) we report a generic summary and
-    # leave the "did it find the right thing" judgement to the human reader.
+    # Hero check is only meaningful on the RMiT<->Outsourcing pair, where the
+    # discovery brief hand-verified the 17.1<->12.1 conflict (RMiT 17.1 lives in
+    # the in-force rmit-v2-2025; outsourcing-v1-2019 is the counterparty). For
+    # any other pair (e.g. cross-workstream probes) we report a generic summary
+    # and leave the "did it find the right thing" judgement to the human reader.
     if (doc_a, doc_b) == DEFAULT_PAIR:
         hero = any(
             any(cite["clause_number"] == "Outsourcing 12.1" for cite in c["target_clauses"])

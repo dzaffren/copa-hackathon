@@ -1,0 +1,965 @@
+{
+  "model_id": "claude-opus-4-8",
+  "timestamp": "2026-07-21T10:47:21.408705+00:00",
+  "document_ids": [
+    "opres-v1-2025-draft",
+    "rmit-v2-2025"
+  ],
+  "finder_output": [
+    {
+      "summary": "Both documents require identifying critical operations/services and maintaining their continuity, with RMiT operationalizing continuity of critical systems and stand-in arrangements.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 3.3(a), Operational Resilience 4.3"
+      ],
+      "target_clauses": [
+        "RMiT 10.31",
+        "RMiT 11.3(b)"
+      ]
+    },
+    {
+      "summary": "Discussion paper's call for deep visibility over internal/external dependencies aligns with RMiT's requirement to map interdependencies and identify single points of failure.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 3.3(b), Operational Resilience 2.9(c)"
+      ],
+      "target_clauses": [
+        "RMiT 10.4",
+        "RMiT 11.3(b)",
+        "RMiT 9.2(i)"
+      ]
+    },
+    {
+      "summary": "The discussion paper references MTD and RTO recovery metrics as necessary but potentially inadequate, while RMiT sets concrete availability/downtime thresholds; RMiT provides prescriptive tolerances the paper only conceptualizes.",
+      "label": "silent-on",
+      "source_clauses": [
+        "Operational Resilience 2.9(d), Operational Resilience 4.3"
+      ],
+      "target_clauses": [
+        "RMiT 10.32",
+        "RMiT 10.24"
+      ]
+    },
+    {
+      "summary": "Both emphasize board-level ownership and accountability for operational resilience, with RMiT establishing concrete board technology governance duties.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 3.4, Operational Resilience 6.1, Operational Resilience 6.3"
+      ],
+      "target_clauses": [
+        "RMiT 8.1",
+        "RMiT 8.4",
+        "RMiT 8.6"
+      ]
+    },
+    {
+      "summary": "The discussion paper's emphasis on third-party dependency management aligns with RMiT's prescriptive third-party service provider oversight requirements.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 4.5, Operational Resilience 4.7"
+      ],
+      "target_clauses": [
+        "RMiT 10.46",
+        "RMiT 10.48",
+        "RMiT 10.49"
+      ]
+    },
+    {
+      "summary": "The paper's call for severe-but-plausible scenario testing beyond isolated failures aligns with RMiT's scenario analysis, cyber drills, and red team requirements.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 2.9(e), Operational Resilience 3.2"
+      ],
+      "target_clauses": [
+        "RMiT 9.2(j)",
+        "RMiT 11.6",
+        "RMiT 11.16"
+      ]
+    },
+    {
+      "summary": "The paper stresses cyber threats and dynamic recovery beyond traditional measures, aligning with RMiT's cyber resilience framework and destructive attack recovery requirements.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 2.4, Operational Resilience 2.9(a)"
+      ],
+      "target_clauses": [
+        "RMiT 11.2",
+        "RMiT 11.13",
+        "RMiT 10.45"
+      ]
+    },
+    {
+      "summary": "The paper's concern over consumer intolerance for downtime and impact tolerances aligns with RMiT's customer-impact escalation thresholds and service availability disclosure.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 2.6, Operational Resilience 2.9(d)"
+      ],
+      "target_clauses": [
+        "RMiT 10.31",
+        "RMiT 10.35",
+        "RMiT 8.6(b)"
+      ]
+    },
+    {
+      "summary": "The paper discusses concentration/systemic risk from shared cloud and third-party infrastructures, aligning with RMiT's cloud risk assessment and diversity requirements.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 2.6, Operational Resilience 2.6(a)"
+      ],
+      "target_clauses": [
+        "RMiT 10.50",
+        "RMiT 10.34",
+        "RMiT 10.37"
+      ]
+    },
+    {
+      "summary": "The paper's continuous improvement and learning from incidents aligns with RMiT's requirement to integrate lessons and continually monitor evolving technology and threats.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 2.9(g), Operational Resilience 3.5"
+      ],
+      "target_clauses": [
+        "RMiT 10.19",
+        "RMiT 15.1"
+      ]
+    },
+    {
+      "summary": "The paper anchors the accountability of a single senior person for operational resilience via Responsibility Mapping, while RMiT designates a CISO responsible for technology risk management; the two designations differ in scope and construct.",
+      "label": "differs-on",
+      "sentiment": "neutral",
+      "source_clauses": [
+        "Operational Resilience 6.3"
+      ],
+      "target_clauses": [
+        "RMiT 9.4"
+      ]
+    },
+    {
+      "summary": "The paper explores establishing impact tolerances for disruptions as an emerging concept, which RMiT does not frame as impact tolerances but only as downtime thresholds.",
+      "label": "goes-beyond",
+      "source_clauses": [
+        "Operational Resilience 2.9(d), Operational Resilience 6.1, Operational Resilience 7.2"
+      ],
+      "target_clauses": [
+        "RMiT 10.32"
+      ]
+    },
+    {
+      "summary": "The discussion paper raises industry-level collaboration and collective third-party leverage as a policy direction, which RMiT partially covers via threat intelligence sharing but not sector-wide vendor negotiation.",
+      "label": "goes-beyond",
+      "source_clauses": [
+        "Operational Resilience 5.5, Operational Resilience 5.6, Operational Resilience 5.8"
+      ],
+      "target_clauses": [
+        "RMiT 11.19"
+      ]
+    },
+    {
+      "summary": "The paper discusses climate/physical risks to infrastructure and data centres, which RMiT addresses only through data centre resilience siting requirements without climate framing.",
+      "label": "goes-beyond",
+      "source_clauses": [
+        "Operational Resilience 2.7"
+      ],
+      "target_clauses": [
+        "RMiT 10.26"
+      ]
+    }
+  ],
+  "critic_output": [
+    {
+      "summary": "Both documents require identifying critical operations/services and maintaining their continuity, with RMiT operationalizing continuity of critical systems and stand-in arrangements.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 3.3(a)",
+        "Operational Resilience 4.3"
+      ],
+      "target_clauses": [
+        "RMiT 10.31",
+        "RMiT 11.3(b)"
+      ],
+      "scope_note": "RMiT's stand-in processing under 10.31 is phased (by 30 September 2027) and prioritised for least-substitutable digital services; e-money issuers, non-bank merchant acquirers and intermediary remittance institutions not designated NCII are only encouraged (RMiT 10.33)."
+    },
+    {
+      "summary": "Discussion paper's call for deep visibility over internal/external dependencies aligns with RMiT's requirement to map interdependencies and identify single points of failure.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 3.3(b)",
+        "Operational Resilience 2.9(c)"
+      ],
+      "target_clauses": [
+        "RMiT 10.4",
+        "RMiT 11.3(b)",
+        "RMiT 9.2(i)"
+      ]
+    },
+    {
+      "summary": "The discussion paper references MTD and RTO as necessary but potentially inadequate recovery metrics; RMiT sets concrete availability/downtime thresholds the paper only conceptualizes.",
+      "label": "silent-on",
+      "source_clauses": [
+        "Operational Resilience 2.9(d)",
+        "Operational Resilience 4.3"
+      ],
+      "target_clauses": [
+        "RMiT 10.32",
+        "RMiT 10.24"
+      ],
+      "scope_note": "RMiT 10.32's 4-hour rolling-12-month cumulative downtime and 120-minute MTD per incident apply to critical systems with reasonable expectation of immediate service delivery."
+    },
+    {
+      "summary": "Both emphasize board-level ownership and accountability for operational resilience, with RMiT establishing concrete board technology governance duties.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 3.4",
+        "Operational Resilience 6.1",
+        "Operational Resilience 6.3"
+      ],
+      "target_clauses": [
+        "RMiT 8.1",
+        "RMiT 8.4",
+        "RMiT 8.6"
+      ]
+    },
+    {
+      "summary": "The discussion paper's emphasis on third-party dependency management aligns with RMiT's prescriptive third-party service provider oversight requirements.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 4.5",
+        "Operational Resilience 4.7"
+      ],
+      "target_clauses": [
+        "RMiT 10.46",
+        "RMiT 10.48",
+        "RMiT 10.49"
+      ],
+      "scope_note": "RMiT third-party requirements are scoped to providers engaged for critical technology functions and systems."
+    },
+    {
+      "summary": "The paper's call for severe-but-plausible scenario testing beyond isolated failures aligns with RMiT's scenario analysis, cyber drills, and red team requirements.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 2.9(e)",
+        "Operational Resilience 3.2"
+      ],
+      "target_clauses": [
+        "RMiT 9.2(j)",
+        "RMiT 11.6",
+        "RMiT 11.16"
+      ],
+      "scope_note": "RMiT specifies fixed cadences (red team at least once every three years; annual cyber drill) whereas the paper stresses concurrent/multi-layer scenarios without prescribing frequency."
+    },
+    {
+      "summary": "The paper stresses cyber threats and dynamic recovery beyond traditional measures, aligning with RMiT's cyber resilience framework and destructive attack recovery requirements.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 2.4",
+        "Operational Resilience 2.9(a)"
+      ],
+      "target_clauses": [
+        "RMiT 11.2",
+        "RMiT 11.13",
+        "RMiT 10.45"
+      ]
+    },
+    {
+      "summary": "The paper's concern over consumer intolerance for downtime aligns with RMiT's customer-impact escalation thresholds and service availability disclosure.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 2.6",
+        "Operational Resilience 2.9(d)"
+      ],
+      "target_clauses": [
+        "RMiT 10.31",
+        "RMiT 10.35",
+        "RMiT 8.6(b)"
+      ],
+      "scope_note": "RMiT sets a concrete 5%-of-daily-customers/transactions immediate escalation trigger (10.31(iii)) and quarterly availability disclosure from 15 October 2027 (10.35(e))."
+    },
+    {
+      "summary": "The paper discusses concentration/systemic risk from shared cloud and third-party infrastructures, aligning with RMiT's cloud risk assessment and diversity requirements.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 2.6",
+        "Operational Resilience 2.6(a)"
+      ],
+      "target_clauses": [
+        "RMiT 10.50",
+        "RMiT 10.34",
+        "RMiT 10.37"
+      ]
+    },
+    {
+      "summary": "The paper's continuous improvement and learning from incidents aligns with RMiT's requirement to continually monitor evolving technology and maintain awareness education.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 2.9(g)",
+        "Operational Resilience 3.5"
+      ],
+      "target_clauses": [
+        "RMiT 10.19",
+        "RMiT 15.1"
+      ]
+    },
+    {
+      "summary": "The paper anchors accountability of a single senior person for operational resilience via Responsibility Mapping (direct CEO reporting line); RMiT designates a CISO responsible for technology risk management. The two designations differ in scope and construct.",
+      "label": "differs-on",
+      "sentiment": "neutral",
+      "source_clauses": [
+        "Operational Resilience 6.3"
+      ],
+      "target_clauses": [
+        "RMiT 9.4"
+      ],
+      "scope_note": "The operational-resilience accountable person spans all resilience domains, while RMiT's CISO is scoped to technology and cyber risk management and must be independent from day-to-day tech operations."
+    },
+    {
+      "summary": "The paper explores establishing impact tolerances for disruptions as an emerging concept; RMiT frames the same axis only as downtime thresholds, not impact tolerances.",
+      "label": "goes-beyond",
+      "source_clauses": [
+        "Operational Resilience 2.9(d)",
+        "Operational Resilience 6.1",
+        "Operational Resilience 7.2"
+      ],
+      "target_clauses": [
+        "RMiT 10.32"
+      ]
+    },
+    {
+      "summary": "The paper raises industry-level collaboration and collective third-party leverage as a policy direction, which RMiT partially covers via threat intelligence sharing but not sector-wide vendor negotiation.",
+      "label": "goes-beyond",
+      "source_clauses": [
+        "Operational Resilience 5.5",
+        "Operational Resilience 5.6",
+        "Operational Resilience 5.8"
+      ],
+      "target_clauses": [
+        "RMiT 11.19",
+        "RMiT 11.20"
+      ]
+    },
+    {
+      "summary": "The paper discusses climate/physical risks to infrastructure and data centres, which RMiT addresses only through data centre siting resilience without climate framing.",
+      "label": "goes-beyond",
+      "source_clauses": [
+        "Operational Resilience 2.7"
+      ],
+      "target_clauses": [
+        "RMiT 10.26"
+      ]
+    },
+    {
+      "summary": "RMiT mandates ongoing gap analysis, action plans and independent external assurance/reviews for compliance, which the discussion paper does not address as it is a consultative paper rather than a binding standard.",
+      "label": "silent-on",
+      "source_clauses": [
+        "Operational Resilience 4.12"
+      ],
+      "target_clauses": [
+        "RMiT 18.1",
+        "RMiT 14.1",
+        "RMiT 14.2",
+        "RMiT 16.4"
+      ]
+    },
+    {
+      "summary": "RMiT prescribes detailed backup, tamper-proof and isolated-recovery arrangements for resumption of critical banking/payment services; the paper references robust recovery capability only at a conceptual level.",
+      "label": "silent-on",
+      "source_clauses": [
+        "Operational Resilience 2.9(a)",
+        "Operational Resilience 4.3"
+      ],
+      "target_clauses": [
+        "RMiT 10.44",
+        "RMiT 10.45"
+      ]
+    },
+    {
+      "summary": "RMiT requires proportional application of controls to size, complexity and digitalisation, aligning with the paper's proportionality/parity principle and differentiated prescriptive vs principle-based calibration.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 4.6",
+        "Operational Resilience 4.9",
+        "Operational Resilience 7.2"
+      ],
+      "target_clauses": [
+        "RMiT 1.2"
+      ]
+    },
+    {
+      "summary": "RMiT sets prescriptive access control, MFA, cryptography and network resilience baselines for critical systems; the discussion paper does not cover these technical control domains, treating technology governance only as an established baseline area.",
+      "label": "silent-on",
+      "source_clauses": [
+        "Operational Resilience 4.12(b)"
+      ],
+      "target_clauses": [
+        "RMiT 10.20",
+        "RMiT 10.54",
+        "RMiT 10.55",
+        "RMiT 10.36"
+      ]
+    },
+    {
+      "summary": "RMiT prescribes detailed digital fraud management, customer awareness and kill-switch requirements addressing consumer harm from disruptions/fraud; the paper raises consumer trust and fraud/privacy concerns only conceptually.",
+      "label": "silent-on",
+      "source_clauses": [
+        "Operational Resilience 2.6"
+      ],
+      "target_clauses": [
+        "RMiT 12.3",
+        "RMiT 12.7",
+        "RMiT 12.8"
+      ]
+    },
+    {
+      "summary": "Both require timely escalation of issues and effective incident/crisis response, with RMiT establishing concrete out-of-band communication and CIRP requirements.",
+      "label": "aligns-with",
+      "source_clauses": [
+        "Operational Resilience 6.4(d)",
+        "Operational Resilience 6.4(f)"
+      ],
+      "target_clauses": [
+        "RMiT 11.12",
+        "RMiT 11.13",
+        "RMiT 11.15"
+      ]
+    },
+    {
+      "summary": "RMiT mandates incident notification to the Bank across multiple policy channels; the discussion paper only aspires to improved incident communication outcomes without specifying reporting obligations.",
+      "label": "silent-on",
+      "source_clauses": [
+        "Operational Resilience 7.2"
+      ],
+      "target_clauses": [
+        "RMiT 11.18"
+      ]
+    }
+  ],
+  "validation": [
+    {
+      "summary": "Both documents require identifying critical operations/services and maintaining their continuity, with RMiT operationalizing continuity of critical systems and stand-in arrangements.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 3.3(a)",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 4.3",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.31",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 11.3(b)",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Discussion paper's call for deep visibility over internal/external dependencies aligns with RMiT's requirement to map interdependencies and identify single points of failure.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 3.3(b)",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 2.9(c)",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.4",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 11.3(b)",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 9.2(i)",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "The discussion paper references MTD and RTO as necessary but potentially inadequate recovery metrics; RMiT sets concrete availability/downtime thresholds the paper only conceptualizes.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 2.9(d)",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 4.3",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.32",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.24",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both emphasize board-level ownership and accountability for operational resilience, with RMiT establishing concrete board technology governance duties.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 3.4",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 6.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 6.3",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 8.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 8.4",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 8.6",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "The discussion paper's emphasis on third-party dependency management aligns with RMiT's prescriptive third-party service provider oversight requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 4.5",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 4.7",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.46",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.48",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.49",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "The paper's call for severe-but-plausible scenario testing beyond isolated failures aligns with RMiT's scenario analysis, cyber drills, and red team requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 2.9(e)",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 3.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 9.2(j)",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 11.6",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 11.16",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "The paper stresses cyber threats and dynamic recovery beyond traditional measures, aligning with RMiT's cyber resilience framework and destructive attack recovery requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 2.4",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 2.9(a)",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 11.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 11.13",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.45",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "The paper's concern over consumer intolerance for downtime aligns with RMiT's customer-impact escalation thresholds and service availability disclosure.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 2.6",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 2.9(d)",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.31",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.35",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 8.6(b)",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "The paper discusses concentration/systemic risk from shared cloud and third-party infrastructures, aligning with RMiT's cloud risk assessment and diversity requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 2.6",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 2.6(a)",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.50",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.34",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.37",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "The paper's continuous improvement and learning from incidents aligns with RMiT's requirement to continually monitor evolving technology and maintain awareness education.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 2.9(g)",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 3.5",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.19",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 15.1",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "The paper anchors accountability of a single senior person for operational resilience via Responsibility Mapping (direct CEO reporting line); RMiT designates a CISO responsible for technology risk management. The two designations differ in scope and construct.",
+      "label": "differs-on",
+      "sentiment": "neutral",
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 6.3",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 9.4",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "The paper explores establishing impact tolerances for disruptions as an emerging concept; RMiT frames the same axis only as downtime thresholds, not impact tolerances.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 2.9(d)",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 6.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 7.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.32",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "The paper raises industry-level collaboration and collective third-party leverage as a policy direction, which RMiT partially covers via threat intelligence sharing but not sector-wide vendor negotiation.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 5.5",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 5.6",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 5.8",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 11.19",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 11.20",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "The paper discusses climate/physical risks to infrastructure and data centres, which RMiT addresses only through data centre siting resilience without climate framing.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 2.7",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.26",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "RMiT mandates ongoing gap analysis, action plans and independent external assurance/reviews for compliance, which the discussion paper does not address as it is a consultative paper rather than a binding standard.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 4.12",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 18.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 14.1",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 14.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 16.4",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "RMiT prescribes detailed backup, tamper-proof and isolated-recovery arrangements for resumption of critical banking/payment services; the paper references robust recovery capability only at a conceptual level.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 2.9(a)",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 4.3",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.44",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.45",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "RMiT requires proportional application of controls to size, complexity and digitalisation, aligning with the paper's proportionality/parity principle and differentiated prescriptive vs principle-based calibration.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 4.6",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 4.9",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 7.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 1.2",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "RMiT sets prescriptive access control, MFA, cryptography and network resilience baselines for critical systems; the discussion paper does not cover these technical control domains, treating technology governance only as an established baseline area.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 4.12(b)",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.20",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.54",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.55",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 10.36",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "RMiT prescribes detailed digital fraud management, customer awareness and kill-switch requirements addressing consumer harm from disruptions/fraud; the paper raises consumer trust and fraud/privacy concerns only conceptually.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 2.6",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 12.3",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 12.7",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 12.8",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require timely escalation of issues and effective incident/crisis response, with RMiT establishing concrete out-of-band communication and CIRP requirements.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 6.4(d)",
+          "resolved": true
+        },
+        {
+          "clause_number": "Operational Resilience 6.4(f)",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 11.12",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 11.13",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 11.15",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "RMiT mandates incident notification to the Bank across multiple policy channels; the discussion paper only aspires to improved incident communication outcomes without specifying reporting obligations.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_clauses": [
+        {
+          "clause_number": "Operational Resilience 7.2",
+          "resolved": true
+        },
+        {
+          "clause_number": "RMiT 11.18",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    }
+  ]
+}

@@ -25,7 +25,7 @@ _BCBS_EDGE = "e-opres_v0_3--bcbs_opres_2021"
 def _make_client(tmp_path):
     dst = tmp_path / "workstreams"
     shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
-    return TestClient(create_app(workstreams_dir=dst, analyze_delay=0)), dst
+    return TestClient(create_app(workstreams_dir=dst)), dst
 
 
 def _accept_first_bcbs_finding(client) -> str:

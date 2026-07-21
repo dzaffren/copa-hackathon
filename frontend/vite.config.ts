@@ -6,6 +6,13 @@ import react from "@vitejs/plugin-react";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  // Dev-only: proxy API calls to the engine (uvicorn on :8000) so the browser
+  // makes same-origin /api requests — the engine has no CORS middleware.
+  server: {
+    proxy: {
+      "/api": "http://localhost:8000",
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

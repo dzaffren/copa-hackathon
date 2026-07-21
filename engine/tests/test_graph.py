@@ -104,9 +104,9 @@ DOCUMENTS = {
         "version": "v1 · 2020",
         "cluster": "technology-risk",
     },
-    "rmit-v2-2026-draft": {
+    "rmit-vnext-draft": {
         "policy_id": "rmit",
-        "document_id": "rmit-v2-2026-draft",
+        "document_id": "rmit-vnext-draft",
         "title": "Risk Management in Technology (RMiT)",
         "version": "v2 · 2026 draft",
         "cluster": "technology-risk",
@@ -139,7 +139,7 @@ def _build_fixture_clause_index() -> ClauseIndex:
     rmit_v2_entries = build_clause_index(
         anchors=RMIT_V2_ANCHORS,
         markdown=RMIT_V2_MARKDOWN,
-        document_id="rmit-v2-2026-draft",
+        document_id="rmit-vnext-draft",
         policy_id="rmit",
         source="draft",
     )
@@ -163,11 +163,11 @@ def _build_fixture_clause_index() -> ClauseIndex:
     primary, versions = merge_clause_indexes(
         [
             ("rmit-v1-2020", rmit_v1_entries),
-            ("rmit-v2-2026-draft", rmit_v2_entries),
+            ("rmit-vnext-draft", rmit_v2_entries),
             ("opres-v1-2025", opres_entries),
             ("bcm-v1-2022", bcm_entries),
         ],
-        current_document_id="rmit-v2-2026-draft",
+        current_document_id="rmit-vnext-draft",
     )
     return ClauseIndex(primary, versions)
 
@@ -205,7 +205,7 @@ def test_curated_edge_has_reason_clause_anchors_and_resolves_in_index():
     assert len(non_lineage) == 1
     edge = non_lineage[0]
 
-    assert edge["source"] == "rmit-v2-2026-draft"
+    assert edge["source"] == "rmit-vnext-draft"
     assert edge["target"] == "opres-v1-2025"
     assert edge["reason"]
     assert len(edge["source_clauses"]) >= 1
@@ -325,7 +325,7 @@ def test_llm_found_edge_is_included_and_may_carry_confidence_below_one():
     clause_index = _build_fixture_clause_index()
     llm_found_edges = [
         {
-            "source": "rmit-v2-2026-draft",
+            "source": "rmit-vnext-draft",
             "target": "opres-v1-2025",
             "type": "depends-on",
             "reason": "RMiT 17.1 depends on the OpRes register staying in sync.",
@@ -389,7 +389,7 @@ def test_status_is_derived_from_draft_registry_never_hand_set():
         draft_registry=DRAFT_REGISTRY,
     )
 
-    assert _node(graph, "rmit-v2-2026-draft")["status"] == "In progress"
+    assert _node(graph, "rmit-vnext-draft")["status"] == "In progress"
     assert _node(graph, "opres-v1-2025")["status"] == "In progress"
     assert _node(graph, "bcm-v1-2022")["status"] == "In force"
     assert _node(graph, "rmit-v1-2020")["status"] == "Superseded"
@@ -409,7 +409,7 @@ def test_version_lineage_edge_links_older_document_to_newer_of_same_policy():
     assert len(lineage_edges) == 1
     edge = lineage_edges[0]
     assert edge["source"] == "rmit-v1-2020"
-    assert edge["target"] == "rmit-v2-2026-draft"
+    assert edge["target"] == "rmit-vnext-draft"
     assert edge["reason"]
     assert edge["provenance"] == "structural"
     assert edge["confidence"] == 1.0
@@ -505,13 +505,13 @@ def _clause_index_with_pdpa_reference() -> ClauseIndex:
     rmit_v2 = build_clause_index(
         anchors=RMIT_V2_ANCHORS,
         markdown=RMIT_V2_MARKDOWN,
-        document_id="rmit-v2-2026-draft",
+        document_id="rmit-vnext-draft",
         policy_id="rmit",
         source="draft",
     )
     primary, versions = merge_clause_indexes(
-        [("rmit-v2-2026-draft", rmit_v2)],
-        current_document_id="rmit-v2-2026-draft",
+        [("rmit-vnext-draft", rmit_v2)],
+        current_document_id="rmit-vnext-draft",
     )
     for clause_number, entry in build_reference_clause(
         "pdpa-2010", "pdpa", "129", "Section 129(2)", PDPA_PASSAGE
@@ -540,7 +540,7 @@ def test_reference_nodes_carry_kind_source_type_access_preview():
     assert pdpa["source_url"] == "https://example.test/pdpa"
 
     # Policy nodes default to kind "policy" (backward compatible).
-    assert _node(graph, "rmit-v2-2026-draft")["kind"] == "policy"
+    assert _node(graph, "rmit-vnext-draft")["kind"] == "policy"
 
     # The restricted handbook carries no source_url; the trend node is preview.
     handbook = _node(graph, "bnm-handbook")
@@ -633,7 +633,7 @@ def test_industry_feedback_nodes_carry_source_type_and_stance():
     assert fsp["stance"] == "partial"
 
     # A policy node (not a reference) never carries a stance.
-    assert "stance" not in _node(graph, "rmit-v2-2026-draft")
+    assert "stance" not in _node(graph, "rmit-vnext-draft")
 
 
 def test_reference_edges_build_with_restricted_and_preview_carveout():
@@ -653,7 +653,7 @@ def test_reference_edges_build_with_restricted_and_preview_carveout():
         "bnm-handbook",
         "trend-cloud-signals",
     }
-    assert all(e["source"] == "rmit-v2-2026-draft" for e in ref_edges)
+    assert all(e["source"] == "rmit-vnext-draft" for e in ref_edges)
 
     by_target = {e["target"]: e for e in ref_edges}
     assert by_target["pdpa-2010"]["provenance"] == "llm-found"

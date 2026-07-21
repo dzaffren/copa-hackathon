@@ -25,12 +25,11 @@ from engine.connections import CONNECTION_LABELS, SENTIMENT_VALUES
 
 ARTIFACTS_DIR = REPO_ROOT / "data" / "artifacts"
 
-# The three committed pairwise traces, with their known supported-finding count
+# The committed pairwise traces, with their known supported-finding count
 # (every one of these validation entries is ``supported: true``).
 TRACE_FILES = {
     "connection-trace-opres-v1-2025-draft__open-finance-v1-2025-ed.json": 12,
     "connection-trace-rmit-v1-2023__rmit-v2-2025.json": 55,
-    "connection-trace-rmit-v2-2026-draft__outsourcing-v1-2019.json": 16,
 }
 
 # The candidate-bearing sections of a trace that must all carry the new schema.
@@ -142,10 +141,7 @@ def test_demo_traces_showcase_goes_beyond_and_a_genuine_conflict() -> None:
         "opres DP×ED pair has no genuine incompatibility; a conflicts-with here "
         "would contradict the finding's own summary — see spec Example 3"
     )
-    rmit_traces = (
-        "connection-trace-rmit-v1-2023__rmit-v2-2025.json",
-        "connection-trace-rmit-v2-2026-draft__outsourcing-v1-2019.json",
-    )
+    rmit_traces = ("connection-trace-rmit-v1-2023__rmit-v2-2025.json",)
     has_genuine_conflict = any(
         entry["label"] == "conflicts-with"
         for name in rmit_traces

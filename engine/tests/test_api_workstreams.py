@@ -21,10 +21,13 @@ _BCBS_EDGE = "e-opres_v0_3--bcbs_opres_2021"  # seeded analysed edge (3 findings
 _FSB_EDGE = "e-opres_v0_3--fsb_3rd_party"  # unanalysed; the analyze demo pair
 
 
-def _make_client(tmp_path) -> tuple[TestClient, "object"]:
+def _make_client(tmp_path, find_connections_fn=None) -> tuple[TestClient, "object"]:
     dst = tmp_path / "workstreams"
     shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
-    app = create_app(workstreams_dir=dst, analyze_delay=0)
+    kwargs = {}
+    if find_connections_fn is not None:
+        kwargs["find_connections_fn"] = find_connections_fn
+    app = create_app(workstreams_dir=dst, **kwargs)
     return TestClient(app), dst
 
 
@@ -243,34 +246,63 @@ def test_POST_node_unknown_workstream_returns_404_WORKSTREAM_NOT_FOUND(tmp_path)
 # --- POST /api/workstreams/{id}/edges/{edge_id}/analyze ---------------------
 
 
-def test_POST_edge_analyze_replays_canned_findings_for_demo_pair(tmp_path):
-    # The demo pair replays canned findings and must not reach a model. This is
-    # now structural rather than asserted: `create_app` takes no finder seam, so
-    # the API has no path to one (it previously injected an exploding stub).
-    client, _ = _make_client(tmp_path)
+def test_POST_edge_analyze_409_when_a_node_has_no_ingested_document(tmp_path):
+    # The old canned-demo-pair replay is retired: `create_app` now takes a live
+    # `find_connections_fn` seam, and the route only reaches it when both edge
+    # endpoints carry a `document_id`. Neither opres-pd-v0-3 nor fsb-3rd-party
+    # has one in the seeded fixture, so this edge is NOT_ANALYSABLE rather than
+    # a path that replays canned findings — see test_api_analyze_live.py for the
+    # live success/failure paths on a fixture built with `document_id`s.
+    def boom(a, b, idx):
+        raise AssertionError("must not reach the finder when a node is unmapped")
+
+    client, _ = _make_client(tmp_path, find_connections_fn=boom)
     res = client.post(f"/api/workstreams/{_OPRES}/edges/{_FSB_EDGE}/analyze")
-    assert res.status_code == 200
-    body = res.json()
-    assert body["status"] == "analysed"
-    assert body["findings_count"] == 3
-    assert body["findings"][0]["label"] == "aligns-with"
+    assert res.status_code == 409
+    assert res.json()["code"] == "NOT_ANALYSABLE"
 
 
 def test_POST_edge_analyze_writes_findings_file_and_flips_edge_analysed_flag(tmp_path):
-    client, dst = _make_client(tmp_path)
+    def stub(a, b, idx):
+        return {
+            "connections": [
+                {
+                    "summary": "stubbed",
+                    "label": "aligns-with",
+                    "sentiment": None,
+                    "scope_note": None,
+                    "supported": True,
+                    "source_clauses": [],
+                    "target_clauses": [],
+                }
+            ],
+            "unsupported": [],
+        }
+
+    client, dst = _make_client(tmp_path, find_connections_fn=stub)
+    # opres-pd-v0-3 -> rmit-pd-2025 is genuinely analysable: both carry a
+    # document_id AND they differ (opres-v1-2025-draft vs rmit-v2-2025). It is
+    # seeded analysed, so delete its findings file to establish the unanalysed
+    # precondition. (The opres-dp edge is a same-document self-comparison — 409.)
+    edge_id = "e-opres_v0_3--rmit_pd_2025"
+    (dst / _OPRES / "findings" / f"{edge_id}.json").unlink()
     # Before: unanalysed.
     assert (
-        client.get(f"/api/workstreams/{_OPRES}/edges/{_FSB_EDGE}").json()["status"]
+        client.get(f"/api/workstreams/{_OPRES}/edges/{edge_id}").json()["status"]
         == "not_analysed"
     )
-    client.post(f"/api/workstreams/{_OPRES}/edges/{_FSB_EDGE}/analyze")
+    res = client.post(f"/api/workstreams/{_OPRES}/edges/{edge_id}/analyze")
+    assert res.status_code == 200
+    body = res.json()
+    assert body["status"] == "analysed"
+    assert body["findings_count"] == 1
     # After: findings file exists and every read reports analysed.
-    assert (dst / _OPRES / "findings" / f"{_FSB_EDGE}.json").exists()
+    assert (dst / _OPRES / "findings" / f"{edge_id}.json").exists()
     graph = client.get(f"/api/workstreams/{_OPRES}/graph").json()
-    fsb_edge = next(e for e in graph["edges"] if e["id"] == _FSB_EDGE)
-    assert fsb_edge["analysed"] is True
-    assert fsb_edge["findings_count"] == 3
+    edge = next(e for e in graph["edges"] if e["id"] == edge_id)
+    assert edge["analysed"] is True
+    assert edge["findings_count"] == 1
     assert (
-        client.get(f"/api/workstreams/{_OPRES}/edges/{_FSB_EDGE}").json()["status"]
+        client.get(f"/api/workstreams/{_OPRES}/edges/{edge_id}").json()["status"]
         == "analysed"
     )

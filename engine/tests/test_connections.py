@@ -104,7 +104,7 @@ def _build_fixture_clause_index() -> ClauseIndex:
     rmit_entries = build_clause_index(
         anchors=RMIT_V2_ANCHORS,
         markdown=RMIT_V2_MARKDOWN,
-        document_id="rmit-v2-2026-draft",
+        document_id="rmit-vnext-draft",
         policy_id="rmit",
         source="draft",
     )
@@ -117,10 +117,10 @@ def _build_fixture_clause_index() -> ClauseIndex:
     )
     primary, versions = merge_clause_indexes(
         [
-            ("rmit-v2-2026-draft", rmit_entries),
+            ("rmit-vnext-draft", rmit_entries),
             ("outsourcing-v1-2019", outsourcing_entries),
         ],
-        current_document_id="rmit-v2-2026-draft",
+        current_document_id="rmit-vnext-draft",
     )
     return ClauseIndex(primary, versions)
 
@@ -177,7 +177,7 @@ def test_two_agent_loop_surfaces_conflict_and_critic_found_dependency(tmp_path):
     clause_index = _build_fixture_clause_index()
 
     result = find_connections(
-        "rmit-v2-2026-draft",
+        "rmit-vnext-draft",
         "outsourcing-v1-2019",
         clause_index,
         finder_fn=_finder_returns_conflict,
@@ -223,10 +223,10 @@ def test_two_agent_loop_surfaces_conflict_and_critic_found_dependency(tmp_path):
     assert trace["model_id"]
     assert trace["timestamp"] == FIXED_NOW.isoformat()
     assert trace["finder_output"] == _finder_returns_conflict(
-        "rmit-v2-2026-draft", "outsourcing-v1-2019", clause_index
+        "rmit-vnext-draft", "outsourcing-v1-2019", clause_index
     )
     assert trace["critic_output"] == _critic_scopes_and_adds_dependency(
-        "rmit-v2-2026-draft", "outsourcing-v1-2019", clause_index, []
+        "rmit-vnext-draft", "outsourcing-v1-2019", clause_index, []
     )
     assert trace["validation"]
 
@@ -244,7 +244,7 @@ def test_unsupported_candidate_from_critic_is_flagged_not_invented(tmp_path):
         ]
 
     result = find_connections(
-        "rmit-v2-2026-draft",
+        "rmit-vnext-draft",
         "outsourcing-v1-2019",
         clause_index,
         finder_fn=_finder_returns_conflict,
@@ -277,11 +277,11 @@ def test_format_clause_context_labels_both_documents_with_numbers_and_text():
     clause_index = _build_fixture_clause_index()
 
     context = _format_clause_context(
-        clause_index, "rmit-v2-2026-draft", "outsourcing-v1-2019"
+        clause_index, "rmit-vnext-draft", "outsourcing-v1-2019"
     )
 
     # Both document ids appear as labels.
-    assert "rmit-v2-2026-draft" in context
+    assert "rmit-vnext-draft" in context
     assert "outsourcing-v1-2019" in context
     # Every clause number of both documents appears...
     assert "RMiT 17.1" in context
@@ -315,7 +315,7 @@ def test_finder_turn_parses_call_chat_json_array(monkeypatch):
 
     monkeypatch.setattr("engine.connections.call_chat", fake_call_chat)
 
-    result = _finder_turn("rmit-v2-2026-draft", "outsourcing-v1-2019", clause_index)
+    result = _finder_turn("rmit-vnext-draft", "outsourcing-v1-2019", clause_index)
 
     assert result == json.loads(canned)
     # The finder handed the model both documents' clause context.
@@ -353,7 +353,7 @@ def test_critic_turn_includes_finder_candidates_in_prompt(monkeypatch):
     monkeypatch.setattr("engine.connections.call_chat", fake_call_chat)
 
     result = _critic_turn(
-        "rmit-v2-2026-draft",
+        "rmit-vnext-draft",
         "outsourcing-v1-2019",
         clause_index,
         finder_candidates,
@@ -373,7 +373,7 @@ def test_finder_turn_raises_on_non_json(monkeypatch):
         lambda deployment, system, user, max_tokens=None: "sorry, no JSON here",
     )
     with pytest.raises(LLMResponseError):
-        _finder_turn("rmit-v2-2026-draft", "outsourcing-v1-2019", clause_index)
+        _finder_turn("rmit-vnext-draft", "outsourcing-v1-2019", clause_index)
 
 
 def test_critic_turn_raises_on_non_list_json(monkeypatch):
@@ -384,7 +384,7 @@ def test_critic_turn_raises_on_non_list_json(monkeypatch):
     )
     with pytest.raises(LLMResponseError):
         _critic_turn(
-            "rmit-v2-2026-draft", "outsourcing-v1-2019", clause_index, []
+            "rmit-vnext-draft", "outsourcing-v1-2019", clause_index, []
         )
 
 
@@ -743,7 +743,7 @@ def _finder_direction_aware(doc_a_id, doc_b_id, clause_index):
     """Emit ``goes-beyond`` when RMiT is the OUR side (doc A) and ``silent-on``
     when it is the THEIR side (doc B) — the same finding, direction-flipped. The
     cited clauses resolve in both directions so only the label changes."""
-    label = "goes-beyond" if doc_a_id == "rmit-v2-2026-draft" else "silent-on"
+    label = "goes-beyond" if doc_a_id == "rmit-vnext-draft" else "silent-on"
     return [
         {
             "summary": "Our side names a cloud-governance officer the other omits.",
@@ -766,7 +766,7 @@ def test_direction_flip_swaps_silent_and_goesbeyond(tmp_path):
     clause_index = _build_fixture_clause_index()
 
     forward = find_connections(
-        "rmit-v2-2026-draft",
+        "rmit-vnext-draft",
         "outsourcing-v1-2019",
         clause_index,
         finder_fn=_finder_direction_aware,
@@ -776,7 +776,7 @@ def test_direction_flip_swaps_silent_and_goesbeyond(tmp_path):
     )
     reverse = find_connections(
         "outsourcing-v1-2019",
-        "rmit-v2-2026-draft",
+        "rmit-vnext-draft",
         clause_index,
         finder_fn=_finder_direction_aware,
         critic_fn=_critic_passthrough,
@@ -817,7 +817,7 @@ def test_write_trace_records_label_and_sentiment(tmp_path):
         ]
 
     find_connections(
-        "rmit-v2-2026-draft",
+        "rmit-vnext-draft",
         "outsourcing-v1-2019",
         clause_index,
         finder_fn=finder,
@@ -892,7 +892,7 @@ def test_write_trace_encodes_utf8(tmp_path, monkeypatch):
         ]
 
     find_connections(
-        "rmit-v2-2026-draft",
+        "rmit-vnext-draft",
         "outsourcing-v1-2019",
         clause_index,
         finder_fn=finder,

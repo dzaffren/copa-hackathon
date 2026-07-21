@@ -20,6 +20,7 @@ All writes are UTF-8 (the corpus carries glyphs that crash the cp1252 platform
 default on Windows — see docs/learnings/pattern-engine-artifact-writes-utf8.md).
 """
 
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -41,70 +42,6 @@ NODE_TYPES: frozenset[str] = frozenset(
 EDGE_TYPES: frozenset[str] = frozenset(
     {"supersedes", "references", "contributes-to", "parallel-to"}
 )
-
-# The demo pair whose "Analyze linkages" replays a canned, verbatim-cited result
-# instead of a live model call (spec Dependencies — "Retired experiment trace").
-# Matched order-independently: the edge runs OpRes PD v0.3 ↔ FSB Third-Party
-# Toolkit in either direction.
-_DEMO_ANALYZE_PAIR: frozenset[str] = frozenset({"opres-pd-v0-3", "fsb-3rd-party"})
-
-# The canned findings for that pair. Every clause quoted here is verbatim from
-# the OpRes working draft / FSB Toolkit (product rule: no invented clauses).
-_DEMO_ANALYZE_FINDINGS: list[dict[str, Any]] = [
-    {
-        "summary": "Third-party register aligns with FSB Toolkit register expectations",
-        "label": "aligns-with",
-        "sentiment": None,
-        "scope_note": None,
-        "supported": True,
-        "source_clauses": [
-            {
-                "clause_number": "OpRes PD 4.5",
-                "text": "A financial institution shall maintain a register of arrangements with third-party service providers that support critical operations.",
-            }
-        ],
-        "target_clauses": [
-            {
-                "clause_number": "FSB Toolkit Tool 2",
-                "text": "Financial institutions maintain a comprehensive register of third-party service relationships.",
-            }
-        ],
-    },
-    {
-        "summary": "Draft mandates tested exit plans per critical provider, going beyond the FSB baseline",
-        "label": "goes-beyond",
-        "sentiment": None,
-        "scope_note": "The FSB Toolkit expects dependency oversight but stops short of a tested per-provider exit plan.",
-        "supported": True,
-        "source_clauses": [
-            {
-                "clause_number": "OpRes PD 4.7",
-                "text": "A financial institution shall maintain a documented and periodically tested exit plan for each critical third-party service provider.",
-            }
-        ],
-        "target_clauses": [
-            {
-                "clause_number": "FSB Toolkit Tool 6",
-                "text": "Financial institutions consider exit strategies for critical third-party service relationships.",
-            }
-        ],
-    },
-    {
-        "summary": "FSB covers third-party concentration risk; the draft is silent on concentration",
-        "label": "silent-on",
-        "sentiment": None,
-        "scope_note": None,
-        "supported": True,
-        "source_clauses": [],
-        "target_clauses": [
-            {
-                "clause_number": "FSB Toolkit Tool 7",
-                "text": "Financial authorities monitor systemic third-party dependencies and concentration across the sector.",
-            }
-        ],
-    },
-]
-
 
 def workstream_dir(root: Union[str, Path], workstream_id: str) -> Path:
     """The on-disk directory for one workstream."""
@@ -519,9 +456,26 @@ def add_node(
     return node, created
 
 
-def canned_analysis(source_id: str, target_id: str) -> Optional[list[dict[str, Any]]]:
-    """The demo pair's canned, verbatim-cited findings, or `None` for any other
-    pair (the route then falls back to the live finder)."""
-    if frozenset({source_id, target_id}) == _DEMO_ANALYZE_PAIR:
-        return [dict(f) for f in _DEMO_ANALYZE_FINDINGS]
-    return None
+def connections_to_findings(result: dict[str, Any]) -> list[dict[str, Any]]:
+    """Adapt an `engine.connections.find_connections` result into the
+    workstream findings shape the Review/Task screens read.
+
+    Only supported connections (`result["connections"]`) become findings —
+    `result["unsupported"]` is dropped, preserving the never-invent guarantee.
+    Each finding is the connection dict plus a stable `id` (hash of summary +
+    cited clause numbers, so re-running yields the same id) and
+    `review_state: "pending"`.
+    """
+    findings: list[dict[str, Any]] = []
+    for conn in result.get("connections", []):
+        cited = [
+            c.get("clause_number", "")
+            for side in ("source_clauses", "target_clauses")
+            for c in conn.get(side) or []
+        ]
+        seed = conn.get("summary", "") + "|" + "|".join(cited)
+        finding = dict(conn)
+        finding["id"] = hashlib.sha1(seed.encode("utf-8")).hexdigest()[:12]
+        finding["review_state"] = "pending"
+        findings.append(finding)
+    return findings

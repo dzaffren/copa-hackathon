@@ -297,7 +297,7 @@ def _build_rmit_nested_index():
     entries = build_clause_index(
         anchors=RMIT_NESTED_ANCHORS,
         markdown=RMIT_NESTED_MARKDOWN,
-        document_id="rmit-v2-2026-draft",
+        document_id="rmit-vnext-draft",
         policy_id="rmit",
         source="draft",
     )
@@ -808,16 +808,16 @@ def _build_rmit_versioned_index():
     v2_entries = build_clause_index(
         anchors=RMIT_V2_ANCHORS,
         markdown=RMIT_V2_DRAFT_MARKDOWN,
-        document_id="rmit-v2-2026-draft",
+        document_id="rmit-vnext-draft",
         policy_id="rmit",
         source="draft",
     )
     primary, versions = merge_clause_indexes(
         [
             ("rmit-v1-2020", v1_entries),
-            ("rmit-v2-2026-draft", v2_entries),
+            ("rmit-vnext-draft", v2_entries),
         ],
-        current_document_id="rmit-v2-2026-draft",
+        current_document_id="rmit-vnext-draft",
     )
     return ClauseIndex(primary, versions)
 
@@ -828,7 +828,7 @@ def test_version_keying_current_draft_wins_and_superseded_reachable_by_version()
     current = index.get("RMiT 17.1")
     assert current is not None
     assert current["source"] == "draft"
-    assert current["document_id"] == "rmit-v2-2026-draft"
+    assert current["document_id"] == "rmit-vnext-draft"
     assert "notify the Bank within 14 days" in current["text"]
     assert current["superseded_versions"] == ["rmit-v1-2020"]
 
@@ -887,7 +887,7 @@ def test_entries_for_document_returns_that_documents_clauses_in_order():
     rmit_entries = build_clause_index(
         anchors=RMIT_NESTED_ANCHORS,
         markdown=RMIT_NESTED_MARKDOWN,
-        document_id="rmit-v2-2026-draft",
+        document_id="rmit-vnext-draft",
         policy_id="rmit",
         source="draft",
     )
@@ -907,14 +907,14 @@ def test_entries_for_document_returns_that_documents_clauses_in_order():
     )
     primary, versions = merge_clause_indexes(
         [
-            ("rmit-v2-2026-draft", rmit_entries),
+            ("rmit-vnext-draft", rmit_entries),
             ("outsourcing-v1-2019", outsourcing_entries),
         ],
-        current_document_id="rmit-v2-2026-draft",
+        current_document_id="rmit-vnext-draft",
     )
     index = ClauseIndex(primary, versions)
 
-    rmit = index.entries_for_document("rmit-v2-2026-draft")
+    rmit = index.entries_for_document("rmit-vnext-draft")
 
     # Only that document's clauses, in insertion (document) order.
     assert [e["clause_number"] for e in rmit] == [
@@ -928,7 +928,7 @@ def test_entries_for_document_returns_that_documents_clauses_in_order():
         "RMiT 12.3(e)",
         "RMiT Appendix 10",
     ]
-    assert all(e["document_id"] == "rmit-v2-2026-draft" for e in rmit)
+    assert all(e["document_id"] == "rmit-vnext-draft" for e in rmit)
 
     outsourcing = index.entries_for_document("outsourcing-v1-2019")
     assert [e["clause_number"] for e in outsourcing] == ["Outsourcing 12.1"]

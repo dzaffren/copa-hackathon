@@ -20,7 +20,6 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 # has none) and does not override already-exported real env vars.
 load_dotenv(REPO_ROOT / ".env")
 CORPUS_DIR = REPO_ROOT / "data" / "corpus"
-MOCK_DIR = REPO_ROOT / "data" / "mock"
 
 CLUSTER = "technology-risk"
 # The Reconciliation Workbench's analysed VEHICLE document lives in its own
@@ -70,20 +69,6 @@ DOCUMENTS = {
         "source_path": CORPUS_DIR / "pd-rmit-nov25.pdf",
         "source": "published",
         "cluster": CLUSTER,
-    },
-    "rmit-v2-2026-draft": {
-        "policy_id": "rmit",
-        "document_id": "rmit-v2-2026-draft",
-        "title": "Risk Management in Technology (RMiT)",
-        "version": "v2 · 2026 draft",
-        "effective_date": None,
-        "source_path": MOCK_DIR / "rmit-v2-2026-draft.md",
-        "source": "draft",
-        "cluster": CLUSTER,
-        "provenance": (
-            "generation: llm-expanded from rmit-v1-2020; 17.x hand-authored; "
-            "reviewed 2026-07-08"
-        ),
     },
     "outsourcing-v1-2019": {
         "policy_id": "outsourcing",
@@ -582,7 +567,7 @@ REFERENCE_DOCUMENTS = {
 }
 
 # Reference↔clause edges (`type:"references"`, #26). All originate from the
-# single editable draft (rmit-v2-2026-draft, the current `rmit` version). Public
+# current `rmit` document (resolved per-policy by `_current_document_id`). Public
 # reference edges are `provenance:"llm-found"` with a frozen per-edge confidence
 # (the output of a one-off finder pass, frozen-as-fixture) — this both satisfies
 # the engine invariant (a `curated` edge MUST be confidence 1.0, so a sub-1.0

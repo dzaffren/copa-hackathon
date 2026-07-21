@@ -7,7 +7,8 @@
       "issuer": "BNM",
       "short_type": "ED",
       "workstream_id": "open-finance-ed",
-      "description": "Exposure Draft BNM/RH/ED 028-36 on Open Finance, issued 18 November 2025."
+      "description": "Exposure Draft BNM/RH/ED 028-36 on Open Finance, issued 18 November 2025.",
+      "document_id": "open-finance-v1-2025-ed"
     },
     {
       "id": "opres-dp-2025",
@@ -16,7 +17,8 @@
       "issuer": "BNM",
       "short_type": "DP",
       "workstream_id": "opres-v2",
-      "description": "Operational Resilience Discussion Paper, December 2025."
+      "description": "Operational Resilience Discussion Paper, December 2025.",
+      "document_id": "opres-v1-2025-draft"
     }
   ],
   "edges": [
