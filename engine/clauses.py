@@ -22,7 +22,6 @@ import re
 from pathlib import Path
 from typing import NotRequired, Optional, TypedDict, Union, cast
 
-
 logger = logging.getLogger(__name__)
 
 # Canonical clause numbers are "{PolicyShortName} {number}" — matching how the
@@ -65,6 +64,20 @@ POLICY_SHORT_NAMES = {
     # / "Industry AoB" (distinct keys under distinct document_ids).
     "industry-fsp-3": "Industry",
     "industry-aob": "Industry",
+    # Open-finance workstream corpus (added 20 Jul 2026). Every BNM PD in the
+    # open-finance cluster whose document_id doesn't already match one of the
+    # base entries above via the token-derivation heuristic in
+    # `engine.build._derive_structured_rules_key`. The ED reclassifies from
+    # `semi-structured` to `structured-rules` on this addition; the other
+    # entries unblock the 7 BNM PDs that Task 7 previously skipped.
+    "bnm-open-finance-ed-2025": "Open Finance ED",
+    "bnm-e-money-pd-2025": "E-Money",
+    "bnm-mcipd-2025": "MCIPD",
+    "bnm-complaints-handling-pd": "Complaints Handling",
+    "bnm-data-management-dfi-guidelines": "Data Management",
+    "bnm-risk-governance-pd": "Risk Governance",
+    "bnm-operational-risk-may2016": "OpRisk 2016",
+    "bnm-product-transparency-dec2024": "Product Transparency",
 }
 
 

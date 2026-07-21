@@ -1,0 +1,5 @@
+New Zealand shared their policy requirements but there are a couple of iteration:
+1. BPR131-Standardised-Credit-Risk-RWAs
+2. BPR131-Standardised-Credit-Risk-RWAs-Oct-2021
+3. BPR131-Standardised-Credit-Risk-RWAs-Oct-2023
+4. BPR132-Credit-Risk-Mitigation-Oct-21 (this is just another module under the same policy but is just separated out as its only doc)

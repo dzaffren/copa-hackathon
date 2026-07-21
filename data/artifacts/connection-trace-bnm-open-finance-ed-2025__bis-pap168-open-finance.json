@@ -1,0 +1,650 @@
+{
+  "model_id": "claude-opus-4-8",
+  "timestamp": "2026-07-21T12:21:22.900008+00:00",
+  "document_ids": [
+    "bnm-open-finance-ed-2025",
+    "bis-pap168-open-finance"
+  ],
+  "finder_output": [
+    {
+      "summary": "Both documents adopt a consent-driven, customer-permissioned model as the foundation for secure financial data sharing.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 1.2",
+        "Open Finance ED 10.1"
+      ],
+      "target_anchors": [
+        "BIS Pap168 4"
+      ]
+    },
+    {
+      "summary": "Our framework mandates specific participation via a customer-count threshold, aligning with the mandatory-participation approach BIS notes some jurisdictions adopt.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 1.4(a)",
+        "Open Finance ED 8.4",
+        "Open Finance ED 12.5(c)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 22"
+      ],
+      "scope_note": "BIS observes mandatory participation is used but notes no evidence it is a necessary condition for a level playing field."
+    },
+    {
+      "summary": "Both treat standardised APIs as the primary secure mechanism for open finance data exchange.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 8.6(a)",
+        "Open Finance ED 12.3"
+      ],
+      "target_anchors": [
+        "BIS Pap168 7"
+      ]
+    },
+    {
+      "summary": "Our framework is a regulatory-driven prescriptive approach with unified technical standards, matching one of the three approaches BIS classifies.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 1.3",
+        "Open Finance ED 8.3"
+      ],
+      "target_anchors": [
+        "BIS Pap168 6",
+        "BIS Pap168 27"
+      ]
+    },
+    {
+      "summary": "Both emphasise financial inclusion as a core objective of open finance.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 8.7",
+        "Open Finance ED 11.19(b)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 18",
+        "BIS Pap168 4"
+      ]
+    },
+    {
+      "summary": "We set detailed prescriptive requirements on consent lifecycle, deletion, and record-keeping, whereas BIS only discusses adoption evidence and general portability challenges without such operational rules.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 10.5",
+        "Open Finance ED 10.7",
+        "Open Finance ED 10.10",
+        "Open Finance ED 10.18"
+      ],
+      "target_anchors": [
+        "BIS Pap168 15"
+      ]
+    },
+    {
+      "summary": "We prescribe detailed customer protection, liability, and complaints-handling requirements, which BIS raises only as risks needing governance without specific rules.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 11.13",
+        "Open Finance ED 11.14",
+        "Open Finance ED 11.15"
+      ],
+      "target_anchors": [
+        "BIS Pap168 6"
+      ]
+    },
+    {
+      "summary": "BIS discusses data access pricing and reciprocity of access as an emerging policy stage, which our document only touches on via the principle of reciprocity without addressing pricing.",
+      "label": "silent-on",
+      "source_anchors": [
+        "Open Finance ED 1.4(a)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 24"
+      ]
+    },
+    {
+      "summary": "BIS highlights cross-border data portability and interoperability of open finance infrastructures, which our document mentions only aspirationally for national open data without operational requirements.",
+      "label": "silent-on",
+      "source_anchors": [
+        "Open Finance ED 1.6"
+      ],
+      "target_anchors": [
+        "BIS Pap168 24"
+      ]
+    },
+    {
+      "summary": "BIS notes payment initiation (write access) drives faster adoption, whereas our mandated scope focuses on read-only data sharing (document submission and account view) without payment initiation.",
+      "label": "silent-on",
+      "source_anchors": [
+        "Open Finance ED 8.6(a)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 28"
+      ]
+    },
+    {
+      "summary": "BIS presents international adoption evidence and structural/behavioural barriers to uptake, which our policy document does not address empirically.",
+      "label": "silent-on",
+      "source_anchors": [
+        "Open Finance ED 1.5"
+      ],
+      "target_anchors": [
+        "BIS Pap168 4"
+      ]
+    }
+  ],
+  "critic_output": [
+    {
+      "summary": "Both documents adopt a consent-driven, customer-permissioned model as the foundation for secure financial data sharing.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 1.2",
+        "Open Finance ED 10.1"
+      ],
+      "target_anchors": [
+        "BIS Pap168 4"
+      ],
+      "scope_note": "Our document operationalises this with binding specific/voluntary consent standards; BIS treats it as a descriptive feature of frameworks."
+    },
+    {
+      "summary": "Our framework mandates specific participation via a customer-count threshold, aligning with the mandatory-participation approach BIS notes some jurisdictions adopt.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 1.4(a)",
+        "Open Finance ED 8.4",
+        "Open Finance ED 12.5(c)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 22"
+      ],
+      "scope_note": "BIS observes mandatory participation is used but notes no evidence it is a necessary condition for a level playing field."
+    },
+    {
+      "summary": "Both treat standardised APIs as the primary secure mechanism for open finance data exchange.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 8.6(a)",
+        "Open Finance ED 12.3"
+      ],
+      "target_anchors": [
+        "BIS Pap168 7"
+      ],
+      "scope_note": "BIS anchor 7 describes screen scraping/reverse engineering; the API-standardisation argument is stronger against BIS Pap168 8 and 9. Kept but note the standardised-API framing sits in adjacent BIS anchors."
+    },
+    {
+      "summary": "Our framework is a regulatory-driven prescriptive approach with unified technical standards, matching one of the three approaches BIS classifies.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 1.3",
+        "Open Finance ED 8.3"
+      ],
+      "target_anchors": [
+        "BIS Pap168 27"
+      ],
+      "scope_note": "Dropped BIS Pap168 6 (which concerns data-monopoly origins, not approach classification); the prescriptive-approach taxonomy is the accurate anchor."
+    },
+    {
+      "summary": "Both emphasise financial inclusion as a core objective of open finance.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 8.7",
+        "Open Finance ED 11.19(b)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 18",
+        "BIS Pap168 4"
+      ]
+    },
+    {
+      "summary": "We set detailed prescriptive requirements on consent lifecycle, deletion, and record-keeping, whereas BIS only discusses adoption evidence and general portability challenges without such operational rules.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 10.5",
+        "Open Finance ED 10.7",
+        "Open Finance ED 10.10",
+        "Open Finance ED 10.18"
+      ],
+      "target_anchors": [
+        "BIS Pap168 15"
+      ]
+    },
+    {
+      "summary": "We prescribe detailed customer protection, liability, and complaints-handling requirements, which BIS raises only as risks needing governance without specific rules.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 11.13",
+        "Open Finance ED 11.14",
+        "Open Finance ED 11.15"
+      ],
+      "target_anchors": [
+        "BIS Pap168 6"
+      ]
+    },
+    {
+      "summary": "BIS discusses data access pricing and reciprocity of access as an emerging policy stage; our document invokes reciprocity as a participation principle but is silent on pricing/compensation for data access.",
+      "label": "silent-on",
+      "source_anchors": [
+        "Open Finance ED 1.4(a)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 24"
+      ],
+      "scope_note": "The pricing/FiDA reciprocity discussion is primarily in the unnumbered FiDA passage; BIS Pap168 24 covers cross-border interoperability. Our document offers no data-pricing regime."
+    },
+    {
+      "summary": "BIS highlights cross-border data portability and interoperability of open finance infrastructures, which our document mentions only aspirationally for national open data without operational requirements.",
+      "label": "silent-on",
+      "source_anchors": [
+        "Open Finance ED 1.6"
+      ],
+      "target_anchors": [
+        "BIS Pap168 24"
+      ],
+      "scope_note": "Our document references regional data-sharing and global-standard alignment only as future collaboration, not as binding cross-border portability requirements."
+    },
+    {
+      "summary": "BIS notes payment initiation (write access) drives faster adoption, whereas our mandated scope focuses on read-only data sharing (document submission and account view) without payment initiation.",
+      "label": "silent-on",
+      "source_anchors": [
+        "Open Finance ED 8.6(a)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 28"
+      ]
+    },
+    {
+      "summary": "BIS presents international adoption evidence and structural/behavioural barriers to uptake, which our policy document does not address empirically.",
+      "label": "silent-on",
+      "source_anchors": [
+        "Open Finance ED 1.5"
+      ],
+      "target_anchors": [
+        "BIS Pap168 4"
+      ]
+    },
+    {
+      "summary": "We require secure authentication (e.g. multi-factor) and technical/operational safeguards before granting data access; BIS notes banks retain control over authentication, monitoring and access management as an API design principle.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 11.5",
+        "Open Finance ED 11.4"
+      ],
+      "target_anchors": [
+        "BIS Pap168 7"
+      ]
+    },
+    {
+      "summary": "We impose voluntary, non-bundled consent and prohibit coercing consent as a condition of service; BIS describes low willingness to share data and behavioural barriers but sets no anti-coercion rules.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 10.1(b)",
+        "Open Finance ED 11.19(b)"
+      ],
+      "target_anchors": [
+        "BIS Pap168 15"
+      ]
+    },
+    {
+      "summary": "We adopt a phased, multi-year mandated rollout with fixed commencement dates, aligning with BIS's observation that jurisdictions typically begin with open banking and phase in broader open finance over time.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 1.5",
+        "Open Finance ED 9.1",
+        "Open Finance ED 9.2"
+      ],
+      "target_anchors": [
+        "BIS Pap168 26"
+      ]
+    },
+    {
+      "summary": "We prescribe binding cyber, API-security and operational-resilience controls for open finance activities; BIS identifies cyber threats and privacy breaches as risks to be governed but sets no specific control requirements.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 12.3",
+        "Open Finance ED 11.12"
+      ],
+      "target_anchors": [
+        "BIS Pap168 6"
+      ]
+    },
+    {
+      "summary": "We frame open finance as digital public infrastructure enabling national/regional data sharing and interoperability, consistent with BIS's characterisation of open finance as DPI built on shared API, identity, consent and governance layers.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 1.6",
+        "Open Finance ED 1.1"
+      ],
+      "target_anchors": [
+        "BIS Pap168 9"
+      ]
+    }
+  ],
+  "validation": [
+    {
+      "summary": "Both documents adopt a consent-driven, customer-permissioned model as the foundation for secure financial data sharing.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 1.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.1",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 4",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Our framework mandates specific participation via a customer-count threshold, aligning with the mandatory-participation approach BIS notes some jurisdictions adopt.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 1.4(a)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 8.4",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 12.5(c)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 22",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both treat standardised APIs as the primary secure mechanism for open finance data exchange.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 8.6(a)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 12.3",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 7",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Our framework is a regulatory-driven prescriptive approach with unified technical standards, matching one of the three approaches BIS classifies.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 1.3",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 8.3",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 27",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both emphasise financial inclusion as a core objective of open finance.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 8.7",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.19(b)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 18",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 4",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "We set detailed prescriptive requirements on consent lifecycle, deletion, and record-keeping, whereas BIS only discusses adoption evidence and general portability challenges without such operational rules.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 10.5",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.7",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.10",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.18",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 15",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "We prescribe detailed customer protection, liability, and complaints-handling requirements, which BIS raises only as risks needing governance without specific rules.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.13",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.14",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.15",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 6",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "BIS discusses data access pricing and reciprocity of access as an emerging policy stage; our document invokes reciprocity as a participation principle but is silent on pricing/compensation for data access.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 1.4(a)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 24",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "BIS highlights cross-border data portability and interoperability of open finance infrastructures, which our document mentions only aspirationally for national open data without operational requirements.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 1.6",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 24",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "BIS notes payment initiation (write access) drives faster adoption, whereas our mandated scope focuses on read-only data sharing (document submission and account view) without payment initiation.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 8.6(a)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 28",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "BIS presents international adoption evidence and structural/behavioural barriers to uptake, which our policy document does not address empirically.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 1.5",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 4",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "We require secure authentication (e.g. multi-factor) and technical/operational safeguards before granting data access; BIS notes banks retain control over authentication, monitoring and access management as an API design principle.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.5",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.4",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 7",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "We impose voluntary, non-bundled consent and prohibit coercing consent as a condition of service; BIS describes low willingness to share data and behavioural barriers but sets no anti-coercion rules.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 10.1(b)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.19(b)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 15",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "We adopt a phased, multi-year mandated rollout with fixed commencement dates, aligning with BIS's observation that jurisdictions typically begin with open banking and phase in broader open finance over time.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 1.5",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 9.1",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 9.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 26",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "We prescribe binding cyber, API-security and operational-resilience controls for open finance activities; BIS identifies cyber threats and privacy breaches as risks to be governed but sets no specific control requirements.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 12.3",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.12",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 6",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "We frame open finance as digital public infrastructure enabling national/regional data sharing and interoperability, consistent with BIS's characterisation of open finance as DPI built on shared API, identity, consent and governance layers.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 1.6",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 1.1",
+          "resolved": true
+        },
+        {
+          "anchor_id": "BIS Pap168 9",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    }
+  ]
+}

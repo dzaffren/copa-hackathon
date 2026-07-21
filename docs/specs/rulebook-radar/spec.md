@@ -1,12 +1,14 @@
 # Rulebook Radar — Overview
 
-> **⚠️ SUPERSEDED (11 Jul 2026).** This two-persona (drafter + supervisor),
-> RMiT-cluster design is the historical record of the 9–10 Jul era. It is
-> superseded by **[`../reconciliation-workbench/spec.md`](../reconciliation-workbench/spec.md)**,
-> the greenfield re-issue built on the 11 Jul reconciliation pivot
-> (`docs/discovery/reconciliation-workbench/brief.md`) and the prototype at
-> `docs/poc/drafter-knowledge-graph/`. The supervisor persona is deferred to a
-> roadmap slide there. Retained for history; do not build from this file.
+> **⚠️ SUPERSEDED (11 Jul 2026, then again 18 Jul 2026).** This two-persona
+> (drafter + supervisor), RMiT-cluster design is the historical record of the
+> 9–10 Jul era. It was first superseded by
+> [`../reconciliation-workbench/spec.md`](../reconciliation-workbench/spec.md)
+> on 11 Jul 2026, and the current live epic is
+> **[`../workstream-brain/spec.md`](../workstream-brain/spec.md)** (18 Jul 2026
+> pivot to cross-workstream drafting). Retained for history; do not build from
+> this file. The Next.js prototype under `web/` that backed the
+> reconciliation-workbench design has been moved to `archive/web/`.
 
 **Discovery Brief:** docs/discovery/policy-consistency-ai/brief.md
 

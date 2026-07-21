@@ -1,0 +1,237 @@
+{
+  "documents": [
+    {
+      "document_id": "bnm-open-finance-ed-2025",
+      "title": "BNM Exposure Draft on Open Finance (2025)",
+      "jurisdiction": "MY",
+      "issuer": "BNM",
+      "doc_class": "structured-rules",
+      "source_path": "data/corpus/open-finance/ED_Open_Finance_2025.pdf",
+      "in_mvp1": true,
+      "notes": "Primary MVP1 demo document — the workstream drafter's target policy. Anchor IDs keyed 'Open Finance ED {n.m}' via POLICY_SHORT_NAMES."
+    },
+    {
+      "document_id": "bnm-e-money-pd-2025",
+      "title": "BNM Revised E-Money Policy Document (27 Jan 2025)",
+      "jurisdiction": "MY",
+      "issuer": "BNM",
+      "doc_class": "structured-rules",
+      "source_path": "data/corpus/open-finance/27012025_Revised_E-Money_PD_v2.pdf",
+      "in_mvp1": true
+    },
+    {
+      "document_id": "bnm-mcipd-2025",
+      "title": "BNM Management of Customer Information and Permitted Disclosures PD (2025)",
+      "jurisdiction": "MY",
+      "issuer": "BNM",
+      "doc_class": "structured-rules",
+      "source_path": "data/corpus/open-finance/MCIPD_PD_2025.pdf",
+      "in_mvp1": true
+    },
+    {
+      "document_id": "bnm-complaints-handling-pd",
+      "title": "BNM Complaints Handling Policy Document",
+      "jurisdiction": "MY",
+      "issuer": "BNM",
+      "doc_class": "structured-rules",
+      "source_path": "data/corpus/open-finance/PD_Complaints_Handling.pdf",
+      "in_mvp1": true
+    },
+    {
+      "document_id": "bnm-data-management-dfi-guidelines",
+      "title": "BNM Guidelines on Data Management and MIS Framework for Development Financial Institutions",
+      "jurisdiction": "MY",
+      "issuer": "BNM",
+      "doc_class": "structured-rules",
+      "source_path": "data/corpus/open-finance/guidelines-on-data-management-and-mis-framework-for-development-financial-institutions.pdf",
+      "in_mvp1": true
+    },
+    {
+      "document_id": "bnm-risk-governance-pd",
+      "title": "BNM Risk Governance Policy Document (gl_013_5)",
+      "jurisdiction": "MY",
+      "issuer": "BNM",
+      "doc_class": "structured-rules",
+      "source_path": "data/corpus/open-finance/gl_013_5.pdf",
+      "in_mvp1": true
+    },
+    {
+      "document_id": "bnm-bcm-pd",
+      "title": "BNM Business Continuity Management Policy Document",
+      "jurisdiction": "MY",
+      "issuer": "BNM",
+      "doc_class": "structured-rules",
+      "source_path": "data/corpus/open-finance/pd-bcm.pdf",
+      "in_mvp1": true
+    },
+    {
+      "document_id": "bnm-ftfc-mar24",
+      "title": "BNM Fair Treatment of Financial Consumers Policy Document (March 2024)",
+      "jurisdiction": "MY",
+      "issuer": "BNM",
+      "doc_class": "structured-rules",
+      "source_path": "data/corpus/open-finance/pd-ftfc-mar24.pdf",
+      "in_mvp1": true
+    },
+    {
+      "document_id": "bnm-rmit-nov25",
+      "title": "BNM Risk Management in Technology (RMiT) Policy Document (November 2025)",
+      "jurisdiction": "MY",
+      "issuer": "BNM",
+      "doc_class": "structured-rules",
+      "source_path": "data/corpus/open-finance/pd-rmit-nov25.pdf",
+      "in_mvp1": true
+    },
+    {
+      "document_id": "bnm-operational-risk-may2016",
+      "title": "BNM Operational Risk Policy Document (May 2016)",
+      "jurisdiction": "MY",
+      "issuer": "BNM",
+      "doc_class": "structured-rules",
+      "source_path": "data/corpus/open-finance/pd_operational risk_may2016.pdf",
+      "in_mvp1": true
+    },
+    {
+      "document_id": "bnm-product-transparency-dec2024",
+      "title": "BNM Product Transparency and Disclosure Policy Document (December 2024)",
+      "jurisdiction": "MY",
+      "issuer": "BNM",
+      "doc_class": "structured-rules",
+      "source_path": "data/corpus/open-finance/pd_product_transparency_and_disclosure_dec2024.pdf",
+      "in_mvp1": true
+    },
+    {
+      "document_id": "bnm-open-api-bulletin",
+      "title": "BNM Quarterly Bulletin Feature: Open Application Programming Interface (API) — A Financial Revolution",
+      "jurisdiction": "MY",
+      "issuer": "BNM",
+      "doc_class": "prose",
+      "source_path": "data/corpus/open-finance/p8_fa1.pdf",
+      "in_mvp1": true,
+      "notes": "Narrative feature article, not a structured PD — segments as prose."
+    },
+    {
+      "document_id": "bis-d575-digitalisation",
+      "title": "BCBS Digitalisation of Finance (May 2024)",
+      "jurisdiction": "INTL",
+      "issuer": "BIS",
+      "doc_class": "semi-structured",
+      "source_path": "data/corpus/open-finance/bis-d575.pdf",
+      "in_mvp1": true
+    },
+    {
+      "document_id": "bis-pap168-open-finance",
+      "title": "BIS Papers No 168: Opening Doors to Open Finance — Evidence from the International Experience",
+      "jurisdiction": "INTL",
+      "issuer": "BIS",
+      "doc_class": "semi-structured",
+      "source_path": "data/corpus/open-finance/bispap168.pdf",
+      "in_mvp1": true
+    },
+    {
+      "document_id": "hkma-open-api-framework-2018",
+      "title": "HKMA Open API Framework for the Hong Kong Banking Sector (July 2018)",
+      "jurisdiction": "HK",
+      "issuer": "HKMA",
+      "doc_class": "semi-structured",
+      "source_path": "data/corpus/open-finance/hkma-20180718e5a2.pdf",
+      "in_mvp1": true
+    },
+    {
+      "document_id": "hkma-open-api-next-phase",
+      "title": "HKMA The Next Phase of the Banking Open API Journey",
+      "jurisdiction": "HK",
+      "issuer": "HKMA",
+      "doc_class": "semi-structured",
+      "source_path": "data/corpus/open-finance/hkma-The_Next_Phase_of_the_Banking_Open_API_Journey.pdf",
+      "in_mvp1": true
+    },
+    {
+      "document_id": "mas-abs-api-playbook",
+      "title": "ABS-MAS Finance-as-a-Service API Playbook",
+      "jurisdiction": "SG",
+      "issuer": "MAS",
+      "doc_class": "semi-structured",
+      "source_path": "data/corpus/open-finance/mas-ABSMASAPIPlaybook.pdf",
+      "in_mvp1": true
+    },
+    {
+      "document_id": "cma-open-banking-roadmap-may2020",
+      "title": "CMA Notice of Proposed Changes to the Open Banking Roadmap (May 2020)",
+      "jurisdiction": "UK",
+      "issuer": "CMA",
+      "doc_class": "prose",
+      "source_path": "data/corpus/open-finance/uk-Notice_of_proposed_changes_to_the_open_banking_roadmap_-_web_publication_-_cma_gov_uk_-_May_2020_-.pdf",
+      "in_mvp1": true
+    },
+    {
+      "document_id": "cma-retail-banking-final-report-summary",
+      "title": "CMA Retail Banking Market Investigation — Summary of Final Report",
+      "jurisdiction": "UK",
+      "issuer": "CMA",
+      "doc_class": "prose",
+      "source_path": "data/corpus/open-finance/uk-summary-of-final-report-retail-banking-investigation.pdf",
+      "in_mvp1": true
+    },
+    {
+      "document_id": "bnm-mcipd-sample",
+      "title": "BNM Management of Customer Information and Permitted Disclosures PD (sample cluster copy)",
+      "jurisdiction": "MY",
+      "issuer": "BNM",
+      "doc_class": "structured-rules",
+      "source_path": "data/corpus/sample/MCIPD_PD_2025.pdf",
+      "in_mvp1": true,
+      "notes": "BNM foundational cluster — required because the retired taxonomy trace cites BNM anchors."
+    },
+    {
+      "document_id": "bnm-rmit-june2023",
+      "title": "BNM Risk Management in Technology (RMiT) Policy Document (June 2023)",
+      "jurisdiction": "MY",
+      "issuer": "BNM",
+      "doc_class": "structured-rules",
+      "source_path": "data/corpus/sample/PD-RMiT-June2023.pdf",
+      "in_mvp1": true,
+      "notes": "BNM foundational cluster — retired taxonomy trace anchor source."
+    },
+    {
+      "document_id": "bnm-outsourcing-2019",
+      "title": "BNM Outsourcing Policy Document (23 October 2019)",
+      "jurisdiction": "MY",
+      "issuer": "BNM",
+      "doc_class": "structured-rules",
+      "source_path": "data/corpus/sample/PD_Outsourcing_20191023.pdf",
+      "in_mvp1": true,
+      "notes": "BNM foundational cluster — retired taxonomy trace anchor source."
+    },
+    {
+      "document_id": "bnm-ai-financial-sector-dp",
+      "title": "BNM Discussion Paper on Artificial Intelligence in the Financial Sector",
+      "jurisdiction": "MY",
+      "issuer": "BNM",
+      "doc_class": "structured-rules",
+      "source_path": "data/corpus/sample/dp_ai_financial_sector.pdf",
+      "in_mvp1": true,
+      "notes": "BNM foundational cluster — retired taxonomy trace anchor source."
+    },
+    {
+      "document_id": "bnm-operational-resilience-dp-dec2025",
+      "title": "BNM Discussion Paper on Operational Resilience (December 2025)",
+      "jurisdiction": "MY",
+      "issuer": "BNM",
+      "doc_class": "structured-rules",
+      "source_path": "data/corpus/sample/dp_operationalresilience_Dec2025.pdf",
+      "in_mvp1": true,
+      "notes": "BNM foundational cluster — retired taxonomy trace anchor source (OpRes)."
+    },
+    {
+      "document_id": "bnm-recovery-planning-pd",
+      "title": "BNM Recovery Planning Policy Document",
+      "jurisdiction": "MY",
+      "issuer": "BNM",
+      "doc_class": "structured-rules",
+      "source_path": "data/corpus/sample/pd_Recovery Planning.pdf",
+      "in_mvp1": true,
+      "notes": "BNM foundational cluster — retired taxonomy trace anchor source."
+    }
+  ]
+}

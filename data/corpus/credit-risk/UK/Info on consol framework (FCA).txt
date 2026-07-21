@@ -1,0 +1,1 @@
+Consol framework on FCA website, reference: https://www.handbook.fca.org.uk/handbook/BIPRU/3/4.html
