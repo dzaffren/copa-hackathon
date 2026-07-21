@@ -280,9 +280,12 @@ def test_POST_edge_analyze_writes_findings_file_and_flips_edge_analysed_flag(tmp
         }
 
     client, dst = _make_client(tmp_path, find_connections_fn=stub)
-    # opres-pd-v0-3 -> opres-dp-2025 is analysable (both carry a document_id)
-    # and unanalysed in the seeded fixture (no findings file yet).
-    edge_id = "e-opres_v0_3--opres_dp_2025"
+    # opres-pd-v0-3 -> rmit-pd-2025 is genuinely analysable: both carry a
+    # document_id AND they differ (opres-v1-2025-draft vs rmit-v2-2025). It is
+    # seeded analysed, so delete its findings file to establish the unanalysed
+    # precondition. (The opres-dp edge is a same-document self-comparison — 409.)
+    edge_id = "e-opres_v0_3--rmit_pd_2025"
+    (dst / _OPRES / "findings" / f"{edge_id}.json").unlink()
     # Before: unanalysed.
     assert (
         client.get(f"/api/workstreams/{_OPRES}/edges/{edge_id}").json()["status"]

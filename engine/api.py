@@ -486,7 +486,15 @@ def create_app(
             "edge_type": edge.get("edge_type"),
             "status": "analysed" if findings is not None else "not_analysed",
             "findings": findings or [],
-            "analysable": bool(src.get("document_id") and tgt.get("document_id")),
+            # Analysable only when BOTH endpoints resolve to ingested documents
+            # AND those documents differ — a doc compared against itself yields
+            # no linkages (e.g. the OpRes draft node and OpRes DP node both map
+            # to opres-v1-2025-draft).
+            "analysable": bool(
+                src.get("document_id")
+                and tgt.get("document_id")
+                and src.get("document_id") != tgt.get("document_id")
+            ),
         }
 
     @app.post("/api/workstreams/{workstream_id}/nodes")
@@ -555,6 +563,16 @@ def create_app(
                 f"Node {edge['target']} has no ingested document to analyse.",
                 field="target",
             )
+        if src_doc == tgt_doc:
+            # Both endpoints resolve to the same document (e.g. the OpRes draft
+            # node and the OpRes DP node both map to opres-v1-2025-draft). A doc
+            # compared against itself yields no linkages, so refuse rather than
+            # write an empty findings file.
+            return _ws_error(
+                409, "NOT_ANALYSABLE",
+                f"Both endpoints resolve to the same document ({src_doc}); "
+                f"there is nothing to compare.",
+            )
         clause_index = load_clause_index(artifacts_dir)
         try:
             result = find_connections_fn(src_doc, tgt_doc, clause_index)
@@ -564,6 +582,17 @@ def create_app(
                 f"Live analysis failed: {exc}",
             )
         findings = workstreams.connections_to_findings(result)
+        # Only persist a non-empty result. Writing an empty findings file would
+        # one-way-flip the edge to "analysed" (analysed is derived from file
+        # presence) with zero linkages and no path back — so a no-linkage run
+        # leaves the edge unanalysed and re-analysable.
+        if not findings:
+            return {
+                "id": edge_id,
+                "status": "no_linkages_found",
+                "findings": [],
+                "findings_count": 0,
+            }
         workstreams.save_findings(workstreams_dir, workstream_id, edge_id, findings)
         return {
             "id": edge_id,
