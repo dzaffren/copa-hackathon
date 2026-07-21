@@ -23,7 +23,7 @@ _FSB_EDGE = "e-opres_v0_3--fsb_3rd_party"  # seeded but NOT analysed (no file)
 def _make_client(tmp_path) -> tuple[TestClient, "object"]:
     dst = tmp_path / "workstreams"
     shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
-    return TestClient(create_app(workstreams_dir=dst, analyze_delay=0)), dst
+    return TestClient(create_app(workstreams_dir=dst)), dst
 
 
 def _review(client, edge=_BCBS_EDGE):

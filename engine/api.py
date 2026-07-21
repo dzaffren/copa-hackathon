@@ -7,8 +7,9 @@ per-edge linkage arrays. It needs **no** model access and no credentials — the
 routes are projections over files held in memory.
 
 The service is constructed by `create_app(...)`, which takes its dependencies as
-injectable arguments (the workstreams dir, the analyze delay), so tests build an
-app against fixture dirs with no network and nothing on disk to prepare. A
+injectable arguments (the workstreams dir, the clause-index `artifacts_dir`, and
+the `find_connections_fn` finder seam), so tests build an app against fixture
+dirs — and stub the finder — with no network and nothing on disk to prepare. A
 module-level `app` for `uvicorn engine.api:app` defaults to `data/workstreams`.
 
 Scope note: this used to also serve the superseded reconciliation-workbench read
