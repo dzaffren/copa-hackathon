@@ -24,7 +24,6 @@ fixtures derive from public BNM documents.
 """
 
 import json
-import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional, Union
@@ -32,6 +31,8 @@ from typing import Any, Optional, Union
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from engine.clauses import load_clause_index
+from engine.connections import find_connections as _default_find_connections
 from engine.config import REPO_ROOT
 from engine import copilot_scripts, directory, drafts, findings, workstreams
 
@@ -73,12 +74,16 @@ def _workstream_name(workstreams_dir: Path, workstream_id: Optional[str]) -> Opt
     meta = workstreams.load_workstream(workstreams_dir, workstream_id)
     return meta.get("name") if meta else None
 
-def _ws_error(status_code: int, code: str, message: str) -> JSONResponse:
+def _ws_error(
+    status_code: int, code: str, message: str, field: Optional[str] = None
+) -> JSONResponse:
     """Error body for the Workstream Brain routes: `{code, message}` (Task 1
-    contract)."""
-    return JSONResponse(
-        status_code=status_code, content={"code": code, "message": message}
-    )
+    contract), plus an optional `field` (e.g. which endpoint of an edge lacks
+    an ingested document) included only when given."""
+    content: dict[str, Any] = {"code": code, "message": message}
+    if field is not None:
+        content["field"] = field
+    return JSONResponse(status_code=status_code, content=content)
 
 
 def _load_workstream_graph(
@@ -94,7 +99,8 @@ def _load_workstream_graph(
 
 def create_app(
     workstreams_dir: Union[str, Path] = WORKSTREAMS_DIR,
-    analyze_delay: float = 0.8,
+    artifacts_dir: Union[str, Path] = REPO_ROOT / "data" / "artifacts",
+    find_connections_fn: Any = _default_find_connections,
 ) -> FastAPI:
     """Construct the Workstream Brain read API against injected dependencies.
 
@@ -103,9 +109,13 @@ def create_app(
             workstream with a `graph.json` + `findings/{edge_id}.json`);
             injectable so tests point it at a fixture/tmp dir. Defaults to
             `data/workstreams`.
-        analyze_delay: artificial delay (seconds) the Graph Screen `analyze`
-            route waits before returning the canned demo findings, so the
-            "Analyze linkages" spinner is visible in the demo. Tests pass `0`.
+        artifacts_dir: where the clause index (`engine.clauses.load_clause_index`)
+            is read from for live analysis. Defaults to `data/artifacts`.
+        find_connections_fn: the finder called by the `analyze` route —
+            `(doc_a_id, doc_b_id, clause_index) -> {"connections": [...],
+            "unsupported": [...]}`. Injectable so tests stub the model; no
+            live model call happens in CI. Defaults to
+            `engine.connections.find_connections`.
 
     Returns:
         A configured `FastAPI` app. No network, credentials, or build artifacts
@@ -524,30 +534,38 @@ def create_app(
                 "EDGE_NOT_FOUND",
                 f"Edge {edge_id} not found in workstream {workstream_id}",
             )
-        # The demo pair replays canned, verbatim-cited findings (no model call).
-        # Any other pair yields no findings — the corpus finder operates over
-        # clause docs, not the workstream anchor set, so it is out of scope for
-        # this screen's demo.
-        findings = workstreams.canned_analysis(edge["source"], edge["target"])
-        if analyze_delay:
-            time.sleep(analyze_delay)
-        # Only persist a real result. Writing an empty findings file would
-        # one-way-flip the edge to "analysed" (analysed is derived from file
-        # presence) with zero linkages and no path back — so a no-match leaves
-        # the edge unanalysed and re-analysable.
-        if findings:
-            workstreams.save_findings(workstreams_dir, workstream_id, edge_id, findings)
-            return {
-                "id": edge_id,
-                "status": "analysed",
-                "findings": findings,
-                "findings_count": len(findings),
-            }
+        by_id = {n["id"]: n for n in ws_graph.get("nodes", [])}
+        src_doc = by_id.get(edge["source"], {}).get("document_id")
+        tgt_doc = by_id.get(edge["target"], {}).get("document_id")
+        # The source (task) node is doc_a ("ours") so silent-on / goes-beyond
+        # read in the drafter's direction (task node is always the edge source).
+        if not src_doc:
+            return _ws_error(
+                409, "NOT_ANALYSABLE",
+                f"Node {edge['source']} has no ingested document to analyse.",
+                field="source",
+            )
+        if not tgt_doc:
+            return _ws_error(
+                409, "NOT_ANALYSABLE",
+                f"Node {edge['target']} has no ingested document to analyse.",
+                field="target",
+            )
+        clause_index = load_clause_index(artifacts_dir)
+        try:
+            result = find_connections_fn(src_doc, tgt_doc, clause_index)
+        except Exception as exc:  # live model / creds / network failure
+            return _ws_error(
+                502, "ANALYZE_FAILED",
+                f"Live analysis failed: {exc}",
+            )
+        findings = workstreams.connections_to_findings(result)
+        workstreams.save_findings(workstreams_dir, workstream_id, edge_id, findings)
         return {
             "id": edge_id,
-            "status": "no_matching_source",
-            "findings": [],
-            "findings_count": 0,
+            "status": "analysed",
+            "findings": findings,
+            "findings_count": len(findings),
         }
 
     # --- Workstream Brain — Review Linkages routes -------------------------
