@@ -23,10 +23,12 @@ def test_structured_rules_emits_anchors_with_clause_number_ids():
 
 
 def test_structured_rules_canonicalizes_parent_anchor():
-    # entry["parent"] from segment_clauses is a BARE number ("10.1"), but the
-    # anchor_id is canonical ("RMiT 10.1"). parent_anchor must be canonicalized
-    # to match anchor_id form, not left bare, so a future consumer can resolve
-    # it via AnchorIndex.get(parent_anchor).
+    # segment_clauses already returns `parent` in canonical form (e.g. 'RMiT 10.1',
+    # not bare '10.1' — see engine/clauses.py _assemble_entries / test_clauses.py:350).
+    # structured_rules_segment passes it straight through as parent_anchor, so
+    # parent_anchor matches the anchor_id convention. This test pins that: a child's
+    # parent_anchor is the canonical 'RMiT 10.1', and a top-level clause's
+    # parent_anchor is None.
     anchors = structured_rules_segment(
         "rmit-v2-2025", BNM_MD, policy_id="rmit", source="rmit.pdf")
     by_id = {a["anchor_id"]: a for a in anchors}
