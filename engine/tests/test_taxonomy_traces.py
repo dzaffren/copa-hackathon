@@ -92,20 +92,28 @@ def test_supported_finding_counts_preserved(traces: dict[str, dict]) -> None:
             f"{name} has {len(validation)} validation entries, "
             f"expected {expected_count}"
         )
-        assert all(v["supported"] is True for v in validation), (
-            f"{name} has a validation entry that is not supported: true"
-        )
+        assert all(
+            v["supported"] is True for v in validation
+        ), f"{name} has a validation entry that is not supported: true"
 
 
 def test_citation_resolution_undisturbed(traces: dict[str, dict]) -> None:
-    """Verbatim integrity: every cited clause on every supported validation
-    finding still resolves — adding labels did not touch the citations."""
+    """Verbatim integrity: every cited anchor/clause on every supported validation
+    finding still resolves — adding labels did not touch the citations.
+
+    Reads via a `cited_anchors` → `cited_clauses` fallback so this test is
+    robust across Task 8 (the backfill script that renames the trace field
+    from the retired `cited_clauses` name to the widened `cited_anchors`).
+    Same fallback for the citation key inside each entry: `anchor_id` on
+    widened traces, `clause_number` on retired ones."""
     for name, trace in traces.items():
         for i, entry in enumerate(trace["validation"]):
-            for cited in entry["cited_clauses"]:
+            cited_items = entry.get("cited_anchors") or entry.get("cited_clauses", [])
+            for cited in cited_items:
+                citation_key = cited.get("anchor_id") or cited.get("clause_number")
                 assert cited["resolved"] is True, (
-                    f"{name} validation[{i}] clause "
-                    f"{cited['clause_number']!r} is no longer resolved"
+                    f"{name} validation[{i}] citation "
+                    f"{citation_key!r} is no longer resolved"
                 )
 
 

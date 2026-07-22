@@ -1,0 +1,945 @@
+{
+  "model_id": "claude-opus-4-8",
+  "timestamp": "2026-07-21T11:21:18.200323+00:00",
+  "document_ids": [
+    "bnm-open-finance-ed-2025",
+    "bnm-rmit-nov25"
+  ],
+  "finder_output": [
+    {
+      "summary": "Both documents require board and senior management oversight of technology and cyber risks, with our open finance governance deferring to RMiT-style risk management frameworks.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 7.1",
+        "Open Finance ED 7.3",
+        "Open Finance ED 7.5"
+      ],
+      "target_anchors": [
+        "RMiT 8.1",
+        "RMiT 8.6",
+        "RMiT 9.1"
+      ]
+    },
+    {
+      "summary": "Our open finance policy explicitly requires FSPs to observe RMiT technology risk requirements for their open finance activities, adopting the RMiT framework without narrowing.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 12.1",
+        "Open Finance ED 12.4",
+        "Open Finance ED 11.5"
+      ],
+      "target_anchors": [
+        "RMiT 1.2",
+        "RMiT 9.2",
+        "RMiT 10.5"
+      ]
+    },
+    {
+      "summary": "Both require robust cyber risk management, API security controls, fraud detection and monitoring for digital/open finance services.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 12.3"
+      ],
+      "target_anchors": [
+        "RMiT 11.2",
+        "RMiT 11.3",
+        "RMiT 12.4"
+      ]
+    },
+    {
+      "summary": "Both require multi-factor authentication and secure authentication procedures before granting access to customer information/critical systems.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 11.5"
+      ],
+      "target_anchors": [
+        "RMiT 10.55",
+        "RMiT 12.1"
+      ]
+    },
+    {
+      "summary": "Both require third-party service provider due diligence, SLA safeguards and confidentiality obligations for handling customer information.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 11.8",
+        "Open Finance ED 11.10"
+      ],
+      "target_anchors": [
+        "RMiT 10.46",
+        "RMiT 10.48",
+        "RMiT 10.47"
+      ]
+    },
+    {
+      "summary": "Both require business continuity, operational resilience and continuity of services against disruptions, outages and third-party failures.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 7.6(b)"
+      ],
+      "target_anchors": [
+        "RMiT 9.2(k)",
+        "RMiT 10.31",
+        "RMiT 11.12"
+      ]
+    },
+    {
+      "summary": "Both require breach handling and incident response plans with escalation procedures for customer information/cyber incidents.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 11.11",
+        "Open Finance ED 11.12",
+        "Open Finance ED 7.6(g)"
+      ],
+      "target_anchors": [
+        "RMiT 11.13",
+        "RMiT 12.9",
+        "RMiT 11.18"
+      ]
+    },
+    {
+      "summary": "Both require internal audit coverage extended to open finance/technology activities and API integrations.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 7.6(f)"
+      ],
+      "target_anchors": [
+        "RMiT 13.1",
+        "RMiT 13.2",
+        "RMiT 8.5"
+      ]
+    },
+    {
+      "summary": "Our open finance policy sets a detailed consent lifecycle regime (specific/voluntary consent, dashboards, time-bound validity, revocation, deletion) that RMiT does not address.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 10.1",
+        "Open Finance ED 10.2",
+        "Open Finance ED 10.5",
+        "Open Finance ED 10.7",
+        "Open Finance ED 10.11",
+        "Open Finance ED 10.17"
+      ],
+      "target_anchors": []
+    },
+    {
+      "summary": "Our open finance policy defines mandated participation as data provider/consumer with reciprocity, prescribed information scope and required interfaces which RMiT does not cover.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 8.4",
+        "Open Finance ED 8.6",
+        "Open Finance ED 1.4(a)",
+        "Open Finance ED 1.4(b)"
+      ],
+      "target_anchors": []
+    },
+    {
+      "summary": "Our open finance policy addresses customer complaints, liability delineation, and fair treatment/redress specific to open finance arrangements which RMiT does not cover.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 11.13",
+        "Open Finance ED 11.14",
+        "Open Finance ED 11.15",
+        "Open Finance ED 11.19"
+      ],
+      "target_anchors": []
+    },
+    {
+      "summary": "RMiT prescribes detailed technical controls (cryptography, data centre resilience, network resilience, SDLC, patch/EOL, access control) that our open finance policy relies on but does not itself detail.",
+      "label": "silent-on",
+      "source_anchors": [],
+      "target_anchors": [
+        "RMiT 10.20",
+        "RMiT 10.24",
+        "RMiT 10.36",
+        "RMiT 10.53",
+        "RMiT 10.17"
+      ]
+    },
+    {
+      "summary": "RMiT sets specific service availability standards (downtime limits, stand-in processing, monitoring thresholds) for digital services that our open finance policy does not quantify.",
+      "label": "silent-on",
+      "source_anchors": [],
+      "target_anchors": [
+        "RMiT 10.32",
+        "RMiT 10.31",
+        "RMiT 10.30"
+      ]
+    },
+    {
+      "summary": "RMiT requires notification/consultation with the Bank for new digital services and cloud/emerging technology adoption which our open finance policy does not separately address.",
+      "label": "silent-on",
+      "source_anchors": [],
+      "target_anchors": [
+        "RMiT 16.1",
+        "RMiT 17.1",
+        "RMiT 18.1"
+      ]
+    },
+    {
+      "summary": "RMiT prescribes detailed digital fraud management and customer awareness/kill-switch requirements which our open finance policy addresses only at a high level through cross-reference.",
+      "label": "silent-on",
+      "source_anchors": [],
+      "target_anchors": [
+        "RMiT 12.3",
+        "RMiT 12.7",
+        "RMiT 12.8"
+      ]
+    }
+  ],
+  "critic_output": [
+    {
+      "summary": "Both documents require board and senior management oversight of technology and cyber risks, with our open finance governance deferring to RMiT-style risk management frameworks.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 7.1",
+        "Open Finance ED 7.3",
+        "Open Finance ED 7.5"
+      ],
+      "target_anchors": [
+        "RMiT 8.1",
+        "RMiT 8.6",
+        "RMiT 9.1"
+      ],
+      "scope_note": "Open finance governance obligations apply per-FSP as may be applicable in relevant policy documents (para 7.2), while RMiT scales expectations to size, complexity and degree of digitalisation (RMiT 1.2)."
+    },
+    {
+      "summary": "Our open finance policy explicitly requires FSPs to observe RMiT technology risk requirements for their open finance activities, adopting the RMiT framework without narrowing.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 12.1",
+        "Open Finance ED 12.4",
+        "Open Finance ED 11.5"
+      ],
+      "target_anchors": [
+        "RMiT 1.2",
+        "RMiT 9.2",
+        "RMiT 10.5"
+      ],
+      "scope_note": "Open finance cross-references RMiT and Technology Requirement for Payment Services Regulatees; RMiT itself excludes certain entities (eligible e-money issuers, non-bank merchant acquirers, intermediary remittance institutions) from some provisions (RMiT 2.2)."
+    },
+    {
+      "summary": "Both require robust cyber risk management, API security controls, fraud detection and monitoring for digital/open finance services.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 12.3"
+      ],
+      "target_anchors": [
+        "RMiT 11.2",
+        "RMiT 11.3",
+        "RMiT 12.4"
+      ]
+    },
+    {
+      "summary": "Both require multi-factor authentication and secure authentication procedures before granting access to customer information/critical systems.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 11.5"
+      ],
+      "target_anchors": [
+        "RMiT 10.55",
+        "RMiT 12.1"
+      ],
+      "scope_note": "Open finance frames MFA as an example ('e.g. multi-factor authentication') for a data provider authenticating the customer, whereas RMiT 10.55 mandates MFA for critical system access as a firm requirement."
+    },
+    {
+      "summary": "Both require third-party service provider due diligence, SLA safeguards and confidentiality obligations for handling customer information.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 11.8",
+        "Open Finance ED 11.10"
+      ],
+      "target_anchors": [
+        "RMiT 10.46",
+        "RMiT 10.48",
+        "RMiT 10.47"
+      ],
+      "scope_note": "Open finance defers to the Outsourcing, RMiT and Management of Customer Information policy documents; RMiT's detailed SLA content (RMiT 10.48) applies specifically to third parties for critical technology functions."
+    },
+    {
+      "summary": "Both require business continuity, operational resilience and continuity of services against disruptions, outages and third-party failures.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 7.6(b)"
+      ],
+      "target_anchors": [
+        "RMiT 9.2(k)",
+        "RMiT 10.31",
+        "RMiT 11.12"
+      ]
+    },
+    {
+      "summary": "Both require breach handling and incident response plans with escalation procedures for customer information/cyber incidents.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 11.11",
+        "Open Finance ED 11.12",
+        "Open Finance ED 7.6(g)"
+      ],
+      "target_anchors": [
+        "RMiT 11.13",
+        "RMiT 12.9",
+        "RMiT 11.18"
+      ],
+      "scope_note": "Open finance breach handling cross-refers to the Management of Customer Information and Permitted Disclosures policy and PDPA; RMiT 11.18 governs cyber incident notification to the Bank."
+    },
+    {
+      "summary": "Both require internal audit coverage extended to open finance/technology activities and API integrations.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 7.6(f)"
+      ],
+      "target_anchors": [
+        "RMiT 13.1",
+        "RMiT 13.2",
+        "RMiT 8.5"
+      ]
+    },
+    {
+      "summary": "Our open finance policy sets a detailed consent lifecycle regime (specific/voluntary consent, dashboards, time-bound validity, revocation, deletion) that RMiT does not address.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 10.1",
+        "Open Finance ED 10.2",
+        "Open Finance ED 10.5",
+        "Open Finance ED 10.7",
+        "Open Finance ED 10.11",
+        "Open Finance ED 10.17"
+      ],
+      "target_anchors": []
+    },
+    {
+      "summary": "Our open finance policy defines mandated participation as data provider/consumer with reciprocity, prescribed information scope and required interfaces which RMiT does not cover.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 8.4",
+        "Open Finance ED 8.6",
+        "Open Finance ED 1.4(a)",
+        "Open Finance ED 1.4(b)"
+      ],
+      "target_anchors": []
+    },
+    {
+      "summary": "Our open finance policy addresses customer complaints, liability delineation, and fair treatment/redress specific to open finance arrangements which RMiT does not cover.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 11.13",
+        "Open Finance ED 11.14",
+        "Open Finance ED 11.15",
+        "Open Finance ED 11.19"
+      ],
+      "target_anchors": []
+    },
+    {
+      "summary": "RMiT prescribes detailed technical controls (cryptography, data centre resilience, network resilience, SDLC, patch/EOL, access control) that our open finance policy relies on but does not itself detail.",
+      "label": "silent-on",
+      "source_anchors": [],
+      "target_anchors": [
+        "RMiT 10.20",
+        "RMiT 10.24",
+        "RMiT 10.36",
+        "RMiT 10.53",
+        "RMiT 10.17"
+      ]
+    },
+    {
+      "summary": "RMiT sets specific service availability standards (downtime limits, stand-in processing, monitoring thresholds) for digital services that our open finance policy does not quantify.",
+      "label": "silent-on",
+      "source_anchors": [],
+      "target_anchors": [
+        "RMiT 10.32",
+        "RMiT 10.31",
+        "RMiT 10.30"
+      ]
+    },
+    {
+      "summary": "RMiT requires notification/consultation with the Bank for new digital services and cloud/emerging technology adoption which our open finance policy does not separately address.",
+      "label": "silent-on",
+      "source_anchors": [],
+      "target_anchors": [
+        "RMiT 16.1",
+        "RMiT 17.1",
+        "RMiT 18.1"
+      ]
+    },
+    {
+      "summary": "RMiT prescribes detailed digital fraud management and customer awareness/kill-switch requirements which our open finance policy addresses only at a high level through cross-reference.",
+      "label": "silent-on",
+      "source_anchors": [],
+      "target_anchors": [
+        "RMiT 12.3",
+        "RMiT 12.7",
+        "RMiT 12.8"
+      ]
+    },
+    {
+      "summary": "Both require that customer information received from or handled via another party be protected by safeguards at least equivalent to those applied to the institution's own information.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 11.6"
+      ],
+      "target_anchors": [
+        "RMiT 10.52",
+        "RMiT 10.5(c)"
+      ]
+    },
+    {
+      "summary": "Both mandate least-privilege / need-to-know access restrictions to customer information and IT assets.",
+      "label": "aligns-with",
+      "source_anchors": [
+        "Open Finance ED 11.2(a)",
+        "Open Finance ED 11.4(a)"
+      ],
+      "target_anchors": [
+        "RMiT 10.54(b)",
+        "RMiT 10.53"
+      ]
+    },
+    {
+      "summary": "Both require data access / activity logging retained for a defined minimum period, but our open finance policy sets a seven-year retention for consent and access records while RMiT sets three years for user activity and network logs.",
+      "label": "differs-on",
+      "sentiment": "tighten",
+      "source_anchors": [
+        "Open Finance ED 10.18",
+        "Open Finance ED 10.19"
+      ],
+      "target_anchors": [
+        "RMiT 10.57(c)",
+        "RMiT 10.42"
+      ]
+    },
+    {
+      "summary": "RMiT prescribes detailed system backup, restoration and tamper-proof recovery requirements to meet business recovery objectives which our open finance policy does not separately detail.",
+      "label": "silent-on",
+      "source_anchors": [],
+      "target_anchors": [
+        "RMiT 10.44",
+        "RMiT 10.45"
+      ]
+    },
+    {
+      "summary": "RMiT requires a designated CISO and an independent enterprise-wide technology risk management function, which our open finance policy does not itself require (relying on FSP-level senior management responsibility instead).",
+      "label": "silent-on",
+      "source_anchors": [],
+      "target_anchors": [
+        "RMiT 9.3",
+        "RMiT 9.4"
+      ]
+    },
+    {
+      "summary": "Our open finance policy requires secure disposal/deletion of customer information upon expiry of use or revoked consent, aligning with RMiT's SDLC and data protection controls but adding a consent-triggered deletion obligation.",
+      "label": "goes-beyond",
+      "source_anchors": [
+        "Open Finance ED 11.2(d)",
+        "Open Finance ED 10.10",
+        "Open Finance ED 10.13"
+      ],
+      "target_anchors": []
+    }
+  ],
+  "validation": [
+    {
+      "summary": "Both documents require board and senior management oversight of technology and cyber risks, with our open finance governance deferring to RMiT-style risk management frameworks.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 7.1",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 7.3",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 7.5",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 8.1",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 8.6",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 9.1",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Our open finance policy explicitly requires FSPs to observe RMiT technology risk requirements for their open finance activities, adopting the RMiT framework without narrowing.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 12.1",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 12.4",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.5",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 1.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 9.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.5",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require robust cyber risk management, API security controls, fraud detection and monitoring for digital/open finance services.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 12.3",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 11.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 11.3",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 12.4",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require multi-factor authentication and secure authentication procedures before granting access to customer information/critical systems.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.5",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.55",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 12.1",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require third-party service provider due diligence, SLA safeguards and confidentiality obligations for handling customer information.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.8",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.10",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.46",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.48",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.47",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require business continuity, operational resilience and continuity of services against disruptions, outages and third-party failures.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 7.6(b)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 9.2(k)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.31",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 11.12",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require breach handling and incident response plans with escalation procedures for customer information/cyber incidents.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.11",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.12",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 7.6(g)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 11.13",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 12.9",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 11.18",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require internal audit coverage extended to open finance/technology activities and API integrations.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 7.6(f)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 13.1",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 13.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 8.5",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Our open finance policy sets a detailed consent lifecycle regime (specific/voluntary consent, dashboards, time-bound validity, revocation, deletion) that RMiT does not address.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 10.1",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.2",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.5",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.7",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.11",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.17",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Our open finance policy defines mandated participation as data provider/consumer with reciprocity, prescribed information scope and required interfaces which RMiT does not cover.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 8.4",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 8.6",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 1.4(a)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 1.4(b)",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Our open finance policy addresses customer complaints, liability delineation, and fair treatment/redress specific to open finance arrangements which RMiT does not cover.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.13",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.14",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.15",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.19",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "RMiT prescribes detailed technical controls (cryptography, data centre resilience, network resilience, SDLC, patch/EOL, access control) that our open finance policy relies on but does not itself detail.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "RMiT 10.20",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.24",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.36",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.53",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.17",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "RMiT sets specific service availability standards (downtime limits, stand-in processing, monitoring thresholds) for digital services that our open finance policy does not quantify.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "RMiT 10.32",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.31",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.30",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "RMiT requires notification/consultation with the Bank for new digital services and cloud/emerging technology adoption which our open finance policy does not separately address.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "RMiT 16.1",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 17.1",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 18.1",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "RMiT prescribes detailed digital fraud management and customer awareness/kill-switch requirements which our open finance policy addresses only at a high level through cross-reference.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "RMiT 12.3",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 12.7",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 12.8",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require that customer information received from or handled via another party be protected by safeguards at least equivalent to those applied to the institution's own information.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.6",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.52",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.5(c)",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both mandate least-privilege / need-to-know access restrictions to customer information and IT assets.",
+      "label": "aligns-with",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.2(a)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 11.4(a)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.54(b)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.53",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Both require data access / activity logging retained for a defined minimum period, but our open finance policy sets a seven-year retention for consent and access records while RMiT sets three years for user activity and network logs.",
+      "label": "differs-on",
+      "sentiment": "tighten",
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 10.18",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.19",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.57(c)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.42",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "RMiT prescribes detailed system backup, restoration and tamper-proof recovery requirements to meet business recovery objectives which our open finance policy does not separately detail.",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "RMiT 10.44",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 10.45",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "RMiT requires a designated CISO and an independent enterprise-wide technology risk management function, which our open finance policy does not itself require (relying on FSP-level senior management responsibility instead).",
+      "label": "silent-on",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "RMiT 9.3",
+          "resolved": true
+        },
+        {
+          "anchor_id": "RMiT 9.4",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    },
+    {
+      "summary": "Our open finance policy requires secure disposal/deletion of customer information upon expiry of use or revoked consent, aligning with RMiT's SDLC and data protection controls but adding a consent-triggered deletion obligation.",
+      "label": "goes-beyond",
+      "sentiment": null,
+      "cited_anchors": [
+        {
+          "anchor_id": "Open Finance ED 11.2(d)",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.10",
+          "resolved": true
+        },
+        {
+          "anchor_id": "Open Finance ED 10.13",
+          "resolved": true
+        }
+      ],
+      "supported": true
+    }
+  ]
+}

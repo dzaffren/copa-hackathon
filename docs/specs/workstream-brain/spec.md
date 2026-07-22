@@ -38,18 +38,21 @@ Workstream Brain is the second POC delivered for the COPA Hackathon 2026, target
 
 ## Story Index
 
-| Ticket | Story                                    | Spec                                                     | Type        | Status      | Dependencies |
-| ------ | ---------------------------------------- | -------------------------------------------------------- | ----------- | ----------- | ------------ |
-| TBD    | Linkage taxonomy widening in the engine  | [spec-engine-taxonomy.md](spec-engine-taxonomy.md)       | Technical   | Not Started | —            |
-| TBD    | Workstream graph screen (hero)           | [spec-workstream-graph.md](spec-workstream-graph.md)     | User-facing | Not Started | Taxonomy     |
-| TBD    | Task screen with pairwise comparison     | [spec-task-screen.md](spec-task-screen.md)               | User-facing | Not Started | Graph        |
-| TBD    | Review linkages screen                   | [spec-review-linkages.md](spec-review-linkages.md)       | User-facing | Not Started | Graph        |
-| TBD    | Drafting workspace with 3-tab side panel | [spec-drafting-workspace.md](spec-drafting-workspace.md) | User-facing | Not Started | Review       |
-| TBD    | New workstream form                      | [spec-new-workstream.md](spec-new-workstream.md)         | User-facing | Not Started | Graph        |
+| Ticket | Story                                               | Spec                                                                     | Type        | Status      | Dependencies                  |
+| ------ | --------------------------------------------------- | ------------------------------------------------------------------------ | ----------- | ----------- | ----------------------------- |
+| TBD    | Linkage taxonomy widening in the engine             | [spec-engine-taxonomy.md](spec-engine-taxonomy.md)                       | Technical   | Not Started | —                             |
+| TBD    | Anchor segmentation (multi-strategy `AnchorIndex`)  | [spec-engine-anchor-segmentation.md](spec-engine-anchor-segmentation.md) | Technical   | Not Started | Taxonomy                      |
+| TBD    | Retrieval-first pipeline (axis extraction + hybrid) | [spec-engine-retrieval-pipeline.md](spec-engine-retrieval-pipeline.md)   | Technical   | Not Started | Taxonomy; Anchor segmentation |
+| TBD    | Workstream graph screen (hero)                      | [spec-workstream-graph.md](spec-workstream-graph.md)                     | User-facing | Not Started | Anchor segmentation           |
+| TBD    | Task screen with pairwise comparison                | [spec-task-screen.md](spec-task-screen.md)                               | User-facing | Not Started | Graph; Retrieval pipeline     |
+| TBD    | Review linkages screen                              | [spec-review-linkages.md](spec-review-linkages.md)                       | User-facing | Not Started | Graph; Retrieval pipeline     |
+| TBD    | Drafting workspace with 3-tab side panel            | [spec-drafting-workspace.md](spec-drafting-workspace.md)                 | User-facing | Not Started | Review                        |
+| TBD    | New workstream form                                 | [spec-new-workstream.md](spec-new-workstream.md)                         | User-facing | Not Started | Graph                         |
 
 ## Shared Business Rules
 
-- **Verbatim citations only.** Every clause quotation shown to a user must come from the parsed clause index for the cited document. If a clause number cannot be resolved to a real clause, the tool displays "No matching clause found" rather than inventing content.
+- **Verbatim citations only.** Every clause or passage quotation shown to a user must come from the `AnchorIndex` for the cited document. If an `anchor_id` cannot be resolved to a real anchor, the tool displays "No matching clause found" rather than inventing content. (Anchors are structured-rules clauses on BNM/HKMA gazetted rules, heading-based sections on MAS Notice 637 / BoE chapters / BCBS papers, and prose paragraphs on Federal-Register-style documents — see [spec-engine-anchor-segmentation.md](spec-engine-anchor-segmentation.md).)
+- **Cross-jurisdiction pairs go through the retrieval-first pipeline.** Pairwise comparison uses axis extraction + hybrid retrieval + glossary expansion _before_ the finder/critic sees a candidate pair (see [spec-engine-retrieval-pipeline.md](spec-engine-retrieval-pipeline.md)). The pipeline is deterministic-orchestrator + role-specialised LLM stages; no free-form multi-agent conversation.
 - **One document, one node.** No clause-level nodes exist on any graph. Clauses surface only inside finding cards.
 - **Seven node types, flat.** `task` is the only editable node type. The other six (`internal-published`, `international-standard`, `peer-regulator`, `act-law`, `industry-input`, `others`) are read-only anchors. Node type is chosen once at add-time.
 - **Four structural edge types.** Every graph edge is exactly one of: `supersedes` (newer version replaces older version of same source), `references` (one doc cites the other as authoritative), `contributes-to` (anchor feeds into a drafting task), `parallel-to` (two live docs on adjacent domains). Edges are declared at node-creation time.
@@ -81,8 +84,10 @@ A composite drafter's day, showing how the stories connect:
 
 ## Dependencies
 
-- **Existing knowledge-graph engine.** The pairwise linkage discovery loop and the clause index are already built and validated on the parent brief's experiment. The taxonomy-widening story extends them; every other story consumes them.
-- **Retired experiment trace (`data/artifacts/connection-trace-opres-v1-2025-draft__open-finance-v1-2025-ed.json`).** Used as the demo backstop when `Analyze linkages` is clicked on the OpRes × Open Finance pair.
+- **Existing knowledge-graph engine.** The pairwise linkage discovery loop and the clause index are already built and validated on the parent brief's experiment. The taxonomy-widening story extends the label vocabulary; the anchor-segmentation story widens what can be cited; the retrieval-pipeline story replaces raw pairwise prompting with axis-first retrieval. Every user-facing story consumes them.
+- **Retired experiment trace (`data/artifacts/connection-trace-opres-v1-2025-draft__open-finance-v1-2025-ed.json`).** Used as the demo backstop when `Analyze linkages` is clicked on the OpRes × Open Finance pair. Replays under the new pipeline via prerecorded-candidate mode.
+- **Cross-jurisdiction demo corpus.** UK Bank of England Chapter 3 (credit-risk standardised approach), HKMA CA-G-1 + gazetted rules, Singapore MAS Notice 637 (effective 1 July 2024), and three BCBS mother-docs from bis.org (CRE, OPE, BCP). Ingested through `data/corpus/manifest.json` per [spec-engine-anchor-segmentation.md](spec-engine-anchor-segmentation.md).
+- **Cross-jurisdiction glossary (`data/glossary.json`).** ~20 hand-authored alias entries covering the demo pair's likely terminology mismatches (conforming loan ↔ Level C loan, KYC ↔ CDD, LCR ↔ MAS Notice 649 liquidity requirement, etc.). Owned by [spec-engine-retrieval-pipeline.md](spec-engine-retrieval-pipeline.md).
 - **Clickable POC (`docs/poc/workstream-brain/`).** Six HTML screens covering the full flow. The build reuses the POC's visual language and interaction patterns; production builds do not reuse the raw HTML.
 - **CLAUDE.md conventions.** Verbatim-citation product rule, personas (Aisyah R. drafts and owns; Farid M. reviews; Priya S. reviews), git strategy, no direct commits to main.
 

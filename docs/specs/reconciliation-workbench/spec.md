@@ -3,10 +3,19 @@
 **Discovery Brief:** docs/discovery/reconciliation-workbench/brief.md
 (grounded by docs/discovery/drafter-knowledge-graph/brief.md — the interview evidence)
 
-> **Supersedes** `docs/specs/rulebook-radar/` (the 9–10 Jul two-persona, RMiT-cluster
-> era). This epic is a greenfield re-issue built on the 11 Jul reconciliation pivot and
-> the clickable prototype at `docs/poc/drafter-knowledge-graph/`. The prior specs remain
-> as the historical record of the two-persona design.
+> **⚠️ SUPERSEDED (18 Jul 2026).** This reconciliation-workbench epic (single
+> policy document as the drafter's home surface, Next.js frontend under `web/`)
+> is retired in favour of **[`../workstream-brain/spec.md`](../workstream-brain/spec.md)**,
+> which reframes the tool around the _workstream_ as the unit of work and adds
+> cross-jurisdiction retrieval. The Next.js app under `web/` has been moved to
+> `archive/web/`; the current frontend stack is Vite + React + TS + Tailwind +
+> shadcn under `frontend/` (see
+> `docs/learnings/convention-frontend-vite-react-not-nextjs.md`). Retained for
+> history; do not build from this file.
+>
+> _Historical note:_ this epic itself superseded `docs/specs/rulebook-radar/`
+> (the 9–10 Jul two-persona, RMiT-cluster era) on 11 Jul 2026. The chain of
+> pivots is rulebook-radar → reconciliation-workbench → workstream-brain.
 
 ## Summary
 
