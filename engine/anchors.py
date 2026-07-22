@@ -9,7 +9,7 @@ verify_substring at build time.
 """
 from __future__ import annotations
 
-from typing import Optional, TypedDict
+from typing import Callable, Optional, TypedDict
 
 # The declared document classes a segmenter can be registered for.
 DOC_CLASSES: tuple[str, ...] = (
@@ -89,3 +89,30 @@ class AnchorIndex:
 
     def __iter__(self):  # type: ignore[no-untyped-def]
         return iter(self._primary.values())
+
+
+SegmenterFn = Callable[[str, str], list[Anchor]]
+
+
+class UnknownDocClassError(Exception):
+    """Raised by SegmenterRegistry.get when no strategy is registered for a
+    doc_class."""
+
+
+class SegmenterRegistry:
+    """Dispatch table: doc_class -> SegmenterFn. Empty until strategies register."""
+
+    def __init__(self) -> None:
+        self._strategies: dict[str, SegmenterFn] = {}
+
+    def register(self, doc_class: str, fn: SegmenterFn) -> None:
+        self._strategies[doc_class] = fn
+
+    def get(self, doc_class: str) -> SegmenterFn:
+        fn = self._strategies.get(doc_class)
+        if fn is None:
+            raise UnknownDocClassError(
+                f"No segmenter registered for doc_class {doc_class!r}. "
+                f"Registered: {sorted(self._strategies)}"
+            )
+        return fn

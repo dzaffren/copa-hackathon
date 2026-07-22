@@ -60,3 +60,18 @@ def test_index_by_document_filters_in_insertion_order():
 def test_duplicate_anchor_id_raises_at_construction():
     with pytest.raises(ValueError):
         AnchorIndex([_anchor(), _anchor()])
+
+
+def test_registry_dispatches_registered_class():
+    from engine.anchors import SegmenterRegistry
+    reg = SegmenterRegistry()
+    reg.register("legislative", lambda doc_id, md: [_anchor()])
+    fn = reg.get("legislative")
+    assert fn("eu-ai-act", "source")[0]["anchor_id"] == "EU AI Act Article 1"
+
+
+def test_registry_raises_on_unknown_class():
+    from engine.anchors import SegmenterRegistry, UnknownDocClassError
+    reg = SegmenterRegistry()
+    with pytest.raises(UnknownDocClassError):
+        reg.get("legislative")
