@@ -33,7 +33,7 @@ DOCUMENTS = {
     "ai-dp-2025": {
         "policy_id": "ai-dp",
         "document_id": "ai-dp-2025",
-        "doc_class": "structured-rules",
+        "segmenter_class": "structured-rules",
         "title": (
             "Discussion Paper on Artificial Intelligence in the Malaysian "
             "Financial Sector"
@@ -54,7 +54,7 @@ DOCUMENTS = {
     "rmit-v1-2023": {
         "policy_id": "rmit",
         "document_id": "rmit-v1-2023",
-        "doc_class": "structured-rules",
+        "segmenter_class": "structured-rules",
         "title": "Risk Management in Technology (RMiT)",
         "version": "v1 · 2023",
         "effective_date": "2023-06-01",
@@ -65,7 +65,7 @@ DOCUMENTS = {
     "rmit-v2-2025": {
         "policy_id": "rmit",
         "document_id": "rmit-v2-2025",
-        "doc_class": "structured-rules",
+        "segmenter_class": "structured-rules",
         "title": "Risk Management in Technology (RMiT)",
         "version": "v2 · 2025",
         "effective_date": "2025-11-28",
@@ -76,7 +76,7 @@ DOCUMENTS = {
     "outsourcing-v1-2019": {
         "policy_id": "outsourcing",
         "document_id": "outsourcing-v1-2019",
-        "doc_class": "structured-rules",
+        "segmenter_class": "structured-rules",
         "title": "Outsourcing",
         "version": "v1 · 2019",
         "effective_date": "2019-10-23",
@@ -87,7 +87,7 @@ DOCUMENTS = {
     "bcm-v1-2022": {
         "policy_id": "bcm",
         "document_id": "bcm-v1-2022",
-        "doc_class": "structured-rules",
+        "segmenter_class": "structured-rules",
         "title": "Business Continuity Management",
         "version": "v1 · 2022",
         "effective_date": "2022-12-19",
@@ -98,7 +98,7 @@ DOCUMENTS = {
     "opres-v1-2025-draft": {
         "policy_id": "opres",
         "document_id": "opres-v1-2025-draft",
-        "doc_class": "structured-rules",
+        "segmenter_class": "structured-rules",
         "title": "Operational Resilience",
         "version": "draft · Discussion Paper 2025",
         "effective_date": "2025-12-19",
@@ -109,7 +109,7 @@ DOCUMENTS = {
     "recovery-planning-v1-2021": {
         "policy_id": "recovery-planning",
         "document_id": "recovery-planning-v1-2021",
-        "doc_class": "structured-rules",
+        "segmenter_class": "structured-rules",
         "title": "Recovery Planning",
         "version": "v1 · 2021",
         "effective_date": "2021-07-28",
@@ -120,7 +120,7 @@ DOCUMENTS = {
     "customer-info-v1-2025": {
         "policy_id": "customer-info",
         "document_id": "customer-info-v1-2025",
-        "doc_class": "structured-rules",
+        "segmenter_class": "structured-rules",
         "title": "Management of Customer Information",
         "version": "v1 · 2025",
         "effective_date": "2025-10-31",
@@ -131,7 +131,7 @@ DOCUMENTS = {
     "open-finance-v1-2025-ed": {
         "policy_id": "open-finance",
         "document_id": "open-finance-v1-2025-ed",
-        "doc_class": "structured-rules",
+        "segmenter_class": "structured-rules",
         "title": "Open Finance",
         "version": "ED · 18 Nov 2025",
         "effective_date": "2025-11-18",
@@ -270,6 +270,7 @@ REFERENCE_DOCUMENTS = {
         "version": "2021",
         "cluster": CLUSTER,
         "kind": "reference",
+        "segmenter_class": "framework",
         "source_type": "peer_regulator",
         "access": "public",
         "preview": False,
@@ -294,6 +295,7 @@ REFERENCE_DOCUMENTS = {
         "version": "2010 · Act 709 (as amended by Act A1727)",
         "cluster": CLUSTER,
         "kind": "reference",
+        "segmenter_class": "legislative",
         "source_type": "act",
         "access": "public",
         "preview": False,
@@ -325,6 +327,7 @@ REFERENCE_DOCUMENTS = {
         "version": "2021",
         "cluster": CLUSTER,
         "kind": "reference",
+        "segmenter_class": "framework",
         "source_type": "standard",
         "access": "public",
         "preview": False,
@@ -351,6 +354,7 @@ REFERENCE_DOCUMENTS = {
         "version": "2013 · BCBS d239",
         "cluster": AI_CLUSTER,
         "kind": "reference",
+        "segmenter_class": "framework",
         "source_type": "international_standard",
         "access": "public",
         "preview": False,
@@ -390,6 +394,7 @@ REFERENCE_DOCUMENTS = {
         "version": "2019 (rev. 2024)",
         "cluster": AI_CLUSTER,
         "kind": "reference",
+        "segmenter_class": "framework",
         "source_type": "international_standard",
         "access": "public",
         "preview": False,
@@ -414,6 +419,7 @@ REFERENCE_DOCUMENTS = {
         "version": "AI RMF 1.0 · 2023",
         "cluster": AI_CLUSTER,
         "kind": "reference",
+        "segmenter_class": "framework",
         "source_type": "international_standard",
         "access": "public",
         "preview": False,
@@ -462,6 +468,7 @@ REFERENCE_DOCUMENTS = {
         "version": "Regulation (EU) 2024/1689",
         "cluster": AI_CLUSTER,
         "kind": "reference",
+        "segmenter_class": "legislative",
         "source_type": "act",
         "access": "public",
         "preview": False,
