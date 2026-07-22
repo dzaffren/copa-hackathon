@@ -126,6 +126,76 @@ def test_unit_text_excludes_next_units_heading():
     assert art2["text"] in source
 
 
+def test_unit_text_excludes_multiple_bled_heading_blocks():
+    # Regression: the gap between two units can contain MULTIPLE heading blocks
+    # (a "## SECTION 3 ..." divider immediately followed by the next unit's
+    # "## Article 5 ..." heading). A single-block trim only strips the last one,
+    # leaving the SECTION divider bled into the previous unit's text. The trim
+    # must loop and strip ALL trailing scaffolding blocks.
+    source = (
+        "## Article 4 Data governance\n\n"
+        "Providers shall address bias arising from confidentiality attacks "
+        "or model flaws.\n\n"
+        "## SECTION 3 Obligations of providers\n\n"
+        "## Article 5 Transparency\n\n"
+        "Providers shall ensure transparency to users.\n"
+    )
+
+    def boundaries(document_id, source_markdown, doc_class):
+        return [
+            {"anchor_label": "Article 4",
+             "starts_with": "Providers shall address bias",
+             "parent": None},
+            {"anchor_label": "Article 5",
+             "starts_with": "Providers shall ensure transparency",
+             "parent": None},
+        ]
+
+    anchors = llm_boundary_segment(
+        "eu-ai-act", source, doc_class="legislative",
+        shortname="EU AI Act", boundary_fn=boundaries,
+    )
+    art4 = next(a for a in anchors if a["anchor_label"] == "Article 4")
+    assert "SECTION 3" not in art4["text"]
+    assert "Article 5" not in art4["text"]
+    assert art4["text"].endswith("model flaws.")
+    assert art4["text"] in source
+
+
+def test_unit_text_keeps_legitimate_multi_paragraph_body():
+    # Guard against over-trimming: a unit whose body legitimately spans multiple
+    # "\n\n"-separated paragraphs (with no trailing heading of its own) must be
+    # returned intact — the loop must stop the moment a trailing block is real
+    # body content, not keep eating paragraphs.
+    source = (
+        "## Article 1 Subject matter\n\n"
+        "First paragraph of body.\n\n"
+        "Second paragraph of body continues normally.\n\n"
+        "## Article 2 Scope\n\n"
+        "Providers text body.\n"
+    )
+
+    def boundaries(document_id, source_markdown, doc_class):
+        return [
+            {"anchor_label": "Article 1",
+             "starts_with": "First paragraph of body",
+             "parent": None},
+            {"anchor_label": "Article 2",
+             "starts_with": "Providers text body",
+             "parent": None},
+        ]
+
+    anchors = llm_boundary_segment(
+        "eu-ai-act", source, doc_class="legislative",
+        shortname="EU AI Act", boundary_fn=boundaries,
+    )
+    art1 = next(a for a in anchors if a["anchor_label"] == "Article 1")
+    assert "First paragraph of body." in art1["text"]
+    assert art1["text"].endswith("Second paragraph of body continues normally.")
+    assert "Article 2" not in art1["text"]
+    assert art1["text"] in source
+
+
 def test_default_boundary_fn_parses_fenced_json(monkeypatch):
     # The live model wraps its array in a ```json fence; the boundary fn must
     # still parse it (regression: raw json.loads failed on the fence).

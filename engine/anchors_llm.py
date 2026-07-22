@@ -12,6 +12,7 @@ no network/credentials are needed (mirrors engine.connections finder_fn).
 """
 from __future__ import annotations
 
+import re
 from typing import Callable, Optional
 
 from engine.anchors import Anchor, verify_substring
@@ -50,42 +51,62 @@ def _default_boundary_fn(
     return data
 
 
+_STRUCTURAL_MARKER_RE = re.compile(r"^(CHAPTER|SECTION|TITLE|ANNEX|Article|PART)\b")
+
+
+def _looks_like_scaffolding(
+    tail: str, next_label: Optional[str], next_snippet: Optional[str]
+) -> bool:
+    """True if the trailing ``"\\n\\n"``-separated block is a heading/divider.
+
+    A block is scaffolding if it starts with a markdown ``#`` marker, starts with
+    one of the EU-legislation structural markers (CHAPTER/SECTION/TITLE/ANNEX/
+    Article/PART, as a heading line), or contains the next unit's
+    `anchor_label`/`starts_with`. Anything else is genuine body content.
+    """
+    if tail.startswith("#"):
+        return True
+    if _STRUCTURAL_MARKER_RE.match(tail):
+        return True
+    if next_label and next_label.strip() in tail:
+        return True
+    if next_snippet and next_snippet.strip() in tail:
+        return True
+    return False
+
+
 def _trim_next_unit_heading(
     segment: str, next_label: Optional[str], next_snippet: Optional[str]
 ) -> str:
-    """Trim the next unit's heading/label block off the tail of `segment`.
+    """Trim the next unit's heading/label block(s) off the tail of `segment`.
 
     `segment` is ``source_markdown[start:next_start]`` — this unit's body PLUS the
     next unit's leading scaffolding (its heading/label line(s) that sit in the gap
     between this unit's body and the next unit's body, `next_start`). Because the
     boundary model quotes `starts_with` from the *body* (no label prefix), a raw
     slice up to the next body picks up that scaffolding. This returns the segment
-    with the trailing heading block removed.
+    with the trailing scaffolding removed.
 
-    Rule (deliberately simple, mirrors clauses._trim_trailing_label's intent for a
-    markdown-heading world): headings are blank-line separated, so the trailing
-    scaffolding is the block after the LAST ``"\\n\\n"``. Cut there IFF that final
-    block looks like the next unit's heading — it starts with a markdown ``#``
-    marker, or it contains the next unit's `anchor_label`/`starts_with`. If the
-    final block does NOT look like a heading, it is genuine body content and is
-    left intact (never cut into the current unit's body). The result is stripped of
-    trailing whitespace either way.
+    The gap can contain MULTIPLE heading blocks (e.g. a "## SECTION 3 ..." divider
+    immediately followed by "## Article 5 ..."), so this loops: headings are
+    blank-line separated, so repeatedly look at the block after the LAST
+    ``"\\n\\n"`` and, while it looks like scaffolding (see
+    `_looks_like_scaffolding`), cut it and continue. The loop stops as soon as a
+    trailing block is NOT scaffolding — that is genuine body content and is left
+    intact, along with everything before it — or when there is no earlier
+    ``"\\n\\n"`` left to split on. The result is always `.rstrip()`-ed.
     """
     stripped = segment.rstrip()
-    sep = stripped.rfind("\n\n")
-    if sep == -1:
-        return stripped
-    tail = stripped[sep + 2:].strip()
-    if not tail:
-        return stripped
-    looks_like_heading = tail.startswith("#")
-    if not looks_like_heading and next_label:
-        looks_like_heading = next_label.strip() in tail
-    if not looks_like_heading and next_snippet:
-        looks_like_heading = next_snippet.strip() in tail
-    if not looks_like_heading:
-        return stripped
-    return stripped[:sep].rstrip()
+    while True:
+        sep = stripped.rfind("\n\n")
+        if sep == -1:
+            return stripped
+        tail = stripped[sep + 2:].strip()
+        if not tail:
+            return stripped
+        if not _looks_like_scaffolding(tail, next_label, next_snippet):
+            return stripped
+        stripped = stripped[:sep].rstrip()
 
 
 def _drop(report: Optional[list[dict]], document_id: str, unit: dict,
