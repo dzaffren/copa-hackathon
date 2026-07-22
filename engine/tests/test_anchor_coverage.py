@@ -43,3 +43,16 @@ def test_non_bnm_doc_meets_acceptance_bar(gt_path, index):
     # anchor carries non-empty text.
     for a in doc_anchors:
         assert a["text"].strip()
+
+    # (4) Trailing-boundary hygiene: an anchor's text must stop at its own
+    # content, never bleed into a LATER unit's heading. The LLM lane sliced up to
+    # the next unit's body-start, which swallowed the next unit's heading line;
+    # assert no anchor text contains a foreign top-level heading marker. Per-doc
+    # tunable via "foreign_heading_pattern".
+    foreign_re = re.compile(
+        gt.get("foreign_heading_pattern", r"\n#+\s*(Article|ANNEX|CHAPTER)\b")
+    )
+    for a in doc_anchors:
+        assert not foreign_re.search(a["text"]), (
+            f"anchor {a['anchor_label']!r} text contains a later unit's heading: "
+            f"{foreign_re.pattern!r}")

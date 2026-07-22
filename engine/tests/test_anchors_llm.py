@@ -85,6 +85,47 @@ def test_verify_substring_rejects_a_fabricated_anchor():
         verify_substring(bad_anchor, SOURCE)
 
 
+def test_unit_text_excludes_next_units_heading():
+    # Regression: the slice from this unit's body to the NEXT unit's body picked
+    # up the next unit's heading/label line(s), contaminating the citation. The
+    # trim must stop unit 1's text at its own content.
+    source = (
+        "REGULATION (EU) 2024/1689\n\n"
+        "## Article 1 Subject matter\n\n"
+        "This Regulation lays down harmonised rules on artificial "
+        "intelligence for start-ups.\n\n"
+        "## Article 2 Scope\n\n"
+        "This Regulation applies to providers placing AI systems on the market.\n"
+    )
+
+    def boundaries(document_id, source_markdown, doc_class):
+        return [
+            {"anchor_label": "Article 1",
+             "starts_with": "This Regulation lays down harmonised rules",
+             "parent": None},
+            {"anchor_label": "Article 2",
+             "starts_with": "This Regulation applies to providers",
+             "parent": None},
+        ]
+
+    anchors = llm_boundary_segment(
+        "eu-ai-act", source, doc_class="legislative",
+        shortname="EU AI Act", boundary_fn=boundaries,
+    )
+    art1 = next(a for a in anchors if a["anchor_label"] == "Article 1")
+    # Article 1's citation must NOT include Article 2's heading or label.
+    assert "Article 2" not in art1["text"]
+    assert "## Article 2" not in art1["text"]
+    assert "Scope" not in art1["text"]
+    # It DOES still carry its own body, verbatim.
+    assert art1["text"].endswith("start-ups.")
+    assert art1["text"] in source
+    # Sanity: Article 2 (the last unit) still slices its own body to source end.
+    art2 = next(a for a in anchors if a["anchor_label"] == "Article 2")
+    assert "This Regulation applies to providers" in art2["text"]
+    assert art2["text"] in source
+
+
 def test_default_boundary_fn_parses_fenced_json(monkeypatch):
     # The live model wraps its array in a ```json fence; the boundary fn must
     # still parse it (regression: raw json.loads failed on the fence).
