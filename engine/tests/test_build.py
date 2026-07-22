@@ -9,7 +9,7 @@ needed — this exercises the true segmentation path end-to-end). This proves
 import json
 import re
 
-from engine.build import run_build
+from engine.build import build_anchor_index, run_build
 
 # Hand-written markdown in the real BNM line-start format the segmenter expects:
 # a section heading ("12 Approval…"), then its numbered clause ("12.1 …").
@@ -376,3 +376,33 @@ def test_run_build_emits_industry_feedback_passage_and_stance(tmp_path):
     node = {n["id"]: n for n in graph["nodes"]}["industry-fsp-3"]
     assert node["source_type"] == "industry_feedback"
     assert node["stance"] == "partial"
+
+
+def test_build_dispatches_by_doc_class(tmp_path):
+    documents = {
+        "rmit-v2-2025": {"document_id": "rmit-v2-2025", "policy_id": "rmit",
+                         "segmenter_class": "structured-rules", "source_path": "x.pdf"},
+        "eu-ai-act": {"document_id": "eu-ai-act", "policy_id": "eu-ai-act",
+                      "segmenter_class": "legislative", "source_path": "y.pdf",
+                      "shortname": "EU AI Act"},
+    }
+    md = {
+        "rmit-v2-2025": "10.1 A financial institution must establish a framework.\n",
+        "eu-ai-act": "Article 1\n\nThis Regulation lays down rules.\n",
+    }
+
+    def ingest(path):
+        return md["rmit-v2-2025"] if str(path) == "x.pdf" else md["eu-ai-act"]
+
+    def boundary(document_id, source_markdown, doc_class):
+        return [{"anchor_label": "Article 1",
+                 "starts_with": "This Regulation lays down rules",
+                 "parent": None}]
+
+    index = build_anchor_index(
+        documents, ingest_fn=ingest, boundary_fn=boundary, output_dir=tmp_path)
+    ids = {a["anchor_id"] for a in index.all()}
+    assert "RMiT 10.1" in ids            # BNM lane
+    assert "EU AI Act Article 1" in ids  # LLM lane
+    written = json.loads((tmp_path / "anchor-index.json").read_text("utf-8"))
+    assert len(written) == len(index)
