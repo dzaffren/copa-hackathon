@@ -42,3 +42,6 @@ graphify-out-corpus/
 skills-lock.json
 # subagent-driven-development scratch
 .superpowers/
+
+# Experimental outputs (retrieval-ablation ARB spec)
+experiments/
