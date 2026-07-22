@@ -21,3 +21,20 @@ def test_every_curated_seed_edge_has_reason_and_clause_anchors_on_both_sides():
             f"edge {edge['source_policy_id']} -> {edge['target_policy_id']} "
             f"has no target_clauses"
         )
+
+
+from engine.anchors import DOC_CLASSES
+from engine.config import DOCUMENTS
+
+
+def test_every_document_declares_a_valid_doc_class():
+    for document_id, doc in DOCUMENTS.items():
+        assert "doc_class" in doc, f"{document_id} missing doc_class"
+        assert doc["doc_class"] in DOC_CLASSES, (
+            f"{document_id} has doc_class {doc['doc_class']!r} not in {DOC_CLASSES}")
+
+
+def test_bnm_documents_are_structured_rules():
+    # The nine BNM policy docs keep the deterministic offline lane.
+    assert DOCUMENTS["rmit-v2-2025"]["doc_class"] == "structured-rules"
+    assert DOCUMENTS["opres-v1-2025-draft"]["doc_class"] == "structured-rules"
