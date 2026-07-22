@@ -62,3 +62,24 @@ def test_every_returned_anchor_passes_verify_substring():
     from engine.anchors import verify_substring
     for a in anchors:
         verify_substring(a, SOURCE)  # must not raise
+
+
+def test_verify_substring_rejects_a_fabricated_anchor():
+    # Guard the verbatim guarantee directly: an anchor whose text is NOT in the
+    # source must raise, proving verify_substring is a real gate.
+    import pytest
+
+    from engine.anchors import verify_substring
+
+    bad_anchor = {
+        "anchor_id": "EU AI Act Article 99",
+        "anchor_label": "Article 99",
+        "text": "this text does not appear anywhere in the source document",
+        "doc_class": "legislative",
+        "document_id": "eu-ai-act",
+        "heading_path": [],
+        "page_span": None,
+        "parent_anchor": None,
+    }
+    with pytest.raises(AnchorTextNotFoundError):
+        verify_substring(bad_anchor, SOURCE)
