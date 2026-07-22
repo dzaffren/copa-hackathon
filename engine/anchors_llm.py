@@ -12,13 +12,12 @@ no network/credentials are needed (mirrors engine.connections finder_fn).
 """
 from __future__ import annotations
 
-import json
 from typing import Callable, Optional
 
 from engine.anchors import Anchor, verify_substring
 from engine.clauses import _find_anchor_positions
 from engine.config import FINDER_CRITIC_DEPLOYMENT
-from engine.llm import call_chat
+from engine.llm import call_chat, parse_json_response
 
 # (document_id, source_markdown, doc_class) -> [{anchor_label, starts_with, parent}]
 BoundaryFn = Callable[[str, str, str], list[dict]]
@@ -45,7 +44,7 @@ def _default_boundary_fn(
     )
     raw = call_chat(FINDER_CRITIC_DEPLOYMENT, BOUNDARY_SYSTEM_PROMPT, user,
                     max_tokens=16384)
-    data = json.loads(raw)
+    data = parse_json_response(raw)
     if not isinstance(data, list):
         raise ValueError("boundary model did not return a JSON array")
     return data

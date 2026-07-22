@@ -83,3 +83,14 @@ def test_verify_substring_rejects_a_fabricated_anchor():
     }
     with pytest.raises(AnchorTextNotFoundError):
         verify_substring(bad_anchor, SOURCE)
+
+
+def test_default_boundary_fn_parses_fenced_json(monkeypatch):
+    # The live model wraps its array in a ```json fence; the boundary fn must
+    # still parse it (regression: raw json.loads failed on the fence).
+    import engine.anchors_llm as mod
+
+    fenced = '```json\n[{"anchor_label": "Article 1", "starts_with": "This Regulation", "parent": null}]\n```'
+    monkeypatch.setattr(mod, "call_chat", lambda *a, **k: fenced)
+    units = mod._default_boundary_fn("eu-ai-act", "This Regulation lays down rules.", "legislative")
+    assert units == [{"anchor_label": "Article 1", "starts_with": "This Regulation", "parent": None}]
