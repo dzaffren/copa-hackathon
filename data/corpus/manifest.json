@@ -124,7 +124,7 @@
       "title": "BIS Papers No 168: Opening Doors to Open Finance — Evidence from the International Experience",
       "jurisdiction": "INTL",
       "issuer": "BIS",
-      "doc_class": "semi-structured",
+      "doc_class": "prose",
       "source_path": "data/corpus/open-finance/bispap168.pdf",
       "in_mvp1": true
     },
