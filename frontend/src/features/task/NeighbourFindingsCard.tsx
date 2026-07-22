@@ -1,12 +1,13 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, Search } from "lucide-react";
 
+import { AnalyzeProgressBar } from "@/components/AnalyzeProgressBar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { analyzeEdge, fetchEdgeFindings } from "@/lib/api";
+import { fetchEdgeFindings } from "@/lib/api";
+import { useAnalyzeEdge } from "@/lib/hooks/useAnalyzeEdge";
 import type { Connection, Neighbour } from "@/lib/types";
 import { nodeTypeStyle } from "./nodeType";
 import { labelStyle, labelText } from "./semanticLabel";
@@ -25,8 +26,14 @@ export function NeighbourFindingsCard({
   preloadedFindings,
   onAnalyzed,
 }: Props) {
-  const [analyzing, setAnalyzing] = useState(false);
-  const [noLinkages, setNoLinkages] = useState(false);
+  const analyze = useAnalyzeEdge(workstreamId, neighbour.edge_id, {
+    onSuccess: (result) => {
+      if (result.status === "analysed" && result.findings.length > 0) {
+        onAnalyzed(neighbour.edge_id, result.findings);
+      }
+    },
+  });
+  const noLinkages = analyze.data?.status === "no_linkages_found";
 
   const effectiveAnalysed = neighbour.analysed || preloadedFindings != null;
   const nodeStyle = nodeTypeStyle(neighbour.node_type);
@@ -41,24 +48,6 @@ export function NeighbourFindingsCard({
   const headline = findings?.[0];
 
   const reviewHref = `/workstreams/${workstreamId}/edges/${neighbour.edge_id}/review`;
-
-  async function handleAnalyze() {
-    setAnalyzing(true);
-    setNoLinkages(false);
-    try {
-      // Run the real finder→critic analysis (not a re-read of already-stored
-      // findings, which is always empty for a pair that has never been
-      // analysed) — mirrors the graph screen's "Analyze linkages" action.
-      const result = await analyzeEdge(workstreamId, neighbour.edge_id);
-      if (result.status === "analysed" && result.findings.length > 0) {
-        onAnalyzed(neighbour.edge_id, result.findings);
-      } else {
-        setNoLinkages(true);
-      }
-    } finally {
-      setAnalyzing(false);
-    }
-  }
 
   const namePill = (
     <span
@@ -97,13 +86,19 @@ export function NeighbourFindingsCard({
             No matching clause found — no linkages surfaced for this pair.
           </p>
         )}
+        {analyze.isError && (
+          <p className="mt-1 text-xs text-red-600">
+            Analysis failed. Check the engine has model credentials, then
+            retry.
+          </p>
+        )}
         <Button
           size="sm"
           className="mt-2 bg-cyan-500 text-slate-950 hover:bg-cyan-400"
-          onClick={handleAnalyze}
-          disabled={analyzing}
+          onClick={() => analyze.mutate()}
+          disabled={analyze.isPending}
         >
-          {analyzing ? (
+          {analyze.isPending ? (
             <>
               <Loader2 className="animate-spin" /> Analyzing…
             </>
@@ -113,6 +108,9 @@ export function NeighbourFindingsCard({
             </>
           )}
         </Button>
+        {analyze.isPending && (
+          <AnalyzeProgressBar isPending={analyze.isPending} />
+        )}
       </article>
     );
   }

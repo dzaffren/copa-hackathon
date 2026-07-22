@@ -159,6 +159,11 @@ export interface GraphEdge {
   edge_type: EdgeType;
   analysed: boolean;
   findings_count: number;
+  /** Set by callers merging multiple workstreams' graphs into one canvas
+   *  (the institution map) to force the cross-workstream rose/dashed
+   *  rendering regardless of `edge_type`. Absent/false for an ordinary
+   *  intra-workstream edge. */
+  cross?: boolean;
 }
 
 export interface WorkstreamGraph {
@@ -279,8 +284,8 @@ export interface AnalyzeResponse {
   id: string;
   /** The finder can genuinely surface nothing for a pair — see CLAUDE.md's
    *  verbatim-citation rule ("no matching clause found" beats a fabricated
-   *  one). `no_matching_source` leaves the edge unanalysed and re-analysable. */
-  status: "analysed" | "no_matching_source";
+   *  one). `no_linkages_found` leaves the edge unanalysed and re-analysable. */
+  status: "analysed" | "no_linkages_found";
   findings: Connection[];
   findings_count: number;
 }
@@ -349,8 +354,9 @@ export interface DraftResponse {
   last_saved_at: string | null;
 }
 
-/** A clause the Copilot quotes. `text` is verbatim from the clause index or the
- *  findings fixtures — see engine/copilot_scripts.py. */
+/** A clause the Copilot quotes. `text` is always re-quoted server-side from
+ *  already-verbatim clause/finding text — see engine/copilot.py's
+ *  `_validate_reply` guardrail — never trusted from the model's own echo. */
 export interface CopilotCitation {
   clause_number: string;
   text: string;
@@ -373,6 +379,14 @@ export interface ChatMessage {
   text: string;
   citations?: CopilotCitation[];
   snippet_html?: string;
+}
+
+/** One turn of the request-side conversation history sent to the Copilot —
+ *  the server holds no conversation state (deliberately not persisted across
+ *  sessions), so the client sends the full prior history on every call. */
+export interface ChatHistoryTurn {
+  role: "user" | "copilot";
+  text: string;
 }
 
 // --- New Workstream --------------------------------------------------------

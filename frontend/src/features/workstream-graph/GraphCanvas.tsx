@@ -3,7 +3,7 @@ import ForceGraph2D, { type ForceGraphMethods } from "react-force-graph-2d";
 import { Maximize, ZoomIn, ZoomOut } from "lucide-react";
 
 import type { GraphEdge, GraphNode } from "@/lib/types";
-import { edgeStyle, nodeStyle } from "./legend";
+import { CROSS_EDGE_DASH, CROSS_EDGE_STROKE, edgeStyle, nodeStyle, shortLabel } from "./legend";
 
 // --- Graph data mapped for react-force-graph-2d ----------------------------
 // The library mutates link.source / link.target from ids into node objects and
@@ -31,12 +31,10 @@ interface GraphCanvasProps {
   selectedEdgeId?: string | null;
   onSelectNode: (id: string) => void;
   onSelectEdge: (id: string) => void;
-  /** Highlight cross-workstream edges (institution map). Solid-colour override. */
-  crossLinkColor?: string;
-}
-
-function nodeLabel(n: GraphNode): string {
-  return n.issuer ?? n.title.split(/[\s—-]/)[0];
+  /** d3-force tuning — defaults suit a single workstream; the institution map
+   *  (denser, multi-workstream) passes its own looser/tighter values. */
+  chargeStrength?: number;
+  linkDistance?: number;
 }
 
 /**
@@ -55,7 +53,8 @@ export function GraphCanvas({
   selectedEdgeId,
   onSelectNode,
   onSelectEdge,
-  crossLinkColor,
+  chargeStrength = -300,
+  linkDistance = 150,
 }: GraphCanvasProps) {
   const fgRef = useRef<ForceGraphMethods<FGNode, FGLink> | undefined>(undefined);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -92,12 +91,14 @@ export function GraphCanvas({
   useEffect(() => {
     const fg = fgRef.current;
     if (!fg) return;
-    fg.d3Force("charge")?.strength(-300);
+    fg.d3Force("charge")?.strength(chargeStrength);
     const link = fg.d3Force("link");
     if (link && "distance" in link) {
-      (link as unknown as { distance: (d: number) => unknown }).distance(150);
+      (link as unknown as { distance: (d: number) => unknown }).distance(
+        linkDistance,
+      );
     }
-  }, [data]);
+  }, [data, chargeStrength, linkDistance]);
 
   const drawNode = useCallback(
     (node: FGNode, ctx: CanvasRenderingContext2D, globalScale: number) => {
@@ -131,7 +132,7 @@ export function GraphCanvas({
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
       ctx.fillStyle = "#cbd5e1";
-      ctx.fillText(nodeLabel(node), x, y + r + 2);
+      ctx.fillText(shortLabel(node.title), x, y + r + 2);
     },
     [selectedNodeId],
   );
@@ -141,9 +142,10 @@ export function GraphCanvas({
       const s = link.source as FGNode;
       const tg = link.target as FGNode;
       if (!s || !tg || s.x == null || tg.x == null) return;
+      const cross = link.cross === true;
       const style = edgeStyle(link.edge_type);
       const selected = link.id === selectedEdgeId;
-      const stroke = crossLinkColor ?? style.stroke;
+      const stroke = cross ? CROSS_EDGE_STROKE : style.stroke;
 
       ctx.save();
       ctx.beginPath();
@@ -152,7 +154,7 @@ export function GraphCanvas({
       ctx.strokeStyle = stroke;
       ctx.lineWidth = (selected ? 2.5 : 1.4) / globalScale;
       // Not-analysed edges (and cross-links) read as dashed; analysed = solid.
-      const dashed = crossLinkColor ? [6, 4] : link.analysed ? [] : style.dash;
+      const dashed = cross ? CROSS_EDGE_DASH : link.analysed ? [] : style.dash;
       ctx.setLineDash(dashed.map((d) => d / globalScale));
       ctx.globalAlpha = selected ? 1 : 0.75;
       ctx.stroke();
@@ -178,7 +180,7 @@ export function GraphCanvas({
         ctx.fillText(style.label, mx, my - fontSize);
       }
     },
-    [selectedEdgeId, crossLinkColor],
+    [selectedEdgeId],
   );
 
   const zoomIn = () => fgRef.current?.zoom((fgRef.current?.zoom() ?? 1) * 1.3, 200);

@@ -1,11 +1,13 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Loader2, Search, Sparkles, X } from "lucide-react";
 
+import { AnalyzeProgressBar } from "@/components/AnalyzeProgressBar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { analyzeEdge, fetchEdgeDetail } from "@/lib/api";
+import { fetchEdgeDetail } from "@/lib/api";
+import { useAnalyzeEdge } from "@/lib/hooks/useAnalyzeEdge";
 import { labelStyle, labelText } from "@/lib/labels";
 
 interface EdgeDetailPanelProps {
@@ -51,8 +53,7 @@ export function EdgeDetailPanel({
     queryKey: ["edge", workstreamId, edgeId],
     queryFn: () => fetchEdgeDetail(workstreamId, edgeId),
   });
-  const analyze = useMutation({
-    mutationFn: () => analyzeEdge(workstreamId, edgeId),
+  const analyze = useAnalyzeEdge(workstreamId, edgeId, {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["edge", workstreamId, edgeId],
@@ -130,8 +131,7 @@ export function EdgeDetailPanel({
             >
               {analyze.isPending ? (
                 <>
-                  <Loader2 className="animate-spin" /> Analyzing… the AI is
-                  reading both documents
+                  <Loader2 className="animate-spin" /> Analyzing…
                 </>
               ) : (
                 <>
@@ -139,6 +139,9 @@ export function EdgeDetailPanel({
                 </>
               )}
             </Button>
+            {analyze.isPending && (
+              <AnalyzeProgressBar isPending={analyze.isPending} />
+            )}
             {!analysable && (
               <p className="text-xs text-muted-foreground">
                 Live analysis needs both documents ingested — this pair isn’t in
@@ -153,7 +156,7 @@ export function EdgeDetailPanel({
             )}
             {/* The finder can genuinely surface nothing for a pair — say so
                 rather than leaving the CTA to silently reset with no feedback. */}
-            {analyze.data?.status === "no_matching_source" && (
+            {analyze.data?.status === "no_linkages_found" && (
               <p className="flex items-start gap-1.5 text-xs italic text-muted-foreground">
                 <Search className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 No matching clause found — no linkages surfaced for this pair.

@@ -100,6 +100,22 @@ export function edgeStyle(type: EdgeType): EdgeStyle {
   return EDGE_LEGEND[type] ?? EDGE_LEGEND["contributes-to"];
 }
 
+/** Cross-workstream edges (institution map) always render in this bright
+ *  rose, dashed, regardless of their structural `edge_type` — the signal is
+ *  "this crosses a workstream boundary," not the structural relationship. */
+export const CROSS_EDGE_STROKE = "#f43f5e";
+export const CROSS_EDGE_DASH = [6, 4];
+
+/** A short on-canvas label fragment for a node — the first word/segment of
+ *  its title, split on whitespace/hyphen/en-dash/em-dash. Deliberately NOT
+ *  `issuer`: issuer is frequently shared across distinct nodes in the same
+ *  graph (e.g. two BNM-issued documents both showing "BNM"), which makes
+ *  nodes visually indistinguishable. The full title remains available via
+ *  the canvas hover tooltip and in detail panels. */
+export function shortLabel(title: string): string {
+  return title.split(/[\s—–-]/)[0];
+}
+
 /** Ordered list for rendering the legend card. */
 export const NODE_LEGEND_ORDER: NodeType[] = [
   "task",

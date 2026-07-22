@@ -1,19 +1,20 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import ForceGraph2D, { type ForceGraphMethods } from "react-force-graph-2d";
 import { AlertTriangle, Building2, Plus, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { fetchCrossLinks, fetchGraph, fetchWorkstreams } from "@/lib/api";
-import { CROSS_STORE, type CrossLink, type SemanticLabel } from "@/lib/types";
-import { nodeStyle } from "@/features/workstream-graph/legend";
+import {
+  CROSS_STORE,
+  type CrossLink,
+  type GraphEdge,
+  type GraphNode,
+  type SemanticLabel,
+} from "@/lib/types";
+import { GraphCanvas } from "@/features/workstream-graph/GraphCanvas";
 import { labelStyle } from "@/lib/labels";
 import { headlineOverlap } from "@/lib/overlaps";
-
-const CROSS_STROKE = "#f43f5e"; // bright rose — the cross-workstream signal
-const TASK_R = 12;
-const NODE_R = 7;
 
 // Guarantees the cross-workstream overlaps (OpRes↔Open Finance and the
 // BCM↔Recovery Planning overlap) are on screen the moment the page loads.
@@ -21,27 +22,8 @@ const DEFAULT_SELECTION = ["open-finance-ed", "resolution-recovery", "opres-v2"]
 
 type NearLink = CrossLink & { nearWorkstreamId: string };
 
-interface FGNode {
-  id: string;
-  nodeType: string;
-  title: string;
-  isTask: boolean;
-  x?: number;
-  y?: number;
-}
-interface FGLink {
-  source: string | FGNode;
-  target: string | FGNode;
-  kind: "intra" | "cross";
-  crossId?: string;
-}
-
 const posKey = (workstreamId: string, nodeId: string) =>
   `${workstreamId}:${nodeId}`;
-
-function shortLabel(title: string): string {
-  return title.split(/[\s—–-]/)[0];
-}
 
 export function InstitutionMapPage() {
   const { data: allWorkstreams = [] } = useQuery({
@@ -51,10 +33,6 @@ export function InstitutionMapPage() {
 
   const [selected, setSelected] = useState<string[] | null>(null);
   const [activeCrossId, setActiveCrossId] = useState<string | null>(null);
-
-  const fgRef = useRef<ForceGraphMethods<FGNode, FGLink> | undefined>(undefined);
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ width: 900, height: 520 });
 
   // Default to the overlap-bearing workstreams once the list is known; fall back
   // to the first three when those seeds are absent (e.g. a fresh instance).
@@ -94,12 +72,15 @@ export function InstitutionMapPage() {
     return [...byId.values()];
   }, [selectedIds, crossQueries]);
 
-  // Merge every selected workstream's graph into one force-directed dataset.
-  // Node ids are namespaced by workstream, since one document id can appear in
-  // more than one workstream's graph.
+  // Merge every selected workstream's graph into one force-directed dataset,
+  // reusing GraphCanvas (the same hero canvas the workstream graph screen
+  // uses) instead of a hand-rolled ForceGraph2D. Node ids are namespaced by
+  // workstream, since one document id can appear in more than one
+  // workstream's graph; edge ids are namespaced too, to avoid collisions
+  // between workstreams that happen to reuse an edge id.
   const data = useMemo(() => {
-    const nodes: FGNode[] = [];
-    const links: FGLink[] = [];
+    const nodes: GraphNode[] = [];
+    const edges: GraphEdge[] = [];
     const nodeIds = new Set<string>();
 
     selectedIds.forEach((wsId, i) => {
@@ -110,16 +91,21 @@ export function InstitutionMapPage() {
         nodeIds.add(key);
         nodes.push({
           id: key,
-          nodeType: n.node_type,
+          node_type: n.node_type,
           title: n.title,
-          isTask: n.id === graph.primary_task_id || n.node_type === "task",
+          issuer: n.issuer,
+          short_type: n.short_type,
         });
       }
       for (const e of graph.edges) {
-        links.push({
+        edges.push({
+          id: `${wsId}:${e.id}`,
           source: posKey(wsId, e.source),
           target: posKey(wsId, e.target),
-          kind: "intra",
+          edge_type: e.edge_type,
+          analysed: e.analysed,
+          findings_count: e.findings_count,
+          cross: false,
         });
       }
     });
@@ -128,11 +114,30 @@ export function InstitutionMapPage() {
       const s = posKey(link.nearWorkstreamId, link.near.node_id);
       const t = posKey(link.far.workstream_id ?? "", link.far.node_id);
       if (nodeIds.has(s) && nodeIds.has(t)) {
-        links.push({ source: s, target: t, kind: "cross", crossId: link.id });
+        edges.push({
+          id: link.id,
+          source: s,
+          target: t,
+          edge_type: link.edge_type,
+          analysed: true,
+          findings_count: link.findings_count,
+          cross: true,
+        });
       }
     }
-    return { nodes, links };
+    return { nodes, edges };
   }, [selectedIds, graphQueries, crossLinks]);
+
+  const onSelectEdge = useCallback(
+    (id: string) => {
+      // Only cross-workstream edges have a callout; an intra-workstream edge
+      // click is a no-op here (this page has no per-edge detail panel).
+      if (crossLinks.some((l) => l.id === id)) {
+        setActiveCrossId(id);
+      }
+    },
+    [crossLinks],
+  );
 
   const availableToAdd = allWorkstreams.filter(
     (w) => !selectedIds.includes(w.id),
@@ -145,77 +150,6 @@ export function InstitutionMapPage() {
   // future workstream pair surfaces (see @/lib/overlaps for the shared rule
   // this shares with the Home dashboard's Overlap Alerts card).
   const headline = headlineOverlap(crossLinks);
-
-  useEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return;
-    const measure = () =>
-      setSize({ width: el.clientWidth, height: el.clientHeight });
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const fg = fgRef.current;
-    if (!fg) return;
-    fg.d3Force("charge")?.strength(-220);
-    const link = fg.d3Force("link");
-    if (link && "distance" in link) {
-      (link as unknown as { distance: (d: number) => unknown }).distance(90);
-    }
-  }, [data]);
-
-  const drawNode = useCallback(
-    (node: FGNode, ctx: CanvasRenderingContext2D, globalScale: number) => {
-      const style = nodeStyle(node.nodeType as never);
-      const r = node.isTask ? TASK_R : NODE_R;
-      const x = node.x ?? 0;
-      const y = node.y ?? 0;
-      ctx.save();
-      ctx.shadowColor = style.stroke;
-      ctx.shadowBlur = node.isTask ? 10 : 4;
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, 2 * Math.PI);
-      ctx.fillStyle = style.fill;
-      ctx.fill();
-      ctx.shadowBlur = 0;
-      ctx.lineWidth = 1.4;
-      ctx.strokeStyle = style.stroke;
-      ctx.stroke();
-      ctx.restore();
-
-      const fontSize = Math.max(8 / globalScale, 3);
-      ctx.font = `600 ${fontSize}px Inter, sans-serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "top";
-      ctx.fillStyle = "#cbd5e1";
-      ctx.fillText(shortLabel(node.title), x, y + r + 1.5);
-    },
-    [],
-  );
-
-  const drawLink = useCallback(
-    (link: FGLink, ctx: CanvasRenderingContext2D, globalScale: number) => {
-      const s = link.source as FGNode;
-      const t = link.target as FGNode;
-      if (!s || !t || s.x == null || t.x == null) return;
-      const cross = link.kind === "cross";
-      const active = cross && link.crossId === activeCrossId;
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(s.x, s.y!);
-      ctx.lineTo(t.x, t.y!);
-      ctx.strokeStyle = cross ? CROSS_STROKE : "#475569";
-      ctx.lineWidth = (cross ? (active ? 3 : 2) : 1) / globalScale;
-      ctx.globalAlpha = cross ? 1 : 0.5;
-      ctx.setLineDash(cross ? [7, 5].map((d) => d / globalScale) : []);
-      ctx.stroke();
-      ctx.restore();
-    },
-    [activeCrossId],
-  );
 
   const activeLink = crossLinks.find((l) => l.id === activeCrossId);
 
@@ -300,42 +234,19 @@ export function InstitutionMapPage() {
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
         {/* Force-directed canvas */}
         <div
-          ref={wrapRef}
           data-testid="institution-canvas"
           className="relative h-[520px] shrink-0 overflow-hidden border-b border-border/60 bg-[#0b1220]"
         >
-          <ForceGraph2D
-            ref={fgRef}
-            width={size.width}
-            height={size.height}
-            graphData={data}
-            backgroundColor="rgba(0,0,0,0)"
-            cooldownTicks={140}
-            onEngineStop={() => fgRef.current?.zoomToFit(400, 70)}
-            nodeRelSize={NODE_R}
-            nodeLabel={(n) => (n as FGNode).title}
-            nodeCanvasObject={drawNode}
-            linkCanvasObjectMode={() => "replace"}
-            linkCanvasObject={drawLink}
-            linkPointerAreaPaint={(link, color, ctx) => {
-              const l = link as FGLink;
-              if (l.kind !== "cross") return;
-              const s = l.source as FGNode;
-              const t = l.target as FGNode;
-              if (!s || !t || s.x == null || t.x == null) return;
-              ctx.strokeStyle = color;
-              ctx.lineWidth = 10;
-              ctx.beginPath();
-              ctx.moveTo(s.x, s.y!);
-              ctx.lineTo(t.x, t.y!);
-              ctx.stroke();
-            }}
-            onLinkClick={(l) => {
-              const link = l as FGLink;
-              if (link.kind === "cross" && link.crossId) {
-                setActiveCrossId(link.crossId);
-              }
-            }}
+          <GraphCanvas
+            nodes={data.nodes}
+            edges={data.edges}
+            primaryTaskId={null}
+            selectedNodeId={null}
+            selectedEdgeId={activeCrossId}
+            onSelectNode={() => {}}
+            onSelectEdge={onSelectEdge}
+            chargeStrength={-220}
+            linkDistance={90}
           />
 
           {/* Active cross-link callout */}
