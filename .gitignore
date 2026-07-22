@@ -43,5 +43,6 @@ skills-lock.json
 # subagent-driven-development scratch
 .superpowers/
 
-# Experimental outputs (retrieval-ablation ARB spec)
-experiments/
+# Experimental outputs (retrieval-ablation ARB spec) — top-level only,
+# not scripts/experiments/ which holds the tracked runner scripts.
+/experiments/
