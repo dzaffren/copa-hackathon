@@ -14,6 +14,7 @@ def test_config_imports_and_defaults_without_env(monkeypatch):
     # no-ops when repo-root .env is absent, so the module-level defaults apply.
     monkeypatch.delenv("AZURE_FOUNDRY_PARSER_DEPLOYMENT", raising=False)
     monkeypatch.delenv("AZURE_FOUNDRY_FINDER_CRITIC_DEPLOYMENT", raising=False)
+    monkeypatch.delenv("AZURE_FOUNDRY_COPILOT_DEPLOYMENT", raising=False)
 
     import engine.config as config
 
@@ -21,3 +22,4 @@ def test_config_imports_and_defaults_without_env(monkeypatch):
 
     assert config.PARSER_DEPLOYMENT == "claude-sonnet-5"
     assert config.FINDER_CRITIC_DEPLOYMENT == "claude-opus-4-8"
+    assert config.COPILOT_DEPLOYMENT == "claude-sonnet-5"

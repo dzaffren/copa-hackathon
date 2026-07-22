@@ -34,10 +34,11 @@ from fastapi.responses import JSONResponse
 
 from engine.clauses import load_clause_index
 from engine.connections import find_connections as _default_find_connections
+from engine.copilot import copilot_reply as _default_copilot_reply
 from engine.config import REPO_ROOT
 from engine import (
     concepts,
-    copilot_scripts,
+    copilot,
     cross_intel,
     directory,
     drafts,
@@ -313,6 +314,7 @@ def create_app(
     workstreams_dir: Union[str, Path] = WORKSTREAMS_DIR,
     artifacts_dir: Union[str, Path] = REPO_ROOT / "data" / "artifacts",
     find_connections_fn: Any = _default_find_connections,
+    copilot_reply_fn: Any = _default_copilot_reply,
 ) -> FastAPI:
     """Construct the Workstream Brain read API against injected dependencies.
 
@@ -328,6 +330,10 @@ def create_app(
             "unsupported": [...]}`. Injectable so tests stub the model; no
             live model call happens in CI. Defaults to
             `engine.connections.find_connections`.
+        copilot_reply_fn: the live call behind the `copilot` route — see
+            `engine.copilot.copilot_reply`'s signature. Injectable so tests
+            stub the model; no live model call happens in CI. Defaults to
+            `engine.copilot.copilot_reply`.
 
     Returns:
         A configured `FastAPI` app. No network, credentials, or build artifacts
@@ -1126,8 +1132,10 @@ def create_app(
 
     # --- Workstream Brain — Drafting Workspace routes ----------------------
     # The editor plus its three-tab context panel. Same `{code, message}` error
-    # body as above. The Copilot here is a scripted map, not a model: see
-    # `engine/copilot_scripts.py` for why every clause it quotes is checkable.
+    # body as above. The Copilot is a live Azure AI Foundry Claude call (see
+    # `engine/copilot.py`) with a deterministic citation guardrail — every
+    # citation it returns is re-quoted from already-verbatim clause/finding
+    # text, never trusted from the model's own echo.
 
     def _task_node(
         ws_graph: dict[str, Any], workstream_id: str, node_id: str
@@ -1298,20 +1306,47 @@ def create_app(
         if isinstance(node, JSONResponse):
             return node
         body = await request.json() if await request.body() else {}
-        intent = body.get("intent") if isinstance(body, dict) else None
-        if intent not in copilot_scripts.INTENTS:
+        if not isinstance(body, dict):
+            body = {}
+        intent = body.get("intent")
+        if intent not in copilot.INTENTS:
             return _ws_error(
                 400,
                 "INVALID_INTENT",
-                f"intent must be one of {list(copilot_scripts.INTENTS)}, got {intent!r}",
+                f"intent must be one of {list(copilot.INTENTS)}, got {intent!r}",
             )
-        # `turn` is the count of prior copilot replies in this conversation. The
-        # client owns it because the chat is deliberately not persisted (spec:
-        # no cross-session history), so the server holds no conversation state.
-        turn = body.get("turn", 0)
-        if not isinstance(turn, int) or turn < 0:
-            turn = 0
-        return {"reply": copilot_scripts.reply_for(intent, turn)}
+        message = body.get("message")
+        if not isinstance(message, str) or not message.strip():
+            return _ws_error(
+                400, "MESSAGE_REQUIRED", "message must be a non-empty string"
+            )
+        # The server holds no conversation state (the chat is deliberately not
+        # persisted across sessions) — the client sends the full prior history
+        # on every call.
+        history = body.get("history") or []
+        if not isinstance(history, list):
+            history = []
+        referenced_finding_ids = body.get("referenced_finding_ids") or []
+        if not isinstance(referenced_finding_ids, list):
+            referenced_finding_ids = []
+
+        clause_index = load_clause_index(artifacts_dir)
+        try:
+            reply = copilot_reply_fn(
+                node=node,
+                intent=intent,
+                history=history,
+                message=message,
+                referenced_finding_ids=referenced_finding_ids,
+                clause_index=clause_index,
+                workstreams_dir=workstreams_dir,
+                workstream_id=workstream_id,
+            )
+        except Exception as exc:  # live model / creds / network failure
+            return _ws_error(
+                502, "COPILOT_FAILED", f"Live Copilot call failed: {exc}"
+            )
+        return {"reply": reply}
 
     return app
 

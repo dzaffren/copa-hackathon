@@ -1,5 +1,6 @@
 import type {
   AnalyzeResponse,
+  ChatHistoryTurn,
   Connection,
   CopilotIntent,
   CopilotResponse,
@@ -267,13 +268,19 @@ export function sendCopilotMessage(
   nodeId: string,
   intent: CopilotIntent,
   message: string,
-  turn: number,
+  history: ChatHistoryTurn[],
+  referencedFindingIds: string[],
 ): Promise<CopilotResponse> {
-  // `turn` is client-owned: the chat is deliberately not persisted, so the
-  // server holds no conversation state to count from.
+  // The server holds no conversation state (deliberately not persisted across
+  // sessions), so the client sends the full prior history on every call.
   return postJson<CopilotResponse>(
     `${API_BASE}/api/workstreams/${workstreamId}/tasks/${nodeId}/copilot`,
-    { intent, message, turn },
+    {
+      intent,
+      message,
+      history,
+      referenced_finding_ids: referencedFindingIds,
+    },
   );
 }
 

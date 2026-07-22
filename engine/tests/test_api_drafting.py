@@ -2,8 +2,10 @@
 
 Same shape as `test_api_review.py`: each test copies the seeded
 `data/workstreams/` into `tmp_path`, so reads double as integrity checks on the
-real demo fixtures while writes mutate only the throwaway copy. No network and no
-credentials — the Copilot is a scripted map, not a model.
+real demo fixtures while writes mutate only the throwaway copy. No network and
+no credentials — the Copilot route's live call (`engine.copilot.copilot_reply`)
+is injected as `copilot_reply_fn`, mirroring the `find_connections_fn` seam
+`test_api_analyze_live.py` already stubs the same way.
 """
 
 import json
@@ -12,7 +14,7 @@ import shutil
 import pytest
 from fastapi.testclient import TestClient
 
-from engine import copilot_scripts
+from engine import copilot
 from engine.api import create_app
 from engine.config import REPO_ROOT
 
@@ -360,32 +362,55 @@ def test_PUT_draft_does_not_touch_the_committed_fixture(tmp_path):
 
 
 # --- POST copilot ----------------------------------------------------------
+# The live Copilot call (`engine.copilot.copilot_reply`) is injected as
+# `copilot_reply_fn`, same DI pattern `test_api_analyze_live.py` uses for
+# `find_connections_fn` — no network/credentials touched here.
 
 
-def test_POST_copilot_returns_the_scripted_PD_welcome(tmp_path):
-    client, _ = _make_client(tmp_path)
+def _make_copilot_client(tmp_path, reply_fn):
+    dst = tmp_path / "workstreams"
+    shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
+    return TestClient(create_app(workstreams_dir=dst, copilot_reply_fn=reply_fn))
+
+
+def test_POST_copilot_returns_the_injected_reply(tmp_path):
+    stub_reply = {"role": "copilot", "text": "Here's a redraft of §6.3."}
+    client = _make_copilot_client(tmp_path, lambda **kwargs: stub_reply)
     body = client.post(
         f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
-        json={"intent": "PD", "message": "hi", "turn": 0},
+        json={"intent": "PD", "message": "hi", "history": []},
     ).json()
-    assert body["reply"]["role"] == "copilot"
-    assert "§6.3" in body["reply"]["text"]
+    assert body["reply"] == stub_reply
 
 
-def test_POST_copilot_second_turn_returns_the_cited_snippet(tmp_path):
-    client, _ = _make_client(tmp_path)
-    body = client.post(
+def test_POST_copilot_passes_message_history_and_references_to_the_reply_fn(tmp_path):
+    captured = {}
+
+    def capture(**kwargs):
+        captured.update(kwargs)
+        return {"role": "copilot", "text": "ok"}
+
+    client = _make_copilot_client(tmp_path, capture)
+    history = [{"role": "user", "text": "hi"}, {"role": "copilot", "text": "hello"}]
+    client.post(
         f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
-        json={"intent": "PD", "message": "yes", "turn": 1},
-    ).json()
-    reply = body["reply"]
-    assert "<strong>6.3</strong>" in reply["snippet_html"]
-    assert reply["citations"][0]["clause_number"] == "RMiT 9.4"
-    assert reply["citations"][0]["text"] == copilot_scripts.RMIT_9_4_QUOTE
+        json={
+            "intent": "PD",
+            "message": "draft §6.3",
+            "history": history,
+            "referenced_finding_ids": ["e-opres_v0_3--bcbs_opres_2021~0"],
+        },
+    )
+    assert captured["message"] == "draft §6.3"
+    assert captured["history"] == history
+    assert captured["referenced_finding_ids"] == ["e-opres_v0_3--bcbs_opres_2021~0"]
+    assert captured["intent"] == "PD"
+    assert captured["node"]["id"] == _TASK
+    assert captured["workstream_id"] == _OPRES
 
 
 def test_POST_copilot_400_for_an_intent_outside_the_seven(tmp_path):
-    client, _ = _make_client(tmp_path)
+    client = _make_copilot_client(tmp_path, lambda **kwargs: {"role": "copilot", "text": "x"})
     res = client.post(
         f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
         json={"intent": "Freestyle", "message": "hi"},
@@ -394,9 +419,19 @@ def test_POST_copilot_400_for_an_intent_outside_the_seven(tmp_path):
     assert res.json()["code"] == "INVALID_INTENT"
 
 
-@pytest.mark.parametrize("intent", copilot_scripts.INTENTS)
-def test_POST_copilot_answers_every_preset(intent: str, tmp_path):
-    client, _ = _make_client(tmp_path)
+def test_POST_copilot_400_for_an_empty_message(tmp_path):
+    client = _make_copilot_client(tmp_path, lambda **kwargs: {"role": "copilot", "text": "x"})
+    res = client.post(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
+        json={"intent": "PD", "message": "   "},
+    )
+    assert res.status_code == 400
+    assert res.json()["code"] == "MESSAGE_REQUIRED"
+
+
+@pytest.mark.parametrize("intent", copilot.INTENTS)
+def test_POST_copilot_accepts_every_preset(intent: str, tmp_path):
+    client = _make_copilot_client(tmp_path, lambda **kwargs: {"role": "copilot", "text": "x"})
     res = client.post(
         f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
         json={"intent": intent, "message": "hi"},
@@ -406,10 +441,23 @@ def test_POST_copilot_answers_every_preset(intent: str, tmp_path):
 
 
 def test_POST_copilot_404_when_node_is_not_a_task(tmp_path):
-    client, _ = _make_client(tmp_path)
+    client = _make_copilot_client(tmp_path, lambda **kwargs: {"role": "copilot", "text": "x"})
     res = client.post(
         f"/api/workstreams/{_OPRES}/tasks/{_ANCHOR}/copilot",
         json={"intent": "PD", "message": "hi"},
     )
     assert res.status_code == 404
     assert res.json()["code"] == "TASK_NOT_FOUND"
+
+
+def test_POST_copilot_502_when_the_live_call_fails(tmp_path):
+    def failing(**kwargs):
+        raise RuntimeError("Foundry credentials missing")
+
+    client = _make_copilot_client(tmp_path, failing)
+    res = client.post(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
+        json={"intent": "PD", "message": "hi"},
+    )
+    assert res.status_code == 502
+    assert res.json()["code"] == "COPILOT_FAILED"

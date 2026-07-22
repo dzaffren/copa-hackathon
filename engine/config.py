@@ -809,6 +809,14 @@ PARSER_DEPLOYMENT = os.environ.get("AZURE_FOUNDRY_PARSER_DEPLOYMENT", "claude-so
 FINDER_CRITIC_DEPLOYMENT = os.environ.get(
     "AZURE_FOUNDRY_FINDER_CRITIC_DEPLOYMENT", "claude-opus-4-8"
 )
+# The Drafting Copilot's live deployment (see engine/copilot.py). Named
+# separately from PARSER_DEPLOYMENT even though both default to the same
+# model today — PARSER_DEPLOYMENT is an unused leftover from when clause
+# parsing called a model (it is deterministic now), and reusing its name here
+# would be misleading about what actually calls it.
+COPILOT_DEPLOYMENT = os.environ.get(
+    "AZURE_FOUNDRY_COPILOT_DEPLOYMENT", "claude-sonnet-5"
+)
 
 # Azure AI Document Intelligence — optional PDF ingestion backend. When both the
 # endpoint and key are set, `engine.ingest` routes PDFs through the

@@ -17,6 +17,7 @@ model's raw text reply into parsed JSON.
 """
 
 import json
+from typing import Optional
 
 from engine.config import (
     AZURE_FOUNDRY_API_KEY,
@@ -29,7 +30,12 @@ class LLMResponseError(Exception):
 
 
 def call_chat(
-    deployment: str, system: str, user: str, max_tokens: int = 8192
+    deployment: str,
+    system: str,
+    user: str,
+    max_tokens: int = 8192,
+    *,
+    messages: Optional[list[dict[str, str]]] = None,
 ) -> str:
     """Call a Claude deployment on Azure AI Foundry and return the reply text.
 
@@ -51,11 +57,22 @@ def call_chat(
     system + user prompt to the named `deployment`, and returns the concatenated
     text of the response content blocks.
 
+    `messages`, when given, is a full multi-turn history (`[{"role": "user" |
+    "assistant", "content": ...}, ...]`) sent verbatim instead of the single
+    `user`-only turn — this is what `engine.copilot` uses for a real
+    back-and-forth conversation, since the Messages API (the whole reason this
+    module uses `AnthropicFoundry` instead of a generic completions client) is
+    built for turn lists, not one-shot flattened prompts. `user` is still
+    required as the single-turn default every existing caller
+    (`engine.connections`) relies on, and is ignored when `messages` is given.
+
     This is the network seam — the finder/critic connection-finding
-    (`engine.connections`) uses it; tests never call it for real (no credentials
-    in CI). Raises a clear `RuntimeError` when the endpoint or key is unset.
-    (Stage-2 clause parsing no longer uses a model — it is the deterministic
-    `engine.clauses.segment_clauses` — so this seam is now finder/critic only.)
+    (`engine.connections`) and the live Copilot (`engine.copilot`) use it;
+    tests never call it for real (no credentials in CI). Raises a clear
+    `RuntimeError` when the endpoint or key is unset. (Stage-2 clause parsing
+    no longer uses a model — it is the deterministic
+    `engine.clauses.segment_clauses` — so this seam is finder/critic + Copilot
+    only.)
     """
     from anthropic import AnthropicFoundry
 
@@ -72,7 +89,7 @@ def call_chat(
     message = client.messages.create(
         model=deployment,
         system=system,
-        messages=[{"role": "user", "content": user}],
+        messages=messages if messages is not None else [{"role": "user", "content": user}],
         max_tokens=max_tokens,
     )
     # Messages API returns a list of content blocks; concatenate the text of

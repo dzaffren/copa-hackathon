@@ -211,6 +211,7 @@ export function DraftingWorkspacePage() {
                 workstreamId={workstreamId}
                 nodeId={nodeId}
                 onInsertSnippet={insertSnippet}
+                reviewedCards={reviewedCards}
               />
             )}
           </div>

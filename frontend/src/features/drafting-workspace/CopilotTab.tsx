@@ -6,37 +6,57 @@ import {
   COPILOT_INTENT_LABELS,
   type ChatMessage,
   type CopilotIntent,
+  type LinkageCard,
 } from "@/lib/types";
+import { AnalyzeProgressBar, COPILOT_STAGES } from "@/components/AnalyzeProgressBar";
+import { MentionInput, parseMentions } from "./MentionInput";
 
 interface CopilotTabProps {
   workstreamId: string;
   nodeId: string;
   onInsertSnippet: (html: string) => void;
+  /** The drafter's already-accepted findings for this task — the `@` mention
+   *  dropdown's source list. */
+  reviewedCards: LinkageCard[];
 }
 
-/** The Drafting Copilot: a scripted conversation, not a model.
+/** The Drafting Copilot: a live Azure AI Foundry Claude chat, not a script.
  *
- * Every clause it quotes is verbatim and checkable — see
- * engine/copilot_scripts.py, whose tests re-resolve the RMiT quote against the
- * built clause index. Citations render as their own block precisely so a
- * reviewer can tell an assertion from a quotation at a glance.
+ * Every clause it quotes is re-grounded server-side — see
+ * `engine/copilot.py`'s citation guardrail, which drops any citation not
+ * actually supplied to the model and always re-quotes text from that
+ * grounded set, never the model's own echo. Citations render as their own
+ * block precisely so a reviewer can tell an assertion from a quotation at a
+ * glance. `@` in the message box references an accepted finding
+ * (`reviewedCards`), grounding the model with that finding's own verbatim
+ * clauses.
  */
 export function CopilotTab({
   workstreamId,
   nodeId,
   onInsertSnippet,
+  reviewedCards,
 }: CopilotTabProps) {
   const [intent, setIntent] = useState<CopilotIntent>("PD");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
 
-  // Copilot turns so far — the server holds no conversation state, because the
-  // chat is deliberately not persisted across sessions.
-  const turn = messages.filter((m) => m.role === "copilot").length;
-
   const send = useMutation({
-    mutationFn: (text: string) =>
-      sendCopilotMessage(workstreamId, nodeId, intent, text, turn),
+    mutationFn: ({
+      text,
+      referencedFindingIds,
+    }: {
+      text: string;
+      referencedFindingIds: string[];
+    }) =>
+      sendCopilotMessage(
+        workstreamId,
+        nodeId,
+        intent,
+        text,
+        messages.map((m) => ({ role: m.role, text: m.text })),
+        referencedFindingIds,
+      ),
     onSuccess: (res) =>
       setMessages((prev) => [...prev, { ...res.reply, role: "copilot" }]),
   });
@@ -44,16 +64,16 @@ export function CopilotTab({
   function submit(text: string) {
     const trimmed = text.trim();
     if (!trimmed || send.isPending) return;
+    const { referencedFindingIds } = parseMentions(trimmed, reviewedCards);
     setMessages((prev) => [...prev, { role: "user", text: trimmed }]);
     setInput("");
-    send.mutate(trimmed);
+    send.mutate({ text: trimmed, referencedFindingIds });
   }
 
   function changeIntent(next: CopilotIntent) {
     setIntent(next);
-    // Resetting is the honest behaviour: the reply script is keyed on intent,
-    // so keeping the old turns would leave answers on screen that the new
-    // preset never gave.
+    // A fresh intent framing deserves a fresh thread — keeping old turns
+    // would mix system-prompt framings the model never actually saw together.
     setMessages([]);
   }
 
@@ -134,7 +154,9 @@ export function CopilotTab({
                     </button>
                     <button
                       type="button"
-                      onClick={() => send.mutate("Regenerate")}
+                      onClick={() =>
+                        send.mutate({ text: "Regenerate", referencedFindingIds: [] })
+                      }
                       className="rounded border border-border/70 px-2 py-1 text-[11px] font-semibold hover:bg-accent"
                     >
                       Regenerate
@@ -147,7 +169,13 @@ export function CopilotTab({
         ))}
 
         {send.isPending && (
-          <p className="text-xs text-muted-foreground">Copilot is typing…</p>
+          <AnalyzeProgressBar isPending={send.isPending} stages={COPILOT_STAGES} />
+        )}
+        {send.isError && (
+          <p className="text-xs text-red-600">
+            The Copilot failed to reply. Check the engine has model
+            credentials, then retry.
+          </p>
         )}
       </div>
 
@@ -158,12 +186,11 @@ export function CopilotTab({
           submit(input);
         }}
       >
-        <input
-          aria-label="Message the Copilot"
+        <MentionInput
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask the Copilot…"
-          className="flex-1 rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-cyan-400/60"
+          onChange={setInput}
+          cards={reviewedCards}
+          disabled={send.isPending}
         />
         <button
           type="submit"

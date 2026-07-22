@@ -1351,7 +1351,9 @@ export const handlers = [
     async ({ request }) => {
       const body = (await request.json()) as {
         intent: CopilotIntent;
-        turn?: number;
+        message?: string;
+        history?: { role: string; text: string }[];
+        referenced_finding_ids?: string[];
       };
       const script = COPILOT_SCRIPT[body.intent];
       if (!script) {
@@ -1360,8 +1362,18 @@ export const handlers = [
           { status: 400 },
         );
       }
-      const turn = Math.min(body.turn ?? 0, script.length - 1);
-      return HttpResponse.json({ reply: script[turn] });
+      if (!body.message || !body.message.trim()) {
+        return HttpResponse.json(
+          { code: "MESSAGE_REQUIRED", message: "message must be non-empty" },
+          { status: 400 },
+        );
+      }
+      // Mirrors the live server holding no conversation state: the mock keys
+      // its scripted reply off how many copilot turns already appear in the
+      // history the client sent, not a client-owned counter.
+      const turn = (body.history ?? []).filter((m) => m.role === "copilot").length;
+      const index = Math.min(turn, script.length - 1);
+      return HttpResponse.json({ reply: script[index] });
     },
   ),
 
