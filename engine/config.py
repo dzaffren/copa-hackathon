@@ -469,6 +469,7 @@ REFERENCE_DOCUMENTS = {
         "cluster": AI_CLUSTER,
         "kind": "reference",
         "segmenter_class": "legislative",
+        "min_anchors": 100,
         "source_type": "act",
         "access": "public",
         "preview": False,

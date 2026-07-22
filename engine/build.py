@@ -39,6 +39,14 @@ from engine.ingest import ingest_document, normalise_glyph_artifacts
 
 logger = logging.getLogger(__name__)
 
+
+class AnchorCompletenessError(Exception):
+    """A document yielded fewer anchors than its declared min_anchors floor —
+    almost always a truncated/incomplete boundary-model run. Raised rather than
+    silently committing an under-segmented artifact (see the boundary-model
+    nondeterminism note in the anchor-segmentation design)."""
+
+
 IngestFn = Callable[[Union[str, Path]], str]
 # Stage 2 seam: (markdown, document_id, policy_id, source, dropped_report)
 # -> per-document clause entries. Defaults to the deterministic segmenter.
@@ -252,6 +260,14 @@ def build_anchor_index(
                 shortname=shortname, boundary_fn=boundary_fn)
         for anchor in anchors:
             verify_substring(anchor, markdown)
+        min_anchors = doc.get("min_anchors")
+        if min_anchors is not None and len(anchors) < min_anchors:
+            raise AnchorCompletenessError(
+                f"{document_id}: segmenter produced {len(anchors)} anchors, "
+                f"below the declared min_anchors={min_anchors}. This usually means "
+                f"the boundary model returned a truncated list — rerun the build; "
+                f"do not commit this artifact."
+            )
         all_anchors.extend(anchors)
 
     index = AnchorIndex(all_anchors)
