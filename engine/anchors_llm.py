@@ -52,61 +52,86 @@ def _default_boundary_fn(
 
 
 _STRUCTURAL_MARKER_RE = re.compile(r"^(CHAPTER|SECTION|TITLE|ANNEX|Article|PART)\b")
-
-
-def _looks_like_scaffolding(
-    tail: str, next_label: Optional[str], next_snippet: Optional[str]
-) -> bool:
-    """True if the trailing ``"\\n\\n"``-separated block is a heading/divider.
-
-    A block is scaffolding if it starts with a markdown ``#`` marker, starts with
-    one of the EU-legislation structural markers (CHAPTER/SECTION/TITLE/ANNEX/
-    Article/PART, as a heading line), or contains the next unit's
-    `anchor_label`/`starts_with`. Anything else is genuine body content.
-    """
-    if tail.startswith("#"):
-        return True
-    if _STRUCTURAL_MARKER_RE.match(tail):
-        return True
-    if next_label and next_label.strip() in tail:
-        return True
-    if next_snippet and next_snippet.strip() in tail:
-        return True
-    return False
+_DIVIDER_LINE_RE = re.compile(r"^[ \t]*#*[ \t]*(CHAPTER|SECTION|TITLE|PART|ANNEX)\b")
 
 
 def _trim_next_unit_heading(
     segment: str, next_label: Optional[str], next_snippet: Optional[str]
 ) -> str:
-    """Trim the next unit's heading/label block(s) off the tail of `segment`.
+    """Trim the next unit's heading + any body that follows it off `segment`.
 
     `segment` is ``source_markdown[start:next_start]`` — this unit's body PLUS the
-    next unit's leading scaffolding (its heading/label line(s) that sit in the gap
-    between this unit's body and the next unit's body, `next_start`). Because the
-    boundary model quotes `starts_with` from the *body* (no label prefix), a raw
-    slice up to the next body picks up that scaffolding. This returns the segment
-    with the trailing scaffolding removed.
+    next unit's scaffolding (its heading line, optionally preceded by a CHAPTER/
+    SECTION/TITLE/PART/ANNEX divider) PLUS the first line(s) of the next unit's
+    body (up to where its `starts_with` matched). The next unit's heading line
+    contains `next_label`, so we cut the segment at the EARLIEST heading/divider
+    that begins the next unit's scaffolding block — NOT by trimming trailing
+    blocks (the scaffolding sits MID-gap, not at the tail).
 
-    The gap can contain MULTIPLE heading blocks (e.g. a "## SECTION 3 ..." divider
-    immediately followed by "## Article 5 ..."), so this loops: headings are
-    blank-line separated, so repeatedly look at the block after the LAST
-    ``"\\n\\n"`` and, while it looks like scaffolding (see
-    `_looks_like_scaffolding`), cut it and continue. The loop stops as soon as a
-    trailing block is NOT scaffolding — that is genuine body content and is left
-    intact, along with everything before it — or when there is no earlier
-    ``"\\n\\n"`` left to split on. The result is always `.rstrip()`-ed.
+    Strategy:
+    1. If `next_label` is provided, find the earliest line that is a heading for
+       `next_label` (``^\\s*#*\\s*<label>\\b``) and cut the segment at its start.
+    2. Walk backwards over any structural divider blocks (CHAPTER/SECTION/TITLE/
+       PART/ANNEX) that immediately precede that heading — separated only by blank
+       lines — and cut before them too, so a "CHAPTER II\\n\\n## Article 2" gap is
+       removed whole, not just the Article line.
+    3. If `next_label` is absent (defensive fallback), trim a trailing block that
+       starts with '#' or a structural marker.
+    The result is always ``.rstrip()``-ed. If the cut would empty a non-empty
+    body (heading at position 0 — shouldn't happen since body precedes it), the
+    rstripped original is returned unchanged as a safety net.
     """
+    if next_label:
+        cut = len(segment)
+        heading_re = re.compile(r"(?m)^[ \t]*#*[ \t]*" + re.escape(next_label) + r"\b")
+        m = heading_re.search(segment)
+        if m is not None:
+            cut = m.start()
+            # Absorb any structural divider block(s) immediately preceding the
+            # next-label heading, separated only by blank lines.
+            cut = _absorb_preceding_dividers(segment, cut)
+        result = segment[:cut].rstrip()
+        if not result and segment.strip():
+            return segment.rstrip()
+        return result
+
+    # Defensive fallback: no next_label — trim a single trailing scaffolding block.
     stripped = segment.rstrip()
+    sep = stripped.rfind("\n\n")
+    if sep == -1:
+        return stripped
+    tail = stripped[sep + 2:].strip()
+    if tail.startswith("#") or _STRUCTURAL_MARKER_RE.match(tail):
+        return stripped[:sep].rstrip()
+    return stripped
+
+
+def _absorb_preceding_dividers(segment: str, cut: int) -> int:
+    """Move `cut` earlier over blank-line-separated structural divider blocks.
+
+    Given a cut point at the start of the next unit's heading, walk backwards over
+    any immediately-preceding blocks (separated only by blank lines) whose first
+    line is a CHAPTER/SECTION/TITLE/PART/ANNEX divider, returning the new (earlier)
+    cut point so those dividers are also removed.
+    """
     while True:
-        sep = stripped.rfind("\n\n")
-        if sep == -1:
-            return stripped
-        tail = stripped[sep + 2:].strip()
-        if not tail:
-            return stripped
-        if not _looks_like_scaffolding(tail, next_label, next_snippet):
-            return stripped
-        stripped = stripped[:sep].rstrip()
+        prefix = segment[:cut]
+        # Strip trailing blank lines between the divider block and the heading.
+        stripped_prefix = prefix.rstrip("\n")
+        trailing_ws = len(prefix) - len(stripped_prefix)
+        if trailing_ws == 0:
+            # No blank-line separation; heading directly abuts prior content.
+            return cut
+        block_start = stripped_prefix.rfind("\n\n")
+        block = (
+            stripped_prefix[block_start + 2:]
+            if block_start != -1
+            else stripped_prefix
+        )
+        first_line = block.split("\n", 1)[0]
+        if not _DIVIDER_LINE_RE.match(first_line):
+            return cut
+        cut = block_start + 2 if block_start != -1 else 0
 
 
 def _drop(report: Optional[list[dict]], document_id: str, unit: dict,

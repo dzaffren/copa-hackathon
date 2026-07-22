@@ -1,5 +1,5 @@
 from engine.anchors import AnchorTextNotFoundError
-from engine.anchors_llm import llm_boundary_segment
+from engine.anchors_llm import _trim_next_unit_heading, llm_boundary_segment
 
 SOURCE = (
     "REGULATION (EU) 2024/1689\n\n"
@@ -194,6 +194,32 @@ def test_unit_text_keeps_legitimate_multi_paragraph_body():
     assert art1["text"].endswith("Second paragraph of body continues normally.")
     assert "Article 2" not in art1["text"]
     assert art1["text"] in source
+
+
+def test_trim_cuts_at_mid_gap_heading():
+    # The actual bug: the next unit's heading sits MID-gap, followed by the first
+    # line of the next unit's body ("1\\." — what starts_with matched). The old
+    # tail-trim stopped at "1\\." and never removed "## Article 2 Scope". The
+    # heading-cut approach removes both.
+    segment = "body content here.\n\n## Article 2 Scope\n\n1\\."
+    assert _trim_next_unit_heading(segment, "Article 2", "1\\.") == "body content here."
+
+
+def test_trim_cuts_at_divider_before_heading():
+    # A CHAPTER/SECTION divider immediately precedes the next-label heading; both
+    # the divider AND the Article-5 heading (and its body) must be removed.
+    segment = (
+        "body text.\n\nCHAPTER II\nPROHIBITED PRACTICES\n\n"
+        "## Article 5 Title\n\nFirst provision"
+    )
+    assert _trim_next_unit_heading(segment, "Article 5", "First provision") == "body text."
+
+
+def test_trim_does_not_over_trim_when_label_absent():
+    # next_label is absent from the segment (defensive): the body must be returned
+    # unchanged (rstripped), never over-trimmed.
+    segment = "A normal body paragraph with no trailing heading."
+    assert _trim_next_unit_heading(segment, "Article 99", None) == segment
 
 
 def test_default_boundary_fn_parses_fenced_json(monkeypatch):
