@@ -1,0 +1,20 @@
+{
+  "document_id": "eu-ai-act",
+  "shortname": "EU AI Act",
+  "coverage_floor": 0.9,
+  "label_pattern": "^(Article \\d+|ANNEX [IVXLCM]+)$",
+  "garbage_pattern": "\\d+\\.\\d+\\.\\d{4}",
+  "foreign_heading_pattern": "\\n##\\s+(Article|ANNEX)\\s+[IVXLCM0-9]",
+  "top_level_locators": [
+    "Article 1",
+    "Article 2",
+    "Article 3",
+    "Article 4",
+    "Article 5",
+    "Article 6",
+    "Article 7",
+    "Article 8",
+    "Article 9",
+    "Article 10"
+  ]
+}

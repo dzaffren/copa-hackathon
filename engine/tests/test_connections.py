@@ -23,11 +23,10 @@ from datetime import datetime, timezone
 
 import pytest
 
+from engine.anchors import Anchor, AnchorIndex
 from engine.clauses import (
     ClauseIndex,
-    build_clause_index,
     build_reference_clause,
-    merge_clause_indexes,
 )
 from engine.connections import (
     CRITIC_SYSTEM_PROMPT,
@@ -46,83 +45,68 @@ from engine.llm import LLMResponseError
 
 # --- Corpus fixtures (verbatim markdown + hand-written anchors) -------------
 
-RMIT_V2_MARKDOWN = """RMiT — Exposure Draft v2
-
-17 Cloud services
-
-17.1 A financial institution shall notify the Bank within 14 days of the first-time adoption of a public cloud service for a critical system.
-
-17.2 A financial institution shall notify the Bank of any subsequent adoption of a public cloud service for a critical system.
-"""
-
-RMIT_V2_ANCHORS = [
-    {
-        "clause_number": "17.1",
-        "starts_with": "A financial institution shall notify the Bank within 14 days",
-        "heading": "17 Cloud services",
-        "parent": None,
-    },
-    {
-        "clause_number": "17.2",
-        "starts_with": "A financial institution shall notify the Bank of any subsequent",
-        "heading": "17 Cloud services",
-        "parent": None,
-    },
-]
-
-OUTSOURCING_MARKDOWN = """Outsourcing
-
-12 Approval for material outsourcing arrangements
-
-12.1 A financial institution must obtain the Bank's written approval before entering into a new material outsourcing arrangement.
-
-12.4 The approval requirement does not apply to an outsourcing arrangement with an affiliate within the same financial group.
-"""
-
-OUTSOURCING_ANCHORS = [
-    {
-        "clause_number": "12.1",
-        "starts_with": "A financial institution must obtain the Bank's written approval",
-        "heading": "12 Approval for material outsourcing arrangements",
-        "parent": None,
-    },
-    {
-        "clause_number": "12.4",
-        "starts_with": "The approval requirement does not apply to an outsourcing arrangement",
-        "heading": "12 Approval for material outsourcing arrangements",
-        "parent": None,
-    },
-]
-
+# BNM anchor_ids ARE the clause_number strings ("RMiT 17.1") — the committed
+# traces resolve on exactly these. The pairwise finder/critic path now keys on an
+# AnchorIndex; each anchor's `text` is the verbatim clause text (a literal
+# substring of the source markdown, as verify_substring requires).
+RMIT_17_1_TEXT = (
+    "A financial institution shall notify the Bank within 14 days of the "
+    "first-time adoption of a public cloud service for a critical system."
+)
+RMIT_17_2_TEXT = (
+    "A financial institution shall notify the Bank of any subsequent adoption "
+    "of a public cloud service for a critical system."
+)
 OUTSOURCING_12_1_TEXT = (
     "A financial institution must obtain the Bank's written approval before "
     "entering into a new material outsourcing arrangement."
 )
+OUTSOURCING_12_4_TEXT = (
+    "The approval requirement does not apply to an outsourcing arrangement with "
+    "an affiliate within the same financial group."
+)
 
 
-def _build_fixture_clause_index() -> ClauseIndex:
-    rmit_entries = build_clause_index(
-        anchors=RMIT_V2_ANCHORS,
-        markdown=RMIT_V2_MARKDOWN,
-        document_id="rmit-vnext-draft",
-        policy_id="rmit",
-        source="draft",
-    )
-    outsourcing_entries = build_clause_index(
-        anchors=OUTSOURCING_ANCHORS,
-        markdown=OUTSOURCING_MARKDOWN,
-        document_id="outsourcing-v1-2019",
-        policy_id="outsourcing",
-        source="published",
-    )
-    primary, versions = merge_clause_indexes(
+def _anchor(
+    anchor_id: str, text: str, document_id: str, heading: str
+) -> Anchor:
+    """Build a structured-rules Anchor keyed by the full clause number
+    (anchor_id == clause_number for BNM PDs), with the verbatim clause text."""
+    return {
+        "anchor_id": anchor_id,
+        "anchor_label": anchor_id,
+        "text": text,
+        "doc_class": "structured-rules",
+        "document_id": document_id,
+        "heading_path": [heading],
+        "page_span": None,
+        "parent_anchor": None,
+    }
+
+
+def _build_fixture_anchor_index() -> AnchorIndex:
+    return AnchorIndex(
         [
-            ("rmit-vnext-draft", rmit_entries),
-            ("outsourcing-v1-2019", outsourcing_entries),
-        ],
-        current_document_id="rmit-vnext-draft",
+            _anchor(
+                "RMiT 17.1", RMIT_17_1_TEXT, "rmit-vnext-draft", "17 Cloud services"
+            ),
+            _anchor(
+                "RMiT 17.2", RMIT_17_2_TEXT, "rmit-vnext-draft", "17 Cloud services"
+            ),
+            _anchor(
+                "Outsourcing 12.1",
+                OUTSOURCING_12_1_TEXT,
+                "outsourcing-v1-2019",
+                "12 Approval for material outsourcing arrangements",
+            ),
+            _anchor(
+                "Outsourcing 12.4",
+                OUTSOURCING_12_4_TEXT,
+                "outsourcing-v1-2019",
+                "12 Approval for material outsourcing arrangements",
+            ),
+        ]
     )
-    return ClauseIndex(primary, versions)
 
 
 FIXED_NOW = datetime(2026, 7, 8, 12, 0, 0, tzinfo=timezone.utc)
@@ -174,12 +158,12 @@ def _critic_scopes_and_adds_dependency(doc_a_id, doc_b_id, clause_index, candida
 
 
 def test_two_agent_loop_surfaces_conflict_and_critic_found_dependency(tmp_path):
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
 
     result = find_connections(
         "rmit-vnext-draft",
         "outsourcing-v1-2019",
-        clause_index,
+        anchor_index,
         finder_fn=_finder_returns_conflict,
         critic_fn=_critic_scopes_and_adds_dependency,
         output_dir=tmp_path,
@@ -223,16 +207,16 @@ def test_two_agent_loop_surfaces_conflict_and_critic_found_dependency(tmp_path):
     assert trace["model_id"]
     assert trace["timestamp"] == FIXED_NOW.isoformat()
     assert trace["finder_output"] == _finder_returns_conflict(
-        "rmit-vnext-draft", "outsourcing-v1-2019", clause_index
+        "rmit-vnext-draft", "outsourcing-v1-2019", anchor_index
     )
     assert trace["critic_output"] == _critic_scopes_and_adds_dependency(
-        "rmit-vnext-draft", "outsourcing-v1-2019", clause_index, []
+        "rmit-vnext-draft", "outsourcing-v1-2019", anchor_index, []
     )
     assert trace["validation"]
 
 
 def test_unsupported_candidate_from_critic_is_flagged_not_invented(tmp_path):
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
 
     def critic_emits_absent_clause(doc_a_id, doc_b_id, clause_index, candidates):
         return [
@@ -246,7 +230,7 @@ def test_unsupported_candidate_from_critic_is_flagged_not_invented(tmp_path):
     result = find_connections(
         "rmit-vnext-draft",
         "outsourcing-v1-2019",
-        clause_index,
+        anchor_index,
         finder_fn=_finder_returns_conflict,
         critic_fn=critic_emits_absent_clause,
         output_dir=tmp_path,
@@ -274,10 +258,10 @@ def test_unsupported_candidate_from_critic_is_flagged_not_invented(tmp_path):
 
 
 def test_format_clause_context_labels_both_documents_with_numbers_and_text():
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
 
     context = _format_clause_context(
-        clause_index, "rmit-vnext-draft", "outsourcing-v1-2019"
+        anchor_index, "rmit-vnext-draft", "outsourcing-v1-2019"
     )
 
     # Both document ids appear as labels.
@@ -294,7 +278,7 @@ def test_format_clause_context_labels_both_documents_with_numbers_and_text():
 
 
 def test_finder_turn_parses_call_chat_json_array(monkeypatch):
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
     canned = json.dumps(
         [
             {
@@ -315,7 +299,7 @@ def test_finder_turn_parses_call_chat_json_array(monkeypatch):
 
     monkeypatch.setattr("engine.connections.call_chat", fake_call_chat)
 
-    result = _finder_turn("rmit-vnext-draft", "outsourcing-v1-2019", clause_index)
+    result = _finder_turn("rmit-vnext-draft", "outsourcing-v1-2019", anchor_index)
 
     assert result == json.loads(canned)
     # The finder handed the model both documents' clause context.
@@ -324,7 +308,7 @@ def test_finder_turn_parses_call_chat_json_array(monkeypatch):
 
 
 def test_critic_turn_includes_finder_candidates_in_prompt(monkeypatch):
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
     finder_candidates = [
         {
             "summary": "RMiT 17.1 conflicts with Outsourcing 12.1.",
@@ -355,7 +339,7 @@ def test_critic_turn_includes_finder_candidates_in_prompt(monkeypatch):
     result = _critic_turn(
         "rmit-vnext-draft",
         "outsourcing-v1-2019",
-        clause_index,
+        anchor_index,
         finder_candidates,
     )
 
@@ -367,24 +351,24 @@ def test_critic_turn_includes_finder_candidates_in_prompt(monkeypatch):
 
 
 def test_finder_turn_raises_on_non_json(monkeypatch):
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
     monkeypatch.setattr(
         "engine.connections.call_chat",
         lambda deployment, system, user, max_tokens=None: "sorry, no JSON here",
     )
     with pytest.raises(LLMResponseError):
-        _finder_turn("rmit-vnext-draft", "outsourcing-v1-2019", clause_index)
+        _finder_turn("rmit-vnext-draft", "outsourcing-v1-2019", anchor_index)
 
 
 def test_critic_turn_raises_on_non_list_json(monkeypatch):
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
     monkeypatch.setattr(
         "engine.connections.call_chat",
         lambda deployment, system, user, max_tokens=None: json.dumps({"not": "a list"}),
     )
     with pytest.raises(LLMResponseError):
         _critic_turn(
-            "rmit-vnext-draft", "outsourcing-v1-2019", clause_index, []
+            "rmit-vnext-draft", "outsourcing-v1-2019", anchor_index, []
         )
 
 
@@ -763,12 +747,12 @@ def _critic_passthrough(doc_a_id, doc_b_id, clause_index, candidates):
 def test_direction_flip_swaps_silent_and_goesbeyond(tmp_path):
     """Swapping the pair flips ``silent-on`` ⇄ ``goes-beyond`` (a coverage
     asymmetry is directional), while the verbatim citations are unchanged."""
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
 
     forward = find_connections(
         "rmit-vnext-draft",
         "outsourcing-v1-2019",
-        clause_index,
+        anchor_index,
         finder_fn=_finder_direction_aware,
         critic_fn=_critic_passthrough,
         output_dir=tmp_path,
@@ -777,7 +761,7 @@ def test_direction_flip_swaps_silent_and_goesbeyond(tmp_path):
     reverse = find_connections(
         "outsourcing-v1-2019",
         "rmit-vnext-draft",
-        clause_index,
+        anchor_index,
         finder_fn=_finder_direction_aware,
         critic_fn=_critic_passthrough,
         output_dir=tmp_path,
@@ -803,7 +787,7 @@ def test_direction_flip_swaps_silent_and_goesbeyond(tmp_path):
 def test_write_trace_records_label_and_sentiment(tmp_path):
     """Every ``validation`` entry in the connection-trace records the finding's
     ``label`` and ``sentiment`` alongside summary/cited_clauses/supported."""
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
 
     def finder(doc_a_id, doc_b_id, clause_index):
         return [
@@ -819,7 +803,7 @@ def test_write_trace_records_label_and_sentiment(tmp_path):
     find_connections(
         "rmit-vnext-draft",
         "outsourcing-v1-2019",
-        clause_index,
+        anchor_index,
         finder_fn=finder,
         critic_fn=_critic_passthrough,
         output_dir=tmp_path,
@@ -878,7 +862,7 @@ def _spy_write_text_encoding(monkeypatch) -> dict:
 def test_write_trace_encodes_utf8(tmp_path, monkeypatch):
     """The connection-trace writer must pass ``encoding="utf-8"`` to write_text."""
     captured = _spy_write_text_encoding(monkeypatch)
-    clause_index = _build_fixture_clause_index()
+    anchor_index = _build_fixture_anchor_index()
 
     def finder(doc_a_id, doc_b_id, clause_index):
         return [
@@ -894,7 +878,7 @@ def test_write_trace_encodes_utf8(tmp_path, monkeypatch):
     find_connections(
         "rmit-vnext-draft",
         "outsourcing-v1-2019",
-        clause_index,
+        anchor_index,
         finder_fn=finder,
         critic_fn=_critic_passthrough,
         output_dir=tmp_path,

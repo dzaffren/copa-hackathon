@@ -23,7 +23,11 @@ import tempfile
 from pathlib import Path
 from typing import Any, Callable, Optional, Union, cast
 
+from engine.anchors import AnchorIndex, verify_substring
+from engine.anchors_bnm import structured_rules_segment
+from engine.anchors_llm import BoundaryFn, llm_boundary_segment
 from engine.clauses import (
+    POLICY_SHORT_NAMES,
     ClauseEntry,
     ClauseIndex,
     build_reference_clause,
@@ -34,6 +38,14 @@ from engine.graph import build_graph
 from engine.ingest import ingest_document, normalise_glyph_artifacts
 
 logger = logging.getLogger(__name__)
+
+
+class AnchorCompletenessError(Exception):
+    """A document yielded fewer anchors than its declared min_anchors floor —
+    almost always a truncated/incomplete boundary-model run. Raised rather than
+    silently committing an under-segmented artifact (see the boundary-model
+    nondeterminism note in the anchor-segmentation design)."""
+
 
 IngestFn = Callable[[Union[str, Path]], str]
 # Stage 2 seam: (markdown, document_id, policy_id, source, dropped_report)
@@ -217,6 +229,55 @@ def run_build(
     # never committed. The five-label taxonomy that replaced it lives in
     # `engine.connections` and is recorded via `scripts/run_finder_trace.py`.
 
+
+
+def build_anchor_index(
+    documents: dict[str, dict[str, Any]],
+    *,
+    ingest_fn: IngestFn = ingest_document,
+    boundary_fn: Optional[BoundaryFn] = None,
+    output_dir: Optional[Path] = None,
+) -> AnchorIndex:
+    """Segment every document via its declared segmenter_class strategy into a
+    single AnchorIndex, running verify_substring on every anchor, and (if
+    output_dir) write anchor-index.json. BNM docs (segmenter_class ==
+    "structured-rules") use the deterministic lane; legislative/framework/prose
+    docs use the LLM-boundary lane.
+    """
+    all_anchors = []
+    for document_id, doc in documents.items():
+        markdown = ingest_fn(doc["source_path"])
+        segmenter_class = doc["segmenter_class"]
+        if segmenter_class == "structured-rules":
+            anchors = structured_rules_segment(
+                document_id, markdown,
+                policy_id=doc["policy_id"], source=str(doc["source_path"]))
+        else:
+            shortname = doc.get("shortname") or POLICY_SHORT_NAMES.get(
+                doc["policy_id"], doc["policy_id"])
+            anchors = llm_boundary_segment(
+                document_id, markdown, doc_class=segmenter_class,
+                shortname=shortname, boundary_fn=boundary_fn)
+        for anchor in anchors:
+            verify_substring(anchor, markdown)
+        min_anchors = doc.get("min_anchors")
+        if min_anchors is not None and len(anchors) < min_anchors:
+            raise AnchorCompletenessError(
+                f"{document_id}: segmenter produced {len(anchors)} anchors, "
+                f"below the declared min_anchors={min_anchors}. This usually means "
+                f"the boundary model returned a truncated list — rerun the build; "
+                f"do not commit this artifact."
+            )
+        all_anchors.extend(anchors)
+
+    index = AnchorIndex(all_anchors)
+    if output_dir is not None:
+        output_dir = Path(output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        (output_dir / "anchor-index.json").write_text(
+            json.dumps(all_anchors, indent=2, ensure_ascii=False),
+            encoding="utf-8")
+    return index
 
 
 def _merge_clause_index(built_dir: Path, target_dir: Path) -> int:

@@ -9,7 +9,9 @@ needed — this exercises the true segmentation path end-to-end). This proves
 import json
 import re
 
-from engine.build import run_build
+import pytest
+
+from engine.build import AnchorCompletenessError, build_anchor_index, run_build
 
 # Hand-written markdown in the real BNM line-start format the segmenter expects:
 # a section heading ("12 Approval…"), then its numbered clause ("12.1 …").
@@ -376,3 +378,158 @@ def test_run_build_emits_industry_feedback_passage_and_stance(tmp_path):
     node = {n["id"]: n for n in graph["nodes"]}["industry-fsp-3"]
     assert node["source_type"] == "industry_feedback"
     assert node["stance"] == "partial"
+
+
+def test_build_dispatches_by_doc_class(tmp_path):
+    documents = {
+        "rmit-v2-2025": {"document_id": "rmit-v2-2025", "policy_id": "rmit",
+                         "segmenter_class": "structured-rules", "source_path": "x.pdf"},
+        "eu-ai-act": {"document_id": "eu-ai-act", "policy_id": "eu-ai-act",
+                      "segmenter_class": "legislative", "source_path": "y.pdf",
+                      "shortname": "EU AI Act"},
+    }
+    md = {
+        "rmit-v2-2025": "10.1 A financial institution must establish a framework.\n",
+        "eu-ai-act": "Article 1\n\nThis Regulation lays down rules.\n",
+    }
+
+    def ingest(path):
+        return md["rmit-v2-2025"] if str(path) == "x.pdf" else md["eu-ai-act"]
+
+    def boundary(document_id, source_markdown, doc_class):
+        return [{"anchor_label": "Article 1",
+                 "starts_with": "This Regulation lays down rules",
+                 "parent": None}]
+
+    index = build_anchor_index(
+        documents, ingest_fn=ingest, boundary_fn=boundary, output_dir=tmp_path)
+    ids = {a["anchor_id"] for a in index.all()}
+    assert "RMiT 10.1" in ids            # BNM lane
+    assert "EU AI Act Article 1" in ids  # LLM lane
+    written = json.loads((tmp_path / "anchor-index.json").read_text("utf-8"))
+    assert len(written) == len(index)
+
+
+# --- Completeness guard (Problem B: nondeterministic boundary-model runs) ---
+
+# Five distinct, unambiguous, `starts_with`-locatable article bodies — enough
+# that a stub boundary_fn can be made to "find" all five (passing case) or
+# only two of them (truncated-run case).
+COMPLETENESS_MARKDOWN = (
+    "Some Act\n\n"
+    "Article 1\n\nThis Regulation lays down rules on one subject matter.\n\n"
+    "Article 2\n\nThis Regulation lays down rules on a second subject matter.\n\n"
+    "Article 3\n\nThis Regulation lays down rules on a third subject matter.\n\n"
+    "Article 4\n\nThis Regulation lays down rules on a fourth subject matter.\n\n"
+    "Article 5\n\nThis Regulation lays down rules on a fifth subject matter.\n"
+)
+
+_ALL_FIVE_UNITS = [
+    {"anchor_label": "Article 1",
+     "starts_with": "This Regulation lays down rules on one subject matter",
+     "parent": None},
+    {"anchor_label": "Article 2",
+     "starts_with": "This Regulation lays down rules on a second subject matter",
+     "parent": None},
+    {"anchor_label": "Article 3",
+     "starts_with": "This Regulation lays down rules on a third subject matter",
+     "parent": None},
+    {"anchor_label": "Article 4",
+     "starts_with": "This Regulation lays down rules on a fourth subject matter",
+     "parent": None},
+    {"anchor_label": "Article 5",
+     "starts_with": "This Regulation lays down rules on a fifth subject matter",
+     "parent": None},
+]
+
+
+def test_build_anchor_index_raises_on_implausibly_low_anchor_count(tmp_path):
+    """A doc declaring `min_anchors` whose boundary_fn returns too few resolvable
+    units (simulating a truncated boundary-model run) must raise
+    AnchorCompletenessError, and NOTHING is written to output_dir — the raise
+    happens before the write, so a truncated run can never silently commit a
+    broken anchor-index.json."""
+    documents = {
+        "some-act": {
+            "document_id": "some-act",
+            "policy_id": "some-act",
+            "segmenter_class": "legislative",
+            "source_path": "some-act.pdf",
+            "shortname": "Some Act",
+            "min_anchors": 5,
+        },
+    }
+
+    def ingest(path):
+        return COMPLETENESS_MARKDOWN
+
+    def boundary(document_id, source_markdown, doc_class):
+        # Truncated run: only the first two units come back.
+        return _ALL_FIVE_UNITS[:2]
+
+    with pytest.raises(AnchorCompletenessError):
+        build_anchor_index(
+            documents, ingest_fn=ingest, boundary_fn=boundary, output_dir=tmp_path
+        )
+
+    assert not (tmp_path / "anchor-index.json").exists()
+
+
+def test_build_anchor_index_without_min_anchors_is_unguarded(tmp_path):
+    """A document with no `min_anchors` floor builds normally regardless of how
+    few anchors the segmenter produces (backward compatible: structured-rules/
+    BNM docs declare no floor)."""
+    documents = {
+        "some-act": {
+            "document_id": "some-act",
+            "policy_id": "some-act",
+            "segmenter_class": "legislative",
+            "source_path": "some-act.pdf",
+            "shortname": "Some Act",
+            # No min_anchors key at all.
+        },
+    }
+
+    def ingest(path):
+        return COMPLETENESS_MARKDOWN
+
+    def boundary(document_id, source_markdown, doc_class):
+        return _ALL_FIVE_UNITS[:2]
+
+    index = build_anchor_index(
+        documents, ingest_fn=ingest, boundary_fn=boundary, output_dir=tmp_path
+    )
+
+    assert len(index) == 2
+    written = json.loads((tmp_path / "anchor-index.json").read_text("utf-8"))
+    assert len(written) == 2
+
+
+def test_build_anchor_index_min_anchors_met_builds_normally(tmp_path):
+    """A document whose `min_anchors` floor IS met builds and writes the
+    artifact exactly as an unguarded document would (existing behavior
+    unchanged when the guard doesn't fire)."""
+    documents = {
+        "some-act": {
+            "document_id": "some-act",
+            "policy_id": "some-act",
+            "segmenter_class": "legislative",
+            "source_path": "some-act.pdf",
+            "shortname": "Some Act",
+            "min_anchors": 5,
+        },
+    }
+
+    def ingest(path):
+        return COMPLETENESS_MARKDOWN
+
+    def boundary(document_id, source_markdown, doc_class):
+        return _ALL_FIVE_UNITS
+
+    index = build_anchor_index(
+        documents, ingest_fn=ingest, boundary_fn=boundary, output_dir=tmp_path
+    )
+
+    assert len(index) == 5
+    written = json.loads((tmp_path / "anchor-index.json").read_text("utf-8"))
+    assert len(written) == 5
