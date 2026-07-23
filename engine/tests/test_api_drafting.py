@@ -461,3 +461,64 @@ def test_POST_copilot_502_when_the_live_call_fails(tmp_path):
     )
     assert res.status_code == 502
     assert res.json()["code"] == "COPILOT_FAILED"
+
+
+# --- POST copilot/stream ---------------------------------------------------
+# The streaming variant of the copilot route. `copilot_stream_fn` is injected
+# so tests stub the generator with no network or credentials.
+
+from engine.copilot import INTENTS as _COPILOT_INTENTS  # noqa: E402
+import json as _json_mod  # noqa: E402
+
+
+def _make_stream_client(tmp_path, stream_fn):
+    dst = tmp_path / "workstreams"
+    shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
+    return TestClient(create_app(workstreams_dir=dst, copilot_stream_fn=stream_fn))
+
+
+def test_POST_copilot_stream_returns_sse_events(tmp_path):
+    def stub_stream_fn(**kwargs):
+        yield 'event: token\ndata: {"t": "Hello"}\n\n'
+        yield 'event: done\ndata: {}\n\n'
+
+    client = _make_stream_client(tmp_path, stub_stream_fn)
+    res = client.post(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot/stream",
+        json={"intent": "PD", "message": "hi", "history": [], "referenced_finding_ids": []},
+    )
+    assert res.status_code == 200
+    assert "text/event-stream" in res.headers["content-type"]
+    body = res.text
+    assert "event: token" in body
+    assert "event: done" in body
+
+
+def test_POST_copilot_stream_400_for_invalid_intent(tmp_path):
+    client = _make_stream_client(tmp_path, lambda **kwargs: iter([]))
+    res = client.post(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot/stream",
+        json={"intent": "InvalidIntent", "message": "hi"},
+    )
+    assert res.status_code == 400
+    assert res.json()["code"] == "INVALID_INTENT"
+
+
+def test_POST_copilot_stream_400_for_empty_message(tmp_path):
+    client = _make_stream_client(tmp_path, lambda **kwargs: iter([]))
+    res = client.post(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot/stream",
+        json={"intent": "PD", "message": ""},
+    )
+    assert res.status_code == 400
+    assert res.json()["code"] == "MESSAGE_REQUIRED"
+
+
+def test_POST_copilot_stream_404_for_non_task_node(tmp_path):
+    client = _make_stream_client(tmp_path, lambda **kwargs: iter([]))
+    res = client.post(
+        f"/api/workstreams/{_OPRES}/tasks/{_ANCHOR}/copilot/stream",
+        json={"intent": "PD", "message": "hi"},
+    )
+    assert res.status_code == 404
+    assert res.json()["code"] == "TASK_NOT_FOUND"

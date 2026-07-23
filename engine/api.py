@@ -30,11 +30,12 @@ from pathlib import Path
 from typing import Any, Optional, Union
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 
 from engine.clauses import load_clause_index
 from engine.connections import find_connections as _default_find_connections
 from engine.copilot import copilot_reply as _default_copilot_reply
+from engine.copilot import copilot_reply_stream as _default_copilot_reply_stream
 from engine.config import REPO_ROOT
 from engine import (
     concepts,
@@ -315,6 +316,7 @@ def create_app(
     artifacts_dir: Union[str, Path] = REPO_ROOT / "data" / "artifacts",
     find_connections_fn: Any = _default_find_connections,
     copilot_reply_fn: Any = _default_copilot_reply,
+    copilot_stream_fn: Any = _default_copilot_reply_stream,
 ) -> FastAPI:
     """Construct the Workstream Brain read API against injected dependencies.
 
@@ -334,6 +336,10 @@ def create_app(
             `engine.copilot.copilot_reply`'s signature. Injectable so tests
             stub the model; no live model call happens in CI. Defaults to
             `engine.copilot.copilot_reply`.
+        copilot_stream_fn: the streaming generator behind the `/copilot/stream`
+            route — `(**kwargs) -> Generator[str]` yielding SSE frames.
+            Injectable so tests stub it; defaults to
+            `engine.copilot.copilot_reply_stream`.
 
     Returns:
         A configured `FastAPI` app. No network, credentials, or build artifacts
@@ -1347,6 +1353,53 @@ def create_app(
                 502, "COPILOT_FAILED", f"Live Copilot call failed: {exc}"
             )
         return {"reply": reply}
+
+    @app.post("/api/workstreams/{workstream_id}/tasks/{node_id}/copilot/stream")
+    async def post_copilot_stream(
+        workstream_id: str, node_id: str, request: Request
+    ) -> Any:
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND",
+                f"Workstream {workstream_id} not found",
+            )
+        node = _task_node(ws_graph, workstream_id, node_id)
+        if isinstance(node, JSONResponse):
+            return node
+        body = await request.json() if await request.body() else {}
+        if not isinstance(body, dict):
+            body = {}
+        intent = body.get("intent")
+        if intent not in copilot.INTENTS:
+            return _ws_error(
+                400, "INVALID_INTENT",
+                f"intent must be one of {list(copilot.INTENTS)}, got {intent!r}",
+            )
+        message = body.get("message")
+        if not isinstance(message, str) or not message.strip():
+            return _ws_error(
+                400, "MESSAGE_REQUIRED", "message must be a non-empty string"
+            )
+        history = body.get("history") or []
+        if not isinstance(history, list):
+            history = []
+        referenced_finding_ids = body.get("referenced_finding_ids") or []
+        if not isinstance(referenced_finding_ids, list):
+            referenced_finding_ids = []
+
+        clause_index = load_clause_index(artifacts_dir)
+        sse_generator = copilot_stream_fn(
+            node=node,
+            intent=intent,
+            history=history,
+            message=message,
+            referenced_finding_ids=referenced_finding_ids,
+            clause_index=clause_index,
+            workstreams_dir=workstreams_dir,
+            workstream_id=workstream_id,
+        )
+        return StreamingResponse(sse_generator, media_type="text/event-stream")
 
     return app
 
