@@ -285,9 +285,25 @@ export function sendCopilotMessage(
   );
 }
 
+function abortError(): DOMException {
+  return new DOMException("The user aborted a request.", "AbortError");
+}
+
 /** Stream a Copilot reply via SSE. Yields typed events as they arrive.
- *  Pass an AbortSignal so the caller can cancel the in-flight fetch when
- *  the component unmounts, the intent changes, or the user navigates away. */
+ *  Pass an AbortSignal so the caller can cancel the in-flight stream when
+ *  the component unmounts, the intent changes, or the user navigates away.
+ *
+ *  The signal is deliberately *not* forwarded via `fetch()`'s `RequestInit`.
+ *  In a real browser that would be equivalent, but under Vitest's jsdom test
+ *  environment, jsdom installs its own `AbortController`/`AbortSignal`
+ *  classes, distinct from the ones Node's native `fetch` (undici) validates
+ *  against internally — passing that signal straight through throws
+ *  `RequestInit: Expected signal (...) to be an instance of AbortSignal` the
+ *  moment MSW's fetch interceptor reconstructs the `Request`. Cancellation is
+ *  handled instead by calling `reader.cancel()`, which the Streams spec also
+ *  defines to abort the underlying fetch in a real browser, so behaviour is
+ *  equivalent without threading an environment-specific class through
+ *  `fetch()`. */
 export async function* streamCopilotMessage(
   workstreamId: string,
   nodeId: string,
@@ -297,6 +313,8 @@ export async function* streamCopilotMessage(
   referencedFindingIds: string[],
   signal: AbortSignal,
 ): AsyncGenerator<SSEEvent> {
+  if (signal.aborted) throw abortError();
+
   const res = await fetch(
     `${API_BASE}/api/workstreams/${workstreamId}/tasks/${nodeId}/copilot/stream`,
     {
@@ -308,9 +326,15 @@ export async function* streamCopilotMessage(
         history,
         referenced_finding_ids: referencedFindingIds,
       }),
-      signal,
     },
   );
+
+  if (signal.aborted) {
+    // Cancelled while the connection was still being established — drop the
+    // response rather than surface stale tokens from an abandoned turn.
+    void res.body?.cancel();
+    throw abortError();
+  }
 
   if (!res.ok) {
     return throwHttpError(res);
@@ -318,29 +342,41 @@ export async function* streamCopilotMessage(
 
   // Parse the SSE stream from the response body.
   const reader = res.body!.getReader();
+  const onAbort = () => {
+    reader.cancel(abortError()).catch(() => {});
+  };
+  signal.addEventListener("abort", onAbort);
+
   const decoder = new TextDecoder();
   let buffer = "";
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        if (signal.aborted) throw abortError();
+        break;
+      }
+      buffer += decoder.decode(value, { stream: true });
 
-    // SSE frames are separated by "\n\n".
-    const frames = buffer.split("\n\n");
-    // The last element is either "" (complete) or a partial frame — keep it.
-    buffer = frames.pop() ?? "";
+      // SSE frames are separated by "\n\n".
+      const frames = buffer.split("\n\n");
+      // The last element is either "" (complete) or a partial frame — keep it.
+      buffer = frames.pop() ?? "";
 
-    for (const frame of frames) {
-      if (!frame.trim()) continue;
-      const lines = frame.split("\n");
-      const eventLine = lines.find((l) => l.startsWith("event: "));
-      const dataLine = lines.find((l) => l.startsWith("data: "));
-      if (!eventLine || !dataLine) continue;
-      const event = eventLine.slice("event: ".length).trim() as SSEEvent["event"];
-      const data = JSON.parse(dataLine.slice("data: ".length)) as SSEEvent["data"];
-      yield { event, data } as SSEEvent;
+      for (const frame of frames) {
+        if (!frame.trim()) continue;
+        const lines = frame.split("\n");
+        const eventLine = lines.find((l) => l.startsWith("event: "));
+        const dataLine = lines.find((l) => l.startsWith("data: "));
+        if (!eventLine || !dataLine) continue;
+        const event = eventLine.slice("event: ".length).trim() as SSEEvent["event"];
+        const data = JSON.parse(dataLine.slice("data: ".length)) as SSEEvent["data"];
+        yield { event, data } as SSEEvent;
+      }
     }
+  } finally {
+    signal.removeEventListener("abort", onAbort);
   }
 }
 

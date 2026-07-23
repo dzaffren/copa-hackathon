@@ -1377,6 +1377,61 @@ export const handlers = [
     },
   ),
 
+  // The streaming twin of the handler above: same script, same per-history
+  // turn indexing, but framed as SSE `token`/`done` events so
+  // streamCopilotMessage's reader loop has real frames to parse.
+  http.post(
+    "*/api/workstreams/:workstreamId/tasks/:nodeId/copilot/stream",
+    async ({ request }) => {
+      const body = (await request.json()) as {
+        intent: CopilotIntent;
+        message?: string;
+        history?: { role: string; text: string }[];
+      };
+      const script = COPILOT_SCRIPT[body.intent];
+      if (!script) {
+        return HttpResponse.json(
+          { code: "INVALID_INTENT", message: `bad intent ${body.intent}` },
+          { status: 400 },
+        );
+      }
+      if (!body.message?.trim()) {
+        return HttpResponse.json(
+          { code: "MESSAGE_REQUIRED", message: "message must be non-empty" },
+          { status: 400 },
+        );
+      }
+
+      // Build SSE body: stream the reply text word by word, then flush
+      // citations/snippet in the done event.
+      const turn = (body.history ?? []).filter((m) => m.role === "copilot").length;
+      const index = Math.min(turn, script.length - 1);
+      const reply = script[index] as {
+        role: string;
+        text: string;
+        citations?: unknown[];
+        snippet_html?: string;
+      };
+
+      const words = reply.text.split(" ");
+      let sseBody = "";
+      for (let i = 0; i < words.length; i++) {
+        const chunk = i === 0 ? words[i] : " " + words[i];
+        sseBody += `event: token\ndata: ${JSON.stringify({ t: chunk })}\n\n`;
+      }
+
+      const donePayload: Record<string, unknown> = {};
+      if (reply.citations) donePayload.citations = reply.citations;
+      if (reply.snippet_html) donePayload.snippet_html = reply.snippet_html;
+      sseBody += `event: done\ndata: ${JSON.stringify(donePayload)}\n\n`;
+
+      return new HttpResponse(sseBody, {
+        status: 200,
+        headers: { "Content-Type": "text/event-stream" },
+      });
+    },
+  ),
+
   http.get(
     "*/api/workstreams/:workstreamId/edges/:edgeId/review",
     ({ params }) => {
