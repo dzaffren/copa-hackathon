@@ -389,6 +389,18 @@ export interface ChatHistoryTurn {
   text: string;
 }
 
+/** Payload of the SSE `done` event from `POST .../copilot/stream`. */
+export interface StreamingCopilotDone {
+  citations?: CopilotCitation[];
+  snippet_html?: string;
+}
+
+/** A parsed SSE event from the Copilot streaming endpoint. */
+export type SSEEvent =
+  | { event: "token"; data: { t: string } }
+  | { event: "done"; data: StreamingCopilotDone }
+  | { event: "error"; data: { code: string; message: string } };
+
 // --- New Workstream --------------------------------------------------------
 
 /** Wire codes for the deliverable dropdown. The server maps these to the human

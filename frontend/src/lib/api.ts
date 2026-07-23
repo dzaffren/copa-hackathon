@@ -22,6 +22,7 @@ import type {
   PatchReviewStateResponse,
   ReviewResponse,
   ReviewState,
+  SSEEvent,
   TaskResponse,
   TaskWorkflow,
   TaskWorkflowStatus,
@@ -282,6 +283,65 @@ export function sendCopilotMessage(
       referenced_finding_ids: referencedFindingIds,
     },
   );
+}
+
+/** Stream a Copilot reply via SSE. Yields typed events as they arrive.
+ *  Pass an AbortSignal so the caller can cancel the in-flight fetch when
+ *  the component unmounts, the intent changes, or the user navigates away. */
+export async function* streamCopilotMessage(
+  workstreamId: string,
+  nodeId: string,
+  intent: CopilotIntent,
+  message: string,
+  history: ChatHistoryTurn[],
+  referencedFindingIds: string[],
+  signal: AbortSignal,
+): AsyncGenerator<SSEEvent> {
+  const res = await fetch(
+    `${API_BASE}/api/workstreams/${workstreamId}/tasks/${nodeId}/copilot/stream`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        intent,
+        message,
+        history,
+        referenced_finding_ids: referencedFindingIds,
+      }),
+      signal,
+    },
+  );
+
+  if (!res.ok) {
+    return throwHttpError(res);
+  }
+
+  // Parse the SSE stream from the response body.
+  const reader = res.body!.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+
+    // SSE frames are separated by "\n\n".
+    const frames = buffer.split("\n\n");
+    // The last element is either "" (complete) or a partial frame — keep it.
+    buffer = frames.pop() ?? "";
+
+    for (const frame of frames) {
+      if (!frame.trim()) continue;
+      const lines = frame.split("\n");
+      const eventLine = lines.find((l) => l.startsWith("event: "));
+      const dataLine = lines.find((l) => l.startsWith("data: "));
+      if (!eventLine || !dataLine) continue;
+      const event = eventLine.slice("event: ".length).trim() as SSEEvent["event"];
+      const data = JSON.parse(dataLine.slice("data: ".length)) as SSEEvent["data"];
+      yield { event, data } as SSEEvent;
+    }
+  }
 }
 
 // --- New Workstream --------------------------------------------------------
