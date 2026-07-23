@@ -106,3 +106,15 @@ def test_call_chat_without_credentials_raises(monkeypatch: pytest.MonkeyPatch) -
     monkeypatch.setattr(llm, "AZURE_FOUNDRY_API_KEY", None)
     with pytest.raises(RuntimeError, match="AZURE_FOUNDRY"):
         llm.call_chat("some-deployment", "system prompt", "user prompt")
+
+
+# ---------------------------------------------------------------------------
+# call_chat_stream
+# ---------------------------------------------------------------------------
+
+from engine.llm import call_chat_stream  # noqa: E402
+
+
+def test_call_chat_stream_is_importable() -> None:
+    """Confirm the function exists before testing its behaviour."""
+    assert callable(call_chat_stream)

@@ -17,7 +17,7 @@ model's raw text reply into parsed JSON.
 """
 
 import json
-from typing import Optional
+from typing import Generator, Optional
 
 from engine.config import (
     AZURE_FOUNDRY_API_KEY,
@@ -99,6 +99,45 @@ def call_chat(
         for block in message.content
         if getattr(block, "type", None) == "text"
     )
+
+
+def call_chat_stream(
+    deployment: str,
+    system: str,
+    messages: list[dict[str, str]],
+    max_tokens: int = 8192,
+) -> Generator[str, None, None]:
+    """Stream a Claude deployment on Azure AI Foundry, yielding text chunks.
+
+    Uses `client.messages.stream(...)` — the Anthropic SDK's context-manager
+    streaming API — and yields each text chunk from `.text_stream` as it
+    arrives, so the caller can forward chunks to the client without waiting
+    for the full model response.
+
+    `call_chat` is left unchanged and still used by `engine.connections`
+    (finder/critic) which needs the full text at once for JSON parsing.
+    This function is the streaming seam for the Copilot only.
+    """
+    from anthropic import AnthropicFoundry
+
+    if not AZURE_FOUNDRY_ENDPOINT or not AZURE_FOUNDRY_API_KEY:
+        raise RuntimeError(
+            "AZURE_FOUNDRY_ENDPOINT and AZURE_FOUNDRY_API_KEY must be set "
+            "in the environment to call call_chat_stream"
+        )
+
+    client = AnthropicFoundry(
+        api_key=AZURE_FOUNDRY_API_KEY,
+        base_url=AZURE_FOUNDRY_ENDPOINT,
+    )
+    with client.messages.stream(
+        model=deployment,
+        system=system,
+        messages=messages,
+        max_tokens=max_tokens,
+    ) as stream:
+        for text in stream.text_stream:
+            yield text
 
 
 def parse_json_response(raw: str) -> list | dict:
