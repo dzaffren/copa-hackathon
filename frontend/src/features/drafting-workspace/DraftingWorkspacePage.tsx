@@ -9,7 +9,7 @@ import {
   saveDraft,
 } from "@/lib/api";
 import type { LinkageCard } from "@/lib/types";
-import { EditorPane } from "./EditorPane";
+import { EditorPane, type EditorPaneHandle } from "./EditorPane";
 import { LinkageRefCard } from "./LinkageRefCard";
 import { CopilotTab } from "./CopilotTab";
 
@@ -22,6 +22,7 @@ export function DraftingWorkspacePage() {
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<TabKey>("reviewed");
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
+  const editorRef = useRef<EditorPaneHandle>(null);
 
   const task = useQuery({
     queryKey: ["task", workstreamId, nodeId],
@@ -72,11 +73,12 @@ export function DraftingWorkspacePage() {
   );
 
   function insertSnippet(snippetHtml: string) {
-    // Appended at end-of-draft rather than at the caret. The spec leaves this
-    // open; end-of-draft is the predictable one, since the caret is usually
-    // wherever the drafter last clicked in a *different* pane.
+    // Lands at the drafter's last cursor position in the editor (falling
+    // back to end-of-draft if they've never clicked into it) — the drafter
+    // decides where a suggested clause goes, rather than it always appending.
     const wrapped = `<div class="copilot-snippet">${snippetHtml}</div>`;
-    const next = `${html ?? ""}${wrapped}`;
+    const next = editorRef.current?.insertAtCursor(wrapped);
+    if (next == null) return;
     setHtml(next);
     save.mutate(next);
   }
@@ -219,6 +221,7 @@ export function DraftingWorkspacePage() {
 
         <main className="col-span-7 min-h-0">
           <EditorPane
+            ref={editorRef}
             contentHtml={html ?? ""}
             lastSavedAt={draft.data?.last_saved_at ?? null}
             linkages={reviewedCards}
