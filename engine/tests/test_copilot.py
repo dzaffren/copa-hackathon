@@ -16,6 +16,7 @@ from engine.copilot import (
     NO_MATCHING_CLAUSE,
     CopilotError,
     _build_grounding_context,
+    _build_messages,
     _validate_reply,
     copilot_reply,
 )
@@ -265,6 +266,87 @@ def test_copilot_reply_sends_history_as_user_assistant_turns(tmp_path):
         {"role": "assistant", "content": "hello"},
         {"role": "user", "content": "next"},
     ]
+
+
+# --- _build_messages (alternation guardrail) --------------------------------
+# Regression coverage for a real bug: a prior turn that never got a reply
+# (e.g. a failed live call) left an unanswered "user" turn in the client's
+# history. Appending the next message after it produced two consecutive
+# "user" turns, which the Messages API rejects outright ("roles must
+# alternate") — turning one failed call into every subsequent call failing
+# too, regardless of credentials.
+
+
+def test_build_messages_normal_alternating_history():
+    messages = _build_messages(
+        [{"role": "user", "text": "hi"}, {"role": "copilot", "text": "hello"}],
+        "next",
+    )
+    assert messages == [
+        {"role": "user", "content": "hi"},
+        {"role": "assistant", "content": "hello"},
+        {"role": "user", "content": "next"},
+    ]
+
+
+def test_build_messages_merges_an_unanswered_user_turn_instead_of_duplicating_role():
+    # history ends on "user" (the previous call never got a copilot reply) —
+    # the new message must merge into that turn, not start a second "user".
+    messages = _build_messages([{"role": "user", "text": "first failed message"}], "next")
+    assert messages == [
+        {"role": "user", "content": "first failed message\n\nnext"},
+    ]
+
+
+def test_build_messages_merges_consecutive_copilot_turns_too():
+    messages = _build_messages(
+        [
+            {"role": "user", "text": "hi"},
+            {"role": "copilot", "text": "first reply"},
+            {"role": "copilot", "text": "a second reply somehow logged"},
+        ],
+        "next",
+    )
+    assert messages == [
+        {"role": "user", "content": "hi"},
+        {"role": "assistant", "content": "first reply\n\na second reply somehow logged"},
+        {"role": "user", "content": "next"},
+    ]
+    assert all(
+        messages[i]["role"] != messages[i + 1]["role"] for i in range(len(messages) - 1)
+    )
+
+
+def test_build_messages_skips_empty_turns():
+    messages = _build_messages([{"role": "user", "text": ""}], "hi")
+    assert messages == [{"role": "user", "content": "hi"}]
+
+
+def test_copilot_reply_survives_an_unanswered_prior_user_turn(tmp_path):
+    """End-to-end: copilot_reply must not itself send an invalid,
+    role-duplicating turn list to the model after a prior failed call."""
+    clause_index = _clause_index({})
+    node = {"id": "n1", "title": "n1", "document_id": None}
+    captured = {}
+
+    def stub_turn(system, messages):
+        captured["messages"] = messages
+        return json.dumps({"text": "ok"})
+
+    copilot_reply(
+        node=node,
+        intent="PD",
+        history=[{"role": "user", "text": "first failed message"}],
+        message="what are the suggestions you have",
+        referenced_finding_ids=[],
+        clause_index=clause_index,
+        workstreams_dir=tmp_path,
+        workstream_id=_WORKSTREAM,
+        turn_fn=stub_turn,
+    )
+
+    roles = [m["role"] for m in captured["messages"]]
+    assert all(roles[i] != roles[i + 1] for i in range(len(roles) - 1))
 
 
 def test_copilot_reply_raises_copilot_error_on_non_object_json(tmp_path):

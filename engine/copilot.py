@@ -69,6 +69,37 @@ def _copilot_turn(system: str, messages: list[dict[str, str]]) -> str:
     return call_chat(COPILOT_DEPLOYMENT, system, "", messages=messages)
 
 
+def _build_messages(
+    history: list[dict[str, str]], message: str
+) -> list[dict[str, str]]:
+    """Build a strictly user/assistant-alternating Messages-API turn list.
+
+    The client sends its own conversation state as `history` — including any
+    prior turn that never got a reply (e.g. a call that errored, or an id
+    the client retried after a network hiccup). Appending the new `message`
+    after an unanswered "user" turn would leave two consecutive "user" turns,
+    which the Messages API rejects outright ("roles must alternate"),
+    surfacing as a 502 on every subsequent call, not just the one that
+    failed. Consecutive same-role turns are merged (concatenated) rather
+    than dropped, so no drafter input is silently lost.
+    """
+    turns: list[dict[str, str]] = []
+    for turn_msg in history:
+        role = "assistant" if turn_msg.get("role") == "copilot" else "user"
+        text = turn_msg.get("text", "")
+        if not text:
+            continue
+        if turns and turns[-1]["role"] == role:
+            turns[-1]["content"] = f"{turns[-1]['content']}\n\n{text}"
+        else:
+            turns.append({"role": role, "content": text})
+    if turns and turns[-1]["role"] == "user":
+        turns[-1]["content"] = f"{turns[-1]['content']}\n\n{message}"
+    else:
+        turns.append({"role": "user", "content": message})
+    return turns
+
+
 def _build_grounding_context(
     node: dict[str, Any],
     clause_index: ClauseIndex,
@@ -241,14 +272,7 @@ def copilot_reply(
     )
     system = _system_prompt(node.get("title") or "this task", intent, context)
 
-    messages: list[dict[str, str]] = []
-    for turn_msg in history:
-        role = "assistant" if turn_msg.get("role") == "copilot" else "user"
-        text = turn_msg.get("text", "")
-        if text:
-            messages.append({"role": role, "content": text})
-    messages.append({"role": "user", "content": message})
-
+    messages = _build_messages(history, message)
     raw = turn(system, messages)
     parsed = parse_json_response(raw)
     if not isinstance(parsed, dict):
