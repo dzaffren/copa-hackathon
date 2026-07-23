@@ -391,6 +391,7 @@ export interface ChatHistoryTurn {
 
 /** Payload of the SSE `done` event from `POST .../copilot/stream`. */
 export interface StreamingCopilotDone {
+  text?: string;
   citations?: CopilotCitation[];
   snippet_html?: string;
 }

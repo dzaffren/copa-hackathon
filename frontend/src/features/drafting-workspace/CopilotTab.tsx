@@ -116,10 +116,14 @@ export function CopilotTab({
         }
       }
 
-      // Stream finished cleanly — commit the full message.
+      // Stream finished cleanly — commit the full message. Prefer the
+      // done event's extracted prose (`text`) over the raw accumulated
+      // token buffer: in production the tokens spell out the model's raw
+      // JSON envelope, not clean prose, so `accumulated` is only a safe
+      // fallback when the server genuinely had no JSON to extract from.
       const fullMessage: ChatMessage = {
         role: "copilot",
-        text: accumulated || "No matching clause found",
+        text: donePayload?.text || accumulated || "No matching clause found",
         citations: donePayload?.citations,
         snippet_html: donePayload?.snippet_html,
       };

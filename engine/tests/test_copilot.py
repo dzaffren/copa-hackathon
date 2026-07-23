@@ -468,6 +468,7 @@ def test_copilot_reply_stream_yields_token_events_then_done(tmp_path):
     assert token_events[0]["data"]["t"] == "Hello"
     assert token_events[1]["data"]["t"] == " world"
     assert len(done_events) == 1
+    assert done_events[0]["data"]["text"] == "Hello world"
     assert len(error_events) == 0
 
 
@@ -491,6 +492,7 @@ def test_copilot_reply_stream_done_carries_validated_citations(tmp_path):
     ))
 
     done = next(e for e in events if e["event"] == "done")
+    assert done["data"]["text"] == "Cites a real clause."
     assert done["data"]["citations"][0]["clause_number"] == "OpRes PD 5.3"
     # text must come from grounded set, not model echo
     assert done["data"]["citations"][0]["text"] == "Annually."
@@ -513,6 +515,7 @@ def test_copilot_reply_stream_graceful_degrade_on_plain_prose(tmp_path):
     token_events = [e for e in events if e["event"] == "token"]
     done = next(e for e in events if e["event"] == "done")
     assert len(token_events) == 1
+    assert done["data"]["text"] == "Yes, there are overlaps between the clauses."
     assert "citations" not in done["data"]
     assert "snippet_html" not in done["data"]
 
@@ -536,6 +539,32 @@ def test_copilot_reply_stream_yields_error_event_on_stream_fn_exception(tmp_path
     assert len(error_events) == 1
     assert "COPILOT_FAILED" in error_events[0]["data"]["code"]
     assert "credentials" in error_events[0]["data"]["message"]
+
+
+def test_copilot_reply_stream_done_text_is_extracted_prose_not_raw_json(tmp_path):
+    """Regression coverage: in production `call_chat_stream` yields the
+    model's raw text chunks — which, per the system prompt, is a JSON
+    envelope like `{"text": ..., "citations": [...]}`, not bare prose. The
+    `done` event's `text` must be the JSON-extracted prose, never the raw
+    accumulated JSON string the tokens spelled out."""
+    clause_index = _clause_index({})
+    node = {"id": "n1", "title": "n1", "document_id": None}
+
+    def stub_stream(system, messages):
+        # Simulate a real model response: the raw wire text IS a JSON
+        # envelope, streamed chunk by chunk (here, as one chunk for
+        # simplicity — the accumulation behaves the same either way).
+        yield _json.dumps({"text": "Clean prose the user should see.", "citations": []})
+
+    events = _collect_sse(copilot_reply_stream(
+        node=node, intent="PD", history=[], message="hi",
+        referenced_finding_ids=[],
+        clause_index=clause_index, workstreams_dir=tmp_path,
+        workstream_id=_WORKSTREAM, stream_fn=stub_stream,
+    ))
+
+    done = next(e for e in events if e["event"] == "done")
+    assert done["data"]["text"] == "Clean prose the user should see."
 
 
 def test_copilot_reply_stream_done_has_no_citations_when_none_are_grounded(tmp_path):

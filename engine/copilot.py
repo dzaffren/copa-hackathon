@@ -337,7 +337,7 @@ def copilot_reply_stream(
 
     Wire format (each yielded string is a complete SSE frame):
         event: token\\ndata: {"t": "chunk"}\\n\\n
-        event: done\\ndata: {"citations": [...], "snippet_html": "..."}\\n\\n
+        event: done\\ndata: {"text": "...", "citations": [...], "snippet_html": "..."}\\n\\n
         event: error\\ndata: {"code": "COPILOT_FAILED", "message": "..."}\\n\\n
 
     `stream_fn` is an injectable seam — tests pass a stub generator so no
@@ -371,11 +371,14 @@ def copilot_reply_stream(
 
     _raw, parsed = _call_and_parse(_replay, system, messages_list, attempts=1)
     if parsed is None:
-        # Plain prose — yield done with no citations (graceful degrade)
-        yield f"event: done\ndata: {json.dumps({})}\n\n"
+        # Plain prose — the accumulated stream text IS the intended reply
+        # (there was no JSON envelope to extract from), so surface it under
+        # the same "text" key the success branch uses, giving the frontend
+        # one consistent place to read the final text from.
+        yield f"event: done\ndata: {json.dumps({'text': accumulated.strip() or NO_MATCHING_CLAUSE})}\n\n"
     else:
         validated = _validate_reply(parsed, grounded)
-        done_payload: dict[str, Any] = {}
+        done_payload: dict[str, Any] = {"text": validated["text"]}
         if validated.get("citations"):
             done_payload["citations"] = validated["citations"]
         if validated.get("snippet_html"):

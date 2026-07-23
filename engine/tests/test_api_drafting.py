@@ -467,10 +467,6 @@ def test_POST_copilot_502_when_the_live_call_fails(tmp_path):
 # The streaming variant of the copilot route. `copilot_stream_fn` is injected
 # so tests stub the generator with no network or credentials.
 
-from engine.copilot import INTENTS as _COPILOT_INTENTS  # noqa: E402
-import json as _json_mod  # noqa: E402
-
-
 def _make_stream_client(tmp_path, stream_fn):
     dst = tmp_path / "workstreams"
     shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
