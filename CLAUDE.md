@@ -115,11 +115,21 @@ Note this is _not_ `data/references/`, which is public and tracked.
   `differs-on`. `engine/tests/test_taxonomy_traces.py` guards this. The competing
   `verdict` vocabulary (`Consensus`/`Conflict`/`Gap`/`Duplicate`/`Partial`) went with
   `verdicts.py`, so "conflict" now means exactly one thing.
-- **The API is a fixture projection, not a model client.** Every route reads
-  `data/workstreams/`; the `analyze` route replays `workstreams.canned_analysis` for
-  the demo pair and returns `no_matching_source` otherwise. `create_app()` takes no
-  model seam, so the service _cannot_ reach a model — editing `connections.py` will
-  not change what the demo renders.
+- **Read routes are fixture projections; `analyze` is live.** Every GET route reads
+  `data/workstreams/` and touches no model. The **POST `.../edges/{edge_id}/analyze`**
+  route is the exception: it loads the clause index and calls the live finder
+  (`find_connections_fn`, defaulting to `engine.connections.find_connections`) on the
+  edge's two ingested documents, then persists the resulting findings. It refuses
+  (409 `NOT_ANALYSABLE`) when either endpoint has no document or both resolve to the
+  same one, returns 502 `ANALYZE_FAILED` on a model/creds/network error, and does
+  **not** persist a no-linkage run (the edge stays unanalysed and re-analysable).
+  It also refuses (409 `ALREADY_ANALYSED`) an edge that already has findings —
+  guarding the curated `_cross` demo backstop from a stray re-analyze — unless
+  called with `?force=true`.
+  `create_app()` **does** take a model seam — `find_connections_fn` — so tests stub the
+  finder and CI never makes a live call, but editing `connections.py` _does_ change what
+  a live `analyze` produces. (There is no `canned_analysis`; that was the pre-16-Jul
+  replay and is gone.)
 
 ## Learnings
 
