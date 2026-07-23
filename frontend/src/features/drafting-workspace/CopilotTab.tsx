@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { sendCopilotMessage } from "@/lib/api";
+import { HttpError, sendCopilotMessage } from "@/lib/api";
 import {
   COPILOT_INTENTS,
   COPILOT_INTENT_LABELS,
@@ -173,8 +173,9 @@ export function CopilotTab({
         )}
         {send.isError && (
           <p className="text-xs text-red-600">
-            The Copilot failed to reply. Check the engine has model
-            credentials, then retry.
+            {send.error instanceof HttpError
+              ? send.error.message
+              : "The Copilot failed to reply. Check the engine is running and reachable, then retry."}
           </p>
         )}
       </div>

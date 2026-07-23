@@ -14,9 +14,9 @@ from engine.clauses import ClauseIndex
 from engine.copilot import (
     INTENTS,
     NO_MATCHING_CLAUSE,
-    CopilotError,
     _build_grounding_context,
     _build_messages,
+    _call_and_parse,
     _validate_reply,
     copilot_reply,
 )
@@ -349,28 +349,77 @@ def test_copilot_reply_survives_an_unanswered_prior_user_turn(tmp_path):
     assert all(roles[i] != roles[i + 1] for i in range(len(roles) - 1))
 
 
-def test_copilot_reply_raises_copilot_error_on_non_object_json(tmp_path):
+# --- _call_and_parse (retry + graceful degrade) -----------------------------
+# Regression coverage for a real bug: Claude sometimes answers an open-ended
+# question in plain prose despite the system prompt's strict-JSON
+# instruction (reproduced live with "does it have any overlapped clause?").
+# That used to propagate as a 502 on a call that actually succeeded — now it
+# retries once, and if the model still won't commit to JSON, the raw prose
+# becomes the reply's `text` instead of failing the turn.
+
+
+def test_call_and_parse_returns_the_parsed_object_on_first_try():
+    def stub_turn(system, messages):
+        return json.dumps({"text": "ok"})
+
+    raw, parsed = _call_and_parse(stub_turn, "sys", [])
+    assert parsed == {"text": "ok"}
+    assert raw == json.dumps({"text": "ok"})
+
+
+def test_call_and_parse_retries_once_after_non_json_then_succeeds():
+    calls = []
+
+    def stub_turn(system, messages):
+        calls.append(1)
+        if len(calls) == 1:
+            return "Sure, here's a plain-prose answer with no JSON at all."
+        return json.dumps({"text": "second attempt worked"})
+
+    raw, parsed = _call_and_parse(stub_turn, "sys", [])
+    assert len(calls) == 2
+    assert parsed == {"text": "second attempt worked"}
+
+
+def test_call_and_parse_gives_up_after_every_attempt_is_non_json():
+    def stub_turn(system, messages):
+        return "Still just prose, no JSON envelope."
+
+    raw, parsed = _call_and_parse(stub_turn, "sys", [])
+    assert parsed is None
+    assert raw == "Still just prose, no JSON envelope."
+
+
+def test_call_and_parse_treats_a_non_dict_json_value_as_non_json_too():
+    def stub_turn(system, messages):
+        return json.dumps(["not", "an", "object"])
+
+    raw, parsed = _call_and_parse(stub_turn, "sys", [])
+    assert parsed is None
+
+
+def test_copilot_reply_degrades_to_plain_text_when_the_model_never_returns_json(tmp_path):
     clause_index = _clause_index({})
     node = {"id": "n1", "title": "n1", "document_id": None}
 
     def stub_turn(system, messages):
-        return json.dumps(["not", "an", "object"])
+        return "Yes — the Discussion Paper explicitly acknowledges overlap with several existing policy documents."
 
-    try:
-        copilot_reply(
-            node=node,
-            intent="PD",
-            history=[],
-            message="hi",
-            referenced_finding_ids=[],
-            clause_index=clause_index,
-            workstreams_dir=tmp_path,
-            workstream_id=_WORKSTREAM,
-            turn_fn=stub_turn,
-        )
-        assert False, "expected CopilotError"
-    except CopilotError:
-        pass
+    reply = copilot_reply(
+        node=node,
+        intent="PD",
+        history=[],
+        message="does it have any overlapped clause?",
+        referenced_finding_ids=[],
+        clause_index=clause_index,
+        workstreams_dir=tmp_path,
+        workstream_id=_WORKSTREAM,
+        turn_fn=stub_turn,
+    )
+
+    assert reply["role"] == "copilot"
+    assert "overlap" in reply["text"]
+    assert "citations" not in reply
 
 
 def test_intents_tuple_has_the_seven_presets():

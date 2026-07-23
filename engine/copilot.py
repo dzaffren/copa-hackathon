@@ -29,7 +29,7 @@ from typing import Any, Callable, Optional
 from engine import findings
 from engine.clauses import ClauseIndex
 from engine.config import COPILOT_DEPLOYMENT
-from engine.llm import call_chat, parse_json_response
+from engine.llm import LLMResponseError, call_chat, parse_json_response
 
 # The seven intent presets — moved from `copilot_scripts.py`, which this
 # module replaces. Cosmetic beyond a light system-prompt framing hint; the
@@ -47,12 +47,6 @@ INTENTS: tuple[str, ...] = (
 # The phrase the Copilot must say instead of inventing a citation — the
 # CLAUDE.md verbatim-citation hard rule, verbatim.
 NO_MATCHING_CLAUSE: str = "No matching clause found"
-
-
-class CopilotError(Exception):
-    """Raised when the live Copilot call cannot proceed or fails (bad
-    credentials, network, or a malformed model reply) — the API route turns
-    this into a 502, never a silent scripted fallback."""
 
 
 # The turn function is an injectable seam, mirroring `engine.connections`'s
@@ -258,10 +252,19 @@ def copilot_reply(
         `{"role": "copilot", "text": ..., "citations"?: [...],
         "snippet_html"?: ...}` — every citation guaranteed grounded.
 
+    A reply the model answered but did not wrap in the requested JSON envelope
+    (it sometimes drifts into plain prose on open-ended questions — a known,
+    sporadic failure mode, not unique to this prompt) is retried once, then
+    shown as a plain-text reply rather than failing the whole turn: the model
+    DID answer, and a 502 on a working reply is a worse outcome than losing
+    the citation block's special rendering. Citation safety is unaffected —
+    with no structured citations to validate, none are shown, never an
+    unverified one.
+
     Raises:
-        CopilotError: the model's reply did not parse as a JSON object.
-        engine.llm.LLMResponseError: the model's reply was not valid JSON at
-            all (propagates from `parse_json_response`).
+        engine.llm.LLMResponseError: propagates only from `parse_json_response`
+            being asked to parse something that isn't reachable here — not a
+            real path today, since a parse failure is handled inline.
         RuntimeError: Foundry credentials are unset (propagates from
             `call_chat`).
     """
@@ -273,10 +276,35 @@ def copilot_reply(
     system = _system_prompt(node.get("title") or "this task", intent, context)
 
     messages = _build_messages(history, message)
-    raw = turn(system, messages)
-    parsed = parse_json_response(raw)
-    if not isinstance(parsed, dict):
-        raise CopilotError(
-            f"Expected a JSON object reply; got {type(parsed).__name__}"
-        )
+    raw, parsed = _call_and_parse(turn, system, messages)
+    if parsed is None:
+        return {"role": "copilot", "text": raw.strip() or NO_MATCHING_CLAUSE}
     return _validate_reply(parsed, grounded)
+
+
+def _call_and_parse(
+    turn: CopilotTurnFn,
+    system: str,
+    messages: list[dict[str, str]],
+    attempts: int = 2,
+) -> tuple[str, Optional[dict[str, Any]]]:
+    """Call the model, retrying once on a reply that isn't a JSON object.
+
+    Mirrors `engine.connections._call_candidates_with_retry`'s reasoning:
+    Claude occasionally answers in free prose despite the system prompt's
+    strict-JSON instruction, and the failure is sporadic enough that a
+    re-ask often succeeds. Returns `(raw_text_from_the_last_attempt,
+    parsed_dict_or_None)` — `None` only when every attempt still failed to
+    produce a JSON object, so the caller can degrade to a plain-text reply
+    instead of discarding a reply the model DID successfully generate.
+    """
+    raw = ""
+    for attempt in range(attempts):
+        raw = turn(system, messages)
+        try:
+            parsed = parse_json_response(raw)
+        except LLMResponseError:
+            continue
+        if isinstance(parsed, dict):
+            return raw, parsed
+    return raw, None
