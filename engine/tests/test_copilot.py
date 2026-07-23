@@ -425,3 +425,135 @@ def test_copilot_reply_degrades_to_plain_text_when_the_model_never_returns_json(
 def test_intents_tuple_has_the_seven_presets():
     assert len(INTENTS) == 7
     assert "PD" in INTENTS
+
+
+# --- copilot_reply_stream (SSE streaming generator) -------------------------
+
+import json as _json
+
+from engine.copilot import copilot_reply_stream
+
+
+def _collect_sse(gen) -> list[dict]:
+    """Parse SSE frames from the generator into a list of {event, data} dicts."""
+    events = []
+    for frame in gen:
+        lines = frame.strip().split("\n")
+        event = next((l[len("event: "):] for l in lines if l.startswith("event: ")), "message")
+        data_line = next((l[len("data: "):] for l in lines if l.startswith("data: ")), "{}")
+        events.append({"event": event, "data": _json.loads(data_line)})
+    return events
+
+
+def test_copilot_reply_stream_yields_token_events_then_done(tmp_path):
+    clause_index = _clause_index({})
+    node = {"id": "n1", "title": "n1", "document_id": None}
+
+    def stub_stream(system, messages):
+        yield "Hello"
+        yield " world"
+
+    events = _collect_sse(copilot_reply_stream(
+        node=node, intent="PD", history=[], message="hi",
+        referenced_finding_ids=[],
+        clause_index=clause_index, workstreams_dir=tmp_path,
+        workstream_id=_WORKSTREAM, stream_fn=stub_stream,
+    ))
+
+    token_events = [e for e in events if e["event"] == "token"]
+    done_events = [e for e in events if e["event"] == "done"]
+    error_events = [e for e in events if e["event"] == "error"]
+
+    assert len(token_events) == 2
+    assert token_events[0]["data"]["t"] == "Hello"
+    assert token_events[1]["data"]["t"] == " world"
+    assert len(done_events) == 1
+    assert len(error_events) == 0
+
+
+def test_copilot_reply_stream_done_carries_validated_citations(tmp_path):
+    clause_index = _clause_index(
+        {"OpRes PD 5.3": {"document_id": "opres-pd-v0-3", "text": "Annually."}}
+    )
+    node = {"id": "opres-pd-v0-3", "title": "OpRes PD", "document_id": "opres-pd-v0-3"}
+
+    def stub_stream(system, messages):
+        yield _json.dumps({
+            "text": "Cites a real clause.",
+            "citations": [{"clause_number": "OpRes PD 5.3", "text": "ignored"}],
+        })
+
+    events = _collect_sse(copilot_reply_stream(
+        node=node, intent="PD", history=[], message="hi",
+        referenced_finding_ids=[],
+        clause_index=clause_index, workstreams_dir=tmp_path,
+        workstream_id=_WORKSTREAM, stream_fn=stub_stream,
+    ))
+
+    done = next(e for e in events if e["event"] == "done")
+    assert done["data"]["citations"][0]["clause_number"] == "OpRes PD 5.3"
+    # text must come from grounded set, not model echo
+    assert done["data"]["citations"][0]["text"] == "Annually."
+
+
+def test_copilot_reply_stream_graceful_degrade_on_plain_prose(tmp_path):
+    clause_index = _clause_index({})
+    node = {"id": "n1", "title": "n1", "document_id": None}
+
+    def stub_stream(system, messages):
+        yield "Yes, there are overlaps between the clauses."
+
+    events = _collect_sse(copilot_reply_stream(
+        node=node, intent="PD", history=[], message="hi",
+        referenced_finding_ids=[],
+        clause_index=clause_index, workstreams_dir=tmp_path,
+        workstream_id=_WORKSTREAM, stream_fn=stub_stream,
+    ))
+
+    token_events = [e for e in events if e["event"] == "token"]
+    done = next(e for e in events if e["event"] == "done")
+    assert len(token_events) == 1
+    assert "citations" not in done["data"]
+    assert "snippet_html" not in done["data"]
+
+
+def test_copilot_reply_stream_yields_error_event_on_stream_fn_exception(tmp_path):
+    clause_index = _clause_index({})
+    node = {"id": "n1", "title": "n1", "document_id": None}
+
+    def stub_stream(system, messages):
+        raise RuntimeError("Foundry credentials missing")
+        yield  # make it a generator
+
+    events = _collect_sse(copilot_reply_stream(
+        node=node, intent="PD", history=[], message="hi",
+        referenced_finding_ids=[],
+        clause_index=clause_index, workstreams_dir=tmp_path,
+        workstream_id=_WORKSTREAM, stream_fn=stub_stream,
+    ))
+
+    error_events = [e for e in events if e["event"] == "error"]
+    assert len(error_events) == 1
+    assert "COPILOT_FAILED" in error_events[0]["data"]["code"]
+    assert "credentials" in error_events[0]["data"]["message"]
+
+
+def test_copilot_reply_stream_done_has_no_citations_when_none_are_grounded(tmp_path):
+    clause_index = _clause_index({})
+    node = {"id": "n1", "title": "n1", "document_id": None}
+
+    def stub_stream(system, messages):
+        yield _json.dumps({
+            "text": "Cites a hallucinated clause.",
+            "citations": [{"clause_number": "MADE UP 99.9", "text": "fake"}],
+        })
+
+    events = _collect_sse(copilot_reply_stream(
+        node=node, intent="PD", history=[], message="hi",
+        referenced_finding_ids=[],
+        clause_index=clause_index, workstreams_dir=tmp_path,
+        workstream_id=_WORKSTREAM, stream_fn=stub_stream,
+    ))
+
+    done = next(e for e in events if e["event"] == "done")
+    assert "citations" not in done["data"]

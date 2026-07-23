@@ -24,12 +24,12 @@ and any `@`-referenced accepted findings' `source_clauses`/`target_clauses`
 """
 
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Generator, Optional
 
 from engine import findings
 from engine.clauses import ClauseIndex
 from engine.config import COPILOT_DEPLOYMENT
-from engine.llm import LLMResponseError, call_chat, parse_json_response
+from engine.llm import LLMResponseError, call_chat, call_chat_stream, parse_json_response
 
 # The seven intent presets — moved from `copilot_scripts.py`, which this
 # module replaces. Cosmetic beyond a light system-prompt framing hint; the
@@ -53,6 +53,7 @@ NO_MATCHING_CLAUSE: str = "No matching clause found"
 # `finder_fn`/`critic_fn` — real callers use `_copilot_turn` (network); tests
 # inject a stub, so no credentials are needed in CI.
 CopilotTurnFn = Callable[[str, list[dict[str, str]]], str]
+CopilotStreamFn = Callable[[str, list[dict[str, str]]], Generator[str, None, None]]
 
 
 def _copilot_turn(system: str, messages: list[dict[str, str]]) -> str:
@@ -61,6 +62,11 @@ def _copilot_turn(system: str, messages: list[dict[str, str]]) -> str:
     `user` is passed as an empty placeholder — `call_chat` ignores it when
     `messages` is given (see `engine.llm.call_chat`'s docstring)."""
     return call_chat(COPILOT_DEPLOYMENT, system, "", messages=messages)
+
+
+def _copilot_stream_turn(system: str, messages: list[dict[str, str]]) -> Generator[str, None, None]:
+    """Real streaming seam — calls call_chat_stream against Azure AI Foundry."""
+    yield from call_chat_stream(COPILOT_DEPLOYMENT, system, messages)
 
 
 def _build_messages(
@@ -308,3 +314,70 @@ def _call_and_parse(
         if isinstance(parsed, dict):
             return raw, parsed
     return raw, None
+
+
+def copilot_reply_stream(
+    *,
+    node: dict[str, Any],
+    intent: str,
+    history: list[dict[str, str]],
+    message: str,
+    referenced_finding_ids: list[str],
+    clause_index: ClauseIndex,
+    workstreams_dir: Path,
+    workstream_id: str,
+    stream_fn: Optional[CopilotStreamFn] = None,
+) -> Generator[str, None, None]:
+    """Stream a Copilot turn as SSE frames.
+
+    Yields token events as text chunks arrive, then a single done event
+    with validated citations+snippet after the stream exhausts. On any
+    exception, yields an error event and stops — never a bare 502 from a
+    partial stream.
+
+    Wire format (each yielded string is a complete SSE frame):
+        event: token\\ndata: {"t": "chunk"}\\n\\n
+        event: done\\ndata: {"citations": [...], "snippet_html": "..."}\\n\\n
+        event: error\\ndata: {"code": "COPILOT_FAILED", "message": "..."}\\n\\n
+
+    `stream_fn` is an injectable seam — tests pass a stub generator so no
+    live credentials are needed in CI. Defaults to `_copilot_stream_turn`
+    which calls `engine.llm.call_chat_stream` against Azure AI Foundry.
+    """
+    import json
+
+    streamer = stream_fn if stream_fn is not None else _copilot_stream_turn
+
+    context, grounded = _build_grounding_context(
+        node, clause_index, workstreams_dir, workstream_id, referenced_finding_ids
+    )
+    system = _system_prompt(node.get("title") or "this task", intent, context)
+    messages_list = _build_messages(history, message)
+
+    accumulated = ""
+    try:
+        for chunk in streamer(system, messages_list):
+            accumulated += chunk
+            yield f"event: token\ndata: {json.dumps({'t': chunk})}\n\n"
+    except Exception as exc:
+        yield f"event: error\ndata: {json.dumps({'code': 'COPILOT_FAILED', 'message': str(exc)})}\n\n"
+        return
+
+    # Stream exhausted — run citation guardrail on the full accumulated text.
+    # Reuse _call_and_parse's retry logic by constructing a stub turn that
+    # returns the accumulated string (no network call needed — we already have it).
+    def _replay(_system: str, _messages: list) -> str:
+        return accumulated
+
+    _raw, parsed = _call_and_parse(_replay, system, messages_list, attempts=1)
+    if parsed is None:
+        # Plain prose — yield done with no citations (graceful degrade)
+        yield f"event: done\ndata: {json.dumps({})}\n\n"
+    else:
+        validated = _validate_reply(parsed, grounded)
+        done_payload: dict[str, Any] = {}
+        if validated.get("citations"):
+            done_payload["citations"] = validated["citations"]
+        if validated.get("snippet_html"):
+            done_payload["snippet_html"] = validated["snippet_html"]
+        yield f"event: done\ndata: {json.dumps(done_payload)}\n\n"
