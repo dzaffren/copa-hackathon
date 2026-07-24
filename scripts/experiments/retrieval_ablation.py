@@ -689,6 +689,108 @@ def _critic_per_pair(
 
 
 # ---------------------------------------------------------------------------
+# Suppression builder + coverage whole-doc finder (Arm G stages 3 & 4)
+# ---------------------------------------------------------------------------
+
+
+def _build_suppression(
+    retrieval_candidates: list[dict], same_topic_findings: list[dict]
+) -> dict:
+    """Build the suppression dict from same-topic stage outputs.
+
+    Args:
+        retrieval_candidates: pair dicts from retrieve_cosine_only /
+            retrieve_bm25_only.  Each has at least
+            ``source_anchor_id``, ``target_anchor_id``,
+            ``matched_axis_source``, and ``matched_axis_target``.
+        same_topic_findings: raw finder output (post-critic).  Each
+            dict has ``source_clauses: [str, ...]`` and
+            ``target_clauses: [str, ...]`` where the strings are
+            anchor IDs.
+
+    Returns:
+        {
+            "covered_pairs":  sorted list of "A × B" strings,
+            "covered_topics": sorted list of unique axis strings,
+        }
+    """
+    # Step 1 — collect the A-side anchor IDs that produced a surviving finding.
+    active_source_ids: set[str] = set()
+    for finding in same_topic_findings:
+        source_clauses = finding.get("source_clauses", [])
+        if source_clauses:
+            active_source_ids.add(source_clauses[0])
+
+    # Step 2 — walk retrieval candidates; only those whose source produced a
+    # finding contribute to the suppression set.
+    covered_pairs: set[tuple[str, str]] = set()
+    covered_topics: set[str] = set()
+    for candidate in retrieval_candidates:
+        src = candidate["source_anchor_id"]
+        if src not in active_source_ids:
+            continue
+        tgt = candidate["target_anchor_id"]
+        covered_pairs.add((src, tgt))
+        covered_topics.add(candidate["matched_axis_source"])
+        covered_topics.add(candidate["matched_axis_target"])
+
+    return {
+        "covered_pairs": sorted(f"{a} × {b}" for a, b in covered_pairs),
+        "covered_topics": sorted(covered_topics),
+    }
+
+
+def _finder_coverage_whole_doc(
+    anchor_index: AnchorIndex,
+    doc_a: str,
+    doc_b: str,
+    suppression: dict,
+) -> list[dict]:
+    """Arm G Stage 4: whole-document coverage finder.
+
+    Sends both documents' full anchor lists in one prompt together with
+    the suppression block (if non-empty), using COVERAGE_FINDER_SYSTEM_PROMPT
+    so the model emits ONLY ``silent-on`` / ``goes-beyond`` findings.
+
+    No critic call — returns the raw parsed list from the LLM.
+
+    Args:
+        anchor_index: provides all anchors for both documents.
+        doc_a: document-A identifier (the "our side").
+        doc_b: document-B identifier (the "their side").
+        suppression: output of ``_build_suppression``; its
+            ``covered_topics`` list is appended to the user message
+            when non-empty so the model skips already-covered topics.
+
+    Returns:
+        A list of raw finding dicts (label restricted to
+        ``silent-on`` / ``goes-beyond`` by the system prompt).
+
+    Raises:
+        LLMResponseError: if the LLM response cannot be parsed as a
+            JSON list.
+    """
+    user = (
+        _format_doc_block(anchor_index, doc_a)
+        + "\n\n"
+        + _format_doc_block(anchor_index, doc_b)
+    )
+    if suppression.get("covered_topics"):
+        topics_block = "\n".join(f"  - {t}" for t in suppression["covered_topics"])
+        user += (
+            f"\n\nTOPICS ALREADY COVERED ON BOTH SIDES — do NOT report these as coverage gaps:\n"
+            f"{topics_block}"
+        )
+    raw = call_chat(
+        FINDER_CRITIC_DEPLOYMENT, COVERAGE_FINDER_SYSTEM_PROMPT, user, max_tokens=16384
+    )
+    parsed = parse_json_response(raw)
+    if not isinstance(parsed, list):
+        raise LLMResponseError(f"expected list, got {type(parsed).__name__}")
+    return parsed
+
+
+# ---------------------------------------------------------------------------
 # Arm runners
 # ---------------------------------------------------------------------------
 
@@ -905,12 +1007,93 @@ def run_arm_f(anchor_index: AnchorIndex, doc_a: str, doc_b: str) -> dict[str, An
     }
 
 
+def run_arm_g(
+    anchor_index: AnchorIndex, doc_a: str, doc_b: str, signal: str = "cosine"
+) -> dict[str, Any]:
+    """Arm G: composite coverage-aware flow.
+
+    Stage 1: same-topic retrieval (cosine or BM25).
+    Stage 2: per-pair finder restricted to aligns-with/differs-on/conflicts-with (no critic).
+    Stage 3: build suppression list from Stage 2 survivors.
+    Stage 4: whole-doc coverage finder (silent-on/goes-beyond only, no critic).
+    Stage 5: merge + validate via _validate_candidates.
+    """
+    start = time.time()
+
+    # Stage 1 — retrieval
+    axes_a = _load_axes(doc_a)
+    axes_b = _load_axes(doc_b)
+    if signal == "bm25":
+        candidates = retrieve_bm25_only(axes_a, axes_b)
+    else:
+        candidates = retrieve_cosine_only(axes_a, axes_b)
+    logger.info("Arm G: %d retrieval candidates (signal=%s)", len(candidates), signal)
+
+    # Stage 2 — same-topic finder only (no critic)
+    all_same_topic_raw: list[dict] = []
+    for i, pair in enumerate(candidates, start=1):
+        logger.info(
+            "[%d/%d] Arm G same-topic finder on %s × %s",
+            i,
+            len(candidates),
+            pair["source_anchor_id"],
+            pair["target_anchor_id"],
+        )
+        try:
+            f_out = _finder_per_pair(anchor_index, pair, labels="same-topic")
+            all_same_topic_raw.extend(f_out)
+        except LLMResponseError as exc:
+            logger.warning(
+                "skipping pair (%s, %s): %s",
+                pair["source_anchor_id"],
+                pair["target_anchor_id"],
+                exc,
+            )
+
+    # Stage 3 — suppression list
+    suppression = _build_suppression(candidates, all_same_topic_raw)
+    logger.info(
+        "Arm G: suppression — %d topics, %d pairs",
+        len(suppression["covered_topics"]),
+        len(suppression["covered_pairs"]),
+    )
+
+    # Stage 4 — coverage whole-doc finder (no critic)
+    logger.info("Arm G: running coverage whole-doc pass on %s × %s", doc_a, doc_b)
+    try:
+        coverage_raw = _finder_coverage_whole_doc(
+            anchor_index, doc_a, doc_b, suppression
+        )
+    except LLMResponseError as exc:
+        logger.warning("coverage whole-doc finder failed: %s", exc)
+        coverage_raw = []
+
+    # Stage 5 — merge + validate
+    merged = all_same_topic_raw + coverage_raw
+    clause_shim = _AnchorAsClauseIndex(anchor_index)
+    supported, unsupported, validation = _validate_candidates(merged, clause_shim)
+
+    return {
+        "arm": "G",
+        "wall_clock_seconds": round(time.time() - start, 1),
+        "finder_output": all_same_topic_raw,
+        "critic_output": [],  # no critic; kept for shape consistency with other arms
+        "supported": supported,
+        "unsupported": unsupported,
+        "validation": validation,
+        "retrieval_candidates": candidates,
+        "suppression": suppression,
+        "coverage_finder_output": coverage_raw,
+    }
+
+
 ARM_RUNNERS = {
     "B": run_arm_b,
     "C": run_arm_c,
     "D": run_arm_d,
     "E": run_arm_e,
     "F": run_arm_f,
+    "G": run_arm_g,
 }
 
 
@@ -919,14 +1102,20 @@ ARM_RUNNERS = {
 # ---------------------------------------------------------------------------
 
 
-def run_one(arm: str, pair: str, anchor_index: AnchorIndex) -> None:
+def run_one(
+    arm: str, pair: str, anchor_index: AnchorIndex, signal: str = "cosine"
+) -> None:
     if pair not in PAIRS:
         raise SystemExit(f"unknown pair {pair!r}; known: {list(PAIRS)}")
     if arm not in ARM_RUNNERS:
         raise SystemExit(f"unknown arm {arm!r}; known: {list(ARM_RUNNERS)}")
     doc_a, doc_b = PAIRS[pair]
     logger.info("=== Arm %s on %s (%s × %s) ===", arm, pair, doc_a, doc_b)
-    result = ARM_RUNNERS[arm](anchor_index, doc_a, doc_b)
+    result = (
+        ARM_RUNNERS[arm](anchor_index, doc_a, doc_b, signal)
+        if arm == "G"
+        else ARM_RUNNERS[arm](anchor_index, doc_a, doc_b)
+    )
 
     out_dir = RESULTS_DIR / arm / pair
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -952,6 +1141,8 @@ def run_one(arm: str, pair: str, anchor_index: AnchorIndex) -> None:
                 "critic_output": result["critic_output"],
                 "validation": result["validation"],
                 "retrieval_candidates": result["retrieval_candidates"],
+                "suppression": result.get("suppression"),
+                "coverage_finder_output": result.get("coverage_finder_output"),
             },
             indent=2,
             ensure_ascii=False,
@@ -971,6 +1162,14 @@ def run_one(arm: str, pair: str, anchor_index: AnchorIndex) -> None:
                     if result["retrieval_candidates"] is not None
                     else None
                 ),
+                "same_topic_finding_count": (
+                    len(result.get("finder_output") or [])
+                    if "coverage_finder_output" in result
+                    else 0
+                ),
+                "coverage_finding_count": len(
+                    result.get("coverage_finder_output") or []
+                ),
             },
             indent=2,
         ),
@@ -989,8 +1188,14 @@ def run_one(arm: str, pair: str, anchor_index: AnchorIndex) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--arm", required=True, help="B, C, D, or all")
+    parser.add_argument("--arm", required=True, help="B, C, D, E, F, G, or all")
     parser.add_argument("--pair", required=True, help="bis-ed, hkma-ed, or all")
+    parser.add_argument(
+        "--signal",
+        choices=["cosine", "bm25"],
+        default="cosine",
+        help="retrieval signal for Arm G (default: cosine)",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -1005,13 +1210,13 @@ def main() -> int:
     raw = json.loads(ANCHOR_INDEX_PATH.read_text(encoding="utf-8"))
     anchor_index = AnchorIndex(raw)
 
-    arms = ["B", "C", "D"] if args.arm == "all" else [args.arm]
+    arms = list(ARM_RUNNERS) if args.arm == "all" else [args.arm]
     pairs = list(PAIRS) if args.pair == "all" else [args.pair]
 
     for arm in arms:
         for pair in pairs:
             try:
-                run_one(arm, pair, anchor_index)
+                run_one(arm, pair, anchor_index, signal=args.signal)
             except Exception as exc:  # noqa: BLE001
                 logger.exception("Arm %s / %s failed: %s", arm, pair, exc)
     return 0
