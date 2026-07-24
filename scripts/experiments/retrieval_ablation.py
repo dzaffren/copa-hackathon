@@ -1098,6 +1098,48 @@ ARM_RUNNERS = {
 
 
 # ---------------------------------------------------------------------------
+# Coverage quality helpers — used by run_one to annotate metadata.json
+# ---------------------------------------------------------------------------
+
+
+def _is_single_sided(finding: dict) -> bool:
+    """Return True if the finding has exactly one non-empty clause side.
+
+    - goes-beyond: source_clauses non-empty AND target_clauses empty.
+    - silent-on: source_clauses empty AND target_clauses non-empty.
+    - Anything else: False.
+    """
+    src = finding.get("source_clauses") or []
+    tgt = finding.get("target_clauses") or []
+    label = finding.get("label")
+    if label == "goes-beyond":
+        return bool(src) and not bool(tgt)
+    if label == "silent-on":
+        return not bool(src) and bool(tgt)
+    return False
+
+
+def _is_redundant(finding: dict, suppression: dict) -> bool:
+    """Return True if this coverage finding overlaps with the suppression set.
+
+    True when:
+    - Any covered_topic (case-insensitive) appears as a substring in the
+      finding's summary, OR
+    - Any cited anchor (source or target) appears in the covered_pairs string.
+    """
+    covered_topics = [t.lower() for t in suppression.get("covered_topics", [])]
+    summary_lower = (finding.get("summary") or "").lower()
+    if any(t in summary_lower for t in covered_topics if t):
+        return True
+    # Also check if any cited anchor appears in covered_pairs
+    covered_pairs_str = " ".join(suppression.get("covered_pairs", []))
+    all_clauses = (finding.get("source_clauses") or []) + (
+        finding.get("target_clauses") or []
+    )
+    return any(clause in covered_pairs_str for clause in all_clauses if clause)
+
+
+# ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
@@ -1170,6 +1212,15 @@ def run_one(
                 "coverage_finding_count": len(
                     result.get("coverage_finder_output") or []
                 ),
+                "coverage_quality_notes": [
+                    {
+                        "summary": f.get("summary", ""),
+                        "label": f.get("label"),
+                        "single_sided": _is_single_sided(f),
+                        "redundant": _is_redundant(f, result.get("suppression") or {}),
+                    }
+                    for f in (result.get("coverage_finder_output") or [])
+                ],
             },
             indent=2,
         ),
