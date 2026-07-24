@@ -42,6 +42,56 @@ from engine.llm import LLMResponseError, call_chat, parse_json_response  # noqa:
 
 logger = logging.getLogger(__name__)
 
+# ---------------------------------------------------------------------------
+# Coverage-stage system prompt — local to this runner, NOT in engine/connections.py.
+#
+# Restricts finder output to ONLY `silent-on` and `goes-beyond` labels.
+# Embeds the COVERAGE-SUMMARY RULE and the explicit "both sides" guardrail.
+# Reuses the same CITATION RULE and JSON-array output contract as FINDER_SYSTEM_PROMPT.
+# Sentiment is intentionally omitted — coverage labels never carry sentiment
+# per the five-label taxonomy.
+# ---------------------------------------------------------------------------
+
+COVERAGE_FINDER_SYSTEM_PROMPT = (
+    "You are a policy analyst identifying COVERAGE GAPS between two Bank Negara Malaysia "
+    "policy documents. Your task is to find sub-topics where exactly one side has a "
+    "provision and the other side is entirely silent.\n\n"
+    "LABEL RESTRICTION (strict): you MUST emit ONLY findings with label `silent-on` or "
+    "`goes-beyond`. Never emit `aligns-with`, `differs-on`, or `conflicts-with` — those "
+    "are for a separate same-topic pass. If no genuine coverage gap exists, return an "
+    "empty array.\n\n"
+    "DIRECTION CONVENTION (fixed): document A is 'we/ours'; document B is 'they/theirs'.\n"
+    "  - goes-beyond: OUR side (document A) covers a sub-topic; THEIR side (document B) "
+    "has no provision for it anywhere in the document.\n"
+    "  - silent-on: OUR side (document A) has no provision for a sub-topic; THEIR side "
+    "(document B) covers it.\n\n"
+    "COVERAGE-SUMMARY RULE: every finding summary MUST do all three of the following:\n"
+    "  1. Name the shared regulatory topic that both documents sit under (e.g. 'open API "
+    "security', 'consent management', 'third-party access').\n"
+    "  2. State what the COVERING side specifically requires or addresses on that sub-topic.\n"
+    "  3. State precisely what the OTHER side does NOT address — name the specific "
+    "obligation or sub-point that is absent, not just 'does not cover this'.\n\n"
+    "GUARDRAIL: If both sides take a position on this topic — even if different — that is "
+    "NOT a coverage finding. Do not emit it. Only emit a finding when one side genuinely "
+    "has no provision for the sub-point. A stricter rule on one side is NOT a gap; it is "
+    "a 'differs-on' finding and belongs in the same-topic pass.\n\n"
+    "OBJECT SHAPE:\n"
+    '  {"summary": "...", "label": "silent-on|goes-beyond",\n'
+    '   "source_clauses": [...], "target_clauses": [...], "scope_note": "..."}\n\n'
+    "For `goes-beyond`: `source_clauses` is non-empty (A covers it); `target_clauses` is "
+    "empty, or holds the nearest B clause cited only to confirm it does not address this "
+    "sub-point.\n"
+    "For `silent-on`: `target_clauses` is non-empty (B covers it); `source_clauses` is "
+    "empty, or holds the nearest A clause cited only to confirm it does not address this "
+    "sub-point.\n\n"
+    "Do NOT include a `sentiment` field — coverage labels never carry sentiment.\n\n"
+    "CITATION RULE (strict): every clause_number in `source_clauses` and `target_clauses` "
+    "MUST be copied EXACTLY from the clause lists provided. Never invent, guess, reformat, "
+    "or paraphrase a clause number. Do not cite a clause that is not in the lists.\n\n"
+    "Return ONLY a JSON array of these objects — no prose, no markdown, no commentary. "
+    "Return an empty array `[]` if there are no genuine coverage gaps."
+)
+
 ANCHOR_INDEX_PATH = REPO_ROOT / "data" / "artifacts" / "anchor-index.json"
 AXES_DIR = REPO_ROOT / "experiments"
 RESULTS_DIR = REPO_ROOT / "experiments" / "retrieval-ablation"
@@ -52,6 +102,7 @@ GLOSSARY_PATH = REPO_ROOT / "data" / "glossary.json"
 PAIRS: dict[str, tuple[str, str]] = {
     "bis-ed": ("bnm-open-finance-ed-2025", "bis-pap168-open-finance"),
     "hkma-ed": ("bnm-open-finance-ed-2025", "hkma-open-api-framework-2018"),
+    "rmit-ed": ("bnm-open-finance-ed-2025", "bnm-rmit-nov25"),
 }
 
 
@@ -563,17 +614,35 @@ def _critic_whole_doc(
     return parsed
 
 
-def _finder_per_pair(anchor_index: AnchorIndex, pair: dict[str, Any]) -> list[dict]:
-    """Arms C/D: judge one candidate pair. Returns 0 or 1 finding candidates.
+_SAME_TOPIC_RESTRICTION = (
+    "RESTRICTION: emit ONLY aligns-with, differs-on, or conflicts-with findings. "
+    "If this pair is one-sided (coverage asymmetry), emit an empty array — "
+    "the coverage pass handles those."
+)
 
-    Uses the same FINDER_SYSTEM_PROMPT — the prompt is prompt-shape-agnostic. We
-    just constrain the input to two anchors.
+
+def _finder_per_pair(
+    anchor_index: AnchorIndex, pair: dict[str, Any], labels: str = "all"
+) -> list[dict]:
+    """Arms C/D/E/F/G-same-topic: judge one candidate pair.
+
+    Returns 0 or 1 finding candidates using FINDER_SYSTEM_PROMPT.
+
+    Args:
+        anchor_index: the anchor index for resolving anchor ids.
+        pair: a candidate pair dict with source_anchor_id / target_anchor_id.
+        labels: when ``"same-topic"``, prepends a restriction to the user
+            message so the model emits ONLY aligns-with / differs-on /
+            conflicts-with and skips one-sided coverage pairs (those are
+            handled by the coverage whole-doc pass in Arm G). When ``"all"``
+            (the default), behaviour is identical to before this parameter
+            was added — no restriction, all five labels permitted.
     """
     a_anchor = anchor_index.get(pair["source_anchor_id"])
     b_anchor = anchor_index.get(pair["target_anchor_id"])
     if a_anchor is None or b_anchor is None:
         return []
-    user = (
+    base_user = (
         f"Document A ({a_anchor['document_id']}):\n"
         f"{_format_anchor_block(a_anchor)}\n\n"
         f"Document B ({b_anchor['document_id']}):\n"
@@ -582,6 +651,10 @@ def _finder_per_pair(anchor_index: AnchorIndex, pair: dict[str, Any]) -> list[di
         f"'{pair.get('matched_axis_source')}' ↔ '{pair.get('matched_axis_target')}'.\n"
         f"Judge whether they genuinely relate. If yes, emit one connection object. If no, emit an empty array."
     )
+    if labels == "same-topic":
+        user = _SAME_TOPIC_RESTRICTION + "\n\n" + base_user
+    else:
+        user = base_user
     raw = call_chat(
         FINDER_CRITIC_DEPLOYMENT, FINDER_SYSTEM_PROMPT, user, max_tokens=2048
     )

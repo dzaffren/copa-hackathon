@@ -14,7 +14,7 @@ Output shape per document:
         "model": ...,
         "generated_at": ISO timestamp,
         "anchors": [
-            {"anchor_id": ..., "text_hash": ..., "axes": [str, ...]},
+            {"anchor_id": ..., "text_hash": ..., "axis_cap": int, "axes": [str, ...]},
             ...
         ]
     }
