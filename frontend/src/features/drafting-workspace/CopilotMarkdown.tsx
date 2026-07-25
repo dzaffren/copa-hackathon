@@ -45,7 +45,7 @@ const PROSE_CLASS = [
   "[&_h3]:mb-1 [&_h3]:mt-2 [&_h3]:text-[12px] [&_h3]:font-semibold",
   "[&_code]:rounded [&_code]:bg-card/70 [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[11px]",
   "[&_blockquote]:border-l-2 [&_blockquote]:border-border [&_blockquote]:pl-2 [&_blockquote]:italic",
-  "[&_a]:text-cyan-400 [&_a]:underline",
+  "[&_a]:text-primary [&_a]:underline",
 ].join(" ");
 
 interface CopilotMarkdownProps {

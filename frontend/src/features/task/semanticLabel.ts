@@ -43,7 +43,7 @@ const CARD_ACCENT: Record<
 };
 
 const FALLBACK: LabelStyle = {
-  pill: "bg-slate-500/15 text-slate-300 border border-slate-400/30",
+  pill: "bg-slate-500/15 text-slate-600 border border-slate-400/30",
   card: "border-border/60 bg-card/50",
   calloutBorder: "border-slate-300",
 };

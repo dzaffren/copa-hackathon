@@ -108,7 +108,7 @@ export function NewWorkstreamPage() {
               placeholder="Climate Risk PD v2 · 2026"
               className={[
                 "mt-1 w-full rounded-md border px-2 py-1.5 text-sm",
-                "bg-background/60 outline-none focus:border-cyan-400/60",
+                "bg-background/60 outline-none focus:border-primary/60",
                 nameError ? "border-red-400" : "border-border/60",
               ].join(" ")}
             />
@@ -131,7 +131,7 @@ export function NewWorkstreamPage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               aria-label="Short description"
-              className="mt-1 w-full rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-cyan-400/60"
+              className="mt-1 w-full rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-primary/60"
             />
           </label>
 
@@ -146,7 +146,7 @@ export function NewWorkstreamPage() {
                   setDeliverableType(e.target.value as DeliverableTypeCode)
                 }
                 aria-label="Deliverable type"
-                className="mt-1 w-full rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-cyan-400/60"
+                className="mt-1 w-full rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-primary/60"
               >
                 {DELIVERABLE_TYPE_OPTIONS.map((o) => (
                   <option key={o.code} value={o.code}>
@@ -165,7 +165,7 @@ export function NewWorkstreamPage() {
                 onChange={(e) => setTargetPublication(e.target.value)}
                 aria-label="Target publication"
                 placeholder="Q4 2026"
-                className="mt-1 w-full rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-cyan-400/60"
+                className="mt-1 w-full rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-primary/60"
               />
             </label>
           </div>
@@ -178,7 +178,7 @@ export function NewWorkstreamPage() {
           <div className="mt-3">
             <span className="text-xs font-semibold text-foreground">Owner</span>
             <div className="mt-1 flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-cyan-500/20 text-[10px] font-bold text-cyan-300">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-[10px] font-bold text-primary">
                 AR
               </span>
               <span className="text-sm">Aisyah R.</span>
@@ -222,7 +222,7 @@ export function NewWorkstreamPage() {
                     key={p.id}
                     type="button"
                     onClick={() => setReviewers((prev) => [...prev, p])}
-                    className="rounded-full border border-dashed border-border/70 px-2 py-0.5 text-xs text-muted-foreground hover:border-cyan-400/60 hover:text-cyan-300"
+                    className="rounded-full border border-dashed border-border/70 px-2 py-0.5 text-xs text-muted-foreground hover:border-primary/60 hover:text-primary"
                   >
                     + {p.name}
                   </button>
@@ -288,7 +288,7 @@ export function NewWorkstreamPage() {
           <button
             type="submit"
             disabled={create.isPending}
-            className="rounded-md bg-cyan-500 px-3 py-1.5 text-sm font-semibold text-slate-950 hover:bg-cyan-400 disabled:opacity-50"
+            className="rounded-md bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
             {create.isPending ? "Creating…" : "Create workstream"}
           </button>

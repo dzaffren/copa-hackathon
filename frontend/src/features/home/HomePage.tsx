@@ -13,21 +13,21 @@ const ROLE_STYLE: Record<
   { dot: string; label: string; chip: string; glow: string }
 > = {
   own: {
-    dot: "bg-cyan-400",
+    dot: "bg-primary",
     label: "Drafting",
-    chip: "bg-cyan-500/15 text-cyan-300 border border-cyan-400/30",
-    glow: "from-cyan-500/40",
+    chip: "bg-blue-100 text-blue-700",
+    glow: "from-primary/40",
   },
   review: {
     dot: "bg-amber-400",
     label: "Reviewing",
-    chip: "bg-amber-400/15 text-amber-300 border border-amber-300/30",
+    chip: "bg-amber-100 text-amber-700",
     glow: "from-amber-400/40",
   },
   delivered: {
     dot: "bg-emerald-400",
     label: "Delivered",
-    chip: "bg-emerald-500/15 text-emerald-300 border border-emerald-400/30",
+    chip: "bg-emerald-100 text-emerald-700",
     glow: "from-emerald-500/40",
   },
 };
@@ -41,7 +41,7 @@ function WorkstreamCard({ ws }: { ws: WorkstreamSummary }) {
   return (
     <Link
       to={`/workstreams/${ws.id}`}
-      className="group glass relative flex flex-col overflow-hidden rounded-2xl p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-400/50 hover:shadow-lg hover:shadow-cyan-500/5"
+      className="group glass relative flex flex-col overflow-hidden rounded-2xl p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
     >
       {/* Corner glow accent, tinted by role */}
       <span
@@ -62,7 +62,7 @@ function WorkstreamCard({ ws }: { ws: WorkstreamSummary }) {
             {style.label}
           </span>
         </span>
-        <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-cyan-300" />
+        <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-primary" />
       </div>
 
       <h3 className="mt-4 text-base font-semibold leading-snug">{ws.name}</h3>
@@ -85,7 +85,7 @@ function StatTile({
 }) {
   return (
     <div className="glass flex items-center gap-3 rounded-2xl px-4 py-3">
-      <span className="grid h-9 w-9 place-items-center rounded-lg bg-accent/60 text-cyan-300">
+      <span className="grid h-9 w-9 place-items-center rounded-lg bg-accent/60 text-primary">
         {icon}
       </span>
       <div className="leading-tight">
@@ -102,7 +102,11 @@ function StatTile({
  * work: New Workstream and the cross-workstream Institution Map.
  */
 export function HomePage() {
-  const { data: workstreams, isPending, isError } = useQuery({
+  const {
+    data: workstreams,
+    isPending,
+    isError,
+  } = useQuery({
     queryKey: ["workstreams"],
     queryFn: fetchWorkstreams,
   });
@@ -118,7 +122,7 @@ export function HomePage() {
       <div className="mx-auto max-w-6xl p-8">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-cyan-300/80">
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary/80">
               Workstream Brain
             </p>
             <h1 className="mt-1 text-3xl font-bold tracking-tight">
@@ -135,11 +139,11 @@ export function HomePage() {
               to="/institution-map"
               className="inline-flex items-center gap-2 rounded-lg border border-border/70 bg-card/40 px-3.5 py-2 text-sm font-medium backdrop-blur transition hover:bg-accent"
             >
-              <Building2 className="h-4 w-4 text-violet-300" /> Institution map
+              <Building2 className="h-4 w-4 text-violet-700" /> Institution map
             </Link>
             <Link
               to="/workstreams/new"
-              className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-3.5 py-2 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-cyan-400"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-3.5 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
             >
               <Plus className="h-4 w-4" /> New workstream
             </Link>
@@ -173,7 +177,10 @@ export function HomePage() {
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {isPending ? (
             [0, 1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="glass flex flex-col gap-3 rounded-2xl p-5">
+              <div
+                key={i}
+                className="glass flex flex-col gap-3 rounded-2xl p-5"
+              >
                 <Skeleton className="h-5 w-24" />
                 <Skeleton className="h-5 w-3/4" />
                 <Skeleton className="h-3 w-1/2" />

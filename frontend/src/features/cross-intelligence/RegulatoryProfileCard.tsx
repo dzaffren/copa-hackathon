@@ -35,7 +35,7 @@ export function RegulatoryProfileCard({ workstreamId }: { workstreamId: string }
         </h3>
         <Link
           to={`/intelligence/compare?a=${workstreamId}`}
-          className="flex items-center gap-1 text-[11px] font-semibold text-cyan-300 hover:underline"
+          className="flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline"
         >
           <ArrowLeftRight className="h-3 w-3" /> Compare
         </Link>

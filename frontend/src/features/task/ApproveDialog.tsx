@@ -39,7 +39,7 @@ export function ApproveDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-emerald-500 text-slate-950 hover:bg-emerald-400">
+        <Button className="bg-emerald-600 text-white hover:bg-emerald-500">
           <ShieldCheck /> Approve
         </Button>
       </DialogTrigger>

@@ -178,7 +178,7 @@ export function CopilotTab({
           aria-label="Intent preset"
           value={intent}
           onChange={(e) => changeIntent(e.target.value as CopilotIntent)}
-          className="w-full rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-cyan-400/60"
+          className="w-full rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-primary/60"
         >
           {COPILOT_INTENTS.map((i) => (
             <option key={i} value={i}>
@@ -209,7 +209,7 @@ export function CopilotTab({
               className={[
                 "max-w-[92%] rounded-lg p-2.5 text-sm",
                 m.role === "user"
-                  ? "bg-cyan-500 text-slate-950"
+                  ? "bg-primary text-primary-foreground"
                   : "bg-muted text-foreground",
               ].join(" ")}
             >
@@ -280,7 +280,7 @@ export function CopilotTab({
         <button
           type="submit"
           disabled={isPending}
-          className="rounded-md bg-cyan-500 px-3 py-1.5 text-sm font-semibold text-slate-950 hover:bg-cyan-400 disabled:opacity-50"
+          className="rounded-md bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
         >
           Send
         </button>
@@ -303,9 +303,9 @@ function SuggestionCard({
   return (
     <div
       data-testid="copilot-suggestion"
-      className="mt-2 rounded-lg border border-cyan-400/40 bg-card/60 p-2"
+      className="mt-2 rounded-lg border border-primary/40 bg-card/60 p-2"
     >
-      <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-cyan-300">
+      <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-primary">
         <FilePlus2 className="h-3.5 w-3.5" />
         Suggested addition to your draft
       </p>
@@ -317,7 +317,7 @@ function SuggestionCard({
       <button
         type="button"
         onClick={onInsert}
-        className="mt-2 flex items-center gap-1.5 rounded bg-cyan-500 px-2 py-1 text-[11px] font-semibold text-slate-950 hover:bg-cyan-400"
+        className="mt-2 flex items-center gap-1.5 rounded bg-primary px-2 py-1 text-[11px] font-semibold text-primary-foreground hover:bg-primary/90"
       >
         <MousePointerClick className="h-3.5 w-3.5" />
         Insert at cursor

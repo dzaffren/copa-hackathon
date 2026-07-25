@@ -24,7 +24,7 @@ export function EmptyDraftCard({ workstreamId, nodeId }: Props) {
           declared neighbours.
         </p>
       </div>
-      <Button asChild className="bg-cyan-500 text-slate-950 hover:bg-cyan-400">
+      <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
         <Link to={`/workstreams/${workstreamId}/tasks/${nodeId}/draft`}>
           <FileText /> Open draft
         </Link>

@@ -57,7 +57,7 @@ export function FindingCard({
         isDismissed
           ? "cursor-default border-border/60 bg-muted/20 opacity-60"
           : "cursor-pointer " + style.card,
-        isActive && !isDismissed ? "ring-2 ring-cyan-400/70" : "",
+        isActive && !isDismissed ? "ring-2 ring-primary/70" : "",
       ].join(" ")}
     >
       <div className="flex flex-wrap items-center gap-2">
@@ -67,20 +67,20 @@ export function FindingCard({
           {labelText(finding.label, finding.sentiment)}
         </span>
         {sentimentTag ? (
-          <span className="rounded-full border border-amber-300/30 bg-amber-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-300">
+          <span className="rounded-full border border-amber-300/30 bg-amber-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700">
             {sentimentTag}
           </span>
         ) : null}
         {isAccepted ? (
           <span
             data-testid="accepted-badge"
-            className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-300"
+            className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-700"
           >
             accepted
           </span>
         ) : null}
         {isDismissed ? (
-          <span className="rounded-full border border-slate-400/30 bg-slate-500/15 px-2 py-0.5 text-xs font-medium text-slate-300">
+          <span className="rounded-full border border-slate-400/30 bg-slate-500/15 px-2 py-0.5 text-xs font-medium text-slate-600">
             dismissed
           </span>
         ) : null}
@@ -107,7 +107,7 @@ export function FindingCard({
               e.stopPropagation();
               onReopen(finding);
             }}
-            className="text-xs font-medium text-cyan-300 hover:underline disabled:opacity-50"
+            className="text-xs font-medium text-primary hover:underline disabled:opacity-50"
           >
             Reopen
           </button>
@@ -123,7 +123,7 @@ export function FindingCard({
                   e.stopPropagation();
                   onAccept(finding);
                 }}
-                className="rounded-md border border-emerald-400/40 px-2 py-1 text-xs font-medium text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-50"
+                className="rounded-md border border-emerald-400/40 px-2 py-1 text-xs font-medium text-emerald-700 hover:bg-emerald-500/10 disabled:opacity-50"
               >
                 Accept
               </button>

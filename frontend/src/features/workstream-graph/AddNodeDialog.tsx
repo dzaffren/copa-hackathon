@@ -36,7 +36,7 @@ interface AddNodeDialogProps {
 }
 
 const fieldClass =
-  "w-full rounded-md border border-border/70 bg-background/60 px-3 py-2 text-sm outline-none focus:border-cyan-400/60 focus:ring-1 focus:ring-cyan-400/40";
+  "w-full rounded-md border border-border/70 bg-background/60 px-3 py-2 text-sm outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/40";
 
 /**
  * Add-node modal. A plain controlled form (consistent with the existing task
@@ -140,7 +140,7 @@ export function AddNodeDialog({
                     className={cn(
                       "flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-left text-[11px] font-medium transition",
                       selected
-                        ? "border-cyan-400/60 bg-cyan-500/10 ring-1 ring-cyan-400/40"
+                        ? "border-primary/60 bg-primary/10 ring-1 ring-primary/40"
                         : "border-border/60 hover:bg-accent/50",
                     )}
                   >
@@ -199,7 +199,7 @@ export function AddNodeDialog({
           >
             <input
               type="checkbox"
-              className="h-4 w-4 rounded border-border/70 accent-cyan-500"
+              className="h-4 w-4 rounded border-border/70 accent-indigo-600"
               checked={autoIngest}
               disabled={!sourceUrl.trim()}
               onChange={(e) => setAutoIngest(e.target.checked)}
@@ -296,7 +296,7 @@ export function AddNodeDialog({
           </Button>
           <Button
             type="button"
-            className="bg-cyan-500 text-slate-950 hover:bg-cyan-400"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
             disabled={!canSubmit || mutation.isPending}
             onClick={() => mutation.mutate()}
           >

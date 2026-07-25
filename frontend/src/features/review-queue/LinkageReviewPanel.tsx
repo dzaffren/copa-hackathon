@@ -125,7 +125,7 @@ export function LinkageReviewPanel({
                 <select
                   value={actorId}
                   onChange={(e) => setActorId(e.target.value)}
-                  className="rounded-md border border-border/60 bg-background/60 px-2 py-1 text-sm outline-none focus:border-cyan-400/50"
+                  className="rounded-md border border-border/60 bg-background/60 px-2 py-1 text-sm outline-none focus:border-primary/50"
                 >
                   {actors.map((a) => (
                     <option key={a.id} value={a.id}>
@@ -139,7 +139,7 @@ export function LinkageReviewPanel({
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Add a comment (optional)…"
                 rows={2}
-                className="w-full resize-none rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-cyan-400/50"
+                className="w-full resize-none rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-primary/50"
               />
               <div className="flex flex-wrap gap-2">
                 {actions.map((a) => (
@@ -151,17 +151,17 @@ export function LinkageReviewPanel({
                     className={cn(
                       "rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors disabled:opacity-50",
                       a.tone === "primary" &&
-                        "bg-cyan-500/15 text-cyan-300 ring-1 ring-cyan-400/30 hover:bg-cyan-500/25",
+                        "bg-primary/10 text-primary ring-1 ring-primary/30 hover:bg-primary/20",
                       a.tone === "neutral" && "bg-accent/60 text-foreground/90 hover:bg-accent",
                       a.tone === "danger" &&
-                        "bg-red-500/15 text-red-300 ring-1 ring-red-400/30 hover:bg-red-500/25",
+                        "bg-red-500/15 text-red-700 ring-1 ring-red-400/30 hover:bg-red-500/25",
                     )}
                   >
                     {a.label}
                   </button>
                 ))}
               </div>
-              {error && <p className="text-xs font-medium text-red-300">{error}</p>}
+              {error && <p className="text-xs font-medium text-red-700">{error}</p>}
             </div>
           )}
         </section>

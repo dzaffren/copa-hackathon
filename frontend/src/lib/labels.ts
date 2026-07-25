@@ -21,21 +21,21 @@ export interface LabelStyle {
 export const LABEL_STYLES: Record<SemanticLabel, LabelStyle> = {
   "aligns-with": {
     label: "aligns-with",
-    pill: "bg-emerald-500/15 text-emerald-300 border border-emerald-400/30",
+    pill: "bg-emerald-500/15 text-emerald-700 border border-emerald-400/30",
     accent: "border-l-emerald-400",
     dot: "bg-emerald-400",
     canvas: "#34d399",
   },
   "differs-on": {
     label: "differs-on",
-    pill: "bg-amber-400/15 text-amber-300 border border-amber-300/30",
+    pill: "bg-amber-400/15 text-amber-700 border border-amber-300/30",
     accent: "border-l-amber-400",
     dot: "bg-amber-400",
     canvas: "#fbbf24",
   },
   "conflicts-with": {
     label: "conflicts-with",
-    pill: "bg-red-500/15 text-red-300 border border-red-400/30",
+    pill: "bg-red-500/15 text-red-700 border border-red-400/30",
     accent: "border-l-red-400",
     dot: "bg-red-400",
     canvas: "#f87171",
@@ -49,7 +49,7 @@ export const LABEL_STYLES: Record<SemanticLabel, LabelStyle> = {
   },
   "goes-beyond": {
     label: "goes-beyond",
-    pill: "bg-violet-500/15 text-violet-300 border border-violet-400/30",
+    pill: "bg-violet-500/15 text-violet-700 border border-violet-400/30",
     accent: "border-l-violet-400",
     dot: "bg-violet-400",
     canvas: "#a78bfa",
@@ -58,7 +58,7 @@ export const LABEL_STYLES: Record<SemanticLabel, LabelStyle> = {
 
 const FALLBACK: LabelStyle = {
   label: "unknown",
-  pill: "bg-slate-500/15 text-slate-300 border border-slate-400/30",
+  pill: "bg-slate-500/15 text-slate-600 border border-slate-400/30",
   accent: "border-l-slate-400",
   dot: "bg-slate-400",
   canvas: "#94a3b8",

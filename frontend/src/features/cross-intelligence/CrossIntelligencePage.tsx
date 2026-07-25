@@ -74,10 +74,10 @@ export function CrossIntelligencePage() {
   return (
     <div className="flex h-full min-h-0 flex-col">
       {/* Header */}
-      <header className="border-b border-border/60 bg-card/30 px-6 py-4 backdrop-blur">
+      <header className="nav-dark border-b border-black/10 px-6 py-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-cyan-300/80">
+            <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary/80">
               <Radar className="h-3.5 w-3.5" /> Cross-Workstream Intelligence
             </p>
             <h1 className="mt-1 text-lg font-bold">
@@ -91,7 +91,7 @@ export function CrossIntelligencePage() {
           </div>
           <Link
             to="/institution-map"
-            className="flex shrink-0 items-center gap-1.5 rounded-lg border border-border/60 px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-violet-400/50 hover:text-violet-200"
+            className="flex shrink-0 items-center gap-1.5 rounded-lg border border-border/60 px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-violet-400/50 hover:text-violet-700"
           >
             <Map className="h-4 w-4" /> Map view
           </Link>
@@ -134,7 +134,7 @@ export function CrossIntelligencePage() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search workstreams, topics, reasons…"
-                className="w-full rounded-lg border border-border/60 bg-background/60 py-1.5 pl-8 pr-3 text-sm outline-none focus:border-cyan-400/50"
+                className="w-full rounded-lg border border-border/60 bg-background/60 py-1.5 pl-8 pr-3 text-sm outline-none focus:border-primary/50"
               />
             </div>
             <div className="flex gap-1">
@@ -217,9 +217,9 @@ function Metric({
 }) {
   const toneClass =
     tone === "danger"
-      ? "text-red-300"
+      ? "text-red-700"
       : tone === "warn"
-        ? "text-amber-300"
+        ? "text-amber-700"
         : "text-foreground";
   return (
     <div className="glass rounded-xl px-3 py-2.5">
@@ -256,7 +256,7 @@ function RelationshipCard({
       className={cn(
         "w-full rounded-xl border p-3 text-left transition-colors",
         active
-          ? "border-cyan-400/50 bg-accent/50"
+          ? "border-primary/50 bg-accent/50"
           : "border-border/60 bg-card/40 hover:border-border hover:bg-accent/30",
       )}
     >
@@ -300,7 +300,7 @@ function RelationshipCard({
           ),
         )}
         {unreviewed > 0 && (
-          <span className="ml-auto text-[10px] font-medium text-amber-300">
+          <span className="ml-auto text-[10px] font-medium text-amber-700">
             {unreviewed} unreviewed
           </span>
         )}

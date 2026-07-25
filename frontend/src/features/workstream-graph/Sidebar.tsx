@@ -6,24 +6,21 @@ import {
   Building2,
   ClipboardCheck,
   Layers,
-  Moon,
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
   Radar,
-  Sun,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { fetchWorkstreams } from "@/lib/api";
-import { useTheme } from "@/lib/theme";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { WorkstreamRole } from "@/lib/types";
 
 // A coloured status dot per workstream role — own (active draft), review
 // (someone else's, we comment), delivered (published).
 const ROLE_DOT: Record<WorkstreamRole, string> = {
-  own: "bg-cyan-400",
+  own: "bg-primary",
   review: "bg-amber-400",
   delivered: "bg-emerald-400",
 };
@@ -46,14 +43,10 @@ export function Sidebar({
   activeWorkstreamId?: string;
 }) {
   const [collapsed, setCollapsed] = useState(false);
-  const { theme, toggleTheme } = useTheme();
   const { pathname } = useLocation();
   const intelActive = pathname.startsWith("/intelligence");
   const queueActive = pathname.startsWith("/review-queue");
-  const {
-    data: workstreams = [],
-    isLoading,
-  } = useQuery({
+  const { data: workstreams = [], isLoading } = useQuery({
     queryKey: ["workstreams"],
     queryFn: fetchWorkstreams,
   });
@@ -61,7 +54,7 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "flex h-screen flex-col border-r border-border/60 bg-card/40 backdrop-blur-xl transition-[width] duration-200",
+        "nav-dark flex h-screen flex-col border-r border-black/10 transition-[width] duration-200",
         collapsed ? "w-16" : "w-64",
       )}
     >
@@ -69,11 +62,13 @@ export function Sidebar({
       <div className="flex items-center justify-between gap-2 border-b border-border/60 px-3 py-4">
         {!collapsed && (
           <Link to="/" className="flex min-w-0 items-center gap-2">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-cyan-500/30 to-indigo-500/30 ring-1 ring-cyan-400/40">
-              <Brain className="h-4 w-4 text-cyan-300" />
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-primary/15 to-indigo-500/20 ring-1 ring-primary/30">
+              <Brain className="h-4 w-4 text-primary" />
             </span>
             <span className="flex min-w-0 flex-col leading-tight">
-              <span className="truncate text-sm font-bold">Workstream Brain</span>
+              <span className="truncate text-sm font-bold">
+                Workstream Brain
+              </span>
               <span className="truncate text-[10px] text-muted-foreground">
                 Policy drafting intelligence
               </span>
@@ -106,11 +101,11 @@ export function Sidebar({
           className={cn(
             "group relative mb-2 flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-semibold transition-colors",
             intelActive
-              ? "bg-cyan-500/15 text-cyan-200 ring-1 ring-cyan-400/30"
+              ? "bg-accent text-accent-foreground ring-1 ring-primary/30"
               : "text-foreground/80 hover:bg-accent/40 hover:text-foreground",
           )}
         >
-          <Radar className="h-4 w-4 shrink-0 text-cyan-300" />
+          <Radar className="h-4 w-4 shrink-0 text-primary" />
           {!collapsed && <span>Cross-Workstream Intel</span>}
         </Link>
 
@@ -122,11 +117,11 @@ export function Sidebar({
           className={cn(
             "group relative mb-2 flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-semibold transition-colors",
             queueActive
-              ? "bg-cyan-500/15 text-cyan-200 ring-1 ring-cyan-400/30"
+              ? "bg-accent text-accent-foreground ring-1 ring-primary/30"
               : "text-foreground/80 hover:bg-accent/40 hover:text-foreground",
           )}
         >
-          <ClipboardCheck className="h-4 w-4 shrink-0 text-cyan-300" />
+          <ClipboardCheck className="h-4 w-4 shrink-0 text-primary" />
           {!collapsed && <span>Review Queue</span>}
         </Link>
 
@@ -158,12 +153,12 @@ export function Sidebar({
                     className={cn(
                       "group relative flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
                       active
-                        ? "bg-accent/70 font-semibold text-foreground"
+                        ? "bg-accent font-semibold text-accent-foreground ring-1 ring-primary/30"
                         : "text-foreground/70 hover:bg-accent/40 hover:text-foreground",
                     )}
                   >
                     {active && (
-                      <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-full bg-cyan-400" />
+                      <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-full bg-primary" />
                     )}
                     <span
                       className={cn(
@@ -186,14 +181,14 @@ export function Sidebar({
         <Link
           to="/workstreams/new"
           title="New workstream"
-          className="mt-2 flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-cyan-300 transition-colors hover:bg-accent/40"
+          className="mt-2 flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-primary transition-colors hover:bg-accent/40"
         >
           <Plus className="h-4 w-4 shrink-0" />
           {!collapsed && <span>New workstream</span>}
         </Link>
       </nav>
 
-      {/* Institution map + theme toggle */}
+      {/* Institution map */}
       <div className="space-y-1 border-t border-border/60 p-2">
         <Link
           to="/institution-map"
@@ -203,24 +198,6 @@ export function Sidebar({
           <Building2 className="h-4 w-4 shrink-0 text-violet-300" />
           {!collapsed && <span>Institution map</span>}
         </Link>
-        <button
-          type="button"
-          onClick={toggleTheme}
-          title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-          aria-label={
-            theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
-          }
-          className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent/40 hover:text-foreground"
-        >
-          {theme === "dark" ? (
-            <Sun className="h-4 w-4 shrink-0" />
-          ) : (
-            <Moon className="h-4 w-4 shrink-0" />
-          )}
-          {!collapsed && (
-            <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
-          )}
-        </button>
       </div>
     </aside>
   );

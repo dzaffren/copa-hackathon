@@ -4,59 +4,56 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Single light theme, aligned to Bank Negara's GEMA design system (Inter +
+       BNM royal blue). A faint cool off-white background so pure-white cards
+       lift off it as elevated surfaces; a deep BNM-blue primary tuned to meet
+       WCAG AA against white text. */
+    --background: 216 43% 98%;
+    --foreground: 222 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 224 76% 42%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 214 32% 93%;
+    --secondary-foreground: 222 47% 20%;
+    --muted: 214 32% 93%;
+    --muted-foreground: 215 19% 38%;
+    --accent: 214 95% 95%;
+    --accent-foreground: 224 76% 35%;
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 26% 87%;
+    --input: 214 26% 87%;
+    --ring: 224 76% 42%;
     --radius: 0.5rem;
-  }
-
-  .dark {
-    /* Deep navy/slate, deliberately NOT pure black (see CLAUDE.md). The
-       background sits darker than the card so glass-morphism surfaces read as
-       elevated panels floating above it. */
-    --background: 222 47% 8%;
-    --foreground: 210 40% 96%;
-    --card: 220 40% 13%;
-    --card-foreground: 210 40% 96%;
-    --popover: 220 42% 11%;
-    --popover-foreground: 210 40% 96%;
-    --primary: 239 84% 67%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 217 33% 18%;
-    --secondary-foreground: 210 40% 96%;
-    --muted: 217 33% 20%;
-    --muted-foreground: 215 20% 68%;
-    --accent: 217 33% 22%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 40%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 30% 24%;
-    --input: 217 30% 24%;
-    --ring: 239 84% 67%;
   }
 }
 
 @layer components {
-  /* Glass-morphism surface: a translucent, blurred panel that reads against
-     both the light and the navy dark background. */
+  /* Card surface: a solid white panel that lifts off the faint off-white
+     (#F7F9FC) page background via a hairline border and a soft shadow. */
   .glass {
-    @apply border border-border/60 bg-card/70 backdrop-blur-md;
+    @apply border border-border/60 bg-card shadow-sm;
+  }
+
+  /* Navy chrome surface: BNM deep indigo (#2A2A72), used by the page top bar
+     and the left sidebar. Scoping the colour tokens re-points every token-based
+     utility inside it (text-foreground, text-muted-foreground, border,
+     hover:text-primary, badge tints) to a light variant, so content reads on
+     the dark surface without per-child edits. */
+  .nav-dark {
+    --background: 240 46% 31%;
+    --foreground: 0 0% 100%;
+    --muted-foreground: 226 40% 82%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 240 46% 31%;
+    --accent: 240 30% 42%;
+    --accent-foreground: 0 0% 100%;
+    --border: 240 30% 46%;
+    background-color: #2a2a72;
+    color: hsl(var(--foreground));
   }
 }
 
@@ -65,6 +62,6 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background font-sans text-foreground antialiased;
   }
 }
