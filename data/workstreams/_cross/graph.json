@@ -37,6 +37,13 @@
       "short_type": "PD (draft)",
       "workstream_id": "resolution-recovery",
       "description": "Working draft revising the Recovery & Resolution Planning framework."
+    },
+    {
+      "id": "rmit-2023",
+      "node_type": "international-standard",
+      "title": "RMIT 2023",
+      "description": null,
+      "source_url": null
     }
   ],
   "edges": [
@@ -57,6 +64,12 @@
       "source_workstream_id": "bcm",
       "target_workstream_id": "resolution-recovery",
       "detected_at": "2026-07-14"
+    },
+    {
+      "id": "e-of_ed_2025--rmit_2023",
+      "source": "of-ed-2025",
+      "target": "rmit-2023",
+      "edge_type": "references"
     }
   ]
 }
