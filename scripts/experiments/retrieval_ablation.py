@@ -688,6 +688,83 @@ def _critic_per_pair(
     return parsed
 
 
+def _build_suppression(
+    retrieval_candidates: list[dict],
+    same_topic_findings: list[dict],
+) -> dict:
+    """Build the suppression set from retrieval candidates and surviving same-topic findings.
+
+    A retrieval candidate "produced a finding" if its source_anchor_id appears in the
+    source_clauses list of any surviving same-topic finding.  Only those candidates
+    contribute to the suppression set.
+
+    Returns:
+        {
+            "covered_pairs": sorted list of "source × target" strings,
+            "covered_topics": sorted list of unique matched_axis_source +
+                              matched_axis_target values from matched candidates,
+        }
+    """
+    # Build set of source anchor ids that appear in any surviving finding's source_clauses
+    covered_sources: set[str] = set()
+    for finding in same_topic_findings:
+        for clause in finding.get("source_clauses", []):
+            covered_sources.add(clause)
+
+    # Filter retrieval candidates to those whose source_anchor_id produced a finding
+    covered_pairs: set[tuple[str, str]] = set()
+    covered_topics: set[str] = set()
+    for candidate in retrieval_candidates:
+        src = candidate.get("source_anchor_id", "")
+        tgt = candidate.get("target_anchor_id", "")
+        if src in covered_sources:
+            covered_pairs.add((src, tgt))
+            axis_src = candidate.get("matched_axis_source")
+            axis_tgt = candidate.get("matched_axis_target")
+            if axis_src:
+                covered_topics.add(axis_src)
+            if axis_tgt:
+                covered_topics.add(axis_tgt)
+
+    return {
+        "covered_pairs": sorted(f"{a} × {b}" for a, b in covered_pairs),
+        "covered_topics": sorted(covered_topics),
+    }
+
+
+def _finder_coverage_whole_doc(
+    anchor_index: AnchorIndex, doc_a: str, doc_b: str, suppression: dict
+) -> list[dict]:
+    """Coverage stage: send both docs' full anchor lists in one prompt.
+
+    Uses COVERAGE_FINDER_SYSTEM_PROMPT (silent-on / goes-beyond only).
+    Appends a suppression block listing topics already covered by the
+    same-topic pass, so the model does not re-report them as coverage gaps.
+    The suppression block is omitted entirely when covered_topics is empty.
+
+    No critic call — the coverage stage intentionally excludes the critic.
+    """
+    user = (
+        _format_doc_block(anchor_index, doc_a)
+        + "\n\n"
+        + _format_doc_block(anchor_index, doc_b)
+    )
+    covered_topics = suppression.get("covered_topics", [])
+    if covered_topics:
+        user += (
+            "\n\nTOPICS ALREADY COVERED ON BOTH SIDES"
+            " — do NOT report these as coverage gaps:\n"
+            + "\n".join(f"  - {t}" for t in covered_topics)
+        )
+    raw = call_chat(
+        FINDER_CRITIC_DEPLOYMENT, COVERAGE_FINDER_SYSTEM_PROMPT, user, max_tokens=16384
+    )
+    parsed = parse_json_response(raw)
+    if not isinstance(parsed, list):
+        raise LLMResponseError(f"expected list, got {type(parsed).__name__}")
+    return parsed
+
+
 # ---------------------------------------------------------------------------
 # Suppression builder + coverage whole-doc finder (Arm G stages 3 & 4)
 # ---------------------------------------------------------------------------
