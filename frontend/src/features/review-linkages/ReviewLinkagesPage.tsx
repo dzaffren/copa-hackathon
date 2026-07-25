@@ -125,6 +125,7 @@ export function ReviewLinkagesPage() {
           subtitle="working draft"
           clauses={data.source_clauses}
           highlighted={sourceLit}
+          filterToHighlighted={true}
         />
         <ClausePane
           side="target"
@@ -132,6 +133,7 @@ export function ReviewLinkagesPage() {
           subtitle={edge.target_node.node_type}
           clauses={data.target_clauses}
           highlighted={targetLit}
+          filterToHighlighted={true}
         />
 
         <aside

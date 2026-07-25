@@ -9,6 +9,8 @@ interface ClausePaneProps {
   highlighted: string[];
   /** Distinguishes the two panes for test queries and scroll containers. */
   side: "source" | "target";
+  /** When true and there are highlighted clauses, render only those cited. */
+  filterToHighlighted?: boolean;
 }
 
 /** A vertical reader of clause cards for one side of a pair.
@@ -24,9 +26,15 @@ export function ClausePane({
   clauses,
   highlighted,
   side,
+  filterToHighlighted = false,
 }: ClausePaneProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const firstHighlighted = highlighted[0];
+
+  const visibleClauses =
+    filterToHighlighted && highlighted.length > 0
+      ? clauses.filter((clause) => highlighted.includes(clause.clause_number))
+      : clauses;
 
   useEffect(() => {
     if (!firstHighlighted || !scrollRef.current) return;
@@ -54,12 +62,12 @@ export function ClausePane({
         ref={scrollRef}
         className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4"
       >
-        {clauses.length === 0 ? (
+        {visibleClauses.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             No clauses cited on this side — every finding is silent here.
           </p>
         ) : (
-          clauses.map((clause) => {
+          visibleClauses.map((clause) => {
             const isLit = highlighted.includes(clause.clause_number);
             return (
               <article
