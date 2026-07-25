@@ -47,3 +47,4 @@ data/obsidian_vault/
 # Experimental outputs (retrieval-ablation ARB spec) — top-level only,
 # not scripts/experiments/ which holds the tracked runner scripts.
 /experiments/
+archive
