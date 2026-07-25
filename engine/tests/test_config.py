@@ -76,3 +76,23 @@ def test_reasoning_deployment_from_env(reload_config, monkeypatch):
     monkeypatch.setenv("AZURE_FOUNDRY_REASONING_DEPLOYMENT", "custom-reasoner")
     cfg = reload_config()
     assert cfg.REASONING_DEPLOYMENT == "custom-reasoner"
+
+
+def test_both_new_deployments_from_env(reload_config, monkeypatch):
+    monkeypatch.setenv("AZURE_FOUNDRY_EXTRACTION_DEPLOYMENT", "custom-extractor")
+    monkeypatch.setenv("AZURE_FOUNDRY_REASONING_DEPLOYMENT", "custom-reasoner")
+    cfg = reload_config()
+    assert cfg.EXTRACTION_DEPLOYMENT == "custom-extractor"
+    assert cfg.REASONING_DEPLOYMENT == "custom-reasoner"
+
+
+def test_existing_deployments_unaffected_by_new_vars(reload_config, monkeypatch):
+    monkeypatch.setenv("AZURE_FOUNDRY_EXTRACTION_DEPLOYMENT", "custom-extractor")
+    monkeypatch.setenv("AZURE_FOUNDRY_REASONING_DEPLOYMENT", "custom-reasoner")
+    monkeypatch.delenv("AZURE_FOUNDRY_PARSER_DEPLOYMENT", raising=False)
+    monkeypatch.delenv("AZURE_FOUNDRY_FINDER_CRITIC_DEPLOYMENT", raising=False)
+    monkeypatch.delenv("AZURE_FOUNDRY_COPILOT_DEPLOYMENT", raising=False)
+    cfg = reload_config()
+    assert cfg.PARSER_DEPLOYMENT == "claude-sonnet-5"
+    assert cfg.FINDER_CRITIC_DEPLOYMENT == "claude-opus-4-8"
+    assert cfg.COPILOT_DEPLOYMENT == "claude-sonnet-5"
