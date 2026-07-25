@@ -48,8 +48,7 @@ import logging
 import re
 import time
 from math import ceil
-from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 from engine.anchors import Anchor, AnchorIndex
 from engine.config import (
