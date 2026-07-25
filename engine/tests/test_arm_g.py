@@ -446,3 +446,286 @@ def test_is_redundant():
         {"summary": "unrelated topic", "source_clauses": ["A9"], "target_clauses": []},
         supp,
     )
+
+
+# ---------------------------------------------------------------------------
+# Test 1 — same-topic labels restricted (batched): a stubbed silent-on from the
+# same-topic stage is rejected; only aligns/differs/conflicts survive.
+# ---------------------------------------------------------------------------
+
+
+def test_same_topic_stage_rejects_coverage_labels(monkeypatch):
+    import engine.arm_g as arm_g
+
+    index = _stage3_index()
+    candidates = _stage3_candidates()[:16]  # 2 batches of 8 (only 1..8 resolve)
+
+    def fake_call_chat(deployment, system, user, max_tokens=None):
+        return json.dumps(
+            [
+                {
+                    "summary": "leaked coverage label",
+                    "label": "silent-on",
+                    "source_clauses": [],
+                    "target_clauses": ["HKMA 1"],
+                },
+                {
+                    "summary": "genuine same-topic",
+                    "label": "aligns-with",
+                    "source_clauses": ["ED 1"],
+                    "target_clauses": ["HKMA 1"],
+                },
+            ]
+        )
+
+    monkeypatch.setattr(arm_g, "call_chat", fake_call_chat)
+    findings = arm_g.finder_same_topic_batched(index, candidates)
+
+    labels = {f["label"] for f in findings}
+    assert "silent-on" not in labels
+    assert labels <= set(arm_g.SAME_TOPIC_LABELS)
+    assert "aligns-with" in labels
+
+
+# ---------------------------------------------------------------------------
+# Stage 6 — reformatter recovers / refuses; single-sided validates.
+# ---------------------------------------------------------------------------
+
+
+def _rmit_index() -> AnchorIndex:
+    return AnchorIndex(
+        [
+            _anchor("RMiT 2.1", "doc-a", "RMiT clause two point one."),
+            _anchor("RMiT 2.2(b)", "doc-a", "RMiT clause two point two b."),
+            _anchor("HKMA OpenAPI 17.2", "doc-b", "HKMA clause seventeen point two."),
+        ]
+    )
+
+
+# Test 4 — reformatter recovers punctuation/prefix drift.
+
+
+def test_reformatter_recovers_trailing_punct_and_bare_prefix():
+    import engine.arm_g as arm_g
+
+    index = _rmit_index()
+
+    # "RMiT 2.2(b):" → strip trailing ":" → "RMiT 2.2(b)".
+    assert arm_g._reformat_citation("RMiT 2.2(b):", "doc-a", index) == (
+        "RMiT 2.2(b)",
+        "strip_trailing_punct",
+    )
+    # Bare "2.1" → restore prefix "RMiT" → "RMiT 2.1".
+    assert arm_g._reformat_citation("2.1", "doc-a", index) == (
+        "RMiT 2.1",
+        "restore_prefix",
+    )
+
+
+def test_stage6_records_rewrites_and_marks_supported():
+    import engine.arm_g as arm_g
+
+    index = _rmit_index()
+    coverage = [
+        {
+            "summary": "gap",
+            "label": "goes-beyond",
+            "source_clauses": ["RMiT 2.2(b):", "2.1"],
+            "target_clauses": [],
+        }
+    ]
+    connections, unsupported, _validation, rewrites = arm_g.merge_reformat_validate(
+        [], coverage, index, "doc-a", "doc-b"
+    )
+    assert len(connections) == 1
+    assert unsupported == []
+    raws = {r["cited_raw"]: r for r in rewrites}
+    assert raws["RMiT 2.2(b):"]["cited_normalized"] == "RMiT 2.2(b)"
+    assert raws["RMiT 2.2(b):"]["transform"] == "strip_trailing_punct"
+    assert raws["2.1"]["cited_normalized"] == "RMiT 2.1"
+    assert raws["2.1"]["transform"] == "restore_prefix"
+
+
+# Test 5 — reformatter refuses unsafe rescue.
+
+
+def test_reformatter_refuses_unsafe_rescue():
+    import engine.arm_g as arm_g
+
+    index = _rmit_index()
+    assert arm_g._reformat_citation("B 7.", "doc-a", index) is None
+    assert arm_g._reformat_citation('"5. Conclusion" chunk#68', "doc-a", index) is None
+
+
+def test_stage6_demotes_unresolvable_without_rewrite():
+    import engine.arm_g as arm_g
+
+    index = _rmit_index()
+    coverage = [
+        {
+            "summary": "invented",
+            "label": "silent-on",
+            "source_clauses": [],
+            "target_clauses": ["B 7."],
+        }
+    ]
+    connections, unsupported, _v, rewrites = arm_g.merge_reformat_validate(
+        [], coverage, index, "doc-a", "doc-b"
+    )
+    assert connections == []
+    assert len(unsupported) == 1
+    assert "No matching clause found" in unsupported[0]["message"]
+    assert rewrites == []
+
+
+# Test 6 — single-sided coverage finding validates supported.
+
+
+def test_single_sided_coverage_validates_supported():
+    import engine.arm_g as arm_g
+
+    index = _rmit_index()
+    coverage = [
+        {
+            "summary": "silent on X",
+            "label": "silent-on",
+            "source_clauses": [],
+            "target_clauses": ["HKMA OpenAPI 17.2"],
+        }
+    ]
+    connections, unsupported, _v, _r = arm_g.merge_reformat_validate(
+        [], coverage, index, "doc-a", "doc-b"
+    )
+    assert len(connections) == 1
+    assert unsupported == []
+
+
+# ---------------------------------------------------------------------------
+# Orchestration — Tests 7 and 9.
+# ---------------------------------------------------------------------------
+
+
+def _orchestration_index() -> AnchorIndex:
+    return AnchorIndex(
+        [
+            _anchor("ED 1", "doc-a", "ED requires consent revocation cadence."),
+            _anchor("ED 2", "doc-a", "ED requires strong authentication."),
+            _anchor("HKMA 1", "doc-b", "HKMA addresses consent."),
+            _anchor("HKMA 2", "doc-b", "HKMA addresses authentication."),
+        ]
+    )
+
+
+def _install_orchestration_stubs(monkeypatch, tmp_path, deployments):
+    """Stub axis extraction (bypass model), retrieval, and call_chat routing.
+
+    Records the deployment each stage's call_chat uses into ``deployments``.
+    """
+    import engine.arm_g as arm_g
+
+    monkeypatch.setattr(arm_g, "AXES_DIR", tmp_path)
+
+    def fake_extract(anchor_index, document_id, deployment=arm_g.EXTRACTION_DEPLOYMENT):
+        deployments.append(("extract", deployment))
+        return {a["anchor_id"]: ["axis"] for a in anchor_index.by_document(document_id)}
+
+    monkeypatch.setattr(arm_g, "extract_axes_for_document", fake_extract)
+
+    def fake_retrieve(axes_a, axes_b, signal="cosine"):
+        return [
+            {
+                "source_anchor_id": "ED 1",
+                "target_anchor_id": "HKMA 1",
+                "matched_axis_source": "consent",
+                "matched_axis_target": "consent",
+            }
+        ]
+
+    monkeypatch.setattr(arm_g, "retrieve", fake_retrieve)
+
+    def fake_call_chat(deployment, system, user, max_tokens=None):
+        if system == arm_g.SAME_TOPIC_FINDER_SYSTEM_PROMPT:
+            deployments.append(("same_topic", deployment))
+            return json.dumps(
+                [
+                    {
+                        "summary": "both require consent",
+                        "label": "differs-on",
+                        "sentiment": "tighten",
+                        "source_clauses": ["ED 1"],
+                        "target_clauses": ["HKMA 1"],
+                        "scope_note": "scoped to retail",
+                    }
+                ]
+            )
+        if system == arm_g.COVERAGE_FINDER_SYSTEM_PROMPT:
+            deployments.append(("coverage", deployment))
+            return json.dumps(
+                [
+                    {
+                        "summary": "ED goes beyond on authentication",
+                        "label": "goes-beyond",
+                        "source_clauses": ["ED 2"],
+                        "target_clauses": [],
+                    }
+                ]
+            )
+        raise AssertionError(f"unexpected system prompt for deployment {deployment}")
+
+    monkeypatch.setattr(arm_g, "call_chat", fake_call_chat)
+
+
+def test_output_contract_shape(monkeypatch, tmp_path):
+    import engine.arm_g as arm_g
+
+    deployments: list = []
+    _install_orchestration_stubs(monkeypatch, tmp_path, deployments)
+
+    result = arm_g.run_arm_g(_orchestration_index(), "doc-a", "doc-b")
+
+    assert set(result.keys()) == {"connections", "unsupported", "trace"}
+    assert "metadata" not in result
+    # scope_note retained on connections.
+    assert any(c.get("scope_note") == "scoped to retail" for c in result["connections"])
+
+    trace = result["trace"]
+    for key in (
+        "retrieval_candidates",
+        "same_topic_finder_output",
+        "suppression",
+        "coverage_finder_output",
+        "validation",
+        "citation_rewrites",
+        "counts",
+        "wall_clock_seconds",
+    ):
+        assert key in trace, f"trace missing {key}"
+
+    # Each coverage entry carries computed single_sided / redundant.
+    for entry in trace["coverage_finder_output"]:
+        assert "single_sided" in entry
+        assert "redundant" in entry
+    counts = trace["counts"]
+    assert counts["same_topic_finding"] == 1
+    assert counts["coverage_finding"] == 1
+
+
+def test_three_tier_routing_no_critic(monkeypatch, tmp_path):
+    import engine.arm_g as arm_g
+
+    deployments: list = []
+    _install_orchestration_stubs(monkeypatch, tmp_path, deployments)
+
+    arm_g.run_arm_g(_orchestration_index(), "doc-a", "doc-b")
+
+    stages = {stage: dep for stage, dep in deployments}
+    assert stages["extract"] == arm_g.EXTRACTION_DEPLOYMENT
+    assert stages["same_topic"] == arm_g.REASONING_DEPLOYMENT
+    assert stages["coverage"] == arm_g.FINDER_CRITIC_DEPLOYMENT
+    # Three distinct tiers, no critic stage ever recorded.
+    assert "critic" not in stages
+    assert (
+        arm_g.EXTRACTION_DEPLOYMENT
+        != arm_g.REASONING_DEPLOYMENT
+        != arm_g.FINDER_CRITIC_DEPLOYMENT
+    )

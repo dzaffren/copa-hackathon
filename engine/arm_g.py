@@ -486,6 +486,11 @@ def retrieve(
 # then skipped with every pair id logged (recall loss, never a correctness fault).
 # ---------------------------------------------------------------------------
 
+# The three agreement-type labels the same-topic stage may carry. Coverage
+# labels (silent-on / goes-beyond) are the whole-doc pass's job and are rejected
+# if the finder leaks one into this stage.
+SAME_TOPIC_LABELS = ("aligns-with", "differs-on", "conflicts-with")
+
 SAME_TOPIC_FINDER_SYSTEM_PROMPT = (
     "You are a policy analyst finding SAME-TOPIC connections between two Bank "
     "Negara Malaysia policy documents. You are given a batch of anchors from "
@@ -576,7 +581,10 @@ def _finder_same_topic_batch(
     parsed = parse_json_response(raw)
     if not isinstance(parsed, list):
         raise LLMResponseError(f"expected list, got {type(parsed).__name__}")
-    return parsed
+    # Taxonomy validation: the same-topic stage may carry ONLY the three
+    # agreement-type labels. A coverage label (silent-on / goes-beyond) leaking
+    # out of this stage is rejected here — coverage is the whole-doc pass's job.
+    return [finding for finding in parsed if finding.get("label") in SAME_TOPIC_LABELS]
 
 
 def finder_same_topic_batched(
@@ -785,3 +793,209 @@ def _is_redundant(finding: dict, suppression: dict) -> bool:
         finding.get("target_clauses") or []
     )
     return any(clause in covered_pairs_str for clause in all_clauses if clause)
+
+
+# ---------------------------------------------------------------------------
+# Stage 6 — merge + reformat + validate [no model].
+#
+# The deterministic citation reformatter runs ONLY on a cited id that fails the
+# exact index lookup. It applies reversible, unambiguous transforms in order and
+# returns (normalized_id, transform_name) on success or None (→ demote). NO
+# fuzzy / substring / semantic matching — an id that only partially resembles a
+# real anchor is NOT rescued. Then engine.connections._validate_candidates
+# splits into connections / unsupported, reused UNCHANGED via the ClauseIndex shim.
+# ---------------------------------------------------------------------------
+
+
+def _document_prefix(document_id: str, index: AnchorIndex) -> Optional[str]:
+    """Derive the document's anchor-id prefix from the index, not hardcoded.
+
+    ``index.by_document(document_id)[0]["anchor_id"].rsplit(" ", 1)[0]`` — e.g.
+    ``"RMiT 2.1"`` → ``"RMiT"``. Returns ``None`` when the document has no
+    anchors (nothing to derive a prefix from).
+    """
+    anchors = index.by_document(document_id)
+    if not anchors:
+        return None
+    first_id = anchors[0]["anchor_id"]
+    parts = first_id.rsplit(" ", 1)
+    if len(parts) < 2:
+        return None
+    return parts[0]
+
+
+def _reformat_citation(
+    cited: str, document_id: str, index: AnchorIndex
+) -> Optional[tuple[str, str]]:
+    """Deterministically recover punctuation/prefix drift on a failed citation.
+
+    Runs ONLY on a cited id that already failed the exact index lookup. Applies
+    reversible transforms in order:
+
+    1. ``strip_trailing_punct`` — ``cited.rstrip(" .:;,")``; re-check the index.
+    2. ``restore_prefix`` — if the stripped id does not start with the
+       document's derived prefix, prepend it; re-check the index.
+
+    Returns ``(normalized_id, transform_name)`` on success, or ``None`` (→ demote
+    to unsupported). NO fuzzy / substring / semantic matching.
+    """
+    stripped = cited.rstrip(" .:;,")
+    if stripped != cited and index.get(stripped) is not None:
+        return stripped, "strip_trailing_punct"
+
+    prefix = _document_prefix(document_id, index)
+    if prefix and not stripped.startswith(prefix + " "):
+        restored = f"{prefix} {stripped}"
+        if index.get(restored) is not None:
+            return restored, "restore_prefix"
+
+    return None
+
+
+def _reformat_side(
+    numbers: list[str],
+    document_id: str,
+    index: AnchorIndex,
+    rewrites: list[dict],
+) -> list[str]:
+    """Reformat every cited id on one side (source or target) that fails an
+    exact lookup. Resolving rewrites are applied and recorded in ``rewrites``;
+    unresolvable ids are left as-is so ``_validate_candidates`` demotes them."""
+    out: list[str] = []
+    for number in numbers:
+        if index.get(number) is not None:
+            out.append(number)
+            continue
+        recovered = _reformat_citation(number, document_id, index)
+        if recovered is None:
+            out.append(number)
+            continue
+        normalized, transform = recovered
+        rewrites.append(
+            {
+                "cited_raw": number,
+                "cited_normalized": normalized,
+                "transform": transform,
+            }
+        )
+        out.append(normalized)
+    return out
+
+
+def merge_reformat_validate(
+    same_topic_raw: list[dict],
+    coverage_raw: list[dict],
+    anchor_index: AnchorIndex,
+    doc_a: str,
+    doc_b: str,
+) -> tuple[list, list, list, list[dict]]:
+    """Stage 6: reformat drifted citations, then validate the merged findings.
+
+    Source clauses are reformatted against ``doc_a``'s prefix, target clauses
+    against ``doc_b``'s. After reformatting, ``_validate_candidates`` (reused
+    unchanged, via the ClauseIndex shim) splits everything into connections /
+    unsupported.
+
+    Returns ``(connections, unsupported, validation, citation_rewrites)``.
+    """
+    rewrites: list[dict] = []
+    merged: list[dict] = []
+    for finding in same_topic_raw + coverage_raw:
+        rewritten = dict(finding)
+        rewritten["source_clauses"] = _reformat_side(
+            finding.get("source_clauses", []) or [], doc_a, anchor_index, rewrites
+        )
+        rewritten["target_clauses"] = _reformat_side(
+            finding.get("target_clauses", []) or [], doc_b, anchor_index, rewrites
+        )
+        merged.append(rewritten)
+
+    clause_shim = _AnchorAsClauseIndex(anchor_index)
+    connections, unsupported, validation = _validate_candidates(merged, clause_shim)
+    return connections, unsupported, validation, rewrites
+
+
+# ---------------------------------------------------------------------------
+# Orchestration — run all six stages in order and return the result dict.
+# ---------------------------------------------------------------------------
+
+
+def run_arm_g(
+    anchor_index: AnchorIndex,
+    doc_a: str,
+    doc_b: str,
+    signal: str = "cosine",
+) -> dict[str, Any]:
+    """Run the six-stage Arm G pipeline and return a result dict.
+
+    Args:
+        anchor_index: the built anchor index for both documents.
+        doc_a: document-A identifier (the "our side").
+        doc_b: document-B identifier (the "their side").
+        signal: retrieval method — ``"cosine"`` (default, auto-falls-back to
+            BM25 when embeddings are unavailable) or ``"bm25"`` (forced).
+
+    Returns a dict with ``connections``, ``unsupported``, and a ``trace``
+    sub-dict holding ``retrieval_candidates``, ``same_topic_finder_output``,
+    ``suppression``, ``coverage_finder_output`` (each entry carrying computed
+    ``single_sided`` / ``redundant``), ``validation``, ``citation_rewrites``,
+    ``counts`` and ``wall_clock_seconds``. Connections keep ``scope_note``. No
+    ``metadata.json`` concept — the route (Story 3) decides file writing.
+    """
+    start = time.time()
+
+    # Stage 1 — axis extraction (small model, cached).
+    axes_a = extract_axes_for_document(anchor_index, doc_a)
+    axes_b = extract_axes_for_document(anchor_index, doc_b)
+
+    # Stage 2 — same-topic retrieval (no model).
+    candidates = retrieve(axes_a, axes_b, signal=signal)
+
+    # Stage 3 — batched same-topic finder (mid-tier model, no critic).
+    same_topic_raw = finder_same_topic_batched(anchor_index, candidates)
+
+    # Stage 4 — suppression build (no model).
+    suppression = _build_suppression(candidates, same_topic_raw)
+
+    # Stage 5 — whole-doc coverage finder (large model, one call, no critic).
+    try:
+        coverage_raw = finder_coverage_whole_doc(
+            anchor_index, doc_a, doc_b, suppression
+        )
+    except LLMResponseError as exc:
+        logger.warning("coverage whole-doc finder failed: %s", exc)
+        coverage_raw = []
+
+    # Stage 6 — merge + reformat + validate (no model).
+    connections, unsupported, validation, rewrites = merge_reformat_validate(
+        same_topic_raw, coverage_raw, anchor_index, doc_a, doc_b
+    )
+
+    coverage_output = [
+        {
+            **finding,
+            "single_sided": _is_single_sided(finding),
+            "redundant": _is_redundant(finding, suppression),
+        }
+        for finding in coverage_raw
+    ]
+
+    return {
+        "connections": connections,
+        "unsupported": unsupported,
+        "trace": {
+            "retrieval_candidates": candidates,
+            "same_topic_finder_output": same_topic_raw,
+            "suppression": suppression,
+            "coverage_finder_output": coverage_output,
+            "validation": validation,
+            "citation_rewrites": rewrites,
+            "counts": {
+                "supported": len(connections),
+                "unsupported": len(unsupported),
+                "same_topic_finding": len(same_topic_raw),
+                "coverage_finding": len(coverage_raw),
+            },
+            "wall_clock_seconds": round(time.time() - start, 1),
+        },
+    }
