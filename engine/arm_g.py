@@ -612,3 +612,176 @@ def finder_same_topic_batched(
                 pair_ids,
             )
     return findings
+
+
+# ---------------------------------------------------------------------------
+# Stage 4 — suppression build [no model]. Ported verbatim from the experiment.
+#
+# A retrieval candidate contributes to suppression only when its A-side anchor
+# produced a surviving same-topic finding (appears in that finding's
+# source_clauses). Those candidates' matched axes become covered_topics and
+# their anchor pair becomes a covered_pair.
+# ---------------------------------------------------------------------------
+
+
+def _build_suppression(
+    retrieval_candidates: list[dict], same_topic_findings: list[dict]
+) -> dict:
+    """Build the suppression dict from same-topic stage outputs.
+
+    Returns ``{"covered_pairs": ["A × B", ...], "covered_topics": [axis, ...]}``,
+    both sorted and de-duplicated.
+    """
+    covered_sources: set[str] = set()
+    for finding in same_topic_findings:
+        for clause in finding.get("source_clauses", []):
+            covered_sources.add(clause)
+
+    covered_pairs: set[tuple[str, str]] = set()
+    covered_topics: set[str] = set()
+    for candidate in retrieval_candidates:
+        src = candidate.get("source_anchor_id", "")
+        tgt = candidate.get("target_anchor_id", "")
+        if src in covered_sources:
+            covered_pairs.add((src, tgt))
+            axis_src = candidate.get("matched_axis_source")
+            axis_tgt = candidate.get("matched_axis_target")
+            if axis_src:
+                covered_topics.add(axis_src)
+            if axis_tgt:
+                covered_topics.add(axis_tgt)
+
+    return {
+        "covered_pairs": sorted(f"{a} × {b}" for a, b in covered_pairs),
+        "covered_topics": sorted(covered_topics),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Stage 5 — whole-doc coverage finder [FINDER_CRITIC_DEPLOYMENT]. ONE call, no
+# critic. silent-on / goes-beyond only, with the three-part COVERAGE-SUMMARY
+# RULE and the "both sides take a position = not a coverage finding" guardrail.
+# COVERAGE_FINDER_SYSTEM_PROMPT ported from the experiment runner.
+# ---------------------------------------------------------------------------
+
+COVERAGE_FINDER_SYSTEM_PROMPT = (
+    "You are a policy analyst identifying COVERAGE GAPS between two Bank Negara "
+    "Malaysia policy documents. Your task is to find sub-topics where exactly "
+    "one side has a provision and the other side is entirely silent.\n\n"
+    "LABEL RESTRICTION (strict): you MUST emit ONLY findings with label "
+    "`silent-on` or `goes-beyond`. Never emit `aligns-with`, `differs-on`, or "
+    "`conflicts-with` — those are for a separate same-topic pass. If no genuine "
+    "coverage gap exists, return an empty array.\n\n"
+    "DIRECTION CONVENTION (fixed): document A is 'we/ours'; document B is "
+    "'they/theirs'.\n"
+    "  - goes-beyond: OUR side (document A) covers a sub-topic; THEIR side "
+    "(document B) has no provision for it anywhere in the document.\n"
+    "  - silent-on: OUR side (document A) has no provision for a sub-topic; "
+    "THEIR side (document B) covers it.\n\n"
+    "COVERAGE-SUMMARY RULE: every finding summary MUST do all three of the "
+    "following:\n"
+    "  1. Name the shared regulatory topic that both documents sit under (e.g. "
+    "'open API security', 'consent management', 'third-party access').\n"
+    "  2. State what the COVERING side specifically requires or addresses on "
+    "that sub-topic.\n"
+    "  3. State precisely what the OTHER side does NOT address — name the "
+    "specific obligation or sub-point that is absent, not just 'does not cover "
+    "this'.\n\n"
+    "GUARDRAIL: If both sides take a position on this topic — even if different "
+    "— that is NOT a coverage finding. Do not emit it. Only emit a finding when "
+    "one side genuinely has no provision for the sub-point. A stricter rule on "
+    "one side is NOT a gap; it is a 'differs-on' finding and belongs in the "
+    "same-topic pass.\n\n"
+    "OBJECT SHAPE:\n"
+    '  {"summary": "...", "label": "silent-on|goes-beyond",\n'
+    '   "source_clauses": [...], "target_clauses": [...], "scope_note": "..."}\n\n'
+    "For `goes-beyond`: `source_clauses` is non-empty (A covers it); "
+    "`target_clauses` is empty, or holds the nearest B clause cited only to "
+    "confirm it does not address this sub-point.\n"
+    "For `silent-on`: `target_clauses` is non-empty (B covers it); "
+    "`source_clauses` is empty, or holds the nearest A clause cited only to "
+    "confirm it does not address this sub-point.\n\n"
+    "Do NOT include a `sentiment` field — coverage labels never carry "
+    "sentiment.\n\n"
+    "CITATION RULE (strict): every clause_number in `source_clauses` and "
+    "`target_clauses` MUST be copied EXACTLY from the clause lists provided. "
+    "Never invent, guess, reformat, or paraphrase a clause number. Do not cite "
+    "a clause that is not in the lists.\n\n"
+    "Return ONLY a JSON array of these objects — no prose, no markdown, no "
+    "commentary. Return an empty array `[]` if there are no genuine coverage "
+    "gaps."
+)
+
+
+def _format_doc_block(anchor_index: AnchorIndex, document_id: str) -> str:
+    """List every anchor of a document as ``{anchor_id}: {text}`` lines."""
+    lines = [f"Document: {document_id}"]
+    for a in anchor_index.by_document(document_id):
+        lines.append(_format_anchor_line(a))
+    return "\n\n".join(lines)
+
+
+def finder_coverage_whole_doc(
+    anchor_index: AnchorIndex,
+    doc_a: str,
+    doc_b: str,
+    suppression: dict,
+    deployment: str = FINDER_CRITIC_DEPLOYMENT,
+) -> list[dict]:
+    """Stage 5: whole-document coverage finder — ONE call, no critic.
+
+    Sends both documents' full anchor lists in one prompt with
+    ``COVERAGE_FINDER_SYSTEM_PROMPT`` (silent-on / goes-beyond only). Appends the
+    suppression block listing already-covered topics when non-empty so the model
+    does not re-report them. Raises ``LLMResponseError`` on a non-list reply.
+    """
+    user = (
+        _format_doc_block(anchor_index, doc_a)
+        + "\n\n"
+        + _format_doc_block(anchor_index, doc_b)
+    )
+    covered_topics = suppression.get("covered_topics", [])
+    if covered_topics:
+        user += (
+            "\n\nTOPICS ALREADY COVERED ON BOTH SIDES — do NOT report these as "
+            "coverage gaps:\n" + "\n".join(f"  - {t}" for t in covered_topics)
+        )
+    raw = call_chat(deployment, COVERAGE_FINDER_SYSTEM_PROMPT, user, max_tokens=16384)
+    parsed = parse_json_response(raw)
+    if not isinstance(parsed, list):
+        raise LLMResponseError(f"expected list, got {type(parsed).__name__}")
+    return parsed
+
+
+def _is_single_sided(finding: dict) -> bool:
+    """True if the coverage finding has exactly one non-empty clause side.
+
+    - goes-beyond: source_clauses non-empty AND target_clauses empty.
+    - silent-on: source_clauses empty AND target_clauses non-empty.
+    - anything else: False.
+    """
+    src = finding.get("source_clauses") or []
+    tgt = finding.get("target_clauses") or []
+    label = finding.get("label")
+    if label == "goes-beyond":
+        return bool(src) and not bool(tgt)
+    if label == "silent-on":
+        return not bool(src) and bool(tgt)
+    return False
+
+
+def _is_redundant(finding: dict, suppression: dict) -> bool:
+    """True if this coverage finding overlaps the suppression set.
+
+    True when any covered_topic (case-insensitive) is a substring of the
+    finding's summary, OR any cited anchor appears in the covered_pairs strings.
+    """
+    covered_topics = [t.lower() for t in suppression.get("covered_topics", [])]
+    summary_lower = (finding.get("summary") or "").lower()
+    if any(t in summary_lower for t in covered_topics if t):
+        return True
+    covered_pairs_str = " ".join(suppression.get("covered_pairs", []))
+    all_clauses = (finding.get("source_clauses") or []) + (
+        finding.get("target_clauses") or []
+    )
+    return any(clause in covered_pairs_str for clause in all_clauses if clause)

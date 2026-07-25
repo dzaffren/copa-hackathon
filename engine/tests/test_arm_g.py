@@ -289,3 +289,160 @@ def test_batch_failure_skips_and_logs_pair_ids(monkeypatch, caplog):
     assert "skipped after retry" in logged
     assert "ED 1 × HKMA 1" in logged
     assert "ED 8 × HKMA 8" in logged
+
+
+# ---------------------------------------------------------------------------
+# Stage 4 — suppression build.
+# ---------------------------------------------------------------------------
+
+_SUPP_CANDIDATES = [
+    {
+        "source_anchor_id": "A1",
+        "target_anchor_id": "B1",
+        "matched_axis_source": "consent-management",
+        "matched_axis_target": "user-consent",
+    },
+    {
+        "source_anchor_id": "A2",
+        "target_anchor_id": "B2",
+        "matched_axis_source": "authentication",
+        "matched_axis_target": "identity-verification",
+    },
+]
+
+
+def test_build_suppression_covers_only_matched_source():
+    """Only candidates whose A-side anchor produced a finding contribute; the
+    A1 finding covers the A1×B1 pair and its axes, not the A2 pair."""
+    import engine.arm_g as arm_g
+
+    findings = [
+        {
+            "summary": "Both require consent",
+            "label": "aligns-with",
+            "source_clauses": ["A1"],
+            "target_clauses": ["B1"],
+        }
+    ]
+    result = arm_g._build_suppression(_SUPP_CANDIDATES, findings)
+    assert "A1 × B1" in result["covered_pairs"]
+    assert "A2 × B2" not in result["covered_pairs"]
+    assert "consent-management" in result["covered_topics"]
+    assert "user-consent" in result["covered_topics"]
+    assert "authentication" not in result["covered_topics"]
+    # Sorted + de-duplicated.
+    assert result["covered_topics"] == sorted(set(result["covered_topics"]))
+
+
+def test_build_suppression_empty_findings():
+    import engine.arm_g as arm_g
+
+    result = arm_g._build_suppression(_SUPP_CANDIDATES, [])
+    assert result == {"covered_pairs": [], "covered_topics": []}
+
+
+# ---------------------------------------------------------------------------
+# Stage 5 — whole-doc coverage finder.
+# ---------------------------------------------------------------------------
+
+
+def _coverage_index() -> AnchorIndex:
+    return AnchorIndex(
+        [
+            _anchor("A1", "doc-a", "A requires explicit consent."),
+            _anchor("B1", "doc-b", "B requires user consent."),
+        ]
+    )
+
+
+def test_coverage_finder_uses_coverage_prompt_and_finder_critic(monkeypatch):
+    """Stage 5 calls call_chat with COVERAGE_FINDER_SYSTEM_PROMPT and the
+    FINDER_CRITIC_DEPLOYMENT (large) tier."""
+    import engine.arm_g as arm_g
+
+    captured = {}
+
+    def fake_call_chat(deployment, system, user, max_tokens=None):
+        captured["deployment"] = deployment
+        captured["system"] = system
+        captured["user"] = user
+        return "[]"
+
+    monkeypatch.setattr(arm_g, "call_chat", fake_call_chat)
+    arm_g.finder_coverage_whole_doc(
+        _coverage_index(), "doc-a", "doc-b", {"covered_topics": [], "covered_pairs": []}
+    )
+
+    assert captured["system"] == arm_g.COVERAGE_FINDER_SYSTEM_PROMPT
+    assert captured["deployment"] == arm_g.FINDER_CRITIC_DEPLOYMENT
+    assert "A requires explicit consent" in captured["user"]
+    assert "B requires user consent" in captured["user"]
+
+
+def test_coverage_finder_appends_suppression_block_when_topics_present(monkeypatch):
+    import engine.arm_g as arm_g
+
+    captured = {}
+
+    def fake_call_chat(deployment, system, user, max_tokens=None):
+        captured["user"] = user
+        return "[]"
+
+    monkeypatch.setattr(arm_g, "call_chat", fake_call_chat)
+    arm_g.finder_coverage_whole_doc(
+        _coverage_index(),
+        "doc-a",
+        "doc-b",
+        {"covered_topics": ["consent-management"], "covered_pairs": ["A1 × B1"]},
+    )
+    assert "TOPICS ALREADY COVERED" in captured["user"]
+    assert "consent-management" in captured["user"]
+
+
+def test_coverage_finder_no_suppression_block_when_empty(monkeypatch):
+    import engine.arm_g as arm_g
+
+    captured = {}
+
+    def fake_call_chat(deployment, system, user, max_tokens=None):
+        captured["user"] = user
+        return "[]"
+
+    monkeypatch.setattr(arm_g, "call_chat", fake_call_chat)
+    arm_g.finder_coverage_whole_doc(
+        _coverage_index(), "doc-a", "doc-b", {"covered_topics": [], "covered_pairs": []}
+    )
+    assert "TOPICS ALREADY COVERED" not in captured["user"]
+
+
+def test_is_single_sided():
+    import engine.arm_g as arm_g
+
+    assert arm_g._is_single_sided(
+        {"label": "goes-beyond", "source_clauses": ["A1"], "target_clauses": []}
+    )
+    assert arm_g._is_single_sided(
+        {"label": "silent-on", "source_clauses": [], "target_clauses": ["B1"]}
+    )
+    assert not arm_g._is_single_sided(
+        {"label": "goes-beyond", "source_clauses": ["A1"], "target_clauses": ["B1"]}
+    )
+    assert not arm_g._is_single_sided(
+        {"label": "aligns-with", "source_clauses": ["A1"], "target_clauses": ["B1"]}
+    )
+
+
+def test_is_redundant():
+    import engine.arm_g as arm_g
+
+    supp = {"covered_topics": ["consent management"], "covered_pairs": ["A1 × B1"]}
+    assert arm_g._is_redundant(
+        {"summary": "gap on consent management cadence", "source_clauses": []}, supp
+    )
+    assert arm_g._is_redundant(
+        {"summary": "unrelated", "source_clauses": ["A1"], "target_clauses": []}, supp
+    )
+    assert not arm_g._is_redundant(
+        {"summary": "unrelated topic", "source_clauses": ["A9"], "target_clauses": []},
+        supp,
+    )
