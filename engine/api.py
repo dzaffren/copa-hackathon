@@ -32,6 +32,8 @@ from typing import Any, Optional, Union
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from engine.anchors import AnchorIndex
+from engine.arm_g import run_arm_g as _run_arm_g
 from engine.clauses import load_clause_index
 from engine.connections import find_connections as _default_find_connections
 from engine.copilot import copilot_reply as _default_copilot_reply
@@ -63,9 +65,7 @@ WORKSTREAMS_DIR = REPO_ROOT / "data" / "workstreams"
 CROSS_STORE = "_cross"
 
 
-def _cross_side(
-    edge: dict[str, Any], workstream_id: str
-) -> Optional[tuple[str, str]]:
+def _cross_side(edge: dict[str, Any], workstream_id: str) -> Optional[tuple[str, str]]:
     """Orient a cross-link relative to `workstream_id` → `(near_id, far_id)`.
 
     Returns None when the edge does not touch this workstream. A link is stored
@@ -79,7 +79,9 @@ def _cross_side(
     return None
 
 
-def _workstream_name(workstreams_dir: Path, workstream_id: Optional[str]) -> Optional[str]:
+def _workstream_name(
+    workstreams_dir: Path, workstream_id: Optional[str]
+) -> Optional[str]:
     """The far workstream's display name, for "…in Open Finance ED · 2025"."""
     if workstream_id is None:
         return None
@@ -129,7 +131,9 @@ def _all_cross_links(workstreams_dir: Path) -> list[dict[str, Any]]:
 
     links: list[dict[str, Any]] = []
     for edge in cross.get("edges", []):
-        edge_findings, labels = _cross_link_findings_summary(workstreams_dir, edge["id"])
+        edge_findings, labels = _cross_link_findings_summary(
+            workstreams_dir, edge["id"]
+        )
         near, far = _side(edge["source"]), _side(edge["target"])
         links.append(
             {
@@ -212,7 +216,10 @@ def _cross_profile(
         "concepts": (
             {"status": "available", **node_concepts}
             if node_concepts is not None
-            else {"status": "placeholder", "message": "Concept extraction not enabled in MVP1"}
+            else {
+                "status": "placeholder",
+                "message": "Concept extraction not enabled in MVP1",
+            }
         ),
     }
 
@@ -287,6 +294,7 @@ def _review_queue_items(workstreams_dir: Path) -> list[dict[str, Any]]:
             )
     return items
 
+
 def _ws_error(
     status_code: int, code: str, message: str, field: Optional[str] = None
 ) -> JSONResponse:
@@ -310,10 +318,33 @@ def _load_workstream_graph(
     return json.loads(graph_path.read_text(encoding="utf-8"))
 
 
+def _make_default_run_arm_g(artifacts_dir: Path) -> Any:
+    """Build the default `run_arm_g_fn` adapter bound to an `artifacts_dir`.
+
+    The adapter loads the persisted `AnchorIndex` from
+    `data/artifacts/anchor-index.json` (under `artifacts_dir`) once per call and
+    runs the six-stage Arm G pipeline on the pair. Its signature is
+    `(src_doc, tgt_doc) -> {"connections", "unsupported", "trace"}` so the route
+    can call it exactly like the old finder minus the clause index — Arm G reads
+    clause text from the anchor index instead. Stage 1 builds the axis cache on
+    demand, so no pre-existing cache is required (first-run auto-population).
+    """
+
+    def _default_run_arm_g(src_doc: str, tgt_doc: str) -> dict[str, Any]:
+        raw = json.loads(
+            (artifacts_dir / "anchor-index.json").read_text(encoding="utf-8")
+        )
+        anchor_index = AnchorIndex(raw)
+        return _run_arm_g(anchor_index, src_doc, tgt_doc)
+
+    return _default_run_arm_g
+
+
 def create_app(
     workstreams_dir: Union[str, Path] = WORKSTREAMS_DIR,
     artifacts_dir: Union[str, Path] = REPO_ROOT / "data" / "artifacts",
     find_connections_fn: Any = _default_find_connections,
+    run_arm_g_fn: Any = None,
     copilot_reply_fn: Any = _default_copilot_reply,
 ) -> FastAPI:
     """Construct the Workstream Brain read API against injected dependencies.
@@ -324,12 +355,18 @@ def create_app(
             injectable so tests point it at a fixture/tmp dir. Defaults to
             `data/workstreams`.
         artifacts_dir: where the clause index (`engine.clauses.load_clause_index`)
-            is read from for live analysis. Defaults to `data/artifacts`.
-        find_connections_fn: the finder called by the `analyze` route —
-            `(doc_a_id, doc_b_id, clause_index) -> {"connections": [...],
-            "unsupported": [...]}`. Injectable so tests stub the model; no
-            live model call happens in CI. Defaults to
+            and the anchor index (`anchor-index.json`) are read from for live
+            analysis. Defaults to `data/artifacts`.
+        find_connections_fn: the LEGACY single-pass finder — `(doc_a_id,
+            doc_b_id, clause_index) -> {"connections": [...], "unsupported":
+            [...]}`. Retained as the rollback seam; the analyze route now calls
+            `run_arm_g_fn` instead. Defaults to
             `engine.connections.find_connections`.
+        run_arm_g_fn: the Arm G pipeline called by the `analyze` route —
+            `(src_doc_id, tgt_doc_id) -> {"connections": [...], "unsupported":
+            [...], "trace": {...}}`. Injectable so tests stub the pipeline; no
+            live model call happens in CI. Defaults to an adapter that loads the
+            anchor index from `artifacts_dir` and runs `engine.arm_g.run_arm_g`.
         copilot_reply_fn: the live call behind the `copilot` route — see
             `engine.copilot.copilot_reply`'s signature. Injectable so tests
             stub the model; no live model call happens in CI. Defaults to
@@ -353,6 +390,11 @@ def create_app(
     )
 
     workstreams_dir = Path(workstreams_dir)
+    artifacts_dir = Path(artifacts_dir)
+    # Default the Arm G seam to an adapter bound to this app's artifacts_dir;
+    # tests pass their own stub. `find_connections_fn` stays wired for rollback.
+    if run_arm_g_fn is None:
+        run_arm_g_fn = _make_default_run_arm_g(artifacts_dir)
 
     # --- Workstream Brain — Task Screen routes (Task 1) --------------------
     # Read-only projections over a per-workstream `graph.json` + `findings/`
@@ -387,8 +429,7 @@ def create_app(
                 return _ws_error(
                     400,
                     "NOT_A_TASK",
-                    f"Node {node_id} is of type {node.get('node_type')}, "
-                    "not task",
+                    f"Node {node_id} is of type {node.get('node_type')}, " "not task",
                 )
 
             # Neighbours = edges out of this task node, in graph.json order.
@@ -554,7 +595,8 @@ def create_app(
         if invalid:
             code, message, field = invalid
             return JSONResponse(
-                status_code=400, content={"code": code, "message": message, "field": field}
+                status_code=400,
+                content={"code": code, "message": message, "field": field},
             )
 
         reviewers, bad_id = directory.resolve_reviewers(body.get("reviewer_ids"))
@@ -680,7 +722,9 @@ def create_app(
         )
         if edge is None:
             return _ws_error(
-                404, "CROSS_LINK_NOT_FOUND", f"Cross-workstream link {edge_id} not found"
+                404,
+                "CROSS_LINK_NOT_FOUND",
+                f"Cross-workstream link {edge_id} not found",
             )
         nodes_by_id = {n["id"]: n for n in cross.get("nodes", [])}
         near_node = nodes_by_id.get(edge["source"], {"id": edge["source"]})
@@ -690,7 +734,13 @@ def create_app(
 
         edge_findings, labels = _cross_link_findings_summary(workstreams_dir, edge_id)
         intel = _cross_intel_block(
-            workstreams_dir, near_ws, near_node["id"], far_ws, far_node["id"], labels, edge
+            workstreams_dir,
+            near_ws,
+            near_node["id"],
+            far_ws,
+            far_node["id"],
+            labels,
+            edge,
         )
         return {
             "id": edge_id,
@@ -800,7 +850,9 @@ def create_app(
         ]
         out_edges = []
         for e in edges:
-            findings = workstreams.load_findings(workstreams_dir, workstream_id, e["id"])
+            findings = workstreams.load_findings(
+                workstreams_dir, workstream_id, e["id"]
+            )
             out_edges.append(
                 {
                     "id": e["id"],
@@ -862,7 +914,10 @@ def create_app(
             "ismp_classification": node.get("ismp_classification"),
             "pursuant_to": node.get("pursuant_to"),
             "first_order_neighbours": first_order,
-            "second_order_neighbours": {"status": "placeholder", "message": "N/A in demo"},
+            "second_order_neighbours": {
+                "status": "placeholder",
+                "message": "N/A in demo",
+            },
             "recent_activity": node.get("recent_activity", []),
             "concepts": (
                 {"status": "available", **node_concepts}
@@ -881,9 +936,7 @@ def create_app(
             return _ws_error(
                 404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
             )
-        edge = next(
-            (e for e in ws_graph.get("edges", []) if e["id"] == edge_id), None
-        )
+        edge = next((e for e in ws_graph.get("edges", []) if e["id"] == edge_id), None)
         if edge is None:
             return _ws_error(
                 404,
@@ -962,9 +1015,7 @@ def create_app(
             return _ws_error(
                 404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
             )
-        edge = next(
-            (e for e in ws_graph.get("edges", []) if e["id"] == edge_id), None
-        )
+        edge = next((e for e in ws_graph.get("edges", []) if e["id"] == edge_id), None)
         if edge is None:
             return _ws_error(
                 404,
@@ -978,13 +1029,15 @@ def create_app(
         # read in the drafter's direction (task node is always the edge source).
         if not src_doc:
             return _ws_error(
-                409, "NOT_ANALYSABLE",
+                409,
+                "NOT_ANALYSABLE",
                 f"Node {edge['source']} has no ingested document to analyse.",
                 field="source",
             )
         if not tgt_doc:
             return _ws_error(
-                409, "NOT_ANALYSABLE",
+                409,
+                "NOT_ANALYSABLE",
                 f"Node {edge['target']} has no ingested document to analyse.",
                 field="target",
             )
@@ -994,18 +1047,27 @@ def create_app(
             # compared against itself yields no linkages, so refuse rather than
             # write an empty findings file.
             return _ws_error(
-                409, "NOT_ANALYSABLE",
+                409,
+                "NOT_ANALYSABLE",
                 f"Both endpoints resolve to the same document ({src_doc}); "
                 f"there is nothing to compare.",
             )
-        clause_index = load_clause_index(artifacts_dir)
         try:
-            result = find_connections_fn(src_doc, tgt_doc, clause_index)
+            # Arm G: `(src_doc, tgt_doc) -> {"connections","unsupported","trace"}`.
+            # Stage 1 builds the axis cache on demand (first-run auto-population),
+            # so no separate preparation step is needed. Any stage failing — incl.
+            # the whole-doc coverage pass — raises here, surfacing as 502 with NO
+            # partial write, since save_findings runs only after a full success.
+            result = run_arm_g_fn(src_doc, tgt_doc)
         except Exception as exc:  # live model / creds / network failure
             return _ws_error(
-                502, "ANALYZE_FAILED",
+                502,
+                "ANALYZE_FAILED",
                 f"Live analysis failed: {exc}",
             )
+        # Map to findings via the SAME connections->findings path the legacy
+        # finder used; the mapper reads only `connections`/`unsupported`, so the
+        # extra `trace` key is ignored (trace is not persisted here).
         findings = workstreams.connections_to_findings(result)
         # Only persist a non-empty result. Writing an empty findings file would
         # one-way-flip the edge to "analysed" (analysed is derived from file
@@ -1035,9 +1097,7 @@ def create_app(
     # can never cite text its record does not contain.
 
     def _review_node(ws_graph: dict[str, Any], node_id: str) -> dict[str, Any]:
-        node = next(
-            (n for n in ws_graph.get("nodes", []) if n["id"] == node_id), {}
-        )
+        node = next((n for n in ws_graph.get("nodes", []) if n["id"] == node_id), {})
         return {
             "id": node_id,
             "title": node.get("title"),
@@ -1100,9 +1160,7 @@ def create_app(
             "counts": findings.counts(edge_findings),
         }
 
-    @app.patch(
-        "/api/workstreams/{workstream_id}/edges/{edge_id}/findings/{finding_id}"
-    )
+    @app.patch("/api/workstreams/{workstream_id}/edges/{edge_id}/findings/{finding_id}")
     async def patch_finding_review_state(
         workstream_id: str, edge_id: str, finding_id: str, request: Request
     ) -> Any:
@@ -1141,9 +1199,7 @@ def create_app(
         ws_graph: dict[str, Any], workstream_id: str, node_id: str
     ) -> Union[dict[str, Any], JSONResponse]:
         """The node, or the error response for "not a task"/"not found"."""
-        node = next(
-            (n for n in ws_graph.get("nodes", []) if n["id"] == node_id), None
-        )
+        node = next((n for n in ws_graph.get("nodes", []) if n["id"] == node_id), None)
         if node is None or node.get("node_type") != "task":
             # One code for both: the workspace is only ever reached from a task,
             # so a caller asking for a draft of an anchor node and a caller
@@ -1151,9 +1207,11 @@ def create_app(
             return _ws_error(
                 404,
                 "TASK_NOT_FOUND",
-                f"Node {node_id} is not a task node in workstream {workstream_id}"
-                if node is not None
-                else f"Task {node_id} not found in workstream {workstream_id}",
+                (
+                    f"Node {node_id} is not a task node in workstream {workstream_id}"
+                    if node is not None
+                    else f"Task {node_id} not found in workstream {workstream_id}"
+                ),
             )
         return node
 
@@ -1207,7 +1265,9 @@ def create_app(
             if node_id not in (edge.get("source"), edge.get("target")):
                 continue
             try:
-                edge_findings = findings.load(workstreams_dir, workstream_id, edge["id"])
+                edge_findings = findings.load(
+                    workstreams_dir, workstream_id, edge["id"]
+                )
             except findings.FindingsNotAnalysedError:
                 continue  # unanalysed edge — nothing to have accepted yet
             cards.extend(
@@ -1241,12 +1301,16 @@ def create_app(
 
         all_edges = ws_graph.get("edges", [])
         neighbours = set(workstreams.neighbour_ids(all_edges, node_id))
-        peer_edges = workstreams.edges_between(all_edges, neighbours, exclude_node=node_id)
+        peer_edges = workstreams.edges_between(
+            all_edges, neighbours, exclude_node=node_id
+        )
 
         cards: list[dict[str, Any]] = []
         for edge in peer_edges:
             try:
-                edge_findings = findings.load(workstreams_dir, workstream_id, edge["id"])
+                edge_findings = findings.load(
+                    workstreams_dir, workstream_id, edge["id"]
+                )
             except findings.FindingsNotAnalysedError:
                 continue
             cards.extend(_linkage_card(f, edge, ws_graph) for f in edge_findings)
@@ -1277,9 +1341,7 @@ def create_app(
         body = await request.json()
         content_html = body.get("content_html") if isinstance(body, dict) else None
         if not isinstance(content_html, str):
-            return _ws_error(
-                400, "INVALID_HTML", "content_html must be a string"
-            )
+            return _ws_error(400, "INVALID_HTML", "content_html must be a string")
         try:
             return drafts.save(workstreams_dir, workstream_id, node_id, content_html)
         except drafts.DraftTooLargeError:
@@ -1343,9 +1405,7 @@ def create_app(
                 workstream_id=workstream_id,
             )
         except Exception as exc:  # live model / creds / network failure
-            return _ws_error(
-                502, "COPILOT_FAILED", f"Live Copilot call failed: {exc}"
-            )
+            return _ws_error(502, "COPILOT_FAILED", f"Live Copilot call failed: {exc}")
         return {"reply": reply}
 
     return app

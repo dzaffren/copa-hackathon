@@ -818,6 +818,17 @@ COPILOT_DEPLOYMENT = os.environ.get(
     "AZURE_FOUNDRY_COPILOT_DEPLOYMENT", "claude-sonnet-5"
 )
 
+# Arm G pipeline model tiers (see docs/specs/workstream-brain/spec-engine-arm-g-model-config.md).
+# EXTRACTION_DEPLOYMENT: small/fast model for Stage 1 axis extraction (pure topic-phrase
+#   extraction, no reasoning). REASONING_DEPLOYMENT: mid-tier model for Stage 3 batched
+#   same-topic per-pair judgment. Stage 5 whole-doc coverage reuses FINDER_CRITIC_DEPLOYMENT (large).
+EXTRACTION_DEPLOYMENT = os.environ.get(
+    "AZURE_FOUNDRY_EXTRACTION_DEPLOYMENT", "claude-haiku-4-5"
+)
+REASONING_DEPLOYMENT = os.environ.get(
+    "AZURE_FOUNDRY_REASONING_DEPLOYMENT", "claude-sonnet-5"
+)
+
 # Azure AI Document Intelligence — optional PDF ingestion backend. When both the
 # endpoint and key are set, `engine.ingest` routes PDFs through the
 # `prebuilt-layout` model, which reconstructs reading order (columns, list
