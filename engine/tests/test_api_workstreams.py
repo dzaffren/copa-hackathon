@@ -21,12 +21,16 @@ _BCBS_EDGE = "e-opres_v0_3--bcbs_opres_2021"  # seeded analysed edge (3 findings
 _FSB_EDGE = "e-opres_v0_3--fsb_3rd_party"  # unanalysed; the analyze demo pair
 
 
-def _make_client(tmp_path, find_connections_fn=None) -> tuple[TestClient, "object"]:
+def _make_client(
+    tmp_path, find_connections_fn=None, run_arm_g_fn=None
+) -> tuple[TestClient, "object"]:
     dst = tmp_path / "workstreams"
     shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
     kwargs = {}
     if find_connections_fn is not None:
         kwargs["find_connections_fn"] = find_connections_fn
+    if run_arm_g_fn is not None:
+        kwargs["run_arm_g_fn"] = run_arm_g_fn
     app = create_app(workstreams_dir=dst, **kwargs)
     return TestClient(app), dst
 
@@ -362,17 +366,17 @@ def test_POST_edge_analyze_409_when_a_node_has_no_ingested_document(tmp_path):
     # has one in the seeded fixture, so this edge is NOT_ANALYSABLE rather than
     # a path that replays canned findings — see test_api_analyze_live.py for the
     # live success/failure paths on a fixture built with `document_id`s.
-    def boom(a, b, idx):
+    def boom(a, b):
         raise AssertionError("must not reach the finder when a node is unmapped")
 
-    client, _ = _make_client(tmp_path, find_connections_fn=boom)
+    client, _ = _make_client(tmp_path, run_arm_g_fn=boom)
     res = client.post(f"/api/workstreams/{_OPRES}/edges/{_FSB_EDGE}/analyze")
     assert res.status_code == 409
     assert res.json()["code"] == "NOT_ANALYSABLE"
 
 
 def test_POST_edge_analyze_writes_findings_file_and_flips_edge_analysed_flag(tmp_path):
-    def stub(a, b, idx):
+    def stub(a, b):
         return {
             "connections": [
                 {
@@ -386,9 +390,10 @@ def test_POST_edge_analyze_writes_findings_file_and_flips_edge_analysed_flag(tmp
                 }
             ],
             "unsupported": [],
+            "trace": {},
         }
 
-    client, dst = _make_client(tmp_path, find_connections_fn=stub)
+    client, dst = _make_client(tmp_path, run_arm_g_fn=stub)
     # opres-pd-v0-3 -> rmit-pd-2025 is genuinely analysable: both carry a
     # document_id AND they differ (opres-v1-2025-draft vs rmit-v2-2025). It is
     # seeded analysed, so delete its findings file to establish the unanalysed
