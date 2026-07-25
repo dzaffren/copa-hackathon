@@ -18,7 +18,11 @@ import { headlineOverlap } from "@/lib/overlaps";
 
 // Guarantees the cross-workstream overlaps (OpRes↔Open Finance and the
 // BCM↔Recovery Planning overlap) are on screen the moment the page loads.
-const DEFAULT_SELECTION = ["open-finance-ed", "resolution-recovery", "opres-v2"];
+const DEFAULT_SELECTION = [
+  "open-finance-ed",
+  "resolution-recovery",
+  "opres-v2",
+];
 
 type NearLink = CrossLink & { nearWorkstreamId: string };
 
@@ -66,7 +70,8 @@ export function InstitutionMapPage() {
     const byId = new Map<string, NearLink>();
     selectedIds.forEach((id, i) => {
       for (const link of crossQueries[i]?.data ?? []) {
-        if (!byId.has(link.id)) byId.set(link.id, { ...link, nearWorkstreamId: id });
+        if (!byId.has(link.id))
+          byId.set(link.id, { ...link, nearWorkstreamId: id });
       }
     });
     return [...byId.values()];
@@ -142,7 +147,8 @@ export function InstitutionMapPage() {
   const availableToAdd = allWorkstreams.filter(
     (w) => !selectedIds.includes(w.id),
   );
-  const remove = (id: string) => setSelected(selectedIds.filter((s) => s !== id));
+  const remove = (id: string) =>
+    setSelected(selectedIds.filter((s) => s !== id));
   const add = (id: string) => setSelected([...selectedIds, id]);
 
   // The most attention-worthy untriaged overlap on this map — not hardcoded to
@@ -155,8 +161,8 @@ export function InstitutionMapPage() {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <header className="border-b border-border/60 bg-card/30 px-6 py-4 backdrop-blur">
-        <p className="text-xs font-semibold uppercase tracking-wider text-violet-300/80">
+      <header className="nav-dark border-b border-black/10 px-6 py-4">
+        <p className="text-xs font-semibold uppercase tracking-wider text-white/70">
           Institution map
         </p>
         <h1 className="text-lg font-bold">Cross-workstream drift</h1>
@@ -191,7 +197,7 @@ export function InstitutionMapPage() {
             <div className="group relative">
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-full border border-dashed border-border px-3 py-1 text-xs font-medium text-muted-foreground hover:border-cyan-400/60 hover:text-cyan-300"
+                className="inline-flex items-center gap-1 rounded-full border border-dashed border-border px-3 py-1 text-xs font-medium text-muted-foreground hover:border-primary/60 hover:text-primary"
               >
                 <Plus className="h-3 w-3" /> Add workstream
               </button>
@@ -212,8 +218,8 @@ export function InstitutionMapPage() {
         </div>
 
         {headline && (
-          <div className="mt-3 flex items-start gap-2 rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-rose-300" />
+          <div className="mt-3 flex items-start gap-2 rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-800">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-rose-700" />
             <span>
               <strong className="font-semibold">Overlap detected:</strong>{" "}
               {headline.near.title} ↔ {headline.far.title} share{" "}
@@ -235,7 +241,7 @@ export function InstitutionMapPage() {
         {/* Force-directed canvas */}
         <div
           data-testid="institution-canvas"
-          className="relative h-[520px] shrink-0 overflow-hidden border-b border-border/60 bg-[#0b1220]"
+          className="relative h-[520px] shrink-0 overflow-hidden border-b border-border/60 bg-background p-3"
         >
           <GraphCanvas
             nodes={data.nodes}
@@ -274,7 +280,7 @@ export function InstitutionMapPage() {
               </div>
               <Link
                 to={`/workstreams/${CROSS_STORE}/edges/${activeLink.id}/review`}
-                className="mt-2 inline-block font-semibold text-cyan-300 hover:underline"
+                className="mt-2 inline-block font-semibold text-primary hover:underline"
               >
                 Review linkages →
               </Link>
@@ -311,8 +317,12 @@ export function InstitutionMapPage() {
                       className="border-t border-border/60 hover:bg-accent/40"
                       data-testid="cross-link-row"
                     >
-                      <td className="px-4 py-2 font-medium">{link.near.title}</td>
-                      <td className="px-4 py-2 font-medium">{link.far.title}</td>
+                      <td className="px-4 py-2 font-medium">
+                        {link.near.title}
+                      </td>
+                      <td className="px-4 py-2 font-medium">
+                        {link.far.title}
+                      </td>
                       <td className="px-4 py-2 text-muted-foreground">
                         {link.far.workstream_name ?? link.far.workstream_id}
                       </td>
@@ -339,7 +349,7 @@ export function InstitutionMapPage() {
                       <td className="px-4 py-2 text-right">
                         <Link
                           to={`/workstreams/${CROSS_STORE}/edges/${link.id}/review`}
-                          className="font-semibold text-cyan-300 hover:underline"
+                          className="font-semibold text-primary hover:underline"
                         >
                           Review
                         </Link>

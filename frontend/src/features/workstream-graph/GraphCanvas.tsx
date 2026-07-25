@@ -3,7 +3,13 @@ import ForceGraph2D, { type ForceGraphMethods } from "react-force-graph-2d";
 import { Maximize, ZoomIn, ZoomOut } from "lucide-react";
 
 import type { GraphEdge, GraphNode } from "@/lib/types";
-import { CROSS_EDGE_DASH, CROSS_EDGE_STROKE, edgeStyle, nodeStyle, shortLabel } from "./legend";
+import {
+  CROSS_EDGE_DASH,
+  CROSS_EDGE_STROKE,
+  edgeStyle,
+  nodeStyle,
+  shortLabel,
+} from "./legend";
 
 // --- Graph data mapped for react-force-graph-2d ----------------------------
 // The library mutates link.source / link.target from ids into node objects and
@@ -56,7 +62,9 @@ export function GraphCanvas({
   chargeStrength = -300,
   linkDistance = 150,
 }: GraphCanvasProps) {
-  const fgRef = useRef<ForceGraphMethods<FGNode, FGLink> | undefined>(undefined);
+  const fgRef = useRef<ForceGraphMethods<FGNode, FGLink> | undefined>(
+    undefined,
+  );
   const wrapRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 800, height: 600 });
 
@@ -108,12 +116,15 @@ export function GraphCanvas({
       const y = node.y ?? 0;
       const selected = node.id === selectedNodeId;
 
-      // Pulsing glow — strong on the hero task node, a gentle halo elsewhere.
+      // Coloured glow — the halo emits the node's own colour. Strong and
+      // pulsing on the hero task node, a lit halo when selected, a gentle
+      // ambient glow otherwise. The saturated node fills read as a soft bloom
+      // even on the light canvas.
       const t = performance.now() / 1000;
       const pulse = 0.5 + 0.5 * Math.sin(t * 2);
-      const glow = node.isTask ? 8 + pulse * 10 : selected ? 8 : 3;
+      const glow = node.isTask ? 16 + pulse * 16 : selected ? 22 : 0;
       ctx.save();
-      ctx.shadowColor = style.stroke;
+      ctx.shadowColor = style.fill;
       ctx.shadowBlur = glow;
 
       ctx.beginPath();
@@ -121,8 +132,8 @@ export function GraphCanvas({
       ctx.fillStyle = style.fill;
       ctx.fill();
       ctx.shadowBlur = 0;
-      ctx.lineWidth = selected ? 3 : node.isTask ? 2.5 : 1.5;
-      ctx.strokeStyle = selected ? "#e2e8f0" : style.stroke;
+      ctx.lineWidth = selected ? 1.5 : node.isTask ? 2.5 : 1.5;
+      ctx.strokeStyle = selected ? "#0f172a" : style.stroke;
       ctx.stroke();
       ctx.restore();
 
@@ -131,7 +142,7 @@ export function GraphCanvas({
       ctx.font = `${node.isTask ? 700 : 500} ${fontSize}px Inter, sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
-      ctx.fillStyle = "#cbd5e1";
+      ctx.fillStyle = "#334155";
       ctx.fillText(shortLabel(node.title), x, y + r + 2);
     },
     [selectedNodeId],
@@ -169,11 +180,11 @@ export function GraphCanvas({
       ctx.textBaseline = "middle";
       if (link.analysed && link.findings_count > 0) {
         const badge = `${link.findings_count}`;
-        ctx.fillStyle = "#34d399";
+        ctx.fillStyle = "#059669";
         ctx.beginPath();
         ctx.arc(mx, my, fontSize * 0.95, 0, 2 * Math.PI);
         ctx.fill();
-        ctx.fillStyle = "#052e2b";
+        ctx.fillStyle = "#ffffff";
         ctx.fillText(badge, mx, my);
       } else if (globalScale > 1.2) {
         ctx.fillStyle = "#64748b";
@@ -183,7 +194,8 @@ export function GraphCanvas({
     [selectedEdgeId],
   );
 
-  const zoomIn = () => fgRef.current?.zoom((fgRef.current?.zoom() ?? 1) * 1.3, 200);
+  const zoomIn = () =>
+    fgRef.current?.zoom((fgRef.current?.zoom() ?? 1) * 1.3, 200);
   const zoomOut = () =>
     fgRef.current?.zoom((fgRef.current?.zoom() ?? 1) * 0.75, 200);
   const resetZoom = () => fgRef.current?.zoomToFit(400, 60);
@@ -192,7 +204,7 @@ export function GraphCanvas({
     <div
       ref={wrapRef}
       data-testid="graph-canvas"
-      className="relative h-full w-full overflow-hidden bg-[#0b1220]"
+      className="relative h-full w-full overflow-hidden rounded-xl border border-border/60 bg-slate-50 shadow-sm"
     >
       <div className="absolute right-3 top-3 z-10 flex flex-col overflow-hidden rounded-lg border border-border/60 bg-card/80 shadow-sm backdrop-blur">
         <button
@@ -236,7 +248,13 @@ export function GraphCanvas({
           const n = node as FGNode;
           ctx.fillStyle = color;
           ctx.beginPath();
-          ctx.arc(n.x ?? 0, n.y ?? 0, (n.isTask ? TASK_R : ANCHOR_R) + 2, 0, 2 * Math.PI);
+          ctx.arc(
+            n.x ?? 0,
+            n.y ?? 0,
+            (n.isTask ? TASK_R : ANCHOR_R) + 2,
+            0,
+            2 * Math.PI,
+          );
           ctx.fill();
         }}
         onNodeClick={(n) => onSelectNode((n as FGNode).id)}

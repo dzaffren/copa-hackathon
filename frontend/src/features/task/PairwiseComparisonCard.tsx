@@ -67,7 +67,7 @@ export function PairwiseComparisonCard({
                 label="All"
                 selected={selected === ALL}
                 onClick={() => setSelected(ALL)}
-                idleClasses="border-cyan-400/40 text-cyan-300"
+                idleClasses="border-primary/40 text-primary"
               />
               {neighbours.map((n) => {
                 const style = nodeTypeStyle(n.node_type);
@@ -133,7 +133,7 @@ function FilterChip({
       className={cn(
         "rounded-md border bg-card/40 px-2 py-1 text-[11px] font-medium transition-colors",
         selected
-          ? cn("border-cyan-400 bg-cyan-500 text-slate-950", selectedClasses)
+          ? cn("border-primary bg-primary text-primary-foreground", selectedClasses)
           : idleClasses,
       )}
     >

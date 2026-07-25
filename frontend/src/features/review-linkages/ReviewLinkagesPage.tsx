@@ -61,7 +61,7 @@ export function ReviewLinkagesPage() {
         </p>
         <Link
           to={`/workstreams/${workstreamId}`}
-          className="mt-2 inline-block text-sm text-cyan-300 hover:underline"
+          className="mt-2 inline-block text-sm text-primary hover:underline"
         >
           Back to the workstream graph
         </Link>
@@ -81,7 +81,7 @@ export function ReviewLinkagesPage() {
       <header className="glass rounded-xl px-4 py-3">
         <Link
           to={`/workstreams/${workstreamId}`}
-          className="text-xs text-cyan-300 hover:underline"
+          className="text-xs text-primary hover:underline"
         >
           ← Back to graph
         </Link>
@@ -99,19 +99,19 @@ export function ReviewLinkagesPage() {
           </span>
           <span
             data-testid="count-accepted"
-            className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2 py-0.5 font-medium text-emerald-300"
+            className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2 py-0.5 font-medium text-emerald-700"
           >
             {counts.accepted} accepted
           </span>
           <span
             data-testid="count-pending"
-            className="rounded-full border border-amber-300/30 bg-amber-400/15 px-2 py-0.5 font-medium text-amber-300"
+            className="rounded-full border border-amber-300/30 bg-amber-400/15 px-2 py-0.5 font-medium text-amber-700"
           >
             {pending} pending
           </span>
           <span
             data-testid="count-dismissed"
-            className="rounded-full border border-slate-400/30 bg-slate-500/15 px-2 py-0.5 font-medium text-slate-300"
+            className="rounded-full border border-slate-400/30 bg-slate-500/15 px-2 py-0.5 font-medium text-slate-600"
           >
             {counts.dismissed} dismissed
           </span>

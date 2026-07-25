@@ -104,8 +104,8 @@ export function EdgeDetailPanel({
             className={cn(
               "border",
               analysed
-                ? "border-emerald-400/30 bg-emerald-500/15 text-emerald-300"
-                : "border-amber-300/30 bg-amber-400/15 text-amber-300",
+                ? "border-emerald-400/30 bg-emerald-500/15 text-emerald-700"
+                : "border-amber-300/30 bg-amber-400/15 text-amber-700",
             )}
           >
             {analysed ? `${edge.findings.length} linkage(s)` : "not analysed"}
@@ -125,7 +125,7 @@ export function EdgeDetailPanel({
               surface how these two documents relate.
             </p>
             <Button
-              className="w-full bg-cyan-500 text-slate-950 hover:bg-cyan-400"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
               disabled={analyze.isPending || !analysable}
               onClick={() => analyze.mutate()}
             >
@@ -186,7 +186,7 @@ export function EdgeDetailPanel({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-7 text-cyan-300 hover:text-cyan-200"
+                    className="h-7 text-primary hover:text-primary"
                     onClick={() =>
                       navigate(
                         `/workstreams/${workstreamId}/edges/${edgeId}/review`,

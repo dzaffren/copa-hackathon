@@ -77,7 +77,7 @@ export function ClausePane({
                 className={[
                   "rounded-md border-l-4 px-3 py-2 transition-colors",
                   isLit
-                    ? "border-l-cyan-400 bg-cyan-500/10 ring-1 ring-cyan-400/30"
+                    ? "border-l-primary bg-primary/10 ring-1 ring-primary/30"
                     : "border-l-transparent bg-muted/20",
                 ].join(" ")}
               >

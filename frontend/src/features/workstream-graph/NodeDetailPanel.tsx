@@ -182,7 +182,7 @@ export function NodeDetailPanel({
                 className={cn(
                   "inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium",
                   ismpValue
-                    ? "border-cyan-400/30 bg-cyan-500/10 text-cyan-300"
+                    ? "border-primary/30 bg-primary/10 text-primary"
                     : "border-slate-400/30 bg-slate-500/10 text-muted-foreground",
                 )}
                 title={ismpValue ? undefined : "ISMP classification not yet sourced"}
@@ -191,7 +191,7 @@ export function NodeDetailPanel({
               </span>
             )}
             {legalBasis.length > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-md border border-amber-300/30 bg-amber-400/10 px-2 py-0.5 text-[11px] font-medium text-amber-300">
+              <span className="inline-flex items-center gap-1 rounded-md border border-amber-300/30 bg-amber-400/10 px-2 py-0.5 text-[11px] font-medium text-amber-700">
                 <Scale className="h-3 w-3" /> Legal basis: {legalBasis.join(", ")}
               </span>
             )}
@@ -320,7 +320,7 @@ export function NodeDetailPanel({
       <div className="border-t border-border/60 p-4">
         {isTask ? (
           <Button
-            className="w-full bg-cyan-500 text-slate-950 hover:bg-cyan-400"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
             onClick={() =>
               navigate(`/workstreams/${workstreamId}/tasks/${node.id}`)
             }

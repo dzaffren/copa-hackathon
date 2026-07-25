@@ -71,7 +71,7 @@ export function NeighbourFindingsCard({
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             {namePill}
-            <Badge className="border border-amber-300/30 bg-amber-400/15 text-amber-300 hover:bg-amber-400/15">
+            <Badge className="border border-amber-300/30 bg-amber-400/15 text-amber-700 hover:bg-amber-400/15">
               not analysed
             </Badge>
           </div>
@@ -94,7 +94,7 @@ export function NeighbourFindingsCard({
         )}
         <Button
           size="sm"
-          className="mt-2 bg-cyan-500 text-slate-950 hover:bg-cyan-400"
+          className="mt-2 bg-primary text-primary-foreground hover:bg-primary/90"
           onClick={() => analyze.mutate()}
           disabled={analyze.isPending}
         >
@@ -155,7 +155,7 @@ export function NeighbourFindingsCard({
 
       <Link
         to={reviewHref}
-        className="mt-2 inline-block text-xs font-semibold text-cyan-300 hover:text-cyan-200"
+        className="mt-2 inline-block text-xs font-semibold text-primary hover:text-primary"
       >
         Open in Review →
       </Link>

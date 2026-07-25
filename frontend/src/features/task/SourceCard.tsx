@@ -35,8 +35,8 @@ function PersonAvatar({ person }: { person: Person }) {
 export function SourceCard({ task }: { task: Task }) {
   return (
     <Card data-testid="source-card" className="glass overflow-hidden">
-      <div className="border-b border-border/60 bg-cyan-500/10 px-4 py-3">
-        <div className="text-[10px] font-bold uppercase tracking-wider text-cyan-300">
+      <div className="border-b border-border/60 bg-primary/10 px-4 py-3">
+        <div className="text-[10px] font-bold uppercase tracking-wider text-primary">
           Source · task
         </div>
       </div>
@@ -80,7 +80,7 @@ export function SourceCard({ task }: { task: Task }) {
           <div className="mb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
             Status
           </div>
-          <Badge className="border border-amber-300/30 bg-amber-400/15 text-amber-300 hover:bg-amber-400/15">
+          <Badge className="border border-amber-300/30 bg-amber-400/15 text-amber-700 hover:bg-amber-400/15">
             {task.status === "in_progress" ? "in progress" : task.status}
           </Badge>
         </div>

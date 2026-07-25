@@ -31,11 +31,8 @@ function LegendCard() {
         {NODE_LEGEND_ORDER.map((t) => (
           <div key={t} className="flex items-center gap-1.5">
             <span
-              className="inline-block h-3 w-3 rounded-full"
-              style={{
-                backgroundColor: NODE_LEGEND[t].fill,
-                boxShadow: `0 0 6px ${NODE_LEGEND[t].stroke}`,
-              }}
+              className="inline-block h-3 w-3 rounded-full ring-1 ring-black/10"
+              style={{ backgroundColor: NODE_LEGEND[t].fill }}
             />
             <span className="text-foreground/80">{NODE_LEGEND[t].label}</span>
           </div>
@@ -88,15 +85,15 @@ export default function WorkstreamGraphPage() {
   return (
     <>
       <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-background">
-        <header className="flex items-center justify-between gap-4 border-b border-border/60 px-6 py-4">
+        <header className="nav-dark flex items-center justify-between gap-4 border-b border-black/10 px-6 py-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-cyan-300/80">
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary/80">
               Workstream graph
             </p>
             <h1 className="text-lg font-bold">{name}</h1>
           </div>
           <Button
-            className="bg-cyan-500 text-slate-950 hover:bg-cyan-400"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
             onClick={() => setAddOpen(true)}
           >
             <Plus /> Add node
@@ -109,7 +106,7 @@ export default function WorkstreamGraphPage() {
               <div
                 role="status"
                 aria-label="Loading graph"
-                className="absolute inset-0 grid place-items-center bg-[#0b1220]"
+                className="absolute inset-0 grid place-items-center rounded-xl border border-border/60 bg-slate-50 shadow-sm"
               >
                 <div className="relative h-64 w-64">
                   <Skeleton className="absolute left-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full" />

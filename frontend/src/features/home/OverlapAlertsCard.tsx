@@ -47,10 +47,10 @@ export function OverlapAlertsCard() {
       className="mb-6 rounded-xl border border-rose-400/30 bg-rose-500/[0.07] p-4"
     >
       <div className="flex items-center justify-between gap-2">
-        <h2 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-rose-300">
+        <h2 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-rose-700">
           <TriangleAlert className="h-3.5 w-3.5" /> Overlap alerts
         </h2>
-        <span className="text-[11px] font-medium text-rose-200/70">
+        <span className="text-[11px] font-medium text-rose-800/70">
           Caught automatically — before FPWG
         </span>
       </div>

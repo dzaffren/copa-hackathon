@@ -111,7 +111,7 @@ export function DraftingWorkspacePage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex items-center justify-between border-b border-border/60 bg-card/30 px-4 py-2.5 backdrop-blur">
+      <header className="nav-dark flex items-center justify-between border-b border-black/10 px-4 py-2.5">
         <div>
           <Link
             to={`/workstreams/${workstreamId}`}
@@ -123,7 +123,7 @@ export function DraftingWorkspacePage() {
             {task.data?.task.title ?? "Working draft"}
           </h1>
         </div>
-        <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-300">
+        <span className="rounded-full border border-white/25 bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white">
           Auto-saved
         </span>
       </header>
@@ -140,7 +140,7 @@ export function DraftingWorkspacePage() {
                 className={[
                   "rounded-md px-2.5 py-1.5 text-xs font-semibold transition",
                   tab === t.key
-                    ? "bg-cyan-500 text-slate-950"
+                    ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:bg-accent",
                 ].join(" ")}
               >

@@ -63,8 +63,8 @@ export function ReviewQueuePage() {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <header className="border-b border-border/60 bg-card/30 px-6 py-4 backdrop-blur">
-        <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-cyan-300/80">
+      <header className="nav-dark border-b border-black/10 px-6 py-4">
+        <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary/80">
           <ClipboardCheck className="h-3.5 w-3.5" /> Review Queue
         </p>
         <h1 className="mt-1 text-lg font-bold">
@@ -101,7 +101,7 @@ export function ReviewQueuePage() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search linkages…"
-                className="w-full rounded-lg border border-border/60 bg-background/60 py-1.5 pl-8 pr-3 text-sm outline-none focus:border-cyan-400/50"
+                className="w-full rounded-lg border border-border/60 bg-background/60 py-1.5 pl-8 pr-3 text-sm outline-none focus:border-primary/50"
               />
             </div>
             <div className="flex flex-wrap gap-1">
@@ -191,7 +191,7 @@ function MetricPill({
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold",
         tone === "warn"
-          ? "border-amber-300/30 bg-amber-400/10 text-amber-300"
+          ? "border-amber-300/30 bg-amber-400/10 text-amber-700"
           : "border-border/60 bg-card/40 text-foreground/80",
       )}
     >
@@ -220,7 +220,7 @@ function QueueRow({
       className={cn(
         "w-full rounded-xl border p-3 text-left transition-colors",
         active
-          ? "border-cyan-400/50 bg-accent/50"
+          ? "border-primary/50 bg-accent/50"
           : "border-border/60 bg-card/40 hover:border-border hover:bg-accent/30",
       )}
     >

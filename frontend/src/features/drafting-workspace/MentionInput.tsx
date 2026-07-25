@@ -98,7 +98,7 @@ export function MentionInput({
             }
           }}
           placeholder="Ask the Copilot… (@ to reference an accepted finding)"
-          className="flex-1 rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-cyan-400/60"
+          className="flex-1 rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-primary/60"
         />
       </Popover.Anchor>
       <Popover.Portal>
