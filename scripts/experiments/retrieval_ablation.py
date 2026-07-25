@@ -42,6 +42,56 @@ from engine.llm import LLMResponseError, call_chat, parse_json_response  # noqa:
 
 logger = logging.getLogger(__name__)
 
+# ---------------------------------------------------------------------------
+# Coverage-stage system prompt — local to this runner, NOT in engine/connections.py.
+#
+# Restricts finder output to ONLY `silent-on` and `goes-beyond` labels.
+# Embeds the COVERAGE-SUMMARY RULE and the explicit "both sides" guardrail.
+# Reuses the same CITATION RULE and JSON-array output contract as FINDER_SYSTEM_PROMPT.
+# Sentiment is intentionally omitted — coverage labels never carry sentiment
+# per the five-label taxonomy.
+# ---------------------------------------------------------------------------
+
+COVERAGE_FINDER_SYSTEM_PROMPT = (
+    "You are a policy analyst identifying COVERAGE GAPS between two Bank Negara Malaysia "
+    "policy documents. Your task is to find sub-topics where exactly one side has a "
+    "provision and the other side is entirely silent.\n\n"
+    "LABEL RESTRICTION (strict): you MUST emit ONLY findings with label `silent-on` or "
+    "`goes-beyond`. Never emit `aligns-with`, `differs-on`, or `conflicts-with` — those "
+    "are for a separate same-topic pass. If no genuine coverage gap exists, return an "
+    "empty array.\n\n"
+    "DIRECTION CONVENTION (fixed): document A is 'we/ours'; document B is 'they/theirs'.\n"
+    "  - goes-beyond: OUR side (document A) covers a sub-topic; THEIR side (document B) "
+    "has no provision for it anywhere in the document.\n"
+    "  - silent-on: OUR side (document A) has no provision for a sub-topic; THEIR side "
+    "(document B) covers it.\n\n"
+    "COVERAGE-SUMMARY RULE: every finding summary MUST do all three of the following:\n"
+    "  1. Name the shared regulatory topic that both documents sit under (e.g. 'open API "
+    "security', 'consent management', 'third-party access').\n"
+    "  2. State what the COVERING side specifically requires or addresses on that sub-topic.\n"
+    "  3. State precisely what the OTHER side does NOT address — name the specific "
+    "obligation or sub-point that is absent, not just 'does not cover this'.\n\n"
+    "GUARDRAIL: If both sides take a position on this topic — even if different — that is "
+    "NOT a coverage finding. Do not emit it. Only emit a finding when one side genuinely "
+    "has no provision for the sub-point. A stricter rule on one side is NOT a gap; it is "
+    "a 'differs-on' finding and belongs in the same-topic pass.\n\n"
+    "OBJECT SHAPE:\n"
+    '  {"summary": "...", "label": "silent-on|goes-beyond",\n'
+    '   "source_clauses": [...], "target_clauses": [...], "scope_note": "..."}\n\n'
+    "For `goes-beyond`: `source_clauses` is non-empty (A covers it); `target_clauses` is "
+    "empty, or holds the nearest B clause cited only to confirm it does not address this "
+    "sub-point.\n"
+    "For `silent-on`: `target_clauses` is non-empty (B covers it); `source_clauses` is "
+    "empty, or holds the nearest A clause cited only to confirm it does not address this "
+    "sub-point.\n\n"
+    "Do NOT include a `sentiment` field — coverage labels never carry sentiment.\n\n"
+    "CITATION RULE (strict): every clause_number in `source_clauses` and `target_clauses` "
+    "MUST be copied EXACTLY from the clause lists provided. Never invent, guess, reformat, "
+    "or paraphrase a clause number. Do not cite a clause that is not in the lists.\n\n"
+    "Return ONLY a JSON array of these objects — no prose, no markdown, no commentary. "
+    "Return an empty array `[]` if there are no genuine coverage gaps."
+)
+
 ANCHOR_INDEX_PATH = REPO_ROOT / "data" / "artifacts" / "anchor-index.json"
 AXES_DIR = REPO_ROOT / "experiments"
 RESULTS_DIR = REPO_ROOT / "experiments" / "retrieval-ablation"
@@ -52,6 +102,7 @@ GLOSSARY_PATH = REPO_ROOT / "data" / "glossary.json"
 PAIRS: dict[str, tuple[str, str]] = {
     "bis-ed": ("bnm-open-finance-ed-2025", "bis-pap168-open-finance"),
     "hkma-ed": ("bnm-open-finance-ed-2025", "hkma-open-api-framework-2018"),
+    "rmit-ed": ("bnm-open-finance-ed-2025", "bnm-rmit-nov25"),
 }
 
 
@@ -563,17 +614,35 @@ def _critic_whole_doc(
     return parsed
 
 
-def _finder_per_pair(anchor_index: AnchorIndex, pair: dict[str, Any]) -> list[dict]:
-    """Arms C/D: judge one candidate pair. Returns 0 or 1 finding candidates.
+_SAME_TOPIC_RESTRICTION = (
+    "RESTRICTION: emit ONLY aligns-with, differs-on, or conflicts-with findings. "
+    "If this pair is one-sided (coverage asymmetry), emit an empty array — "
+    "the coverage pass handles those."
+)
 
-    Uses the same FINDER_SYSTEM_PROMPT — the prompt is prompt-shape-agnostic. We
-    just constrain the input to two anchors.
+
+def _finder_per_pair(
+    anchor_index: AnchorIndex, pair: dict[str, Any], labels: str = "all"
+) -> list[dict]:
+    """Arms C/D/E/F/G-same-topic: judge one candidate pair.
+
+    Returns 0 or 1 finding candidates using FINDER_SYSTEM_PROMPT.
+
+    Args:
+        anchor_index: the anchor index for resolving anchor ids.
+        pair: a candidate pair dict with source_anchor_id / target_anchor_id.
+        labels: when ``"same-topic"``, prepends a restriction to the user
+            message so the model emits ONLY aligns-with / differs-on /
+            conflicts-with and skips one-sided coverage pairs (those are
+            handled by the coverage whole-doc pass in Arm G). When ``"all"``
+            (the default), behaviour is identical to before this parameter
+            was added — no restriction, all five labels permitted.
     """
     a_anchor = anchor_index.get(pair["source_anchor_id"])
     b_anchor = anchor_index.get(pair["target_anchor_id"])
     if a_anchor is None or b_anchor is None:
         return []
-    user = (
+    base_user = (
         f"Document A ({a_anchor['document_id']}):\n"
         f"{_format_anchor_block(a_anchor)}\n\n"
         f"Document B ({b_anchor['document_id']}):\n"
@@ -582,6 +651,10 @@ def _finder_per_pair(anchor_index: AnchorIndex, pair: dict[str, Any]) -> list[di
         f"'{pair.get('matched_axis_source')}' ↔ '{pair.get('matched_axis_target')}'.\n"
         f"Judge whether they genuinely relate. If yes, emit one connection object. If no, emit an empty array."
     )
+    if labels == "same-topic":
+        user = _SAME_TOPIC_RESTRICTION + "\n\n" + base_user
+    else:
+        user = base_user
     raw = call_chat(
         FINDER_CRITIC_DEPLOYMENT, FINDER_SYSTEM_PROMPT, user, max_tokens=2048
     )
@@ -608,6 +681,185 @@ def _critic_per_pair(
     )
     raw = call_chat(
         FINDER_CRITIC_DEPLOYMENT, CRITIC_SYSTEM_PROMPT, user, max_tokens=2048
+    )
+    parsed = parse_json_response(raw)
+    if not isinstance(parsed, list):
+        raise LLMResponseError(f"expected list, got {type(parsed).__name__}")
+    return parsed
+
+
+def _build_suppression(
+    retrieval_candidates: list[dict],
+    same_topic_findings: list[dict],
+) -> dict:
+    """Build the suppression set from retrieval candidates and surviving same-topic findings.
+
+    A retrieval candidate "produced a finding" if its source_anchor_id appears in the
+    source_clauses list of any surviving same-topic finding.  Only those candidates
+    contribute to the suppression set.
+
+    Returns:
+        {
+            "covered_pairs": sorted list of "source × target" strings,
+            "covered_topics": sorted list of unique matched_axis_source +
+                              matched_axis_target values from matched candidates,
+        }
+    """
+    # Build set of source anchor ids that appear in any surviving finding's source_clauses
+    covered_sources: set[str] = set()
+    for finding in same_topic_findings:
+        for clause in finding.get("source_clauses", []):
+            covered_sources.add(clause)
+
+    # Filter retrieval candidates to those whose source_anchor_id produced a finding
+    covered_pairs: set[tuple[str, str]] = set()
+    covered_topics: set[str] = set()
+    for candidate in retrieval_candidates:
+        src = candidate.get("source_anchor_id", "")
+        tgt = candidate.get("target_anchor_id", "")
+        if src in covered_sources:
+            covered_pairs.add((src, tgt))
+            axis_src = candidate.get("matched_axis_source")
+            axis_tgt = candidate.get("matched_axis_target")
+            if axis_src:
+                covered_topics.add(axis_src)
+            if axis_tgt:
+                covered_topics.add(axis_tgt)
+
+    return {
+        "covered_pairs": sorted(f"{a} × {b}" for a, b in covered_pairs),
+        "covered_topics": sorted(covered_topics),
+    }
+
+
+def _finder_coverage_whole_doc(
+    anchor_index: AnchorIndex, doc_a: str, doc_b: str, suppression: dict
+) -> list[dict]:
+    """Coverage stage: send both docs' full anchor lists in one prompt.
+
+    Uses COVERAGE_FINDER_SYSTEM_PROMPT (silent-on / goes-beyond only).
+    Appends a suppression block listing topics already covered by the
+    same-topic pass, so the model does not re-report them as coverage gaps.
+    The suppression block is omitted entirely when covered_topics is empty.
+
+    No critic call — the coverage stage intentionally excludes the critic.
+    """
+    user = (
+        _format_doc_block(anchor_index, doc_a)
+        + "\n\n"
+        + _format_doc_block(anchor_index, doc_b)
+    )
+    covered_topics = suppression.get("covered_topics", [])
+    if covered_topics:
+        user += (
+            "\n\nTOPICS ALREADY COVERED ON BOTH SIDES"
+            " — do NOT report these as coverage gaps:\n"
+            + "\n".join(f"  - {t}" for t in covered_topics)
+        )
+    raw = call_chat(
+        FINDER_CRITIC_DEPLOYMENT, COVERAGE_FINDER_SYSTEM_PROMPT, user, max_tokens=16384
+    )
+    parsed = parse_json_response(raw)
+    if not isinstance(parsed, list):
+        raise LLMResponseError(f"expected list, got {type(parsed).__name__}")
+    return parsed
+
+
+# ---------------------------------------------------------------------------
+# Suppression builder + coverage whole-doc finder (Arm G stages 3 & 4)
+# ---------------------------------------------------------------------------
+
+
+def _build_suppression(
+    retrieval_candidates: list[dict], same_topic_findings: list[dict]
+) -> dict:
+    """Build the suppression dict from same-topic stage outputs.
+
+    Args:
+        retrieval_candidates: pair dicts from retrieve_cosine_only /
+            retrieve_bm25_only.  Each has at least
+            ``source_anchor_id``, ``target_anchor_id``,
+            ``matched_axis_source``, and ``matched_axis_target``.
+        same_topic_findings: raw finder output (post-critic).  Each
+            dict has ``source_clauses: [str, ...]`` and
+            ``target_clauses: [str, ...]`` where the strings are
+            anchor IDs.
+
+    Returns:
+        {
+            "covered_pairs":  sorted list of "A × B" strings,
+            "covered_topics": sorted list of unique axis strings,
+        }
+    """
+    # Step 1 — collect the A-side anchor IDs that produced a surviving finding.
+    active_source_ids: set[str] = set()
+    for finding in same_topic_findings:
+        source_clauses = finding.get("source_clauses", [])
+        if source_clauses:
+            active_source_ids.add(source_clauses[0])
+
+    # Step 2 — walk retrieval candidates; only those whose source produced a
+    # finding contribute to the suppression set.
+    covered_pairs: set[tuple[str, str]] = set()
+    covered_topics: set[str] = set()
+    for candidate in retrieval_candidates:
+        src = candidate["source_anchor_id"]
+        if src not in active_source_ids:
+            continue
+        tgt = candidate["target_anchor_id"]
+        covered_pairs.add((src, tgt))
+        covered_topics.add(candidate["matched_axis_source"])
+        covered_topics.add(candidate["matched_axis_target"])
+
+    return {
+        "covered_pairs": sorted(f"{a} × {b}" for a, b in covered_pairs),
+        "covered_topics": sorted(covered_topics),
+    }
+
+
+def _finder_coverage_whole_doc(
+    anchor_index: AnchorIndex,
+    doc_a: str,
+    doc_b: str,
+    suppression: dict,
+) -> list[dict]:
+    """Arm G Stage 4: whole-document coverage finder.
+
+    Sends both documents' full anchor lists in one prompt together with
+    the suppression block (if non-empty), using COVERAGE_FINDER_SYSTEM_PROMPT
+    so the model emits ONLY ``silent-on`` / ``goes-beyond`` findings.
+
+    No critic call — returns the raw parsed list from the LLM.
+
+    Args:
+        anchor_index: provides all anchors for both documents.
+        doc_a: document-A identifier (the "our side").
+        doc_b: document-B identifier (the "their side").
+        suppression: output of ``_build_suppression``; its
+            ``covered_topics`` list is appended to the user message
+            when non-empty so the model skips already-covered topics.
+
+    Returns:
+        A list of raw finding dicts (label restricted to
+        ``silent-on`` / ``goes-beyond`` by the system prompt).
+
+    Raises:
+        LLMResponseError: if the LLM response cannot be parsed as a
+            JSON list.
+    """
+    user = (
+        _format_doc_block(anchor_index, doc_a)
+        + "\n\n"
+        + _format_doc_block(anchor_index, doc_b)
+    )
+    if suppression.get("covered_topics"):
+        topics_block = "\n".join(f"  - {t}" for t in suppression["covered_topics"])
+        user += (
+            f"\n\nTOPICS ALREADY COVERED ON BOTH SIDES — do NOT report these as coverage gaps:\n"
+            f"{topics_block}"
+        )
+    raw = call_chat(
+        FINDER_CRITIC_DEPLOYMENT, COVERAGE_FINDER_SYSTEM_PROMPT, user, max_tokens=16384
     )
     parsed = parse_json_response(raw)
     if not isinstance(parsed, list):
@@ -832,13 +1084,136 @@ def run_arm_f(anchor_index: AnchorIndex, doc_a: str, doc_b: str) -> dict[str, An
     }
 
 
+def run_arm_g(
+    anchor_index: AnchorIndex, doc_a: str, doc_b: str, signal: str = "cosine"
+) -> dict[str, Any]:
+    """Arm G: composite coverage-aware flow.
+
+    Stage 1: same-topic retrieval (cosine or BM25).
+    Stage 2: per-pair finder restricted to aligns-with/differs-on/conflicts-with (no critic).
+    Stage 3: build suppression list from Stage 2 survivors.
+    Stage 4: whole-doc coverage finder (silent-on/goes-beyond only, no critic).
+    Stage 5: merge + validate via _validate_candidates.
+    """
+    start = time.time()
+
+    # Stage 1 — retrieval
+    axes_a = _load_axes(doc_a)
+    axes_b = _load_axes(doc_b)
+    if signal == "bm25":
+        candidates = retrieve_bm25_only(axes_a, axes_b)
+    else:
+        candidates = retrieve_cosine_only(axes_a, axes_b)
+    logger.info("Arm G: %d retrieval candidates (signal=%s)", len(candidates), signal)
+
+    # Stage 2 — same-topic finder only (no critic)
+    all_same_topic_raw: list[dict] = []
+    for i, pair in enumerate(candidates, start=1):
+        logger.info(
+            "[%d/%d] Arm G same-topic finder on %s × %s",
+            i,
+            len(candidates),
+            pair["source_anchor_id"],
+            pair["target_anchor_id"],
+        )
+        try:
+            f_out = _finder_per_pair(anchor_index, pair, labels="same-topic")
+            all_same_topic_raw.extend(f_out)
+        except LLMResponseError as exc:
+            logger.warning(
+                "skipping pair (%s, %s): %s",
+                pair["source_anchor_id"],
+                pair["target_anchor_id"],
+                exc,
+            )
+
+    # Stage 3 — suppression list
+    suppression = _build_suppression(candidates, all_same_topic_raw)
+    logger.info(
+        "Arm G: suppression — %d topics, %d pairs",
+        len(suppression["covered_topics"]),
+        len(suppression["covered_pairs"]),
+    )
+
+    # Stage 4 — coverage whole-doc finder (no critic)
+    logger.info("Arm G: running coverage whole-doc pass on %s × %s", doc_a, doc_b)
+    try:
+        coverage_raw = _finder_coverage_whole_doc(
+            anchor_index, doc_a, doc_b, suppression
+        )
+    except LLMResponseError as exc:
+        logger.warning("coverage whole-doc finder failed: %s", exc)
+        coverage_raw = []
+
+    # Stage 5 — merge + validate
+    merged = all_same_topic_raw + coverage_raw
+    clause_shim = _AnchorAsClauseIndex(anchor_index)
+    supported, unsupported, validation = _validate_candidates(merged, clause_shim)
+
+    return {
+        "arm": "G",
+        "wall_clock_seconds": round(time.time() - start, 1),
+        "finder_output": all_same_topic_raw,
+        "critic_output": [],  # no critic; kept for shape consistency with other arms
+        "supported": supported,
+        "unsupported": unsupported,
+        "validation": validation,
+        "retrieval_candidates": candidates,
+        "suppression": suppression,
+        "coverage_finder_output": coverage_raw,
+    }
+
+
 ARM_RUNNERS = {
     "B": run_arm_b,
     "C": run_arm_c,
     "D": run_arm_d,
     "E": run_arm_e,
     "F": run_arm_f,
+    "G": run_arm_g,
 }
+
+
+# ---------------------------------------------------------------------------
+# Coverage quality helpers — used by run_one to annotate metadata.json
+# ---------------------------------------------------------------------------
+
+
+def _is_single_sided(finding: dict) -> bool:
+    """Return True if the finding has exactly one non-empty clause side.
+
+    - goes-beyond: source_clauses non-empty AND target_clauses empty.
+    - silent-on: source_clauses empty AND target_clauses non-empty.
+    - Anything else: False.
+    """
+    src = finding.get("source_clauses") or []
+    tgt = finding.get("target_clauses") or []
+    label = finding.get("label")
+    if label == "goes-beyond":
+        return bool(src) and not bool(tgt)
+    if label == "silent-on":
+        return not bool(src) and bool(tgt)
+    return False
+
+
+def _is_redundant(finding: dict, suppression: dict) -> bool:
+    """Return True if this coverage finding overlaps with the suppression set.
+
+    True when:
+    - Any covered_topic (case-insensitive) appears as a substring in the
+      finding's summary, OR
+    - Any cited anchor (source or target) appears in the covered_pairs string.
+    """
+    covered_topics = [t.lower() for t in suppression.get("covered_topics", [])]
+    summary_lower = (finding.get("summary") or "").lower()
+    if any(t in summary_lower for t in covered_topics if t):
+        return True
+    # Also check if any cited anchor appears in covered_pairs
+    covered_pairs_str = " ".join(suppression.get("covered_pairs", []))
+    all_clauses = (finding.get("source_clauses") or []) + (
+        finding.get("target_clauses") or []
+    )
+    return any(clause in covered_pairs_str for clause in all_clauses if clause)
 
 
 # ---------------------------------------------------------------------------
@@ -846,14 +1221,20 @@ ARM_RUNNERS = {
 # ---------------------------------------------------------------------------
 
 
-def run_one(arm: str, pair: str, anchor_index: AnchorIndex) -> None:
+def run_one(
+    arm: str, pair: str, anchor_index: AnchorIndex, signal: str = "cosine"
+) -> None:
     if pair not in PAIRS:
         raise SystemExit(f"unknown pair {pair!r}; known: {list(PAIRS)}")
     if arm not in ARM_RUNNERS:
         raise SystemExit(f"unknown arm {arm!r}; known: {list(ARM_RUNNERS)}")
     doc_a, doc_b = PAIRS[pair]
     logger.info("=== Arm %s on %s (%s × %s) ===", arm, pair, doc_a, doc_b)
-    result = ARM_RUNNERS[arm](anchor_index, doc_a, doc_b)
+    result = (
+        ARM_RUNNERS[arm](anchor_index, doc_a, doc_b, signal)
+        if arm == "G"
+        else ARM_RUNNERS[arm](anchor_index, doc_a, doc_b)
+    )
 
     out_dir = RESULTS_DIR / arm / pair
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -879,6 +1260,8 @@ def run_one(arm: str, pair: str, anchor_index: AnchorIndex) -> None:
                 "critic_output": result["critic_output"],
                 "validation": result["validation"],
                 "retrieval_candidates": result["retrieval_candidates"],
+                "suppression": result.get("suppression"),
+                "coverage_finder_output": result.get("coverage_finder_output"),
             },
             indent=2,
             ensure_ascii=False,
@@ -898,6 +1281,23 @@ def run_one(arm: str, pair: str, anchor_index: AnchorIndex) -> None:
                     if result["retrieval_candidates"] is not None
                     else None
                 ),
+                "same_topic_finding_count": (
+                    len(result.get("finder_output") or [])
+                    if "coverage_finder_output" in result
+                    else 0
+                ),
+                "coverage_finding_count": len(
+                    result.get("coverage_finder_output") or []
+                ),
+                "coverage_quality_notes": [
+                    {
+                        "summary": f.get("summary", ""),
+                        "label": f.get("label"),
+                        "single_sided": _is_single_sided(f),
+                        "redundant": _is_redundant(f, result.get("suppression") or {}),
+                    }
+                    for f in (result.get("coverage_finder_output") or [])
+                ],
             },
             indent=2,
         ),
@@ -916,8 +1316,14 @@ def run_one(arm: str, pair: str, anchor_index: AnchorIndex) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--arm", required=True, help="B, C, D, or all")
+    parser.add_argument("--arm", required=True, help="B, C, D, E, F, G, or all")
     parser.add_argument("--pair", required=True, help="bis-ed, hkma-ed, or all")
+    parser.add_argument(
+        "--signal",
+        choices=["cosine", "bm25"],
+        default="cosine",
+        help="retrieval signal for Arm G (default: cosine)",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -932,13 +1338,13 @@ def main() -> int:
     raw = json.loads(ANCHOR_INDEX_PATH.read_text(encoding="utf-8"))
     anchor_index = AnchorIndex(raw)
 
-    arms = ["B", "C", "D"] if args.arm == "all" else [args.arm]
+    arms = list(ARM_RUNNERS) if args.arm == "all" else [args.arm]
     pairs = list(PAIRS) if args.pair == "all" else [args.pair]
 
     for arm in arms:
         for pair in pairs:
             try:
-                run_one(arm, pair, anchor_index)
+                run_one(arm, pair, anchor_index, signal=args.signal)
             except Exception as exc:  # noqa: BLE001
                 logger.exception("Arm %s / %s failed: %s", arm, pair, exc)
     return 0

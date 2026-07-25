@@ -14,7 +14,7 @@ Output shape per document:
         "model": ...,
         "generated_at": ISO timestamp,
         "anchors": [
-            {"anchor_id": ..., "text_hash": ..., "axes": [str, ...]},
+            {"anchor_id": ..., "text_hash": ..., "axis_cap": int, "axes": [str, ...]},
             ...
         ]
     }
@@ -30,6 +30,7 @@ import json
 import logging
 import sys
 from datetime import datetime, timezone
+from math import ceil
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -46,8 +47,9 @@ AXES_DIR = REPO_ROOT / "experiments"
 
 _AXIS_SYSTEM_PROMPT = (
     "You are an expert regulatory-policy analyst. Given one clause or "
-    "passage from a policy document, list 1-5 short 'axes' that describe "
-    "*what topics this passage speaks to*.\n\n"
+    "passage from a policy document, list 1-N short 'axes' that describe "
+    "*what topics this passage speaks to*, where N is provided in the user "
+    "message.\n\n"
     "Each axis is a short noun phrase (2-6 words) in canonical regulatory "
     "language, deliberately abstracted away from the specific terminology "
     "this document happens to use. The goal is that a semantically-equivalent "
@@ -96,8 +98,15 @@ def _write_axes_cache(document_id: str, cache: dict) -> None:
 
 
 def extract_axes_for_anchor(anchor: Anchor) -> list[str]:
-    """Call the LLM once for one anchor. Return 1-5 axis strings."""
-    user = f"Anchor text:\n\n{anchor['text']}"
+    """Call the LLM once for one anchor. Return 1-N axis strings.
+
+    The cap N is computed dynamically from anchor length:
+        cap = min(12, max(5, ceil(len(anchor["text"]) / 400)))
+    Longer anchors cover more regulatory topics and warrant more axes; the cap
+    is bounded at 5 (floor) and 12 (ceiling).
+    """
+    cap = min(12, max(5, ceil(len(anchor["text"]) / 400)))
+    user = f"Anchor text (list {cap} axes):\n\n{anchor['text']}"
     for attempt in range(1, 4):
         raw = call_chat(
             FINDER_CRITIC_DEPLOYMENT, _AXIS_SYSTEM_PROMPT, user, max_tokens=1024
@@ -108,8 +117,8 @@ def extract_axes_for_anchor(anchor: Anchor) -> list[str]:
                 raise LLMResponseError(f"expected list[str], got {type(axes).__name__}")
             if not axes:
                 raise LLMResponseError("empty axes list")
-            if len(axes) > 5:
-                axes = axes[:5]
+            if len(axes) > cap:
+                axes = axes[:cap]
             return axes
         except LLMResponseError as exc:
             logger.warning(
@@ -139,8 +148,13 @@ def extract_axes_for_document(anchor_index: AnchorIndex, document_id: str) -> No
     for i, anchor in enumerate(anchors, start=1):
         anchor_id = anchor["anchor_id"]
         text_hash = _text_hash(anchor["text"])
+        cap = min(12, max(5, ceil(len(anchor["text"]) / 400)))
         existing = cached_by_id.get(anchor_id)
-        if existing and existing.get("text_hash") == text_hash:
+        if (
+            existing
+            and existing.get("text_hash") == text_hash
+            and existing.get("axis_cap") == cap
+        ):
             new_entries.append(existing)
             hits += 1
             continue
@@ -159,7 +173,12 @@ def extract_axes_for_document(anchor_index: AnchorIndex, document_id: str) -> No
             continue
 
         new_entries.append(
-            {"anchor_id": anchor_id, "text_hash": text_hash, "axes": axes}
+            {
+                "anchor_id": anchor_id,
+                "text_hash": text_hash,
+                "axis_cap": cap,
+                "axes": axes,
+            }
         )
         misses += 1
 

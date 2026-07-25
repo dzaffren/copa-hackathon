@@ -16,7 +16,9 @@
         "clause_number": "BCBS OpRes Principle 7",
         "text": "Banks should manage their dependencies on relationships, including but not limited to those of third parties or intra-group entities."
       }
-    ]
+    ],
+    "id": "e-opres_v0_3--bcbs_opres_2021~0",
+    "review_state": "accepted"
   },
   {
     "summary": "Board accountability for operational resilience aligns with BCBS Principle 1",
@@ -35,7 +37,9 @@
         "clause_number": "BCBS OpRes Principle 1",
         "text": "Banks should utilise their existing governance structure to establish, oversee and implement an effective operational resilience approach."
       }
-    ]
+    ],
+    "id": "e-opres_v0_3--bcbs_opres_2021~1",
+    "review_state": "accepted"
   },
   {
     "summary": "Draft mandates tested exit plans for critical third parties, going beyond the BCBS baseline",
@@ -54,6 +58,8 @@
         "clause_number": "BCBS OpRes Principle 7",
         "text": "Banks should manage their dependencies on relationships, including but not limited to those of third parties or intra-group entities."
       }
-    ]
+    ],
+    "id": "e-opres_v0_3--bcbs_opres_2021~2",
+    "review_state": "accepted"
   }
 ]

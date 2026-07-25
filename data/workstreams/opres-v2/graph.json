@@ -137,6 +137,13 @@
       "description": "Operational Resilience Discussion Paper, December 2025 — the consultation the v0.3 PD draft follows.",
       "source_url": null,
       "document_id": "opres-v1-2025-draft"
+    },
+    {
+      "id": "iais-draft-application-paper-on-operational-resilience-objectives-and-toolkit",
+      "node_type": "international-standard",
+      "title": "IAIS Draft Application Paper on operational  resilience objectives and toolkit",
+      "description": null,
+      "source_url": "https://www.iais.org/uploads/2025/07/Draft-Application-Paper-on-operational-resilience-objectives-and-toolkit.pdf"
     }
   ],
   "edges": [
@@ -191,6 +198,12 @@
     {
       "id": "e-opres_v0_3--opres_dp_2025",
       "source": "opres-pd-v0-3",
+      "target": "opres-dp-2025",
+      "edge_type": "references"
+    },
+    {
+      "id": "e-iais_draft_application_paper_on_operational_resilience_objectives_and_toolkit--opres_dp_2025",
+      "source": "iais-draft-application-paper-on-operational-resilience-objectives-and-toolkit",
       "target": "opres-dp-2025",
       "edge_type": "references"
     }
