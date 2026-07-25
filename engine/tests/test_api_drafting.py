@@ -407,6 +407,34 @@ def test_POST_copilot_passes_message_history_and_references_to_the_reply_fn(tmp_
     assert captured["intent"] == "PD"
     assert captured["node"]["id"] == _TASK
     assert captured["workstream_id"] == _OPRES
+    # No draft/selection sent → both default to None.
+    assert captured["draft_text"] is None
+    assert captured["selection_text"] is None
+
+
+def test_POST_copilot_flattens_draft_html_and_forwards_the_selection(tmp_path):
+    captured = {}
+
+    def capture(**kwargs):
+        captured.update(kwargs)
+        return {"role": "copilot", "text": "ok"}
+
+    client = _make_copilot_client(tmp_path, capture)
+    client.post(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
+        json={
+            "intent": "PD",
+            "message": "suggestions on this?",
+            "draft_html": "<h2>PART F</h2><p>This Part does <strong>not</strong> displace.</p>",
+            "draft_selection": "This Part does not displace.",
+        },
+    )
+    # HTML flattened to text: tags gone, block boundaries preserved.
+    assert "PART F" in captured["draft_text"]
+    assert "This Part does not displace." in captured["draft_text"]
+    assert "<h2>" not in captured["draft_text"]
+    assert "<strong>" not in captured["draft_text"]
+    assert captured["selection_text"] == "This Part does not displace."
 
 
 def test_POST_copilot_400_for_an_intent_outside_the_seven(tmp_path):

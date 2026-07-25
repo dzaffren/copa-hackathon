@@ -25,7 +25,9 @@ fixtures derive from public BNM documents.
 """
 
 import json
+import re
 from datetime import datetime, timezone
+from html import unescape
 from pathlib import Path
 from typing import Any, Optional, Union
 
@@ -34,6 +36,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 
 from engine.clauses import load_clause_index
 from engine.connections import find_connections as _default_find_connections
+from engine.ingest import UnreadableDocumentError, ingest_from_url
 from engine.copilot import copilot_reply as _default_copilot_reply
 from engine.copilot import copilot_reply_stream as _default_copilot_reply_stream
 from engine.config import REPO_ROOT
@@ -298,6 +301,79 @@ def _ws_error(
     if field is not None:
         content["field"] = field
     return JSONResponse(status_code=status_code, content=content)
+
+
+# --- Copilot request parsing (shared by the blocking + streaming routes) ----
+
+_BLOCK_BREAK_RE = re.compile(
+    r"(?i)</(?:p|div|h1|h2|h3|li|ul|ol|blockquote)>|<br\s*/?>"
+)
+_TAG_RE = re.compile(r"<[^>]+>")
+
+
+def _html_to_text(html: str) -> str:
+    """Flatten draft HTML into readable plain text for the Copilot prompt.
+
+    Block boundaries (paragraphs, headings, list items, `<br>`) become
+    newlines so the document's structure (e.g. a "PART F" heading on its own
+    line) survives; remaining tags are stripped and HTML entities decoded.
+    This is context for the model, not something rendered or stored, so a
+    lightweight regex flatten is enough."""
+    if not html:
+        return ""
+    text = _BLOCK_BREAK_RE.sub("\n", html)
+    text = _TAG_RE.sub("", text)
+    text = unescape(text)
+    lines = [line.rstrip() for line in text.splitlines()]
+    text = re.sub(r"\n{3,}", "\n\n", "\n".join(lines))
+    return text.strip()
+
+
+def _parse_copilot_request(
+    body: dict[str, Any],
+) -> Union[dict[str, Any], JSONResponse]:
+    """Validate + normalise a copilot request body into the kwargs both copilot
+    routes pass to `engine.copilot`, or a `JSONResponse` error. `draft_html` is
+    the drafter's LIVE editor content (possibly unsaved), flattened to text;
+    `draft_selection` is their highlighted passage. Both are non-citable context
+    (see `engine.copilot._build_grounding_context`)."""
+    intent = body.get("intent")
+    if intent not in copilot.INTENTS:
+        return _ws_error(
+            400, "INVALID_INTENT",
+            f"intent must be one of {list(copilot.INTENTS)}, got {intent!r}",
+        )
+    message = body.get("message")
+    if not isinstance(message, str) or not message.strip():
+        return _ws_error(400, "MESSAGE_REQUIRED", "message must be a non-empty string")
+    history = body.get("history") or []
+    if not isinstance(history, list):
+        history = []
+    referenced_finding_ids = body.get("referenced_finding_ids") or []
+    if not isinstance(referenced_finding_ids, list):
+        referenced_finding_ids = []
+
+    draft_html = body.get("draft_html")
+    draft_text = (
+        _html_to_text(draft_html[: drafts.MAX_DRAFT_BYTES])
+        if isinstance(draft_html, str) and draft_html.strip()
+        else None
+    )
+    selection = body.get("draft_selection")
+    selection_text = (
+        selection[: drafts.MAX_DRAFT_BYTES]
+        if isinstance(selection, str) and selection.strip()
+        else None
+    )
+
+    return {
+        "intent": intent,
+        "message": message,
+        "history": history,
+        "referenced_finding_ids": referenced_finding_ids,
+        "draft_text": draft_text,
+        "selection_text": selection_text,
+    }
 
 
 def _load_workstream_graph(
@@ -949,7 +1025,33 @@ def create_app(
                     "INVALID_EDGE_TARGET",
                     f"Edge target {edge['target_node_id']} is not an existing node",
                 )
+        # `skip_ingest` is a client-only flag (opt out of the URL download);
+        # strip it before add_node, which does not expect it.
+        skip_ingest = body.pop("skip_ingest", False) is True
+        source_url = (body.get("source_url") or "").strip()
+
+        # Auto-ingest: download the source document up front so a failure aborts
+        # the request (422) before the node is persisted. Deferring the markdown
+        # write until after add_node gives us the real, collision-suffixed id.
+        markdown: Optional[str] = None
+        if source_url and not skip_ingest:
+            try:
+                markdown = ingest_from_url(source_url)
+            except UnreadableDocumentError as exc:
+                return _ws_error(
+                    422,
+                    "INGEST_FAILED",
+                    f"Could not ingest a document from {source_url}: {exc}",
+                    field="source_url",
+                )
+
         new_node, created = workstreams.add_node(ws_graph, body)
+
+        if markdown is not None:
+            artifact_path = Path(artifacts_dir) / f"{new_node['id']}.md"
+            artifact_path.parent.mkdir(parents=True, exist_ok=True)
+            artifact_path.write_text(markdown, encoding="utf-8")
+
         workstreams.save_graph(workstreams_dir, workstream_id, ws_graph)
         return JSONResponse(
             status_code=201,
@@ -1314,39 +1416,21 @@ def create_app(
         body = await request.json() if await request.body() else {}
         if not isinstance(body, dict):
             body = {}
-        intent = body.get("intent")
-        if intent not in copilot.INTENTS:
-            return _ws_error(
-                400,
-                "INVALID_INTENT",
-                f"intent must be one of {list(copilot.INTENTS)}, got {intent!r}",
-            )
-        message = body.get("message")
-        if not isinstance(message, str) or not message.strip():
-            return _ws_error(
-                400, "MESSAGE_REQUIRED", "message must be a non-empty string"
-            )
         # The server holds no conversation state (the chat is deliberately not
-        # persisted across sessions) — the client sends the full prior history
-        # on every call.
-        history = body.get("history") or []
-        if not isinstance(history, list):
-            history = []
-        referenced_finding_ids = body.get("referenced_finding_ids") or []
-        if not isinstance(referenced_finding_ids, list):
-            referenced_finding_ids = []
+        # persisted across sessions); the client sends the full prior history,
+        # plus its live draft + selection, on every call.
+        fields = _parse_copilot_request(body)
+        if isinstance(fields, JSONResponse):
+            return fields
 
         clause_index = load_clause_index(artifacts_dir)
         try:
             reply = copilot_reply_fn(
                 node=node,
-                intent=intent,
-                history=history,
-                message=message,
-                referenced_finding_ids=referenced_finding_ids,
                 clause_index=clause_index,
                 workstreams_dir=workstreams_dir,
                 workstream_id=workstream_id,
+                **fields,
             )
         except Exception as exc:  # live model / creds / network failure
             return _ws_error(
@@ -1370,34 +1454,17 @@ def create_app(
         body = await request.json() if await request.body() else {}
         if not isinstance(body, dict):
             body = {}
-        intent = body.get("intent")
-        if intent not in copilot.INTENTS:
-            return _ws_error(
-                400, "INVALID_INTENT",
-                f"intent must be one of {list(copilot.INTENTS)}, got {intent!r}",
-            )
-        message = body.get("message")
-        if not isinstance(message, str) or not message.strip():
-            return _ws_error(
-                400, "MESSAGE_REQUIRED", "message must be a non-empty string"
-            )
-        history = body.get("history") or []
-        if not isinstance(history, list):
-            history = []
-        referenced_finding_ids = body.get("referenced_finding_ids") or []
-        if not isinstance(referenced_finding_ids, list):
-            referenced_finding_ids = []
+        fields = _parse_copilot_request(body)
+        if isinstance(fields, JSONResponse):
+            return fields
 
         clause_index = load_clause_index(artifacts_dir)
         sse_generator = copilot_stream_fn(
             node=node,
-            intent=intent,
-            history=history,
-            message=message,
-            referenced_finding_ids=referenced_finding_ids,
             clause_index=clause_index,
             workstreams_dir=workstreams_dir,
             workstream_id=workstream_id,
+            **fields,
         )
         return StreamingResponse(sse_generator, media_type="text/event-stream")
 

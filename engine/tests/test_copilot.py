@@ -1,10 +1,10 @@
 """Tests for engine.copilot — live Copilot grounding + citation guardrail.
 
-No network access: the turn function (`turn_fn`) is always an injected stub,
-mirroring `test_connections.py`'s `finder_fn`/`critic_fn` stubbing. Covers the
-two-layer guardrail (`_build_grounding_context` assembling only verbatim
-text, `_validate_reply` dropping anything not actually grounded) plus the
-`copilot_reply` orchestration.
+No network access: the turn/stream seam is always an injected stub, mirroring
+`test_connections.py`'s `finder_fn`/`critic_fn` stubbing. Covers the two-layer
+guardrail (`_build_grounding_context` assembling only citable clauses,
+`_validate_reply` dropping anything not grounded), the prose/`<<<META>>>` split
+(`_split_reply`), draft/selection awareness, and both reply orchestrations.
 """
 
 import json
@@ -13,12 +13,14 @@ from engine import findings
 from engine.clauses import ClauseIndex
 from engine.copilot import (
     INTENTS,
+    META_SENTINEL,
     NO_MATCHING_CLAUSE,
     _build_grounding_context,
     _build_messages,
-    _call_and_parse,
+    _split_reply,
     _validate_reply,
     copilot_reply,
+    copilot_reply_stream,
 )
 
 _WORKSTREAM = "opres-v2"
@@ -50,6 +52,26 @@ def _write_finding(workstreams_dir, edge_id: str, finding: dict) -> None:
     findings.save(workstreams_dir, _WORKSTREAM, edge_id, [finding])
 
 
+def _meta(payload: dict) -> str:
+    """The trailing metadata block a model appends after its prose."""
+    return f"\n{META_SENTINEL}\n{json.dumps(payload)}"
+
+
+def _collect_sse(gen) -> list[dict]:
+    """Parse SSE frames from the generator into a list of {event, data} dicts."""
+    events = []
+    for frame in gen:
+        lines = frame.strip().split("\n")
+        event = next(
+            (l[len("event: "):] for l in lines if l.startswith("event: ")), "message"
+        )
+        data_line = next(
+            (l[len("data: "):] for l in lines if l.startswith("data: ")), "{}"
+        )
+        events.append({"event": event, "data": json.loads(data_line)})
+    return events
+
+
 # --- _build_grounding_context ------------------------------------------------
 
 
@@ -63,12 +85,13 @@ def test_grounding_context_includes_task_documents_own_clauses(tmp_path):
         node, clause_index, tmp_path, _WORKSTREAM, []
     )
 
+    assert "CITABLE CLAUSES" in context
     assert "OpRes PD 5.3" in context
     assert "Scenario testing annually." in context
     assert grounded["OpRes PD 5.3"] == "Scenario testing annually."
 
 
-def test_grounding_context_is_empty_when_node_has_no_document_id(tmp_path):
+def test_grounding_context_reports_no_clauses_when_node_has_no_document_id(tmp_path):
     clause_index = _clause_index({})
     node = {"id": "n1", "title": "n1", "document_id": None}
 
@@ -76,7 +99,7 @@ def test_grounding_context_is_empty_when_node_has_no_document_id(tmp_path):
         node, clause_index, tmp_path, _WORKSTREAM, []
     )
 
-    assert context == ""
+    assert "no clauses available" in context
     assert grounded == {}
 
 
@@ -109,11 +132,10 @@ def test_referenced_finding_id_with_no_tilde_is_skipped_not_errored(tmp_path):
     clause_index = _clause_index({})
     node = {"id": "n1", "title": "n1", "document_id": None}
 
-    context, grounded = _build_grounding_context(
+    _, grounded = _build_grounding_context(
         node, clause_index, tmp_path, _WORKSTREAM, ["not-a-valid-id"]
     )
 
-    assert context == ""
     assert grounded == {}
 
 
@@ -121,11 +143,10 @@ def test_referenced_finding_id_for_unanalysed_edge_is_skipped_not_errored(tmp_pa
     clause_index = _clause_index({})
     node = {"id": "n1", "title": "n1", "document_id": None}
 
-    context, grounded = _build_grounding_context(
+    _, grounded = _build_grounding_context(
         node, clause_index, tmp_path, _WORKSTREAM, ["e-never-analysed~0"]
     )
 
-    assert context == ""
     assert grounded == {}
 
 
@@ -145,12 +166,63 @@ def test_referenced_finding_id_not_present_on_the_edge_is_skipped(tmp_path):
     )
 
     # Only index 0 exists on this edge — index 5 does not resolve.
-    context, grounded = _build_grounding_context(
+    _, grounded = _build_grounding_context(
         node, clause_index, tmp_path, _WORKSTREAM, [f"{_EDGE}~5"]
     )
 
-    assert context == ""
     assert grounded == {}
+
+
+def test_grounding_context_includes_draft_and_selection_as_non_citable(tmp_path):
+    clause_index = _clause_index({})
+    node = {"id": "n1", "title": "n1", "document_id": None}
+
+    context, grounded = _build_grounding_context(
+        node,
+        clause_index,
+        tmp_path,
+        _WORKSTREAM,
+        [],
+        draft_text="PART F\nThis Part does not displace existing requirements.",
+        selection_text="This Part does not displace existing requirements.",
+    )
+
+    assert "CURRENT WORKING DRAFT" in context
+    assert "PART F" in context
+    assert "HIGHLIGHTED" in context
+    # The draft and selection are context only — never citable.
+    assert grounded == {}
+
+
+# --- _split_reply ------------------------------------------------------------
+
+
+def test_split_reply_no_sentinel_is_all_prose():
+    prose, meta = _split_reply("Just some prose, no metadata.")
+    assert prose == "Just some prose, no metadata."
+    assert meta == {}
+
+
+def test_split_reply_splits_prose_and_meta():
+    raw = "Here is my answer." + _meta(
+        {"citations": [{"clause_number": "X 1.1", "text": "t"}], "snippet_html": "<p>s</p>"}
+    )
+    prose, meta = _split_reply(raw)
+    assert prose == "Here is my answer."
+    assert meta["citations"][0]["clause_number"] == "X 1.1"
+    assert meta["snippet_html"] == "<p>s</p>"
+
+
+def test_split_reply_bad_json_tail_degrades_to_prose_only():
+    prose, meta = _split_reply(f"Answer.\n{META_SENTINEL}\nnot valid json {{")
+    assert prose == "Answer."
+    assert meta == {}
+
+
+def test_split_reply_empty_tail_is_prose_only():
+    prose, meta = _split_reply(f"Answer.\n{META_SENTINEL}\n   ")
+    assert prose == "Answer."
+    assert meta == {}
 
 
 # --- _validate_reply ---------------------------------------------------------
@@ -158,15 +230,16 @@ def test_referenced_finding_id_not_present_on_the_edge_is_skipped(tmp_path):
 
 def test_validator_drops_a_citation_whose_clause_number_is_not_grounded():
     grounded = {"OpRes PD 5.3": "Scenario testing annually."}
-    raw = {
-        "text": "Cites both a real and a fabricated clause.",
-        "citations": [
-            {"clause_number": "OpRes PD 5.3", "text": "Scenario testing annually."},
-            {"clause_number": "Made Up 9.9", "text": "This clause does not exist."},
-        ],
-    }
-
-    result = _validate_reply(raw, grounded)
+    result = _validate_reply(
+        "Cites both a real and a fabricated clause.",
+        {
+            "citations": [
+                {"clause_number": "OpRes PD 5.3", "text": "Scenario testing annually."},
+                {"clause_number": "Made Up 9.9", "text": "This clause does not exist."},
+            ]
+        },
+        grounded,
+    )
 
     assert len(result["citations"]) == 1
     assert result["citations"][0]["clause_number"] == "OpRes PD 5.3"
@@ -174,35 +247,32 @@ def test_validator_drops_a_citation_whose_clause_number_is_not_grounded():
 
 def test_validator_always_re_quotes_from_grounded_text_never_the_models_echo():
     grounded = {"OpRes PD 5.3": "Scenario testing annually."}
-    raw = {
-        "text": "x",
-        "citations": [
-            {"clause_number": "OpRes PD 5.3", "text": "a paraphrased, WRONG echo"},
-        ],
-    }
-
-    result = _validate_reply(raw, grounded)
+    result = _validate_reply(
+        "x",
+        {"citations": [{"clause_number": "OpRes PD 5.3", "text": "a paraphrased, WRONG echo"}]},
+        grounded,
+    )
 
     assert result["citations"][0]["text"] == "Scenario testing annually."
 
 
 def test_validator_defaults_to_no_matching_clause_when_text_is_empty():
-    result = _validate_reply({"text": ""}, {})
+    result = _validate_reply("", {}, {})
     assert result["text"] == NO_MATCHING_CLAUSE
 
 
 def test_validator_omits_citations_key_when_none_survive():
-    result = _validate_reply({"text": "no clause supports this"}, {})
+    result = _validate_reply("no clause supports this", {}, {})
     assert "citations" not in result
 
 
 def test_validator_passes_through_snippet_html_when_present():
-    result = _validate_reply({"text": "x", "snippet_html": "<p>draft</p>"}, {})
+    result = _validate_reply("x", {"snippet_html": "<p>draft</p>"}, {})
     assert result["snippet_html"] == "<p>draft</p>"
 
 
 def test_validator_omits_snippet_html_when_absent():
-    result = _validate_reply({"text": "x"}, {})
+    result = _validate_reply("x", {}, {})
     assert "snippet_html" not in result
 
 
@@ -217,11 +287,8 @@ def test_copilot_reply_returns_the_validated_turn_fn_output(tmp_path):
 
     def stub_turn(system, messages):
         assert "OpRes PD 5.3" in system  # grounding reached the prompt
-        return json.dumps(
-            {
-                "text": "Here is a redraft citing OpRes PD 5.3.",
-                "citations": [{"clause_number": "OpRes PD 5.3", "text": "irrelevant"}],
-            }
+        return "Here is a redraft citing OpRes PD 5.3." + _meta(
+            {"citations": [{"clause_number": "OpRes PD 5.3", "text": "irrelevant"}]}
         )
 
     reply = copilot_reply(
@@ -237,7 +304,60 @@ def test_copilot_reply_returns_the_validated_turn_fn_output(tmp_path):
     )
 
     assert reply["role"] == "copilot"
+    assert reply["text"] == "Here is a redraft citing OpRes PD 5.3."
     assert reply["citations"][0]["text"] == "Scenario testing annually."
+
+
+def test_copilot_reply_threads_draft_and_selection_into_the_prompt(tmp_path):
+    clause_index = _clause_index({})
+    node = {"id": "n1", "title": "n1", "document_id": None}
+    captured = {}
+
+    def stub_turn(system, messages):
+        captured["system"] = system
+        return "ok"
+
+    copilot_reply(
+        node=node,
+        intent="PD",
+        history=[],
+        message="suggestions on this?",
+        referenced_finding_ids=[],
+        clause_index=clause_index,
+        workstreams_dir=tmp_path,
+        workstream_id=_WORKSTREAM,
+        draft_text="PART F relationship with other policy documents",
+        selection_text="PART F",
+        turn_fn=stub_turn,
+    )
+
+    assert "CURRENT WORKING DRAFT" in captured["system"]
+    assert "PART F relationship with other policy documents" in captured["system"]
+    assert "HIGHLIGHTED" in captured["system"]
+
+
+def test_copilot_reply_returns_prose_only_when_no_meta(tmp_path):
+    clause_index = _clause_index({})
+    node = {"id": "n1", "title": "n1", "document_id": None}
+
+    def stub_turn(system, messages):
+        return "Yes, the paper acknowledges overlap with existing policy documents."
+
+    reply = copilot_reply(
+        node=node,
+        intent="PD",
+        history=[],
+        message="does it overlap?",
+        referenced_finding_ids=[],
+        clause_index=clause_index,
+        workstreams_dir=tmp_path,
+        workstream_id=_WORKSTREAM,
+        turn_fn=stub_turn,
+    )
+
+    assert reply["role"] == "copilot"
+    assert "overlap" in reply["text"]
+    assert "citations" not in reply
 
 
 def test_copilot_reply_sends_history_as_user_assistant_turns(tmp_path):
@@ -247,7 +367,7 @@ def test_copilot_reply_sends_history_as_user_assistant_turns(tmp_path):
 
     def stub_turn(system, messages):
         captured["messages"] = messages
-        return json.dumps({"text": "ok"})
+        return "ok"
 
     copilot_reply(
         node=node,
@@ -273,8 +393,7 @@ def test_copilot_reply_sends_history_as_user_assistant_turns(tmp_path):
 # (e.g. a failed live call) left an unanswered "user" turn in the client's
 # history. Appending the next message after it produced two consecutive
 # "user" turns, which the Messages API rejects outright ("roles must
-# alternate") — turning one failed call into every subsequent call failing
-# too, regardless of credentials.
+# alternate"), turning one failed call into every subsequent call failing too.
 
 
 def test_build_messages_normal_alternating_history():
@@ -290,8 +409,6 @@ def test_build_messages_normal_alternating_history():
 
 
 def test_build_messages_merges_an_unanswered_user_turn_instead_of_duplicating_role():
-    # history ends on "user" (the previous call never got a copilot reply) —
-    # the new message must merge into that turn, not start a second "user".
     messages = _build_messages([{"role": "user", "text": "first failed message"}], "next")
     assert messages == [
         {"role": "user", "content": "first failed message\n\nnext"},
@@ -322,130 +439,10 @@ def test_build_messages_skips_empty_turns():
     assert messages == [{"role": "user", "content": "hi"}]
 
 
-def test_copilot_reply_survives_an_unanswered_prior_user_turn(tmp_path):
-    """End-to-end: copilot_reply must not itself send an invalid,
-    role-duplicating turn list to the model after a prior failed call."""
-    clause_index = _clause_index({})
-    node = {"id": "n1", "title": "n1", "document_id": None}
-    captured = {}
-
-    def stub_turn(system, messages):
-        captured["messages"] = messages
-        return json.dumps({"text": "ok"})
-
-    copilot_reply(
-        node=node,
-        intent="PD",
-        history=[{"role": "user", "text": "first failed message"}],
-        message="what are the suggestions you have",
-        referenced_finding_ids=[],
-        clause_index=clause_index,
-        workstreams_dir=tmp_path,
-        workstream_id=_WORKSTREAM,
-        turn_fn=stub_turn,
-    )
-
-    roles = [m["role"] for m in captured["messages"]]
-    assert all(roles[i] != roles[i + 1] for i in range(len(roles) - 1))
-
-
-# --- _call_and_parse (retry + graceful degrade) -----------------------------
-# Regression coverage for a real bug: Claude sometimes answers an open-ended
-# question in plain prose despite the system prompt's strict-JSON
-# instruction (reproduced live with "does it have any overlapped clause?").
-# That used to propagate as a 502 on a call that actually succeeded — now it
-# retries once, and if the model still won't commit to JSON, the raw prose
-# becomes the reply's `text` instead of failing the turn.
-
-
-def test_call_and_parse_returns_the_parsed_object_on_first_try():
-    def stub_turn(system, messages):
-        return json.dumps({"text": "ok"})
-
-    raw, parsed = _call_and_parse(stub_turn, "sys", [])
-    assert parsed == {"text": "ok"}
-    assert raw == json.dumps({"text": "ok"})
-
-
-def test_call_and_parse_retries_once_after_non_json_then_succeeds():
-    calls = []
-
-    def stub_turn(system, messages):
-        calls.append(1)
-        if len(calls) == 1:
-            return "Sure, here's a plain-prose answer with no JSON at all."
-        return json.dumps({"text": "second attempt worked"})
-
-    raw, parsed = _call_and_parse(stub_turn, "sys", [])
-    assert len(calls) == 2
-    assert parsed == {"text": "second attempt worked"}
-
-
-def test_call_and_parse_gives_up_after_every_attempt_is_non_json():
-    def stub_turn(system, messages):
-        return "Still just prose, no JSON envelope."
-
-    raw, parsed = _call_and_parse(stub_turn, "sys", [])
-    assert parsed is None
-    assert raw == "Still just prose, no JSON envelope."
-
-
-def test_call_and_parse_treats_a_non_dict_json_value_as_non_json_too():
-    def stub_turn(system, messages):
-        return json.dumps(["not", "an", "object"])
-
-    raw, parsed = _call_and_parse(stub_turn, "sys", [])
-    assert parsed is None
-
-
-def test_copilot_reply_degrades_to_plain_text_when_the_model_never_returns_json(tmp_path):
-    clause_index = _clause_index({})
-    node = {"id": "n1", "title": "n1", "document_id": None}
-
-    def stub_turn(system, messages):
-        return "Yes — the Discussion Paper explicitly acknowledges overlap with several existing policy documents."
-
-    reply = copilot_reply(
-        node=node,
-        intent="PD",
-        history=[],
-        message="does it have any overlapped clause?",
-        referenced_finding_ids=[],
-        clause_index=clause_index,
-        workstreams_dir=tmp_path,
-        workstream_id=_WORKSTREAM,
-        turn_fn=stub_turn,
-    )
-
-    assert reply["role"] == "copilot"
-    assert "overlap" in reply["text"]
-    assert "citations" not in reply
-
-
-def test_intents_tuple_has_the_seven_presets():
-    assert len(INTENTS) == 7
-    assert "PD" in INTENTS
-
-
 # --- copilot_reply_stream (SSE streaming generator) -------------------------
 
-import json as _json
 
-from engine.copilot import copilot_reply_stream
-
-
-def _collect_sse(gen) -> list[dict]:
-    """Parse SSE frames from the generator into a list of {event, data} dicts."""
-    events = []
-    for frame in gen:
-        lines = frame.strip().split("\n")
-        event = next((l[len("event: "):] for l in lines if l.startswith("event: ")), "message")
-        data_line = next((l[len("data: "):] for l in lines if l.startswith("data: ")), "{}")
-        events.append({"event": event, "data": _json.loads(data_line)})
-    return events
-
-
-def test_copilot_reply_stream_yields_token_events_then_done(tmp_path):
+def test_copilot_reply_stream_streams_prose_tokens_then_done(tmp_path):
     clause_index = _clause_index({})
     node = {"id": "n1", "title": "n1", "document_id": None}
 
@@ -461,49 +458,28 @@ def test_copilot_reply_stream_yields_token_events_then_done(tmp_path):
     ))
 
     token_events = [e for e in events if e["event"] == "token"]
-    done_events = [e for e in events if e["event"] == "done"]
-    error_events = [e for e in events if e["event"] == "error"]
-
-    assert len(token_events) == 2
-    assert token_events[0]["data"]["t"] == "Hello"
-    assert token_events[1]["data"]["t"] == " world"
-    assert len(done_events) == 1
-    assert done_events[0]["data"]["text"] == "Hello world"
-    assert len(error_events) == 0
+    done = next(e for e in events if e["event"] == "done")
+    # Token boundaries are re-chunked by the sentinel hold-back; assert on the
+    # concatenation, which is what the client reassembles.
+    assert "".join(t["data"]["t"] for t in token_events) == "Hello world"
+    assert done["data"]["text"] == "Hello world"
+    assert not any(e["event"] == "error" for e in events)
 
 
-def test_copilot_reply_stream_done_carries_validated_citations(tmp_path):
+def test_copilot_reply_stream_does_not_stream_the_meta_block(tmp_path):
     clause_index = _clause_index(
         {"OpRes PD 5.3": {"document_id": "opres-pd-v0-3", "text": "Annually."}}
     )
     node = {"id": "opres-pd-v0-3", "title": "OpRes PD", "document_id": "opres-pd-v0-3"}
 
     def stub_stream(system, messages):
-        yield _json.dumps({
-            "text": "Cites a real clause.",
-            "citations": [{"clause_number": "OpRes PD 5.3", "text": "ignored"}],
-        })
-
-    events = _collect_sse(copilot_reply_stream(
-        node=node, intent="PD", history=[], message="hi",
-        referenced_finding_ids=[],
-        clause_index=clause_index, workstreams_dir=tmp_path,
-        workstream_id=_WORKSTREAM, stream_fn=stub_stream,
-    ))
-
-    done = next(e for e in events if e["event"] == "done")
-    assert done["data"]["text"] == "Cites a real clause."
-    assert done["data"]["citations"][0]["clause_number"] == "OpRes PD 5.3"
-    # text must come from grounded set, not model echo
-    assert done["data"]["citations"][0]["text"] == "Annually."
-
-
-def test_copilot_reply_stream_graceful_degrade_on_plain_prose(tmp_path):
-    clause_index = _clause_index({})
-    node = {"id": "n1", "title": "n1", "document_id": None}
-
-    def stub_stream(system, messages):
-        yield "Yes, there are overlaps between the clauses."
+        yield "Here is my answer."
+        yield _meta(
+            {
+                "citations": [{"clause_number": "OpRes PD 5.3", "text": "ignored"}],
+                "snippet_html": "<p>s</p>",
+            }
+        )
 
     events = _collect_sse(copilot_reply_stream(
         node=node, intent="PD", history=[], message="hi",
@@ -513,11 +489,62 @@ def test_copilot_reply_stream_graceful_degrade_on_plain_prose(tmp_path):
     ))
 
     token_events = [e for e in events if e["event"] == "token"]
+    joined = "".join(t["data"]["t"] for t in token_events)
     done = next(e for e in events if e["event"] == "done")
-    assert len(token_events) == 1
-    assert done["data"]["text"] == "Yes, there are overlaps between the clauses."
+
+    assert META_SENTINEL not in joined
+    assert "citations" not in joined  # the JSON metadata never streamed as prose
+    assert joined.strip() == "Here is my answer."
+    assert done["data"]["text"] == "Here is my answer."
+    assert done["data"]["citations"][0]["text"] == "Annually."  # re-quoted, grounded
+    assert done["data"]["snippet_html"] == "<p>s</p>"
+
+
+def test_copilot_reply_stream_handles_sentinel_split_across_chunks(tmp_path):
+    clause_index = _clause_index({})
+    node = {"id": "n1", "title": "n1", "document_id": None}
+
+    def stub_stream(system, messages):
+        yield "Answer."
+        yield "<<<"
+        yield "META"
+        yield ">>>"
+        yield "\n" + json.dumps({"citations": []})
+
+    events = _collect_sse(copilot_reply_stream(
+        node=node, intent="PD", history=[], message="hi",
+        referenced_finding_ids=[],
+        clause_index=clause_index, workstreams_dir=tmp_path,
+        workstream_id=_WORKSTREAM, stream_fn=stub_stream,
+    ))
+
+    token_events = [e for e in events if e["event"] == "token"]
+    joined = "".join(t["data"]["t"] for t in token_events)
+    done = next(e for e in events if e["event"] == "done")
+
+    assert META_SENTINEL not in joined
+    assert joined == "Answer."
+    assert done["data"]["text"] == "Answer."
+
+
+def test_copilot_reply_stream_done_has_no_citations_when_none_are_grounded(tmp_path):
+    clause_index = _clause_index({})
+    node = {"id": "n1", "title": "n1", "document_id": None}
+
+    def stub_stream(system, messages):
+        yield "Cites a hallucinated clause."
+        yield _meta({"citations": [{"clause_number": "MADE UP 99.9", "text": "fake"}]})
+
+    events = _collect_sse(copilot_reply_stream(
+        node=node, intent="PD", history=[], message="hi",
+        referenced_finding_ids=[],
+        clause_index=clause_index, workstreams_dir=tmp_path,
+        workstream_id=_WORKSTREAM, stream_fn=stub_stream,
+    ))
+
+    done = next(e for e in events if e["event"] == "done")
+    assert done["data"]["text"] == "Cites a hallucinated clause."
     assert "citations" not in done["data"]
-    assert "snippet_html" not in done["data"]
 
 
 def test_copilot_reply_stream_yields_error_event_on_stream_fn_exception(tmp_path):
@@ -541,48 +568,6 @@ def test_copilot_reply_stream_yields_error_event_on_stream_fn_exception(tmp_path
     assert "credentials" in error_events[0]["data"]["message"]
 
 
-def test_copilot_reply_stream_done_text_is_extracted_prose_not_raw_json(tmp_path):
-    """Regression coverage: in production `call_chat_stream` yields the
-    model's raw text chunks — which, per the system prompt, is a JSON
-    envelope like `{"text": ..., "citations": [...]}`, not bare prose. The
-    `done` event's `text` must be the JSON-extracted prose, never the raw
-    accumulated JSON string the tokens spelled out."""
-    clause_index = _clause_index({})
-    node = {"id": "n1", "title": "n1", "document_id": None}
-
-    def stub_stream(system, messages):
-        # Simulate a real model response: the raw wire text IS a JSON
-        # envelope, streamed chunk by chunk (here, as one chunk for
-        # simplicity — the accumulation behaves the same either way).
-        yield _json.dumps({"text": "Clean prose the user should see.", "citations": []})
-
-    events = _collect_sse(copilot_reply_stream(
-        node=node, intent="PD", history=[], message="hi",
-        referenced_finding_ids=[],
-        clause_index=clause_index, workstreams_dir=tmp_path,
-        workstream_id=_WORKSTREAM, stream_fn=stub_stream,
-    ))
-
-    done = next(e for e in events if e["event"] == "done")
-    assert done["data"]["text"] == "Clean prose the user should see."
-
-
-def test_copilot_reply_stream_done_has_no_citations_when_none_are_grounded(tmp_path):
-    clause_index = _clause_index({})
-    node = {"id": "n1", "title": "n1", "document_id": None}
-
-    def stub_stream(system, messages):
-        yield _json.dumps({
-            "text": "Cites a hallucinated clause.",
-            "citations": [{"clause_number": "MADE UP 99.9", "text": "fake"}],
-        })
-
-    events = _collect_sse(copilot_reply_stream(
-        node=node, intent="PD", history=[], message="hi",
-        referenced_finding_ids=[],
-        clause_index=clause_index, workstreams_dir=tmp_path,
-        workstream_id=_WORKSTREAM, stream_fn=stub_stream,
-    ))
-
-    done = next(e for e in events if e["event"] == "done")
-    assert "citations" not in done["data"]
+def test_intents_tuple_has_the_seven_presets():
+    assert len(INTENTS) == 7
+    assert "PD" in INTENTS
