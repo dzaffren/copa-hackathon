@@ -263,6 +263,8 @@ export interface CreateNodeRequest {
   source_url?: string | null;
   attachment_submission_id?: string | null;
   edges: CreateNodeEdge[];
+  /** Opt out of the server-side URL download + ingest of `source_url`. */
+  skip_ingest?: boolean;
 }
 
 export interface CreatedEdge {
@@ -387,6 +389,15 @@ export interface ChatMessage {
 export interface ChatHistoryTurn {
   role: "user" | "copilot";
   text: string;
+}
+
+/** The drafter's live editor state, sent with each Copilot message so the
+ *  Copilot can see what they are working on. `draftHtml` is the full current
+ *  draft (possibly unsaved); `selectionText` is the passage they have
+ *  highlighted, if any. Both are non-citable context server-side. */
+export interface CopilotDraftContext {
+  draftHtml: string;
+  selectionText: string;
 }
 
 /** Payload of the SSE `done` event from `POST .../copilot/stream`. */

@@ -9,11 +9,14 @@ Covers Acceptance Criteria:
 import re
 from pathlib import Path
 
+import httpx
 import pytest
 
+import engine.ingest as ingest
 from engine.ingest import (
     UnreadableDocumentError,
     ingest_document,
+    ingest_from_url,
     normalise_glyph_artifacts,
 )
 
@@ -165,6 +168,112 @@ def test_normalise_is_idempotent():
     twice = normalise_glyph_artifacts(once)
     assert once == "AI and AI and GenAI"
     assert twice == once
+
+
+# --- URL download + ingest (ingest_from_url) --------------------------------
+#
+# All HTTP is mocked by monkeypatching `httpx.get` to return (or raise from)
+# real `httpx.Response`/`httpx.HTTPError` objects, and the conversion is stubbed
+# with `_FakeConverter` — so these tests touch neither the network nor MarkItDown.
+
+
+def _stub_get(monkeypatch, response=None, exc=None):
+    """Point `engine.ingest.httpx.get` at a fake, capturing the requested URL."""
+    seen: dict[str, str] = {}
+
+    def fake_get(url, **kwargs):
+        seen["url"] = url
+        if exc is not None:
+            raise exc
+        return response
+
+    monkeypatch.setattr(ingest.httpx, "get", fake_get)
+    return seen
+
+
+def test_ingest_from_url_downloads_then_converts(monkeypatch):
+    """A 200 response is written to a tempfile and handed to the converter,
+    whose text is returned. The tempfile carries the URL's inferred suffix."""
+    url = "https://example.test/policy/doc.pdf"
+    response = httpx.Response(
+        200, request=httpx.Request("GET", url), content=b"%PDF-fake-bytes"
+    )
+    seen = _stub_get(monkeypatch, response=response)
+    fake = _FakeConverter("clean clause text")
+
+    text = ingest_from_url(url, converter=fake)
+
+    assert text == "clean clause text"
+    assert seen["url"] == url
+    # ingest_document was called with the downloaded tempfile, suffixed .pdf.
+    assert len(fake.converted) == 1
+    assert fake.converted[0].endswith(".pdf")
+
+
+def test_ingest_from_url_infers_docx_suffix(monkeypatch):
+    """A `.docx` URL lands on a `.docx` tempfile so MarkItDown dispatches to the
+    DOCX reader rather than the default `.pdf`."""
+    url = "https://example.test/guidance.docx"
+    response = httpx.Response(
+        200, request=httpx.Request("GET", url), content=b"PK\x03\x04fake-docx"
+    )
+    _stub_get(monkeypatch, response=response)
+    fake = _FakeConverter("docx clause text")
+
+    text = ingest_from_url(url, converter=fake)
+
+    assert text == "docx clause text"
+    assert fake.converted[0].endswith(".docx")
+
+
+def test_ingest_from_url_defaults_to_pdf_suffix_when_url_has_no_extension(
+    monkeypatch,
+):
+    """A URL with no file extension defaults to `.pdf`."""
+    url = "https://example.test/download?id=42"
+    response = httpx.Response(
+        200, request=httpx.Request("GET", url), content=b"%PDF-fake"
+    )
+    _stub_get(monkeypatch, response=response)
+    fake = _FakeConverter("text")
+
+    ingest_from_url(url, converter=fake)
+
+    assert fake.converted[0].endswith(".pdf")
+
+
+def test_ingest_from_url_raises_on_non_200(monkeypatch):
+    """A non-200 (here 404) surfaces as UnreadableDocumentError, not a raw
+    httpx error — the API turns this into a 422 for the client."""
+    url = "https://example.test/missing.pdf"
+    response = httpx.Response(404, request=httpx.Request("GET", url))
+    _stub_get(monkeypatch, response=response)
+
+    with pytest.raises(UnreadableDocumentError):
+        ingest_from_url(url, converter=_FakeConverter("unused"))
+
+
+def test_ingest_from_url_raises_on_network_error(monkeypatch):
+    """A transport-level failure (connection refused, DNS, timeout) is wrapped
+    as UnreadableDocumentError too."""
+    url = "https://unreachable.test/doc.pdf"
+    _stub_get(monkeypatch, exc=httpx.ConnectError("connection refused"))
+
+    with pytest.raises(UnreadableDocumentError):
+        ingest_from_url(url, converter=_FakeConverter("unused"))
+
+
+def test_ingest_from_url_propagates_empty_conversion_error(monkeypatch):
+    """A successful download whose conversion yields no text still raises
+    UnreadableDocumentError (propagated from ingest_document)."""
+    url = "https://example.test/blank.pdf"
+    response = httpx.Response(
+        200, request=httpx.Request("GET", url), content=b"%PDF-fake"
+    )
+    _stub_get(monkeypatch, response=response)
+
+    with pytest.raises(UnreadableDocumentError):
+        ingest_from_url(url, converter=_FakeConverter("   "))
 
 
 @pytest.mark.skipif(not AI_DP_PDF.exists(), reason="AI DP corpus PDF not present")

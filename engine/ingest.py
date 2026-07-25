@@ -19,9 +19,12 @@ extractor is used unchanged (no Azure dependency in CI / offline).
 """
 
 import re
+import tempfile
 from pathlib import Path
 from typing import Any, Optional, Union
+from urllib.parse import urlparse
 
+import httpx
 from markitdown import MarkItDown
 from markitdown._exceptions import MarkItDownException
 
@@ -161,3 +164,49 @@ def ingest_document(
         )
 
     return text
+
+
+def _suffix_for_url(url: str) -> str:
+    """Infer the on-disk suffix (`.pdf`/`.docx`) MarkItDown needs from the URL.
+
+    MarkItDown dispatches on file extension, so a downloaded document must land
+    on a tempfile with the right suffix. We read it from the URL path and
+    default to ``.pdf`` (the dominant format across BNM's published sources).
+    """
+    path = urlparse(url).path.lower()
+    if path.endswith(".docx"):
+        return ".docx"
+    return ".pdf"
+
+
+def ingest_from_url(url: str, converter: Optional[Any] = None) -> str:
+    """Download a document from ``url`` and convert it to clean markdown.
+
+    Infers a ``.pdf``/``.docx`` suffix from the URL (default ``.pdf``),
+    downloads the bytes to a tempfile, then delegates to ``ingest_document``
+    (passing ``converter`` through so tests inject a stub — no network into
+    MarkItDown, no Azure credentials). The tempfile is always removed.
+
+    Raises:
+        UnreadableDocumentError: on any download failure (non-200 status,
+            network error), or — propagated from ``ingest_document`` — if the
+            downloaded document yields no usable text.
+    """
+    try:
+        response = httpx.get(url, follow_redirects=True, timeout=30.0)
+        response.raise_for_status()
+    except httpx.HTTPError as exc:
+        raise UnreadableDocumentError(
+            f"Download of '{url}' failed: {exc}"
+        ) from exc
+
+    with tempfile.NamedTemporaryFile(
+        suffix=_suffix_for_url(url), delete=False
+    ) as tmp:
+        tmp.write(response.content)
+        tmp_path = Path(tmp.name)
+
+    try:
+        return ingest_document(tmp_path, converter)
+    finally:
+        tmp_path.unlink(missing_ok=True)

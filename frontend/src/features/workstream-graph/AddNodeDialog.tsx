@@ -56,6 +56,7 @@ export function AddNodeDialog({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [sourceUrl, setSourceUrl] = useState("");
+  const [autoIngest, setAutoIngest] = useState(true);
   const [edges, setEdges] = useState<EdgeRow[]>([]);
 
   const completeEdges = edges.filter((e) => e.target_node_id && e.edge_type);
@@ -66,6 +67,7 @@ export function AddNodeDialog({
     setTitle("");
     setDescription("");
     setSourceUrl("");
+    setAutoIngest(true);
     setEdges([]);
   }
 
@@ -80,6 +82,7 @@ export function AddNodeDialog({
           target_node_id: e.target_node_id,
           edge_type: e.edge_type as EdgeType,
         })),
+        ...(autoIngest ? {} : { skip_ingest: true }),
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -188,6 +191,23 @@ export function AddNodeDialog({
             />
           </label>
 
+          <label
+            className={cn(
+              "flex items-center gap-2 text-sm",
+              sourceUrl.trim() ? "" : "text-muted-foreground",
+            )}
+          >
+            <input
+              type="checkbox"
+              className="h-4 w-4 rounded border-border/70 accent-cyan-500"
+              checked={autoIngest}
+              disabled={!sourceUrl.trim()}
+              onChange={(e) => setAutoIngest(e.target.checked)}
+              aria-label="Auto-ingest document from URL"
+            />
+            <span>Auto-ingest document from URL</span>
+          </label>
+
           <label className="block text-sm">
             <span className="mb-1 block font-medium">Attachment</span>
             <input
@@ -280,7 +300,11 @@ export function AddNodeDialog({
             disabled={!canSubmit || mutation.isPending}
             onClick={() => mutation.mutate()}
           >
-            {mutation.isPending ? "Adding…" : "Add to graph"}
+            {mutation.isPending
+              ? sourceUrl.trim() && autoIngest
+                ? "Downloading & ingesting…"
+                : "Adding…"
+              : "Add to graph"}
           </Button>
         </DialogFooter>
       </DialogContent>
