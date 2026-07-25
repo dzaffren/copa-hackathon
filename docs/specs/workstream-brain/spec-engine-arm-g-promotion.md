@@ -2,7 +2,7 @@
 
 **Ticket:** TBD
 **Type:** Technical Epic
-**Experiment spec:** [Arm G — Coverage-aware composite finding flow](experiment-arm-g-coverage-flow.md)
+**Experiment spec:** [Arm G — Coverage-aware composite finding flow (retired experiment)](retired-experiment-arm-g-coverage-flow.md)
 
 Promotes the Arm G finding pipeline from an offline experiment into the live analyze engine, replacing the current single-pass pairwise approach with a smarter two-stage flow that correctly separates "both sides speak to this topic" findings from "only one side covers this" findings. At the same time, routes each processing step to the right-sized model — small and fast for extraction, mid-tier for judgment, large only for the one step that genuinely needs it — so the pipeline runs faster and costs a fraction of what it does today.
 

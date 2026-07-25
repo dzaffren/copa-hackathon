@@ -16,7 +16,7 @@ Without a widened anchor model, the finder→critic loop cannot cite anything on
 
 **Desired state:** the engine has an `AnchorIndex` that supersedes `ClauseIndex`, keyed by a stable `anchor_id` string that is always a verbatim substring of the source document's markdown. Three segmentation strategies dispatch by declared `doc_class`. Every citation stored on a `Connection` or `UnsupportedConnection` uses the widened `AnchorCitation` shape (`anchor_id`, `anchor_label`, `text`, `doc_class`). All existing BNM demo artefacts (`data/artifacts/clause-index.json`, all three `connection-trace-*.json` files) round-trip through the new index without content loss. The retired taxonomy trace still replays.
 
-**Trigger:** the workstream-brain epic's cross-jurisdiction demo commits to at least one non-BNM pair analysed end-to-end (SG MAS 637 × UK BoE Chapter 3). Without anchor segmentation, that pair cannot be ingested; without ingestion, the retrieval-pipeline story ([spec-engine-retrieval-pipeline.md](spec-engine-retrieval-pipeline.md)) has no input to run axis extraction over.
+**Trigger:** the workstream-brain epic's cross-jurisdiction demo commits to at least one non-BNM pair analysed end-to-end (SG MAS 637 × UK BoE Chapter 3). Without anchor segmentation, that pair cannot be ingested; without ingestion, the retrieval-pipeline story (the Arm G engine pipeline ([spec-engine-arm-g-promotion.md](spec-engine-arm-g-promotion.md))) has no input to run axis extraction over.
 
 ## Scope
 
@@ -29,7 +29,7 @@ Without a widened anchor model, the finder→critic loop cannot cite anything on
   - Preserve every existing BNM clause as a legal `Anchor` under `doc_class: "structured-rules"` — no BNM regression.
   - Preserve the retired taxonomy trace (twelve linkages) end-to-end under the widened schema.
 - **Out of scope:**
-  - Retrieval, axis extraction, or any change to the finder→critic loop's _logic_. Only the citation shape changes here. Retrieval-first pipeline is [spec-engine-retrieval-pipeline.md](spec-engine-retrieval-pipeline.md).
+  - Retrieval, axis extraction, or any change to the finder→critic loop's _logic_. Only the citation shape changes here. Retrieval-first pipeline is the Arm G engine pipeline ([spec-engine-arm-g-promotion.md](spec-engine-arm-g-promotion.md)).
   - Automated `doc_class` inference. Class is declared in the corpus manifest by whoever adds the document; no LLM detector.
   - Ingesting NZ, EU, US, ID from `data/corpus/temp/`. MVP1 demo is UK + HK + SG + BCBS; the other jurisdictions stay archived until v2.
   - UI changes. Downstream screens still render "cite: `{label}` — `{text}`"; the shape they read from the API just replaces `clause_number` with `anchor_label`.
