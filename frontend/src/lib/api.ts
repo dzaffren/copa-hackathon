@@ -2,6 +2,7 @@ import type {
   AnalyzeResponse,
   ChatHistoryTurn,
   Connection,
+  CopilotDraftContext,
   CopilotIntent,
   CopilotResponse,
   CreateNodeRequest,
@@ -271,6 +272,7 @@ export function sendCopilotMessage(
   message: string,
   history: ChatHistoryTurn[],
   referencedFindingIds: string[],
+  draftContext?: CopilotDraftContext,
 ): Promise<CopilotResponse> {
   // The server holds no conversation state (deliberately not persisted across
   // sessions), so the client sends the full prior history on every call.
@@ -281,6 +283,8 @@ export function sendCopilotMessage(
       message,
       history,
       referenced_finding_ids: referencedFindingIds,
+      draft_html: draftContext?.draftHtml,
+      draft_selection: draftContext?.selectionText,
     },
   );
 }
@@ -312,6 +316,7 @@ export async function* streamCopilotMessage(
   history: ChatHistoryTurn[],
   referencedFindingIds: string[],
   signal: AbortSignal,
+  draftContext?: CopilotDraftContext,
 ): AsyncGenerator<SSEEvent> {
   if (signal.aborted) throw abortError();
 
@@ -325,6 +330,8 @@ export async function* streamCopilotMessage(
         message,
         history,
         referenced_finding_ids: referencedFindingIds,
+        draft_html: draftContext?.draftHtml,
+        draft_selection: draftContext?.selectionText,
       }),
     },
   );

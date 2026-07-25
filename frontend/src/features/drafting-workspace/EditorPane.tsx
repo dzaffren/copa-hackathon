@@ -25,6 +25,11 @@ export interface EditorPaneHandle {
    *  the caller can persist it. Used by the Copilot's "Insert into draft" —
    *  the drafter picks where a suggested clause lands, not just append. */
   insertAtCursor: (html: string) => string | null;
+  /** The plain text the drafter currently has highlighted in the editor
+   *  (empty string when the selection is collapsed or outside the editor).
+   *  Sent to the Copilot as focused context so "suggestions on this part"
+   *  resolves to the highlighted passage. */
+  getSelectionText: () => string;
 }
 
 // Mirrors engine/drafts.py ALLOWED_TAGS/ALLOWED_ATTRS. This is a nicety, not a
@@ -131,6 +136,18 @@ export const EditorPane = forwardRef<EditorPaneHandle, EditorPaneProps>(
       const next = el.innerHTML;
       onChange(next);
       return next;
+    },
+    getSelectionText() {
+      // Read the last range saved inside the editor, not the live
+      // `window.getSelection()`: by the time the drafter has clicked into the
+      // Copilot input to ask their question, the browser selection points at
+      // that input, so only `savedRangeRef` (captured on the editor's
+      // mouseup/keyup/blur) still holds what they highlighted in the document.
+      const el = editorRef.current;
+      const range = savedRangeRef.current;
+      if (!el || !range || range.collapsed) return "";
+      if (!el.contains(range.commonAncestorContainer)) return "";
+      return range.toString().trim();
     },
   }));
 

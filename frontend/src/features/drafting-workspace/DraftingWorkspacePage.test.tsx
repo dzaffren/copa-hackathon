@@ -1,7 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { cleanup, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { http, HttpResponse } from "msw";
 import { renderApp } from "@/test/utils";
+import { server } from "@/test/msw/server";
 
 const DRAFT_URL = "/workstreams/opres-v2/tasks/opres-pd-v0-3/draft";
 const BCBS_EDGE = "e-opres_v0_3--bcbs_opres_2021";
@@ -180,6 +182,47 @@ describe("DraftingWorkspacePage — Copilot tab", () => {
     );
   });
 
+  it("renders the Copilot's Markdown as formatting, not raw asterisks", async () => {
+    const user = userEvent.setup();
+    await loadWorkspace();
+    await user.click(screen.getByRole("tab", { name: /Copilot/ }));
+
+    await user.type(screen.getByLabelText("Message the Copilot"), "hi");
+    await user.click(screen.getByRole("button", { name: "Send" }));
+
+    const copilot = await screen.findByTestId("chat-copilot");
+    // `**accountable-officer preamble**` in the reply becomes a <strong>, and
+    // the literal ** markers never reach the screen.
+    await waitFor(() => expect(copilot.querySelector("strong")).not.toBeNull());
+    expect(copilot).not.toHaveTextContent("**accountable-officer preamble**");
+  });
+
+  it("sends the drafter's live draft as context so the Copilot can see it", async () => {
+    const seen: Array<Record<string, unknown>> = [];
+    server.use(
+      http.post(
+        "*/api/workstreams/:workstreamId/tasks/:nodeId/copilot/stream",
+        async ({ request }) => {
+          seen.push((await request.json()) as Record<string, unknown>);
+          return new HttpResponse(
+            'event: token\ndata: {"t": "ok"}\n\nevent: done\ndata: {"text": "ok"}\n\n',
+            { status: 200, headers: { "Content-Type": "text/event-stream" } },
+          );
+        },
+      ),
+    );
+
+    const user = userEvent.setup();
+    await loadWorkspace();
+    await user.click(screen.getByRole("tab", { name: /Copilot/ }));
+    await user.type(screen.getByLabelText("Message the Copilot"), "suggestions?");
+    await user.click(screen.getByRole("button", { name: "Send" }));
+
+    await waitFor(() => expect(seen).toHaveLength(1));
+    // The seeded draft (which the workspace loaded) travels with the request.
+    expect(String(seen[0].draft_html)).toContain("at least annually");
+  });
+
   it("quotes RMiT 9.4 verbatim, with its clause number, on the snippet turn", async () => {
     const user = userEvent.setup();
     await loadWorkspace();
@@ -225,7 +268,7 @@ describe("DraftingWorkspacePage — inserting a Copilot snippet", () => {
     await screen.findByTestId("chat-copilot");
     await user.type(input, "go on");
     await user.click(screen.getByRole("button", { name: "Send" }));
-    return screen.findByRole("button", { name: "Insert into draft" });
+    return screen.findByRole("button", { name: /Insert at cursor/i });
   }
 
   it("puts the snippet in the editor, marked as generated", async () => {

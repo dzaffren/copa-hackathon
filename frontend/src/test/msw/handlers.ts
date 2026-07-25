@@ -764,7 +764,7 @@ const COPILOT_SCRIPT: Record<string, unknown[]> = {
   PD: [
     {
       role: "copilot",
-      text: "Hi Aisyah — I've loaded your accepted linkages and the OpRes DP feedback register. The draft has no §6.3 yet. Want me to draft the accountable-officer preamble that goes beyond RMiT?",
+      text: "Hi Aisyah, I've loaded your accepted linkages and the OpRes DP feedback register. The draft has no §6.3 yet. Want me to draft the **accountable-officer preamble** that goes beyond RMiT?",
     },
     {
       role: "copilot",
@@ -1420,7 +1420,7 @@ export const handlers = [
         sseBody += `event: token\ndata: ${JSON.stringify({ t: chunk })}\n\n`;
       }
 
-      const donePayload: Record<string, unknown> = {};
+      const donePayload: Record<string, unknown> = { text: reply.text };
       if (reply.citations) donePayload.citations = reply.citations;
       if (reply.snippet_html) donePayload.snippet_html = reply.snippet_html;
       sseBody += `event: done\ndata: ${JSON.stringify(donePayload)}\n\n`;

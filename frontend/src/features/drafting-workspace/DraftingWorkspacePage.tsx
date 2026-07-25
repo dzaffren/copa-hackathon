@@ -214,6 +214,10 @@ export function DraftingWorkspacePage() {
                 nodeId={nodeId}
                 onInsertSnippet={insertSnippet}
                 reviewedCards={reviewedCards}
+                getDraftContext={() => ({
+                  draftHtml: html ?? "",
+                  selectionText: editorRef.current?.getSelectionText() ?? "",
+                })}
               />
             )}
           </div>

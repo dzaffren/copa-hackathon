@@ -1,15 +1,19 @@
 import { useEffect, useRef, useState } from "react";
+import DOMPurify from "dompurify";
+import { FilePlus2, MousePointerClick } from "lucide-react";
 import { streamCopilotMessage } from "@/lib/api";
 import {
   COPILOT_INTENTS,
   COPILOT_INTENT_LABELS,
   type ChatMessage,
   type CopilotCitation,
+  type CopilotDraftContext,
   type CopilotIntent,
   type LinkageCard,
   type StreamingCopilotDone,
 } from "@/lib/types";
 import { AnalyzeProgressBar, COPILOT_STAGES } from "@/components/AnalyzeProgressBar";
+import { CopilotMarkdown } from "./CopilotMarkdown";
 import { MentionInput, parseMentions } from "./MentionInput";
 
 interface CopilotTabProps {
@@ -19,7 +23,22 @@ interface CopilotTabProps {
   /** The drafter's already-accepted findings for this task — the `@` mention
    *  dropdown's source list. */
   reviewedCards: LinkageCard[];
+  /** Reads the drafter's live editor content + current highlighted selection
+   *  at send time, so the Copilot can see what they are drafting and answer
+   *  "suggestions on this part". */
+  getDraftContext: () => CopilotDraftContext;
 }
+
+// The snippet preview is model-authored HTML. Sanitize before display with the
+// same tag set the editor accepts (mirrors EditorPane.PURIFY_CONFIG), so the
+// "Suggested addition" card can never render unsafe markup.
+const SNIPPET_PURIFY = {
+  ALLOWED_TAGS: [
+    "h1", "h2", "h3", "p", "strong", "em", "u", "ul", "ol", "li", "div",
+    "span", "br",
+  ],
+  ALLOWED_ATTR: ["class"],
+};
 
 type SendState = "idle" | "connecting" | "streaming";
 
@@ -41,6 +60,7 @@ export function CopilotTab({
   nodeId,
   onInsertSnippet,
   reviewedCards,
+  getDraftContext,
 }: CopilotTabProps) {
   const [intent, setIntent] = useState<CopilotIntent>("PD");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -75,6 +95,9 @@ export function CopilotTab({
     if (!trimmed || sendState !== "idle") return;
 
     const { referencedFindingIds } = parseMentions(trimmed, reviewedCards);
+    // Capture the drafter's live draft + highlighted selection at send time so
+    // the Copilot can see what they are working on ("suggestions on this part").
+    const draftContext = getDraftContext();
 
     // Append the user's message immediately.
     const historyForRequest = messages.map((m) => ({ role: m.role, text: m.text }));
@@ -99,6 +122,7 @@ export function CopilotTab({
         historyForRequest,
         referencedFindingIds,
         controller.signal,
+        draftContext,
       );
 
       for await (const evt of stream) {
@@ -189,7 +213,13 @@ export function CopilotTab({
                   : "bg-muted text-foreground",
               ].join(" ")}
             >
-              <p className="leading-snug">{m.text}</p>
+              {/* The user's own message stays plain text; the Copilot's reply
+                  is Markdown, so bold/lists/headings render as formatting. */}
+              {m.role === "user" ? (
+                <p className="leading-snug">{m.text}</p>
+              ) : (
+                <CopilotMarkdown>{m.text}</CopilotMarkdown>
+              )}
 
               {m.citations?.map((c: CopilotCitation) => (
                 <blockquote
@@ -207,22 +237,10 @@ export function CopilotTab({
               ))}
 
               {m.snippet_html && (
-                <div className="mt-2 rounded border border-cyan-400/30 bg-card/60 p-2">
-                  <div
-                    className="prose-sm max-h-40 overflow-y-auto text-[12px] [&_h2]:mt-0 [&_h2]:text-[11px] [&_h2]:font-bold [&_p]:mt-1"
-                    data-testid="copilot-snippet-preview"
-                    dangerouslySetInnerHTML={{ __html: m.snippet_html }}
-                  />
-                  <div className="mt-2 flex gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => onInsertSnippet(m.snippet_html!)}
-                      className="rounded bg-cyan-500 px-2 py-1 text-[11px] font-semibold text-slate-950 hover:bg-cyan-400"
-                    >
-                      Insert into draft
-                    </button>
-                  </div>
-                </div>
+                <SuggestionCard
+                  html={m.snippet_html}
+                  onInsert={() => onInsertSnippet(m.snippet_html!)}
+                />
               )}
             </div>
           </div>
@@ -232,7 +250,7 @@ export function CopilotTab({
         {isStreaming && streamingText && (
           <div data-testid="chat-copilot-streaming">
             <div className="max-w-[92%] rounded-lg bg-muted p-2.5 text-sm text-foreground">
-              <p className="leading-snug">{streamingText}</p>
+              <CopilotMarkdown>{streamingText}</CopilotMarkdown>
               <span className="ml-1 inline-block h-3 w-0.5 animate-pulse bg-current" />
             </div>
           </div>
@@ -267,6 +285,47 @@ export function CopilotTab({
           Send
         </button>
       </form>
+    </div>
+  );
+}
+
+/** A Copilot-proposed clause the drafter can drop into their document. Shows a
+ *  sanitized preview and inserts at the drafter's cursor on click (the drafter
+ *  first clicks where they want it in the draft, then presses Insert). */
+function SuggestionCard({
+  html,
+  onInsert,
+}: {
+  html: string;
+  onInsert: () => void;
+}) {
+  const clean = DOMPurify.sanitize(html, SNIPPET_PURIFY);
+  return (
+    <div
+      data-testid="copilot-suggestion"
+      className="mt-2 rounded-lg border border-cyan-400/40 bg-card/60 p-2"
+    >
+      <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-cyan-300">
+        <FilePlus2 className="h-3.5 w-3.5" />
+        Suggested addition to your draft
+      </p>
+      <div
+        className="max-h-40 overflow-y-auto rounded bg-background/40 p-2 text-[12px] leading-snug [&_h2]:mt-0 [&_h2]:text-[11px] [&_h2]:font-bold [&_h3]:text-[11px] [&_h3]:font-semibold [&_p]:mt-1"
+        data-testid="copilot-snippet-preview"
+        dangerouslySetInnerHTML={{ __html: clean }}
+      />
+      <button
+        type="button"
+        onClick={onInsert}
+        className="mt-2 flex items-center gap-1.5 rounded bg-cyan-500 px-2 py-1 text-[11px] font-semibold text-slate-950 hover:bg-cyan-400"
+      >
+        <MousePointerClick className="h-3.5 w-3.5" />
+        Insert at cursor
+      </button>
+      <p className="mt-1 text-[10px] leading-snug text-muted-foreground">
+        Click where you want it in your draft to place the cursor, then press
+        Insert at cursor.
+      </p>
     </div>
   );
 }
