@@ -206,29 +206,14 @@ def test_GET_related_linkages_404_when_node_is_not_a_task(tmp_path):
 # --- GET / PUT draft -------------------------------------------------------
 
 
-def test_GET_draft_returns_the_seeded_working_draft(tmp_path):
+def test_GET_draft_returns_the_blank_working_draft(tmp_path):
+    """The demo opens on a blank page: the drafter builds the PD from scratch
+    with the Copilot, so the seeded working draft ships empty."""
     client, _ = _make_client(tmp_path)
     body = client.get(f"/api/workstreams/{_OPRES}/tasks/{_TASK}/draft").json()
     assert body["node_id"] == _TASK
-    assert "<strong>5.3</strong>" in body["content_html"]
-    assert body["last_saved_at"] == "2026-07-13T14:30:00Z"
-
-
-def test_GET_draft_clauses_are_verbatim_from_the_findings_fixtures(tmp_path):
-    """The draft body quotes the same OpRes text the findings cite.
-
-    If the two drift, the review screen and the editor would show different words
-    for the same clause number — and one of them would be wrong.
-    """
-    client, dst = _make_client(tmp_path)
-    html = client.get(f"/api/workstreams/{_OPRES}/tasks/{_TASK}/draft").json()["content_html"]
-    findings = json.loads(
-        (dst / _OPRES / "findings" / "e-opres_v0_3--hkma_spm_or2.json").read_text(
-            encoding="utf-8"
-        )
-    )
-    clause_text = findings[0]["source_clauses"][0]["text"]
-    assert clause_text in html
+    assert body["content_html"] == ""
+    assert body["last_saved_at"] is None
 
 
 def test_GET_draft_is_blank_not_404_for_a_task_never_drafted(tmp_path):

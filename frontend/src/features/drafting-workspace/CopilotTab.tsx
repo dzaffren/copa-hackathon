@@ -1,174 +1,294 @@
-import { useEffect, useRef, useState } from "react";
-import DOMPurify from "dompurify";
-import { FilePlus2, MousePointerClick } from "lucide-react";
-import { streamCopilotMessage } from "@/lib/api";
+import { useRef, useState } from "react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  FilePlus2,
+  FileText,
+  Globe,
+  PenLine,
+  RotateCcw,
+  Send,
+} from "lucide-react";
 import {
   COPILOT_INTENTS,
   COPILOT_INTENT_LABELS,
-  type ChatMessage,
-  type CopilotCitation,
   type CopilotDraftContext,
   type CopilotIntent,
   type LinkageCard,
-  type StreamingCopilotDone,
 } from "@/lib/types";
-import { AnalyzeProgressBar, COPILOT_STAGES } from "@/components/AnalyzeProgressBar";
-import { CopilotMarkdown } from "./CopilotMarkdown";
-import { MentionInput, parseMentions } from "./MentionInput";
 
 interface CopilotTabProps {
   workstreamId: string;
   nodeId: string;
   onInsertSnippet: (html: string) => void;
-  /** The drafter's already-accepted findings for this task — the `@` mention
-   *  dropdown's source list. */
+  /** The drafter's already-accepted findings for this task. Retained on the
+   *  props contract; unused by this static demo panel. */
   reviewedCards: LinkageCard[];
-  /** Reads the drafter's live editor content + current highlighted selection
-   *  at send time, so the Copilot can see what they are drafting and answer
-   *  "suggestions on this part". */
+  /** Reads the drafter's live editor content + current highlighted selection.
+   *  Retained on the contract; unused by this static demo panel. */
   getDraftContext: () => CopilotDraftContext;
 }
 
-// The snippet preview is model-authored HTML. Sanitize before display with the
-// same tag set the editor accepts (mirrors EditorPane.PURIFY_CONFIG), so the
-// "Suggested addition" card can never render unsafe markup.
-const SNIPPET_PURIFY = {
-  ALLOWED_TAGS: [
-    "h1", "h2", "h3", "p", "strong", "em", "u", "ul", "ol", "li", "div",
-    "span", "br",
-  ],
-  ALLOWED_ATTR: ["class"],
+/** A canned Copilot reply. `snippet` is the HTML the drafter can drop into the
+ *  editor at their cursor; `followups` are suggested next prompts the Copilot
+ *  surfaces under its answer. */
+interface Reply {
+  title: string;
+  body: string;
+  snippet?: string;
+  followups?: string[];
+}
+
+type Turn = { role: "user"; text: string } | { role: "copilot"; reply: Reply };
+
+/** Status badge styling for a benchmark card. */
+const BADGE_STYLES: Record<string, string> = {
+  Aligned: "bg-emerald-500/15 text-emerald-300 border-emerald-400/30",
+  "Gap detected": "bg-amber-400/15 text-amber-300 border-amber-300/30",
+  Deviation: "bg-red-500/15 text-red-300 border-red-400/30",
 };
 
-type SendState = "idle" | "connecting" | "streaming";
+/** Finding-label pill styling, reusing the taxonomy's colours. */
+const TAG_STYLES: Record<string, string> = {
+  "conflicts-with": "bg-red-500/15 text-red-300 border-red-400/30",
+  "silent-on": "bg-amber-400/15 text-amber-300 border-amber-300/30",
+  "aligns-with": "bg-emerald-500/15 text-emerald-300 border-emerald-400/30",
+};
 
-/** The Drafting Copilot: a live Azure AI Foundry Claude chat, streamed token
- *  by token over SSE (`engine/copilot.py`'s `/copilot/stream` route), not a
- *  script.
- *
- * Every clause it quotes is re-grounded server-side — the citation
- * guardrail drops any citation not actually supplied to the model and
- * always re-quotes text from that grounded set, never the model's own echo.
- * Citations render as their own block precisely so a reviewer can tell an
- * assertion from a quotation at a glance. `@` in the message box references
- * an accepted finding (`reviewedCards`), grounding the model with that
- * finding's own verbatim clauses. Citations and any drafted snippet only
- * arrive on the stream's terminal `done` event, so the partial bubble shows
- * prose only — the committed message is what carries them. */
-export function CopilotTab({
-  workstreamId,
-  nodeId,
-  onInsertSnippet,
-  reviewedCards,
-  getDraftContext,
-}: CopilotTabProps) {
+// Reusable drafted clauses, grounded in the workstream's anchor documents.
+const GOV_SNIPPET =
+  "<h3>Governance &amp; Accountability</h3><p>The board shall approve the operational resilience framework and designate a single accountable officer responsible for its implementation, consistent with BCM PD 8.1–8.3 and Recovery Planning PD 12.3.</p>";
+const REPORTING_SNIPPET =
+  "<h3>Reporting Requirements</h3><p>A financial institution shall submit a semi-annual operational resilience self-assessment to the Bank, and notify the Bank without delay upon activation of any recovery or continuity plan.</p>";
+const CBF_SNIPPET =
+  "<h3>Critical Business Functions</h3><p>For the purposes of this policy, a critical business function is (a) an operational function whose disruption would materially impair the institution's delivery of critical operations; and (b) a function whose failure would disrupt the real economy or financial stability.</p>";
+const SCENARIO_SNIPPET =
+  "<h3>Scenario Testing</h3><p>A financial institution shall conduct scenario testing of its operational resilience arrangements at least annually, covering severe but plausible disruption scenarios.</p>";
+const OUTLINE_SNIPPET =
+  "<h3>Policy Document — Outline</h3><ul><li>1. Policy Objectives &amp; Legal Basis</li><li>2. Scope of Application</li><li>3. Governance &amp; Accountability</li><li>4. Critical Business Functions &amp; Impact Tolerance</li><li>5. Recovery &amp; Continuity Planning</li><li>6. Reporting &amp; Supervisory Submissions</li><li>7. Enforcement &amp; Supervisory Expectations</li></ul>";
+const RTO_SNIPPET =
+  "<h3>Recovery Time Objectives</h3><p>A financial institution shall establish recovery time and recovery point objectives for each critical business function, calibrated to its institution tier.</p>";
+const ENFORCE_SNIPPET =
+  "<h3>Enforcement &amp; Supervisory Expectations</h3><p>The Bank may take supervisory action on a tiered basis — advisory notice, formal direction, and financial penalty — proportionate to the severity of non-compliance.</p>";
+const GENERIC_SNIPPET =
+  "<h3>Draft clause</h3><p>A financial institution shall [state the obligation] in a manner proportionate to the nature, scale and complexity of its operations. Adapt this scaffold to the requirement you have in mind.</p>";
+
+/** The fake "smart" Copilot: matches the drafter's message against a few
+ *  keyword rules and tailors a reply — most carrying a snippet the drafter can
+ *  insert. Falls back to a generic drafting scaffold so every message gets a
+ *  usable answer. No model call. */
+function buildMockReply(input: string): Reply {
+  const t = input.toLowerCase();
+  const has = (...keys: string[]) => keys.some((k) => t.includes(k));
+
+  if (has("governance", "section 3", "accountab", "board")) {
+    return {
+      title: "Section 3 — Governance & Accountability",
+      body: "This section has the strongest clause coverage in your workstream. Here's a clause grounded in BCM PD 8.1–8.3 and Recovery Planning PD 12.3 — insert it and tailor the officer's title to your mandate.",
+      snippet: GOV_SNIPPET,
+      followups: ["Draft the scope section next", "Compare with MAS"],
+    };
+  }
+  if (has("report", "section 6", "submission", "notify")) {
+    return {
+      title: "Section 6 — Reporting Requirements",
+      body: "No existing clause covers supervisory reporting. Benchmarking MAS (semi-annual) and FSB (event-triggered) gives a defensible starting point — the drafted clause below combines both.",
+      snippet: REPORTING_SNIPPET,
+      followups: ["Add an enforcement section", "Summarise gaps"],
+    };
+  }
+  if (has("cbf", "critical business", "section 4", "reconcile", "definition")) {
+    return {
+      title: "Reconcile the CBF definition",
+      body: "BCM PD 9.7 frames CBFs by operational continuity; Recovery Planning PD 11.11 frames them by real-economy impact. UK PRA and MAS both resolved this with a two-tier definition — the clause below adopts the same approach.",
+      snippet: CBF_SNIPPET,
+      followups: ["Draft impact tolerance next", "Show full outline"],
+    };
+  }
+  if (has("scenario", "testing", "stress")) {
+    return {
+      title: "Scenario testing (BCBS Principle 5)",
+      body: "Neither connected document addresses scenario testing — a deviation from the BCBS baseline. Insert the clause below to close it.",
+      snippet: SCENARIO_SNIPPET,
+      followups: ["Draft Section 3 — Governance", "Compare with MAS"],
+    };
+  }
+  if (has("outline", "structure", "sections", "skeleton")) {
+    return {
+      title: "Recommended structure",
+      body: "Here's a seven-section structure for the Policy Document. Insert it as headings, then draft into each section.",
+      snippet: OUTLINE_SNIPPET,
+      followups: ["Draft Section 3 — Governance", "Summarise gaps"],
+    };
+  }
+  if (has("rto", "rpo", "recovery time", "recovery point", "target")) {
+    return {
+      title: "Recovery time & point objectives",
+      body: "Your draft is silent on quantitative recovery targets. MAS prescribes them by institution tier — the clause below follows that model.",
+      snippet: RTO_SNIPPET,
+      followups: ["Draft the CBF definition", "Compare with MAS"],
+    };
+  }
+  if (has("enforce", "section 7", "penalt", "sanction")) {
+    return {
+      title: "Section 7 — Enforcement",
+      body: "No clause evidence in your workstream. MAS uses a tiered model (advisory → direction → penalty) aligned with FSA 2013 powers — the clause below mirrors it.",
+      snippet: ENFORCE_SNIPPET,
+      followups: ["Draft the reporting section", "Show full outline"],
+    };
+  }
+  if (has("mas", "singapore")) {
+    return {
+      title: "Comparison with MAS",
+      body: "MAS is more prescriptive than your current draft: it sets RTO/RPO targets by institution tier and requires tiered enforcement. Consider borrowing MAS's quantitative targets for Section 4.",
+      followups: ["Draft RTO/RPO targets", "Draft Section 7 — Enforcement"],
+    };
+  }
+  if (has("gap", "missing", "cover")) {
+    return {
+      title: "Gap summary",
+      body: "Open gaps across your workstream:\n• CBF definition conflict (BCM PD 9.7 vs Recovery Planning PD 11.11)\n• Section 6 reporting — no clause evidence\n• Section 7 enforcement — no clause evidence\n• Scenario testing absent (BCBS Principle 5)\n• No RTO/RPO targets (MAS benchmark)",
+      followups: ["Draft Section 6 — Reporting", "Draft the CBF definition"],
+    };
+  }
+  return {
+    title: "Drafting help",
+    body: "I can help you draft that. Here's a clause scaffold grounded in the operational-resilience framework — insert it at your cursor and adapt the obligation to your requirement.",
+    snippet: GENERIC_SNIPPET,
+    followups: ["Show full outline", "Summarise gaps"],
+  };
+}
+
+/** How peer jurisdictions handle this policy area. Each is clickable and opens
+ *  a canned reply in the conversation. */
+const BENCHMARKS: Array<{
+  region: string;
+  name: string;
+  status: keyof typeof BADGE_STYLES;
+  desc: string;
+  prompt: string;
+  reply: Reply;
+}> = [
+  {
+    region: "UK",
+    name: "UK PRA — PS6/21",
+    status: "Aligned",
+    desc: "Board accountability & impact tolerance map to BCM PD 8.1–8.3",
+    prompt: "How does UK PRA PS6/21 compare?",
+    reply: {
+      title: "UK PRA — PS6/21 · Aligned",
+      body: "Your draft's board-accountability and impact-tolerance requirements map cleanly to UK PRA PS6/21. BCM PD 8.1–8.3 already covers this — no change needed.",
+      followups: ["Draft Section 3 — Governance", "Compare with MAS"],
+    },
+  },
+  {
+    region: "SG",
+    name: "MAS — BCM Guidelines",
+    status: "Gap detected",
+    desc: "Prescriptive RTO/RPO targets by tier — not yet in draft",
+    prompt: "How does MAS compare?",
+    reply: buildMockReply("mas"),
+  },
+  {
+    region: "HK",
+    name: "HKMA — SA-2 Module",
+    status: "Gap detected",
+    desc: "Annual self-certification to the regulator — no equivalent",
+    prompt: "How does HKMA SA-2 compare?",
+    reply: {
+      title: "HKMA — SA-2 Module · Gap detected",
+      body: "HKMA mandates an annual self-certification to the regulator. No equivalent obligation exists in your workstream — insert the attestation clause below.",
+      snippet:
+        "<h3>Annual Certification</h3><p>The accountable officer shall certify to the Bank annually that the institution's operational resilience arrangements remain adequate and effective.</p>",
+      followups: ["Draft Section 6 — Reporting", "Summarise gaps"],
+    },
+  },
+  {
+    region: "INT",
+    name: "BCBS — OpRes Principles 2021",
+    status: "Deviation",
+    desc: "Scenario testing (Principle 5) not addressed in either doc",
+    prompt: "How does BCBS OpRes Principles compare?",
+    reply: buildMockReply("scenario testing"),
+  },
+];
+
+/** Suggested next drafting actions. Each is clickable and opens a canned reply
+ *  in the conversation. */
+const SUGGESTIONS: Array<{
+  id: string;
+  Icon: typeof AlertTriangle;
+  iconClass: string;
+  title: string;
+  body: string;
+  tag: keyof typeof TAG_STYLES;
+  reply: Reply;
+}> = [
+  {
+    id: "cbf",
+    Icon: AlertTriangle,
+    iconClass: "text-red-300",
+    title: "Reconcile CBF definition conflict",
+    body: "BCM PD 9.7 and Recovery Planning PD 11.11 define Critical Business Functions differently.",
+    tag: "conflicts-with",
+    reply: buildMockReply("reconcile cbf"),
+  },
+  {
+    id: "sec6",
+    Icon: FileText,
+    iconClass: "text-amber-300",
+    title: "Draft Section 6 — Reporting Requirements",
+    body: "No clause evidence in workstream. Consider the MAS semi-annual reporting model.",
+    tag: "silent-on",
+    reply: buildMockReply("section 6 reporting"),
+  },
+  {
+    id: "sec3",
+    Icon: CheckCircle2,
+    iconClass: "text-emerald-300",
+    title: "Section 3 ready to draft",
+    body: "Governance & Accountability has strong clause coverage from BCM PD 8.1–8.3.",
+    tag: "aligns-with",
+    reply: buildMockReply("section 3 governance"),
+  },
+];
+
+/** Quick-prompt chips, always available above the message box. */
+const CHIPS = [
+  "Summarise gaps",
+  "Show full outline",
+  "Compare with MAS",
+  "Draft Section 3",
+];
+
+export function CopilotTab({ onInsertSnippet }: CopilotTabProps) {
   const [intent, setIntent] = useState<CopilotIntent>("PD");
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
-  const [sendState, setSendState] = useState<SendState>("idle");
-  const [streamingText, setStreamingText] = useState<string>("");
-  const [errorText, setErrorText] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  // AbortController ref — aborts the in-flight stream when the user
-  // changes intent, the component unmounts, or a new send starts.
-  const abortRef = useRef<AbortController | null>(null);
-
-  // Cancel any in-flight stream when the component unmounts.
-  useEffect(() => {
-    return () => abortRef.current?.abort();
-  }, []);
-
-  function changeIntent(next: CopilotIntent) {
-    abortRef.current?.abort();
-    abortRef.current = null;
-    setSendState("idle");
-    setStreamingText("");
-    setErrorText(null);
-    setIntent(next);
-    // A fresh intent framing deserves a fresh thread — keeping old turns
-    // would mix system-prompt framings the model never actually saw together.
-    setMessages([]);
+  function ask(prompt: string, reply: Reply) {
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", text: prompt },
+      { role: "copilot", reply },
+    ]);
+    // Jump to the newest turn on the next frame.
+    requestAnimationFrame(() => {
+      const el = scrollRef.current;
+      if (el) el.scrollTop = el.scrollHeight;
+    });
   }
 
-  async function submit(text: string) {
-    const trimmed = text.trim();
-    if (!trimmed || sendState !== "idle") return;
-
-    const { referencedFindingIds } = parseMentions(trimmed, reviewedCards);
-    // Capture the drafter's live draft + highlighted selection at send time so
-    // the Copilot can see what they are working on ("suggestions on this part").
-    const draftContext = getDraftContext();
-
-    // Append the user's message immediately.
-    const historyForRequest = messages.map((m) => ({ role: m.role, text: m.text }));
-    setMessages((prev) => [...prev, { role: "user", text: trimmed }]);
+  function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const text = input.trim();
+    if (!text) return;
     setInput("");
-    setErrorText(null);
-    setStreamingText("");
-    setSendState("connecting");
-
-    const controller = new AbortController();
-    abortRef.current = controller;
-
-    let accumulated = "";
-    let donePayload: StreamingCopilotDone | null = null;
-
-    try {
-      const stream = streamCopilotMessage(
-        workstreamId,
-        nodeId,
-        intent,
-        trimmed,
-        historyForRequest,
-        referencedFindingIds,
-        controller.signal,
-        draftContext,
-      );
-
-      for await (const evt of stream) {
-        if (evt.event === "token") {
-          accumulated += evt.data.t;
-          setSendState("streaming");
-          setStreamingText(accumulated);
-        } else if (evt.event === "done") {
-          donePayload = evt.data;
-        } else if (evt.event === "error") {
-          setErrorText(evt.data.message || "The Copilot failed to reply.");
-          setSendState("idle");
-          setStreamingText("");
-          return;
-        }
-      }
-
-      // Stream finished cleanly — commit the full message. Prefer the
-      // done event's extracted prose (`text`) over the raw accumulated
-      // token buffer: in production the tokens spell out the model's raw
-      // JSON envelope, not clean prose, so `accumulated` is only a safe
-      // fallback when the server genuinely had no JSON to extract from.
-      const fullMessage: ChatMessage = {
-        role: "copilot",
-        text: donePayload?.text || accumulated || "No matching clause found",
-        citations: donePayload?.citations,
-        snippet_html: donePayload?.snippet_html,
-      };
-      setMessages((prev) => [...prev, fullMessage]);
-    } catch (err: unknown) {
-      if (err instanceof Error && err.name === "AbortError") {
-        // Intentional cancel (intent change / unmount) — silent.
-      } else {
-        const msg = err instanceof Error ? err.message : "The Copilot failed to reply.";
-        setErrorText(msg);
-      }
-    } finally {
-      setSendState("idle");
-      setStreamingText("");
-      abortRef.current = null;
-    }
+    ask(text, buildMockReply(text));
   }
 
-  const isPending = sendState !== "idle";
-  const isConnecting = sendState === "connecting";
-  const isStreaming = sendState === "streaming";
+  const started = messages.length > 0;
 
   return (
     <div className="flex h-full flex-col" data-testid="copilot-tab">
@@ -177,8 +297,8 @@ export function CopilotTab({
         <select
           aria-label="Intent preset"
           value={intent}
-          onChange={(e) => changeIntent(e.target.value as CopilotIntent)}
-          className="w-full rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-primary/60"
+          onChange={(e) => setIntent(e.target.value as CopilotIntent)}
+          className="w-full rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-cyan-400/60"
         >
           {COPILOT_INTENTS.map((i) => (
             <option key={i} value={i}>
@@ -189,143 +309,191 @@ export function CopilotTab({
       </label>
 
       <div
-        className="flex-1 space-y-3 overflow-y-auto px-1"
+        ref={scrollRef}
+        className="flex-1 space-y-4 overflow-y-auto px-1 pb-2"
         aria-label="Copilot conversation"
       >
-        {messages.length === 0 && !isStreaming && (
-          <p className="rounded-lg bg-muted/40 p-3 text-sm text-muted-foreground">
-            Ask the Copilot for a preamble, a section skeleton, or an FAQ
-            answer. It only quotes clauses it can cite.
-          </p>
-        )}
+        {!started ? (
+          <>
+            {/* Header */}
+            <div className="space-y-0.5">
+              <h3 className="px-1 text-sm font-semibold text-foreground">
+                Copilot suggestions based on your workstream
+              </h3>
+              <p className="px-1 text-xs text-muted-foreground">
+                BCM PD (19 Dec 2022) · Recovery Planning PD v0.1 · 2 anchor
+                documents
+              </p>
+            </div>
 
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            data-testid={`chat-${m.role}`}
-            className={m.role === "user" ? "flex justify-end" : ""}
-          >
-            <div
-              className={[
-                "max-w-[92%] rounded-lg p-2.5 text-sm",
-                m.role === "user"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-foreground",
-              ].join(" ")}
+            {/* Global benchmarks */}
+            <section className="space-y-2">
+              <h4 className="flex items-center gap-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <Globe className="h-3.5 w-3.5" />
+                Global Benchmarks
+              </h4>
+              <div className="grid grid-cols-2 gap-2">
+                {BENCHMARKS.map((b) => (
+                  <button
+                    key={b.name}
+                    type="button"
+                    onClick={() => ask(b.prompt, b.reply)}
+                    className="rounded-xl border border-border/60 bg-muted/30 p-2.5 text-left transition hover:border-cyan-400/60 hover:bg-cyan-500/10"
+                  >
+                    <div className="mb-1 flex items-center gap-1.5">
+                      <span className="rounded bg-background/60 px-1 py-0.5 text-[9px] font-bold tracking-wide text-muted-foreground">
+                        {b.region}
+                      </span>
+                      <span className="text-xs font-medium leading-tight text-foreground">
+                        {b.name}
+                      </span>
+                    </div>
+                    <span
+                      className={[
+                        "inline-block rounded-full border px-1.5 py-0.5 text-[9px] font-semibold",
+                        BADGE_STYLES[b.status],
+                      ].join(" ")}
+                    >
+                      {b.status}
+                    </span>
+                    <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">
+                      {b.desc}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            {/* Suggested next actions */}
+            <section className="space-y-2">
+              <h4 className="flex items-center gap-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <PenLine className="h-3.5 w-3.5" />
+                Suggested next actions
+              </h4>
+              <div className="space-y-2">
+                {SUGGESTIONS.map((s) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => ask(s.title, s.reply)}
+                    className="block w-full rounded-xl border border-border/60 bg-muted/30 p-2.5 text-left transition hover:border-cyan-400/60 hover:bg-cyan-500/10"
+                  >
+                    <div className="mb-1 flex items-center justify-between gap-2">
+                      <span className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+                        <s.Icon
+                          className={`h-3.5 w-3.5 shrink-0 ${s.iconClass}`}
+                        />
+                        {s.title}
+                      </span>
+                      <span
+                        className={[
+                          "shrink-0 rounded-full border px-1.5 py-0.5 text-[9px] font-semibold",
+                          TAG_STYLES[s.tag],
+                        ].join(" ")}
+                      >
+                        {s.tag}
+                      </span>
+                    </div>
+                    <p className="text-[11px] leading-snug text-muted-foreground">
+                      {s.body}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </section>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={() => setMessages([])}
+              className="flex items-center gap-1.5 px-1 text-[11px] font-medium text-muted-foreground hover:text-foreground"
             >
-              {/* The user's own message stays plain text; the Copilot's reply
-                  is Markdown, so bold/lists/headings render as formatting. */}
-              {m.role === "user" ? (
-                <p className="leading-snug">{m.text}</p>
+              <RotateCcw className="h-3 w-3" />
+              New chat
+            </button>
+
+            {messages.map((m, i) =>
+              m.role === "user" ? (
+                <div key={i} data-testid="chat-user" className="flex justify-end">
+                  <p className="max-w-[85%] rounded-lg bg-cyan-500 px-2.5 py-1.5 text-sm leading-snug text-slate-950">
+                    {m.text}
+                  </p>
+                </div>
               ) : (
-                <CopilotMarkdown>{m.text}</CopilotMarkdown>
-              )}
-
-              {m.citations?.map((c: CopilotCitation) => (
-                <blockquote
-                  key={c.clause_number}
-                  data-testid="copilot-citation"
-                  className="mt-2 border-l-2 border-gray-400 bg-card/70 py-1 pl-2"
+                <div
+                  key={i}
+                  data-testid="chat-copilot"
+                  className="rounded-xl border border-border/60 bg-muted/30 p-3"
                 >
-                  <p className="font-mono text-[10px] font-semibold text-muted-foreground">
-                    {c.clause_number}
+                  <p className="mb-1 text-sm font-semibold text-foreground">
+                    {m.reply.title}
                   </p>
-                  <p className="text-[12px] italic leading-snug text-foreground">
-                    &ldquo;{c.text}&rdquo;
+                  <p className="whitespace-pre-line text-xs leading-relaxed text-muted-foreground">
+                    {m.reply.body}
                   </p>
-                </blockquote>
-              ))}
-
-              {m.snippet_html && (
-                <SuggestionCard
-                  html={m.snippet_html}
-                  onInsert={() => onInsertSnippet(m.snippet_html!)}
-                />
-              )}
-            </div>
-          </div>
-        ))}
-
-        {/* Partial message bubble while streaming */}
-        {isStreaming && streamingText && (
-          <div data-testid="chat-copilot-streaming">
-            <div className="max-w-[92%] rounded-lg bg-muted p-2.5 text-sm text-foreground">
-              <CopilotMarkdown>{streamingText}</CopilotMarkdown>
-              <span className="ml-1 inline-block h-3 w-0.5 animate-pulse bg-current" />
-            </div>
-          </div>
+                  {m.reply.snippet && (
+                    <button
+                      type="button"
+                      onClick={() => onInsertSnippet(m.reply.snippet!)}
+                      className="mt-2.5 flex items-center gap-1.5 rounded-md bg-cyan-500 px-2.5 py-1 text-xs font-semibold text-slate-950 hover:bg-cyan-400"
+                    >
+                      <FilePlus2 className="h-3.5 w-3.5" />
+                      Insert at cursor
+                    </button>
+                  )}
+                  {m.reply.followups && m.reply.followups.length > 0 && (
+                    <div className="mt-2.5 flex flex-wrap gap-1.5">
+                      {m.reply.followups.map((f) => (
+                        <button
+                          key={f}
+                          type="button"
+                          onClick={() => ask(f, buildMockReply(f))}
+                          className="rounded-full border border-border/60 px-2 py-0.5 text-[11px] text-muted-foreground transition hover:border-cyan-400/60 hover:text-cyan-300"
+                        >
+                          {f}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ),
+            )}
+          </>
         )}
-
-        {/* Progress bar only while connecting (before first token) */}
-        {isConnecting && (
-          <AnalyzeProgressBar isPending={true} stages={COPILOT_STAGES} />
-        )}
-
-        {errorText && <p className="text-xs text-red-600">{errorText}</p>}
       </div>
 
-      <form
-        className="mt-2 flex gap-1.5 px-1"
-        onSubmit={(e) => {
-          e.preventDefault();
-          submit(input);
-        }}
-      >
-        <MentionInput
-          value={input}
-          onChange={setInput}
-          cards={reviewedCards}
-          disabled={isPending}
-        />
-        <button
-          type="submit"
-          disabled={isPending}
-          className="rounded-md bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-        >
-          Send
-        </button>
-      </form>
-    </div>
-  );
-}
-
-/** A Copilot-proposed clause the drafter can drop into their document. Shows a
- *  sanitized preview and inserts at the drafter's cursor on click (the drafter
- *  first clicks where they want it in the draft, then presses Insert). */
-function SuggestionCard({
-  html,
-  onInsert,
-}: {
-  html: string;
-  onInsert: () => void;
-}) {
-  const clean = DOMPurify.sanitize(html, SNIPPET_PURIFY);
-  return (
-    <div
-      data-testid="copilot-suggestion"
-      className="mt-2 rounded-lg border border-primary/40 bg-card/60 p-2"
-    >
-      <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-primary">
-        <FilePlus2 className="h-3.5 w-3.5" />
-        Suggested addition to your draft
-      </p>
-      <div
-        className="max-h-40 overflow-y-auto rounded bg-background/40 p-2 text-[12px] leading-snug [&_h2]:mt-0 [&_h2]:text-[11px] [&_h2]:font-bold [&_h3]:text-[11px] [&_h3]:font-semibold [&_p]:mt-1"
-        data-testid="copilot-snippet-preview"
-        dangerouslySetInnerHTML={{ __html: clean }}
-      />
-      <button
-        type="button"
-        onClick={onInsert}
-        className="mt-2 flex items-center gap-1.5 rounded bg-primary px-2 py-1 text-[11px] font-semibold text-primary-foreground hover:bg-primary/90"
-      >
-        <MousePointerClick className="h-3.5 w-3.5" />
-        Insert at cursor
-      </button>
-      <p className="mt-1 text-[10px] leading-snug text-muted-foreground">
-        Click where you want it in your draft to place the cursor, then press
-        Insert at cursor.
-      </p>
+      {/* Footer: quick prompts + message box */}
+      <div className="mt-2 space-y-1.5 px-1">
+        <div className="flex flex-wrap gap-1.5">
+          {CHIPS.map((chip) => (
+            <button
+              key={chip}
+              type="button"
+              onClick={() => ask(chip, buildMockReply(chip))}
+              className="rounded-full border border-border/60 px-2 py-0.5 text-xs text-muted-foreground transition hover:border-cyan-400/60 hover:text-cyan-300"
+            >
+              {chip}
+            </button>
+          ))}
+        </div>
+        <form className="flex gap-1.5" onSubmit={onSubmit}>
+          <input
+            aria-label="Message the Copilot"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask the Copilot to draft or compare…"
+            className="min-w-0 flex-1 rounded-md border border-border/60 bg-background/60 px-2.5 py-1.5 text-sm outline-none focus:border-cyan-400/60"
+          />
+          <button
+            type="submit"
+            aria-label="Send"
+            className="flex items-center gap-1 rounded-md bg-cyan-500 px-3 py-1.5 text-sm font-semibold text-slate-950 hover:bg-cyan-400"
+          >
+            <Send className="h-3.5 w-3.5" />
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
