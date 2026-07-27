@@ -74,20 +74,25 @@ def test_POST_creates_a_workstream_and_returns_201(tmp_path):
     assert body["created_at"].endswith("Z")
 
 
-def test_POST_writes_workstream_json_and_an_empty_graph(tmp_path):
-    """The graph must exist: every read path treats a missing graph.json as
-    WORKSTREAM_NOT_FOUND, and the form sends the user straight there."""
+def test_POST_writes_workstream_json_and_seeds_one_focal_task_node(tmp_path):
+    """The graph must exist (every read path treats a missing graph.json as
+    WORKSTREAM_NOT_FOUND) and now opens with exactly one focal task node so the
+    first added document has an anchor to connect to."""
     client, dst = _make_client(tmp_path)
     ws_id = _create(client).json()["id"]
 
     meta = json.loads((dst / ws_id / "workstream.json").read_text(encoding="utf-8"))
     graph = json.loads((dst / ws_id / "graph.json").read_text(encoding="utf-8"))
     assert meta["name"] == VALID["name"]
-    assert graph == {"nodes": [], "edges": []}
+    assert len(graph["nodes"]) == 1
+    assert graph["nodes"][0]["node_type"] == "task"
+    assert graph["edges"] == []
+    assert meta["primary_task_id"] == graph["nodes"][0]["id"]
 
 
 def test_POST_new_workstream_is_immediately_loadable_by_the_graph_route(tmp_path):
-    """The round trip the form actually performs: create, then land on it."""
+    """The round trip the form actually performs: create, then land on it —
+    now centred on the seeded focal node."""
     client, _ = _make_client(tmp_path)
     ws_id = _create(client).json()["id"]
 
@@ -95,9 +100,72 @@ def test_POST_new_workstream_is_immediately_loadable_by_the_graph_route(tmp_path
 
     assert res.status_code == 200
     body = res.json()
-    assert body["nodes"] == []
+    assert len(body["nodes"]) == 1
     assert body["edges"] == []
-    assert body["primary_task_id"] is None
+    assert body["primary_task_id"] == body["nodes"][0]["id"]
+
+
+# --- Focal task node on create (workstream-brain-live-build) ----------------
+
+
+def _graph(dst, ws_id):
+    return json.loads((dst / ws_id / "graph.json").read_text(encoding="utf-8"))
+
+
+def test_POST_focal_node_id_equals_primary_task_id(tmp_path):
+    """primary_task_id points at the seeded focal node in both the 201 body and
+    workstream.json, and matches the sole graph node's id."""
+    client, dst = _make_client(tmp_path)
+    body = _create(client).json()
+    ws_id = body["id"]
+
+    graph = _graph(dst, ws_id)
+    meta = json.loads((dst / ws_id / "workstream.json").read_text(encoding="utf-8"))
+    assert body["primary_task_id"] is not None
+    assert body["primary_task_id"] == meta["primary_task_id"]
+    assert body["primary_task_id"] == graph["nodes"][0]["id"]
+
+
+def test_POST_focal_node_title_reflects_name_and_deliverable_type(tmp_path):
+    client, dst = _make_client(tmp_path)
+    ws_id = _create(
+        client, name="Open Finance ED response", deliverable_type="ED"
+    ).json()["id"]
+    node = _graph(dst, ws_id)["nodes"][0]
+    assert node["title"] == "Open Finance ED response (ED)"
+    assert node["id"] == "open-finance-ed-response-ed"
+
+
+def test_POST_focal_node_carries_no_document(tmp_path):
+    client, dst = _make_client(tmp_path)
+    body = _create(client, name="Climate Risk DP", deliverable_type="DP").json()
+    ws_id = body["id"]
+    node = _graph(dst, ws_id)["nodes"][0]
+    assert "document_id" not in node
+
+    detail = client.get(f"/api/workstreams/{ws_id}/nodes/{node['id']}")
+    assert detail.status_code == 200
+
+
+@pytest.mark.parametrize(
+    "name, type_code",
+    [
+        ("Operational Resilience PD v0.3", "PD"),
+        ("Open Finance ED response", "ED"),
+        ("Climate Risk DP", "DP"),
+        ("Supervisory Notes compilation", "Other"),
+    ],
+)
+def test_POST_seeds_exactly_one_focal_node_per_deliverable_type(
+    tmp_path, name, type_code
+):
+    client, dst = _make_client(tmp_path)
+    ws_id = _create(client, name=name, deliverable_type=type_code).json()["id"]
+    nodes = _graph(dst, ws_id)["nodes"]
+    assert len(nodes) == 1
+    assert nodes[0]["node_type"] == "task"
+    assert nodes[0]["title"].endswith(f"({type_code})")
+    assert "document_id" not in nodes[0]
 
 
 def test_POST_new_workstream_appears_in_the_sidebar_list_with_a_role(tmp_path):
@@ -184,7 +252,11 @@ def test_POST_name_that_slugifies_to_nothing_still_gets_an_id(tmp_path):
             "TARGET_PUBLICATION_TOO_LONG",
             "target_publication",
         ),
-        ({"deliverable_type": "Manifesto"}, "INVALID_DELIVERABLE_TYPE", "deliverable_type"),
+        (
+            {"deliverable_type": "Manifesto"},
+            "INVALID_DELIVERABLE_TYPE",
+            "deliverable_type",
+        ),
         ({"deliverable_type": _OMIT}, "INVALID_DELIVERABLE_TYPE", "deliverable_type"),
         ({"access": "everyone"}, "INVALID_ACCESS", "access"),
         ({"access": _OMIT}, "INVALID_ACCESS", "access"),
@@ -232,7 +304,9 @@ def test_POST_does_not_touch_the_committed_fixture_store(tmp_path):
     """The real data/workstreams/ gains nothing from a test run."""
     client, _ = _make_client(tmp_path)
     _create(client)
-    real = {p.name for p in (REPO_ROOT / "data" / "workstreams").iterdir() if p.is_dir()}
+    real = {
+        p.name for p in (REPO_ROOT / "data" / "workstreams").iterdir() if p.is_dir()
+    }
     assert "climate-risk-pd-v2-2026" not in real
 
 

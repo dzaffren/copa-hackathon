@@ -44,6 +44,7 @@ EDGE_TYPES: frozenset[str] = frozenset(
     {"supersedes", "references", "contributes-to", "parallel-to"}
 )
 
+
 def workstream_dir(root: Union[str, Path], workstream_id: str) -> Path:
     """The on-disk directory for one workstream."""
     return Path(root) / workstream_id
@@ -61,7 +62,9 @@ def _write_json(path: Path, payload: Any) -> None:
     )
 
 
-def load_workstream(root: Union[str, Path], workstream_id: str) -> Optional[dict[str, Any]]:
+def load_workstream(
+    root: Union[str, Path], workstream_id: str
+) -> Optional[dict[str, Any]]:
     """Load `workstream.json`, or `None` when the workstream is unknown."""
     path = workstream_dir(root, workstream_id) / "workstream.json"
     return _read_json(path) if path.exists() else None
@@ -73,7 +76,9 @@ def load_graph(root: Union[str, Path], workstream_id: str) -> Optional[dict[str,
     return _read_json(path) if path.exists() else None
 
 
-def save_graph(root: Union[str, Path], workstream_id: str, graph: dict[str, Any]) -> None:
+def save_graph(
+    root: Union[str, Path], workstream_id: str, graph: dict[str, Any]
+) -> None:
     """Persist `graph.json` (UTF-8)."""
     _write_json(workstream_dir(root, workstream_id) / "graph.json", graph)
 
@@ -316,28 +321,46 @@ def create_workstream(
 ) -> dict[str, Any]:
     """Scaffold a new workstream on disk and return its record.
 
-    Writes `workstream.json` plus an empty `graph.json`, because every read path
-    treats a missing graph.json as "workstream not found" — a workstream without
-    one would 404 the instant the user landed on it, which is exactly where the
-    form sends them.
+    Writes `workstream.json` plus a `graph.json` seeded with a single focal
+    `task` node — the drafter's own working draft. The graph must exist (every
+    read path treats a missing graph.json as "workstream not found"), and it
+    opens with the focal node so the first document added has an anchor to
+    connect to (add-node requires ≥1 edge to an existing node). The focal node
+    carries no `document_id`, so it is the expected non-analysable starting
+    state until documents are added and connected.
 
     Assumes `body` already passed `validate_workstream_create`.
     """
     root = Path(root)
-    existing = {p.name for p in root.iterdir() if p.is_dir()} if root.exists() else set()
-    ws_id = make_workstream_id(body["name"].strip(), existing)
+    existing = (
+        {p.name for p in root.iterdir() if p.is_dir()} if root.exists() else set()
+    )
+    name = body["name"].strip()
+    ws_id = make_workstream_id(name, existing)
+
+    # The focal node's identity comes from the workstream itself — its title is
+    # the name plus the deliverable-type code, and the drafter never names it
+    # separately. `node_type` must be "task": primary_task_id/primary_subgraph
+    # and the Task Screen all key off it. No document_id — the draft starts empty.
+    focal_title = f"{name} ({body['deliverable_type']})"
+    focal_id = make_node_id(focal_title, set())
+    focal_node: dict[str, Any] = {
+        "id": focal_id,
+        "node_type": "task",
+        "title": focal_title,
+        "description": (body.get("description") or "").strip() or None,
+        "source_url": None,
+    }
 
     record: dict[str, Any] = {
         "id": ws_id,
-        "name": body["name"].strip(),
+        "name": name,
         "deliverable_type": DELIVERABLE_TYPES[body["deliverable_type"]],
         # Anything you create, you own — which is also what makes the sidebar's
         # role badge render.
         "role": "own",
         "description": (body.get("description") or "").strip() or None,
-        # No task node exists yet; the graph screen falls back to the first task
-        # it finds, and an empty graph has none. Explicitly null beats absent.
-        "primary_task_id": None,
+        "primary_task_id": focal_id,
         "target_publication": (body.get("target_publication") or "").strip() or None,
         "owner": owner,
         "reviewers": reviewers,
@@ -345,7 +368,7 @@ def create_workstream(
         "created_at": created_at,
     }
     _write_json(root / ws_id / "workstream.json", record)
-    _write_json(root / ws_id / "graph.json", {"nodes": [], "edges": []})
+    _write_json(root / ws_id / "graph.json", {"nodes": [focal_node], "edges": []})
     return record
 
 
