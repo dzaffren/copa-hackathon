@@ -100,7 +100,7 @@ def test_GET_node_detail_concepts_placeholder_when_not_enriched(tmp_path):
     MVP1 placeholder — never an error, never a guess."""
     client, _ = _make_client(tmp_path)
     body = client.get(f"/api/workstreams/{_OPRES}/nodes/bcbs-opres-2021").json()
-    assert body["concepts"] == {
+    assert body["metadata"] == {
         "status": "placeholder",
         "message": "Concept extraction not enabled in MVP1",
     }
@@ -114,14 +114,14 @@ def test_GET_node_detail_concepts_available_when_offline_enriched(tmp_path):
     owner is reused verbatim rather than re-derived."""
     client, _ = _make_client(tmp_path)
     body = client.get(f"/api/workstreams/{_OPRES}/nodes/{_TASK}").json()
-    assert body["concepts"]["status"] == "available"
-    assert body["concepts"]["policy_owner"] == "Aisyah R."
-    assert body["concepts"]["empowerment_framework"] == (
+    assert body["metadata"]["status"] == "available"
+    assert body["metadata"]["policy_owner"] == "Aisyah R."
+    assert body["metadata"]["empowerment_framework"] == (
         "This policy document is issued pursuant to section 143(2) of the "
         "Financial Services Act 2013."
     )
     # A field the enrichment script could not honestly derive stays null.
-    assert body["concepts"]["applicability"] is None
+    assert body["metadata"]["applicability"] is None
     assert body["pursuant_to"] == "FSA 2013 §143"
 
 

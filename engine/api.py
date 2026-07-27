@@ -36,6 +36,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
 from engine.anchors import AnchorIndex, segment
+from engine.arm_g import extract_axes_for_document as _default_extract_axes
 from engine.arm_g import run_arm_g as _run_arm_g
 from engine.clauses import load_clause_index
 from engine.connections import find_connections as _default_find_connections
@@ -317,6 +318,43 @@ def _ws_error(
     return JSONResponse(status_code=status_code, content=content)
 
 
+def _ws_axes_dir(workstreams_dir: Path, workstream_id: str) -> Path:
+    """Where a workstream's axis cache lives — beside its graph and findings, so
+    a workstream prepared ahead of a demo travels with its concepts."""
+    return Path(workstreams_dir) / workstream_id / "axes"
+
+
+def _extracted_axes(
+    workstreams_dir: Path, workstream_id: str, document_id: str
+) -> Optional[list[str]]:
+    """The deduped union of a document's cached axes, in first-seen order.
+
+    Returns `None` when no axis cache exists for the document — "not extracted
+    yet" is the common, expected case and is not an error.
+    """
+    path = _ws_axes_dir(workstreams_dir, workstream_id) / f"axes-{document_id}.json"
+    if not path.exists():
+        return None
+    cache = json.loads(path.read_text(encoding="utf-8"))
+    seen: dict[str, None] = {}
+    for entry in cache.get("anchors", []):
+        for axis in entry.get("axes", []):
+            seen.setdefault(axis, None)
+    return list(seen)
+
+
+def _node_concepts_block(
+    workstreams_dir: Path, workstream_id: str, node_id: str
+) -> dict[str, Any]:
+    """The node-detail `concepts` block: extracted axis pills, or an explicit
+    `not_extracted` with an empty list so the panel renders an empty section
+    rather than an error."""
+    axes = _extracted_axes(workstreams_dir, workstream_id, node_id)
+    if axes is None:
+        return {"status": "not_extracted", "axes": []}
+    return {"status": "extracted", "axes": axes}
+
+
 async def _parse_node_create(
     request: Request,
 ) -> tuple[Optional[dict[str, Any]], Any, bool]:
@@ -488,6 +526,7 @@ def create_app(
     copilot_reply_fn: Any = _default_copilot_reply,
     copilot_stream_fn: Any = _default_copilot_reply_stream,
     converter: Any = None,
+    extract_axes_fn: Any = _default_extract_axes,
 ) -> FastAPI:
     """Construct the Workstream Brain read API against injected dependencies.
 
@@ -517,6 +556,10 @@ def create_app(
             route — `(**kwargs) -> Generator[str]` yielding SSE frames.
             Injectable so tests stub it; defaults to
             `engine.copilot.copilot_reply_stream`.
+        extract_axes_fn: the axis extractor behind the `extract-concepts` route —
+            `(anchor_index, document_id, axes_dir=...) -> {anchor_id: [axis]}`.
+            Injectable so tests stub it; no live model call happens in CI.
+            Defaults to `engine.arm_g.extract_axes_for_document`.
         converter: the document-to-markdown converter used when an add-node
             request carries a file attachment — anything with
             `.convert(path) -> result`. Injectable so tests stub ingest with no
@@ -1054,6 +1097,11 @@ def create_app(
             if nid in all_by_id
         ]
         node_concepts = concepts.load_concepts(workstreams_dir, workstream_id, node_id)
+        # Four ordered blocks: neighbours → recent activity → metadata → concepts.
+        # `metadata` is the nine-field regulatory profile (formerly served under
+        # `concepts`); `concepts` now carries the extracted axis pills. The two
+        # are distinct: metadata is the document's regulatory identity, concepts
+        # are what it talks about.
         return {
             "id": node["id"],
             "node_type": node.get("node_type"),
@@ -1065,12 +1113,8 @@ def create_app(
             "ismp_classification": node.get("ismp_classification"),
             "pursuant_to": node.get("pursuant_to"),
             "first_order_neighbours": first_order,
-            "second_order_neighbours": {
-                "status": "placeholder",
-                "message": "N/A in demo",
-            },
             "recent_activity": node.get("recent_activity", []),
-            "concepts": (
+            "metadata": (
                 {"status": "available", **node_concepts}
                 if node_concepts is not None
                 else {
@@ -1078,6 +1122,81 @@ def create_app(
                     "message": "Concept extraction not enabled in MVP1",
                 }
             ),
+            "concepts": _node_concepts_block(workstreams_dir, workstream_id, node_id),
+            # Retained after the four ordered blocks — still a placeholder
+            # disclosure, and dropping it would churn five consumers for no
+            # gain in this story.
+            "second_order_neighbours": {
+                "status": "placeholder",
+                "message": "N/A in demo",
+            },
+        }
+
+    @app.post("/api/workstreams/{workstream_id}/nodes/{node_id}/extract-concepts")
+    def extract_node_concepts(workstream_id: str, node_id: str) -> Any:
+        """Derive a chunked document's concepts (axes) from its anchors.
+
+        SYNCHRONOUS by design: the drafter waits while it runs (one small-model
+        call per anchor), because a queue plus job status is machinery this demo
+        does not need. The per-anchor cache in `arm_g` makes a re-run on
+        unchanged anchors a hit — no model call, same axes — so this doubles as
+        a cheap pre-warm for the analyze route's stage 1.
+
+        Every side effect (cache write, activity entry) lands only after a fully
+        successful extraction, so a failure leaves the node exactly as it was.
+        """
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        node = next((n for n in ws_graph.get("nodes", []) if n["id"] == node_id), None)
+        if node is None:
+            return _ws_error(
+                404,
+                "NODE_NOT_FOUND",
+                f"Node {node_id} not found in workstream {workstream_id}",
+            )
+
+        index = ws_anchors.build_index(workstreams_dir, workstream_id)
+        document_id = node.get("document_id") or node_id
+        if not index.by_document(document_id):
+            return _ws_error(
+                409,
+                "NOT_SEGMENTED",
+                f"Node {node_id} has not been segmented into passages",
+            )
+
+        try:
+            extract_axes_fn(
+                index,
+                document_id,
+                axes_dir=_ws_axes_dir(workstreams_dir, workstream_id),
+            )
+        except Exception as exc:  # model / creds / unparseable reply
+            return _ws_error(
+                502, "EXTRACTION_FAILED", f"Concept extraction failed: {exc}"
+            )
+
+        # Append the activity entry only once — a cache-hit re-run must not
+        # stack duplicate "axes extracted" lines on the node.
+        activity = node.setdefault("recent_activity", [])
+        if not any(entry.get("event") == "axes extracted" for entry in activity):
+            activity.append(
+                {
+                    "event": "axes extracted",
+                    "author": directory.owner().get("name"),
+                    "at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+                }
+            )
+            workstreams.save_graph(workstreams_dir, workstream_id, ws_graph)
+
+        return {
+            "node_id": node_id,
+            "concepts": _node_concepts_block(
+                workstreams_dir, workstream_id, document_id
+            ),
+            "recent_activity": activity,
         }
 
     @app.get("/api/workstreams/{workstream_id}/edges/{edge_id}")

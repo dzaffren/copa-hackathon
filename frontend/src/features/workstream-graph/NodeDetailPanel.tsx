@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import {
   ChevronDown,
@@ -14,8 +14,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { fetchNodeDetail } from "@/lib/api";
+import { extractConcepts, fetchNodeDetail } from "@/lib/api";
 import type { ConceptsAvailable } from "@/lib/types";
+import { Sparkles } from "lucide-react";
 import { nodeStyle } from "./legend";
 
 function conceptsAvailable(
@@ -35,17 +36,18 @@ function asList(value: string[] | string | null | undefined): string[] {
 // Display order + labels for the regulatory-profile concept fields. `legal_basis`
 // and `ismp_classification` were added for Cross-Workstream Intelligence — a
 // shared Act or classification is a strong overlap signal.
-const CONCEPT_FIELD_ORDER: [keyof Omit<ConceptsAvailable, "status">, string][] = [
-  ["policy_owner", "Policy owner"],
-  ["applicability", "Applicability"],
-  ["empowerment_framework", "Empowerment framework"],
-  ["requirement", "Requirement"],
-  ["issuance_date", "Issuance date"],
-  ["effective_date", "Effective date"],
-  ["keywords", "Keywords"],
-  ["legal_basis", "Legal basis"],
-  ["ismp_classification", "ISMP classification"],
-];
+const CONCEPT_FIELD_ORDER: [keyof Omit<ConceptsAvailable, "status">, string][] =
+  [
+    ["policy_owner", "Policy owner"],
+    ["applicability", "Applicability"],
+    ["empowerment_framework", "Empowerment framework"],
+    ["requirement", "Requirement"],
+    ["issuance_date", "Issuance date"],
+    ["effective_date", "Effective date"],
+    ["keywords", "Keywords"],
+    ["legal_basis", "Legal basis"],
+    ["ismp_classification", "ISMP classification"],
+  ];
 
 // Fields whose values render as chips rather than a single line.
 const CHIP_FIELDS = new Set(["keywords", "legal_basis"]);
@@ -109,9 +111,21 @@ export function NodeDetailPanel({
 }: NodeDetailPanelProps) {
   const navigate = useNavigate();
   const [conceptsOpen, setConceptsOpen] = useState(false);
+  const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: ["node", workstreamId, nodeId],
     queryFn: () => fetchNodeDetail(workstreamId, nodeId),
+  });
+  // Synchronous on the server: the mutation stays pending for the whole
+  // extraction, then the node refetches so the pills and the new activity
+  // entry appear together.
+  const extract = useMutation({
+    mutationFn: () => extractConcepts(workstreamId, nodeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["node", workstreamId, nodeId],
+      });
+    },
   });
 
   if (query.isPending) {
@@ -139,7 +153,9 @@ export function NodeDetailPanel({
   }
 
   const node = query.data;
-  const concepts = node.concepts;
+  // The nine-field regulatory profile moved to `metadata`; `concepts` now
+  // carries the extracted axis pills rendered in its own section below.
+  const concepts = node.metadata;
   const enriched = conceptsAvailable(concepts);
   const style = nodeStyle(node.node_type);
   const isTask = node.node_type === "task";
@@ -156,7 +172,8 @@ export function NodeDetailPanel({
         ? [node.pursuant_to]
         : [];
   const ismpValue =
-    (enriched ? concepts.ismp_classification : null) ?? node.ismp_classification;
+    (enriched ? concepts.ismp_classification : null) ??
+    node.ismp_classification;
   const ismpBadge = ismpValue ?? (enriched ? ISMP_PENDING : null);
 
   return (
@@ -185,14 +202,17 @@ export function NodeDetailPanel({
                     ? "border-primary/30 bg-primary/10 text-primary"
                     : "border-slate-400/30 bg-slate-500/10 text-muted-foreground",
                 )}
-                title={ismpValue ? undefined : "ISMP classification not yet sourced"}
+                title={
+                  ismpValue ? undefined : "ISMP classification not yet sourced"
+                }
               >
                 <ShieldCheck className="h-3 w-3" /> ISMP: {ismpBadge}
               </span>
             )}
             {legalBasis.length > 0 && (
               <span className="inline-flex items-center gap-1 rounded-md border border-amber-300/30 bg-amber-400/10 px-2 py-0.5 text-[11px] font-medium text-amber-700">
-                <Scale className="h-3 w-3" /> Legal basis: {legalBasis.join(", ")}
+                <Scale className="h-3 w-3" /> Legal basis:{" "}
+                {legalBasis.join(", ")}
               </span>
             )}
           </div>
@@ -262,7 +282,7 @@ export function NodeDetailPanel({
             aria-expanded={conceptsOpen}
             className="flex w-full items-center justify-between text-xs font-semibold uppercase tracking-wider text-muted-foreground"
           >
-            <span>Concepts</span>
+            <span>Metadata</span>
             <ChevronDown
               className={cn(
                 "h-4 w-4 transition-transform",
@@ -298,10 +318,16 @@ export function NodeDetailPanel({
                             ))}
                           </dd>
                         ) : (
-                          <dd className="text-muted-foreground">Not available</dd>
+                          <dd className="text-muted-foreground">
+                            Not available
+                          </dd>
                         )
                       ) : (
-                        <dd className={cn((!value || pending) && "text-muted-foreground")}>
+                        <dd
+                          className={cn(
+                            (!value || pending) && "text-muted-foreground",
+                          )}
+                        >
                           {value ?? pending ?? "Not available"}
                         </dd>
                       )}
@@ -314,6 +340,52 @@ export function NodeDetailPanel({
                 {concepts.message}
               </p>
             ))}
+        </section>
+
+        <section>
+          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Concepts
+          </h3>
+          {node.concepts.axes.length > 0 ? (
+            <div className="flex flex-wrap gap-1.5">
+              {node.concepts.axes.map((axis) => (
+                <span
+                  key={axis}
+                  data-testid="concept-pill"
+                  className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
+                >
+                  {axis}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                No concepts extracted yet.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={extract.isPending}
+                onClick={() => extract.mutate()}
+              >
+                {extract.isPending ? (
+                  <>
+                    <Loader2 className="animate-spin" /> Extracting…
+                  </>
+                ) : (
+                  <>
+                    <Sparkles /> Extract concepts
+                  </>
+                )}
+              </Button>
+              {extract.isError && (
+                <p role="alert" className="text-sm text-red-500">
+                  Concept extraction failed. Try again.
+                </p>
+              )}
+            </div>
+          )}
         </section>
       </div>
 

@@ -193,6 +193,17 @@ export async function createNode(
   return (await res.json()) as CreateNodeResponse;
 }
 
+/** Derive a document's concepts from its passages. Synchronous on the server —
+ *  the promise settles only when extraction finishes (or fails). */
+export function extractConcepts(
+  workstreamId: string,
+  nodeId: string,
+): Promise<ExtractConceptsResponse> {
+  return postJson<ExtractConceptsResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/nodes/${nodeId}/extract-concepts`,
+  );
+}
+
 export function analyzeEdge(
   workstreamId: string,
   edgeId: string,

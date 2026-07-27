@@ -239,7 +239,7 @@ function ProfileColumn({
     ],
   });
   const detail = detailQuery.data as NodeDetail | undefined;
-  const concepts = conceptsOf(detail?.concepts);
+  const concepts = conceptsOf(detail?.metadata);
   const accentBar =
     accent === "blue" ? "border-t-primary/60" : "border-t-violet-400/60";
 

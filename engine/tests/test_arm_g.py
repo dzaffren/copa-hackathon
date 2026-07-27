@@ -625,7 +625,12 @@ def _install_orchestration_stubs(monkeypatch, tmp_path, deployments):
 
     monkeypatch.setattr(arm_g, "AXES_DIR", tmp_path)
 
-    def fake_extract(anchor_index, document_id, deployment=arm_g.EXTRACTION_DEPLOYMENT):
+    def fake_extract(
+        anchor_index,
+        document_id,
+        deployment=arm_g.EXTRACTION_DEPLOYMENT,
+        axes_dir=None,
+    ):
         deployments.append(("extract", deployment))
         return {a["anchor_id"]: ["axis"] for a in anchor_index.by_document(document_id)}
 
@@ -729,3 +734,60 @@ def test_three_tier_routing_no_critic(monkeypatch, tmp_path):
         != arm_g.REASONING_DEPLOYMENT
         != arm_g.FINDER_CRITIC_DEPLOYMENT
     )
+
+
+# ---------------------------------------------------------------------------
+# axes_dir parameter — the per-workstream axis cache location.
+# ---------------------------------------------------------------------------
+
+
+def test_axes_dir_writes_and_reads_outside_the_default_location(tmp_path, monkeypatch):
+    """Passing `axes_dir` puts the cache there, NOT under the module default —
+    this is what lets a workstream's axis cache travel with the workstream."""
+    import engine.arm_g as arm_g
+
+    default_dir = tmp_path / "default"
+    ws_dir = tmp_path / "opres-v2" / "axes"
+    monkeypatch.setattr(arm_g, "AXES_DIR", default_dir)
+
+    index = AnchorIndex([_anchor("DOC 1.1", "doc-a", "Some clause text.")])
+
+    calls: list = []
+
+    def fake_call_chat(deployment, system, user, max_tokens=None):
+        calls.append(deployment)
+        return json.dumps(["scenario testing cadence"])
+
+    monkeypatch.setattr(arm_g, "call_chat", fake_call_chat)
+
+    result = arm_g.extract_axes_for_document(index, "doc-a", axes_dir=ws_dir)
+
+    assert result["DOC 1.1"] == ["scenario testing cadence"]
+    assert (ws_dir / "axes-doc-a.json").exists()
+    assert not (default_dir / "axes-doc-a.json").exists()
+    assert len(calls) == 1
+
+    # A second call against the same axes_dir is a cache hit — no model call.
+    def boom(*args, **kwargs):
+        raise AssertionError("cache hit must not call the model")
+
+    monkeypatch.setattr(arm_g, "call_chat", boom)
+    again = arm_g.extract_axes_for_document(index, "doc-a", axes_dir=ws_dir)
+    assert again["DOC 1.1"] == ["scenario testing cadence"]
+
+
+def test_axes_dir_defaults_to_the_module_location(tmp_path, monkeypatch):
+    """Omitting axes_dir preserves the experiment/script path (back-compat)."""
+    import engine.arm_g as arm_g
+
+    monkeypatch.setattr(arm_g, "AXES_DIR", tmp_path)
+    index = AnchorIndex([_anchor("DOC 1.1", "doc-a", "Some clause text.")])
+    monkeypatch.setattr(
+        arm_g,
+        "call_chat",
+        lambda *a, **k: json.dumps(["an axis"]),
+    )
+
+    arm_g.extract_axes_for_document(index, "doc-a")
+
+    assert (tmp_path / "axes-doc-a.json").exists()

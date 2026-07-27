@@ -231,7 +231,22 @@ export interface NodeDetail {
   first_order_neighbours: NeighbourRef[];
   second_order_neighbours: Placeholder;
   recent_activity: RecentActivity[];
-  concepts: Placeholder | ConceptsAvailable;
+  /** The nine-field regulatory profile. Formerly served as `concepts`; renamed
+   *  when `concepts` was repurposed for extracted axes. */
+  metadata: Placeholder | ConceptsAvailable;
+  /** The document's extracted topics, shown as pills. `not_extracted` (with an
+   *  empty list) is the expected state until the drafter extracts them. */
+  concepts: NodeConcepts;
+}
+
+export type NodeConcepts =
+  | { status: "extracted"; axes: string[] }
+  | { status: "not_extracted"; axes: [] };
+
+export interface ExtractConceptsResponse {
+  node_id: string;
+  concepts: NodeConcepts;
+  recent_activity: RecentActivity[];
 }
 
 export interface EdgeEndpoint {

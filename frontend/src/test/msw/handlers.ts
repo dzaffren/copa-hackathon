@@ -630,10 +630,11 @@ function buildNodeDetail(nodeId: string): NodeDetail | null {
     })),
     second_order_neighbours: { status: "placeholder", message: "N/A in demo" },
     recent_activity: node.node_type === "task" ? TASK_ACTIVITY : [],
-    concepts: {
+    metadata: {
       status: "placeholder",
       message: "Concept extraction not enabled in MVP1",
     },
+    concepts: { status: "not_extracted", axes: [] },
   };
 }
 

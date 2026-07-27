@@ -170,7 +170,7 @@ def test_no_concepts_are_extracted_on_add(tmp_path):
 
     assert not (dst / _OPRES / "axes").exists()
     detail = client.get(f"/api/workstreams/{_OPRES}/nodes/{node_id}").json()
-    assert detail["concepts"]["status"] == "placeholder"
+    assert detail["concepts"] == {"status": "not_extracted", "axes": []}
 
 
 # --- Failure paths: every one leaves graph.json untouched -------------------

@@ -25,7 +25,7 @@ export function RegulatoryProfileCard({ workstreamId }: { workstreamId: string }
     enabled: Boolean(workstreamId && taskId),
   });
 
-  const concepts = conceptsOf(detail?.concepts);
+  const concepts = conceptsOf(detail?.metadata);
 
   return (
     <section className="rounded-xl border border-border/60 bg-card/40 p-3">
