@@ -166,14 +166,31 @@ export function fetchEdgeDetail(
   );
 }
 
-export function createNode(
+/** Create a node, optionally attaching the document to chunk.
+ *
+ *  With an `attachment` the request goes as `multipart/form-data` — a JSON
+ *  `payload` part plus the file — because a file cannot ride in a JSON body.
+ *  Without one it stays the plain-JSON shape the URL-ingest path uses. The
+ *  Content-Type header is deliberately NOT set for FormData: the browser must
+ *  add it itself so the multipart boundary is included.
+ */
+export async function createNode(
   workstreamId: string,
   body: CreateNodeRequest,
+  attachment?: File | null,
 ): Promise<CreateNodeResponse> {
-  return postJson<CreateNodeResponse>(
-    `${API_BASE}/api/workstreams/${workstreamId}/nodes`,
-    body,
-  );
+  const url = `${API_BASE}/api/workstreams/${workstreamId}/nodes`;
+  if (!attachment) {
+    return postJson<CreateNodeResponse>(url, body);
+  }
+  const form = new FormData();
+  form.append("payload", JSON.stringify(body));
+  form.append("attachment", attachment);
+  const res = await fetch(url, { method: "POST", body: form });
+  if (!res.ok) {
+    return throwHttpError(res);
+  }
+  return (await res.json()) as CreateNodeResponse;
 }
 
 export function analyzeEdge(
@@ -377,8 +394,12 @@ export async function* streamCopilotMessage(
         const eventLine = lines.find((l) => l.startsWith("event: "));
         const dataLine = lines.find((l) => l.startsWith("data: "));
         if (!eventLine || !dataLine) continue;
-        const event = eventLine.slice("event: ".length).trim() as SSEEvent["event"];
-        const data = JSON.parse(dataLine.slice("data: ".length)) as SSEEvent["data"];
+        const event = eventLine
+          .slice("event: ".length)
+          .trim() as SSEEvent["event"];
+        const data = JSON.parse(
+          dataLine.slice("data: ".length),
+        ) as SSEEvent["data"];
         yield { event, data } as SSEEvent;
       }
     }
@@ -392,14 +413,19 @@ export async function* streamCopilotMessage(
 export async function fetchReviewers(): Promise<Person[]> {
   // The server already excludes the owner, so the picker cannot offer a drafter
   // themselves — no client-side filtering to keep in step.
-  const body = await getJson<{ reviewers: Person[] }>(`${API_BASE}/api/reviewers`);
+  const body = await getJson<{ reviewers: Person[] }>(
+    `${API_BASE}/api/reviewers`,
+  );
   return body.reviewers;
 }
 
 export function createWorkstream(
   body: CreateWorkstreamRequest,
 ): Promise<CreateWorkstreamResponse> {
-  return postJson<CreateWorkstreamResponse>(`${API_BASE}/api/workstreams`, body);
+  return postJson<CreateWorkstreamResponse>(
+    `${API_BASE}/api/workstreams`,
+    body,
+  );
 }
 
 // --- Cross-workstream linkage ----------------------------------------------

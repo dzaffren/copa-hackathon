@@ -256,6 +256,11 @@ export interface CreateNodeEdge {
   edge_type: EdgeType;
 }
 
+/** How an attached document is broken into citable passages. Declared by the
+ *  drafter, never inferred — a wrong guess chops a document into useless
+ *  passages. `structured-rules` only suits numbered BNM policies. */
+export type DocClass = "structured-rules" | "semi-structured" | "prose";
+
 export interface CreateNodeRequest {
   node_type: NodeType;
   title: string;
@@ -265,6 +270,8 @@ export interface CreateNodeRequest {
   edges: CreateNodeEdge[];
   /** Opt out of the server-side URL download + ingest of `source_url`. */
   skip_ingest?: boolean;
+  /** Required when an attachment is sent; the server rejects a file without it. */
+  doc_class?: DocClass;
 }
 
 export interface CreatedEdge {
@@ -280,6 +287,10 @@ export interface CreateNodeResponse {
   node_type: NodeType;
   title: string;
   created_edges: CreatedEdge[];
+  /** Present only when a document was attached and chunked. */
+  document_id?: string;
+  doc_class?: DocClass;
+  anchor_count?: number;
 }
 
 export interface AnalyzeResponse {
@@ -473,10 +484,7 @@ export interface CrossLinkEnd {
  *  a conflict, `differs-on` divergent, `goes-beyond`/`silent-on` an overlap,
  *  and only `aligns-with` aligned. Derived server-side (engine/cross_intel.py). */
 export type RelationshipClassification =
-  | "conflict"
-  | "divergent"
-  | "overlap"
-  | "aligned";
+  "conflict" | "divergent" | "overlap" | "aligned";
 
 export type RiskLevel = "high" | "medium" | "low";
 
@@ -561,12 +569,7 @@ export type LinkageStatus =
 
 /** The transition verbs the API accepts. */
 export type LinkageAction =
-  | "claim"
-  | "submit"
-  | "pick_up"
-  | "approve"
-  | "reject"
-  | "request_changes";
+  "claim" | "submit" | "pick_up" | "approve" | "reject" | "request_changes";
 
 export interface LinkageComment {
   author: Person;
