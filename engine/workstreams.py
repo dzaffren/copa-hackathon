@@ -23,6 +23,7 @@ default on Windows — see docs/learnings/pattern-engine-artifact-writes-utf8.md
 import hashlib
 import json
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional, Union
 
@@ -44,6 +45,14 @@ EDGE_TYPES: frozenset[str] = frozenset(
     {"supersedes", "references", "contributes-to", "parallel-to"}
 )
 
+# The three segmentation strategies a drafter may pick when attaching a
+# document (`engine.anchors` registers exactly these). Declared, never
+# inferred — a wrong guess chops a document into useless passages.
+DOC_CLASSES: frozenset[str] = frozenset(
+    {"structured-rules", "semi-structured", "prose"}
+)
+
+
 def workstream_dir(root: Union[str, Path], workstream_id: str) -> Path:
     """The on-disk directory for one workstream."""
     return Path(root) / workstream_id
@@ -61,7 +70,9 @@ def _write_json(path: Path, payload: Any) -> None:
     )
 
 
-def load_workstream(root: Union[str, Path], workstream_id: str) -> Optional[dict[str, Any]]:
+def load_workstream(
+    root: Union[str, Path], workstream_id: str
+) -> Optional[dict[str, Any]]:
     """Load `workstream.json`, or `None` when the workstream is unknown."""
     path = workstream_dir(root, workstream_id) / "workstream.json"
     return _read_json(path) if path.exists() else None
@@ -73,7 +84,9 @@ def load_graph(root: Union[str, Path], workstream_id: str) -> Optional[dict[str,
     return _read_json(path) if path.exists() else None
 
 
-def save_graph(root: Union[str, Path], workstream_id: str, graph: dict[str, Any]) -> None:
+def save_graph(
+    root: Union[str, Path], workstream_id: str, graph: dict[str, Any]
+) -> None:
     """Persist `graph.json` (UTF-8)."""
     _write_json(workstream_dir(root, workstream_id) / "graph.json", graph)
 
@@ -324,7 +337,9 @@ def create_workstream(
     Assumes `body` already passed `validate_workstream_create`.
     """
     root = Path(root)
-    existing = {p.name for p in root.iterdir() if p.is_dir()} if root.exists() else set()
+    existing = (
+        {p.name for p in root.iterdir() if p.is_dir()} if root.exists() else set()
+    )
     ws_id = make_workstream_id(body["name"].strip(), existing)
 
     record: dict[str, Any] = {
@@ -382,13 +397,26 @@ def make_edge_id(source: str, target: str) -> str:
 def validate_node_create(body: dict[str, Any]) -> Optional[tuple[int, str, str]]:
     """Validate an add-node request body. Returns `None` when valid, else the
     `(status, code, message)` for the first rule broken, checked in this order:
-    node type, then ≥1 edge, then each edge's type and a present target."""
+    node type, then `doc_class` (when supplied), then ≥1 edge, then each edge's
+    type and a present target.
+
+    `doc_class` is optional here because the legacy JSON path adds a node
+    without a document to chunk. The route requires it whenever an attachment
+    is present — presence of the file is what makes the choice meaningful.
+    """
     if body.get("node_type") not in NODE_TYPES:
         return (
             400,
             "INVALID_NODE_TYPE",
             f"node_type must be one of the eight flat types, got "
             f"{body.get('node_type')!r}",
+        )
+    if "doc_class" in body and body.get("doc_class") not in DOC_CLASSES:
+        return (
+            400,
+            "INVALID_DOC_CLASS",
+            f"doc_class must be one of {sorted(DOC_CLASSES)}, got "
+            f"{body.get('doc_class')!r}",
         )
     edges = body.get("edges")
     if not isinstance(edges, list) or len(edges) == 0:
@@ -415,11 +443,22 @@ def validate_node_create(body: dict[str, Any]) -> Optional[tuple[int, str, str]]
 
 
 def add_node(
-    graph: dict[str, Any], body: dict[str, Any]
+    graph: dict[str, Any],
+    body: dict[str, Any],
+    chunked: bool = False,
+    author: Optional[str] = None,
+    at: Optional[str] = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     """Append a new node and its declared edges to `graph` in place. Returns the
     `(new_node, created_edges)`. Assumes `body` already passed
-    `validate_node_create`."""
+    `validate_node_create`.
+
+    `chunked=True` marks a node whose attached document was ingested and
+    segmented by the caller: the node gains `document_id` (its own id, so its
+    anchors and axis cache key off one identifier) and a `recent_activity`
+    trail of "node created" then "chunking completed". Legacy callers that add
+    a node without a document leave both absent.
+    """
     existing = {n["id"] for n in graph.get("nodes", [])}
     node_type_by_id = {n["id"]: n.get("node_type") for n in graph.get("nodes", [])}
     node_id = make_node_id(body.get("title", "node"), existing)
@@ -432,6 +471,15 @@ def add_node(
     }
     if body.get("attachment_submission_id"):
         node["attachment_submission_id"] = body["attachment_submission_id"]
+    if chunked:
+        node["document_id"] = node_id
+        node["doc_class"] = body["doc_class"]
+        stamp = at or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        who = author or "Aisyah R."
+        node["recent_activity"] = [
+            {"event": "node created", "author": who, "at": stamp},
+            {"event": "chunking completed", "author": who, "at": stamp},
+        ]
     graph.setdefault("nodes", []).append(node)
 
     created: list[dict[str, Any]] = []

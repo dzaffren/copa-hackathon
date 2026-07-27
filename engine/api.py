@@ -26,6 +26,7 @@ fixtures derive from public BNM documents.
 
 import json
 import re
+import tempfile
 from datetime import datetime, timezone
 from html import unescape
 from pathlib import Path
@@ -34,11 +35,15 @@ from typing import Any, Optional, Union
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
-from engine.anchors import AnchorIndex
+from engine.anchors import AnchorIndex, segment
 from engine.arm_g import run_arm_g as _run_arm_g
 from engine.clauses import load_clause_index
 from engine.connections import find_connections as _default_find_connections
-from engine.ingest import UnreadableDocumentError, ingest_from_url
+from engine.ingest import (
+    UnreadableDocumentError,
+    ingest_document,
+    ingest_from_url,
+)
 from engine.copilot import copilot_reply as _default_copilot_reply
 from engine.copilot import copilot_reply_stream as _default_copilot_reply_stream
 from engine.config import REPO_ROOT
@@ -52,6 +57,7 @@ from engine import (
     linkage_review,
     tasks,
     workstreams,
+    ws_anchors,
 )
 
 # The Workstream Brain fixture store (Task 1): one directory per workstream, each
@@ -311,11 +317,67 @@ def _ws_error(
     return JSONResponse(status_code=status_code, content=content)
 
 
+async def _parse_node_create(
+    request: Request,
+) -> tuple[Optional[dict[str, Any]], Any, bool]:
+    """Read an add-node request in either supported shape.
+
+    Returns `(body, upload, is_form)`:
+    - a form body (`multipart/form-data`, or urlencoded when a client sends the
+      `payload` part with no file) → the JSON `payload` part parsed to a dict,
+      the single `attachment` file (or `None` when absent), and `True`.
+    - anything else → the plain JSON body, `None`, and `False`.
+
+    `is_form` lets the caller demand an attachment on the form path — a form
+    POST is the chunking screen's shape, so a missing file there is an error
+    rather than a legacy no-document add.
+
+    `body` is `None` when the payload is absent or not a JSON object, which the
+    caller reports as a malformed request.
+    """
+    content_type = request.headers.get("content-type", "")
+    if content_type.startswith("multipart/form-data") or content_type.startswith(
+        "application/x-www-form-urlencoded"
+    ):
+        form = await request.form()
+        raw = form.get("payload")
+        upload = form.get("attachment")
+        # A text part named `attachment` is not a file — treat only real uploads
+        # (which carry `.read()`) as an attachment.
+        if upload is not None and not hasattr(upload, "read"):
+            upload = None
+        if not isinstance(raw, str):
+            return None, upload, True
+        try:
+            body = json.loads(raw)
+        except json.JSONDecodeError:
+            return None, upload, True
+        return (body if isinstance(body, dict) else None), upload, True
+    body = await request.json()
+    return (body if isinstance(body, dict) else None), None, False
+
+
+async def _ingest_upload(upload: Any, converter: Any) -> str:
+    """Convert an uploaded PDF/DOCX to markdown.
+
+    The bytes land on a tempfile with the upload's suffix (MarkItDown dispatches
+    on extension) and are always unlinked, mirroring `ingest.ingest_from_url`.
+    Raises `UnreadableDocumentError` when conversion yields no usable text.
+    """
+    suffix = Path(getattr(upload, "filename", "") or "").suffix.lower() or ".pdf"
+    data = await upload.read()
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+        tmp.write(data)
+        tmp_path = Path(tmp.name)
+    try:
+        return ingest_document(tmp_path, converter)
+    finally:
+        tmp_path.unlink(missing_ok=True)
+
+
 # --- Copilot request parsing (shared by the blocking + streaming routes) ----
 
-_BLOCK_BREAK_RE = re.compile(
-    r"(?i)</(?:p|div|h1|h2|h3|li|ul|ol|blockquote)>|<br\s*/?>"
-)
+_BLOCK_BREAK_RE = re.compile(r"(?i)</(?:p|div|h1|h2|h3|li|ul|ol|blockquote)>|<br\s*/?>")
 _TAG_RE = re.compile(r"<[^>]+>")
 
 
@@ -348,7 +410,8 @@ def _parse_copilot_request(
     intent = body.get("intent")
     if intent not in copilot.INTENTS:
         return _ws_error(
-            400, "INVALID_INTENT",
+            400,
+            "INVALID_INTENT",
             f"intent must be one of {list(copilot.INTENTS)}, got {intent!r}",
         )
     message = body.get("message")
@@ -424,6 +487,7 @@ def create_app(
     run_arm_g_fn: Any = None,
     copilot_reply_fn: Any = _default_copilot_reply,
     copilot_stream_fn: Any = _default_copilot_reply_stream,
+    converter: Any = None,
 ) -> FastAPI:
     """Construct the Workstream Brain read API against injected dependencies.
 
@@ -453,6 +517,11 @@ def create_app(
             route — `(**kwargs) -> Generator[str]` yielding SSE frames.
             Injectable so tests stub it; defaults to
             `engine.copilot.copilot_reply_stream`.
+        converter: the document-to-markdown converter used when an add-node
+            request carries a file attachment — anything with
+            `.convert(path) -> result`. Injectable so tests stub ingest with no
+            network or Azure credentials; `None` lets `engine.ingest` build its
+            default (Document Intelligence when configured, else MarkItDown).
 
     Returns:
         A configured `FastAPI` app. No network, credentials, or build artifacts
@@ -1064,12 +1133,38 @@ def create_app(
             return _ws_error(
                 404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
             )
-        body = await request.json()
-        if not isinstance(body, dict):
+        # Two request shapes: `multipart/form-data` (a JSON `payload` part plus a
+        # single `attachment` file — the chunking path this screen uses), and the
+        # legacy plain-JSON body (a node whose document is fetched by URL, or
+        # none at all). An attachment, when present, takes precedence for ingest.
+        body, upload, is_form = await _parse_node_create(request)
+        if body is None:
             return _ws_error(400, "EDGE_REQUIRED", "Request body must be an object")
+        # The chunking screen always posts a form with a file. A form POST that
+        # carries no file is a missing attachment, not a legacy no-document add.
+        if is_form and upload is None:
+            return _ws_error(
+                400,
+                "ATTACHMENT_REQUIRED",
+                "Attach a document to add it to the graph.",
+                field="attachment",
+            )
         problem = workstreams.validate_node_create(body)
         if problem is not None:
-            return _ws_error(*problem)
+            return _ws_error(
+                *problem,
+                field="doc_class" if problem[1] == "INVALID_DOC_CLASS" else None,
+            )
+        # An attached document must declare how to break it up — the drafter
+        # chooses; the tool never guesses (a wrong guess yields useless passages).
+        if upload is not None and "doc_class" not in body:
+            return _ws_error(
+                400,
+                "INVALID_DOC_CLASS",
+                "Choose how the document should be broken up: "
+                "structured-rules, semi-structured, or prose.",
+                field="doc_class",
+            )
         node_ids = {n["id"] for n in ws_graph.get("nodes", [])}
         for edge in body["edges"]:
             if edge["target_node_id"] not in node_ids:
@@ -1083,11 +1178,48 @@ def create_app(
         skip_ingest = body.pop("skip_ingest", False) is True
         source_url = (body.get("source_url") or "").strip()
 
-        # Auto-ingest: download the source document up front so a failure aborts
-        # the request (422) before the node is persisted. Deferring the markdown
-        # write until after add_node gives us the real, collision-suffixed id.
+        # Ingest AND segment up front, so any failure aborts the request before
+        # a node is persisted — no half-formed node, and no anchors file for a
+        # node that does not exist. The markdown write is deferred until after
+        # add_node, which is what yields the real collision-suffixed id.
         markdown: Optional[str] = None
-        if source_url and not skip_ingest:
+        anchors: Optional[list[Any]] = None
+        if upload is not None:
+            try:
+                markdown = await _ingest_upload(upload, converter)
+            except UnreadableDocumentError as exc:
+                return _ws_error(
+                    422,
+                    "INGEST_FAILED",
+                    f"The attached document could not be read; try a different "
+                    f"file ({exc}).",
+                    field="attachment",
+                )
+            doc_class = body["doc_class"]
+            # Segment against the PROSPECTIVE node id. add_node re-derives the
+            # same id from the same title against the same graph, so the anchors'
+            # document_id matches the node it lands on.
+            provisional_id = workstreams.make_node_id(
+                body.get("title", "node"), node_ids
+            )
+            try:
+                anchors = segment(provisional_id, markdown, doc_class)
+            except Exception as exc:  # UnknownDocumentIdError / segmenter failure
+                return _ws_error(
+                    422,
+                    "CHUNKING_FAILED",
+                    f"This document can't be broken up as {doc_class} — try "
+                    f"prose or semi-structured ({exc}).",
+                    field="doc_class",
+                )
+            if not anchors:
+                return _ws_error(
+                    422,
+                    "NO_PASSAGES",
+                    "The document produced no passages and can't be added.",
+                    field="attachment",
+                )
+        elif source_url and not skip_ingest:
             try:
                 markdown = ingest_from_url(source_url)
             except UnreadableDocumentError as exc:
@@ -1098,7 +1230,12 @@ def create_app(
                     field="source_url",
                 )
 
-        new_node, created = workstreams.add_node(ws_graph, body)
+        new_node, created = workstreams.add_node(
+            ws_graph, body, chunked=anchors is not None
+        )
+
+        if anchors is not None:
+            ws_anchors.save(workstreams_dir, workstream_id, new_node["id"], anchors)
 
         if markdown is not None:
             artifact_path = Path(artifacts_dir) / f"{new_node['id']}.md"
@@ -1106,15 +1243,17 @@ def create_app(
             artifact_path.write_text(markdown, encoding="utf-8")
 
         workstreams.save_graph(workstreams_dir, workstream_id, ws_graph)
-        return JSONResponse(
-            status_code=201,
-            content={
-                "id": new_node["id"],
-                "node_type": new_node["node_type"],
-                "title": new_node["title"],
-                "created_edges": [{**edge, "analysed": False} for edge in created],
-            },
-        )
+        content: dict[str, Any] = {
+            "id": new_node["id"],
+            "node_type": new_node["node_type"],
+            "title": new_node["title"],
+            "created_edges": [{**edge, "analysed": False} for edge in created],
+        }
+        if anchors is not None:
+            content["document_id"] = new_node["document_id"]
+            content["doc_class"] = new_node["doc_class"]
+            content["anchor_count"] = len(anchors)
+        return JSONResponse(status_code=201, content=content)
 
     @app.post("/api/workstreams/{workstream_id}/edges/{edge_id}/analyze")
     def analyze_workstream_edge(workstream_id: str, edge_id: str) -> Any:
@@ -1505,7 +1644,8 @@ def create_app(
         ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
         if ws_graph is None:
             return _ws_error(
-                404, "WORKSTREAM_NOT_FOUND",
+                404,
+                "WORKSTREAM_NOT_FOUND",
                 f"Workstream {workstream_id} not found",
             )
         node = _task_node(ws_graph, workstream_id, node_id)
