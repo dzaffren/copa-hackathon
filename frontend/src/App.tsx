@@ -9,11 +9,16 @@ import { InstitutionMapPage } from "@/features/institution-map/InstitutionMapPag
 import { CrossIntelligencePage } from "@/features/cross-intelligence/CrossIntelligencePage";
 import { CompareWorkstreamsPage } from "@/features/cross-intelligence/CompareWorkstreamsPage";
 import { ReviewQueuePage } from "@/features/review-queue/ReviewQueuePage";
+import { IntroPage } from "@/features/intro/IntroPage";
 import { AppShell } from "@/components/AppShell";
 
 function App() {
   return (
     <Routes>
+      {/* Standalone splash — a sibling of the AppShell layout route, so it
+          renders without the Sidebar/DemoController. */}
+      <Route path="/intro" element={<IntroPage />} />
+
       {/* The sidebar frame wraps every screen; pages render into its outlet. */}
       <Route element={<AppShell />}>
         <Route path="/" element={<HomePage />} />
