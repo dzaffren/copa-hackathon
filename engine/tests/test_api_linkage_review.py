@@ -24,7 +24,7 @@ _CHECKER = "ps"  # Priya S.
 def _make_client(tmp_path):
     dst = tmp_path / "workstreams"
     shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
-    return TestClient(create_app(workstreams_dir=dst, analyze_delay=0)), dst
+    return TestClient(create_app(workstreams_dir=dst)), dst
 
 
 def _patch(client, action, actor, comment=None):
@@ -61,9 +61,12 @@ def test_full_maker_checker_flow_to_approved(tmp_path):
     assert claim["maker"]["id"] == _MAKER
     assert claim["created_at"] is not None
 
-    assert _patch(client, "submit", _MAKER, "Looks like a real overlap").json()[
-        "review"
-    ]["status"] == "submitted_for_check"
+    assert (
+        _patch(client, "submit", _MAKER, "Looks like a real overlap").json()["review"][
+            "status"
+        ]
+        == "submitted_for_check"
+    )
 
     pick = _patch(client, "pick_up", _CHECKER).json()["review"]
     assert pick["status"] == "checker_review"
