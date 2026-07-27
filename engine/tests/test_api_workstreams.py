@@ -42,14 +42,14 @@ def _graph_on_disk(dst, workstream=_OPRES) -> dict:
 # --- GET /api/workstreams ---------------------------------------------------
 
 
-def test_GET_workstreams_lists_three_seeded_workstreams(tmp_path):
+def test_GET_workstreams_lists_seeded_workstreams(tmp_path):
     client, _ = _make_client(tmp_path)
     body = client.get("/api/workstreams").json()
     ids = {w["id"] for w in body["workstreams"]}
-    assert {"opres-v2", "outsourcing-v2", "rmit-v2-2025"} <= ids
+    assert {"opres-v2", "open-finance-ed", "rmit-v2-2025"} <= ids
     roles = {w["id"]: w["role"] for w in body["workstreams"]}
     assert roles["opres-v2"] == "own"
-    assert roles["outsourcing-v2"] == "review"
+    assert roles["open-finance-ed"] == "review"
     assert roles["rmit-v2-2025"] == "delivered"
 
 

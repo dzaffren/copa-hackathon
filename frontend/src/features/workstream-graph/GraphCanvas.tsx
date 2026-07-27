@@ -3,7 +3,13 @@ import ForceGraph2D, { type ForceGraphMethods } from "react-force-graph-2d";
 import { Maximize, ZoomIn, ZoomOut } from "lucide-react";
 
 import type { GraphEdge, GraphNode } from "@/lib/types";
-import { CROSS_EDGE_DASH, CROSS_EDGE_STROKE, edgeStyle, nodeStyle, shortLabel } from "./legend";
+import {
+  CROSS_EDGE_DASH,
+  CROSS_EDGE_STROKE,
+  edgeStyle,
+  nodeStyle,
+  shortLabel,
+} from "./legend";
 
 // --- Graph data mapped for react-force-graph-2d ----------------------------
 // The library mutates link.source / link.target from ids into node objects and
@@ -56,7 +62,9 @@ export function GraphCanvas({
   chargeStrength = -300,
   linkDistance = 150,
 }: GraphCanvasProps) {
-  const fgRef = useRef<ForceGraphMethods<FGNode, FGLink> | undefined>(undefined);
+  const fgRef = useRef<ForceGraphMethods<FGNode, FGLink> | undefined>(
+    undefined,
+  );
   const wrapRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 800, height: 600 });
 
@@ -108,10 +116,11 @@ export function GraphCanvas({
       const y = node.y ?? 0;
       const selected = node.id === selectedNodeId;
 
-      // Pulsing glow — strong on the hero task node, a gentle halo elsewhere.
-      const t = performance.now() / 1000;
-      const pulse = 0.5 + 0.5 * Math.sin(t * 2);
-      const glow = node.isTask ? 8 + pulse * 10 : selected ? 8 : 3;
+      // Glow only on the selected node, whatever its type — no ambient or
+      // pulsing halo. An unselected node (including the focal/task node) never
+      // glows; the task node reads as the hero via its larger radius and
+      // heavier stroke instead.
+      const glow = selected ? 22 : 0;
       ctx.save();
       ctx.shadowColor = style.stroke;
       ctx.shadowBlur = glow;
@@ -183,7 +192,8 @@ export function GraphCanvas({
     [selectedEdgeId],
   );
 
-  const zoomIn = () => fgRef.current?.zoom((fgRef.current?.zoom() ?? 1) * 1.3, 200);
+  const zoomIn = () =>
+    fgRef.current?.zoom((fgRef.current?.zoom() ?? 1) * 1.3, 200);
   const zoomOut = () =>
     fgRef.current?.zoom((fgRef.current?.zoom() ?? 1) * 0.75, 200);
   const resetZoom = () => fgRef.current?.zoomToFit(400, 60);
@@ -236,7 +246,13 @@ export function GraphCanvas({
           const n = node as FGNode;
           ctx.fillStyle = color;
           ctx.beginPath();
-          ctx.arc(n.x ?? 0, n.y ?? 0, (n.isTask ? TASK_R : ANCHOR_R) + 2, 0, 2 * Math.PI);
+          ctx.arc(
+            n.x ?? 0,
+            n.y ?? 0,
+            (n.isTask ? TASK_R : ANCHOR_R) + 2,
+            0,
+            2 * Math.PI,
+          );
           ctx.fill();
         }}
         onNodeClick={(n) => onSelectNode((n as FGNode).id)}

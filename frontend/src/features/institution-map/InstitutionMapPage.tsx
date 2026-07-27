@@ -16,9 +16,9 @@ import { GraphCanvas } from "@/features/workstream-graph/GraphCanvas";
 import { labelStyle } from "@/lib/labels";
 import { headlineOverlap } from "@/lib/overlaps";
 
-// Guarantees the cross-workstream overlaps (OpRes↔Open Finance and the
-// BCM↔Recovery Planning overlap) are on screen the moment the page loads.
-const DEFAULT_SELECTION = ["open-finance-ed", "resolution-recovery", "opres-v2"];
+// Guarantees the cross-workstream overlap (OpRes↔Open Finance) is on screen the
+// moment the page loads.
+const DEFAULT_SELECTION = ["open-finance-ed", "opres-v2"];
 
 type NearLink = CrossLink & { nearWorkstreamId: string };
 
@@ -66,7 +66,8 @@ export function InstitutionMapPage() {
     const byId = new Map<string, NearLink>();
     selectedIds.forEach((id, i) => {
       for (const link of crossQueries[i]?.data ?? []) {
-        if (!byId.has(link.id)) byId.set(link.id, { ...link, nearWorkstreamId: id });
+        if (!byId.has(link.id))
+          byId.set(link.id, { ...link, nearWorkstreamId: id });
       }
     });
     return [...byId.values()];
@@ -142,7 +143,8 @@ export function InstitutionMapPage() {
   const availableToAdd = allWorkstreams.filter(
     (w) => !selectedIds.includes(w.id),
   );
-  const remove = (id: string) => setSelected(selectedIds.filter((s) => s !== id));
+  const remove = (id: string) =>
+    setSelected(selectedIds.filter((s) => s !== id));
   const add = (id: string) => setSelected([...selectedIds, id]);
 
   // The most attention-worthy untriaged overlap on this map — not hardcoded to
@@ -311,8 +313,12 @@ export function InstitutionMapPage() {
                       className="border-t border-border/60 hover:bg-accent/40"
                       data-testid="cross-link-row"
                     >
-                      <td className="px-4 py-2 font-medium">{link.near.title}</td>
-                      <td className="px-4 py-2 font-medium">{link.far.title}</td>
+                      <td className="px-4 py-2 font-medium">
+                        {link.near.title}
+                      </td>
+                      <td className="px-4 py-2 font-medium">
+                        {link.far.title}
+                      </td>
                       <td className="px-4 py-2 text-muted-foreground">
                         {link.far.workstream_name ?? link.far.workstream_id}
                       </td>

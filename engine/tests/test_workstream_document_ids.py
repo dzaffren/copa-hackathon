@@ -1,6 +1,7 @@
 """Every document_id declared on a workstream graph node must be a real
 ingested document (present in the clause index), so the live analyze route
 never resolves a node to a document with zero clauses."""
+
 import json
 from pathlib import Path
 
@@ -18,7 +19,6 @@ EXPECTED = {
     ("open-finance-ed", "rmit-pd-2023"): "rmit-v1-2023",
     ("open-finance-ed", "bcm-pd-2022"): "bcm-v1-2022",
     ("rmit-v2-2025", "rmit-pd-v2"): "rmit-v2-2025",
-    ("outsourcing-v2", "outsourcing-pd-v2"): "outsourcing-v1-2019",
     ("_cross", "of-ed-2025"): "open-finance-v1-2025-ed",
     ("_cross", "opres-dp-2025"): "opres-v1-2025-draft",
 }

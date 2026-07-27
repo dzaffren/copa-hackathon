@@ -40,7 +40,7 @@ def test_opres_sees_the_link_into_open_finance(tmp_path):
     link = links[0]
     assert link["near"]["title"] == "OpRes DP (Dec 2025)"
     assert link["far"]["workstream_id"] == _OF
-    assert link["far"]["workstream_name"] == "Open Finance ED · 2025"
+    assert link["far"]["workstream_name"] == "Open Finance PD · 2026"
     assert link["findings_count"] == 12
 
 
@@ -57,7 +57,7 @@ def test_open_finance_sees_the_same_link_from_its_own_end(tmp_path):
 
 def test_an_unrelated_workstream_sees_no_links(tmp_path):
     client, _ = _make_client(tmp_path)
-    assert _links(client, "outsourcing-v2") == []
+    assert _links(client, "rmit-v2-2025") == []
 
 
 def test_link_carries_a_label_tally(tmp_path):
@@ -142,7 +142,9 @@ def test_every_finding_is_verbatim_cited_from_both_sides_or_says_it_cannot_be(
     """
     _, dst = _make_client(tmp_path)
     findings = json.loads(
-        (dst / "_cross" / "findings" / f"{_CROSS_EDGE}.json").read_text(encoding="utf-8")
+        (dst / "_cross" / "findings" / f"{_CROSS_EDGE}.json").read_text(
+            encoding="utf-8"
+        )
     )
     assert len(findings) == 12
 
@@ -187,7 +189,9 @@ def test_every_linkage_still_quotes_at_least_one_clause_per_side_except_one(tmp_
     """
     _, dst = _make_client(tmp_path)
     findings = json.loads(
-        (dst / "_cross" / "findings" / f"{_CROSS_EDGE}.json").read_text(encoding="utf-8")
+        (dst / "_cross" / "findings" / f"{_CROSS_EDGE}.json").read_text(
+            encoding="utf-8"
+        )
     )
     mute = [
         i
@@ -201,9 +205,17 @@ def test_every_linkage_still_quotes_at_least_one_clause_per_side_except_one(tmp_
 def test_findings_use_only_the_five_label_taxonomy(tmp_path):
     _, dst = _make_client(tmp_path)
     findings = json.loads(
-        (dst / "_cross" / "findings" / f"{_CROSS_EDGE}.json").read_text(encoding="utf-8")
+        (dst / "_cross" / "findings" / f"{_CROSS_EDGE}.json").read_text(
+            encoding="utf-8"
+        )
     )
-    allowed = {"aligns-with", "differs-on", "conflicts-with", "silent-on", "goes-beyond"}
+    allowed = {
+        "aligns-with",
+        "differs-on",
+        "conflicts-with",
+        "silent-on",
+        "goes-beyond",
+    }
     assert {f["label"] for f in findings} <= allowed
     # sentiment is valid only on differs-on
     for f in findings:
@@ -217,9 +229,13 @@ def test_the_accountability_gap_survived_the_projection(tmp_path):
     Pinned because it is the moment the demo turns on."""
     _, dst = _make_client(tmp_path)
     findings = json.loads(
-        (dst / "_cross" / "findings" / f"{_CROSS_EDGE}.json").read_text(encoding="utf-8")
+        (dst / "_cross" / "findings" / f"{_CROSS_EDGE}.json").read_text(
+            encoding="utf-8"
+        )
     )
-    gap = next(f for f in findings if f["label"] == "goes-beyond" and "7.1" in json.dumps(f))
+    gap = next(
+        f for f in findings if f["label"] == "goes-beyond" and "7.1" in json.dumps(f)
+    )
     assert "Open Finance 7.1" in [c["clause_number"] for c in gap["source_clauses"]]
     assert "Operational Resilience 6.3" in [
         c["clause_number"] for c in gap["target_clauses"]
