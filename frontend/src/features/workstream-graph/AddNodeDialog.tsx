@@ -199,7 +199,7 @@ export function AddNodeDialog({
           >
             <input
               type="checkbox"
-              className="h-4 w-4 rounded border-border/70 accent-indigo-600"
+              className="h-4 w-4 rounded border-border/70 accent-primary"
               checked={autoIngest}
               disabled={!sourceUrl.trim()}
               onChange={(e) => setAutoIngest(e.target.checked)}

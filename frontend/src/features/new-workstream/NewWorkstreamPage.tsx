@@ -178,7 +178,7 @@ export function NewWorkstreamPage() {
           <div className="mt-3">
             <span className="text-xs font-semibold text-foreground">Owner</span>
             <div className="mt-1 flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-[10px] font-bold text-primary">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-[10px] font-bold text-primary">
                 AR
               </span>
               <span className="text-sm">Aisyah R.</span>

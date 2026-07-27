@@ -13,37 +13,37 @@ export interface StatusStyle {
 export const STATUS_STYLES: Record<LinkageStatus, StatusStyle> = {
   ai_detected: {
     label: "AI detected",
-    pill: "bg-slate-500/15 text-slate-600 border border-slate-400/40",
+    pill: "bg-slate-500/15 text-slate-700 border border-slate-400/40",
     dot: "bg-slate-400",
   },
   maker_review: {
     label: "Maker review",
-    pill: "bg-primary/10 text-primary border border-primary/30",
+    pill: "bg-primary/15 text-primary border border-primary/30",
     dot: "bg-primary",
   },
   submitted_for_check: {
     label: "Submitted for check",
-    pill: "bg-sky-500/15 text-sky-300 border border-sky-400/30",
+    pill: "bg-sky-500/15 text-sky-800 border border-sky-400/30",
     dot: "bg-sky-400",
   },
   checker_review: {
     label: "Checker review",
-    pill: "bg-violet-500/15 text-violet-700 border border-violet-400/30",
+    pill: "bg-violet-500/15 text-violet-800 border border-violet-400/30",
     dot: "bg-violet-400",
   },
   approved: {
     label: "Approved",
-    pill: "bg-emerald-500/15 text-emerald-700 border border-emerald-400/30",
+    pill: "bg-emerald-500/15 text-emerald-800 border border-emerald-400/30",
     dot: "bg-emerald-400",
   },
   rejected: {
     label: "Rejected",
-    pill: "bg-red-500/15 text-red-700 border border-red-400/30",
+    pill: "bg-red-500/15 text-red-800 border border-red-400/30",
     dot: "bg-red-400",
   },
   changes_requested: {
     label: "Changes requested",
-    pill: "bg-amber-400/15 text-amber-700 border border-amber-300/30",
+    pill: "bg-amber-400/15 text-amber-800 border border-amber-300/30",
     dot: "bg-amber-400",
   },
 };

@@ -10,11 +10,7 @@ import {
   fetchNodeDetail,
   fetchWorkstreams,
 } from "@/lib/api";
-import {
-  CROSS_STORE,
-  type NodeDetail,
-  type WorkstreamSummary,
-} from "@/lib/types";
+import { CROSS_STORE, type NodeDetail, type WorkstreamSummary } from "@/lib/types";
 import { labelStyle } from "@/lib/labels";
 import { LABEL_ORDER } from "@/lib/labels";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -32,10 +28,7 @@ export function CompareWorkstreamsPage() {
 
   // Default to the flagship pair (BCM vs Resolution & Recovery) when present.
   const fallbackA = pick(workstreams, ["bcm", "opres-v2"]);
-  const fallbackB = pick(workstreams, [
-    "resolution-recovery",
-    "open-finance-ed",
-  ]);
+  const fallbackB = pick(workstreams, ["resolution-recovery", "open-finance-ed"]);
   const aId = params.get("a") ?? fallbackA;
   const bId = params.get("b") ?? fallbackB;
 
@@ -43,10 +36,7 @@ export function CompareWorkstreamsPage() {
     const next = new URLSearchParams(params);
     next.set(side, id);
     if (!next.get(side === "a" ? "b" : "a")) {
-      next.set(
-        side === "a" ? "b" : "a",
-        side === "a" ? (bId ?? "") : (aId ?? ""),
-      );
+      next.set(side === "a" ? "b" : "a", side === "a" ? bId ?? "" : aId ?? "");
     }
     setParams(next);
   };
@@ -67,7 +57,7 @@ export function CompareWorkstreamsPage() {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <header className="nav-dark border-b border-black/10 px-6 py-4">
+      <header className="border-b border-border/60 bg-card/30 px-6 py-4 backdrop-blur">
         <Link
           to="/intelligence"
           className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
@@ -75,8 +65,7 @@ export function CompareWorkstreamsPage() {
           <ArrowLeft className="h-3.5 w-3.5" /> Cross-Workstream Intelligence
         </Link>
         <h1 className="mt-1 flex items-center gap-2 text-lg font-bold">
-          <ArrowLeftRight className="h-5 w-5 text-primary" /> Compare
-          workstreams
+          <ArrowLeftRight className="h-5 w-5 text-primary" /> Compare workstreams
         </h1>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <SidePicker
@@ -99,16 +88,8 @@ export function CompareWorkstreamsPage() {
 
       <div className="min-h-0 flex-1 overflow-y-auto p-6">
         <div className="grid gap-4 lg:grid-cols-2">
-          <ProfileColumn
-            workstreamId={aId}
-            workstreams={workstreams}
-            accent="cyan"
-          />
-          <ProfileColumn
-            workstreamId={bId}
-            workstreams={workstreams}
-            accent="violet"
-          />
+          <ProfileColumn workstreamId={aId} workstreams={workstreams} accent="blue" />
+          <ProfileColumn workstreamId={bId} workstreams={workstreams} accent="violet" />
         </div>
 
         {/* Detected relationships */}
@@ -118,8 +99,8 @@ export function CompareWorkstreamsPage() {
           </h2>
           {!link ? (
             <p className="mt-2 text-sm text-muted-foreground">
-              No cross-workstream linkages detected between these two
-              workstreams yet.
+              No cross-workstream linkages detected between these two workstreams
+              yet.
             </p>
           ) : (
             <div className="glass mt-2 rounded-xl p-4">
@@ -196,9 +177,7 @@ function SidePicker({
 }) {
   return (
     <label className="flex items-center gap-1.5 text-sm">
-      <span className="text-[10px] font-bold uppercase text-muted-foreground">
-        {label}
-      </span>
+      <span className="text-[10px] font-bold uppercase text-muted-foreground">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -223,7 +202,7 @@ function ProfileColumn({
 }: {
   workstreamId: string;
   workstreams: WorkstreamSummary[];
-  accent: "cyan" | "violet";
+  accent: "blue" | "violet";
 }) {
   const meta = workstreams.find((w) => w.id === workstreamId);
   const { data: graph } = useQuery({
@@ -243,8 +222,7 @@ function ProfileColumn({
   });
   const detail = detailQuery.data as NodeDetail | undefined;
   const concepts = conceptsOf(detail?.concepts);
-  const accentBar =
-    accent === "cyan" ? "border-t-primary/60" : "border-t-violet-500/60";
+  const accentBar = accent === "blue" ? "border-t-primary/60" : "border-t-violet-400/60";
 
   return (
     <div className={cn("glass rounded-xl border-t-2 p-4", accentBar)}>
@@ -265,11 +243,7 @@ function ProfileColumn({
         <dl className="mt-3 space-y-2 text-sm">
           <Field label="Policy owner" value={concepts?.policy_owner} />
           <Field label="Applicability" value={concepts?.applicability} />
-          <ListField
-            label="Legal basis"
-            values={asList(concepts?.legal_basis)}
-            fallback={detail.pursuant_to}
-          />
+          <ListField label="Legal basis" values={asList(concepts?.legal_basis) } fallback={detail.pursuant_to} />
           <Field
             label="ISMP classification"
             value={concepts?.ismp_classification}
@@ -307,8 +281,7 @@ function Field({
     <div className="grid grid-cols-[110px_1fr] gap-2">
       <dt className="text-xs font-semibold text-muted-foreground">{label}</dt>
       <dd className={cn("text-sm", !value && "italic text-muted-foreground")}>
-        {value ||
-          (pendingNote ? `Not available — ${pendingNote}` : "Not available")}
+        {value || (pendingNote ? `Not available — ${pendingNote}` : "Not available")}
       </dd>
     </div>
   );
@@ -329,9 +302,7 @@ function ListField({
       <dt className="text-xs font-semibold text-muted-foreground">{label}</dt>
       <dd className="flex flex-wrap gap-1">
         {items.length === 0 ? (
-          <span className="text-sm italic text-muted-foreground">
-            Not available
-          </span>
+          <span className="text-sm italic text-muted-foreground">Not available</span>
         ) : (
           items.map((v) => (
             <span

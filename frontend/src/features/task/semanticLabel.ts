@@ -1,7 +1,7 @@
 import type { SemanticLabel } from "@/lib/types";
 import { LABEL_STYLES } from "@/lib/labels";
 
-// Task-screen view of the five-label taxonomy. Pills come from the shared dark
+// Task-screen view of the five-label taxonomy. Pills come from the shared
 // palette in @/lib/labels; `card` and `calloutBorder` add the container accents
 // the task/drafting cards need on top of that. `labelText` is re-exported from
 // the shared module so there is exactly one sentiment-arrow implementation.
@@ -43,7 +43,7 @@ const CARD_ACCENT: Record<
 };
 
 const FALLBACK: LabelStyle = {
-  pill: "bg-slate-500/15 text-slate-600 border border-slate-400/30",
+  pill: "bg-slate-500/15 text-slate-700 border border-slate-400/30",
   card: "border-border/60 bg-card/50",
   calloutBorder: "border-slate-300",
 };

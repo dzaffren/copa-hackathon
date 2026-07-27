@@ -63,7 +63,7 @@ export function ReviewQueuePage() {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <header className="nav-dark border-b border-black/10 px-6 py-4">
+      <header className="border-b border-border/60 bg-card/30 px-6 py-4 backdrop-blur">
         <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary/80">
           <ClipboardCheck className="h-3.5 w-3.5" /> Review Queue
         </p>
@@ -191,7 +191,7 @@ function MetricPill({
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold",
         tone === "warn"
-          ? "border-amber-300/30 bg-amber-400/10 text-amber-700"
+          ? "border-amber-300/30 bg-amber-400/10 text-amber-800"
           : "border-border/60 bg-card/40 text-foreground/80",
       )}
     >

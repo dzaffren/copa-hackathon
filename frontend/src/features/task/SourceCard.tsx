@@ -80,7 +80,7 @@ export function SourceCard({ task }: { task: Task }) {
           <div className="mb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
             Status
           </div>
-          <Badge className="border border-amber-300/30 bg-amber-400/15 text-amber-700 hover:bg-amber-400/15">
+          <Badge className="border border-amber-300/30 bg-amber-400/15 text-amber-800 hover:bg-amber-400/15">
             {task.status === "in_progress" ? "in progress" : task.status}
           </Badge>
         </div>

@@ -43,16 +43,16 @@ type Turn = { role: "user"; text: string } | { role: "copilot"; reply: Reply };
 
 /** Status badge styling for a benchmark card. */
 const BADGE_STYLES: Record<string, string> = {
-  Aligned: "bg-emerald-500/15 text-emerald-300 border-emerald-400/30",
-  "Gap detected": "bg-amber-400/15 text-amber-300 border-amber-300/30",
-  Deviation: "bg-red-500/15 text-red-300 border-red-400/30",
+  Aligned: "bg-emerald-500/15 text-emerald-800 border-emerald-400/30",
+  "Gap detected": "bg-amber-400/15 text-amber-800 border-amber-300/30",
+  Deviation: "bg-red-500/15 text-red-800 border-red-400/30",
 };
 
 /** Finding-label pill styling, reusing the taxonomy's colours. */
 const TAG_STYLES: Record<string, string> = {
-  "conflicts-with": "bg-red-500/15 text-red-300 border-red-400/30",
-  "silent-on": "bg-amber-400/15 text-amber-300 border-amber-300/30",
-  "aligns-with": "bg-emerald-500/15 text-emerald-300 border-emerald-400/30",
+  "conflicts-with": "bg-red-500/15 text-red-800 border-red-400/30",
+  "silent-on": "bg-amber-400/15 text-amber-800 border-amber-300/30",
+  "aligns-with": "bg-emerald-500/15 text-emerald-800 border-emerald-400/30",
 };
 
 // Reusable drafted clauses, grounded in the workstream's anchor documents.
@@ -227,7 +227,7 @@ const SUGGESTIONS: Array<{
   {
     id: "cbf",
     Icon: AlertTriangle,
-    iconClass: "text-red-300",
+    iconClass: "text-red-600",
     title: "Reconcile CBF definition conflict",
     body: "BCM PD 9.7 and Recovery Planning PD 11.11 define Critical Business Functions differently.",
     tag: "conflicts-with",
@@ -236,7 +236,7 @@ const SUGGESTIONS: Array<{
   {
     id: "sec6",
     Icon: FileText,
-    iconClass: "text-amber-300",
+    iconClass: "text-amber-600",
     title: "Draft Section 6 — Reporting Requirements",
     body: "No clause evidence in workstream. Consider the MAS semi-annual reporting model.",
     tag: "silent-on",
@@ -245,7 +245,7 @@ const SUGGESTIONS: Array<{
   {
     id: "sec3",
     Icon: CheckCircle2,
-    iconClass: "text-emerald-300",
+    iconClass: "text-emerald-600",
     title: "Section 3 ready to draft",
     body: "Governance & Accountability has strong clause coverage from BCM PD 8.1–8.3.",
     tag: "aligns-with",
@@ -298,7 +298,7 @@ export function CopilotTab({ onInsertSnippet }: CopilotTabProps) {
           aria-label="Intent preset"
           value={intent}
           onChange={(e) => setIntent(e.target.value as CopilotIntent)}
-          className="w-full rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-cyan-400/60"
+          className="w-full rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-primary/60"
         >
           {COPILOT_INTENTS.map((i) => (
             <option key={i} value={i}>
@@ -338,7 +338,7 @@ export function CopilotTab({ onInsertSnippet }: CopilotTabProps) {
                     key={b.name}
                     type="button"
                     onClick={() => ask(b.prompt, b.reply)}
-                    className="rounded-xl border border-border/60 bg-muted/30 p-2.5 text-left transition hover:border-cyan-400/60 hover:bg-cyan-500/10"
+                    className="rounded-xl border border-border/60 bg-muted/30 p-2.5 text-left transition hover:border-primary/60 hover:bg-primary/10"
                   >
                     <div className="mb-1 flex items-center gap-1.5">
                       <span className="rounded bg-background/60 px-1 py-0.5 text-[9px] font-bold tracking-wide text-muted-foreground">
@@ -376,7 +376,7 @@ export function CopilotTab({ onInsertSnippet }: CopilotTabProps) {
                     key={s.id}
                     type="button"
                     onClick={() => ask(s.title, s.reply)}
-                    className="block w-full rounded-xl border border-border/60 bg-muted/30 p-2.5 text-left transition hover:border-cyan-400/60 hover:bg-cyan-500/10"
+                    className="block w-full rounded-xl border border-border/60 bg-muted/30 p-2.5 text-left transition hover:border-primary/60 hover:bg-primary/10"
                   >
                     <div className="mb-1 flex items-center justify-between gap-2">
                       <span className="flex items-center gap-1.5 text-sm font-medium text-foreground">
@@ -416,7 +416,7 @@ export function CopilotTab({ onInsertSnippet }: CopilotTabProps) {
             {messages.map((m, i) =>
               m.role === "user" ? (
                 <div key={i} data-testid="chat-user" className="flex justify-end">
-                  <p className="max-w-[85%] rounded-lg bg-cyan-500 px-2.5 py-1.5 text-sm leading-snug text-slate-950">
+                  <p className="max-w-[85%] rounded-lg bg-primary px-2.5 py-1.5 text-sm leading-snug text-primary-foreground">
                     {m.text}
                   </p>
                 </div>
@@ -436,7 +436,7 @@ export function CopilotTab({ onInsertSnippet }: CopilotTabProps) {
                     <button
                       type="button"
                       onClick={() => onInsertSnippet(m.reply.snippet!)}
-                      className="mt-2.5 flex items-center gap-1.5 rounded-md bg-cyan-500 px-2.5 py-1 text-xs font-semibold text-slate-950 hover:bg-cyan-400"
+                      className="mt-2.5 flex items-center gap-1.5 rounded-md bg-primary px-2.5 py-1 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
                     >
                       <FilePlus2 className="h-3.5 w-3.5" />
                       Insert at cursor
@@ -449,7 +449,7 @@ export function CopilotTab({ onInsertSnippet }: CopilotTabProps) {
                           key={f}
                           type="button"
                           onClick={() => ask(f, buildMockReply(f))}
-                          className="rounded-full border border-border/60 px-2 py-0.5 text-[11px] text-muted-foreground transition hover:border-cyan-400/60 hover:text-cyan-300"
+                          className="rounded-full border border-border/60 px-2 py-0.5 text-[11px] text-muted-foreground transition hover:border-primary/60 hover:text-primary"
                         >
                           {f}
                         </button>
@@ -471,7 +471,7 @@ export function CopilotTab({ onInsertSnippet }: CopilotTabProps) {
               key={chip}
               type="button"
               onClick={() => ask(chip, buildMockReply(chip))}
-              className="rounded-full border border-border/60 px-2 py-0.5 text-xs text-muted-foreground transition hover:border-cyan-400/60 hover:text-cyan-300"
+              className="rounded-full border border-border/60 px-2 py-0.5 text-xs text-muted-foreground transition hover:border-primary/60 hover:text-primary"
             >
               {chip}
             </button>
@@ -483,12 +483,12 @@ export function CopilotTab({ onInsertSnippet }: CopilotTabProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask the Copilot to draft or compare…"
-            className="min-w-0 flex-1 rounded-md border border-border/60 bg-background/60 px-2.5 py-1.5 text-sm outline-none focus:border-cyan-400/60"
+            className="min-w-0 flex-1 rounded-md border border-border/60 bg-background/60 px-2.5 py-1.5 text-sm outline-none focus:border-primary/60"
           />
           <button
             type="submit"
             aria-label="Send"
-            className="flex items-center gap-1 rounded-md bg-cyan-500 px-3 py-1.5 text-sm font-semibold text-slate-950 hover:bg-cyan-400"
+            className="flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
           >
             <Send className="h-3.5 w-3.5" />
           </button>

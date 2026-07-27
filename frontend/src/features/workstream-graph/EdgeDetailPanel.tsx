@@ -186,7 +186,7 @@ export function EdgeDetailPanel({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-7 text-primary hover:text-primary"
+                    className="h-7 text-primary hover:text-primary/80"
                     onClick={() =>
                       navigate(
                         `/workstreams/${workstreamId}/edges/${edgeId}/review`,

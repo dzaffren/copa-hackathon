@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import {
   Brain,
   Building2,
-  ClipboardCheck,
   Layers,
   PanelLeftClose,
   PanelLeftOpen,
@@ -45,8 +44,10 @@ export function Sidebar({
   const [collapsed, setCollapsed] = useState(false);
   const { pathname } = useLocation();
   const intelActive = pathname.startsWith("/intelligence");
-  const queueActive = pathname.startsWith("/review-queue");
-  const { data: workstreams = [], isLoading } = useQuery({
+  const {
+    data: workstreams = [],
+    isLoading,
+  } = useQuery({
     queryKey: ["workstreams"],
     queryFn: fetchWorkstreams,
   });
@@ -54,7 +55,7 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "nav-dark flex h-screen flex-col border-r border-black/10 transition-[width] duration-200",
+        "flex h-screen flex-col border-r border-border/60 bg-card transition-[width] duration-200",
         collapsed ? "w-16" : "w-64",
       )}
     >
@@ -62,13 +63,11 @@ export function Sidebar({
       <div className="flex items-center justify-between gap-2 border-b border-border/60 px-3 py-4">
         {!collapsed && (
           <Link to="/" className="flex min-w-0 items-center gap-2">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-primary/15 to-indigo-500/20 ring-1 ring-primary/30">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-primary/30 to-primary/10 ring-1 ring-primary/40">
               <Brain className="h-4 w-4 text-primary" />
             </span>
             <span className="flex min-w-0 flex-col leading-tight">
-              <span className="truncate text-sm font-bold">
-                Workstream Brain
-              </span>
+              <span className="truncate text-sm font-bold">Workstream Brain</span>
               <span className="truncate text-[10px] text-muted-foreground">
                 Policy drafting intelligence
               </span>
@@ -101,28 +100,12 @@ export function Sidebar({
           className={cn(
             "group relative mb-2 flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-semibold transition-colors",
             intelActive
-              ? "bg-accent text-accent-foreground ring-1 ring-primary/30"
+              ? "bg-primary/15 text-primary ring-1 ring-primary/30"
               : "text-foreground/80 hover:bg-accent/40 hover:text-foreground",
           )}
         >
           <Radar className="h-4 w-4 shrink-0 text-primary" />
           {!collapsed && <span>Cross-Workstream Intel</span>}
-        </Link>
-
-        {/* Review Queue — the maker-checker backlog for detected linkages. */}
-        <Link
-          to="/review-queue"
-          title="Review Queue"
-          aria-current={queueActive ? "page" : undefined}
-          className={cn(
-            "group relative mb-2 flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-semibold transition-colors",
-            queueActive
-              ? "bg-accent text-accent-foreground ring-1 ring-primary/30"
-              : "text-foreground/80 hover:bg-accent/40 hover:text-foreground",
-          )}
-        >
-          <ClipboardCheck className="h-4 w-4 shrink-0 text-primary" />
-          {!collapsed && <span>Review Queue</span>}
         </Link>
 
         <p
@@ -153,7 +136,7 @@ export function Sidebar({
                     className={cn(
                       "group relative flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
                       active
-                        ? "bg-accent font-semibold text-accent-foreground ring-1 ring-primary/30"
+                        ? "bg-accent/70 font-semibold text-foreground"
                         : "text-foreground/70 hover:bg-accent/40 hover:text-foreground",
                     )}
                   >
@@ -195,7 +178,7 @@ export function Sidebar({
           title="Institution map"
           className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-foreground/70 transition-colors hover:bg-accent/40 hover:text-foreground"
         >
-          <Building2 className="h-4 w-4 shrink-0 text-violet-300" />
+          <Building2 className="h-4 w-4 shrink-0 text-violet-600" />
           {!collapsed && <span>Institution map</span>}
         </Link>
       </div>

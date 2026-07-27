@@ -13,7 +13,7 @@ import type {
 
 export interface ClassStyle {
   label: string;
-  /** Translucent pill — reads on the dark navy. */
+  /** Translucent pill — deep text for AA contrast on white. */
   pill: string;
   /** Small status dot. */
   dot: string;
@@ -22,29 +22,29 @@ export interface ClassStyle {
 export const CLASS_STYLES: Record<RelationshipClassification, ClassStyle> = {
   conflict: {
     label: "Conflict",
-    pill: "bg-red-500/15 text-red-700 border border-red-400/30",
+    pill: "bg-red-500/15 text-red-800 border border-red-400/30",
     dot: "bg-red-400",
   },
   divergent: {
     label: "Divergent",
-    pill: "bg-amber-400/15 text-amber-700 border border-amber-300/30",
+    pill: "bg-amber-400/15 text-amber-800 border border-amber-300/30",
     dot: "bg-amber-400",
   },
   overlap: {
     label: "Overlap",
-    pill: "bg-sky-500/15 text-sky-300 border border-sky-400/30",
+    pill: "bg-sky-500/15 text-sky-800 border border-sky-400/30",
     dot: "bg-sky-400",
   },
   aligned: {
     label: "Aligned",
-    pill: "bg-emerald-500/15 text-emerald-700 border border-emerald-400/30",
+    pill: "bg-emerald-500/15 text-emerald-800 border border-emerald-400/30",
     dot: "bg-emerald-400",
   },
 };
 
 const CLASS_FALLBACK: ClassStyle = {
   label: "Overlap",
-  pill: "bg-slate-500/15 text-slate-600 border border-slate-400/30",
+  pill: "bg-slate-500/15 text-slate-700 border border-slate-400/30",
   dot: "bg-slate-400",
 };
 
@@ -53,12 +53,12 @@ export function classStyle(c: RelationshipClassification): ClassStyle {
 }
 
 export const RISK_STYLES: Record<RiskLevel, { label: string; pill: string }> = {
-  high: { label: "High risk", pill: "bg-red-500/15 text-red-700 border border-red-400/30" },
+  high: { label: "High risk", pill: "bg-red-500/15 text-red-800 border border-red-400/30" },
   medium: {
     label: "Medium risk",
-    pill: "bg-amber-400/15 text-amber-700 border border-amber-300/30",
+    pill: "bg-amber-400/15 text-amber-800 border border-amber-300/30",
   },
-  low: { label: "Low risk", pill: "bg-slate-500/15 text-slate-600 border border-slate-400/40" },
+  low: { label: "Low risk", pill: "bg-slate-500/15 text-slate-700 border border-slate-400/40" },
 };
 
 export function riskStyle(r: RiskLevel) {

@@ -1,6 +1,6 @@
 import type { SemanticLabel, Sentiment } from "@/lib/types";
 
-// One source of truth for the five-label semantic taxonomy on the dark theme:
+// One source of truth for the five-label semantic taxonomy:
 //   aligns-with · differs-on · conflicts-with · silent-on · goes-beyond
 // Plan palette: aligns=emerald, differs=amber, conflicts=red, silent=blue,
 // goes-beyond=purple. Sentiment (tighten/loosen) renders ONLY on `differs-on`.
@@ -8,7 +8,7 @@ import type { SemanticLabel, Sentiment } from "@/lib/types";
 export interface LabelStyle {
   /** Human label text. */
   label: string;
-  /** Pill: translucent bg + coloured text + hairline border, reads on navy. */
+  /** Pill: translucent bg + coloured text + hairline border, reads on white. */
   pill: string;
   /** Left-border accent for cards and inline callouts. */
   accent: string;
@@ -42,7 +42,7 @@ export const LABEL_STYLES: Record<SemanticLabel, LabelStyle> = {
   },
   "silent-on": {
     label: "silent-on",
-    pill: "bg-sky-500/15 text-sky-300 border border-sky-400/30",
+    pill: "bg-sky-500/15 text-sky-700 border border-sky-400/30",
     accent: "border-l-sky-400",
     dot: "bg-sky-400",
     canvas: "#38bdf8",
@@ -58,7 +58,7 @@ export const LABEL_STYLES: Record<SemanticLabel, LabelStyle> = {
 
 const FALLBACK: LabelStyle = {
   label: "unknown",
-  pill: "bg-slate-500/15 text-slate-600 border border-slate-400/30",
+  pill: "bg-slate-500/15 text-slate-700 border border-slate-400/30",
   accent: "border-l-slate-400",
   dot: "bg-slate-400",
   canvas: "#94a3b8",

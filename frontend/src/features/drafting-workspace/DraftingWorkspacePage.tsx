@@ -111,7 +111,7 @@ export function DraftingWorkspacePage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="nav-dark flex items-center justify-between border-b border-black/10 px-4 py-2.5">
+      <header className="flex items-center justify-between border-b border-border/60 bg-card px-4 py-2.5">
         <div>
           <Link
             to={`/workstreams/${workstreamId}`}
@@ -123,7 +123,7 @@ export function DraftingWorkspacePage() {
             {task.data?.task.title ?? "Working draft"}
           </h1>
         </div>
-        <span className="rounded-full border border-white/25 bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white">
+        <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
           Auto-saved
         </span>
       </header>
@@ -150,7 +150,7 @@ export function DraftingWorkspacePage() {
                     data-testid={`count-${t.key}`}
                     className={[
                       "ml-1.5 rounded-full px-1.5 py-0.5 text-[10px]",
-                      tab === t.key ? "bg-slate-950/20" : "bg-accent",
+                      tab === t.key ? "bg-primary-foreground/20" : "bg-accent",
                     ].join(" ")}
                   >
                     {t.count}

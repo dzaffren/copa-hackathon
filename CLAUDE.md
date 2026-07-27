@@ -189,4 +189,6 @@ Note this is _not_ `data/references/`, which is public and tracked.
 - **Finding labels (5):** aligns-with, differs-on, conflicts-with, silent-on, goes-beyond.
 - **Sentiment (3, differs-on only):** tighten, loosen, neutral.
 - **CORS:** FastAPI includes CORS middleware allowing origin `http://localhost:5173`.
-- **Dark mode:** default theme. Deep navy/slate, NOT pure black.
+- **Theme:** single light theme only — no dark mode, no toggle. Off-white
+  page background, white cards, a royal-blue primary accent. See
+  `frontend/src/index.css`'s `:root` block for the token values.

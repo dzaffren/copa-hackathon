@@ -4,56 +4,76 @@
 
 @layer base {
   :root {
-    /* Single light theme, aligned to Bank Negara's GEMA design system (Inter +
-       BNM royal blue). A faint cool off-white background so pure-white cards
-       lift off it as elevated surfaces; a deep BNM-blue primary tuned to meet
-       WCAG AA against white text. */
-    --background: 216 43% 98%;
-    --foreground: 222 47% 11%;
+    /* Single light theme (see CLAUDE.md) — off-white page, white cards, a
+       confident royal-blue primary. No dark variant, no toggle. */
+    --background: 210 20% 98%;
+    --foreground: 222.2 47.4% 11.2%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 222.2 47.4% 11.2%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 224 76% 42%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 214 32% 93%;
-    --secondary-foreground: 222 47% 20%;
-    --muted: 214 32% 93%;
-    --muted-foreground: 215 19% 38%;
-    --accent: 214 95% 95%;
-    --accent-foreground: 224 76% 35%;
-    --destructive: 0 72% 48%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 214 26% 87%;
-    --input: 214 26% 87%;
-    --ring: 224 76% 42%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 30% 95%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 25% 95%;
+    --muted-foreground: 215 16% 40%;
+    --accent: 213 60% 94%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214 20% 88%;
+    --input: 214 20% 88%;
+    --ring: 221 83% 53%;
     --radius: 0.5rem;
   }
 }
 
-@layer components {
-  /* Card surface: a solid white panel that lifts off the faint off-white
-     (#F7F9FC) page background via a hairline border and a soft shadow. */
-  .glass {
-    @apply border border-border/60 bg-card shadow-sm;
-  }
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(37,99,235,0.3); }
+  50% { box-shadow: 0 0 20px rgba(37,99,235,0.6), 0 0 40px rgba(37,99,235,0.2); }
+}
+@keyframes floatUp {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes rotateGlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes gridPan {
+  from { background-position: 0 0; }
+  to   { background-position: 60px 60px; }
+}
+@keyframes blobFloat {
+  0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: translate(0, 0) scale(1); }
+  33%       { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: translate(20px, -15px) scale(1.05); }
+  66%       { border-radius: 50% 60% 30% 60% / 40% 30% 70% 50%; transform: translate(-10px, 10px) scale(0.97); }
+}
 
-  /* Navy chrome surface: BNM deep indigo (#2A2A72), used by the page top bar
-     and the left sidebar. Scoping the colour tokens re-points every token-based
-     utility inside it (text-foreground, text-muted-foreground, border,
-     hover:text-primary, badge tints) to a light variant, so content reads on
-     the dark surface without per-child edits. */
-  .nav-dark {
-    --background: 240 46% 31%;
-    --foreground: 0 0% 100%;
-    --muted-foreground: 226 40% 82%;
-    --primary: 0 0% 100%;
-    --primary-foreground: 240 46% 31%;
-    --accent: 240 30% 42%;
-    --accent-foreground: 0 0% 100%;
-    --border: 240 30% 46%;
-    background-color: #2a2a72;
-    color: hsl(var(--foreground));
+:root {
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer components {
+  /* Elevated surface: a solid white card with a hairline border and a soft
+     shadow. Replaces the old backdrop-blur glassmorphism, which read poorly
+     against a light background. */
+  .glass {
+    @apply border border-border bg-card shadow-sm;
   }
 }
 
@@ -62,6 +82,6 @@
     @apply border-border;
   }
   body {
-    @apply bg-background font-sans text-foreground antialiased;
+    @apply bg-background text-foreground font-sans;
   }
 }

@@ -65,7 +65,7 @@ export function RelationshipPanel({
       <header className="border-b border-border/60 bg-card/40 p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-rose-700/80">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-rose-800/80">
               Potential overlap detected
             </p>
             <h2 className="mt-1 text-base font-bold leading-snug">
@@ -148,7 +148,7 @@ export function RelationshipPanel({
       <footer className="grid grid-cols-2 gap-2 border-t border-border/60 bg-card/40 p-3">
         <Link
           to={`/workstreams/${CROSS_STORE}/edges/${data.id}/review`}
-          className="flex items-center justify-center gap-1.5 rounded-lg bg-primary/10 px-3 py-2 text-sm font-semibold text-primary ring-1 ring-primary/30 transition-colors hover:bg-primary/20"
+          className="flex items-center justify-center gap-1.5 rounded-lg bg-primary/15 px-3 py-2 text-sm font-semibold text-primary ring-1 ring-primary/30 transition-colors hover:bg-primary/25"
         >
           <FileText className="h-4 w-4" /> View clause linkage
         </Link>

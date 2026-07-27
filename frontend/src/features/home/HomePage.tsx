@@ -15,19 +15,19 @@ const ROLE_STYLE: Record<
   own: {
     dot: "bg-primary",
     label: "Drafting",
-    chip: "bg-blue-100 text-blue-700",
+    chip: "bg-primary/15 text-primary border border-primary/30",
     glow: "from-primary/40",
   },
   review: {
     dot: "bg-amber-400",
     label: "Reviewing",
-    chip: "bg-amber-100 text-amber-700",
+    chip: "bg-amber-400/15 text-amber-800 border border-amber-300/30",
     glow: "from-amber-400/40",
   },
   delivered: {
     dot: "bg-emerald-400",
     label: "Delivered",
-    chip: "bg-emerald-100 text-emerald-700",
+    chip: "bg-emerald-500/15 text-emerald-800 border border-emerald-400/30",
     glow: "from-emerald-500/40",
   },
 };
@@ -102,11 +102,7 @@ function StatTile({
  * work: New Workstream and the cross-workstream Institution Map.
  */
 export function HomePage() {
-  const {
-    data: workstreams,
-    isPending,
-    isError,
-  } = useQuery({
+  const { data: workstreams, isPending, isError } = useQuery({
     queryKey: ["workstreams"],
     queryFn: fetchWorkstreams,
   });
@@ -137,9 +133,9 @@ export function HomePage() {
           <div className="flex gap-2">
             <Link
               to="/institution-map"
-              className="inline-flex items-center gap-2 rounded-lg border border-border/70 bg-card/40 px-3.5 py-2 text-sm font-medium backdrop-blur transition hover:bg-accent"
+              className="inline-flex items-center gap-2 rounded-lg border border-border/70 bg-card px-3.5 py-2 text-sm font-medium transition hover:bg-accent"
             >
-              <Building2 className="h-4 w-4 text-violet-700" /> Institution map
+              <Building2 className="h-4 w-4 text-violet-600" /> Institution map
             </Link>
             <Link
               to="/workstreams/new"
@@ -177,10 +173,7 @@ export function HomePage() {
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {isPending ? (
             [0, 1, 2, 3, 4, 5].map((i) => (
-              <div
-                key={i}
-                className="glass flex flex-col gap-3 rounded-2xl p-5"
-              >
+              <div key={i} className="glass flex flex-col gap-3 rounded-2xl p-5">
                 <Skeleton className="h-5 w-24" />
                 <Skeleton className="h-5 w-3/4" />
                 <Skeleton className="h-3 w-1/2" />

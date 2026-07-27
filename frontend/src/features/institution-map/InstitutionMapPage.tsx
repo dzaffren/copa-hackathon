@@ -18,11 +18,7 @@ import { headlineOverlap } from "@/lib/overlaps";
 
 // Guarantees the cross-workstream overlaps (OpRes↔Open Finance and the
 // BCM↔Recovery Planning overlap) are on screen the moment the page loads.
-const DEFAULT_SELECTION = [
-  "open-finance-ed",
-  "resolution-recovery",
-  "opres-v2",
-];
+const DEFAULT_SELECTION = ["open-finance-ed", "resolution-recovery", "opres-v2"];
 
 type NearLink = CrossLink & { nearWorkstreamId: string };
 
@@ -70,8 +66,7 @@ export function InstitutionMapPage() {
     const byId = new Map<string, NearLink>();
     selectedIds.forEach((id, i) => {
       for (const link of crossQueries[i]?.data ?? []) {
-        if (!byId.has(link.id))
-          byId.set(link.id, { ...link, nearWorkstreamId: id });
+        if (!byId.has(link.id)) byId.set(link.id, { ...link, nearWorkstreamId: id });
       }
     });
     return [...byId.values()];
@@ -147,8 +142,7 @@ export function InstitutionMapPage() {
   const availableToAdd = allWorkstreams.filter(
     (w) => !selectedIds.includes(w.id),
   );
-  const remove = (id: string) =>
-    setSelected(selectedIds.filter((s) => s !== id));
+  const remove = (id: string) => setSelected(selectedIds.filter((s) => s !== id));
   const add = (id: string) => setSelected([...selectedIds, id]);
 
   // The most attention-worthy untriaged overlap on this map — not hardcoded to
@@ -161,8 +155,8 @@ export function InstitutionMapPage() {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <header className="nav-dark border-b border-black/10 px-6 py-4">
-        <p className="text-xs font-semibold uppercase tracking-wider text-white/70">
+      <header className="border-b border-border/60 bg-card/30 px-6 py-4 backdrop-blur">
+        <p className="text-xs font-semibold uppercase tracking-wider text-violet-800/80">
           Institution map
         </p>
         <h1 className="text-lg font-bold">Cross-workstream drift</h1>
@@ -219,7 +213,7 @@ export function InstitutionMapPage() {
 
         {headline && (
           <div className="mt-3 flex items-start gap-2 rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-800">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-rose-700" />
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-rose-800" />
             <span>
               <strong className="font-semibold">Overlap detected:</strong>{" "}
               {headline.near.title} ↔ {headline.far.title} share{" "}
@@ -241,7 +235,7 @@ export function InstitutionMapPage() {
         {/* Force-directed canvas */}
         <div
           data-testid="institution-canvas"
-          className="relative h-[520px] shrink-0 overflow-hidden border-b border-border/60 bg-background p-3"
+          className="relative h-[520px] shrink-0 overflow-hidden border-b border-border/60 bg-[#0b1220]"
         >
           <GraphCanvas
             nodes={data.nodes}
@@ -317,12 +311,8 @@ export function InstitutionMapPage() {
                       className="border-t border-border/60 hover:bg-accent/40"
                       data-testid="cross-link-row"
                     >
-                      <td className="px-4 py-2 font-medium">
-                        {link.near.title}
-                      </td>
-                      <td className="px-4 py-2 font-medium">
-                        {link.far.title}
-                      </td>
+                      <td className="px-4 py-2 font-medium">{link.near.title}</td>
+                      <td className="px-4 py-2 font-medium">{link.far.title}</td>
                       <td className="px-4 py-2 text-muted-foreground">
                         {link.far.workstream_name ?? link.far.workstream_id}
                       </td>

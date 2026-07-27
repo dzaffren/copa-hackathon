@@ -74,7 +74,7 @@ export function CrossIntelligencePage() {
   return (
     <div className="flex h-full min-h-0 flex-col">
       {/* Header */}
-      <header className="nav-dark border-b border-black/10 px-6 py-4">
+      <header className="border-b border-border/60 bg-card/30 px-6 py-4 backdrop-blur">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary/80">
@@ -91,7 +91,7 @@ export function CrossIntelligencePage() {
           </div>
           <Link
             to="/institution-map"
-            className="flex shrink-0 items-center gap-1.5 rounded-lg border border-border/60 px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-violet-400/50 hover:text-violet-700"
+            className="flex shrink-0 items-center gap-1.5 rounded-lg border border-border/60 px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-violet-400/50 hover:text-violet-800"
           >
             <Map className="h-4 w-4" /> Map view
           </Link>
@@ -217,9 +217,9 @@ function Metric({
 }) {
   const toneClass =
     tone === "danger"
-      ? "text-red-700"
+      ? "text-red-800"
       : tone === "warn"
-        ? "text-amber-700"
+        ? "text-amber-800"
         : "text-foreground";
   return (
     <div className="glass rounded-xl px-3 py-2.5">
@@ -300,7 +300,7 @@ function RelationshipCard({
           ),
         )}
         {unreviewed > 0 && (
-          <span className="ml-auto text-[10px] font-medium text-amber-700">
+          <span className="ml-auto text-[10px] font-medium text-amber-800">
             {unreviewed} unreviewed
           </span>
         )}

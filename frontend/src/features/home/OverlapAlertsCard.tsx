@@ -31,7 +31,7 @@ export function OverlapAlertsCard() {
         aria-label="Overlap alerts"
         className="mb-6 flex items-start gap-2.5 rounded-xl border border-border/60 bg-card/30 px-4 py-3 text-sm text-muted-foreground"
       >
-        <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400/80" />
+        <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
         <p>
           No overlaps detected yet. This runs automatically as workstreams are
           added — nothing to do here.
@@ -50,7 +50,7 @@ export function OverlapAlertsCard() {
         <h2 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-rose-700">
           <TriangleAlert className="h-3.5 w-3.5" /> Overlap alerts
         </h2>
-        <span className="text-[11px] font-medium text-rose-800/70">
+        <span className="text-[11px] font-medium text-rose-600/80">
           Caught automatically — before FPWG
         </span>
       </div>

@@ -151,17 +151,17 @@ export function LinkageReviewPanel({
                     className={cn(
                       "rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors disabled:opacity-50",
                       a.tone === "primary" &&
-                        "bg-primary/10 text-primary ring-1 ring-primary/30 hover:bg-primary/20",
+                        "bg-primary/15 text-primary ring-1 ring-primary/30 hover:bg-primary/25",
                       a.tone === "neutral" && "bg-accent/60 text-foreground/90 hover:bg-accent",
                       a.tone === "danger" &&
-                        "bg-red-500/15 text-red-700 ring-1 ring-red-400/30 hover:bg-red-500/25",
+                        "bg-red-500/15 text-red-800 ring-1 ring-red-400/30 hover:bg-red-500/25",
                     )}
                   >
                     {a.label}
                   </button>
                 ))}
               </div>
-              {error && <p className="text-xs font-medium text-red-700">{error}</p>}
+              {error && <p className="text-xs font-medium text-red-800">{error}</p>}
             </div>
           )}
         </section>

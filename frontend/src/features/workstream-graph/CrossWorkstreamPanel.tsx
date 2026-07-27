@@ -35,7 +35,7 @@ export function CrossWorkstreamPanel({
       aria-label="Cross-workstream linkages"
       className="rounded-xl border border-amber-400/30 bg-amber-400/[0.07] p-3"
     >
-      <h2 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-700">
+      <h2 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-800">
         <GitCompareArrows className="h-3.5 w-3.5" /> Cross-workstream
       </h2>
       <p className="mt-0.5 text-[11px] leading-snug text-amber-800/70">

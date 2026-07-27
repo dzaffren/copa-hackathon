@@ -67,20 +67,20 @@ export function FindingCard({
           {labelText(finding.label, finding.sentiment)}
         </span>
         {sentimentTag ? (
-          <span className="rounded-full border border-amber-300/30 bg-amber-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700">
+          <span className="rounded-full border border-amber-300/30 bg-amber-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800">
             {sentimentTag}
           </span>
         ) : null}
         {isAccepted ? (
           <span
             data-testid="accepted-badge"
-            className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-700"
+            className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-800"
           >
             accepted
           </span>
         ) : null}
         {isDismissed ? (
-          <span className="rounded-full border border-slate-400/30 bg-slate-500/15 px-2 py-0.5 text-xs font-medium text-slate-600">
+          <span className="rounded-full border border-slate-400/30 bg-slate-500/15 px-2 py-0.5 text-xs font-medium text-slate-700">
             dismissed
           </span>
         ) : null}
@@ -123,7 +123,7 @@ export function FindingCard({
                   e.stopPropagation();
                   onAccept(finding);
                 }}
-                className="rounded-md border border-emerald-400/40 px-2 py-1 text-xs font-medium text-emerald-700 hover:bg-emerald-500/10 disabled:opacity-50"
+                className="rounded-md border border-emerald-400/40 px-2 py-1 text-xs font-medium text-emerald-800 hover:bg-emerald-500/10 disabled:opacity-50"
               >
                 Accept
               </button>

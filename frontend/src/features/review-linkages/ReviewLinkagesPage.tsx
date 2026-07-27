@@ -99,19 +99,19 @@ export function ReviewLinkagesPage() {
           </span>
           <span
             data-testid="count-accepted"
-            className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2 py-0.5 font-medium text-emerald-700"
+            className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2 py-0.5 font-medium text-emerald-800"
           >
             {counts.accepted} accepted
           </span>
           <span
             data-testid="count-pending"
-            className="rounded-full border border-amber-300/30 bg-amber-400/15 px-2 py-0.5 font-medium text-amber-700"
+            className="rounded-full border border-amber-300/30 bg-amber-400/15 px-2 py-0.5 font-medium text-amber-800"
           >
             {pending} pending
           </span>
           <span
             data-testid="count-dismissed"
-            className="rounded-full border border-slate-400/30 bg-slate-500/15 px-2 py-0.5 font-medium text-slate-600"
+            className="rounded-full border border-slate-400/30 bg-slate-500/15 px-2 py-0.5 font-medium text-slate-700"
           >
             {counts.dismissed} dismissed
           </span>

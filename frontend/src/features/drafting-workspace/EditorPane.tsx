@@ -77,188 +77,189 @@ export const EditorPane = forwardRef<EditorPaneHandle, EditorPaneProps>(
     { contentHtml, lastSavedAt, linkages, onChange, isSaving },
     ref,
   ) {
-    const editorRef = useRef<HTMLDivElement>(null);
-    const [secondsAgo, setSecondsAgo] = useState(0);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const [secondsAgo, setSecondsAgo] = useState(0);
 
-    // The last cursor/selection position the drafter left inside the editor —
-    // captured on blur (before focus moves to, say, the Copilot panel's "Insert
-    // into draft" button) so a snippet insert lands where they were looking,
-    // not always at the end of the document.
-    const savedRangeRef = useRef<Range | null>(null);
-    function saveCursor() {
-      const el = editorRef.current;
-      const selection = window.getSelection();
-      if (!el || !selection || selection.rangeCount === 0) return;
-      const range = selection.getRangeAt(0);
-      if (el.contains(range.commonAncestorContainer)) {
-        savedRangeRef.current = range.cloneRange();
-      }
+  // The last cursor/selection position the drafter left inside the editor —
+  // captured on blur (before focus moves to, say, the Copilot panel's "Insert
+  // into draft" button) so a snippet insert lands where they were looking,
+  // not always at the end of the document.
+  const savedRangeRef = useRef<Range | null>(null);
+  function saveCursor() {
+    const el = editorRef.current;
+    const selection = window.getSelection();
+    if (!el || !selection || selection.rangeCount === 0) return;
+    const range = selection.getRangeAt(0);
+    if (el.contains(range.commonAncestorContainer)) {
+      savedRangeRef.current = range.cloneRange();
     }
+  }
 
-    useImperativeHandle(ref, () => ({
-      insertAtCursor(html: string) {
-        const el = editorRef.current;
-        if (!el) return null;
-
-        let range = savedRangeRef.current;
-        // A stale range (from a previous mount, or one the DOM has since
-        // moved past) is worse than no range — fall back to end-of-document.
-        if (!range || !el.contains(range.commonAncestorContainer)) {
-          range = document.createRange();
-          range.selectNodeContents(el);
-          range.collapse(false);
-        }
-
-        const sanitized = DOMPurify.sanitize(html, PURIFY_CONFIG);
-        const wrapper = document.createElement("div");
-        wrapper.innerHTML = sanitized;
-        const fragment = document.createDocumentFragment();
-        let lastInserted: ChildNode | null = null;
-        while (wrapper.firstChild) {
-          lastInserted = fragment.appendChild(wrapper.firstChild);
-        }
-
-        range.deleteContents();
-        range.insertNode(fragment);
-
-        // Move the caret to just after what was inserted, so typing right
-        // after an insert continues from there, not from the old position.
-        if (lastInserted) {
-          const after = document.createRange();
-          after.setStartAfter(lastInserted);
-          after.collapse(true);
-          savedRangeRef.current = after.cloneRange();
-          const selection = window.getSelection();
-          selection?.removeAllRanges();
-          selection?.addRange(after);
-        }
-
-        const next = el.innerHTML;
-        onChange(next);
-        return next;
-      },
-      getSelectionText() {
-        // Read the last range saved inside the editor, not the live
-        // `window.getSelection()`: by the time the drafter has clicked into the
-        // Copilot input to ask their question, the browser selection points at
-        // that input, so only `savedRangeRef` (captured on the editor's
-        // mouseup/keyup/blur) still holds what they highlighted in the document.
-        const el = editorRef.current;
-        const range = savedRangeRef.current;
-        if (!el || !range || range.collapsed) return "";
-        if (!el.contains(range.commonAncestorContainer)) return "";
-        return range.toString().trim();
-      },
-    }));
-
-    // Seed / re-seed from props only when the DOM genuinely differs, so typing
-    // (which does not change `contentHtml` until the debounce fires) never
-    // clobbers the caret, while an inserted snippet still lands.
-    useEffect(() => {
+  useImperativeHandle(ref, () => ({
+    insertAtCursor(html: string) {
       const el = editorRef.current;
-      if (el && el.innerHTML !== contentHtml) {
-        el.innerHTML = DOMPurify.sanitize(contentHtml, PURIFY_CONFIG);
+      if (!el) return null;
+
+      let range = savedRangeRef.current;
+      // A stale range (from a previous mount, or one the DOM has since
+      // moved past) is worse than no range — fall back to end-of-document.
+      if (!range || !el.contains(range.commonAncestorContainer)) {
+        range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
       }
-    }, [contentHtml]);
 
-    // "Auto-saved Ns ago". Cosmetic by spec — the counter is confidence-building
-    // chrome, and the real durability signal is the PUT the parent debounces.
-    useEffect(() => {
-      setSecondsAgo(0);
-      const id = setInterval(() => setSecondsAgo((n) => n + 12), 12_000);
-      return () => clearInterval(id);
-    }, [lastSavedAt]);
+      const sanitized = DOMPurify.sanitize(html, PURIFY_CONFIG);
+      const wrapper = document.createElement("div");
+      wrapper.innerHTML = sanitized;
+      const fragment = document.createDocumentFragment();
+      let lastInserted: ChildNode | null = null;
+      while (wrapper.firstChild) {
+        lastInserted = fragment.appendChild(wrapper.firstChild);
+      }
 
-    const callouts = linkages
-      .map((card) => ({ card, tail: clauseTail(card.source_clause_number) }))
-      // silent-on findings anchor to no draft clause, so they get no callout.
-      .filter((c) => c.tail && c.card.label !== "silent-on");
+      range.deleteContents();
+      range.insertNode(fragment);
 
-    return (
-      <section className="flex h-full flex-col" aria-label="Draft editor">
-        <div className="flex items-center justify-between border-b border-border/60 bg-card/30 px-3 py-1.5">
-          {/* Toolbar is a visual signal only — MVP1 does not require these to
+      // Move the caret to just after what was inserted, so typing right
+      // after an insert continues from there, not from the old position.
+      if (lastInserted) {
+        const after = document.createRange();
+        after.setStartAfter(lastInserted);
+        after.collapse(true);
+        savedRangeRef.current = after.cloneRange();
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(after);
+      }
+
+      const next = el.innerHTML;
+      onChange(next);
+      return next;
+    },
+    getSelectionText() {
+      // Read the last range saved inside the editor, not the live
+      // `window.getSelection()`: by the time the drafter has clicked into the
+      // Copilot input to ask their question, the browser selection points at
+      // that input, so only `savedRangeRef` (captured on the editor's
+      // mouseup/keyup/blur) still holds what they highlighted in the document.
+      const el = editorRef.current;
+      const range = savedRangeRef.current;
+      if (!el || !range || range.collapsed) return "";
+      if (!el.contains(range.commonAncestorContainer)) return "";
+      return range.toString().trim();
+    },
+  }));
+
+  // Seed / re-seed from props only when the DOM genuinely differs, so typing
+  // (which does not change `contentHtml` until the debounce fires) never
+  // clobbers the caret, while an inserted snippet still lands.
+  useEffect(() => {
+    const el = editorRef.current;
+    if (el && el.innerHTML !== contentHtml) {
+      el.innerHTML = DOMPurify.sanitize(contentHtml, PURIFY_CONFIG);
+    }
+  }, [contentHtml]);
+
+  // "Auto-saved Ns ago". Cosmetic by spec — the counter is confidence-building
+  // chrome, and the real durability signal is the PUT the parent debounces.
+  useEffect(() => {
+    setSecondsAgo(0);
+    const id = setInterval(() => setSecondsAgo((n) => n + 12), 12_000);
+    return () => clearInterval(id);
+  }, [lastSavedAt]);
+
+  const callouts = linkages
+    .map((card) => ({ card, tail: clauseTail(card.source_clause_number) }))
+    // silent-on findings anchor to no draft clause, so they get no callout.
+    .filter((c) => c.tail && c.card.label !== "silent-on");
+
+  return (
+    <section className="flex h-full flex-col" aria-label="Draft editor">
+      <div className="flex items-center justify-between border-b border-border/60 bg-card/30 px-3 py-1.5">
+        {/* Toolbar is a visual signal only — MVP1 does not require these to
             function, and execCommand is deprecated. Kept non-functional rather
             than wired to something that half-works. */}
-          <div className="flex gap-0.5" aria-label="Formatting">
-            {["B", "I", "U", "H", "•"].map((b) => (
-              <button
-                key={b}
-                type="button"
-                disabled
-                title="Formatting is not wired up in this build"
-                className="h-6 w-6 rounded text-xs font-semibold text-muted-foreground"
-              >
-                {b}
-              </button>
-            ))}
-          </div>
-          <span
-            data-testid="autosave-indicator"
-            className="text-[11px] text-muted-foreground"
-          >
-            {isSaving
-              ? "Saving…"
-              : lastSavedAt
-                ? `Auto-saved ${secondsAgo}s ago`
-                : "Not saved yet"}
-          </span>
+        <div className="flex gap-0.5" aria-label="Formatting">
+          {["B", "I", "U", "H", "•"].map((b) => (
+            <button
+              key={b}
+              type="button"
+              disabled
+              title="Formatting is not wired up in this build"
+              className="h-6 w-6 rounded text-xs font-semibold text-muted-foreground"
+            >
+              {b}
+            </button>
+          ))}
         </div>
+        <span
+          data-testid="autosave-indicator"
+          className="text-[11px] text-muted-foreground"
+        >
+          {isSaving
+            ? "Saving…"
+            : lastSavedAt
+              ? `Auto-saved ${secondsAgo}s ago`
+              : "Not saved yet"}
+        </span>
+      </div>
 
-        {/* A white "paper" document surface, floated on a soft grey desk so the
-          serif draft reads like a real Word page. */}
-        <div className="flex-1 overflow-y-auto bg-slate-100 p-4">
-          <div className="mx-auto max-w-2xl rounded-sm bg-white p-8 text-slate-900 shadow-lg shadow-slate-400/30 ring-1 ring-slate-200">
-            <div
-              ref={editorRef}
-              contentEditable
-              suppressContentEditableWarning
-              role="textbox"
-              aria-multiline="true"
-              aria-label="Working draft"
-              data-testid="draft-surface"
-              onInput={(e) => onChange((e.target as HTMLDivElement).innerHTML)}
-              onMouseUp={saveCursor}
-              onKeyUp={saveCursor}
-              onBlur={saveCursor}
-              className={[
-                "min-h-[420px] font-serif text-[15px] leading-relaxed text-slate-900 outline-none",
-                "[&_h1]:mb-4 [&_h1]:text-2xl [&_h1]:font-bold",
-                "[&_h2]:mb-2 [&_h2]:mt-5 [&_h2]:text-xs [&_h2]:font-bold [&_h2]:tracking-wider [&_h2]:text-slate-500",
-                "[&_p]:mb-3",
-                // The Copilot's provenance mark. Its `copilot-snippet` class
-                // survives both sanitizers so the border reliably shows which
-                // text the drafter did not write.
-                "[&_.copilot-snippet]:border-l-4 [&_.copilot-snippet]:border-primary [&_.copilot-snippet]:bg-indigo-50 [&_.copilot-snippet]:py-1 [&_.copilot-snippet]:pl-3",
-              ].join(" ")}
-            />
+      {/* A white "paper" document surface, floated on a soft neutral canvas so
+          the serif draft reads like a real page rather than blending into the
+          surrounding chrome. */}
+      <div className="flex-1 overflow-y-auto bg-muted p-4">
+        <div className="mx-auto max-w-2xl rounded-sm bg-white p-8 text-slate-900 shadow-xl shadow-black/30">
+          <div
+            ref={editorRef}
+            contentEditable
+            suppressContentEditableWarning
+            role="textbox"
+            aria-multiline="true"
+            aria-label="Working draft"
+            data-testid="draft-surface"
+            onInput={(e) => onChange((e.target as HTMLDivElement).innerHTML)}
+            onMouseUp={saveCursor}
+            onKeyUp={saveCursor}
+            onBlur={saveCursor}
+            className={[
+              "min-h-[420px] font-serif text-[15px] leading-relaxed text-slate-900 outline-none",
+              "[&_h1]:mb-4 [&_h1]:text-2xl [&_h1]:font-bold",
+              "[&_h2]:mb-2 [&_h2]:mt-5 [&_h2]:text-xs [&_h2]:font-bold [&_h2]:tracking-wider [&_h2]:text-slate-500",
+              "[&_p]:mb-3",
+              // The Copilot's provenance mark. Its `copilot-snippet` class
+              // survives both sanitizers so the border reliably shows which
+              // text the drafter did not write.
+              "[&_.copilot-snippet]:border-l-4 [&_.copilot-snippet]:border-primary [&_.copilot-snippet]:bg-primary/5 [&_.copilot-snippet]:py-1 [&_.copilot-snippet]:pl-3",
+            ].join(" ")}
+          />
 
-            {callouts.length > 0 && (
-              <div className="mt-6 border-t border-dashed border-slate-200 pt-3">
-                <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Accepted context
-                </p>
-                <div className="space-y-1.5">
-                  {callouts.map(({ card, tail }) => (
-                    <div
-                      key={card.id}
-                      data-testid="inline-callout"
-                      data-label={card.label}
-                      data-clause={tail}
-                      className={`border-l-4 pl-2 ${labelStyle(card.label).calloutBorder}`}
-                    >
-                      <p className="font-mono text-[10px] text-muted-foreground">
-                        §{tail} · {card.right.title}
-                      </p>
-                      <p className="text-[12px] leading-snug">{card.summary}</p>
-                    </div>
-                  ))}
-                </div>
+          {callouts.length > 0 && (
+            <div className="mt-6 border-t border-dashed border-slate-200 pt-3">
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Accepted context
+              </p>
+              <div className="space-y-1.5">
+                {callouts.map(({ card, tail }) => (
+                  <div
+                    key={card.id}
+                    data-testid="inline-callout"
+                    data-label={card.label}
+                    data-clause={tail}
+                    className={`border-l-4 pl-2 ${labelStyle(card.label).calloutBorder}`}
+                  >
+                    <p className="font-mono text-[10px] text-muted-foreground">
+                      §{tail} · {card.right.title}
+                    </p>
+                    <p className="text-[12px] leading-snug">{card.summary}</p>
+                  </div>
+                ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
-      </section>
-    );
+      </div>
+    </section>
+  );
   },
 );

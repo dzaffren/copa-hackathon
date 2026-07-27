@@ -1,9 +1,16 @@
 import { Link, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { GitBranch, Link2, Loader2, PencilLine, Sparkles } from "lucide-react";
+import {
+  GitBranch,
+  Link2,
+  Loader2,
+  PencilLine,
+  Sparkles,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { fetchTask, setTaskWorkflow, HttpError } from "@/lib/api";
 import type { TaskWorkflowStatus } from "@/lib/types";
 import { SourceCard } from "./SourceCard";
@@ -11,27 +18,18 @@ import { NeighboursCard } from "./NeighboursCard";
 import { PairwiseComparisonCard } from "./PairwiseComparisonCard";
 import { AssignDialog } from "./AssignDialog";
 import { ApproveDialog } from "./ApproveDialog";
-import { WorkflowStepper, type StepState } from "./WorkflowStepper";
 
-// The task workflow is a linear stepper: Draft → Pending Review → Approved.
-const WORKFLOW_STEPS: { key: TaskWorkflowStatus; label: string }[] = [
-  { key: "draft", label: "Draft" },
-  { key: "pending_review", label: "Pending Review" },
-  { key: "approved", label: "Approved" },
-];
+const STATUS_LABEL: Record<TaskWorkflowStatus, string> = {
+  draft: "Draft",
+  pending_review: "Pending Review",
+  approved: "Approved",
+};
 
-function stepStateFor(
-  stepIndex: number,
-  currentStatus: TaskWorkflowStatus,
-): StepState {
-  const currentIndex = WORKFLOW_STEPS.findIndex((s) => s.key === currentStatus);
-  if (stepIndex < currentIndex) return "completed";
-  if (stepIndex === currentIndex) {
-    // The terminal "Approved" step reads as completed, not in-progress.
-    return currentStatus === "approved" ? "completed" : "current";
-  }
-  return "upcoming";
-}
+const STATUS_BADGE: Record<TaskWorkflowStatus, string> = {
+  draft: "bg-slate-500/15 text-slate-700 border border-slate-400/30",
+  pending_review: "bg-amber-400/15 text-amber-800 border border-amber-300/30",
+  approved: "bg-emerald-500/15 text-emerald-800 border border-emerald-400/30",
+};
 
 function formatApprovedAt(iso: string): string {
   const d = new Date(iso);
@@ -53,13 +51,13 @@ function MetricTile({
   label: string;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-white/20 bg-white/10 px-4 py-3">
-      <span className="grid h-9 w-9 place-items-center rounded-lg bg-white/15 text-white">
+    <div className="glass flex items-center gap-3 rounded-xl px-4 py-3">
+      <span className="grid h-9 w-9 place-items-center rounded-lg bg-accent/60 text-primary">
         {icon}
       </span>
       <div className="leading-tight">
-        <div className="text-lg font-bold text-white">{value}</div>
-        <div className="text-[11px] text-white/70">{label}</div>
+        <div className="text-lg font-bold">{value}</div>
+        <div className="text-[11px] text-muted-foreground">{label}</div>
       </div>
     </div>
   );
@@ -107,7 +105,7 @@ export default function TaskScreenPage() {
         <p className="mt-1 text-xs text-muted-foreground">{code}</p>
         <Link
           to={graphHref}
-          className="mt-4 inline-block text-sm font-semibold text-primary hover:text-primary"
+          className="mt-4 inline-block text-sm font-semibold text-primary hover:text-primary/80"
         >
           ← Back to the workstream graph
         </Link>
@@ -125,7 +123,7 @@ export default function TaskScreenPage() {
 
   return (
     <div className="h-full overflow-y-auto bg-background">
-      <header className="nav-dark border-b border-black/10 px-6 py-4">
+      <header className="border-b border-border/60 bg-card/30 px-6 py-4 backdrop-blur">
         <div className="flex items-center justify-between gap-6">
           <div className="min-w-0">
             <div className="mb-1 flex items-center gap-2 text-xs text-muted-foreground">
@@ -136,23 +134,25 @@ export default function TaskScreenPage() {
               <span className="font-medium text-foreground">Task</span>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="border border-primary/30 bg-primary/10 uppercase tracking-wider text-primary hover:bg-primary/10">
+              <Badge className="border border-primary/30 bg-primary/15 uppercase tracking-wider text-primary hover:bg-primary/15">
                 task
               </Badge>
               <h1 className="text-xl font-bold">{task.title}</h1>
+              <Badge
+                className={cn(
+                  "uppercase tracking-wide",
+                  STATUS_BADGE[currentStatus],
+                )}
+              >
+                {STATUS_LABEL[currentStatus]}
+              </Badge>
             </div>
             <p className="mt-1 text-sm text-muted-foreground">
               {task.owner.name} · {task.format} · {neighbours.length} neighbour
               nodes
             </p>
-            <div className="mt-3">
-              <WorkflowStepper
-                steps={WORKFLOW_STEPS}
-                stateFor={(i) => stepStateFor(i, currentStatus)}
-              />
-            </div>
             {currentStatus === "approved" && workflow.approved_by && (
-              <p className="mt-0.5 text-xs text-emerald-200">
+              <p className="mt-0.5 text-xs text-emerald-800">
                 Approved by {workflow.approved_by.name}
                 {workflow.approved_at &&
                   ` · ${formatApprovedAt(workflow.approved_at)}`}
