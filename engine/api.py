@@ -496,24 +496,40 @@ def _load_workstream_graph(
     return json.loads(graph_path.read_text(encoding="utf-8"))
 
 
-def _make_default_run_arm_g(artifacts_dir: Path) -> Any:
-    """Build the default `run_arm_g_fn` adapter bound to an `artifacts_dir`.
+def _make_default_run_arm_g(
+    artifacts_dir: Path,
+    workstreams_dir: Optional[Path] = None,
+    workstream_id: Optional[str] = None,
+) -> Any:
+    """Build the default `run_arm_g_fn` adapter for one analyze call.
 
-    The adapter loads the persisted `AnchorIndex` from
-    `data/artifacts/anchor-index.json` (under `artifacts_dir`) once per call and
-    runs the six-stage Arm G pipeline on the pair. Its signature is
-    `(src_doc, tgt_doc) -> {"connections", "unsupported", "trace"}` so the route
-    can call it exactly like the old finder minus the clause index — Arm G reads
-    clause text from the anchor index instead. Stage 1 builds the axis cache on
-    demand, so no pre-existing cache is required (first-run auto-population).
+    Signature stays `(src_doc, tgt_doc) -> {"connections", "unsupported",
+    "trace"}` so every injected stub keeps working — the workstream context is
+    bound here instead of widening the seam.
+
+    The anchor index comes from the WORKSTREAM's own per-node anchor files
+    (`ws_anchors.build_index`), so documents a drafter added and chunked in-app
+    are analysable; the shared `data/artifacts/anchor-index.json` is only the
+    fallback for a workstream that has no anchors of its own (the legacy,
+    offline-built path). Stage 1's axis cache is likewise pointed at the
+    workstream's `axes/` dir, so a cache warmed by "Extract concepts" is reused
+    rather than re-derived.
     """
 
     def _default_run_arm_g(src_doc: str, tgt_doc: str) -> dict[str, Any]:
-        raw = json.loads(
-            (artifacts_dir / "anchor-index.json").read_text(encoding="utf-8")
-        )
-        anchor_index = AnchorIndex(raw)
-        return _run_arm_g(anchor_index, src_doc, tgt_doc)
+        anchor_index: Optional[AnchorIndex] = None
+        axes_dir: Optional[Path] = None
+        if workstreams_dir is not None and workstream_id is not None:
+            built = ws_anchors.build_index(workstreams_dir, workstream_id)
+            if len(built) > 0:
+                anchor_index = built
+                axes_dir = _ws_axes_dir(workstreams_dir, workstream_id)
+        if anchor_index is None:
+            raw = json.loads(
+                (artifacts_dir / "anchor-index.json").read_text(encoding="utf-8")
+            )
+            anchor_index = AnchorIndex(raw)
+        return _run_arm_g(anchor_index, src_doc, tgt_doc, axes_dir=axes_dir)
 
     return _default_run_arm_g
 
@@ -546,8 +562,11 @@ def create_app(
         run_arm_g_fn: the Arm G pipeline called by the `analyze` route —
             `(src_doc_id, tgt_doc_id) -> {"connections": [...], "unsupported":
             [...], "trace": {...}}`. Injectable so tests stub the pipeline; no
-            live model call happens in CI. Defaults to an adapter that loads the
-            anchor index from `artifacts_dir` and runs `engine.arm_g.run_arm_g`.
+            live model call happens in CI. When omitted, the analyze route builds
+            a workstream-bound adapter per call: the anchor index comes from that
+            workstream's own per-node anchors (falling back to `artifacts_dir`'s
+            shared index only when it has none), with stage 1's axis cache
+            pointed at the workstream's `axes/` dir.
         copilot_reply_fn: the live call behind the `copilot` route — see
             `engine.copilot.copilot_reply`'s signature. Injectable so tests
             stub the model; no live model call happens in CI. Defaults to
@@ -585,10 +604,11 @@ def create_app(
 
     workstreams_dir = Path(workstreams_dir)
     artifacts_dir = Path(artifacts_dir)
-    # Default the Arm G seam to an adapter bound to this app's artifacts_dir;
-    # tests pass their own stub. `find_connections_fn` stays wired for rollback.
-    if run_arm_g_fn is None:
-        run_arm_g_fn = _make_default_run_arm_g(artifacts_dir)
+    # An explicitly injected seam wins; otherwise the analyze route builds a
+    # WORKSTREAM-BOUND adapter per call (it needs the workstream_id to find that
+    # workstream's anchors and axis cache). `find_connections_fn` stays wired
+    # for rollback.
+    injected_run_arm_g_fn = run_arm_g_fn
 
     # --- Workstream Brain — Task Screen routes (Task 1) --------------------
     # Read-only projections over a per-workstream `graph.json` + `findings/`
@@ -1483,7 +1503,10 @@ def create_app(
             # so no separate preparation step is needed. Any stage failing — incl.
             # the whole-doc coverage pass — raises here, surfacing as 502 with NO
             # partial write, since save_findings runs only after a full success.
-            result = run_arm_g_fn(src_doc, tgt_doc)
+            analyze_fn = injected_run_arm_g_fn or _make_default_run_arm_g(
+                artifacts_dir, workstreams_dir, workstream_id
+            )
+            result = analyze_fn(src_doc, tgt_doc)
         except Exception as exc:  # live model / creds / network failure
             return _ws_error(
                 502,
