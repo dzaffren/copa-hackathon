@@ -17,7 +17,7 @@ from engine.config import REPO_ROOT
 def _make_client(tmp_path):
     dst = tmp_path / "workstreams"
     shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
-    return TestClient(create_app(workstreams_dir=dst, analyze_delay=0)), dst
+    return TestClient(create_app(workstreams_dir=dst)), dst
 
 
 def test_supervisory_letter_is_a_first_class_node_type_with_a_profile(tmp_path):
