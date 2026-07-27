@@ -250,67 +250,65 @@ def extract_axes_for_document(
 # ---------------------------------------------------------------------------
 # Stage 2 — same-topic retrieval [no model].
 #
-# Cosine (default, validated) over axis embeddings via the Bedrock Cohere embed
-# call; BM25 (fallback) is pure Python, zero cost. `retrieve_hybrid` is NOT
-# ported (spec constraint). When cosine is requested but the embeddings endpoint
-# is unavailable/errors, `retrieve` falls back to BM25 automatically.
+# Cosine (default, validated) over axis embeddings via Azure OpenAI's
+# text-embedding-3-small deployment (same AZURE_FOUNDRY_API_KEY as the chat
+# deployments); BM25 (fallback) is pure Python, zero cost. `retrieve_hybrid` is
+# NOT ported (spec constraint). When cosine is requested but the embeddings
+# endpoint is unavailable/errors, `retrieve` falls back to BM25 automatically.
 # ---------------------------------------------------------------------------
 
 
-_BEDROCK_CLIENT = None
+_EMBED_CLIENT = None
 
 
-def _get_bedrock_client() -> Any:
-    """Lazy-init the Bedrock runtime client using the .env AWS creds."""
-    global _BEDROCK_CLIENT
-    if _BEDROCK_CLIENT is None:
-        import os
+def _get_embed_client() -> Any:
+    """Lazy-init the Azure OpenAI client for embeddings, sharing the Foundry key."""
+    global _EMBED_CLIENT
+    if _EMBED_CLIENT is None:
+        from openai import AzureOpenAI
 
-        try:
-            from dotenv import load_dotenv
+        from engine.config import (
+            AZURE_FOUNDRY_API_KEY,
+            EMBEDDING_API_VERSION,
+            EMBEDDING_ENDPOINT,
+        )
 
-            load_dotenv(REPO_ROOT / ".env")
-        except ImportError:
-            pass
-        import boto3
-
-        region = os.environ.get("AWS_REGION") or os.environ.get("REGION")
-        _BEDROCK_CLIENT = boto3.client("bedrock-runtime", region_name=region)
-    return _BEDROCK_CLIENT
+        if not EMBEDDING_ENDPOINT or not AZURE_FOUNDRY_API_KEY:
+            raise RuntimeError(
+                "AZURE_FOUNDRY_ENDPOINT/AZURE_EMBEDDING_ENDPOINT and "
+                "AZURE_FOUNDRY_API_KEY must be set to embed"
+            )
+        _EMBED_CLIENT = AzureOpenAI(
+            api_key=AZURE_FOUNDRY_API_KEY,
+            azure_endpoint=EMBEDDING_ENDPOINT,
+            api_version=EMBEDDING_API_VERSION,
+        )
+    return _EMBED_CLIENT
 
 
 def _embed_batch(
     texts: list[str],
     input_type: str = "search_document",
-    output_dimension: int = 1024,
-    model_id: str = "global.cohere.embed-v4:0",
+    output_dimension: int = 1536,
 ) -> list[list[float]]:
-    """Embed a batch of texts via Bedrock's Cohere embed-v4 inference profile.
+    """Embed a batch of texts via Azure OpenAI's text-embedding-3-small deployment.
 
-    ``input_type`` should be ``search_document`` for corpus-side texts and
-    ``search_query`` for retrieval-side queries — Cohere's asymmetric embedding
-    trained this way. Cohere embed-v4 accepts up to 96 texts per call; chunked
-    automatically.
+    ``input_type`` is accepted for call-site compatibility with the previous
+    Cohere path but ignored — text-embedding-3-small is symmetric, so query and
+    document texts use the same embedding. Batched in chunks of 96 per call.
     """
-    import json as _json
+    from engine.config import EMBEDDING_DEPLOYMENT
 
-    client = _get_bedrock_client()
+    client = _get_embed_client()
     all_embeddings: list[list[float]] = []
     for chunk_start in range(0, len(texts), 96):
         chunk = texts[chunk_start : chunk_start + 96]
-        resp = client.invoke_model(
-            modelId=model_id,
-            body=_json.dumps(
-                {
-                    "texts": chunk,
-                    "input_type": input_type,
-                    "embedding_types": ["float"],
-                    "output_dimension": output_dimension,
-                }
-            ),
+        resp = client.embeddings.create(
+            model=EMBEDDING_DEPLOYMENT,
+            input=chunk,
+            dimensions=output_dimension,
         )
-        body = _json.loads(resp["body"].read())
-        all_embeddings.extend(body["embeddings"]["float"])
+        all_embeddings.extend(item.embedding for item in resp.data)
     return all_embeddings
 
 

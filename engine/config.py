@@ -829,6 +829,21 @@ REASONING_DEPLOYMENT = os.environ.get(
     "AZURE_FOUNDRY_REASONING_DEPLOYMENT", "claude-sonnet-5"
 )
 
+# Stage-2 cosine retrieval embeddings (Arm G) — Azure OpenAI, sharing the same
+# AZURE_FOUNDRY_API_KEY as the chat deployments. Claude chat runs on the
+# `/anthropic` Messages API; embeddings run through the Azure OpenAI client,
+# whose `azure_endpoint` is the resource root (no `/anthropic` suffix), so the
+# default strips it from AZURE_FOUNDRY_ENDPOINT. Override any piece via env.
+EMBEDDING_DEPLOYMENT = os.environ.get(
+    "AZURE_EMBEDDING_DEPLOYMENT", "text-embedding-3-small"
+)
+EMBEDDING_ENDPOINT = os.environ.get("AZURE_EMBEDDING_ENDPOINT") or (
+    AZURE_FOUNDRY_ENDPOINT.removesuffix("/anthropic").rstrip("/")
+    if AZURE_FOUNDRY_ENDPOINT
+    else None
+)
+EMBEDDING_API_VERSION = os.environ.get("AZURE_EMBEDDING_API_VERSION", "2024-10-21")
+
 # Azure AI Document Intelligence — optional PDF ingestion backend. When both the
 # endpoint and key are set, `engine.ingest` routes PDFs through the
 # `prebuilt-layout` model, which reconstructs reading order (columns, list

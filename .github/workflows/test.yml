@@ -51,6 +51,7 @@ jobs:
             uvicorn \
             anthropic \
             azure-ai-inference \
+            openai \
             bleach \
             'markitdown[pdf,docx]'
 
