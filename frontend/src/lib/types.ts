@@ -289,6 +289,16 @@ export interface CreateNodeRequest {
   doc_class?: DocClass;
 }
 
+export interface CreateEdgeRequest {
+  source_node_id: string;
+  target_node_id: string;
+  edge_type: EdgeType;
+}
+
+/** The persisted edge. `source`/`target` may be swapped relative to the request:
+ *  a task endpoint is always stored as the source (edges read task → anchor). */
+export type CreateEdgeResponse = CreatedEdge;
+
 export interface CreatedEdge {
   id: string;
   source: string;

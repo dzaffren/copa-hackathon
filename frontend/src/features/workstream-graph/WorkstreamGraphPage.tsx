@@ -151,6 +151,7 @@ export default function WorkstreamGraphPage() {
               <NodeDetailPanel
                 workstreamId={workstreamId}
                 nodeId={selection.id}
+                nodes={graphQuery.data?.nodes ?? []}
                 onClose={() => setSelection({ kind: "none" })}
                 onSelectNode={(id) => setSelection({ kind: "node", id })}
               />

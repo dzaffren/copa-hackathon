@@ -5,6 +5,8 @@ import type {
   CopilotDraftContext,
   CopilotIntent,
   CopilotResponse,
+  CreateEdgeRequest,
+  CreateEdgeResponse,
   CreateNodeRequest,
   CreateNodeResponse,
   CreateWorkstreamRequest,
@@ -13,6 +15,7 @@ import type {
   CrossLinksResponse,
   DraftResponse,
   EdgeDetail,
+  ExtractConceptsResponse,
   LinkageReviewResponse,
   LinkageTransitionRequest,
   LinkageTransitionResponse,
@@ -201,6 +204,17 @@ export function extractConcepts(
 ): Promise<ExtractConceptsResponse> {
   return postJson<ExtractConceptsResponse>(
     `${API_BASE}/api/workstreams/${workstreamId}/nodes/${nodeId}/extract-concepts`,
+  );
+}
+
+/** Connect two nodes already on the canvas. Runs no analysis. */
+export function createEdge(
+  workstreamId: string,
+  body: CreateEdgeRequest,
+): Promise<CreateEdgeResponse> {
+  return postJson<CreateEdgeResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/edges`,
+    body,
   );
 }
 

@@ -1374,6 +1374,65 @@ def create_app(
             content["anchor_count"] = len(anchors)
         return JSONResponse(status_code=201, content=content)
 
+    @app.post("/api/workstreams/{workstream_id}/edges", status_code=201)
+    async def create_workstream_edge(workstream_id: str, request: Request) -> Any:
+        """Connect two nodes that are already on the canvas.
+
+        Until this route, an edge could only be declared while adding a NEW
+        node, so linking two existing documents meant removing and re-adding one
+        — destroying its passages and concepts. Drawing the link runs no
+        analysis; that stays an explicit, separate action.
+        """
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        body = await request.json()
+        if not isinstance(body, dict):
+            return _ws_error(
+                400,
+                "EDGE_REQUIRED",
+                "source_node_id, target_node_id and edge_type are required.",
+            )
+        problem = workstreams.validate_edge_create(body)
+        if problem is not None:
+            return _ws_error(*problem)
+
+        node_ids = {n["id"] for n in ws_graph.get("nodes", [])}
+        for node_id in (body["source_node_id"], body["target_node_id"]):
+            # Same-workstream only — a node from elsewhere is simply unknown here.
+            if node_id not in node_ids:
+                return _ws_error(
+                    404,
+                    "NODE_NOT_FOUND",
+                    f"Node {node_id} not found in workstream {workstream_id}",
+                )
+
+        source, target = workstreams.resolve_edge_direction(
+            ws_graph, body["source_node_id"], body["target_node_id"]
+        )
+        edge_type = body["edge_type"]
+        # A duplicate is the same pair joined by the same type in the same
+        # direction; a DIFFERENT type between the pair is a legitimate second
+        # relationship and is allowed alongside.
+        if any(
+            e.get("source") == source
+            and e.get("target") == target
+            and e.get("edge_type") == edge_type
+            for e in ws_graph.get("edges", [])
+        ):
+            return _ws_error(
+                409,
+                "DUPLICATE_EDGE",
+                f"A {edge_type} connection already exists between these two "
+                f"documents.",
+            )
+
+        record = workstreams.add_edge(ws_graph, source, target, edge_type)
+        workstreams.save_graph(workstreams_dir, workstream_id, ws_graph)
+        return JSONResponse(status_code=201, content={**record, "analysed": False})
+
     @app.post("/api/workstreams/{workstream_id}/edges/{edge_id}/analyze")
     def analyze_workstream_edge(workstream_id: str, edge_id: str) -> Any:
         ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)

@@ -505,6 +505,64 @@ def add_node(
     return node, created
 
 
+def validate_edge_create(body: dict[str, Any]) -> Optional[tuple[int, str, str]]:
+    """Validate a create-edge body. `None` when valid, else `(status, code,
+    message)` for the first rule broken: required fields, then the edge type,
+    then the self-loop guard."""
+    source = (body.get("source_node_id") or "").strip()
+    target = (body.get("target_node_id") or "").strip()
+    edge_type = body.get("edge_type")
+    if not source or not target or not edge_type:
+        return (
+            400,
+            "EDGE_REQUIRED",
+            "source_node_id, target_node_id and edge_type are required.",
+        )
+    if edge_type not in EDGE_TYPES:
+        return (
+            400,
+            "INVALID_EDGE_TYPE",
+            f"edge_type must be one of the four structural types, got "
+            f"{edge_type!r}",
+        )
+    if source == target:
+        return (400, "SELF_LOOP", "A document cannot be connected to itself.")
+    return None
+
+
+def resolve_edge_direction(
+    graph: dict[str, Any], source: str, target: str
+) -> tuple[str, str]:
+    """Orient a new edge, preserving the seeded task-is-source convention.
+
+    Edges read task → anchor because the Task Screen lists a task's OUTGOING
+    edges only; a connection drawn toward the draft would otherwise vanish from
+    it. Anchor↔anchor edges keep the caller's direction. Mirrors `add_node`.
+    """
+    node_type_by_id = {n["id"]: n.get("node_type") for n in graph.get("nodes", [])}
+    if node_type_by_id.get(target) == "task" and node_type_by_id.get(source) != "task":
+        return target, source
+    return source, target
+
+
+def add_edge(
+    graph: dict[str, Any], source: str, target: str, edge_type: str
+) -> dict[str, Any]:
+    """Append one edge between two existing nodes and return the record.
+
+    Assumes the body passed `validate_edge_create`, both endpoints exist, and
+    the caller already refused duplicates.
+    """
+    record = {
+        "id": make_edge_id(source, target),
+        "source": source,
+        "target": target,
+        "edge_type": edge_type,
+    }
+    graph.setdefault("edges", []).append(record)
+    return record
+
+
 def connections_to_findings(result: dict[str, Any]) -> list[dict[str, Any]]:
     """Adapt an `engine.connections.find_connections` result into the
     workstream findings shape the Review/Task screens read.

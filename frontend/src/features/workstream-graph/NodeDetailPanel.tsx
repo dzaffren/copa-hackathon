@@ -5,9 +5,11 @@ import {
   ChevronDown,
   ExternalLink,
   FileText,
+  Link2,
   Loader2,
-  ShieldCheck,
   Scale,
+  ShieldCheck,
+  Sparkles,
   X,
 } from "lucide-react";
 
@@ -15,8 +17,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { extractConcepts, fetchNodeDetail } from "@/lib/api";
-import type { ConceptsAvailable } from "@/lib/types";
-import { Sparkles } from "lucide-react";
+import type { ConceptsAvailable, GraphNode } from "@/lib/types";
+import { AddEdgeDialog } from "./AddEdgeDialog";
 import { nodeStyle } from "./legend";
 
 function conceptsAvailable(
@@ -60,6 +62,9 @@ interface NodeDetailPanelProps {
   /** Refocus the panel on a neighbour when its chip is clicked. */
   onSelectNode: (id: string) => void;
   onClose?: () => void;
+  /** Every node in this workstream — the Add-edge dialog's target choices.
+   *  Defaults to empty so callers that do not offer edge creation still work. */
+  nodes?: GraphNode[];
 }
 
 function openSource(url: string | null) {
@@ -108,9 +113,11 @@ export function NodeDetailPanel({
   nodeId,
   onSelectNode,
   onClose,
+  nodes = [],
 }: NodeDetailPanelProps) {
   const navigate = useNavigate();
   const [conceptsOpen, setConceptsOpen] = useState(false);
+  const [addEdgeOpen, setAddEdgeOpen] = useState(false);
   const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: ["node", workstreamId, nodeId],
@@ -389,7 +396,21 @@ export function NodeDetailPanel({
         </section>
       </div>
 
-      <div className="border-t border-border/60 p-4">
+      <div className="space-y-2 border-t border-border/60 p-4">
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => setAddEdgeOpen(true)}
+        >
+          <Link2 /> Add edge
+        </Button>
+        <AddEdgeDialog
+          workstreamId={workstreamId}
+          sourceNodeId={node.id}
+          nodes={nodes}
+          open={addEdgeOpen}
+          onOpenChange={setAddEdgeOpen}
+        />
         {isTask ? (
           <Button
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
