@@ -1,7 +1,22 @@
-# Demo Hardening Suite — COPA Hackathon (demo 5 Aug 2026)
+# Demo Hardening Suite — COPA Hackathon (demo 3 Aug 2026)
+
+> **STATUS (29 Jul 2026): largely SUPERSEDED by upstream #52/#53.** This suite was
+> written against a pre-#52 reality where "live Analyze" returned nothing because the
+> global anchor index and the workstream graphs used disjoint document-id namespaces.
+> Upstream #52 ("build a workstream from scratch") resolved that with **per-workstream
+> anchors** (`engine/ws_anchors.py`) and build-and-persist findings, so:
+>
+> - **Obsolete:** the artifact-integrity guard (`spec-engine-artifact-integrity-guard.md`)
+>   and the analyze fan-out cap (`spec-engine-analyze-fanout-cap.md`) — they harden the
+>   shared-index live path the demo no longer uses.
+> - **Still relevant:** `spec-cross-workstream-climax.md` — the cross-workstream climax
+>   is the one piece #52 explicitly **deferred** (its Non-Goals) and for which no
+>   upstream spec exists. See `docs/specs/workstream-brain/REVIEW-2026-07-29.md` for the
+>   current state and the real pending work.
+>   Demo date corrected from 5 Aug to **3 Aug** (per the upstream epic).
 
 **Ticket:** —
-**Type:** Overview — sequencing for a set of technical specs
+**Type:** Overview — sequencing for a set of technical specs (mostly superseded)
 
 This is the umbrella spec for firming up Workstream Brain ahead of the COPA
 Hackathon demo on **5 August 2026** (written 28 July — an eight-day, single-builder
