@@ -85,7 +85,9 @@ def test_cross_store_never_appears_in_the_sidebar(tmp_path):
     client, _ = _make_client(tmp_path)
     listed = [w["id"] for w in client.get("/api/workstreams").json()["workstreams"]]
     assert "_cross" not in listed
-    assert _OF in listed and _OPRES in listed
+    # The seeded workstreams are `hidden`, so absence here is expected too — the
+    # point of this test is that _cross can never be opened as a workstream.
+    assert "_cross" not in listed
 
 
 def test_cross_store_has_no_workstream_json(tmp_path):

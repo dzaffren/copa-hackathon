@@ -1,0 +1,126 @@
+{
+  "nodes": [
+    {
+      "id": "open-finance-pd-2026-pd",
+      "node_type": "task",
+      "title": "Open Finance PD . 2026 (PD)",
+      "description": "PD consolidating the 2025 Open Finance ED against peer guidance.",
+      "source_url": null
+    },
+    {
+      "id": "ed-open-finance-2025",
+      "node_type": "internal-published",
+      "title": "ED Open Finance 2025",
+      "description": "BNM Open Finance Exposure Draft, 2025.",
+      "source_url": null,
+      "document_id": "ed-open-finance-2025",
+      "doc_class": "semi-structured",
+      "recent_activity": [
+        {
+          "event": "node created",
+          "author": "Aisyah R.",
+          "at": "2026-07-28T03:25:38.556580Z"
+        },
+        {
+          "event": "chunking completed",
+          "author": "Aisyah R.",
+          "at": "2026-07-28T03:25:38.556580Z"
+        },
+        {
+          "event": "axes extracted",
+          "author": "Aisyah R.",
+          "at": "2026-07-28T03:32:00.592905Z"
+        }
+      ]
+    },
+    {
+      "id": "hkma-open-api-framework",
+      "node_type": "peer-regulator",
+      "title": "HKMA Open API Framework",
+      "description": "HKMA Open API Framework for the Banking Sector, 18 Jul 2018.",
+      "source_url": null,
+      "document_id": "hkma-open-api-framework",
+      "doc_class": "semi-structured",
+      "recent_activity": [
+        {
+          "event": "node created",
+          "author": "Aisyah R.",
+          "at": "2026-07-28T03:26:13.921115Z"
+        },
+        {
+          "event": "chunking completed",
+          "author": "Aisyah R.",
+          "at": "2026-07-28T03:26:13.921115Z"
+        }
+      ]
+    },
+    {
+      "id": "bis-papers-168",
+      "node_type": "international-standard",
+      "title": "BIS Papers 168",
+      "description": "BIS Papers No 168 — open banking and data portability.",
+      "source_url": null,
+      "document_id": "bis-papers-168",
+      "doc_class": "prose",
+      "recent_activity": [
+        {
+          "event": "node created",
+          "author": "Aisyah R.",
+          "at": "2026-07-28T03:26:45.469895Z"
+        },
+        {
+          "event": "chunking completed",
+          "author": "Aisyah R.",
+          "at": "2026-07-28T03:26:45.469895Z"
+        }
+      ]
+    },
+    {
+      "id": "rmit-2025",
+      "node_type": "internal-published",
+      "title": "RMiT 2025",
+      "description": "BNM Risk Management in Technology PD, Nov 2025.",
+      "source_url": null,
+      "document_id": "rmit-2025",
+      "doc_class": "structured-rules",
+      "recent_activity": [
+        {
+          "event": "node created",
+          "author": "Aisyah R.",
+          "at": "2026-07-28T07:00:20.604553Z"
+        },
+        {
+          "event": "chunking completed",
+          "author": "Aisyah R.",
+          "at": "2026-07-28T07:00:20.604553Z"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-open_finance_pd_2026_pd--ed_open_finance_2025",
+      "source": "open-finance-pd-2026-pd",
+      "target": "ed-open-finance-2025",
+      "edge_type": "contributes-to"
+    },
+    {
+      "id": "e-hkma_open_api_framework--ed_open_finance_2025",
+      "source": "hkma-open-api-framework",
+      "target": "ed-open-finance-2025",
+      "edge_type": "references"
+    },
+    {
+      "id": "e-bis_papers_168--ed_open_finance_2025",
+      "source": "bis-papers-168",
+      "target": "ed-open-finance-2025",
+      "edge_type": "references"
+    },
+    {
+      "id": "e-rmit_2025--ed_open_finance_2025",
+      "source": "rmit-2025",
+      "target": "ed-open-finance-2025",
+      "edge_type": "parallel-to"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { describe, it, expect } from "vitest";
-import { screen } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 
@@ -24,7 +24,8 @@ const ENRICHED_SUPERVISORY_LETTER: NodeDetail = {
   first_order_neighbours: [],
   second_order_neighbours: { status: "placeholder", message: "N/A in demo" },
   recent_activity: [],
-  concepts: {
+  concepts: { status: "not_extracted", axes: [] },
+  metadata: {
     status: "available",
     policy_owner: null,
     applicability: "Financial institutions subject to the RMiT policy document",
@@ -127,12 +128,16 @@ describe("NodeDetailPanel", () => {
     // The document type is visually distinguished by its own badge.
     expect(await screen.findByText("supervisory-letter")).toBeInTheDocument();
     // Legal basis (multi-Act) is surfaced first-class, not hidden in a disclosure.
-    expect(screen.getByText(/Legal basis: FSA 2013, IFSA 2013, DFIA 2002/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Legal basis: FSA 2013, IFSA 2013, DFIA 2002/),
+    ).toBeInTheDocument();
     // ISMP is supported but honestly pending — no fabricated classification.
-    expect(screen.getByText(/ISMP: Pending — RH publication form/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/ISMP: Pending — RH publication form/),
+    ).toBeInTheDocument();
   });
 
-  it("renders keyword + legal-basis concept chips in the Concepts disclosure", async () => {
+  it("renders keyword + legal-basis chips in the Metadata disclosure", async () => {
     seedNode(ENRICHED_SUPERVISORY_LETTER);
     renderWithProviders(
       <NodeDetailPanel
@@ -144,14 +149,192 @@ describe("NodeDetailPanel", () => {
     );
 
     await screen.findByText("supervisory-letter");
-    await userEvent.click(screen.getByRole("button", { name: /concepts/i }));
+    await userEvent.click(screen.getByRole("button", { name: /metadata/i }));
 
     // Keywords render as individual chips.
-    expect(await screen.findByText("implementation guidance")).toBeInTheDocument();
+    expect(
+      await screen.findByText("implementation guidance"),
+    ).toBeInTheDocument();
     expect(screen.getByText("technology risk")).toBeInTheDocument();
     // The ISMP row inside the disclosure also shows the pending state.
     expect(
       screen.getAllByText(/Pending — RH publication form/).length,
     ).toBeGreaterThan(0);
+  });
+
+  // --- Concepts (extracted axes) -------------------------------------------
+
+  it("shows the four sections in order: neighbours, activity, metadata, concepts", async () => {
+    seedNode(ENRICHED_SUPERVISORY_LETTER);
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="rmit-v2-2025"
+        nodeId="bnm-supervisory-letter-rmit-2025"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/rmit-v2-2025",
+    );
+
+    await screen.findByText("supervisory-letter");
+    const headings = screen
+      .getAllByText(
+        /^(first-order neighbours|recent activity|metadata|concepts)$/i,
+      )
+      .map((el) => el.textContent?.trim().toLowerCase());
+
+    expect(headings).toEqual([
+      "first-order neighbours",
+      "recent activity",
+      "metadata",
+      "concepts",
+    ]);
+  });
+
+  it("offers Extract concepts when none are extracted yet", async () => {
+    seedNode(ENRICHED_SUPERVISORY_LETTER);
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="rmit-v2-2025"
+        nodeId="bnm-supervisory-letter-rmit-2025"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/rmit-v2-2025",
+    );
+
+    await screen.findByText("supervisory-letter");
+    expect(screen.getByText(/no concepts extracted yet/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /extract concepts/i }),
+    ).toBeEnabled();
+    expect(screen.queryAllByTestId("concept-pill")).toHaveLength(0);
+  });
+
+  it("renders extracted axes as pills and drops the Extract button", async () => {
+    seedNode({
+      ...ENRICHED_SUPERVISORY_LETTER,
+      concepts: {
+        status: "extracted",
+        axes: ["scenario testing cadence", "third-party dependency management"],
+      },
+    });
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="rmit-v2-2025"
+        nodeId="bnm-supervisory-letter-rmit-2025"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/rmit-v2-2025",
+    );
+
+    expect(
+      await screen.findByText("scenario testing cadence"),
+    ).toBeInTheDocument();
+    expect(screen.getAllByTestId("concept-pill")).toHaveLength(2);
+    expect(
+      screen.queryByRole("button", { name: /extract concepts/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("surfaces a retryable message when extraction fails", async () => {
+    seedNode(ENRICHED_SUPERVISORY_LETTER);
+    server.use(
+      http.post("*/api/workstreams/:ws/nodes/:nodeId/extract-concepts", () =>
+        HttpResponse.json(
+          { code: "EXTRACTION_FAILED", message: "Concept extraction failed" },
+          { status: 502 },
+        ),
+      ),
+    );
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="rmit-v2-2025"
+        nodeId="bnm-supervisory-letter-rmit-2025"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/rmit-v2-2025",
+    );
+
+    await screen.findByText("supervisory-letter");
+    await userEvent.click(
+      screen.getByRole("button", { name: /extract concepts/i }),
+    );
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /concept extraction failed/i,
+    );
+    expect(screen.queryAllByTestId("concept-pill")).toHaveLength(0);
+  });
+
+  // --- delete node ----------------------------------------------------------
+
+  it("takes two clicks to delete, and names what will be lost", async () => {
+    seedNode(ENRICHED_SUPERVISORY_LETTER);
+    const onClose = vi.fn();
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="rmit-v2-2025"
+        nodeId="bnm-supervisory-letter-rmit-2025"
+        onSelectNode={() => {}}
+        onClose={onClose}
+      />,
+      "/workstreams/rmit-v2-2025",
+    );
+
+    await screen.findByText("supervisory-letter");
+    // First click only arms it — nothing is deleted yet.
+    await userEvent.click(screen.getByRole("button", { name: /delete node/i }));
+    expect(screen.getByText(/cannot be undone/i)).toBeInTheDocument();
+    expect(onClose).not.toHaveBeenCalled();
+
+    let called = false;
+    server.use(
+      http.delete("*/api/workstreams/:ws/nodes/:nodeId", () => {
+        called = true;
+        return HttpResponse.json({ id: "x", removed_edges: [] });
+      }),
+    );
+    await userEvent.click(screen.getByRole("button", { name: /^delete$/i }));
+
+    await waitFor(() => expect(called).toBe(true));
+    // The node is gone, so the panel describing it closes.
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+  });
+
+  it("cancelling the confirmation deletes nothing", async () => {
+    seedNode(ENRICHED_SUPERVISORY_LETTER);
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="rmit-v2-2025"
+        nodeId="bnm-supervisory-letter-rmit-2025"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/rmit-v2-2025",
+    );
+
+    await screen.findByText("supervisory-letter");
+    await userEvent.click(screen.getByRole("button", { name: /delete node/i }));
+    await userEvent.click(screen.getByRole("button", { name: /cancel/i }));
+
+    expect(screen.queryByText(/cannot be undone/i)).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /delete node/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("does not offer delete for the focal task node", async () => {
+    // The seeded opres task node comes from the default MSW handler.
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="opres-v2"
+        nodeId="opres-pd-v0-3"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/opres-v2",
+    );
+
+    await screen.findByRole("button", { name: /open task/i });
+    expect(
+      screen.queryByRole("button", { name: /delete node/i }),
+    ).not.toBeInTheDocument();
   });
 });

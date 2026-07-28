@@ -630,10 +630,11 @@ function buildNodeDetail(nodeId: string): NodeDetail | null {
     })),
     second_order_neighbours: { status: "placeholder", message: "N/A in demo" },
     recent_activity: node.node_type === "task" ? TASK_ACTIVITY : [],
-    concepts: {
+    metadata: {
       status: "placeholder",
       message: "Concept extraction not enabled in MVP1",
     },
+    concepts: { status: "not_extracted", axes: [] },
   };
 }
 
@@ -903,11 +904,23 @@ const MSW_TRANSITIONS: Record<
   { from: string[]; to: string; role: "maker" | "checker" }
 > = {
   claim: { from: ["ai_detected"], to: "maker_review", role: "maker" },
-  submit: { from: ["maker_review", "changes_requested"], to: "submitted_for_check", role: "maker" },
-  pick_up: { from: ["submitted_for_check"], to: "checker_review", role: "checker" },
+  submit: {
+    from: ["maker_review", "changes_requested"],
+    to: "submitted_for_check",
+    role: "maker",
+  },
+  pick_up: {
+    from: ["submitted_for_check"],
+    to: "checker_review",
+    role: "checker",
+  },
   approve: { from: ["checker_review"], to: "approved", role: "checker" },
   reject: { from: ["checker_review"], to: "rejected", role: "checker" },
-  request_changes: { from: ["checker_review"], to: "changes_requested", role: "checker" },
+  request_changes: {
+    from: ["checker_review"],
+    to: "changes_requested",
+    role: "checker",
+  },
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -961,13 +974,15 @@ export const handlers = [
     "*/api/workstreams/:workstreamId/edges/:edgeId/linkage-review",
     ({ params }) => {
       const edgeId = params.edgeId as string;
-      const linkages = QUEUE_SEED.filter((s) => s.edge_id === edgeId).map((s) => ({
-        finding_id: s.finding_id,
-        summary: s.summary,
-        label: s.label,
-        sentiment: s.sentiment,
-        review: recordFor(s.finding_id),
-      }));
+      const linkages = QUEUE_SEED.filter((s) => s.edge_id === edgeId).map(
+        (s) => ({
+          finding_id: s.finding_id,
+          summary: s.summary,
+          label: s.label,
+          sentiment: s.sentiment,
+          review: recordFor(s.finding_id),
+        }),
+      );
       return HttpResponse.json({ edge_id: edgeId, linkages });
     },
   ),
@@ -982,7 +997,8 @@ export const handlers = [
         comment?: string;
       };
       const transition = MSW_TRANSITIONS[body.action];
-      if (!transition) return jsonError(400, "INVALID_ACTION", "Unknown action");
+      if (!transition)
+        return jsonError(400, "INVALID_ACTION", "Unknown action");
       const actor = PEOPLE_BY_ID[body.actor_id];
       if (!actor) return jsonError(400, "UNKNOWN_ACTOR", "Unknown actor");
 
@@ -1002,7 +1018,11 @@ export const handlers = [
         record.created_at = at;
       } else if (body.action === "pick_up") {
         if (record.maker && record.maker.id === actor.id) {
-          return jsonError(400, "SAME_ACTOR", "The checker cannot be the maker");
+          return jsonError(
+            400,
+            "SAME_ACTOR",
+            "The checker cannot be the maker",
+          );
         }
         record.checker = actor;
       }
@@ -1371,7 +1391,9 @@ export const handlers = [
       // Mirrors the live server holding no conversation state: the mock keys
       // its scripted reply off how many copilot turns already appear in the
       // history the client sent, not a client-owned counter.
-      const turn = (body.history ?? []).filter((m) => m.role === "copilot").length;
+      const turn = (body.history ?? []).filter(
+        (m) => m.role === "copilot",
+      ).length;
       const index = Math.min(turn, script.length - 1);
       return HttpResponse.json({ reply: script[index] });
     },
@@ -1404,7 +1426,9 @@ export const handlers = [
 
       // Build SSE body: stream the reply text word by word, then flush
       // citations/snippet in the done event.
-      const turn = (body.history ?? []).filter((m) => m.role === "copilot").length;
+      const turn = (body.history ?? []).filter(
+        (m) => m.role === "copilot",
+      ).length;
       const index = Math.min(turn, script.length - 1);
       const reply = script[index] as {
         role: string;
@@ -1643,11 +1667,26 @@ export const handlers = [
     return HttpResponse.json(detail);
   }),
   http.post("*/api/workstreams/:workstreamId/nodes", async ({ request }) => {
-    const body = (await request.json()) as {
+    // Mirror the route's two shapes: multipart (a JSON `payload` part plus an
+    // `attachment` file — the chunking path) or a plain JSON body.
+    type NodeBody = {
       node_type: string;
       title: string;
+      doc_class?: string;
       edges: Array<{ target_node_id: string; edge_type: string }>;
     };
+    let body: NodeBody;
+    let attached = false;
+    if (
+      request.headers.get("content-type")?.includes("multipart/form-data") ??
+      false
+    ) {
+      const form = await request.formData();
+      body = JSON.parse(String(form.get("payload"))) as NodeBody;
+      attached = form.get("attachment") !== null;
+    } else {
+      body = (await request.json()) as NodeBody;
+    }
     const id = (body.title || "node")
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
@@ -1657,6 +1696,13 @@ export const handlers = [
         id,
         node_type: body.node_type,
         title: body.title,
+        ...(attached
+          ? {
+              document_id: id,
+              doc_class: body.doc_class,
+              anchor_count: 12,
+            }
+          : {}),
         created_edges: body.edges.map((e) => {
           // Mirror the backend: a task target stays the edge source.
           const targetIsTask =

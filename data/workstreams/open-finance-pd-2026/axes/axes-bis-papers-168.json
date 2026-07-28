@@ -1,0 +1,1489 @@
+{
+  "document_id": "bis-papers-168",
+  "model": "claude-haiku-4-5",
+  "anchors": [
+    {
+      "anchor_id": "bis-papers-168 chunk#0",
+      "text_hash": "8a2ab17a3cbb3ef8",
+      "axis_cap": 5,
+      "axes": [
+        "open finance regulatory framework",
+        "international financial integration models",
+        "financial data access and portability",
+        "third-party service provider oversight",
+        "payment system competition and interoperability"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"BIS Papers No 168\" chunk#1",
+      "text_hash": "98bccbf1b20f0500",
+      "axis_cap": 5,
+      "axes": [
+        "open finance framework scope",
+        "financial inclusion policy objectives",
+        "competition in financial services",
+        "data sharing arrangements",
+        "central bank regulatory guidance"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"BIS Papers No 168\" chunk#2",
+      "text_hash": "20db86053f9f7b3d",
+      "axis_cap": 5,
+      "axes": [
+        "document publication platform",
+        "intellectual property rights",
+        "source attribution requirements",
+        "excerpt reproduction permissions",
+        "translation rights governance"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Opening doors to open finance: evidence from the international experience\" chunk#3",
+      "text_hash": "0c876974659c4a63",
+      "axis_cap": 5,
+      "axes": [
+        "open finance data sharing standards",
+        "customer data permissioning and consent frameworks",
+        "payment system interoperability requirements",
+        "financial market competition and entry barriers",
+        "open finance regulatory framework design"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Abstract\" chunk#4",
+      "text_hash": "6512168b795d69b0",
+      "axis_cap": 5,
+      "axes": [
+        "cross-border data portability frameworks",
+        "open banking and data access standards",
+        "financial inclusion through data intermediation",
+        "competition enhancement via information asymmetry reduction",
+        "consumer data rights and portability mechanisms"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Abstract\" chunk#5",
+      "text_hash": "b146034b5109e8f4",
+      "axis_cap": 5,
+      "axes": [
+        "author acknowledgment and attribution",
+        "disclaimer of institutional views",
+        "editorial and research support disclosure",
+        "external contributor recognition",
+        "authorial independence statement"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"1. Introduction\" chunk#6",
+      "text_hash": "74902e5e949a3b5a",
+      "axis_cap": 5,
+      "axes": [
+        "data access inequality and market participation",
+        "data subject control and governance",
+        "open banking and open finance frameworks",
+        "data sharing regulation",
+        "digital economy participation barriers"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"1. Introduction\" chunk#7",
+      "text_hash": "a85a8f529fc019bd",
+      "axis_cap": 5,
+      "axes": [
+        "customer data sharing and access frameworks",
+        "third-party data access permissions and controls",
+        "read and write access authorization mechanisms",
+        "open banking and open finance policy mandates",
+        "cross-jurisdictional data sharing standards and initiatives"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"1. Introduction\" chunk#8",
+      "text_hash": "b094b3cb030cc0df",
+      "axis_cap": 5,
+      "axes": [
+        "open banking scope and definition",
+        "financial product data access coverage"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"1. Introduction\" chunk#9",
+      "text_hash": "bbb77bf465435e61",
+      "axis_cap": 5,
+      "axes": [
+        "financial data access rights",
+        "third-party data sharing authorization",
+        "consumer data portability frameworks"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"1. Introduction\" chunk#10",
+      "text_hash": "669d06cfe06630cf",
+      "axis_cap": 5,
+      "axes": [
+        "open finance framework implementation maturity",
+        "financial inclusion policy objectives",
+        "regulatory enablement of financial innovation",
+        "consumer choice and competition promotion",
+        "cross-jurisdictional regulatory coordination"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"1. Introduction\" chunk#11",
+      "text_hash": "b07e28a8a3770562",
+      "axis_cap": 5,
+      "axes": [
+        "data portability requirements",
+        "financial data interoperability standards",
+        "market concentration in payment systems",
+        "competition and innovation barriers",
+        "consumer data access and sharing rights"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"1. Introduction\" chunk#12",
+      "text_hash": "554f93d2e30771fd",
+      "axis_cap": 5,
+      "axes": [
+        "open finance framework adoption",
+        "third-party intermediary market entry",
+        "fintech and technology company participation",
+        "consumer financial product choice expansion",
+        "financial services access and inclusion"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"1. Introduction\" chunk#13",
+      "text_hash": "705c49987fc4404c",
+      "axis_cap": 5,
+      "axes": [
+        "open banking and open finance policy effects",
+        "cross-jurisdictional regulatory implementation comparison",
+        "empirical validation of open finance theory",
+        "causal impact measurement of open data policies",
+        "open finance framework adoption and adaptation"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"1. Introduction\" chunk#14",
+      "text_hash": "117265a31c162928",
+      "axis_cap": 5,
+      "axes": [
+        "open banking initiative origins",
+        "open finance regulatory adoption",
+        "competitive impact assessment",
+        "financial services market entry barriers",
+        "credit access and availability"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#15",
+      "text_hash": "3282bb002baf7a23",
+      "axis_cap": 5,
+      "axes": [
+        "open banking market origins",
+        "third-party access practices",
+        "private sector data-sharing arrangements",
+        "pre-regulatory framework adoption",
+        "open finance ecosystem development"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#16",
+      "text_hash": "9a5517188ad12d6b",
+      "axis_cap": 5,
+      "axes": [
+        "technology company financial services entry",
+        "data network activities integration risks",
+        "cybersecurity and data breach exposure",
+        "algorithmic bias and fairness governance",
+        "market concentration from tech entrants"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#17",
+      "text_hash": "4b8cfe7ab0bfda84",
+      "axis_cap": 5,
+      "axes": [
+        "consumer data portability mechanisms",
+        "standardized API requirements for financial data",
+        "third-party access to customer financial information",
+        "regulatory intervention in data sharing infrastructure",
+        "financial data market concentration concerns"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#18",
+      "text_hash": "e4cd3ebbdfe3828a",
+      "axis_cap": 5,
+      "axes": [
+        "API-based data exchange standards",
+        "third-party access mechanisms",
+        "customer data permissioning framework",
+        "financial institution authentication and access control",
+        "open finance interoperability requirements"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#19",
+      "text_hash": "2f522412820c24fc",
+      "axis_cap": 5,
+      "axes": [
+        "open banking regulatory framework structure",
+        "data sharing mandate scope and requirements",
+        "third-party access registration and supervision",
+        "technical standard harmonization for data exchange",
+        "regulatory approach taxonomy for financial data"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#20",
+      "text_hash": "dc1ac07600523c60",
+      "axis_cap": 5,
+      "axes": [
+        "screen scraping data extraction practice",
+        "customer credential handling and consent",
+        "reverse engineering of banking systems",
+        "third-party access to customer data",
+        "alternative data access methods prior to open banking"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#21",
+      "text_hash": "a67f58fd2398dbf3",
+      "axis_cap": 5,
+      "axes": [
+        "application programming interface standards",
+        "third-party data exchange protocols",
+        "open banking infrastructure framework",
+        "digital identity and authentication systems",
+        "financial data interoperability requirements"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#22",
+      "text_hash": "1c29522c0809f44c",
+      "axis_cap": 5,
+      "axes": [
+        "regulatory guidance binding status",
+        "open banking framework participation requirements",
+        "data sharing voluntariness spectrum",
+        "regulator facilitation intensity levels",
+        "phased implementation approach design"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#23",
+      "text_hash": "42e4a65b5213383e",
+      "axis_cap": 5,
+      "axes": [
+        "banking sector concentration",
+        "digital infrastructure quality standards",
+        "data privacy regulatory framework",
+        "political economy considerations",
+        "technical architecture implementation models"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#24",
+      "text_hash": "27d9d1937e0e5166",
+      "axis_cap": 5,
+      "axes": [
+        "third-party access to payment accounts",
+        "open banking regulatory mandate",
+        "strong customer authentication requirements",
+        "technical interoperability standards",
+        "api governance and implementation"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#25",
+      "text_hash": "19bee5f3376a587c",
+      "axis_cap": 5,
+      "axes": [
+        "open banking adoption framework design",
+        "voluntary participation versus regulatory mandate",
+        "technical standardization and interoperability guidelines",
+        "market-led versus authority-directed implementation pace",
+        "industry coordination mechanisms for financial data exchange"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#26",
+      "text_hash": "8199a52d1f8bd844",
+      "axis_cap": 5,
+      "axes": [
+        "open banking regulatory framework",
+        "consumer data access rights",
+        "market-led versus regulated implementation approaches",
+        "third-party data sharing authorization",
+        "regulatory framework transition and modification"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#27",
+      "text_hash": "2c0feed9d3f73a71",
+      "axis_cap": 5,
+      "axes": [
+        "open banking architecture models",
+        "centralized versus decentralized infrastructure design",
+        "third-party provider API standardization",
+        "ecosystem interoperability and coordination mechanisms",
+        "data access governance frameworks"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#28",
+      "text_hash": "8fcdee18a7b87639",
+      "axis_cap": 5,
+      "axes": [
+        "open finance adoption metrics",
+        "API call volume measurement",
+        "cross-jurisdictional data comparability",
+        "digital payments ecosystem maturity",
+        "personal finance management integration"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#29",
+      "text_hash": "1bf1956967d01044",
+      "axis_cap": 5,
+      "axes": [
+        "open finance adoption metrics",
+        "application programming interface usage trends",
+        "financial data access growth",
+        "open finance market penetration",
+        "api call volume expansion"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#30",
+      "text_hash": "c3745e62443e5c40",
+      "axis_cap": 5,
+      "axes": [
+        "API usage volume measurement",
+        "API call rate normalization",
+        "API adoption per capita metric",
+        "API usage trend monitoring",
+        "API consumption by jurisdiction"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#31",
+      "text_hash": "75404feb7c50641d",
+      "axis_cap": 5,
+      "axes": [
+        "consent and data access tracking metrics",
+        "API subscriber and user measurement bases",
+        "data fetch volume estimation methodology",
+        "jurisdiction-specific consent quantification standards",
+        "API call activity measurement approaches"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#32",
+      "text_hash": "cca1a0fcd27a4144",
+      "axis_cap": 5,
+      "axes": [
+        "open banking data standards adoption",
+        "financial data exchange infrastructure",
+        "regulatory framework implementation across jurisdictions",
+        "interbank clearing and settlement systems",
+        "consumer financial data access mechanisms"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#33",
+      "text_hash": "0e5bf5ad384b0010",
+      "axis_cap": 5,
+      "axes": [
+        "open finance adoption measurement metrics",
+        "API usage intensity indicators",
+        "ecosystem participation and coverage assessment",
+        "consent and data sharing tracking",
+        "third-party provider market development monitoring"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#34",
+      "text_hash": "16251d6d1725408c",
+      "axis_cap": 5,
+      "axes": [
+        "subscriber population coverage metrics",
+        "multi-institution account holding patterns",
+        "financial services penetration measurement",
+        "data source documentation",
+        "account deduplication methodology"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#35",
+      "text_hash": "92488bb8d950c9bb",
+      "axis_cap": 5,
+      "axes": [
+        "open finance API call volume",
+        "open finance user adoption metrics",
+        "cross-border open finance integration patterns",
+        "open finance ecosystem maturity comparison",
+        "fast payments service interoperability"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#36",
+      "text_hash": "d665e795ba92d969",
+      "axis_cap": 5,
+      "axes": [
+        "open finance adoption barriers",
+        "consumer segment targeting for open banking",
+        "payment initiation integration models",
+        "data-sharing versus payment-embedded service delivery",
+        "open finance scaling mechanisms"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"3. Impact on market entry, competition and financial inclusion\" chunk#37",
+      "text_hash": "8851e67866eb470f",
+      "axis_cap": 5,
+      "axes": [
+        "market entry barriers for financial service providers",
+        "third-party provider market participation",
+        "cross-border service delivery mechanisms",
+        "financial services competition structure",
+        "financial inclusion through new market entrants"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"3. Impact on market entry, competition and financial inclusion\" chunk#38",
+      "text_hash": "3b39a9adb10d0ee7",
+      "axis_cap": 5,
+      "axes": [
+        "consumer data right API usage metrics",
+        "banking sector data access performance",
+        "API invocation monitoring and reporting",
+        "per capita data access measurement",
+        "regulatory dashboard performance tracking"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"3. Impact on market entry, competition and financial inclusion\" chunk#39",
+      "text_hash": "770e2cdecf100421",
+      "axis_cap": 5,
+      "axes": [
+        "data portability rights adoption barriers",
+        "user awareness of data access rights",
+        "complexity of data transfer mechanisms",
+        "API-based data sharing infrastructure",
+        "service-integrated versus user-driven data portability"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#40",
+      "text_hash": "a7ad7b796c30fc01",
+      "axis_cap": 5,
+      "axes": [
+        "third-party provider market entry",
+        "open finance competitive dynamics",
+        "payment service provider proliferation",
+        "market concentration and competition",
+        "financial services ecosystem openness"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#41",
+      "text_hash": "54ea4ef4b76ded17",
+      "axis_cap": 5,
+      "axes": [
+        "third-party provider market growth",
+        "account switching service uptake",
+        "cross-border regulatory passporting",
+        "domestic market participation metrics",
+        "consumer account mobility tracking"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#42",
+      "text_hash": "72918d27152f354b",
+      "axis_cap": 5,
+      "axes": [
+        "third-party provider cross-border operations",
+        "eIDAS certificate revocation and withdrawal",
+        "open banking identification requirements",
+        "passporting regime discontinuation",
+        "Brexit transition period regulatory impact"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#43",
+      "text_hash": "39847fbcd5814838",
+      "axis_cap": 5,
+      "axes": [
+        "consumer data portability mechanisms",
+        "customer switching friction reduction",
+        "open banking API standardization",
+        "customer authentication and consent requirements",
+        "cross-provider service integration frameworks"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#44",
+      "text_hash": "fd0554a0664fb7af",
+      "axis_cap": 5,
+      "axes": [
+        "consumer demand for financial services",
+        "open finance service expansion",
+        "market demand assessment",
+        "service accessibility and availability",
+        "financial services innovation drivers"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#45",
+      "text_hash": "333ca6317bab218a",
+      "axis_cap": 5,
+      "axes": [
+        "open banking competition effects",
+        "cross-market spillover analysis",
+        "payments market pricing impact",
+        "credit market competition dynamics",
+        "open finance policy global effects"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#46",
+      "text_hash": "c7d36bb59af601d7",
+      "axis_cap": 5,
+      "axes": [
+        "open finance policy adoption effects",
+        "fintech market entry barriers and competition",
+        "venture capital funding dynamics",
+        "small business credit access expansion",
+        "financial inclusion through data access"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#47",
+      "text_hash": "d281d9823edcb0c8",
+      "axis_cap": 5,
+      "axes": [
+        "open banking framework effectiveness",
+        "cross-jurisdictional regulatory divergence",
+        "fintech adoption and market maturity",
+        "sector-specific fintech satisfaction metrics",
+        "emerging versus advanced economy implementation gaps"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#48",
+      "text_hash": "9d26dc866c2fd8cf",
+      "axis_cap": 5,
+      "axes": [
+        "data portability and consumer control effects",
+        "credit risk assessment and information asymmetry reduction",
+        "financial inclusion outcomes for underserved borrowers",
+        "interest rate and approval impact from data transparency",
+        "credit allocation efficiency and market entry barriers"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#49",
+      "text_hash": "705f44acc23bdd00",
+      "axis_cap": 5,
+      "axes": [
+        "financial inclusion definition",
+        "universal access to financial services",
+        "affordability of financial products",
+        "transaction account accessibility",
+        "small business financial service access"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#50",
+      "text_hash": "2df0b6265fffd27b",
+      "axis_cap": 5,
+      "axes": [
+        "open finance competitive impact on incumbents",
+        "bank valuation effects from regulatory announcements",
+        "screening efficiency versus screening cost trade-off",
+        "compliance cost burden from open finance requirements",
+        "credit expansion effects from open banking policies"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Competition in lending is driving investment and SME lending\" chunk#51",
+      "text_hash": "2d4eae2cf12cffb3",
+      "axis_cap": 5,
+      "axes": [
+        "open finance policy impacts",
+        "fintech investment and market entry",
+        "small and medium enterprise lending volume",
+        "competitive lending market dynamics",
+        "financial data access and portability"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Competition in lending is driving investment and SME lending\" chunk#52",
+      "text_hash": "c7c81dd2f8525b87",
+      "axis_cap": 5,
+      "axes": [
+        "fintech venture capital investment trends",
+        "new lending relationship formation metrics",
+        "open banking initiative economic impact",
+        "credit market entry and expansion measurement",
+        "alternative lending volume and growth patterns"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Competition in lending is driving investment and SME lending\" chunk#53",
+      "text_hash": "ac6824b2164561be",
+      "axis_cap": 5,
+      "axes": [
+        "venture capital investment measurement methodology",
+        "confidence interval estimation practices",
+        "open finance policy impact quantification",
+        "lending relationship formation metrics",
+        "SME credit access measurement"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Competition in lending is driving investment and SME lending\" chunk#54",
+      "text_hash": "881d12b48c1856fe",
+      "axis_cap": 5,
+      "axes": [
+        "alternative credit data incorporation",
+        "financial inclusion through digital payments",
+        "credit risk assessment methodologies",
+        "borrower data access and portability",
+        "fintech lending and capital access"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#55",
+      "text_hash": "b1f889d3e85dfb03",
+      "axis_cap": 5,
+      "axes": [
+        "data standardization frameworks",
+        "data governance requirements",
+        "open banking to open finance transition",
+        "regulatory mandate clarity",
+        "consumer trust and protection"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#56",
+      "text_hash": "61413447bf26b376",
+      "axis_cap": 5,
+      "axes": [
+        "data sharing technical standards harmonization",
+        "open finance regulatory approach design",
+        "API standardization mandates",
+        "cross-jurisdictional interoperability frameworks",
+        "third-party provider integration infrastructure"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#57",
+      "text_hash": "a1c19f1b8fd06f36",
+      "axis_cap": 5,
+      "axes": [
+        "asymmetric data access obligations between traditional and non-traditional financial institutions",
+        "third-party data sharing consent and consumer protection requirements",
+        "open banking competition and market distortion risks",
+        "algorithmic risk oversight and data analytics safeguards",
+        "privacy and consumer protection framework design standards"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#58",
+      "text_hash": "2f22a5009e4b6655",
+      "axis_cap": 5,
+      "axes": [
+        "open finance regulatory scope",
+        "data protection framework complexity",
+        "financial infrastructure investment requirements",
+        "cross-sector data standardization",
+        "regulatory clarity and coordination mechanisms"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#59",
+      "text_hash": "a6c4bb07ab75fcab",
+      "axis_cap": 5,
+      "axes": [
+        "cross-border data mobility framework",
+        "open finance system implementation gaps",
+        "jurisdictional coordination in open finance",
+        "individual and business financial data portability",
+        "domestic versus international open finance harmonization"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#60",
+      "text_hash": "b3ff413a8d53cc5a",
+      "axis_cap": 5,
+      "axes": [
+        "data access mandate scope",
+        "incumbent market concentration mitigation",
+        "mandatory participation requirement",
+        "competitive parity mechanism design",
+        "data sharing architecture"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#61",
+      "text_hash": "c7db4fc038e70ea0",
+      "axis_cap": 5,
+      "axes": [
+        "cross-border financial data portability",
+        "data sovereignty and interoperability balance",
+        "open finance technical standards harmonization",
+        "consent management in multi-jurisdictional data sharing",
+        "cross-border financial services infrastructure governance"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#62",
+      "text_hash": "3d31896c4974c058",
+      "axis_cap": 5,
+      "axes": [
+        "open finance adoption barriers",
+        "demographic disparities in financial data sharing",
+        "consumer awareness of financial data aggregation",
+        "behavioral adoption constraints in open finance",
+        "financial inclusion by education and income level"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#63",
+      "text_hash": "f83d4cae007da67e",
+      "axis_cap": 5,
+      "axes": [
+        "data access pricing mechanisms",
+        "open finance regulatory scope",
+        "financial data sharing eligibility criteria",
+        "incumbent institution competitive protections",
+        "real-time data access mandates"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#64",
+      "text_hash": "0fcea47c1c2ddc7f",
+      "axis_cap": 5,
+      "axes": [
+        "cross-border data portability",
+        "open finance interoperability standards",
+        "security protocol harmonization",
+        "trust framework design",
+        "financial data exchange use cases"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#65",
+      "text_hash": "d0b07d99d1398856",
+      "axis_cap": 5,
+      "axes": [
+        "data sharing operational costs",
+        "cyber security investment requirements",
+        "risk aversion in data governance",
+        "secure data infrastructure expenses",
+        "data sharing technology costs"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"5. Conclusion\" chunk#66",
+      "text_hash": "782a6ec010c19085",
+      "axis_cap": 5,
+      "axes": [
+        "open finance framework implementation maturity",
+        "cross-jurisdictional regulatory learning and coordination",
+        "consumer empowerment through data access",
+        "financial services competition and innovation drivers",
+        "open finance risk mitigation requirements"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"5. Conclusion\" chunk#67",
+      "text_hash": "74dd4b21225aab02",
+      "axis_cap": 5,
+      "axes": [
+        "open finance market structure impacts",
+        "financial intermediation effects assessment",
+        "consumer welfare outcome evaluation",
+        "data protection and privacy framework role",
+        "cross-jurisdictional regulatory harmonization effects"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"5. Conclusion\" chunk#68",
+      "text_hash": "6d9261bfb6947e3b",
+      "axis_cap": 5,
+      "axes": [
+        "open finance performance measurement",
+        "consent management frameworks",
+        "liability allocation in data sharing",
+        "financial inclusion through data access",
+        "alternative credit assessment data sources"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"5. Conclusion\" chunk#69",
+      "text_hash": "40aaaa2014b7395f",
+      "axis_cap": 5,
+      "axes": [
+        "open finance ecosystem resilience",
+        "consumer protection in open finance",
+        "market integrity safeguards",
+        "innovation-consumer protection balance",
+        "open banking framework adoption"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#70",
+      "text_hash": "e7aac2cd4c01391b",
+      "axis_cap": 5,
+      "axes": [
+        "financial data interoperability standards",
+        "open banking regulatory framework",
+        "cross-border financial data exchange",
+        "regulatory impact assessment on market participants",
+        "international banking system coordination"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#71",
+      "text_hash": "32638c706c9042e6",
+      "axis_cap": 5,
+      "axes": [
+        "open finance policy development",
+        "financial inclusion implementation frameworks",
+        "open banking credit access implications",
+        "digital payments infrastructure impact",
+        "regulatory guidance for financial system openness"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#72",
+      "text_hash": "1427f62dc044199a",
+      "axis_cap": 5,
+      "axes": [
+        "data sharing willingness by demographic",
+        "gender and age disparities in privacy preferences",
+        "open finance infrastructure policy",
+        "financial data disclosure frameworks",
+        "demographic variation in consumer consent behavior"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#73",
+      "text_hash": "fa6ef5ecb9cdecbb",
+      "axis_cap": 5,
+      "axes": [
+        "open banking data access requirements",
+        "fintech market entry barriers",
+        "customer financial data portability",
+        "competitive effects of data sharing mandates",
+        "third-party access to deposit account information"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#74",
+      "text_hash": "f0c100f75261c5ab",
+      "axis_cap": 5,
+      "axes": [
+        "technology sector participation in financial services",
+        "fintech and bigtech regulatory scope",
+        "open banking architecture and API standards",
+        "financial innovation policy framework",
+        "digital economy integration with traditional finance"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#75",
+      "text_hash": "235fba7942be22a3",
+      "axis_cap": 5,
+      "axes": [
+        "open banking architecture and API standards",
+        "financial system interoperability requirements",
+        "financial inclusion through technological access",
+        "third-party data integration and connectivity",
+        "cross-institution information sharing frameworks"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#76",
+      "text_hash": "36d20affb2e62074",
+      "axis_cap": 5,
+      "axes": [
+        "data access and sharing frameworks",
+        "open finance ecosystem governance",
+        "stakeholder participation in financial data",
+        "data democratization implementation",
+        "cross-sector financial information transparency"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#77",
+      "text_hash": "58b099c6621e2dc8",
+      "axis_cap": 5,
+      "axes": [
+        "open finance regulatory framework",
+        "open banking implementation lessons",
+        "APAC financial services policy",
+        "cross-jurisdiction regulatory comparison",
+        "financial data access standards"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#78",
+      "text_hash": "2acd08280468987b",
+      "axis_cap": 5,
+      "axes": [
+        "retail banking market investigation scope",
+        "personal financial data consumer rights",
+        "regulatory rulemaking authority and mandate",
+        "consumer protection in financial services",
+        "market competition enforcement jurisdiction"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#79",
+      "text_hash": "4cea18f077f9dff5",
+      "axis_cap": 5,
+      "axes": [
+        "digital financial infrastructure design",
+        "privacy regulation in fintech lending",
+        "emerging market financial technology development",
+        "regulatory approaches to financial innovation",
+        "cross-jurisdictional fintech policy frameworks"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#80",
+      "text_hash": "5bf0c5accdcb3c99",
+      "axis_cap": 5,
+      "axes": [
+        "open banking data access frameworks",
+        "payment services regulation scope",
+        "financial data standardization and interoperability",
+        "third-party access to customer financial information",
+        "regulatory harmonization across payment services"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#81",
+      "text_hash": "1edd5f9bf52e60e1",
+      "axis_cap": 5,
+      "axes": [
+        "open banking data access regimes",
+        "consumer financial data rights",
+        "banking sector data sharing frameworks",
+        "customer loyalty and banking relationships",
+        "regulatory evaluation of fintech data practices"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#82",
+      "text_hash": "2766aac3336c6fa3",
+      "axis_cap": 5,
+      "axes": [
+        "data sharing frameworks for financial institutions",
+        "open data policy in banking sector",
+        "financial innovation and consumer inclusion",
+        "government treasury and cabinet policy coordination",
+        "financial services data access standards"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#83",
+      "text_hash": "c9944fd4ea207fd1",
+      "axis_cap": 5,
+      "axes": [
+        "fintech lending business models",
+        "digital payment system architecture",
+        "open banking regulatory framework",
+        "maturity transformation risk in digital finance",
+        "financial intermediation through technology platforms"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#84",
+      "text_hash": "48614ee2099e85b0",
+      "axis_cap": 5,
+      "axes": [
+        "open banking data ownership framework",
+        "credit market competition effects",
+        "borrower data portability rights",
+        "financial intermediation restructuring",
+        "regulatory decree implementation scope"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#85",
+      "text_hash": "c51b1679a847e810",
+      "axis_cap": 5,
+      "axes": [
+        "open application programming interface framework",
+        "banking sector technological infrastructure",
+        "central bank digital platform governance",
+        "third-party fintech integration standards",
+        "public financial data access mechanism"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#86",
+      "text_hash": "077990c2d29350f9",
+      "axis_cap": 5,
+      "axes": [
+        "open banking data framework architecture",
+        "data portability and sharing standards",
+        "third-party access control mechanisms",
+        "open finance ecosystem implementation challenges",
+        "regulatory data governance requirements"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#87",
+      "text_hash": "3efad1a3c630d26f",
+      "axis_cap": 5,
+      "axes": [
+        "data economics and nonrivalry",
+        "open banking regulatory frameworks",
+        "financial market policy analysis",
+        "banking sector competition and access",
+        "digital financial services architecture"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#88",
+      "text_hash": "75e22d0698409219",
+      "axis_cap": 5,
+      "axes": [
+        "big tech exclusion from financial data sharing",
+        "financial data access restrictions by entity type",
+        "open banking API standardization frameworks",
+        "fintech data interoperability requirements",
+        "regulatory sandbox and innovation governance"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#89",
+      "text_hash": "eff079fb347afd47",
+      "axis_cap": 5,
+      "axes": [
+        "open banking regulatory framework",
+        "customer data access and portability",
+        "fintech lending and credit market impacts",
+        "financial data sharing standards",
+        "open finance ecosystem governance"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#90",
+      "text_hash": "920b265ad2a7b5cd",
+      "axis_cap": 5,
+      "axes": [
+        "open banking regulatory framework",
+        "fintech competition policy",
+        "third-party data access arrangements",
+        "financial services market competition",
+        "regional banking modernization standards"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#91",
+      "text_hash": "4e36cdfcfe303cfa",
+      "axis_cap": 5,
+      "axes": [
+        "open finance regulatory framework",
+        "financial inclusion policy objectives",
+        "cashless payment system governance",
+        "fintech ecosystem policy coordination",
+        "payment infrastructure modernization"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#92",
+      "text_hash": "3f63b65e584554f3",
+      "axis_cap": 5,
+      "axes": [
+        "payments system modernization",
+        "financial technology disruption",
+        "domestic payments infrastructure development",
+        "banking sector technological transformation",
+        "international financial intermediation standards"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#93",
+      "text_hash": "d1e5e16020def2dc",
+      "axis_cap": 5,
+      "axes": [
+        "data portability mechanisms",
+        "user empowerment through data access",
+        "competition and market innovation effects",
+        "data availability and governance",
+        "digital economy policy frameworks"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#94",
+      "text_hash": "450b5d9c453d7980",
+      "axis_cap": 5,
+      "axes": [
+        "payment data interoperability for credit assessment",
+        "loan screening and monitoring data standards",
+        "open finance adoption barriers and enablers",
+        "consumer trust in financial data sharing",
+        "regulatory framework for data access and use"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#95",
+      "text_hash": "9a13cf8a78c443e6",
+      "axis_cap": 5,
+      "axes": [
+        "third-party data access pricing",
+        "financial institution data commercialization",
+        "fintech vendor data licensing arrangements",
+        "customer data monetization by depository institutions",
+        "data intermediation fee structures"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#96",
+      "text_hash": "fd91937a5be6f653",
+      "axis_cap": 5,
+      "axes": [
+        "open banking market structure",
+        "digital disruption in financial services",
+        "banking landscape competitive dynamics",
+        "financial technology industry analysis",
+        "regulatory environment for fintech adoption"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#97",
+      "text_hash": "f6b07914d36b985f",
+      "axis_cap": 5,
+      "axes": [
+        "open finance architecture and implementation",
+        "fintech market growth and expansion dynamics",
+        "regional financial innovation ecosystems",
+        "sustainable fintech business model development",
+        "cross-border financial services integration"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#98",
+      "text_hash": "5a307e92792d0646",
+      "axis_cap": 5,
+      "axes": [
+        "open banking ecosystem architecture",
+        "third-party data access and integration",
+        "fintech lending platform operations",
+        "crowdfunding market empirical evidence",
+        "digital finance regulatory scope"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#99",
+      "text_hash": "ca52c2b55c6baa6b",
+      "axis_cap": 5,
+      "axes": [
+        "open banking data access frameworks",
+        "small business lending collateral alternatives",
+        "cross-jurisdictional open finance policy lessons",
+        "financial data as loan security mechanism",
+        "emerging market fintech regulatory models"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"References\" chunk#100",
+      "text_hash": "e9598b873c1a1c88",
+      "axis_cap": 5,
+      "axes": [
+        "open banking scope and product coverage",
+        "open finance product categories",
+        "data access rights and permissions",
+        "read access versus write access capabilities",
+        "cross-sector data integration beyond financial services"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#101",
+      "text_hash": "8807fc082e961e57",
+      "axis_cap": 5,
+      "axes": [
+        "open finance regulatory scope",
+        "open banking product categories",
+        "financial data sharing frameworks",
+        "deposit account data access requirements",
+        "mortgage and loan data disclosure obligations"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#102",
+      "text_hash": "9872acd82ef19755",
+      "axis_cap": 5,
+      "axes": [
+        "open banking read access scope",
+        "payment initiation write access scope",
+        "cross-sector data access permissions",
+        "account information disclosure requirements",
+        "third-party access to deposit accounts"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#103",
+      "text_hash": "db0c39847bcb6ea2",
+      "axis_cap": 5,
+      "axes": [
+        "open banking scope and authorized transactions",
+        "customer data sharing permissions",
+        "third-party access to financial institution data",
+        "consumer consent for data portability",
+        "financial service access expansion via data APIs"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#104",
+      "text_hash": "ad6f3701dbd3733d",
+      "axis_cap": 5,
+      "axes": [
+        "payment initiation service provider access rights",
+        "third-party account access authorization",
+        "write access to deposit accounts",
+        "licensed payment service provider permissions",
+        "consumer account data access controls"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#105",
+      "text_hash": "77d3eadf1b29d2ab",
+      "axis_cap": 5,
+      "axes": [
+        "open finance regulatory frameworks",
+        "regulation-led vs market-led approaches",
+        "jurisdiction-specific open finance models",
+        "central bank open finance authority",
+        "government decree implementation mechanisms"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#106",
+      "text_hash": "bb2ab44a4a6815c7",
+      "axis_cap": 5,
+      "axes": [
+        "open finance framework governance model",
+        "regulatory approach to fintech integration",
+        "market-driven versus regulation-led classification",
+        "financial innovation oversight structure",
+        "jurisdictional open banking implementation strategy"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#107",
+      "text_hash": "2384304cb7b04f7c",
+      "axis_cap": 5,
+      "axes": [
+        "open banking regulatory framework enactment timeline",
+        "open finance ecosystem transition stages",
+        "regulatory progression from open banking to open finance",
+        "open finance implementation maturity levels",
+        "jurisdictional framework classification scope and coverage"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#108",
+      "text_hash": "7a051d4b4af97b9d",
+      "axis_cap": 5,
+      "axes": [
+        "consent mechanism for automated services",
+        "data modification authorization scope",
+        "payment order submission consent",
+        "open banking system implementation",
+        "regulatory impact assessment framework"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#109",
+      "text_hash": "0e13553b2c096708",
+      "axis_cap": 5,
+      "axes": [
+        "regulatory implementation timeline",
+        "open banking deployment phasing",
+        "open finance launch schedule",
+        "regulation issuance-to-implementation lag",
+        "cross-jurisdiction regulatory coordination timing"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#110",
+      "text_hash": "699379bee3c8058a",
+      "axis_cap": 5,
+      "axes": [
+        "open banking regulatory timeline",
+        "open finance implementation schedule",
+        "jurisdiction-specific fintech legislation adoption",
+        "phased regulatory rollout by geography",
+        "financial data-sharing regulatory framework progression"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#111",
+      "text_hash": "5a695661d2b7cca9",
+      "axis_cap": 5,
+      "axes": [
+        "jurisdictional regulatory coverage",
+        "multi-year implementation timeline",
+        "cross-border regulatory alignment",
+        "geographic scope of requirements",
+        "phased adoption schedule by jurisdiction"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#112",
+      "text_hash": "e9e2220dcb8b2586",
+      "axis_cap": 5,
+      "axes": [
+        "jurisdictional regulatory coverage",
+        "cross-border regulatory scope",
+        "geographic regulatory jurisdiction",
+        "Middle Eastern financial regulation",
+        "jurisdiction-specific compliance framework"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#113",
+      "text_hash": "25e2fee88d29b930",
+      "axis_cap": 5,
+      "axes": [
+        "third-party provider market composition",
+        "open finance ecosystem maturation",
+        "non-bank financial intermediary participation",
+        "consumer consent authorization trends",
+        "financial service use case diversification"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#114",
+      "text_hash": "6200f8a4be8ae6f5",
+      "axis_cap": 5,
+      "axes": [
+        "third-party provider ecosystem maturity",
+        "open finance market participant diversity",
+        "consent-based lending volume metrics",
+        "consumer data sharing authorization scale",
+        "financial services API adoption indicators"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"A. A growing diversity of different TPPs\" chunk#115",
+      "text_hash": "13e9c4300721aada",
+      "axis_cap": 5,
+      "axes": [
+        "third-party provider consent distribution",
+        "non-banking financial corporation access",
+        "peer-to-peer lending market participation",
+        "investment adviser authorization metrics",
+        "public bank data sharing permissions"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"A. A growing diversity of different TPPs\" chunk#116",
+      "text_hash": "dbd2afbcf9315323",
+      "axis_cap": 5,
+      "axes": [
+        "credit consent issuance volume",
+        "lending authorization percentage distribution",
+        "private banking market share trends",
+        "stockbroker credit access metrics",
+        "consent cumulative tracking methodology"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"A. A growing diversity of different TPPs\" chunk#117",
+      "text_hash": "59a1ba86f79cf8e9",
+      "axis_cap": 5,
+      "axes": [
+        "third-party provider scope definition",
+        "non-bank financial institution categories",
+        "regulated entity classification framework",
+        "alternative investment fund oversight",
+        "insurance and payment system intermediaries"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"A. A growing diversity of different TPPs\" chunk#118",
+      "text_hash": "8db9c279101ba1d7",
+      "axis_cap": 5,
+      "axes": [
+        "open banking API technical specification",
+        "standardized data exchange protocols",
+        "third-party system interoperability requirements",
+        "secure information transfer mechanisms",
+        "API documentation and interface standards"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Glossary\" chunk#119",
+      "text_hash": "29c2332c26b553cd",
+      "axis_cap": 5,
+      "axes": [
+        "customer data sharing frameworks",
+        "third-party data access permissions",
+        "cross-sector data portability",
+        "customer consent requirements for data disclosure",
+        "open banking and open data regimes"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Glossary\" chunk#120",
+      "text_hash": "3352b8608654db48",
+      "axis_cap": 5,
+      "axes": [
+        "customer data sharing permissions",
+        "third-party financial data access",
+        "open finance product scope",
+        "cross-product data portability",
+        "customer consent frameworks for data disclosure"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Glossary\" chunk#121",
+      "text_hash": "6d9a13e629b73369",
+      "axis_cap": 5,
+      "axes": [
+        "private interface data access standards",
+        "payment services directive scope",
+        "data holder and data user eligibility",
+        "reciprocal participation in data ecosystems",
+        "customer consent requirements for data sharing"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Glossary\" chunk#122",
+      "text_hash": "a1700f80dd740737",
+      "axis_cap": 5,
+      "axes": [
+        "unauthorized system functionality replication",
+        "undocumented API access methods",
+        "third-party reverse engineering practices",
+        "open banking framework transition",
+        "proprietary interface circumvention"
+      ]
+    },
+    {
+      "anchor_id": "bis-papers-168 \"Glossary\" chunk#123",
+      "text_hash": "582dbaeb7035e4be",
+      "axis_cap": 5,
+      "axes": [
+        "third-party data access mechanisms",
+        "customer credential sharing authorization",
+        "automated data extraction from banking platforms",
+        "third-party provider operational practices",
+        "customer consent for credential use"
+      ]
+    }
+  ]
+}

@@ -42,15 +42,42 @@ def _graph_on_disk(dst, workstream=_OPRES) -> dict:
 # --- GET /api/workstreams ---------------------------------------------------
 
 
-def test_GET_workstreams_lists_seeded_workstreams(tmp_path):
+def test_GET_workstreams_omits_hidden_workstreams(tmp_path):
+    """The seeded fixtures are marked `hidden` — stale demo data the test suite
+    still reads by id, but which must not clutter the drafter's sidebar."""
     client, _ = _make_client(tmp_path)
     body = client.get("/api/workstreams").json()
     ids = {w["id"] for w in body["workstreams"]}
-    assert {"opres-v2", "open-finance-ed", "rmit-v2-2025"} <= ids
-    roles = {w["id"]: w["role"] for w in body["workstreams"]}
-    assert roles["opres-v2"] == "own"
-    assert roles["open-finance-ed"] == "review"
-    assert roles["rmit-v2-2025"] == "delivered"
+    assert {"opres-v2", "open-finance-ed", "rmit-v2-2025"}.isdisjoint(ids)
+
+
+def test_a_hidden_workstream_is_still_served_by_id(tmp_path):
+    """Hiding only affects the listing: every direct-id route keeps working, so
+    an existing link into a hidden workstream never 404s."""
+    client, _ = _make_client(tmp_path)
+
+    assert client.get(f"/api/workstreams/{_OPRES}/graph").status_code == 200
+    assert client.get(f"/api/workstreams/{_OPRES}/nodes/{_TASK}").status_code == 200
+
+
+def test_a_visible_workstream_keeps_its_role_badge(tmp_path):
+    """The sidebar renders `role` as a badge, so a listed workstream must carry
+    one. Uses a freshly created (unhidden) workstream."""
+    client, _ = _make_client(tmp_path)
+    client.post(
+        "/api/workstreams",
+        json={
+            "name": "Visible Probe PD",
+            "deliverable_type": "PD",
+            "access": "team_only",
+        },
+    )
+
+    listed = client.get("/api/workstreams").json()["workstreams"]
+
+    probe = next(w for w in listed if w["id"] == "visible-probe-pd")
+    assert probe["role"] == "own"
+    assert probe["deliverable_type"] == "Policy Document"
 
 
 # --- GET /api/workstreams/{id}/graph ----------------------------------------
@@ -59,8 +86,11 @@ def test_GET_workstreams_lists_seeded_workstreams(tmp_path):
 def test_GET_graph_returns_seeded_opres_workstream(tmp_path):
     client, _ = _make_client(tmp_path)
     body = client.get(f"/api/workstreams/{_OPRES}/graph").json()
-    assert len(body["nodes"]) == 8  # one PD + seven anchors (sibling draft excluded)
-    assert len(body["edges"]) == 7
+    # The canvas renders the WHOLE workstream — a drafter can chain documents
+    # (focal -> ED -> the sources ED references), and a one-hop projection made
+    # everything past the first document invisible. The sibling draft shows too.
+    assert len(body["nodes"]) == 10
+    assert len(body["edges"]) == 10
     assert body["primary_task_id"] == _TASK
     edges = {e["id"]: e for e in body["edges"]}
     assert edges[_BCBS_EDGE]["analysed"] is True
@@ -100,7 +130,7 @@ def test_GET_node_detail_concepts_placeholder_when_not_enriched(tmp_path):
     MVP1 placeholder — never an error, never a guess."""
     client, _ = _make_client(tmp_path)
     body = client.get(f"/api/workstreams/{_OPRES}/nodes/bcbs-opres-2021").json()
-    assert body["concepts"] == {
+    assert body["metadata"] == {
         "status": "placeholder",
         "message": "Concept extraction not enabled in MVP1",
     }
@@ -114,25 +144,27 @@ def test_GET_node_detail_concepts_available_when_offline_enriched(tmp_path):
     owner is reused verbatim rather than re-derived."""
     client, _ = _make_client(tmp_path)
     body = client.get(f"/api/workstreams/{_OPRES}/nodes/{_TASK}").json()
-    assert body["concepts"]["status"] == "available"
-    assert body["concepts"]["policy_owner"] == "Aisyah R."
-    assert body["concepts"]["empowerment_framework"] == (
+    assert body["metadata"]["status"] == "available"
+    assert body["metadata"]["policy_owner"] == "Aisyah R."
+    assert body["metadata"]["empowerment_framework"] == (
         "This policy document is issued pursuant to section 143(2) of the "
         "Financial Services Act 2013."
     )
     # A field the enrichment script could not honestly derive stays null.
-    assert body["concepts"]["applicability"] is None
+    assert body["metadata"]["applicability"] is None
     assert body["pursuant_to"] == "FSA 2013 §143"
 
 
-def test_GET_node_detail_resource_node_lists_only_primary_task(tmp_path):
+def test_GET_node_detail_lists_every_neighbour_in_the_workstream(tmp_path):
     client, _ = _make_client(tmp_path)
     body = client.get(f"/api/workstreams/{_OPRES}/nodes/bcbs-opres-2021").json()
     assert body["node_type"] == "international-standard"
     neighbour_ids = [n["id"] for n in body["first_order_neighbours"]]
-    # bcbs also has an edge to the empty sibling draft, but the node panel is
-    # scoped to the primary subgraph, so only the v0.3 draft shows.
-    assert neighbour_ids == [_TASK]
+    # Neighbours match the canvas: bcbs is joined to BOTH drafts, so both list.
+    # Scoping this to a one-hop subgraph hid documents chained off another
+    # document, which is a shape a drafter can legitimately build.
+    assert _TASK in neighbour_ids
+    assert "opres-pd-v0-0" in neighbour_ids
 
 
 def test_GET_node_detail_unknown_node_returns_404(tmp_path):

@@ -23,6 +23,7 @@ default on Windows — see docs/learnings/pattern-engine-artifact-writes-utf8.md
 import hashlib
 import json
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional, Union
 
@@ -44,6 +45,14 @@ EDGE_TYPES: frozenset[str] = frozenset(
     {"supersedes", "references", "contributes-to", "parallel-to"}
 )
 
+# The three segmentation strategies a drafter may pick when attaching a
+# document (`engine.anchors` registers exactly these). Declared, never
+# inferred — a wrong guess chops a document into useless passages.
+DOC_CLASSES: frozenset[str] = frozenset(
+    {"structured-rules", "semi-structured", "prose"}
+)
+
+
 def workstream_dir(root: Union[str, Path], workstream_id: str) -> Path:
     """The on-disk directory for one workstream."""
     return Path(root) / workstream_id
@@ -61,7 +70,9 @@ def _write_json(path: Path, payload: Any) -> None:
     )
 
 
-def load_workstream(root: Union[str, Path], workstream_id: str) -> Optional[dict[str, Any]]:
+def load_workstream(
+    root: Union[str, Path], workstream_id: str
+) -> Optional[dict[str, Any]]:
     """Load `workstream.json`, or `None` when the workstream is unknown."""
     path = workstream_dir(root, workstream_id) / "workstream.json"
     return _read_json(path) if path.exists() else None
@@ -73,7 +84,9 @@ def load_graph(root: Union[str, Path], workstream_id: str) -> Optional[dict[str,
     return _read_json(path) if path.exists() else None
 
 
-def save_graph(root: Union[str, Path], workstream_id: str, graph: dict[str, Any]) -> None:
+def save_graph(
+    root: Union[str, Path], workstream_id: str, graph: dict[str, Any]
+) -> None:
     """Persist `graph.json` (UTF-8)."""
     _write_json(workstream_dir(root, workstream_id) / "graph.json", graph)
 
@@ -110,7 +123,14 @@ def edge_is_analysed(root: Union[str, Path], workstream_id: str, edge_id: str) -
 def list_workstreams(root: Union[str, Path]) -> list[dict[str, Any]]:
     """Project every workstream's `workstream.json` onto the sidebar list shape
     `{id, name, deliverable_type, role}`. Directories without a `workstream.json`
-    are skipped. Sorted by directory name for a stable order."""
+    are skipped. Sorted by directory name for a stable order.
+
+    A workstream marked `"hidden": true` is omitted. That lets a stale fixture
+    stay on disk — the engine test suite reads several of them by id — without
+    cluttering the drafter's sidebar with workstreams they should not pick. Only
+    THIS listing honours the flag: every direct-id route still serves a hidden
+    workstream, so nothing that already links to one breaks.
+    """
     root = Path(root)
     out: list[dict[str, Any]] = []
     if not root.exists():
@@ -120,6 +140,8 @@ def list_workstreams(root: Union[str, Path]) -> list[dict[str, Any]]:
         if not meta_path.exists():
             continue
         ws = _read_json(meta_path)
+        if ws.get("hidden") is True:
+            continue
         out.append(
             {
                 "id": ws.get("id", d.name),
@@ -316,28 +338,46 @@ def create_workstream(
 ) -> dict[str, Any]:
     """Scaffold a new workstream on disk and return its record.
 
-    Writes `workstream.json` plus an empty `graph.json`, because every read path
-    treats a missing graph.json as "workstream not found" — a workstream without
-    one would 404 the instant the user landed on it, which is exactly where the
-    form sends them.
+    Writes `workstream.json` plus a `graph.json` seeded with a single focal
+    `task` node — the drafter's own working draft. The graph must exist (every
+    read path treats a missing graph.json as "workstream not found"), and it
+    opens with the focal node so the first document added has an anchor to
+    connect to (add-node requires ≥1 edge to an existing node). The focal node
+    carries no `document_id`, so it is the expected non-analysable starting
+    state until documents are added and connected.
 
     Assumes `body` already passed `validate_workstream_create`.
     """
     root = Path(root)
-    existing = {p.name for p in root.iterdir() if p.is_dir()} if root.exists() else set()
-    ws_id = make_workstream_id(body["name"].strip(), existing)
+    existing = (
+        {p.name for p in root.iterdir() if p.is_dir()} if root.exists() else set()
+    )
+    name = body["name"].strip()
+    ws_id = make_workstream_id(name, existing)
+
+    # The focal node's identity comes from the workstream itself — its title is
+    # the name plus the deliverable-type code, and the drafter never names it
+    # separately. `node_type` must be "task": primary_task_id/primary_subgraph
+    # and the Task Screen all key off it. No document_id — the draft starts empty.
+    focal_title = f"{name} ({body['deliverable_type']})"
+    focal_id = make_node_id(focal_title, set())
+    focal_node: dict[str, Any] = {
+        "id": focal_id,
+        "node_type": "task",
+        "title": focal_title,
+        "description": (body.get("description") or "").strip() or None,
+        "source_url": None,
+    }
 
     record: dict[str, Any] = {
         "id": ws_id,
-        "name": body["name"].strip(),
+        "name": name,
         "deliverable_type": DELIVERABLE_TYPES[body["deliverable_type"]],
         # Anything you create, you own — which is also what makes the sidebar's
         # role badge render.
         "role": "own",
         "description": (body.get("description") or "").strip() or None,
-        # No task node exists yet; the graph screen falls back to the first task
-        # it finds, and an empty graph has none. Explicitly null beats absent.
-        "primary_task_id": None,
+        "primary_task_id": focal_id,
         "target_publication": (body.get("target_publication") or "").strip() or None,
         "owner": owner,
         "reviewers": reviewers,
@@ -345,7 +385,7 @@ def create_workstream(
         "created_at": created_at,
     }
     _write_json(root / ws_id / "workstream.json", record)
-    _write_json(root / ws_id / "graph.json", {"nodes": [], "edges": []})
+    _write_json(root / ws_id / "graph.json", {"nodes": [focal_node], "edges": []})
     return record
 
 
@@ -382,13 +422,26 @@ def make_edge_id(source: str, target: str) -> str:
 def validate_node_create(body: dict[str, Any]) -> Optional[tuple[int, str, str]]:
     """Validate an add-node request body. Returns `None` when valid, else the
     `(status, code, message)` for the first rule broken, checked in this order:
-    node type, then ≥1 edge, then each edge's type and a present target."""
+    node type, then `doc_class` (when supplied), then ≥1 edge, then each edge's
+    type and a present target.
+
+    `doc_class` is optional here because the legacy JSON path adds a node
+    without a document to chunk. The route requires it whenever an attachment
+    is present — presence of the file is what makes the choice meaningful.
+    """
     if body.get("node_type") not in NODE_TYPES:
         return (
             400,
             "INVALID_NODE_TYPE",
             f"node_type must be one of the eight flat types, got "
             f"{body.get('node_type')!r}",
+        )
+    if "doc_class" in body and body.get("doc_class") not in DOC_CLASSES:
+        return (
+            400,
+            "INVALID_DOC_CLASS",
+            f"doc_class must be one of {sorted(DOC_CLASSES)}, got "
+            f"{body.get('doc_class')!r}",
         )
     edges = body.get("edges")
     if not isinstance(edges, list) or len(edges) == 0:
@@ -415,11 +468,22 @@ def validate_node_create(body: dict[str, Any]) -> Optional[tuple[int, str, str]]
 
 
 def add_node(
-    graph: dict[str, Any], body: dict[str, Any]
+    graph: dict[str, Any],
+    body: dict[str, Any],
+    chunked: bool = False,
+    author: Optional[str] = None,
+    at: Optional[str] = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     """Append a new node and its declared edges to `graph` in place. Returns the
     `(new_node, created_edges)`. Assumes `body` already passed
-    `validate_node_create`."""
+    `validate_node_create`.
+
+    `chunked=True` marks a node whose attached document was ingested and
+    segmented by the caller: the node gains `document_id` (its own id, so its
+    anchors and axis cache key off one identifier) and a `recent_activity`
+    trail of "node created" then "chunking completed". Legacy callers that add
+    a node without a document leave both absent.
+    """
     existing = {n["id"] for n in graph.get("nodes", [])}
     node_type_by_id = {n["id"]: n.get("node_type") for n in graph.get("nodes", [])}
     node_id = make_node_id(body.get("title", "node"), existing)
@@ -432,6 +496,15 @@ def add_node(
     }
     if body.get("attachment_submission_id"):
         node["attachment_submission_id"] = body["attachment_submission_id"]
+    if chunked:
+        node["document_id"] = node_id
+        node["doc_class"] = body["doc_class"]
+        stamp = at or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        who = author or "Aisyah R."
+        node["recent_activity"] = [
+            {"event": "node created", "author": who, "at": stamp},
+            {"event": "chunking completed", "author": who, "at": stamp},
+        ]
     graph.setdefault("nodes", []).append(node)
 
     created: list[dict[str, Any]] = []
@@ -455,6 +528,89 @@ def add_node(
         graph.setdefault("edges", []).append(record)
         created.append(record)
     return node, created
+
+
+def validate_edge_create(body: dict[str, Any]) -> Optional[tuple[int, str, str]]:
+    """Validate a create-edge body. `None` when valid, else `(status, code,
+    message)` for the first rule broken: required fields, then the edge type,
+    then the self-loop guard."""
+    source = (body.get("source_node_id") or "").strip()
+    target = (body.get("target_node_id") or "").strip()
+    edge_type = body.get("edge_type")
+    if not source or not target or not edge_type:
+        return (
+            400,
+            "EDGE_REQUIRED",
+            "source_node_id, target_node_id and edge_type are required.",
+        )
+    if edge_type not in EDGE_TYPES:
+        return (
+            400,
+            "INVALID_EDGE_TYPE",
+            f"edge_type must be one of the four structural types, got "
+            f"{edge_type!r}",
+        )
+    if source == target:
+        return (400, "SELF_LOOP", "A document cannot be connected to itself.")
+    return None
+
+
+def resolve_edge_direction(
+    graph: dict[str, Any], source: str, target: str
+) -> tuple[str, str]:
+    """Orient a new edge, preserving the seeded task-is-source convention.
+
+    Edges read task → anchor because the Task Screen lists a task's OUTGOING
+    edges only; a connection drawn toward the draft would otherwise vanish from
+    it. Anchor↔anchor edges keep the caller's direction. Mirrors `add_node`.
+    """
+    node_type_by_id = {n["id"]: n.get("node_type") for n in graph.get("nodes", [])}
+    if node_type_by_id.get(target) == "task" and node_type_by_id.get(source) != "task":
+        return target, source
+    return source, target
+
+
+def add_edge(
+    graph: dict[str, Any], source: str, target: str, edge_type: str
+) -> dict[str, Any]:
+    """Append one edge between two existing nodes and return the record.
+
+    Assumes the body passed `validate_edge_create`, both endpoints exist, and
+    the caller already refused duplicates.
+    """
+    record = {
+        "id": make_edge_id(source, target),
+        "source": source,
+        "target": target,
+        "edge_type": edge_type,
+    }
+    graph.setdefault("edges", []).append(record)
+    return record
+
+
+def remove_node(graph: dict[str, Any], node_id: str) -> list[str]:
+    """Drop a node and every edge touching it, in place.
+
+    Returns the ids of the removed edges so the caller can clean up their
+    findings files — an edge whose endpoint is gone can never be reviewed or
+    re-analysed, so leaving its findings behind would orphan them.
+    """
+    removed = [
+        e["id"]
+        for e in graph.get("edges", [])
+        if e.get("source") == node_id or e.get("target") == node_id
+    ]
+    graph["nodes"] = [n for n in graph.get("nodes", []) if n["id"] != node_id]
+    graph["edges"] = [e for e in graph.get("edges", []) if e["id"] not in removed]
+    return removed
+
+
+def remove_edge(graph: dict[str, Any], edge_id: str) -> bool:
+    """Drop one edge in place, leaving both endpoint nodes. Returns whether it
+    was found — un-linking two documents must not remove the documents."""
+    before = len(graph.get("edges", []))
+    graph["edges"] = [e for e in graph.get("edges", []) if e["id"] != edge_id]
+    return len(graph.get("edges", [])) < before
 
 
 def connections_to_findings(result: dict[str, Any]) -> list[dict[str, Any]]:

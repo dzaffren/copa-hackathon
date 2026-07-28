@@ -1,0 +1,3832 @@
+[
+  {
+    "anchor_id": "Rmit 2025 1.1",
+    "anchor_label": "Rmit 2025 1.1",
+    "text": "With the prevalent use of technology in the provision of financial services,\nfinancial institutions must-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 1.1(a)",
+    "anchor_label": "Rmit 2025 1.1(a)",
+    "text": "invest in the required expertise and risk controls to prevent operational\ndisruptions given the complexity of Information Technology (IT) systems;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 1.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 1.1(b)",
+    "anchor_label": "Rmit 2025 1.1(b)",
+    "text": "achieve the highest level of security to combat fast-changing digital\ncrimes for public confidence;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 1.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 1.1(c)",
+    "anchor_label": "Rmit 2025 1.1(c)",
+    "text": "maintain robust oversight to prevent transmission of risks with increased\nthird party interlinkages;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 1.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 1.1(d)",
+    "anchor_label": "Rmit 2025 1.1(d)",
+    "text": "build operational resilience against sophisticated and malicious cyber\nthreats amidst heightened cyber risks globally; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 1.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 1.1(e)",
+    "anchor_label": "Rmit 2025 1.1(e)",
+    "text": "practice ethical and responsible use of technology for inclusive growth.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 1.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 1.2",
+    "anchor_label": "Rmit 2025 1.2",
+    "text": "This policy document sets out the Bank's policy objectives and minimum\nrequirements to improve financial institutions' management of technology risk,\nincluding cyber risk. In applying this policy document, a financial institution\nshall have regard to the size and complexity of its operations, the level of\ntechnology use and its external stress exposure. Accordingly, larger and more\ncomplex financial institutions, or those with a high degree of digitalisation and\nlinkages with third parties, are required to adopt more robust risk controls that\ncommensurate with the increased technology risk exposure of the institution.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 1.3",
+    "anchor_label": "Rmit 2025 1.3",
+    "text": "Enforcement or supervisory actions can be taken against the financial\ninstitutions including its directors, officers and employees for any non-\ncompliance with any provision marked as \"S\" in Part B of this policy document.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 1.4",
+    "anchor_label": "Rmit 2025 1.4",
+    "text": "Where the Bank considers that a financial institution's technology risk\nmanagement has material weaknesses which, if not promptly and effectively\naddressed, might contribute to, or result in, non-compliance with this policy\ndocument, the Bank may, among others-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 1.4(a)",
+    "anchor_label": "Rmit 2025 1.4(a)",
+    "text": "require an independent external review of the overall or specific areas of\nthe financial institution's technology risk management;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 1.4"
+  },
+  {
+    "anchor_id": "Rmit 2025 1.4(b)",
+    "anchor_label": "Rmit 2025 1.4(b)",
+    "text": "require the financial institution to develop and implement specific\nremediation plan;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 1.4"
+  },
+  {
+    "anchor_id": "Rmit 2025 1.4(c)",
+    "anchor_label": "Rmit 2025 1.4(c)",
+    "text": "require the financial institution to hold additional capital; or",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 1.4"
+  },
+  {
+    "anchor_id": "Rmit 2025 1.4(d)",
+    "anchor_label": "Rmit 2025 1.4(d)",
+    "text": "require the financial institution to take any other corrective action\nnecessary to rectify the weaknesses in a sustainable manner.\n\n### 2 Applicability",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 1.4"
+  },
+  {
+    "anchor_id": "Rmit 2025 2.1",
+    "anchor_label": "Rmit 2025 2.1",
+    "text": "Subject to paragraph 2.2, this policy document is applicable to all financial\ninstitutions as defined in paragraph 5.2.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 2.2",
+    "anchor_label": "Rmit 2025 2.2",
+    "text": "The following paragraphs and appendices are not applicable to certain financial\ninstitutions identified below:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 2.2(a)",
+    "anchor_label": "Rmit 2025 2.2(a)",
+    "text": "sections 47(1), $4 7 \\left( 2 \\right) \\left( d \\right)$ and 143(2) of the Financial Services Act 2013\n(FSA);",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 2.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 2.2(i)",
+    "anchor_label": "Rmit 2025 2.2(i)",
+    "text": "eligible e-money issuers;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 2.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 2.2(ii)",
+    "anchor_label": "Rmit 2025 2.2(ii)",
+    "text": "non-bank registered merchant acquirers; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 2.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 2.2(iii)",
+    "anchor_label": "Rmit 2025 2.2(iii)",
+    "text": "intermediary remittance institutions.\n\n### 3 Legal provisions\n\n#### 3.1 The requirements in this policy document are specified pursuant to-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 2.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 2.2(iv)",
+    "anchor_label": "Rmit 2025 2.2(iv)",
+    "text": "intermediary remittance institutions; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 2.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 2.2(b)",
+    "anchor_label": "Rmit 2025 2.2(b)",
+    "text": "sections $5 7 \\left( 1 \\right) ,$ 57(2)(d) and 155(2) of the Islamic Financial Services Act\n2013 (IFSA);",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 2.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 2.2(c)",
+    "anchor_label": "Rmit 2025 2.2(c)",
+    "text": "sections 41(1), 41(2)(b) and 116(1) of the Development Financial\nInstitutions Act 2002 $\\left( \\mathrm { D F I A } \\right)$ and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 2.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 2.2(d)",
+    "anchor_label": "Rmit 2025 2.2(d)",
+    "text": "sections 34(2) and 74 of the Money Services Business Act 2011 (MSBA).",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 2.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 3.2",
+    "anchor_label": "Rmit 2025 3.2",
+    "text": "The guidance in this policy document is issued pursuant to section 266 of the\nFSA, section 277 of the IFSA, section 126 of the DFIA and section 74 of the\nMSBA.\n\n### 4 Effective date",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 4.1",
+    "anchor_label": "Rmit 2025 4.1",
+    "text": "This policy document comes into effect on 28 November 2025 except where\notherwise stated explicitly in this policy document.\n\n### 5 Interpretation",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 5.1",
+    "anchor_label": "Rmit 2025 5.1",
+    "text": "The terms and expressions used in this policy document shall have the same\nmeanings assigned to them in the FSA, IFSA, DFIA or MSBA, as the case may\nbe, unless otherwise defined in this policy document.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 5.2",
+    "anchor_label": "Rmit 2025 5.2",
+    "text": "For purposes of this policy document-\n\n\"S\" denotes a standard, an obligation, a requirement, specification, direction,\ncondition and any interpretative, supplemental and transitional provisions that\nmust be complied with. Non-compliance may result in enforcement action;\n\n\"G\" denotes guidance which may consist of statements or information\nintended to promote common understanding and advice or recommendations\nthat are encouraged to be adopted;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 6.1",
+    "anchor_label": "Rmit 2025 6.1",
+    "text": "This policy document must be read together with any relevant legal\ninstruments, policy documents, guidelines, circulars, and supplementary\ndocuments issued by the Bank, including any amendments and reissuances\nthereafter, in particular-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 6.1(a)",
+    "anchor_label": "Rmit 2025 6.1(a)",
+    "text": "Guidelines on Data Management and MIS Framework issued on 23\nOctober 2008;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 6.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 6.1(b)",
+    "anchor_label": "Rmit 2025 6.1(b)",
+    "text": "Guidelines on Data Management and MIS Framework for Development\nFinancial Institutions issued on 5 November 2012;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 6.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 6.1(c)",
+    "anchor_label": "Rmit 2025 6.1(c)",
+    "text": "Policy Document on Risk Governance issued on 1 March 2013;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 6.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 6.1(d)",
+    "anchor_label": "Rmit 2025 6.1(d)",
+    "text": "Policy Document on Introduction of New Products issued on 7 March\n2014;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 6.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 6.1(e)",
+    "anchor_label": "Rmit 2025 6.1(e)",
+    "text": "Policy Document on Compliance issued on 10 May 2016;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 6.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 7.1",
+    "anchor_label": "Rmit 2025 7.1",
+    "text": "This policy document supersedes the following policy documents, guidelines,\ncirculars and notifications:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 7.1(a)",
+    "anchor_label": "Rmit 2025 7.1(a)",
+    "text": "Guidelines on the Provision of Electronic Banking (e-banking) Services\nby Financial Institutions, including for the provisions under paragraphs\n21, 22 and 26 issued on 18 November 2019;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 7.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 7.1(b)",
+    "anchor_label": "Rmit 2025 7.1(b)",
+    "text": "Specifications on Measures to Combat Electronic Banking Fraud dated",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 7.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 7.1(c)",
+    "anchor_label": "Rmit 2025 7.1(c)",
+    "text": "Measures to Combat Fraud Monetised via Internet Banking and Mobile\nBanking dated 31 May 2022;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 7.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 7.1(d)",
+    "anchor_label": "Rmit 2025 7.1(d)",
+    "text": "Policy Document on Risk Management in Technology (RMIT) issued on",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 7.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 8.1",
+    "anchor_label": "Rmit 2025 8.1",
+    "text": "The board must establish and approve the technology risk appetite which is\naligned with the financial institution's risk appetite statement. In doing so, the\nboard must-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 8.1(a)",
+    "anchor_label": "Rmit 2025 8.1(a)",
+    "text": "approve and review the adequacy of the financial institution's IT and\ncybersecurity strategic plans to meet business objectives covering a\nperiod of no less than three years;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 8.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 8.1(b)",
+    "anchor_label": "Rmit 2025 8.1(b)",
+    "text": "endorse and oversee the effective implementation of a sound and robust\ntechnology risk management framework (TRMF) and cyber resilience\nframework (CRF), as required to be developed under paragraphs 9.1\nand 11.2, for the continuity of operations and delivery of financial\nservices;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 8.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 8.1(c)",
+    "anchor_label": "Rmit 2025 8.1(c)",
+    "text": "require senior management to continuously demonstrate that risk\nassessments undertaken in relation to critical IT systems and use of\nemerging technology are robust and comprehensive, supported with\nadequate control measures and resources to mitigate IT and cyber risks\narising from the execution of IT strategic plans;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 8.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 8.1(d)",
+    "anchor_label": "Rmit 2025 8.1(d)",
+    "text": "ensure IT-related framework, policies and guidelines are reviewed at\nleast once every three years (unless otherwise stated in this policy\ndocument) and apply a depth of review that is commensurate with the\ncomplexity of the financial institution's operations and changes in the\nrisk environment; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 8.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 8.1(e)",
+    "anchor_label": "Rmit 2025 8.1(e)",
+    "text": "ensure risk management framework provide support to robust risk\nassessments in relation to technology related applications submitted to\nthe Bank.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 8.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 8.3",
+    "anchor_label": "Rmit 2025 8.3",
+    "text": "The board must designate a board-level committee9 which shall be\nresponsible for supporting the board in providing oversight over technology-\nrelated matters. The composition of the designated committee must include",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 8.4",
+    "anchor_label": "Rmit 2025 8.4",
+    "text": "To promote effective discussion at the board level amidst a rapidly evolving\ntechnology and cyber risk landscape, the board must-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 8.4(a)",
+    "anchor_label": "Rmit 2025 8.4(a)",
+    "text": "obtain regular updates on technology risk and cyber threats;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 8.4"
+  },
+  {
+    "anchor_id": "Rmit 2025 8.4(b)",
+    "anchor_label": "Rmit 2025 8.4(b)",
+    "text": "allocate sufficient time to discuss cyber risks, including the strategic,\nreputational and liquidity risks and impact of operational disruption to\nstakeholders which could arise from an extreme cyber incident. This\nshall be supported by input from external experts where appropriate;\nand",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 8.4"
+  },
+  {
+    "anchor_id": "Rmit 2025 8.4(c)",
+    "anchor_label": "Rmit 2025 8.4(c)",
+    "text": "participate in relevant cybersecurity awareness and training\nprogrammes.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 8.4"
+  },
+  {
+    "anchor_id": "Rmit 2025 8.5",
+    "anchor_label": "Rmit 2025 8.5",
+    "text": "The board audit committee (BAC) shall be responsible for ensuring the\neffectiveness of the internal technology audit function. This shall include\nensuring the adequate competence of the audit staff to perform technology\naudits. The BAC shall review and ensure appropriate audit scope,\nprocedures and frequency of technology audits. The BAC shall also ensure\neffective oversight over the prompt closure of corrective actions to address\ntechnology control gaps.\n\n#### Responsibilities of the senior management",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 8.6",
+    "anchor_label": "Rmit 2025 8.6",
+    "text": "The senior management shall bear primary responsibility for the day-to-day\nmanagement of technology risks including cyber risks. In fulfilling its\nresponsibilities, senior management must-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 8.6(a)",
+    "anchor_label": "Rmit 2025 8.6(a)",
+    "text": "implement board approved TRMF and CRF into specific policies and\nprocedures that are consistent with the approved risk appetite and risk\ntolerance;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 8.6"
+  },
+  {
+    "anchor_id": "Rmit 2025 8.6(b)",
+    "anchor_label": "Rmit 2025 8.6(b)",
+    "text": "ensure that the crisis management plan for service disruptions provides\nfor timely escalation of recovery action, taking into consideration the\nimpact on customers, such as:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 8.6"
+  },
+  {
+    "anchor_id": "Rmit 2025 8.6(i)",
+    "anchor_label": "Rmit 2025 8.6(i)",
+    "text": "duration of disruption;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 8.6"
+  },
+  {
+    "anchor_id": "Rmit 2025 8.6(ii)",
+    "anchor_label": "Rmit 2025 8.6(ii)",
+    "text": "number of customers affected by a disruption; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 8.6"
+  },
+  {
+    "anchor_id": "Rmit 2025 8.6(iii)",
+    "anchor_label": "Rmit 2025 8.6(iii)",
+    "text": "number and value of financial transaction impacted; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 8.6"
+  },
+  {
+    "anchor_id": "Rmit 2025 8.6(c)",
+    "anchor_label": "Rmit 2025 8.6(c)",
+    "text": "provide regular updates to the board on the status of key performance\nindicators with pertinent information on the risk controls to facilitate\ninformed performance review.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 8.6"
+  },
+  {
+    "anchor_id": "Rmit 2025 8.7",
+    "anchor_label": "Rmit 2025 8.7",
+    "text": "The senior management must establish a cross-functional committee to\nprovide guidance on the financial institution's technology plans and\noperations. The members of the committee must include senior management\nfrom both cyber and technology functions, as well as major business units.\nThe committee's responsibilities shall include the following:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 8.7(a)",
+    "anchor_label": "Rmit 2025 8.7(a)",
+    "text": "oversee the formulation and effective implementation of the strategic\ntechnology plan and associated technology policies and procedures;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 8.7"
+  },
+  {
+    "anchor_id": "Rmit 2025 8.7(b)",
+    "anchor_label": "Rmit 2025 8.7(b)",
+    "text": "provide timely updates to the board on key technology matters 10; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 8.7"
+  },
+  {
+    "anchor_id": "Rmit 2025 8.7(c)",
+    "anchor_label": "Rmit 2025 8.7(c)",
+    "text": "approve any deviation from technology-related policies after having\ncarefully considered a robust assessment of related risks. Material\ndeviations shall be reported to the board.\n\nThe rest of the page is intentionally left as blank\n\n### 9 Technology Risk Management\n\n#### Risk Management Framework",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 8.7"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.1",
+    "anchor_label": "Rmit 2025 9.1",
+    "text": "A financial institution must ensure that the TRMF is an integral part of the\nfinancial institution's enterprise risk management framework (ERM).",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 9.2",
+    "anchor_label": "Rmit 2025 9.2",
+    "text": "The TRMF must include the following:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 9.2(a)",
+    "anchor_label": "Rmit 2025 9.2(a)",
+    "text": "clear definition of technology risk;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.2(b)",
+    "anchor_label": "Rmit 2025 9.2(b)",
+    "text": "clear responsibilities assigned for the management of technology risk at\ndifferent levels and across functions, with appropriate governance and\nreporting arrangements;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.2(c)",
+    "anchor_label": "Rmit 2025 9.2(c)",
+    "text": "the identification of technology risks to which the financial institution is\nexposed, including risks from the adoption of new or emerging\ntechnology (refer Appendix 9 on Guidance on Emerging Technologies);",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.2(d)",
+    "anchor_label": "Rmit 2025 9.2(d)",
+    "text": "risk classification of all information assets / systems based on its\ncriticality;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.2(e)",
+    "anchor_label": "Rmit 2025 9.2(e)",
+    "text": "risk measurement and assessment approaches and methodologies;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.2(f)",
+    "anchor_label": "Rmit 2025 9.2(f)",
+    "text": "risk controls and mitigations;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.2(g)",
+    "anchor_label": "Rmit 2025 9.2(g)",
+    "text": "continuous monitoring to timely detect and address any material risks;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.2(h)",
+    "anchor_label": "Rmit 2025 9.2(h)",
+    "text": "effective information system to ensure the technology risk profile\nremains accurate and up to date;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.2(i)",
+    "anchor_label": "Rmit 2025 9.2(i)",
+    "text": "identification of key resources and interdependencies (including critical\nthird party service providers and their connected parties11) which\nsupport delivery of critical technology functions;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.2(j)",
+    "anchor_label": "Rmit 2025 9.2(j)",
+    "text": "undertake scenario analysis to strengthen capacity and readiness to\nresume critical systems under severe conditions; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.2(k)",
+    "anchor_label": "Rmit 2025 9.2(k)",
+    "text": "effective incident management policies and procedures to minimise the\nimpact of any service disruption on the financial institution and its\ncustomers, by restoring the affected service or system to a secure and\nstable state as quickly as possible.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.3",
+    "anchor_label": "Rmit 2025 9.3",
+    "text": "A financial institution must establish an independent enterprise-wide\ntechnology risk management function which is responsible for-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 9.3(a)",
+    "anchor_label": "Rmit 2025 9.3(a)",
+    "text": "implementing the TRMF and CRF;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.3(b)",
+    "anchor_label": "Rmit 2025 9.3(b)",
+    "text": "advising on critical technology projects and ensuring critical issues that\nmay have an impact on the financial institution's risk tolerance are\nadequately deliberated or escalated in a timely manner; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.3(c)",
+    "anchor_label": "Rmit 2025 9.3(c)",
+    "text": "providing independent views to the board and senior management on\nthird party assessments12, where necessary.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.4",
+    "anchor_label": "Rmit 2025 9.4",
+    "text": "A financial institution must designate a Chief Information Security $^ { 1 3 }$\n(CISO) by whatever name called, to be responsible for the technology risk\nmanagement function of the financial institution. The financial institution must\nensure that the CISO has sufficient authority, independence and resources 14.\nThe CISO shall-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 9.4(a)",
+    "anchor_label": "Rmit 2025 9.4(a)",
+    "text": "be independent from day-to-day technology operations;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.4"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.4(b)",
+    "anchor_label": "Rmit 2025 9.4(b)",
+    "text": "apprise board and senior management of current and emerging\ntechnology risks which could potentially affect the financial institution's\nrisk profile;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.4"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.4(c)",
+    "anchor_label": "Rmit 2025 9.4(c)",
+    "text": "have the requisite technical skills in emerging and core technologies\nused by the institution, expertise and experience in audit, governance\nand risk management, strategic planning and execution of IT and\ncybersecurity programs, and third party risk management; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.4"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.4(d)",
+    "anchor_label": "Rmit 2025 9.4(d)",
+    "text": "be appropriately certified.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.4"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.5",
+    "anchor_label": "Rmit 2025 9.5",
+    "text": "The CISO shall be responsible for ensuring that the financial institution's\ninformation assets and technologies are adequately protected, which\nincludes-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 9.5(a)",
+    "anchor_label": "Rmit 2025 9.5(a)",
+    "text": "formulating appropriate policies for the effective implementation of\nTRMF and CRF;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.5"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.5(b)",
+    "anchor_label": "Rmit 2025 9.5(b)",
+    "text": "enforcing compliance with these policies, frameworks and other\ntechnology-related regulatory requirements; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.5"
+  },
+  {
+    "anchor_id": "Rmit 2025 9.5(c)",
+    "anchor_label": "Rmit 2025 9.5(c)",
+    "text": "advising senior management on technology risk and security matters,\nincluding developments in the financial institution's technology security\nrisk profile in relation to its business and operations.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 9.5"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.1",
+    "anchor_label": "Rmit 2025 10.1",
+    "text": "A financial institution must establish appropriate governance requirements\ncommensurate with the risk and complexity15 of technology projects\nundertaken. This shall include project oversight roles and responsibilities,\nauthority and reporting structures, and risk assessments throughout the\nproject life cycle.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.2",
+    "anchor_label": "Rmit 2025 10.2",
+    "text": "The risk assessments shall identify and address the key risks arising from\nthe implementation of technology projects. These include the risks that could\nthreaten successful project implementation and the risks that a project failure\nwill lead to a broader impact on the financial institution's operational\ncapabilities. At a minimum, due regard shall be given to the following areas:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.2(a)",
+    "anchor_label": "Rmit 2025 10.2(a)",
+    "text": "the adequacy and competency of resources including those of the\nvendor to effectively implement the project. This shall also take into\nconsideration the number, size and duration of significant technology\nprojects already undertaken concurrently by the financial institution;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.2(b)",
+    "anchor_label": "Rmit 2025 10.2(b)",
+    "text": "the complexity of systems to be implemented such as the use of\nunproven or unfamiliar technology and the corresponding risks of\nintegrating the new technology into existing systems, managing multiple\nvendor-proprietary technologies, large-scale data migration or cleansing\nefforts and extensive system customisation;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.2(c)",
+    "anchor_label": "Rmit 2025 10.2(c)",
+    "text": "the adequacy and configuration of security controls throughout the\nproject life cycle to mitigate cybersecurity breaches or exposure of\nconfidential data;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.2(d)",
+    "anchor_label": "Rmit 2025 10.2(d)",
+    "text": "the comprehensiveness of the user requirement specifications to\nmitigate risks from extensive changes in project scope or deficiencies in\nmeeting business needs;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.2(e)",
+    "anchor_label": "Rmit 2025 10.2(e)",
+    "text": "the robustness of system and user testing strategies to reduce risks of\nundiscovered system faults and functionality errors;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.2(f)",
+    "anchor_label": "Rmit 2025 10.2(f)",
+    "text": "the appropriateness of system deployment and fallback strategies to\nmitigate risks from prolonged system stability issues; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.2(g)",
+    "anchor_label": "Rmit 2025 10.2(g)",
+    "text": "the adequacy of disaster recovery operational readiness following the\nimplementation of new or enhanced systems.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.3",
+    "anchor_label": "Rmit 2025 10.3",
+    "text": "The board and senior management must receive and review timely reports\non the management of these risks on an ongoing basis throughout the\nimplementation of significant projects.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.4",
+    "anchor_label": "Rmit 2025 10.4",
+    "text": "A financial institution must establish a framework to guide the design,\nplanning, implementation, and governance of an enterprise technology\narchitecture. A technology architecture serves as a foundation on which\nfinancial institutions plan and structure system development and acquisition\nstrategies to meet business goals. Thus, the financial institution must ensure\nthe framework carry out these functions-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.4(a)",
+    "anchor_label": "Rmit 2025 10.4(a)",
+    "text": "provides a comprehensive view of technology throughout the financial\ninstitution, baseline architecture components and key rationale for their\nuse;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.4"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.4(b)",
+    "anchor_label": "Rmit 2025 10.4(b)",
+    "text": "is an overall technical design and high-level plan that describes the\nfinancial institution's technology infrastructure, systems' inter-\nconnectivity and dependencies (e.g. fallback facility), and security\ncontrols. The outlined information is critical to support identification of a\nsingle point of failure;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.4"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.4(c)",
+    "anchor_label": "Rmit 2025 10.4(c)",
+    "text": "contains mapping to supported business functions, organisation units,\napplications, and data to enable business impact analysis;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.4"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.4(d)",
+    "anchor_label": "Rmit 2025 10.4(d)",
+    "text": "defines principles and guideline to govern the design and maintenance\nof the network infrastructure, related technology controls, and IT security\npolicies; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.4"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.4(e)",
+    "anchor_label": "Rmit 2025 10.4(e)",
+    "text": "outline longer-term priorities to guide its evolution.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.4"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.5",
+    "anchor_label": "Rmit 2025 10.5",
+    "text": "A financial institution must adopt a methodology for an effective and secure\nimplementation of IT systems. Key phases of System Development Life\nCycle (SDLC) shall include requirement, design, development, testing,\ndeployment, change management, maintenance and decommissioning, and\nintegrate with-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.5(a)",
+    "anchor_label": "Rmit 2025 10.5(a)",
+    "text": "enterprise architecture to ensure successful execution of business\nstrategy;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.5"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.5(b)",
+    "anchor_label": "Rmit 2025 10.5(b)",
+    "text": "risk management policies and practices to achieve business objectives;\nand",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.5"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.5(c)",
+    "anchor_label": "Rmit 2025 10.5(c)",
+    "text": "security principles16 and requirements to ensure confidentiality, integrity,\nand availability of customer and counterparty information.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.5"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.6",
+    "anchor_label": "Rmit 2025 10.6",
+    "text": "A financial institution must meet enterprise security, governance and\ncompliance requirements when using rapid system development\nmethodology17. Given the dynamic environment can increase likelihood of\nerrors, a financial institution shall automate the IT security compliance review\nto prevent unauthorised access as well as the discovery and testing of\nsecurity vulnerabilities to ensure secure release of new IT services.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.7",
+    "anchor_label": "Rmit 2025 10.7",
+    "text": "A financial institution shall physically segregate the production environment\nfrom the development and testing environment to mitigate the risk of\nunauthorised changes to the production systems. Where a financial\ninstitution is relying on a cloud environment, the financial institution shall\nensure that these environments are not running on the same virtual host.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.8",
+    "anchor_label": "Rmit 2025 10.8",
+    "text": "A financial institution must establish a sound methodology for a rigorous\nsystem testing prior to deployment. The testing shall ensure that the system\nmeets user requirements and performs robustly. Where sensitive test data is\nused, the financial institution must ensure proper authorisation procedures\nand adequate measures to prevent their unauthorised disclosure are in place.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.9",
+    "anchor_label": "Rmit 2025 10.9",
+    "text": "The scope of system testing referred to in paragraph 10.8 may include unit\ntesting, integration testing, user acceptance testing, application security\ntesting, stress and load testing, regression, exception and negative testing,\nwhere applicable.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.10",
+    "anchor_label": "Rmit 2025 10.10",
+    "text": "A financial institution must ensure any changes to the source code of critical\nsystems are subject to adequate source code reviews to ensure code is\nsecure and developed in line with recognised coding practices prior to\nintroducing any system changes.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.11",
+    "anchor_label": "Rmit 2025 10.11",
+    "text": "A financial institution must establish appropriate procedures to\nindependently review and approve system changes. The financial institution\nmust also establish and test contingency plans in the event of an\nunsuccessful implementation of material changes to minimise any business\ndisruption.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.12",
+    "anchor_label": "Rmit 2025 10.12",
+    "text": "In relation to critical systems that are developed or maintained by third party\nservice provider, a financial institution must, through contractual obligations,\nrequire third party service provider to:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.12(a)",
+    "anchor_label": "Rmit 2025 10.12(a)",
+    "text": "provide sufficient notice to the financial institution before any changes\nare undertaken that may impact the IT system;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.12"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.12(b)",
+    "anchor_label": "Rmit 2025 10.12(b)",
+    "text": "demonstrate that it adopts secure by design principles in IT system\ndevelopment methodology to mitigate cyber risks from propagating\nacross the supply chain; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.12"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.12(c)",
+    "anchor_label": "Rmit 2025 10.12(c)",
+    "text": "ensure the source code continues to be readily accessible for business\ncontinuity.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.12"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.13",
+    "anchor_label": "Rmit 2025 10.13",
+    "text": "When decommissioning critical systems, a financial institution must ensure\nminimal adverse impact on customers and business operations. This\nincludes establishing and testing contingency plans in the event of\nunsuccessful system decommissioning.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.14",
+    "anchor_label": "Rmit 2025 10.14",
+    "text": "A financial institution may deploy automated tools for software development,\ntesting, software deployment, change management, code scanning and\nsoftware version control to facilitate timely security assessment of critical\nsystems in keeping with growing complexity in IT systems and emerging\ncyber threats.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.15",
+    "anchor_label": "Rmit 2025 10.15",
+    "text": "Where a third party software is used, a financial institution should consider\nthe potential risks and impacts a cyber supply chain incident may pose to its\noverall business operations and services. A financial institution may\nconsider-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.15(a)",
+    "anchor_label": "Rmit 2025 10.15(a)",
+    "text": "adopting Software-Bill-of-Materials (SBOM)18 to automate the\nidentification and continuous monitoring of potential security\nvulnerabilities including security issues associated with third party\nsoftware components; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.15"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.15(b)",
+    "anchor_label": "Rmit 2025 10.15(b)",
+    "text": "establishing open-source software security policy and procedures. This\nincludes ensuring secure access to source code repositories in third\nparty platforms, regular monitoring to prevent data leakages, adoption\nof secure coding practices, robust testing of open-source software and\ntimely vulnerability assessment to mitigate security vulnerabilities and\npropagation of malwares across supply chain.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.15"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.16",
+    "anchor_label": "Rmit 2025 10.16",
+    "text": "A financial institution must develop and implement robust policies to identify\nand reduce shadow IT19 risks.\n\n## Patch and End-of-Life System Management",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.17",
+    "anchor_label": "Rmit 2025 10.17",
+    "text": "A financial institution must ensure that all systems including digital services\nare not running with known security vulnerabilities20, on outdated platform or\nend-of-life (EOL) technology systems. In this regard, a financial institution\nmust-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.17(a)",
+    "anchor_label": "Rmit 2025 10.17(a)",
+    "text": "maintain current security baseline for the security hardening of\ntechnology components and ensure the security baseline is accurate\nand up to date;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.17"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.17(b)",
+    "anchor_label": "Rmit 2025 10.17(b)",
+    "text": "continuously monitor and implement latest patch releases in a timely\nmanner;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.17"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.17(c)",
+    "anchor_label": "Rmit 2025 10.17(c)",
+    "text": "identify, plan and implement remedial action for technology systems that\nare approaching EOL; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.17"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.17(d)",
+    "anchor_label": "Rmit 2025 10.17(d)",
+    "text": "obtain management approval for any exception permitting the continued\nuse of unsupported or outdated technology. This exception must be\nsubstantiated by a thorough risk assessment with clear timeline for\nphasing out the outdated technology and are regularly reviewed at least\non annual basis to ensure associated risks are effectively managed.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.17"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.18",
+    "anchor_label": "Rmit 2025 10.18",
+    "text": "A financial institution must establish a patch and EOL management\nframework which addresses among others the following requirements:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.18(a)",
+    "anchor_label": "Rmit 2025 10.18(a)",
+    "text": "identification and risk assessment of all technology assets for potential\nvulnerabilities arising from undeployed patches or EOL systems;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.18"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.18(b)",
+    "anchor_label": "Rmit 2025 10.18(b)",
+    "text": "formulation of criteria, priority and turnaround time for patch deployment\naccording to the severity of the vulnerabilities identified;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.18"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.18(c)",
+    "anchor_label": "Rmit 2025 10.18(c)",
+    "text": "conduct of compatibility testing prior to the deployment of patches to\nminimise disruption to connected systems;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.18"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.18(d)",
+    "anchor_label": "Rmit 2025 10.18(d)",
+    "text": "adherence to the workflow for end-to-end patch deployment processes\nincluding approval, testing, monitoring and tracking of activities; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.18"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.18(e)",
+    "anchor_label": "Rmit 2025 10.18(e)",
+    "text": "end-user awareness for orderly transition.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.18"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.19",
+    "anchor_label": "Rmit 2025 10.19",
+    "text": "A financial institution must continually monitor the effectiveness and security\nof the technology in use, incorporating developments in technology that may\ndisrupt existing security controls21. A financial institution shall-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.19(a)",
+    "anchor_label": "Rmit 2025 10.19(a)",
+    "text": "ensure its board receives advice on the potential impact to business\noperation arising from evolving technology landscape;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.19"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.19(b)",
+    "anchor_label": "Rmit 2025 10.19(b)",
+    "text": "formulate long-term strategy to address anticipated changes with\nallocation of competent resources to manage associated risks, including\nnew cyber adversary tactics and techniques; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.19"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.19(c)",
+    "anchor_label": "Rmit 2025 10.19(c)",
+    "text": "establish roadmap for system migration to preserve security and\nreliability of the technology infrastructure in an orderly manner.\n\n## Cryptography",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.19"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.20",
+    "anchor_label": "Rmit 2025 10.20",
+    "text": "A financial institution must establish a robust and resilient cryptography\npolicy to promote the adoption of strong cryptographic controls for protection\nof important data and information. This policy, at a minimum, shall address\nrequirements for-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.20(a)",
+    "anchor_label": "Rmit 2025 10.20(a)",
+    "text": "the adoption of industry standards for encryption algorithms, message\nauthentication, hash functions, digital signatures and random number\ngeneration;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.20"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.20(b)",
+    "anchor_label": "Rmit 2025 10.20(b)",
+    "text": "the adoption of robust and secure processes in managing cryptographic\nkey lifecycles which include generation, distribution, renewal, usage,\nstorage, recovery, revocation and destruction;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.20"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.20(c)",
+    "anchor_label": "Rmit 2025 10.20(c)",
+    "text": "the periodic review, at least annually, of all cryptographic standards and\nalgorithms currently in use for critical systems, external linked or\ntransactional customer-facing applications to prevent exploitation of\nweakened algorithms or protocols;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.20"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.20(d)",
+    "anchor_label": "Rmit 2025 10.20(d)",
+    "text": "the expansion of IT asset inventory to include all cryptographic tools and\nalgorithms in use with pertinent information on the rationale for each\ncryptographic method employed and its mapping to supported\napplication systems; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.20"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.20(e)",
+    "anchor_label": "Rmit 2025 10.20(e)",
+    "text": "the development and testing of compromise-recovery plans in the event\nof a cryptographic key compromise. This must set out the escalation\nprocess, procedures for keys regeneration, interim measures, changes\nto business-as-usual protocols and containment strategies or options to\nminimise the impact of a compromise.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.20"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.21",
+    "anchor_label": "Rmit 2025 10.21",
+    "text": "A financial institution must conduct due diligence and evaluate the\ncryptographic controls associated with the technology used in order to\nprotect the confidentiality, integrity, authentication, authorisation and non-\nrepudiation of information. Additionally, a financial institution must ensure the\nfollowing:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.21(a)",
+    "anchor_label": "Rmit 2025 10.21(a)",
+    "text": "except for non-critical systems or applications that do not contain\ncustomer information, the financial institution must retain ownership and\ncontrol of the encryption keys (themselves or with an independent key\ncustodian) to minimize the risk of unauthorised access to the data;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.21"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.21(b)",
+    "anchor_label": "Rmit 2025 10.21(b)",
+    "text": "where the financial institution does not generate its own encryption keys,\nthe financial institution shall undertake appropriate measures to ensure\nrobust controls and processes are in place to manage encryption keys\nsecurely including adhere to relevant industry standard;\n\nc) where this involves a reliance on third party assessments22, the financial\ninstitution shall consider whether such reliance is consistent with the\nfinancial institution's risk appetite and tolerance; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.21"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.21(d)",
+    "anchor_label": "Rmit 2025 10.21(d)",
+    "text": "the financial institution must also give due regard to the system\nresources required to support the cryptographic controls and the risk of\nreduced network traffic visibility of data that has been encrypted.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.21"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.22",
+    "anchor_label": "Rmit 2025 10.22",
+    "text": "A financial institution must ensure cryptographic controls are based on the\neffective implementation of suitable cryptographic protocols. The protocols\nshall include secret and public cryptographic key protocols, both of which\nshall reflect a high degree of protection to the applicable secret or private\ncryptographic keys. The selection of such protocols must be based on\nrecognised international standards and tested accordingly. Commensurate\nwith the level of risk, secret cryptographic key and private-cryptographic key\nstorage and encryption / decryption computation must be undertaken in a\nprotected environment, supported by a hardware security module (HSM),\ntrusted execution environment (TEE) or similarly secured devices.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.23",
+    "anchor_label": "Rmit 2025 10.23",
+    "text": "A financial institution shall store public cryptographic keys in a certificate\nissued by a Certificate Authority, as appropriate to the level of risk. Such\ncertificates associated with customers shall be issued by recognised\nCertificate Authorities. The financial institution must ensure that the\nimplementation of authentication and signature protocols using such\ncertificates are subject to strong protection to ensure that the use of private\ncryptographic keys corresponding to the user certificates are legally binding\nand irrefutable. The initial issuance and subsequent renewal of such\ncertificates must be consistent with industry best practices and applicable\nlegal / regulatory specifications.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.24",
+    "anchor_label": "Rmit 2025 10.24",
+    "text": "A financial institution must specify the resilience and availability objectives of\nits data centres to effectively support its business recovery objectives.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.25",
+    "anchor_label": "Rmit 2025 10.25",
+    "text": "A financial institution must ensure data centres have redundant capacity\ncomponents and multiple distribution paths serving the computer equipment\nto eliminate any single point of failure for effective achievement of the\nidentified business recovery objectives.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.26",
+    "anchor_label": "Rmit 2025 10.26",
+    "text": "A financial institution shall host critical systems in a dedicated space intended\nfor production data centre usage. The dedicated space must be physically\nsecured from unauthorised access and is not located in a disaster-prone\narea. A financial institution must also ensure there is no single point of failure\nin the design and connectivity for critical components of the production data\ncentres, including hardware components, electrical utility, thermal\nmanagement and data centre infrastructure. A financial institution must also\nensure adequate maintenance, and holistic and continuous monitoring of\nthese critical components with timely alerts on faults and indicators of\npotential issues.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.27",
+    "anchor_label": "Rmit 2025 10.27",
+    "text": "A financial institution must establish adequate control procedures for its data\ncentre operations, including the deployment of relevant automated tools for\nbatch processing management to ensure timely and accurate batch\nprocesses. These control procedures shall also include procedures for\nimplementing changes in the production system, error handling as well as\nmanagement of other exceptional conditions.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.28",
+    "anchor_label": "Rmit 2025 10.28",
+    "text": "A financial institution must segregate incompatible activities in the data\ncentre operations environment to prevent any unauthorised activity23. In the\ncase where vendors' or programmers' access to the production environment\nis necessary, these activities must be properly authorised and monitored.\n\n## Service Availability",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.29",
+    "anchor_label": "Rmit 2025 10.29",
+    "text": "A financial institution must ensure its system capacity needs are well-planned\nand managed with due regard to peak processing period, business growth\nplans and technology architecture changes.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.30",
+    "anchor_label": "Rmit 2025 10.30",
+    "text": "A financial institution must establish real-time monitoring mechanisms to\ntrack capacity utilisation and performance of key processes and services 24.\nThese monitoring mechanisms shall be capable of providing actionable alerts\nto administrators to enable timely detection and resolution of service\ninterruptions. The monitoring scope, metrics and thresholds shall be updated\nperiodically to ensure they remain effective.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.31",
+    "anchor_label": "Rmit 2025 10.31",
+    "text": "A financial institution shall enhance the resilience of key digital services25 and\ndelivery channels26 through the following measures:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.31(a)",
+    "anchor_label": "Rmit 2025 10.31(a)",
+    "text": "implement effective mechanisms by 30 September 2027 to provide early\nsignals or warning of service degradation or intermittent failures. This\nmeans the capability to:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.31"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.31(i)",
+    "anchor_label": "Rmit 2025 10.31(i)",
+    "text": "detect failed transactions and measure service availability27 more\naccurately;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.31"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.31(ii)",
+    "anchor_label": "Rmit 2025 10.31(ii)",
+    "text": "monitor the number of affected customers and transaction volumes\nduring service disruptions to measure the extent and severity\ncustomer impact; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.31"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.31(iii)",
+    "anchor_label": "Rmit 2025 10.31(iii)",
+    "text": "immediately escalating to senior management when service\ndisruptions affect 5% or more of expected daily customers or\ntransaction volumes;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.31"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.31(b)",
+    "anchor_label": "Rmit 2025 10.31(b)",
+    "text": "conduct regular reviews to identify and mitigate potentially vulnerable IT\nsystem interdependencies to prevent simultaneous interruptions to\nmultiple digital services or delivery channels; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.31"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.31(c)",
+    "anchor_label": "Rmit 2025 10.31(c)",
+    "text": "establish stand-in processing arrangement by 30 September 2027 and\ndeploy such arrangement during disruptions to ensure continuity of\nservices during disruptions. A financial institution shall prioritise\ndeployment of this capability for digital services and delivery channels\nwhich are least substitutable28, and ensure its customers are well\ninformed on the terms of use (such as the transaction limit), associated\nrisks and allocation of responsibilities between parties and mitigation\nactions against fraud risks.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.31"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.32",
+    "anchor_label": "Rmit 2025 10.32",
+    "text": "For critical systems, where there is a reasonable expectation for immediate\ndelivery of service to customers or dealings with counterparties, a financial\ninstitution must ensure that these systems are designed for high availability\nwith a cumulative unplanned downtime affecting the interface with customers\nor counterparties of not more than 4 hours on a rolling 12 months basis and\na maximum tolerable downtime of 120 minutes per incident.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.33",
+    "anchor_label": "Rmit 2025 10.33",
+    "text": "Eligible e-money issuers, non-bank registered merchant acquirers and\nintermediary remittance institutions that have not been designated as a\nNational Critical Information Infrastructure (NCII) entity are encouraged to\nimplement the measures provided in paragraph 10.31.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.34",
+    "anchor_label": "Rmit 2025 10.34",
+    "text": "A financial institution shall prioritise diversity29 in technology to enhance\nresilience by ensuring critical systems infrastructure are not excessively\nexposed to similar technology risks.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.35",
+    "anchor_label": "Rmit 2025 10.35",
+    "text": "During an interruption of digital services or delivery channels, including\nperiods of performance degradation or intermittent failures, a financial\ninstitution shall respond promptly and effectively to minimise the impact on\nits customers. This includes but not limited to-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.35(a)",
+    "anchor_label": "Rmit 2025 10.35(a)",
+    "text": "ensure timely escalation and decision-making to resume services\npromptly via alternative arrangements and stabilise performance within\nthe timeframe specified in paragraph 10.32 under all plausible\nscenarios;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.35"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.35(b)",
+    "anchor_label": "Rmit 2025 10.35(b)",
+    "text": "define clear accountabilities for managing performance degradation\nissues and formalise arrangements with third party service providers to\nensure effective coordination and timely recovery to normal\nperformance levels;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.35"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.35(c)",
+    "anchor_label": "Rmit 2025 10.35(c)",
+    "text": "establish a communication plan for service interruptions to immediately\ninform affected customers, properly manage a high volume of customer\nfeedback, and provide frequent updates on recovery efforts, as well as\nactionable information on available alternatives for customers with\nurgent needs;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.35"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.35(d)",
+    "anchor_label": "Rmit 2025 10.35(d)",
+    "text": "provide customers with a convenient means of checking the availability\nof digital services, which may include publishing real-time availability\nand performance status of its digital services on the corporate website;\nand",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.35"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.35(e)",
+    "anchor_label": "Rmit 2025 10.35(e)",
+    "text": "disclose the track record of service availability on a quarterly basis within\n15 calendar days of quarter-end, beginning from 15 October 2027.\n\n## Network Resilience",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.35"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.36",
+    "anchor_label": "Rmit 2025 10.36",
+    "text": "A financial institution must design and implement a reliable, scalable and\nsecure enterprise network that is able to support its business activities,\nincluding future growth plans.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.37",
+    "anchor_label": "Rmit 2025 10.37",
+    "text": "A financial institution must ensure the network services for its critical systems\nare reliable and have no single point of failure in order to protect the critical\nsystems against potential network faults and cyber threats.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.38",
+    "anchor_label": "Rmit 2025 10.38",
+    "text": "The control measures to prevent from network faults as referred to in\nparagraph 10.37 are expected to include component redundancy, service\ndiversity and alternate network paths.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.39",
+    "anchor_label": "Rmit 2025 10.39",
+    "text": "A financial institution must establish real-time network bandwidth monitoring\nprocesses and corresponding network service resilience metrics to flag any\nover utilisation of bandwidth and system disruptions due to bandwidth\ncongestion and network faults. This includes traffic analysis to detect trends\nand anomalies.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.40",
+    "anchor_label": "Rmit 2025 10.40",
+    "text": "A financial institution must ensure network services supporting critical\nsystems are designed and implemented to ensure the confidentiality,\nintegrity and availability of data.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.41",
+    "anchor_label": "Rmit 2025 10.41",
+    "text": "A financial institution must establish and maintain a network design blueprint\nidentifying all of its internal and external network interfaces and connectivity.\nThe blueprint must highlight both physical and logical connectivity between\nnetwork components and network segmentations.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.42",
+    "anchor_label": "Rmit 2025 10.42",
+    "text": "A financial institution must ensure sufficient and relevant network device logs\nare retained for investigations and forensic purposes for at least three years.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.43",
+    "anchor_label": "Rmit 2025 10.43",
+    "text": "A financial institution must implement appropriate safeguards to minimise the\nrisk of a system compromise in one entity affecting other entities within the\ngroup. Safeguards implemented may include establishing logical network\nsegmentation for the financial institution from other entities within the group.\n\n## System backup and restoration",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.44",
+    "anchor_label": "Rmit 2025 10.44",
+    "text": "A financial institution must establish a robust backup strategy and\nprocedures to meet business recovery objectives. At a minimum, a financial\ninstitution shall-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.44(a)",
+    "anchor_label": "Rmit 2025 10.44(a)",
+    "text": "establish backup and restoration procedures to effectively manage the\nbackup data life cycle;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.44"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.44(b)",
+    "anchor_label": "Rmit 2025 10.44(b)",
+    "text": "maintain an adequate number of backup copies of all critical data, the\nupdated version of the operating system software, production programs,\nsystem utilities, all master and transaction files and event logs for\nrecovery purposes;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.44"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.44(c)",
+    "anchor_label": "Rmit 2025 10.44(c)",
+    "text": "backup media must be stored in an environmentally secure and access-\ncontrolled backup site;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.44"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.44(d)",
+    "anchor_label": "Rmit 2025 10.44(d)",
+    "text": "secure the storage and transportation of sensitive data in removable\nmedia to meet minimum controls as specified in Appendix 1 or\nequivalent;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.44"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.44(e)",
+    "anchor_label": "Rmit 2025 10.44(e)",
+    "text": "test backup and restoration procedures periodically to validate recovery\ncapabilities. Remedial actions shall be taken promptly by the financial\ninstitution to fix the root cause of unsuccessful backups; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.44"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.44(f)",
+    "anchor_label": "Rmit 2025 10.44(f)",
+    "text": "undertake an independent risk assessment of its end-to-end backup\nstorage and delivery management to ensure that existing controls are\nadequate in protecting sensitive data at all times.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.44"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.45",
+    "anchor_label": "Rmit 2025 10.45",
+    "text": "A financial institution shall establish a tamper-proof backup arrangement and\nan isolated recovery environment to enable timely resumption of critical\nbanking and payment services within its tolerable level in the event of\ndestructive cyber-attacks such as widespread data loss caused by\nransomware.\n\n## Third Party Service Provider Management",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.46",
+    "anchor_label": "Rmit 2025 10.46",
+    "text": "The board and senior management of the financial institution must exercise\neffective oversight and address associated risks when engaging third party\nservice providers30 for critical technology functions and systems. The\nfinancial institution remains accountable for managing all risks that arise from\nengagement of third party service providers, to ensure security and reliability\nof technology services in compliance with all relevant regulatory\nrequirements prescribed in this policy document.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.47",
+    "anchor_label": "Rmit 2025 10.47",
+    "text": "A financial institution must conduct a due diligence on a third party service\nprovider prior its on-boarding or engagement and throughout the service",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 Appendix 8",
+    "anchor_label": "Rmit 2025 Appendix 8",
+    "text": "Appendix 8.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.48",
+    "anchor_label": "Rmit 2025 10.48",
+    "text": "A financial institution must establish a Service Level Agreement (SLA) when\nengaging third party service provider. At a minimum, the SLA shall contain\nthe following:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.48(a)",
+    "anchor_label": "Rmit 2025 10.48(a)",
+    "text": "access rights for the regulator and any party appointed by the financial\ninstitution to examine any activity or entity of the financial institution. This\nshall include access to any record, file or data of the financial institution,\nincluding management information and the minutes of all consultative\nand decision-making processes;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.48"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.48(b)",
+    "anchor_label": "Rmit 2025 10.48(b)",
+    "text": "requirements for the third party service provider to provide sufficient\nprior notice to financial institutions of any sub-contracting which is\nsubstantial;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.48"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.48(c)",
+    "anchor_label": "Rmit 2025 10.48(c)",
+    "text": "a written undertaking by the third party service provider on its\ncompliance with secrecy provisions under relevant legislations. The SLA\nshall further clearly provide for the third party service provider to be\nbound by integrity and confidentiality provisions stipulated under the\ncontract even after the engagement has ended;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.48"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.48(d)",
+    "anchor_label": "Rmit 2025 10.48(d)",
+    "text": "arrangements for disaster recovery and backup capability, where\napplicable;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.48"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.48(e)",
+    "anchor_label": "Rmit 2025 10.48(e)",
+    "text": "service level objectives for uptime or availability;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.48"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.48(f)",
+    "anchor_label": "Rmit 2025 10.48(f)",
+    "text": "arrangements to secure business continuity in the event of an exit or\ntermination of the third party service provider, which includes ensuring\ndata residing in third party service providers are recoverable in a timely\nmanner;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.48"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.48(g)",
+    "anchor_label": "Rmit 2025 10.48(g)",
+    "text": "responsibility of third party service providers to promptly disclose and\nnotify the financial institution31 of any service disruptions or cyber\nincidents that affect the financial institution or its customer data that\noccur within such service providers' or sub-contractors' environment.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.48"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.48(h)",
+    "anchor_label": "Rmit 2025 10.48(h)",
+    "text": "requirements for the third party service providers to comply with the\nrelevant internationally recognised standards and ensure their key staff\nkeep their skills up-to-date with the relevant certifications; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.48"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.48(i)",
+    "anchor_label": "Rmit 2025 10.48(i)",
+    "text": "requirements for third party service providers to participate in the\nfinancial institution's security awareness and education program, where\nappropriate.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.48"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.49",
+    "anchor_label": "Rmit 2025 10.49",
+    "text": "A financial institution must formulate a roadmap to achieve continuous\nmonitoring of a third party service provider's cybersecurity posture to obtain\nreal-time insights for effective incident management. The financial institution\nshall undertake the following:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.49(a)",
+    "anchor_label": "Rmit 2025 10.49(a)",
+    "text": "measure the IT infrastructure footprint and the customer information\naccessible to third parties, and regularly manage this external stress\nstate exposures to mitigate cyber-attack surfaces;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.49"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.49(b)",
+    "anchor_label": "Rmit 2025 10.49(b)",
+    "text": "adopt leading security policies and controls to mitigate product-specific\nthird party risks;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.49"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.49(c)",
+    "anchor_label": "Rmit 2025 10.49(c)",
+    "text": "ensure incident response plans incorporate protocols with third party\nservice providers to detect and contain adverse impact of security\nvulnerabilities resulting from software updates;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.49"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.49(d)",
+    "anchor_label": "Rmit 2025 10.49(d)",
+    "text": "define a priority set of security controls that require more frequent\nassurance assertion from the third party service providers;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.49"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.49(e)",
+    "anchor_label": "Rmit 2025 10.49(e)",
+    "text": "monitor technology and cyber incidents information disclosed by third\nparty service providers at a higher frequency;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.49"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.49(f)",
+    "anchor_label": "Rmit 2025 10.49(f)",
+    "text": "implement technology solutions to automate metric testing; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.49"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.49(g)",
+    "anchor_label": "Rmit 2025 10.49(g)",
+    "text": ") establish processes to respond to breached thresholds, including\ninvestigating failed assertions and remedying control gaps.\n\nS\n\n## Cloud Services",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.49"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.50",
+    "anchor_label": "Rmit 2025 10.50",
+    "text": "A financial institution must fully understand the inherent risk of adopting cloud\nservices. In this regard, a financial institution shall conduct a comprehensive\nrisk assessment prior to cloud adoption which considers the inherent\narchitecture of cloud services that leverages on the sharing of resources and\nservices across multiple tenants over the Internet. The assessment must\nspecifically address risks associated with the following:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.50(a)",
+    "anchor_label": "Rmit 2025 10.50(a)",
+    "text": "sophistication of the deployment model;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.50"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.50(b)",
+    "anchor_label": "Rmit 2025 10.50(b)",
+    "text": "migration of existing systems to cloud infrastructure;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.50"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.50(c)",
+    "anchor_label": "Rmit 2025 10.50(c)",
+    "text": "location of cloud infrastructure including potential geo-political risks and\nlegal risks that may impede compliance with any legal or regulatory\nrequirements;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.50"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.50(d)",
+    "anchor_label": "Rmit 2025 10.50(d)",
+    "text": "multi-tenancy or data co-mingling;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.50"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.50(e)",
+    "anchor_label": "Rmit 2025 10.50(e)",
+    "text": "vendor lock-in and application portability or interoperability;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.50"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.50(f)",
+    "anchor_label": "Rmit 2025 10.50(f)",
+    "text": "ability to customise security configurations of the cloud infrastructure to\nensure a high level of data and technology system protection;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.50"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.50(g)",
+    "anchor_label": "Rmit 2025 10.50(g)",
+    "text": "exposure to cyber-attacks via cloud service providers;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.50"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.50(h)",
+    "anchor_label": "Rmit 2025 10.50(h)",
+    "text": "termination of a cloud service provider including the ability to secure the\nfinancial institution's data following the termination;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.50"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.50(i)",
+    "anchor_label": "Rmit 2025 10.50(i)",
+    "text": "demarcation of responsibilities, limitations and liability of the cloud\nservice provider; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.50"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.50(j)",
+    "anchor_label": "Rmit 2025 10.50(j)",
+    "text": "ability to meet regulatory requirements and international standards on\ncloud computing on a continuing basis.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.50"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.51",
+    "anchor_label": "Rmit 2025 10.51",
+    "text": "For critical systems hosted on a public cloud32, a financial institution is\nexpected to consider common key risks and control measures as specified\nin Appendix 10. A financial institution that relies on alternative risk\nmanagement practices that depart from the measures outlined in Appendix\n10 is expected to be prepared to explain and demonstrate to the Bank that\n\nthese alternative practices are at least as effective as, or superior to, the\nmeasures in Appendix 10.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.52",
+    "anchor_label": "Rmit 2025 10.52",
+    "text": "A financial institution must implement appropriate safeguards on customer\nand counterparty information and proprietary data when using cloud services\nto protect against unauthorised disclosure and access. This shall include\nretaining ownership, control and management of all data pertaining to\ncustomer and counterparty information, proprietary data and services hosted\non the cloud, including the relevant cryptographic keys management.\n\n## Access Control",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.53",
+    "anchor_label": "Rmit 2025 10.53",
+    "text": "A financial institution must implement an access control policy for the\nidentification, authentication, and authorisation of all users to its IT assets\nand data. The level of granularity defined in the access control policy shall be\ncommensurate with the level of risk of unauthorised access to its IT assets.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.54",
+    "anchor_label": "Rmit 2025 10.54",
+    "text": "A financial institution shall adhere to the following principles:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.54(a)",
+    "anchor_label": "Rmit 2025 10.54(a)",
+    "text": "adopt a \"deny all\" access control policy for users by default because all\naccess to IT assets must be explicitly authorised;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.54"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.54(b)",
+    "anchor_label": "Rmit 2025 10.54(b)",
+    "text": "employ \"least privilege\" access rights to ensure IT assets are accessed\non a \"need-to-have\" basis where only the minimum sufficient\npermissions are granted to legitimate users to perform their roles;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.54"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.54(c)",
+    "anchor_label": "Rmit 2025 10.54(c)",
+    "text": "employ time-bound access which restrict access to a specific period\nbased on the nature of work;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.54"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.54(d)",
+    "anchor_label": "Rmit 2025 10.54(d)",
+    "text": "employ segregation of incompatible functions where no single person is\nresponsible for an entire operation that may provide the ability to\nindependently modify, circumvent, and disable system security features.\nThis may include a combination of functions such as:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.54"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.54(i)",
+    "anchor_label": "Rmit 2025 10.54(i)",
+    "text": "stronger authentication for critical activities and higher-risk\nenvironment such as remote access;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.54"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.54(ii)",
+    "anchor_label": "Rmit 2025 10.54(ii)",
+    "text": "ensure user credentials provisioned with robust identity verification\nmethod to prevent impersonation risks; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.54"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.54(iii)",
+    "anchor_label": "Rmit 2025 10.54(iii)",
+    "text": "ensure online credential is uniquely linked to a single user to ensure\nclear accountability in access to confidential IT assets.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.54"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.54(iv)",
+    "anchor_label": "Rmit 2025 10.54(iv)",
+    "text": "IT operations environment;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.54"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.54(e)",
+    "anchor_label": "Rmit 2025 10.54(e)",
+    "text": "establish criteria for activities that require dual authorization control; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.54"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.54(f)",
+    "anchor_label": "Rmit 2025 10.54(f)",
+    "text": "adopt robust user authorization and authentication based on criticality of\nIT assets as follows:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.54"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.55",
+    "anchor_label": "Rmit 2025 10.55",
+    "text": "A financial institution must employ a multi-factor authentication (MFA) that\ncan defend against social engineering attacks for authenticating user access\nto critical systems. The MFA must combine two or more of knowledge factors,\ninherent factors (e.g. biometric characteristics) or possession factors (e.g.\nsecurity keys, tokens).",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.56",
+    "anchor_label": "Rmit 2025 10.56",
+    "text": "A financial institution must establish a user access matrix to outline access\nrights, user roles or profiles, and the authorising and approving authorities.\nThe access matrix must be periodically reviewed and updated.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.57",
+    "anchor_label": "Rmit 2025 10.57",
+    "text": "A financial institution must ensure-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 10.57(a)",
+    "anchor_label": "Rmit 2025 10.57(a)",
+    "text": "access controls to enterprise-wide systems are effectively managed and\nmonitored;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.57"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.57(b)",
+    "anchor_label": "Rmit 2025 10.57(b)",
+    "text": "anomalies are flagged for prompt investigations to contain any cyber\nincidents; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.57"
+  },
+  {
+    "anchor_id": "Rmit 2025 10.57(c)",
+    "anchor_label": "Rmit 2025 10.57(c)",
+    "text": "user activities in critical systems are logged for audit and investigations.\nActivity logs must be maintained for at least three years and regularly\nreviewed in a timely manner.\n\nThe rest of the page is intentionally left as blank\n\n### 11 Cybersecurity Management\n\n#### Cyber Risk Management",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 10.57"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.1",
+    "anchor_label": "Rmit 2025 11.1",
+    "text": "A financial institution must ensure that there is an enterprise-wide focus on\neffective cyber risk management to reflect the collective responsibility of\nbusiness and technology lines for managing cyber risks.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.2",
+    "anchor_label": "Rmit 2025 11.2",
+    "text": "A financial institution must develop a CRF which clearly articulates its\ngovernance for managing cyber risks, its cyber resilience objectives and its\nrisk tolerance, with due regard to the evolving cyber threat environment.\nObjectives of the CRF shall include ensuring operational resilience against\nextreme but plausible cyber-attacks. The framework must be able to support\nthe effective identification, protection, detection, response, and recovery\n(IPDRR) of systems and data hosted on-premises or by third party service\nproviders from internal and external cyber-attacks.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.3",
+    "anchor_label": "Rmit 2025 11.3",
+    "text": "The CRF must consist of, at a minimum, the following elements:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.3(a)",
+    "anchor_label": "Rmit 2025 11.3(a)",
+    "text": "development of an institutional understanding of the overall cyber risk\ncontext in relation to the financial institution's business and operations,\nits exposure to cyber risks and current cybersecurity posture;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.3(b)",
+    "anchor_label": "Rmit 2025 11.3(b)",
+    "text": "identification, classification and prioritisation of critical systems,\ninformation, assets and interconnectivity (with internal and external\nparties) to obtain a complete and accurate view of the financial\ninstitution's information assets, critical systems, interdependencies and\ncyber risk profile;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.3(c)",
+    "anchor_label": "Rmit 2025 11.3(c)",
+    "text": "identification of cybersecurity threats, vulnerabilities and\ncountermeasures to secure digital services delivery against cyber-\nattacks and contain reputational damage that can undermine confidence\nin the financial institution;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.3(d)",
+    "anchor_label": "Rmit 2025 11.3(d)",
+    "text": "enhancing layers of cyber defence with reference to the latest\ninternational standards and sound practices such as zero-trust\nprinciples33, defense-in-depth through micro-segmentation and security\nby design, to protect its data, infrastructure and assets against evolving\ncyber threats;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.3(e)",
+    "anchor_label": "Rmit 2025 11.3(e)",
+    "text": "timely detection of cybersecurity incidents through continuous\nsurveillance and monitoring;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.3(f)",
+    "anchor_label": "Rmit 2025 11.3(f)",
+    "text": "detailed incident handling policies and procedures and a crisis response\nmanagement playbook to support the swift recovery from cyber\nincidents and contain any damage resulting from a cybersecurity\nbreach;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.3(g)",
+    "anchor_label": "Rmit 2025 11.3(g)",
+    "text": "policies and procedures for timely and secure information sharing and\ncollaboration with other financial institutions and participants in financial\nmarket infrastructure to strengthen cyber resilience and fraud\nprevention;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.3(h)",
+    "anchor_label": "Rmit 2025 11.3(h)",
+    "text": "implement a centralised automated tracking system to manage its\ntechnology asset inventory; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.3(i)",
+    "anchor_label": "Rmit 2025 11.3(i)",
+    "text": "establish a cyber risk management function to analyse actual and\npotential cyber threats, providing risk assessments and timely",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.4",
+    "anchor_label": "Rmit 2025 11.4",
+    "text": "A financial institution that is designated as a National Critical Information\nInfrastructure (NCII) entity pursuant to the Cyber Security Act 2024 must\nensure compliance to the requirements and guidelines applicable to NCII,\nincluding any additional directives and standards issued by the National\nCyber Security Agency (NACSA).",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.5",
+    "anchor_label": "Rmit 2025 11.5",
+    "text": "A financial institution must adopt robust control measures as outlined in",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 Appendix 5",
+    "anchor_label": "Rmit 2025 Appendix 5",
+    "text": "Appendix 5 to enhance its resilience to cyber-attacks.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.6",
+    "anchor_label": "Rmit 2025 11.6",
+    "text": "A financial institution must conduct a realistic \"Red Team34\" simulation attack\non its infrastructure at least once every three years to proactively identify and\nmanage potential vulnerabilities.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.7",
+    "anchor_label": "Rmit 2025 11.7",
+    "text": "A financial institution may implement crowdsourced security testing programs\nas a complement to existing security assessments, in order to thoroughly test\nthe security of their IT environment. The financial institution must engage\nreputable and credible service providers to facilitate the program.\n\n#### Cybersecurity Operations",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.8",
+    "anchor_label": "Rmit 2025 11.8",
+    "text": "A financial institution must establish clear responsibilities for cybersecurity\noperations which shall include implementing appropriate mitigating\nmeasures in the financial institution's conduct of business that correspond to\nthe following phases of the cyber-attack lifecycle:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.8(a)",
+    "anchor_label": "Rmit 2025 11.8(a)",
+    "text": "reconnaissance;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.8"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.8(b)",
+    "anchor_label": "Rmit 2025 11.8(b)",
+    "text": "weaponisation;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.8"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.8(c)",
+    "anchor_label": "Rmit 2025 11.8(c)",
+    "text": "delivery;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.8"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.8(d)",
+    "anchor_label": "Rmit 2025 11.8(d)",
+    "text": "exploitation;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.8"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.8(e)",
+    "anchor_label": "Rmit 2025 11.8(e)",
+    "text": "installation;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.8"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.8(f)",
+    "anchor_label": "Rmit 2025 11.8(f)",
+    "text": "command and control; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.8"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.8(g)",
+    "anchor_label": "Rmit 2025 11.8(g)",
+    "text": "exfiltration.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.8"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.9",
+    "anchor_label": "Rmit 2025 11.9",
+    "text": "A financial institution must ensure continuous and proactive monitoring and\ntimely detection of anomalous activities in its technology infrastructure to\nprevent potential compromise of its security controls or weakening of its\nsecurity posture. This shall include-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.9(a)",
+    "anchor_label": "Rmit 2025 11.9(a)",
+    "text": "establishing a Security Operations Center (SOC) supported by\ncompetent resources and equipped with the necessary tools and\ntechnologies for proactive monitoring of its technology security posture;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.9"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.9(b)",
+    "anchor_label": "Rmit 2025 11.9(b)",
+    "text": "ensuring the scope of monitoring must cover all critical systems\nincluding the supporting infrastructure; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.9"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.9(c)",
+    "anchor_label": "Rmit 2025 11.9(c)",
+    "text": "conducting regular review of its security posture via the conduct of a\nvulnerability assessment and penetration testing in line with Appendix\n5.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.9"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.10",
+    "anchor_label": "Rmit 2025 11.10",
+    "text": "A financial institution must establish a process to collect, analyse and\nevaluate cyber threat information in relation to its environment (\"cyber threat\nintelligence\") to promptly detect cyber threats, including data breach incidents\nand spread of misleading information in relation to the financial institution over\nthe Internet35.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.11",
+    "anchor_label": "Rmit 2025 11.11",
+    "text": "A financial institution must establish appropriate response to investigate and\nrespond to flagged anomalous activities based on their level of complexity.\n\n## Cyber Response and Recovery",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.12",
+    "anchor_label": "Rmit 2025 11.12",
+    "text": "A financial institution must establish comprehensive cyber crisis\nmanagement policies and procedures that incorporate cyber-attack\nscenarios and responses in the organisation's overall crisis management\nplan, escalation processes, business continuity and disaster recovery\nplanning. This includes developing a clear communication plan for engaging\nshareholders, regulatory authorities, customers and employees in the event\nof a cyber incident.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.13",
+    "anchor_label": "Rmit 2025 11.13",
+    "text": "A financial institution must establish and implement a comprehensive Cyber\nIncident Response Plan (CIRP). The CIRP must address the following:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.13(a)",
+    "anchor_label": "Rmit 2025 11.13(a)",
+    "text": "Preparedness\n\nEstablish a clear governance process, reporting structure and roles and\nresponsibilities of the Cyber Emergency Response Team (CERT) as\nwell as invocation and escalation procedures in the event of an incident;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.13"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.13(b)",
+    "anchor_label": "Rmit 2025 11.13(b)",
+    "text": "Detection and analysis\n\nEnsure effective and expedient processes for identifying points of\ncompromise, assessing36 the extent of damage and preserving sufficient\nevidence for forensics purposes;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.13"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.13(c)",
+    "anchor_label": "Rmit 2025 11.13(c)",
+    "text": "Containment and eradication\n\nIdentify and implement remedial actions to prevent or minimise damage\nto the financial institution, contain and remove the known threats and\nresume business activities;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.13"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.13(d)",
+    "anchor_label": "Rmit 2025 11.13(d)",
+    "text": "Recovery\n\nImplement multiple strategies including contingency plans as part of\nincident recovery to swiftly resume business operations and significantly\nenhance redundancy and resilience; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.13"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.14",
+    "anchor_label": "Rmit 2025 11.14",
+    "text": "A financial institution must ensure that relevant CERT members are\nconversant with the incident response plan and handling procedures and\nremain contactable at all times.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.15",
+    "anchor_label": "Rmit 2025 11.15",
+    "text": "A financial institution shall establish a secure and reliable out-of-band\ncommunication infrastructure for both internal and external stakeholders to\nensure continued coordination and communication if the primary\ncommunication infrastructure is compromised or rendered unavailable during\na crisis.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.16",
+    "anchor_label": "Rmit 2025 11.16",
+    "text": "A financial institution must conduct an annual cyber drill exercise to test the\neffectiveness of its CIRP including the out-of-band communication methods,\nbased on various current and emerging threat scenarios (e.g. social\nengineering), with the involvement of key stakeholders including members of\nthe board, senior management and relevant third party service providers.\nThe result of the annual cyber drill exercise must be reported to the board in\na timely manner. The out-of-band communication methods must also be\ntested regularly as part of the institutions cyber drill exercises. The test\nscenarios must include scenarios designed to test-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.16(a)",
+    "anchor_label": "Rmit 2025 11.16(a)",
+    "text": "the effectiveness of escalation, internal and external communication and\ndecision-making processes that correspond to different impact levels of\na cyber incident; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.16"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.16(b)",
+    "anchor_label": "Rmit 2025 11.16(b)",
+    "text": "the readiness and effectiveness of CERT and relevant third party service\nproviders in supporting the recovery process.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.16"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.17",
+    "anchor_label": "Rmit 2025 11.17",
+    "text": "A financial institution shall review its loss provision arrangements to ensure\nits adequacy to cover cyber incidents based on its scenario analysis of\nextreme adverse events. Where cyber insurance is adopted to mitigate\nimpact of cyber incidents, the financial institution shall-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.17(a)",
+    "anchor_label": "Rmit 2025 11.17(a)",
+    "text": "ensure that the scope of the insurance policy adequately covers the\ninformation security events and types of liability that the financial\ninstitution is exposed to;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.17"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.17(b)",
+    "anchor_label": "Rmit 2025 11.17(b)",
+    "text": "understand the terms and conditions of the insurance policy in relation\nto warranties, attestations or any responsibilities of the financial\ninstitution, have them reflected in the crisis response policies and\nprocedures as appropriate and ensure that any changes to IT services\nand control measures do not result in unintended exclusions of cover;\nand",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.17"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.17(c)",
+    "anchor_label": "Rmit 2025 11.17(c)",
+    "text": "ensure that any obligations imposed by the insurance policy (such as in\nrelation to appointment of experts and accepting their recommendations\nduring a cyber incident) do not impair its ability to act in the best interest\nof the financial institution and its customers. The financial institution shall\nanticipate and adequately manage any conflict of interest that may arise\nfrom the objective of the insurer to minimise the cost of its liability under\nthe insurance policy.\n\n## Cyber Reporting and Threat Information Sharing",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 11.17"
+  },
+  {
+    "anchor_id": "Rmit 2025 11.18",
+    "anchor_label": "Rmit 2025 11.18",
+    "text": "A financial institution is required to notify the Bank of cyber incidents in\nadherence to the Bank's policy documents on Operational Risk Reporting -\nPart C, Business Continuity Management - Part C, Merchant Acquiring\nServices - paragraphs 19.25 to 19.26 and any other relevant policy\ndocuments specified by the Bank.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.19",
+    "anchor_label": "Rmit 2025 11.19",
+    "text": "Subject to the applicable data protection laws, a financial institution must\nshare cyber threat intelligence information with the industry on a timely basis\nvia the relevant sharing platforms developed by the Bank, the industry, or law\nenforcement agencies. In addition, the financial institution must allocate\nresources to participate in any industry-wide initiatives aimed at improving\ncollective threat intelligence capabilities.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 11.20",
+    "anchor_label": "Rmit 2025 11.20",
+    "text": "A financial institution shall collaborate and cooperate closely with relevant\nstakeholders and authorities in combating cyber threats.\n\nThe rest of the page is intentionally left as blank\n\n### 12 Digital Services\n\n#### Security of Digital Services",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 12.1",
+    "anchor_label": "Rmit 2025 12.1",
+    "text": "Securing digital services is an integral part of financial institution's risk\nmanagement. A financial institution must expand its CRF to implement robust\ntechnology security controls in providing digital services which assure the\nfollowing:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 12.1(a)",
+    "anchor_label": "Rmit 2025 12.1(a)",
+    "text": "adopt and regularly assess the minimum-security controls for respective\ndelivery channels to ensure confidentiality and integrity of customer and\ncounterparty information and transactions. Refer to Appendices 2, 3, 4\nand 11;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.1(b)",
+    "anchor_label": "Rmit 2025 12.1(b)",
+    "text": "proper authentication of users or devices and authorization of\ntransactions to mitigate impersonation and fraud risk. Refer the\nminimum-security controls in Appendix 3; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.1(c)",
+    "anchor_label": "Rmit 2025 12.1(c)",
+    "text": "strong physical control and logical control measures.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.2",
+    "anchor_label": "Rmit 2025 12.2",
+    "text": "In the event that a financial institution has not yet implemented the digital\nservices security controls specified under paragraph 12.1 to 12.9, the\nfinancial institution must-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 12.2(a)",
+    "anchor_label": "Rmit 2025 12.2(a)",
+    "text": "be ready to provide documented explanation of how alternatives\nmeasures or mitigations achieve equivalent or superior effectiveness;\nand",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.2(b)",
+    "anchor_label": "Rmit 2025 12.2(b)",
+    "text": "assume the liability of any fraud that occurs due to the gaps arise from\nthe absence of the specified control.\n\n#### Digital Fraud Management and Customer Awareness",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.3",
+    "anchor_label": "Rmit 2025 12.3",
+    "text": "The complex and fast evolving digital fraud requires financial institutions to be\nvigilant against new fraud techniques and proactive in strengthening their\ncyber defence for customer protection. In line with paragraphs 11.2 and 11.3,\na financial institution must enhance its CRF as follows:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 12.3(a)",
+    "anchor_label": "Rmit 2025 12.3(a)",
+    "text": "expand the scope of identification of cybersecurity threats and\ncountermeasures to include customers' mobile devices and access\npoints;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.3(b)",
+    "anchor_label": "Rmit 2025 12.3(b)",
+    "text": "adopt layered (defense-in-depth) security controls to protect the digital\nservice application deployed to customers' mobile devices and the\nrelevant banking data contained in it;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.3(c)",
+    "anchor_label": "Rmit 2025 12.3(c)",
+    "text": "perform continuous surveillance and monitoring to detect any\nexploitation of the digital service application deployed to customers'\nmobile devices and ensure the swift upgrade of security controls to\nmitigate new vulnerabilities;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.3(d)",
+    "anchor_label": "Rmit 2025 12.3(d)",
+    "text": ")establish clearly defined and effective incident handling procedures to\nassist customers to contain the potential damage resulting from a\ncybersecurity breach involving digital services;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.3(e)",
+    "anchor_label": "Rmit 2025 12.3(e)",
+    "text": "formalise operational arrangement to enable swift coordinated response\nand rapid upgrade of countermeasures to defend against advanced\nfraud tactics if a financial institution relies on multiple business functions;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.3(f)",
+    "anchor_label": "Rmit 2025 12.3(f)",
+    "text": "conduct regular review by senior management to ensure the\neffectiveness of digital fraud management and define threshold for\nescalation of countermeasures considering the actual impact to victims\nof digital fraud and emerging fraud environment; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.3(g)",
+    "anchor_label": "Rmit 2025 12.3(g)",
+    "text": "apprise the board on the outcome of management reviews to preserve\npublic confidence in the security of digital services and mitigate\nreputation risk to the industry.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.3"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.4",
+    "anchor_label": "Rmit 2025 12.4",
+    "text": "A financial institution must ensure that its fraud detection capabilities and\nrules are updated in a timely manner upon detection of new fraud modus\noperandi in order to prevent fraudulent transactions or account takeover using\nstolen customer credentials. This must be supported by appropriate risk\nanalytics to improve the accuracy of fraud detection, that includes continuous\nupgrade of fraud detection capabilities as specified in Appendix 11 on Fraud\nDetection Standards.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 12.5",
+    "anchor_label": "Rmit 2025 12.5",
+    "text": "A financial institution must mitigate any attendant risk arising from its delivery\nof digital services. This shall include-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 12.5(a)",
+    "anchor_label": "Rmit 2025 12.5(a)",
+    "text": "adopt secure communication channel to mitigate risk of phishing.\nCompensating controls shall be adopted when using communication\nchannel prone to phishing exploits 37;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.5"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.5(b)",
+    "anchor_label": "Rmit 2025 12.5(b)",
+    "text": "all customers must be properly informed in advance of new controls to\nease adoption and minimise inconvenience; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.5"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.5(c)",
+    "anchor_label": "Rmit 2025 12.5(c)",
+    "text": "practical ways for customers to verify the authenticity of calls made by\nthe financial institution or its appointed outsourced service providers.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.5"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.6",
+    "anchor_label": "Rmit 2025 12.6",
+    "text": "A financial institution shall empower customers to mitigate digital fraud risks\nwhere it is reasonably practical. This shall include offering customer\nmechanisms to manage activation and de-activation of payment card38 for\ncard-not-present and overseas transactions. This shall not absolve the\nfinancial institution from its liabilities, responsibilities and duty of care to\nensure the security of its digital services.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 12.7",
+    "anchor_label": "Rmit 2025 12.7",
+    "text": "Consumer competency is essential to strengthening the security of digital\nservices. A financial institution must maintain continuous efforts to review and\nenhance the effectiveness of its awareness programmes, ensuring customers\nunderstand the risks of digital services fraud. This shall include-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 12.7(a)",
+    "anchor_label": "Rmit 2025 12.7(a)",
+    "text": "continuous and timely updates of practical information on how to identify\npotential fraud, including specific information about new or common\nmodus operandi;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.7"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.7(b)",
+    "anchor_label": "Rmit 2025 12.7(b)",
+    "text": "clear explanation about new and existing security measures, such as\nhow to verify genuine e-banking websites and mobile applications;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.7"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.7(c)",
+    "anchor_label": "Rmit 2025 12.7(c)",
+    "text": "real-time alerts of possible risks when security measures are absent or\nhave not yet been implemented; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.7"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.7(d)",
+    "anchor_label": "Rmit 2025 12.7(d)",
+    "text": "measures to further improve customer understanding and familiarisation\nwith fraud risks and controls, such as through interactive simulations of\nsecurity features etc.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.7"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.8",
+    "anchor_label": "Rmit 2025 12.8",
+    "text": "A financial institution must provide convenient means for customers to report,\nsuspend and re-activate their account swiftly in the event of a suspected\nfraud, where applicable. This shall require the financial institution to:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 12.8(a)",
+    "anchor_label": "Rmit 2025 12.8(a)",
+    "text": "offer a secure self-service \"kill switch\" solution;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.8"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.8(b)",
+    "anchor_label": "Rmit 2025 12.8(b)",
+    "text": "ensure that its contact centre is adequately resourced and operating\neffectively to provide prompt and adequate assistance to customers in\ndistress; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.8"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.8(c)",
+    "anchor_label": "Rmit 2025 12.8(c)",
+    "text": "restore customer access to digital services within a reasonable\ntimeframe upon validation.\n\n##",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.8"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.9",
+    "anchor_label": "Rmit 2025 12.9",
+    "text": "In addition to effective incident handling procedures, a financial institution\nmust adopt additional measures to mitigate risk to customers arising from any\nincident involving potential fraud or compromise of customer data. This shall\ninclude-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 12.9(a)",
+    "anchor_label": "Rmit 2025 12.9(a)",
+    "text": "heighten monitoring of affected customer accounts;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.9"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.9(b)",
+    "anchor_label": "Rmit 2025 12.9(b)",
+    "text": "notify affected customers and provide them with the necessary\ninformation to apply mitigating measures and reduce the risk of fraud;\nand",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.9"
+  },
+  {
+    "anchor_id": "Rmit 2025 12.9(c)",
+    "anchor_label": "Rmit 2025 12.9(c)",
+    "text": "revoke and re-issue affected user credentials or designated payment\ninstruments, where there is a potential risk of exploitation due to\ncompromised data or other fraudulent activity.\n\nThe rest of the page is intentionally left as blank\n\n### 13 Technology Audits\n\n#### Audit function",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 12.9"
+  },
+  {
+    "anchor_id": "Rmit 2025 13.1",
+    "anchor_label": "Rmit 2025 13.1",
+    "text": "A financial institution must ensure that the scope, frequency, and intensity of\ntechnology audits are commensurate with the complexity, sophistication and\ncriticality of technology systems and applications.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 13.2",
+    "anchor_label": "Rmit 2025 13.2",
+    "text": "A financial institution must establish annual review on its technology audit plan\nthat provides appropriate frequency and coverage of critical technology\nservices, third party service providers, material external system interfaces,\ndelayed or prematurely terminated critical technology projects and post-\nimplementation review of new or material enhancements of technology\nservices.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 13.3",
+    "anchor_label": "Rmit 2025 13.3",
+    "text": "A financial institution must ensure the internal audit function must have\ndedicated technology audit resources with specialised competencies and\nprofessionally certified. The technology audit resources shall be adequately\nconversant with the developing sophisticate of the financial institution's\ntechnology systems, delivery channels and have sound knowledge in the\nareas audited.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 13.4",
+    "anchor_label": "Rmit 2025 13.4",
+    "text": "The technology audit resources may be enlisted to provide advice on\ncompliance and adequacy of control processes during the planning and\ndevelopment phases of new major products, systems, adoption of third party\nservice providers or technology operations. In such cases, the technology\nauditors participating in this capacity are expected to carefully consider\nwhether such an advisory or consulting role can materially impair their\nindependence or objectivity in performing post-implementation reviews of the\nproducts, systems and operations concerned.\n\n### 14 External Party Assurance",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 14.1",
+    "anchor_label": "Rmit 2025 14.1",
+    "text": "A financial institution shall appoint a technically competent external service\nprovider to carry out a production data centre resilience and risk assessment\n(DCRA). The assessment must consider all major risks and determine the\ncurrent level of resilience of the production data centre. A financial institution\nmust ensure the assessment is conducted at least once every three years or\nwhen there is a material change in the data centre infrastructure, whichever is\nearlier. The assessment shall, at a minimum, include a consideration of\nwhether the requirements in paragraphs 10.24 to 10.28 have been adhered\nto. For data centres managed by third party service providers, a financial\ninstitution shall only rely on independent third party assurance reports\nprovided such reliance is consistent with the financial institution's risk appetite\nand tolerance, and the independent assurance has considered similar risks\nand meets the requirements in this paragraph for conducting the DCRA. The\ndesignated board-level committee specified in paragraph 8.3 must deliberate\nthe outcome of the assessment.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 14.2",
+    "anchor_label": "Rmit 2025 14.2",
+    "text": "A financial institution shall appoint a technically competent external service\nprovider to carry out regular network resilience and risk assessments (NRA)\nand set proportionate controls aligned with its risk appetite. The assessment\nmust be conducted at least once in three years or whenever there is a material\nchange in the network design, whichever is earlier. The assessment must\nconsider all major risks and determine the current level of resilience. This shall\ninclude an assessment of the financial institution's adherence to the\nrequirements in paragraphs 10.36 to 10.43. The designated board-level\ncommittee specified in paragraph 8.3 must deliberate the outcome of the\nassessment.\n\n### 15 Security Awareness and Education",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 15.1",
+    "anchor_label": "Rmit 2025 15.1",
+    "text": "A financial institution must provide adequate and regular technology and\ncybersecurity awareness education for all staff in undertaking their respective\nroles and measure the effectiveness of its education and awareness\nprograms. This cybersecurity awareness education must be conducted at\nleast annually and must reflect the evolving cyber threat landscape and\nemerging risks. Where appropriate, the financial institution shall also include\nits third party service providers in their relevant training as outlined in\nparagraph 10.48(i).",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 15.2",
+    "anchor_label": "Rmit 2025 15.2",
+    "text": "A financial institution must provide adequate and continuous training for staff\ninvolved in technology operations, cybersecurity and risk management in\norder to ensure that the staff are competent and suitably certified to effectively\nperform their roles and responsibilities.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 15.3",
+    "anchor_label": "Rmit 2025 15.3",
+    "text": "A financial institution must provide its board members with regular training and\ninformation on technology developments to enable the board to effectively\ndischarge its oversight role.\n\n# PART C REGULATORY PROCESS\n\n## 16 Notification for Technology-Related Applications\n\n### Introduction or enhancement to digital services",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 16.1",
+    "anchor_label": "Rmit 2025 16.1",
+    "text": "A financial institution must notify the Bank in accordance with the\nrequirements in paragraphs 16.2 to 16.7 prior to introducing new digital\nservices or enhancement to existing digital services.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 16.2",
+    "anchor_label": "Rmit 2025 16.2",
+    "text": "A financial institution offering digital services for the first time must undertake\nmeasures specified under paragraph 16.4 and submit the following\ninformation in the notification to the Bank:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 16.2(a)",
+    "anchor_label": "Rmit 2025 16.2(a)",
+    "text": "assessment on the risks identified and strategies to manage such risks.\nThis includes specific accountabilities, policies and controls to address\nrisks;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 16.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 16.2(b)",
+    "anchor_label": "Rmit 2025 16.2(b)",
+    "text": "security arrangements and controls;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 16.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 16.2(c)",
+    "anchor_label": "Rmit 2025 16.2(c)",
+    "text": "significant terms and conditions;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 16.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 16.2(d)",
+    "anchor_label": "Rmit 2025 16.2(d)",
+    "text": "client charter;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 16.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 16.2(e)",
+    "anchor_label": "Rmit 2025 16.2(e)",
+    "text": "privacy policy statement; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 16.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 16.2(f)",
+    "anchor_label": "Rmit 2025 16.2(f)",
+    "text": "any outsourcing or website link arrangements, or strategic alliances or\npartnerships with third parties that have been finalised.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 16.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 16.3",
+    "anchor_label": "Rmit 2025 16.3",
+    "text": "For any enhancements to existing digital services which meet the criteria in",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 Appendix 6",
+    "anchor_label": "Rmit 2025 Appendix 6",
+    "text": "Appendix 6, a financial institution shall be subject to a simplified notification\nrequirement and submit the following information in the notification to the\nBank:\n\n(a) description of the enhancements to the existing technologies; and\n\n(b) risk assessment of the proposed enhancements, including the impact\nand measures to mitigate identified risks.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 16.4",
+    "anchor_label": "Rmit 2025 16.4",
+    "text": "For any enhancements to existing digital services which are not subject to\nthe simplified notification requirement under paragraph 16.3, a financial\ninstitution is required to undertake the following measures prior to notifying\nthe Bank:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 16.4(a)",
+    "anchor_label": "Rmit 2025 16.4(a)",
+    "text": "engage an independent external party to provide assurance that the\nfinancial institution has addressed the technology risks and security\ncontrols associated with the digital services or any material\nenhancement to the digital services. The format of the assurance shall\nbe as set out in Part A of Appendix 7; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 16.4"
+  },
+  {
+    "anchor_id": "Rmit 2025 16.4(b)",
+    "anchor_label": "Rmit 2025 16.4(b)",
+    "text": "provide a confirmation by the CISO, senior management officer or the\nchairman of the board or designated board-level committee specified in\nparagraph 8.3 of the financial institution's readiness to provide digital\nservices or implement any material enhancement to the digital services.\nThe format of the confirmation shall be as set out in Part B of Appendix\n7.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 16.4"
+  },
+  {
+    "anchor_id": "Rmit 2025 16.5",
+    "anchor_label": "Rmit 2025 16.5",
+    "text": "A financial institution must ensure that the independent external party\nproviding the assurance is competent and has a good track record. The\nassurance shall address the matters covered in, and comply with, Part C\nand $D$ of Appendix 7.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 16.6",
+    "anchor_label": "Rmit 2025 16.6",
+    "text": "A financial institution shall provide relevant documents for the Bank's review\nwhen required by the Bank.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 16.7",
+    "anchor_label": "Rmit 2025 16.7",
+    "text": "A financial institution may offer digital services or implement any\nenhancement to the digital services immediately upon submission of the\nnotification under paragraph 16.1 and compliance with the requirements in\nparagraphs 16.2 to 16.6.\n\n## 17 Consultation and Notification related to Cloud Services and Emerging Technology",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 17.1",
+    "anchor_label": "Rmit 2025 17.1",
+    "text": "A financial institution is required to consult the Bank prior to the first-time\nadoption of a public cloud or emerging technology for critical systems. During\nthe consultation, the financial institution must demonstrate that specific risks\nassociated with the use of these technologies have been adequately\nconsidered and addressed to the satisfaction of the Bank, in order to proceed\nwith the adoption of the public cloud for critical systems for the first time. The\nfinancial institution shall undertake the following prior to consulting the Bank\non its adoption of public cloud for critical systems:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 17.1(a)",
+    "anchor_label": "Rmit 2025 17.1(a)",
+    "text": "conduct a comprehensive risk assessment of the proposed cloud\nadoption or emerging technology, including the possible impact and\nmeasures to address and mitigate the identified risks. For public cloud,\nthe assessment must follow the risk outlined in paragraph 10.50 and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 17.1"
+  },
+  {
+    "anchor_id": "Rmit 2025 Appendix 10",
+    "anchor_label": "Rmit 2025 Appendix 10",
+    "text": "Appendix 10 (for public cloud) or Appendix 9 (for emerging technology)\nand Part C of Appendix 7 for higher-risk services, such as those\ninvolving the processing or storage of customer information, or cross-\nborder data transmission.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 Appendix 9",
+    "anchor_label": "Rmit 2025 Appendix 9",
+    "text": "Appendix 9. The financial institution shall also adopt the format of the\nRisk Assessment Report as per Part A of Appendix 7;\n\n(b) provide a confirmation by the CISO, senior management officer or the\nchairman of the board or designated board-level committee specified in\nparagraph 8.3 of the financial institution's readiness to adopt public\ncloud or emerging technology for critical system. The format of the\nconfirmation shall be as set out in Part B of Appendix 7; and\n\n(c) perform a third party pre-implementation review on public cloud or\nemerging technology. This review shall encompass the areas set out in",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 17.2",
+    "anchor_label": "Rmit 2025 17.2",
+    "text": "A financial institution shall notify the Bank on any subsequent adoption of a\npublic cloud or emerging technology for critical system, by submitting the\nnotification together with the necessary updates to all the information required\nunder paragraph 17.1, subject to the financial institution having complied with\nthe following requirements and included documentation and information to\ndemonstrate such compliance in the notification submitted to the Bank that\nthe financial institution:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 17.2(a)",
+    "anchor_label": "Rmit 2025 17.2(a)",
+    "text": "has consulted the Bank prior to adopting a public cloud or emerging\ntechnology for critical systems for the first time in accordance with\nparagraph 17.1, with no concerns raised by the Bank during the first-\ntime consultation;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 17.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 17.2(b)",
+    "anchor_label": "Rmit 2025 17.2(b)",
+    "text": "has enhanced the technology risk management framework to manage\ncloud or emerging technology risks;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 17.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 17.2(c)",
+    "anchor_label": "Rmit 2025 17.2(c)",
+    "text": "has established independent assurance on the cloud risk management\nframework or emerging technology risk management framework; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 17.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 17.2(d)",
+    "anchor_label": "Rmit 2025 17.2(d)",
+    "text": "has provided assurance to the Bank that the incident response plans\nare sufficient to cater for adverse or unexpected events.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 17.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 17.3",
+    "anchor_label": "Rmit 2025 17.3",
+    "text": "For the avoidance of doubt, notification to the Bank under paragraph 17.2 is\nnot required for any enhancement to existing cloud adoption and emerging\ntechnology adoption that does not materially alter the prior assessments and\nrepresentations made by a financial institution to the Bank.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 17.4",
+    "anchor_label": "Rmit 2025 17.4",
+    "text": "The Bank may at its discretion direct a financial institution to consult the Bank\nunder paragraph 17.1, notify the Bank under paragraph 17.2 or observe any\nof the guidance in Appendix 10 or Appendix 9 and to explain any deviations\nfrom the guidance in Appendix 10 or Appendix 9, including for a non-critical\nsystem or when the pre-requisites in the paragraphs 17.1 or 17.2 have not\nbeen met. A financial institution must comply with such a directive promptly\nand to the satisfaction of the Bank.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 17.5",
+    "anchor_label": "Rmit 2025 17.5",
+    "text": "A financial institution must ensure the roadmap for adoption of cloud services\nor emerging technology (for critical systems and non-critical systems) is\nincluded in the annual outsourcing plan submitted to the Bank in adherence\nwith the requirements in the policy document on Outsourcing or IT Profile\nreporting. The risk assessment as outlined in paragraph 10.50 for cloud\nservices or Appendix 9 for emerging technology must also be documented\nand made available for the Bank's review as and when requested by the\nBank.\n\n## 18 Assessment and Gap Analysis",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 18.1",
+    "anchor_label": "Rmit 2025 18.1",
+    "text": "A financial institution must perform a gap analysis of existing practices in\nmanaging technology risk against the requirements in this policy document\nand highlight key implementation gaps. The financial institution must develop\nan action plan with a clear timeline and key milestones to address the gaps\nidentified. The gap analysis and action plan must be submitted to the Bank\nno later than 90 days after the issuance date of this policy document.\nFinancial institutions that have previously made a submission in accordance\nwith the equivalent provision in the previous version of this policy document\nare required to maintain continuous compliance by identifying any new gaps\nagainst the enhanced or revised requirements in the latest version of this\npolicy document and taking the necessary steps to address such gaps. The\nupdated annual assessment of its level of compliance must be made\navailable to the Bank upon request.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2",
+    "anchor_label": "Rmit 2025 18.2",
+    "text": "The self-assessment, gap analysis and action plan in paragraph 18.1 must\nbe submitted to Jabatan Penyeliaan Konglomerat Kewangan, Jabatan\nPenyeliaan Perbankan, Jabatan Penyeliaan Insurans dan Takaful or Jabatan\nPemantauan Perkhidmatan Pembayaran, as the case may be.\n\n# Appendix 1 Storage and Transportation of Sensitive Data in Removable Media\n\nFinancial institutions must ensure adequate controls and measures are implemented\nfor the storage and transportation of sensitive data in removable media, including:\n\n1\\.\ndeploying the latest industry-tested and accepted encryption techniques;\n\n2\\.\nimplementing authorised access control to sensitive data (e.g. password\nprotection, user access matrix);\n\n3\\.\nprohibiting unauthorised copying and reading from the media;\n\n4\\. where there is a need to transport the removable media to a different physical\nlocation, financial institutions must-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(a)",
+    "anchor_label": "Rmit 2025 18.2(a)",
+    "text": "enhance its fraud detection rules promptly upon detection of new fraud\ntechniques that have evaded its fraud detection system. The enhancements\nshall be timely upon being notified by its internal fraud team or upon receiving\nsuch intelligence from external sources such as other financial institution,\nindustry group, public-private partnership and other intelligence sharing\nplatform; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(i)",
+    "anchor_label": "Rmit 2025 18.2(i)",
+    "text": "understand the scope of customer information shared across the supply\nchain and ensure that relevant information security controls can be legally\nenforced by the financial institution; and\n\n(ii)ensure Service Level Agreement (SLA) negotiations and contractual terms\ncover the performance matrix, availability, and reliability of services in\norder to ensure that the cloud service providers agree and are formally\naligned on the requirements and standard of cloud services provided. In\naddition, cloud service providers should be accountable to the financial\ninstitution for the SLA, performance matrix, availability and reliability of\ncloud services rendered by its service providers (i.e. sub-contractors).\n\n## 6. Oversight over cloud service providers\n\nA financial institution should ensure effective oversight over cloud service providers\ntaking into account the fact that the cloud service providers may engage sub-\ncontractor(s) to provide cloud services. This includes, at a minimum, the following:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(ii)",
+    "anchor_label": "Rmit 2025 18.2(ii)",
+    "text": "application is not running on compromised devices;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(iii)",
+    "anchor_label": "Rmit 2025 18.2(iii)",
+    "text": "conduct penetration test to identify and rectify potential vulnerability;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(b)",
+    "anchor_label": "Rmit 2025 18.2(b)",
+    "text": "review the effectiveness of its fraud detection parameters and thresholds in\na timely manner, taking into consideration recent typologies in relation to\nfraudulent transactions and financial mule accounts, including new digital\nfraud techniques and modus operandi in other jurisdictions.\n\n8\\. In order to effectively address the wide range of fraud alerts that can arise from\nvarious fraud modus operandi and techniques, it is important to have clear and\ndetailed procedures for managing suspected fraud cases. Therefore, the financial\ninstitution must develop a comprehensive fraud management playbook, as a\npoint of reference for the relevant staff to promptly identify, confirm, and respond\neffectively to various scenarios. The playbook must be updated and validated at\nleast once a year, or more frequently if needed, to ensure it remains relevant in\nthe evolving fraud landscape. This includes reflecting insights from assessments\nof confirmed fraud cases and lessons learnt from incidences in which the financial\ninstitution was unable to detect the fraudulent activities or transactions.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(c)",
+    "anchor_label": "Rmit 2025 18.2(c)",
+    "text": "Changes in a device fingerprint, such as the location, IP address, device\nMAC, operating system and other device profile. This must include the ability\nto detect and block attempts to defeat or bypass device fingerprinting\nmethodologies.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(d)",
+    "anchor_label": "Rmit 2025 18.2(d)",
+    "text": "Account takeover and identity fraud using advanced artificial intelligence\ntools, techniques, and procedures to defeat or bypass the authentication\ncontrols of digital services or contact centre.",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(e)",
+    "anchor_label": "Rmit 2025 18.2(e)",
+    "text": "Higher risk scoring must be applied for vulnerable customers (e.g. senior\ncitizens, younger customers, previous victims of fraud, customers with lower\nliteracy on the safety of electronic banking or awareness level, etc).",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(f)",
+    "anchor_label": "Rmit 2025 18.2(f)",
+    "text": "Changes in biometric credentials registered in a device, where biometric\ntechnologies are solely used for financial transaction authentication\npurposes. This includes the scenario where a mobile banking application\nrelies on the biometric verification function of the device, mobile operating\nsystem, or a third party application.\n\n3\\.\nA financial institution must implement measures to promptly detect and terminate\nhijacked sessions to prevent unauthorised access to customer accounts. The\nfinancial institution shall notify customer on elevated cyber risk caused by the\npresence of risky application (e.g. application downloaded outside official\ndistribution platforms or detected to contain security vulnerabilities).\n\n4\\.\nWhen customer' online banking access is restricted, a financial institution must\npromptly notify customer with appropriate guidance to enable customer to restore\naccess to their account subject to robust verification. To mitigate privacy\n\nconcerns, the financial institution must seek consent from the customer prior to\neffecting the customer device profiling.\n\n5\\. A financial institution must investigate suspicious transactions based on pre-\ndetermined priority levels and conduct the necessary verification (such as call-\nbacks or other effective methods) with the customer prior to releasing any flagged\ntransactions. To ensure acceptable customer experience, the financial institution\nmust notify the affected customer immediately upon the blocking of each\nsuspicious transaction (e.g. via SMS or secure app notification) and deploy\nsufficient resources to contact the affected customer within 30 minutes of the\ntransaction, including during peak periods. The verification procedures must\nconsider and include ways to help detect circumstances where customer may be\nresponding under the influence or threat of fraudsters. The financial institution\nmust also establish a robust process to minimise risk in the event the customer\ncannot be contacted due to their unavailability.\n\n6\\.\nA financial institution must ensure that its various touch points such as contact\ncentres and branches are easily accessible and sufficiently resourced to provide\ncustomer with prompt advice or to connect customer with the fraud investigation\nteam, if necessary.\n\n7\\. A financial institution must continuously update its system to ensure fraud\ndetection rules remain effective to combat new fraud modus operandi via the\nfollowing:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(g)",
+    "anchor_label": "Rmit 2025 18.2(g)",
+    "text": "A financial institution should review its loss provision arrangements to ensure\nits adequacy to cover cyber incidents in accordance with the requirement on\nparagraph 11.17 of this policy document.\n\n## Appendix 11 Fraud Detection Standards\n\nA financial institution is required to adhere to the specified requirements, which include\ncarrying out financial transactions conducted via digital services for retail customer.\n\nWhile compliance with the minimum standards is essential, a financial institution is\nencouraged to exceed these standards to stay ahead of emerging threat. The financial\ninstitution shall continuously upgrade and refine their fraud detection capability to\nensure it remains robust against the anticipated level of threat.\n\n1\\.\nA financial institution must establish detailed and comprehensive risk profiles for\neach customer as a reference point when performing fraud detection based on\nbehavioural analysis of the financial institution's customer and fraud profiles.\nExamples of relevant factors to be considered may include:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(h)",
+    "anchor_label": "Rmit 2025 18.2(h)",
+    "text": "conduct periodic security assessments on APIs, including penetration\ntesting and static / dynamic security testing;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(j)",
+    "anchor_label": "Rmit 2025 18.2(j)",
+    "text": "establish process to effectively revoke access token or $\\mathrm { A P I }$ keys in the\nevent of a compromise.\n\n# Appendix 6 Criteria for Simplified Notification for IT Services Enhancements\n\n## Guiding principles for simplified notification\n\n1\\. Where the enhancement does not result in:",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(iv)",
+    "anchor_label": "Rmit 2025 18.2(iv)",
+    "text": "secure end-to-end communication between the device and host;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(v)",
+    "anchor_label": "Rmit 2025 18.2(v)",
+    "text": "sensitive information is not stored on mobile devices;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(vi)",
+    "anchor_label": "Rmit 2025 18.2(vi)",
+    "text": "user is notified of successful transactions;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(vii)",
+    "anchor_label": "Rmit 2025 18.2(vii)",
+    "text": "user is notified of suspicious transactions;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(viii)",
+    "anchor_label": "Rmit 2025 18.2(viii)",
+    "text": "continuous monitoring and takedown of fake applications in\napplication distribution platforms;",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(ix)",
+    "anchor_label": "Rmit 2025 18.2(ix)",
+    "text": "controls over the uploading of application-to-application distribution\nplatforms;\n☒",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(x)",
+    "anchor_label": "Rmit 2025 18.2(x)",
+    "text": "☒\na unique code is generated per transaction; and",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  },
+  {
+    "anchor_id": "Rmit 2025 18.2(xi)",
+    "anchor_label": "Rmit 2025 18.2(xi)",
+    "text": "timely expiry of the transaction code.\n☒\n\n## Appendix 8 IT and Cyber Risks Associated with Third Party Service Providers\n\n1\\. Operational performance and capacity (including staff competency and bench\nstrength to mitigate key-man risks, system infrastructure reliability and IT\noperation management for service quality, strong recovery and resumption\ncapability for business continuity).\n\n2\\. Security requirements to mitigate information security risks relating to secure\nhandling of confidential information pertaining to the financial institution, its\ncustomers or counterparty during transmission, process or storage of such\ninformation-",
+    "doc_class": "structured-rules",
+    "document_id": "rmit-2025",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": "Rmit 2025 18.2"
+  }
+]

@@ -199,14 +199,14 @@ class SegmenterRegistry:
 
 
 class UnknownDocumentIdError(ValueError):
-    """Raised when `structured_rules_segment` is called with a `document_id`
-    that has no entry in `engine.clauses.POLICY_SHORT_NAMES`.
+    """No longer raised by `structured_rules_segment`.
 
-    Structured-rules anchor_ids follow the canonical BNM shape
-    ``"{PolicyShortName} {clause_number}"`` (e.g. ``"RMiT 17.1"``). The
-    shortname must come from `POLICY_SHORT_NAMES` — the segmenter never
-    fabricates one. Add the document to `POLICY_SHORT_NAMES` (or use a
-    different `doc_class`) to fix.
+    It used to reject any `document_id` absent from
+    `engine.clauses.POLICY_SHORT_NAMES`, which made the structured-rules method
+    unusable for a drafter-uploaded document: the id comes from their node title
+    (`"RMiT 2025"` -> `"rmit-2025"`), never a corpus key, so the method they
+    picked always failed. The table is now a citation-prefix convenience with a
+    derived fallback. Retained so existing importers keep working.
     """
 
 
@@ -228,22 +228,19 @@ def structured_rules_segment(
     belt-and-braces check that a future refactor of `clauses.py` cannot silently
     break the invariant.
 
-    `document_id` is interpreted as the POLICY_SHORT_NAMES key (what `clauses.py`
-    internally calls `policy_id`) — e.g. `"rmit"`, `"outsourcing"`, `"opres"`.
-    An unknown key raises `UnknownDocumentIdError` rather than fabricating a
-    shortname or letting a bare `KeyError` bubble up.
+    `document_id` doubles as `clauses.py`'s `policy_id`. A document in
+    `POLICY_SHORT_NAMES` (`"rmit"`, `"opres"`, …) gets its curated citation
+    prefix; any other id gets one derived from the id itself. The table is a
+    naming convenience, NOT a gate — a drafter who uploads a numbered policy and
+    picks `structured-rules` must get the regex parser, not a refusal, because
+    the clause regex needs nothing from that table. A document the parser finds
+    no numbered clauses in simply yields no anchors, which the caller reports as
+    `NO_PASSAGES`.
     """
     # Local imports keep engine/anchors.py importable in test envs that stub
     # out engine.clauses, and avoid a circular import if clauses.py grows to
     # reference Anchor in future.
-    from engine.clauses import POLICY_SHORT_NAMES, segment_clauses
-
-    if document_id not in POLICY_SHORT_NAMES:
-        raise UnknownDocumentIdError(
-            f"Unknown document_id {document_id!r} for structured-rules "
-            f"segmentation — no entry in engine.clauses.POLICY_SHORT_NAMES. "
-            f"Add a shortname mapping (or use a different doc_class)."
-        )
+    from engine.clauses import segment_clauses
 
     entries = segment_clauses(
         markdown=source_markdown,
@@ -643,6 +640,13 @@ def semi_structured_segment(
     join_sep = " §" if section_mark else " "
 
     anchors: list[Anchor] = []
+    # A numeric path is NOT unique across a real document: BNM EDs restart
+    # numbering per part, so `7` can appear under "PART B POLICY REQUIREMENTS"
+    # and again under "A. Obtaining consent". `AnchorIndex` rejects duplicate
+    # ids outright, so a repeat occurrence takes a `#n` suffix. The FIRST
+    # occurrence keeps the bare id, so citations already recorded against it
+    # stay valid.
+    seen_ids: dict[str, int] = {}
     for leaf_index in _identify_leaves(headings):
         leaf = headings[leaf_index]
         # Only emit anchors for headings that have a numeric identity — a
@@ -654,6 +658,10 @@ def semi_structured_segment(
 
         numeric_path = leaf.num_path
         anchor_id = f"{prefix}{join_sep}{numeric_path}"
+        occurrence = seen_ids.get(anchor_id, 0) + 1
+        seen_ids[anchor_id] = occurrence
+        if occurrence > 1:
+            anchor_id = f"{anchor_id}#{occurrence}"
         text = _text_for_leaf(source_markdown, headings, leaf_index)
         heading_path = _heading_path_labels(headings, leaf_index)
 

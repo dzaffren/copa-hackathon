@@ -5,7 +5,11 @@ import type {
   CopilotDraftContext,
   CopilotIntent,
   CopilotResponse,
+  CreateEdgeRequest,
+  CreateEdgeResponse,
   CreateNodeRequest,
+  DeleteEdgeResponse,
+  DeleteNodeResponse,
   CreateNodeResponse,
   CreateWorkstreamRequest,
   CreateWorkstreamResponse,
@@ -13,6 +17,7 @@ import type {
   CrossLinksResponse,
   DraftResponse,
   EdgeDetail,
+  ExtractConceptsResponse,
   LinkageReviewResponse,
   LinkageTransitionRequest,
   LinkageTransitionResponse,
@@ -83,6 +88,14 @@ async function postJson<T>(url: string, body?: unknown): Promise<T> {
     headers: { "Content-Type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
+  if (!res.ok) {
+    return throwHttpError(res);
+  }
+  return (await res.json()) as T;
+}
+
+async function deleteJson<T>(url: string): Promise<T> {
+  const res = await fetch(url, { method: "DELETE" });
   if (!res.ok) {
     return throwHttpError(res);
   }
@@ -166,13 +179,72 @@ export function fetchEdgeDetail(
   );
 }
 
-export function createNode(
+/** Create a node, optionally attaching the document to chunk.
+ *
+ *  With an `attachment` the request goes as `multipart/form-data` — a JSON
+ *  `payload` part plus the file — because a file cannot ride in a JSON body.
+ *  Without one it stays the plain-JSON shape the URL-ingest path uses. The
+ *  Content-Type header is deliberately NOT set for FormData: the browser must
+ *  add it itself so the multipart boundary is included.
+ */
+export async function createNode(
   workstreamId: string,
   body: CreateNodeRequest,
+  attachment?: File | null,
 ): Promise<CreateNodeResponse> {
-  return postJson<CreateNodeResponse>(
-    `${API_BASE}/api/workstreams/${workstreamId}/nodes`,
+  const url = `${API_BASE}/api/workstreams/${workstreamId}/nodes`;
+  if (!attachment) {
+    return postJson<CreateNodeResponse>(url, body);
+  }
+  const form = new FormData();
+  form.append("payload", JSON.stringify(body));
+  form.append("attachment", attachment);
+  const res = await fetch(url, { method: "POST", body: form });
+  if (!res.ok) {
+    return throwHttpError(res);
+  }
+  return (await res.json()) as CreateNodeResponse;
+}
+
+/** Derive a document's concepts from its passages. Synchronous on the server —
+ *  the promise settles only when extraction finishes (or fails). */
+export function extractConcepts(
+  workstreamId: string,
+  nodeId: string,
+): Promise<ExtractConceptsResponse> {
+  return postJson<ExtractConceptsResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/nodes/${nodeId}/extract-concepts`,
+  );
+}
+
+/** Connect two nodes already on the canvas. Runs no analysis. */
+export function createEdge(
+  workstreamId: string,
+  body: CreateEdgeRequest,
+): Promise<CreateEdgeResponse> {
+  return postJson<CreateEdgeResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/edges`,
     body,
+  );
+}
+
+/** Remove a node, its linkages, and the artefacts that only existed for it. */
+export function deleteNode(
+  workstreamId: string,
+  nodeId: string,
+): Promise<DeleteNodeResponse> {
+  return deleteJson<DeleteNodeResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/nodes/${nodeId}`,
+  );
+}
+
+/** Remove one linkage. Both documents stay; only the relationship goes. */
+export function deleteEdge(
+  workstreamId: string,
+  edgeId: string,
+): Promise<DeleteEdgeResponse> {
+  return deleteJson<DeleteEdgeResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/edges/${edgeId}`,
   );
 }
 
@@ -377,8 +449,12 @@ export async function* streamCopilotMessage(
         const eventLine = lines.find((l) => l.startsWith("event: "));
         const dataLine = lines.find((l) => l.startsWith("data: "));
         if (!eventLine || !dataLine) continue;
-        const event = eventLine.slice("event: ".length).trim() as SSEEvent["event"];
-        const data = JSON.parse(dataLine.slice("data: ".length)) as SSEEvent["data"];
+        const event = eventLine
+          .slice("event: ".length)
+          .trim() as SSEEvent["event"];
+        const data = JSON.parse(
+          dataLine.slice("data: ".length),
+        ) as SSEEvent["data"];
         yield { event, data } as SSEEvent;
       }
     }
@@ -392,14 +468,19 @@ export async function* streamCopilotMessage(
 export async function fetchReviewers(): Promise<Person[]> {
   // The server already excludes the owner, so the picker cannot offer a drafter
   // themselves — no client-side filtering to keep in step.
-  const body = await getJson<{ reviewers: Person[] }>(`${API_BASE}/api/reviewers`);
+  const body = await getJson<{ reviewers: Person[] }>(
+    `${API_BASE}/api/reviewers`,
+  );
   return body.reviewers;
 }
 
 export function createWorkstream(
   body: CreateWorkstreamRequest,
 ): Promise<CreateWorkstreamResponse> {
-  return postJson<CreateWorkstreamResponse>(`${API_BASE}/api/workstreams`, body);
+  return postJson<CreateWorkstreamResponse>(
+    `${API_BASE}/api/workstreams`,
+    body,
+  );
 }
 
 // --- Cross-workstream linkage ----------------------------------------------

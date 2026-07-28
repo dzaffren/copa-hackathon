@@ -125,13 +125,21 @@ class ClausePrimaryIndexCollisionError(Exception):
 
 
 def _short_name(policy_id: str) -> str:
-    try:
-        return POLICY_SHORT_NAMES[policy_id]
-    except KeyError as exc:
-        raise KeyError(
-            f"No policy short-name mapping for policy_id '{policy_id}' — "
-            f"add it to POLICY_SHORT_NAMES in engine/clauses.py"
-        ) from exc
+    """The citation prefix for a document: `"rmit"` -> `"RMiT"`.
+
+    `POLICY_SHORT_NAMES` is a curated table of pretty names for the documents
+    the offline corpus build knows about. It is NOT a gate on which documents may
+    be parsed: a drafter who uploads a numbered policy and picks
+    `structured-rules` gets a prefix derived from their own document id rather
+    than a hard failure, since the shortname only affects how a citation READS —
+    the clause regex itself needs nothing from this table.
+    """
+    known = POLICY_SHORT_NAMES.get(policy_id)
+    if known is not None:
+        return known
+    # Derive a readable prefix from the id: "rmit-pd-2025" -> "Rmit Pd 2025".
+    derived = policy_id.replace("-", " ").replace("_", " ").strip()
+    return derived.title() if derived else policy_id
 
 
 def _canonical(policy_id: str, bare_number: str) -> str:

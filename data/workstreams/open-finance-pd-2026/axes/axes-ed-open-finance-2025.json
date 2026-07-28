@@ -1,0 +1,534 @@
+{
+  "document_id": "ed-open-finance-2025",
+  "model": "claude-haiku-4-5",
+  "anchors": [
+    {
+      "anchor_id": "ed-open-finance-2025 (a)(b)(c)(d)",
+      "text_hash": "e3b0c44298fc1c14",
+      "axis_cap": 5,
+      "axes": [
+        "financial institution",
+        "scenario testing",
+        "operational resilience",
+        "testing frequency",
+        "annual compliance cadence"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 1.1",
+      "text_hash": "6042cc34d26a7439",
+      "axis_cap": 5,
+      "axes": [
+        "digital infrastructure security requirements",
+        "customer data handling and protection",
+        "financial information access controls",
+        "digital transaction platform resilience",
+        "data processing security standards"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 1.2",
+      "text_hash": "e34422250ac7747f",
+      "axis_cap": 5,
+      "axes": [
+        "consent-driven data sharing framework",
+        "customer control over personal financial information",
+        "open finance API architecture and standards",
+        "financial inclusion and access objectives",
+        "data-driven innovation in financial services"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 1.3",
+      "text_hash": "116aa76ae5a063e2",
+      "axis_cap": 5,
+      "axes": [
+        "open finance regulatory framework",
+        "data sharing security and resilience requirements",
+        "data privacy and protection compliance",
+        "financial innovation risk management balance",
+        "responsible data sharing governance"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 1.4(a)(b)(c)(d)(e)(f)",
+      "text_hash": "27f5bf3f8a929560",
+      "axis_cap": 5,
+      "axes": [
+        "open finance cyber risk management",
+        "technology risk governance",
+        "cybersecurity in open banking environments",
+        "operational resilience for financial data sharing",
+        "third-party technology risk oversight"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 1.5",
+      "text_hash": "4094b9c1848b55d1",
+      "axis_cap": 5,
+      "axes": [
+        "open finance implementation timeline",
+        "phased regulatory requirement rollout",
+        "industry adoption transition period",
+        "stakeholder ecosystem development",
+        "open finance security and order framework"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 1.6",
+      "text_hash": "2e4d1ce82033b575",
+      "axis_cap": 5,
+      "axes": [
+        "open finance ecosystem development",
+        "cross-sector data sharing governance",
+        "data accessibility and standardization",
+        "public-private collaboration framework",
+        "regional data sharing initiatives"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 2.1",
+      "text_hash": "420558bd16ca4afa",
+      "axis_cap": 5,
+      "axes": [
+        "financial service provider scope definition",
+        "regulatory perimeter establishment",
+        "policy applicability criteria",
+        "regulated entity classification",
+        "scope of regulatory coverage"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 3.1(a)(b)(c)",
+      "text_hash": "4362a23eb8511a76",
+      "axis_cap": 5,
+      "axes": [
+        "Domestic Financial Institution Act",
+        "Financial institution regulatory framework",
+        "Domestic regulatory authority",
+        "Financial services legislation",
+        "Statutory regulatory basis"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 3.2",
+      "text_hash": "b8fba37e277cd1fb",
+      "axis_cap": 5,
+      "axes": [
+        "regulatory authority citation",
+        "legislative basis for guidance",
+        "multi-statute delegation framework",
+        "financial services act references",
+        "policy document legal foundation"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 4.1",
+      "text_hash": "631ad502384fca32",
+      "axis_cap": 5,
+      "axes": [
+        "policy effective date",
+        "transition arrangement provisions",
+        "implementation timeline",
+        "staged compliance framework",
+        "regulatory phase-in schedule"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 5.1",
+      "text_hash": "b1b45d5633c40131",
+      "axis_cap": 5,
+      "axes": [
+        "definition sourcing hierarchy",
+        "cross-regulatory terminology alignment",
+        "statutory reference incorporation",
+        "policy document scope of definitions",
+        "regulatory framework term harmonization"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 5.2",
+      "text_hash": "9451be2a9bea9a91",
+      "axis_cap": 5,
+      "axes": [
+        "regulatory obligation classification",
+        "compliance enforcement framework",
+        "regulatory guidance versus requirements distinction",
+        "financial services provider definition scope",
+        "customer information access and sharing governance"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 1",
+      "text_hash": "97f60d2d9ec922bc",
+      "axis_cap": 5,
+      "axes": [
+        "customer information disclosure to financial service providers",
+        "application withdrawal and rejection handling",
+        "open finance arrangement service provision",
+        "electronic money instrument definition and classification",
+        "electronic money issuer regulatory approval"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 11(a)(b)(c)(d)(e)(f)(g)",
+      "text_hash": "865d0bd27091cdde",
+      "axis_cap": 5,
+      "axes": [
+        "eligible entity classification for open finance",
+        "customer consent and data sharing scope",
+        "financial service provider participation requirements",
+        "open finance platform technical infrastructure standards",
+        "third-party service provider data handling oversight"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 6.1(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)(l)(m)(n)(o)",
+      "text_hash": "eceb3e29a77b91bf",
+      "axis_cap": 5,
+      "axes": [
+        "disclosure timing and schedule",
+        "periodic reporting calendar",
+        "financial statement publication date",
+        "regulatory filing deadline",
+        "annual disclosure cycle"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 6.2(Amendment)",
+      "text_hash": "a27eb69445b02bed",
+      "axis_cap": 5,
+      "axes": [
+        "regulatory framework applicability",
+        "jurisdiction-specific legal authority",
+        "statutory compliance scope",
+        "governing law specification",
+        "legal jurisdiction delineation"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 7",
+      "text_hash": "d29d312f42127be0",
+      "axis_cap": 5,
+      "axes": [
+        "board oversight of open finance arrangements",
+        "senior management accountability for open finance",
+        "operational resilience in open finance",
+        "governance framework for open finance participation",
+        "cybersecurity and data security in open finance"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 7(b)(c)(d)(e)(f)(g)",
+      "text_hash": "97f431d701b82c76",
+      "axis_cap": 5,
+      "axes": [
+        "open finance governance escalation",
+        "board-level issue reporting requirements",
+        "information security breach notification",
+        "customer data confidentiality safeguards",
+        "material risk escalation thresholds"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 8",
+      "text_hash": "d981ce4ca1acf005",
+      "axis_cap": 5,
+      "axes": [
+        "open finance platform participation",
+        "data provider role eligibility",
+        "data consumer role eligibility",
+        "platform operator requirements",
+        "financial services provider participation conditions"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 2(a)",
+      "text_hash": "6e1013a35fec6f27",
+      "axis_cap": 5,
+      "axes": [
+        "customer-directed data request mechanisms",
+        "machine-readable data exchange standardization",
+        "third-party data provider integration",
+        "alternative document submission methods",
+        "customer onboarding and due diligence data collection"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 4",
+      "text_hash": "f94d9b0d7a845929",
+      "axis_cap": 5,
+      "axes": [
+        "aggregated account view functionality",
+        "open finance data consumer interface design",
+        "financial inclusion accessibility standards",
+        "cross-provider data display requirements",
+        "digital accessibility for underserved populations"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 9",
+      "text_hash": "2b910fb68c62386d",
+      "axis_cap": 5,
+      "axes": [
+        "mandated financial service provider obligations timeline",
+        "open banking interface implementation deadline",
+        "document submission interface launch date",
+        "single account view interface deployment requirement",
+        "staggered compliance commencement provisions"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 5",
+      "text_hash": "8929359c1f0ea371",
+      "axis_cap": 5,
+      "axes": [
+        "customer segment exclusions",
+        "small and medium enterprise coverage",
+        "retail customer scope",
+        "credit card product exemption",
+        "applicability by customer type"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 10",
+      "text_hash": "e3b0c44298fc1c14",
+      "axis_cap": 5,
+      "axes": [
+        "anchor text definition",
+        "hyperlink text specification",
+        "link labeling standards",
+        "accessible link naming",
+        "descriptive link requirements"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 10(a)(i)(ii)(iii)(b)",
+      "text_hash": "f53b13daa200cae7",
+      "axis_cap": 5,
+      "axes": [
+        "consent bundling restrictions",
+        "tied consent prohibition",
+        "customer information disclosure conditions",
+        "coercive consent practices",
+        "necessity standard for third-party data sharing"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 6",
+      "text_hash": "e9ffab5a88dfb5ea",
+      "axis_cap": 5,
+      "axes": [
+        "third-party information disclosure consent",
+        "customer data sharing authorization",
+        "data consumer consent requirements",
+        "product service provider access controls",
+        "separate consent for data analytics partners"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 7#2",
+      "text_hash": "320c34c8c48c8d2a",
+      "axis_cap": 5,
+      "axes": [
+        "consent mechanism design for data sharing",
+        "pre-ticked consent opt-out arrangements",
+        "scope limitations on customer data disclosure",
+        "consent practices for third-party data transfers",
+        "customer consent autonomy and coercion mitigation"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 8(c)(d)",
+      "text_hash": "a3f7a76ad9046f55",
+      "axis_cap": 5,
+      "axes": [
+        "consent revocation rights",
+        "revocation process ease and accessibility",
+        "revocation notification and instruction requirements",
+        "legal and contractual disclosure exceptions",
+        "customer information disclosure consent"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 9#2",
+      "text_hash": "d57f345238cf3827",
+      "axis_cap": 5,
+      "axes": [
+        "consent mechanism validity standards",
+        "affirmative opt-out requirements",
+        "explicit customer action for consent",
+        "default consent presumption prohibition",
+        "information disclosure authorization"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 10#2",
+      "text_hash": "f6fc84c9f21c2490",
+      "axis_cap": 5,
+      "axes": [
+        "digital channel operations",
+        "internet-based service delivery",
+        "electronic transaction processing",
+        "web platform infrastructure",
+        "remote access capabilities"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 11",
+      "text_hash": "7c4325caee53cda2",
+      "axis_cap": 5,
+      "axes": [
+        "informed customer consent requirements",
+        "consent status transparency mechanisms",
+        "real-time consent tracking systems",
+        "consent revocation and expiration procedures",
+        "pre-ticked consent box restrictions"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 10.6",
+      "text_hash": "7c00aa0a78fa9a5e",
+      "axis_cap": 5,
+      "axes": [
+        "consent expiration and renewal mechanics",
+        "data access scope limitation by consent purpose",
+        "customer notification on consent expiry",
+        "data retention obligations post-consent expiration",
+        "recurring access consent validity period"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 11.2(a)(b)(c)(d)",
+      "text_hash": "03311840bcfdea70",
+      "axis_cap": 5,
+      "axes": [
+        "data retention and disposal requirements",
+        "data governance policy adequacy",
+        "privacy policy review cadence",
+        "customer information lifecycle management",
+        "operational environment risk assessment"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 11.2(a)(b)(c)(d)(a)(b)",
+      "text_hash": "04a4f19dc51ebbb0",
+      "axis_cap": 5,
+      "axes": [
+        "open finance data transmission security",
+        "customer authentication and consent procedures",
+        "data protection equivalence standards",
+        "control effectiveness monitoring cadence",
+        "technology risk management compliance"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 11.8",
+      "text_hash": "38a152fe724527ba",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider data handling standards",
+        "customer information sharing consent requirements",
+        "data privacy and security compliance obligations",
+        "service level agreement data protection terms",
+        "outsourced function information safeguarding responsibility"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 11.12",
+      "text_hash": "045ee57287804ff0",
+      "axis_cap": 5,
+      "axes": [
+        "customer data breach response procedures",
+        "incident escalation protocol",
+        "breach containment and remediation responsibility",
+        "open finance security incident management",
+        "unauthorized access mitigation framework"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 11.12(a)(b)(a)(b)(c)",
+      "text_hash": "ae513695dd3545fd",
+      "axis_cap": 5,
+      "axes": [
+        "customer complaint handling procedures",
+        "financial assistance programs",
+        "consumer redress mechanisms",
+        "grievance resolution processes",
+        "customer service infrastructure"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 12.2",
+      "text_hash": "14949cf20b9c43a1",
+      "axis_cap": 5,
+      "axes": [
+        "technology operations management for open finance",
+        "third-party service provider oversight and control",
+        "data availability integrity and confidentiality protection",
+        "cyber risk management and cybersecurity control framework",
+        "API security and external threat mitigation"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 12.4",
+      "text_hash": "3fad798175267ac4",
+      "axis_cap": 5,
+      "axes": [
+        "open finance arrangement participation",
+        "regulatory process compliance",
+        "technology risk management framework",
+        "third-party ecosystem governance",
+        "policy document incorporation by reference"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 12.5",
+      "text_hash": "3de3a1ba7926729a",
+      "axis_cap": 5,
+      "axes": [
+        "open finance platform membership obligations",
+        "API technical specification compliance",
+        "system uptime and availability requirements",
+        "operational resilience technology review",
+        "user journey design standards"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 12.5(a)(b)(c)",
+      "text_hash": "d44e9699522b5346",
+      "axis_cap": 5,
+      "axes": [
+        "active user threshold",
+        "e-money network operator classification",
+        "eligible institution size metric",
+        "user base measurement methodology",
+        "network-based e-money service scope"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 12.5(a)(b)(c)(a)(b)",
+      "text_hash": "16070aee6fcec1e8",
+      "axis_cap": 5,
+      "axes": [
+        "account balance measurement",
+        "current liability quantification",
+        "outstanding principal tracking",
+        "account valuation methodology",
+        "balance reporting standard"
+      ]
+    },
+    {
+      "anchor_id": "ed-open-finance-2025 14",
+      "text_hash": "b66100d54c81b466",
+      "axis_cap": 5,
+      "axes": [
+        "data provider commencement timeline",
+        "customer segment inclusion requirements",
+        "small and medium enterprise coverage",
+        "individual customer data sharing",
+        "phased implementation effective date"
+      ]
+    }
+  ]
+}

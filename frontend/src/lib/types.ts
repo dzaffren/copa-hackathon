@@ -231,7 +231,22 @@ export interface NodeDetail {
   first_order_neighbours: NeighbourRef[];
   second_order_neighbours: Placeholder;
   recent_activity: RecentActivity[];
-  concepts: Placeholder | ConceptsAvailable;
+  /** The nine-field regulatory profile. Formerly served as `concepts`; renamed
+   *  when `concepts` was repurposed for extracted axes. */
+  metadata: Placeholder | ConceptsAvailable;
+  /** The document's extracted topics, shown as pills. `not_extracted` (with an
+   *  empty list) is the expected state until the drafter extracts them. */
+  concepts: NodeConcepts;
+}
+
+export type NodeConcepts =
+  | { status: "extracted"; axes: string[] }
+  | { status: "not_extracted"; axes: [] };
+
+export interface ExtractConceptsResponse {
+  node_id: string;
+  concepts: NodeConcepts;
+  recent_activity: RecentActivity[];
 }
 
 export interface EdgeEndpoint {
@@ -256,6 +271,11 @@ export interface CreateNodeEdge {
   edge_type: EdgeType;
 }
 
+/** How an attached document is broken into citable passages. Declared by the
+ *  drafter, never inferred — a wrong guess chops a document into useless
+ *  passages. `structured-rules` only suits numbered BNM policies. */
+export type DocClass = "structured-rules" | "semi-structured" | "prose";
+
 export interface CreateNodeRequest {
   node_type: NodeType;
   title: string;
@@ -265,7 +285,19 @@ export interface CreateNodeRequest {
   edges: CreateNodeEdge[];
   /** Opt out of the server-side URL download + ingest of `source_url`. */
   skip_ingest?: boolean;
+  /** Required when an attachment is sent; the server rejects a file without it. */
+  doc_class?: DocClass;
 }
+
+export interface CreateEdgeRequest {
+  source_node_id: string;
+  target_node_id: string;
+  edge_type: EdgeType;
+}
+
+/** The persisted edge. `source`/`target` may be swapped relative to the request:
+ *  a task endpoint is always stored as the source (edges read task → anchor). */
+export type CreateEdgeResponse = CreatedEdge;
 
 export interface CreatedEdge {
   id: string;
@@ -280,6 +312,20 @@ export interface CreateNodeResponse {
   node_type: NodeType;
   title: string;
   created_edges: CreatedEdge[];
+  /** Present only when a document was attached and chunked. */
+  document_id?: string;
+  doc_class?: DocClass;
+  anchor_count?: number;
+}
+
+export interface DeleteNodeResponse {
+  id: string;
+  /** Ids of the edges removed with the node — their findings went too. */
+  removed_edges: string[];
+}
+
+export interface DeleteEdgeResponse {
+  id: string;
 }
 
 export interface AnalyzeResponse {
@@ -473,10 +519,7 @@ export interface CrossLinkEnd {
  *  a conflict, `differs-on` divergent, `goes-beyond`/`silent-on` an overlap,
  *  and only `aligns-with` aligned. Derived server-side (engine/cross_intel.py). */
 export type RelationshipClassification =
-  | "conflict"
-  | "divergent"
-  | "overlap"
-  | "aligned";
+  "conflict" | "divergent" | "overlap" | "aligned";
 
 export type RiskLevel = "high" | "medium" | "low";
 
@@ -561,12 +604,7 @@ export type LinkageStatus =
 
 /** The transition verbs the API accepts. */
 export type LinkageAction =
-  | "claim"
-  | "submit"
-  | "pick_up"
-  | "approve"
-  | "reject"
-  | "request_changes";
+  "claim" | "submit" | "pick_up" | "approve" | "reject" | "request_changes";
 
 export interface LinkageComment {
   author: Person;

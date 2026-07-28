@@ -17,7 +17,7 @@ from engine.config import REPO_ROOT
 def _make_client(tmp_path):
     dst = tmp_path / "workstreams"
     shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
-    return TestClient(create_app(workstreams_dir=dst, analyze_delay=0)), dst
+    return TestClient(create_app(workstreams_dir=dst)), dst
 
 
 def test_supervisory_letter_is_a_first_class_node_type_with_a_profile(tmp_path):
@@ -26,7 +26,9 @@ def test_supervisory_letter_is_a_first_class_node_type_with_a_profile(tmp_path):
         "/api/workstreams/rmit-v2-2025/nodes/bnm-supervisory-letter-rmit-2025"
     ).json()
     assert body["node_type"] == "supervisory-letter"
-    concepts = body["concepts"]
+    # The nine-field regulatory profile now lands under `metadata`; `concepts`
+    # carries extracted axes.
+    concepts = body["metadata"]
     assert concepts["status"] == "available"
     assert "RMiT" in concepts["keywords"]
     assert concepts["applicability"].startswith("Financial institutions")
@@ -43,7 +45,7 @@ def test_new_concept_fields_are_present_for_every_enriched_document(tmp_path):
         ("open-finance-ed", "of-ed-2025"),
         ("opres-v2", "opres-pd-v0-3"),
     ]:
-        concepts = client.get(f"/api/workstreams/{ws}/nodes/{node}").json()["concepts"]
+        concepts = client.get(f"/api/workstreams/{ws}/nodes/{node}").json()["metadata"]
         assert concepts["status"] == "available"
         assert "legal_basis" in concepts
         assert "ismp_classification" in concepts

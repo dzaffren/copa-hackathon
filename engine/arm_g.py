@@ -48,6 +48,7 @@ import logging
 import re
 import time
 from math import ceil
+from pathlib import Path
 from typing import Any, Optional
 
 from engine.anchors import Anchor, AnchorIndex
@@ -131,9 +132,14 @@ def _axis_cap(text: str) -> int:
     return min(12, max(5, ceil(len(text) / 400)))
 
 
-def _load_axes_cache(document_id: str) -> dict:
-    """Load a document's axes cache, or an empty scaffold when none exists."""
-    path = AXES_DIR / f"axes-{document_id}.json"
+def _load_axes_cache(document_id: str, axes_dir: Optional[Path] = None) -> dict:
+    """Load a document's axes cache, or an empty scaffold when none exists.
+
+    `axes_dir` defaults to the module-level `AXES_DIR` so the experiment runner
+    and `scripts/run_finder_trace.py` keep their existing location; the
+    Workstream Brain routes pass the per-workstream `axes/` dir instead.
+    """
+    path = (axes_dir or AXES_DIR) / f"axes-{document_id}.json"
     if path.exists():
         return json.loads(path.read_text(encoding="utf-8"))
     return {
@@ -143,9 +149,12 @@ def _load_axes_cache(document_id: str) -> dict:
     }
 
 
-def _write_axes_cache(document_id: str, cache: dict) -> None:
-    AXES_DIR.mkdir(parents=True, exist_ok=True)
-    path = AXES_DIR / f"axes-{document_id}.json"
+def _write_axes_cache(
+    document_id: str, cache: dict, axes_dir: Optional[Path] = None
+) -> None:
+    target = axes_dir or AXES_DIR
+    target.mkdir(parents=True, exist_ok=True)
+    path = target / f"axes-{document_id}.json"
     path.write_text(
         json.dumps(cache, indent=2, ensure_ascii=False),
         encoding="utf-8",
@@ -186,6 +195,7 @@ def extract_axes_for_document(
     anchor_index: AnchorIndex,
     document_id: str,
     deployment: str = EXTRACTION_DEPLOYMENT,
+    axes_dir: Optional[Path] = None,
 ) -> dict[str, list[str]]:
     """Stage 1: extract per-anchor axes for one document, honouring the cache.
 
@@ -193,10 +203,14 @@ def extract_axes_for_document(
     anchor text AND its ``axis_cap`` matches the current cap — a change in
     either forces re-extraction. The refreshed cache is written back to disk.
 
+    ``axes_dir`` selects where that cache lives; it defaults to the module-level
+    ``AXES_DIR`` (the experiment location) and the Workstream Brain routes pass
+    the per-workstream ``axes/`` dir so a workstream's cache travels with it.
+
     Returns ``{anchor_id: [axis, ...]}`` for every anchor in the document.
     """
     anchors = anchor_index.by_document(document_id)
-    cache = _load_axes_cache(document_id)
+    cache = _load_axes_cache(document_id, axes_dir)
     cached_by_id = {entry["anchor_id"]: entry for entry in cache["anchors"]}
 
     new_entries: list[dict] = []
@@ -236,7 +250,7 @@ def extract_axes_for_document(
 
     cache["anchors"] = new_entries
     cache["model"] = deployment
-    _write_axes_cache(document_id, cache)
+    _write_axes_cache(document_id, cache, axes_dir)
     logger.info(
         "%s: %d anchors, %d cache hits, %d extraction calls",
         document_id,
@@ -922,6 +936,7 @@ def run_arm_g(
     doc_a: str,
     doc_b: str,
     signal: str = "cosine",
+    axes_dir: Optional[Path] = None,
 ) -> dict[str, Any]:
     """Run the six-stage Arm G pipeline and return a result dict.
 
@@ -931,6 +946,9 @@ def run_arm_g(
         doc_b: document-B identifier (the "their side").
         signal: retrieval method — ``"cosine"`` (default, auto-falls-back to
             BM25 when embeddings are unavailable) or ``"bm25"`` (forced).
+        axes_dir: where stage 1's axis cache lives. Defaults to ``AXES_DIR``;
+            the workstream analyze route passes that workstream's ``axes/`` dir
+            so a cache warmed by "Extract concepts" is reused here.
 
     Returns a dict with ``connections``, ``unsupported``, and a ``trace``
     sub-dict holding ``retrieval_candidates``, ``same_topic_finder_output``,
@@ -942,8 +960,8 @@ def run_arm_g(
     start = time.time()
 
     # Stage 1 — axis extraction (small model, cached).
-    axes_a = extract_axes_for_document(anchor_index, doc_a)
-    axes_b = extract_axes_for_document(anchor_index, doc_b)
+    axes_a = extract_axes_for_document(anchor_index, doc_a, axes_dir=axes_dir)
+    axes_b = extract_axes_for_document(anchor_index, doc_b, axes_dir=axes_dir)
 
     # Stage 2 — same-topic retrieval (no model).
     candidates = retrieve(axes_a, axes_b, signal=signal)

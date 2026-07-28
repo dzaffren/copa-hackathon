@@ -26,6 +26,7 @@ fixtures derive from public BNM documents.
 
 import json
 import re
+import tempfile
 from datetime import datetime, timezone
 from html import unescape
 from pathlib import Path
@@ -34,11 +35,16 @@ from typing import Any, Optional, Union
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
-from engine.anchors import AnchorIndex
+from engine.anchors import AnchorIndex, segment
+from engine.arm_g import extract_axes_for_document as _default_extract_axes
 from engine.arm_g import run_arm_g as _run_arm_g
 from engine.clauses import load_clause_index
 from engine.connections import find_connections as _default_find_connections
-from engine.ingest import UnreadableDocumentError, ingest_from_url
+from engine.ingest import (
+    UnreadableDocumentError,
+    ingest_document,
+    ingest_from_url,
+)
 from engine.copilot import copilot_reply as _default_copilot_reply
 from engine.copilot import copilot_reply_stream as _default_copilot_reply_stream
 from engine.config import REPO_ROOT
@@ -52,6 +58,7 @@ from engine import (
     linkage_review,
     tasks,
     workstreams,
+    ws_anchors,
 )
 
 # The Workstream Brain fixture store (Task 1): one directory per workstream, each
@@ -311,11 +318,104 @@ def _ws_error(
     return JSONResponse(status_code=status_code, content=content)
 
 
+def _ws_axes_dir(workstreams_dir: Path, workstream_id: str) -> Path:
+    """Where a workstream's axis cache lives — beside its graph and findings, so
+    a workstream prepared ahead of a demo travels with its concepts."""
+    return Path(workstreams_dir) / workstream_id / "axes"
+
+
+def _extracted_axes(
+    workstreams_dir: Path, workstream_id: str, document_id: str
+) -> Optional[list[str]]:
+    """The deduped union of a document's cached axes, in first-seen order.
+
+    Returns `None` when no axis cache exists for the document — "not extracted
+    yet" is the common, expected case and is not an error.
+    """
+    path = _ws_axes_dir(workstreams_dir, workstream_id) / f"axes-{document_id}.json"
+    if not path.exists():
+        return None
+    cache = json.loads(path.read_text(encoding="utf-8"))
+    seen: dict[str, None] = {}
+    for entry in cache.get("anchors", []):
+        for axis in entry.get("axes", []):
+            seen.setdefault(axis, None)
+    return list(seen)
+
+
+def _node_concepts_block(
+    workstreams_dir: Path, workstream_id: str, node_id: str
+) -> dict[str, Any]:
+    """The node-detail `concepts` block: extracted axis pills, or an explicit
+    `not_extracted` with an empty list so the panel renders an empty section
+    rather than an error."""
+    axes = _extracted_axes(workstreams_dir, workstream_id, node_id)
+    if axes is None:
+        return {"status": "not_extracted", "axes": []}
+    return {"status": "extracted", "axes": axes}
+
+
+async def _parse_node_create(
+    request: Request,
+) -> tuple[Optional[dict[str, Any]], Any, bool]:
+    """Read an add-node request in either supported shape.
+
+    Returns `(body, upload, is_form)`:
+    - a form body (`multipart/form-data`, or urlencoded when a client sends the
+      `payload` part with no file) → the JSON `payload` part parsed to a dict,
+      the single `attachment` file (or `None` when absent), and `True`.
+    - anything else → the plain JSON body, `None`, and `False`.
+
+    `is_form` lets the caller demand an attachment on the form path — a form
+    POST is the chunking screen's shape, so a missing file there is an error
+    rather than a legacy no-document add.
+
+    `body` is `None` when the payload is absent or not a JSON object, which the
+    caller reports as a malformed request.
+    """
+    content_type = request.headers.get("content-type", "")
+    if content_type.startswith("multipart/form-data") or content_type.startswith(
+        "application/x-www-form-urlencoded"
+    ):
+        form = await request.form()
+        raw = form.get("payload")
+        upload = form.get("attachment")
+        # A text part named `attachment` is not a file — treat only real uploads
+        # (which carry `.read()`) as an attachment.
+        if upload is not None and not hasattr(upload, "read"):
+            upload = None
+        if not isinstance(raw, str):
+            return None, upload, True
+        try:
+            body = json.loads(raw)
+        except json.JSONDecodeError:
+            return None, upload, True
+        return (body if isinstance(body, dict) else None), upload, True
+    body = await request.json()
+    return (body if isinstance(body, dict) else None), None, False
+
+
+async def _ingest_upload(upload: Any, converter: Any) -> str:
+    """Convert an uploaded PDF/DOCX to markdown.
+
+    The bytes land on a tempfile with the upload's suffix (MarkItDown dispatches
+    on extension) and are always unlinked, mirroring `ingest.ingest_from_url`.
+    Raises `UnreadableDocumentError` when conversion yields no usable text.
+    """
+    suffix = Path(getattr(upload, "filename", "") or "").suffix.lower() or ".pdf"
+    data = await upload.read()
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+        tmp.write(data)
+        tmp_path = Path(tmp.name)
+    try:
+        return ingest_document(tmp_path, converter)
+    finally:
+        tmp_path.unlink(missing_ok=True)
+
+
 # --- Copilot request parsing (shared by the blocking + streaming routes) ----
 
-_BLOCK_BREAK_RE = re.compile(
-    r"(?i)</(?:p|div|h1|h2|h3|li|ul|ol|blockquote)>|<br\s*/?>"
-)
+_BLOCK_BREAK_RE = re.compile(r"(?i)</(?:p|div|h1|h2|h3|li|ul|ol|blockquote)>|<br\s*/?>")
 _TAG_RE = re.compile(r"<[^>]+>")
 
 
@@ -348,7 +448,8 @@ def _parse_copilot_request(
     intent = body.get("intent")
     if intent not in copilot.INTENTS:
         return _ws_error(
-            400, "INVALID_INTENT",
+            400,
+            "INVALID_INTENT",
             f"intent must be one of {list(copilot.INTENTS)}, got {intent!r}",
         )
     message = body.get("message")
@@ -395,24 +496,40 @@ def _load_workstream_graph(
     return json.loads(graph_path.read_text(encoding="utf-8"))
 
 
-def _make_default_run_arm_g(artifacts_dir: Path) -> Any:
-    """Build the default `run_arm_g_fn` adapter bound to an `artifacts_dir`.
+def _make_default_run_arm_g(
+    artifacts_dir: Path,
+    workstreams_dir: Optional[Path] = None,
+    workstream_id: Optional[str] = None,
+) -> Any:
+    """Build the default `run_arm_g_fn` adapter for one analyze call.
 
-    The adapter loads the persisted `AnchorIndex` from
-    `data/artifacts/anchor-index.json` (under `artifacts_dir`) once per call and
-    runs the six-stage Arm G pipeline on the pair. Its signature is
-    `(src_doc, tgt_doc) -> {"connections", "unsupported", "trace"}` so the route
-    can call it exactly like the old finder minus the clause index — Arm G reads
-    clause text from the anchor index instead. Stage 1 builds the axis cache on
-    demand, so no pre-existing cache is required (first-run auto-population).
+    Signature stays `(src_doc, tgt_doc) -> {"connections", "unsupported",
+    "trace"}` so every injected stub keeps working — the workstream context is
+    bound here instead of widening the seam.
+
+    The anchor index comes from the WORKSTREAM's own per-node anchor files
+    (`ws_anchors.build_index`), so documents a drafter added and chunked in-app
+    are analysable; the shared `data/artifacts/anchor-index.json` is only the
+    fallback for a workstream that has no anchors of its own (the legacy,
+    offline-built path). Stage 1's axis cache is likewise pointed at the
+    workstream's `axes/` dir, so a cache warmed by "Extract concepts" is reused
+    rather than re-derived.
     """
 
     def _default_run_arm_g(src_doc: str, tgt_doc: str) -> dict[str, Any]:
-        raw = json.loads(
-            (artifacts_dir / "anchor-index.json").read_text(encoding="utf-8")
-        )
-        anchor_index = AnchorIndex(raw)
-        return _run_arm_g(anchor_index, src_doc, tgt_doc)
+        anchor_index: Optional[AnchorIndex] = None
+        axes_dir: Optional[Path] = None
+        if workstreams_dir is not None and workstream_id is not None:
+            built = ws_anchors.build_index(workstreams_dir, workstream_id)
+            if len(built) > 0:
+                anchor_index = built
+                axes_dir = _ws_axes_dir(workstreams_dir, workstream_id)
+        if anchor_index is None:
+            raw = json.loads(
+                (artifacts_dir / "anchor-index.json").read_text(encoding="utf-8")
+            )
+            anchor_index = AnchorIndex(raw)
+        return _run_arm_g(anchor_index, src_doc, tgt_doc, axes_dir=axes_dir)
 
     return _default_run_arm_g
 
@@ -424,6 +541,8 @@ def create_app(
     run_arm_g_fn: Any = None,
     copilot_reply_fn: Any = _default_copilot_reply,
     copilot_stream_fn: Any = _default_copilot_reply_stream,
+    converter: Any = None,
+    extract_axes_fn: Any = _default_extract_axes,
 ) -> FastAPI:
     """Construct the Workstream Brain read API against injected dependencies.
 
@@ -443,8 +562,11 @@ def create_app(
         run_arm_g_fn: the Arm G pipeline called by the `analyze` route —
             `(src_doc_id, tgt_doc_id) -> {"connections": [...], "unsupported":
             [...], "trace": {...}}`. Injectable so tests stub the pipeline; no
-            live model call happens in CI. Defaults to an adapter that loads the
-            anchor index from `artifacts_dir` and runs `engine.arm_g.run_arm_g`.
+            live model call happens in CI. When omitted, the analyze route builds
+            a workstream-bound adapter per call: the anchor index comes from that
+            workstream's own per-node anchors (falling back to `artifacts_dir`'s
+            shared index only when it has none), with stage 1's axis cache
+            pointed at the workstream's `axes/` dir.
         copilot_reply_fn: the live call behind the `copilot` route — see
             `engine.copilot.copilot_reply`'s signature. Injectable so tests
             stub the model; no live model call happens in CI. Defaults to
@@ -453,6 +575,15 @@ def create_app(
             route — `(**kwargs) -> Generator[str]` yielding SSE frames.
             Injectable so tests stub it; defaults to
             `engine.copilot.copilot_reply_stream`.
+        extract_axes_fn: the axis extractor behind the `extract-concepts` route —
+            `(anchor_index, document_id, axes_dir=...) -> {anchor_id: [axis]}`.
+            Injectable so tests stub it; no live model call happens in CI.
+            Defaults to `engine.arm_g.extract_axes_for_document`.
+        converter: the document-to-markdown converter used when an add-node
+            request carries a file attachment — anything with
+            `.convert(path) -> result`. Injectable so tests stub ingest with no
+            network or Azure credentials; `None` lets `engine.ingest` build its
+            default (Document Intelligence when configured, else MarkItDown).
 
     Returns:
         A configured `FastAPI` app. No network, credentials, or build artifacts
@@ -473,10 +604,11 @@ def create_app(
 
     workstreams_dir = Path(workstreams_dir)
     artifacts_dir = Path(artifacts_dir)
-    # Default the Arm G seam to an adapter bound to this app's artifacts_dir;
-    # tests pass their own stub. `find_connections_fn` stays wired for rollback.
-    if run_arm_g_fn is None:
-        run_arm_g_fn = _make_default_run_arm_g(artifacts_dir)
+    # An explicitly injected seam wins; otherwise the analyze route builds a
+    # WORKSTREAM-BOUND adapter per call (it needs the workstream_id to find that
+    # workstream's anchors and axis cache). `find_connections_fn` stays wired
+    # for rollback.
+    injected_run_arm_g_fn = run_arm_g_fn
 
     # --- Workstream Brain — Task Screen routes (Task 1) --------------------
     # Read-only projections over a per-workstream `graph.json` + `findings/`
@@ -919,7 +1051,12 @@ def create_app(
             )
         ws_meta = workstreams.load_workstream(workstreams_dir, workstream_id)
         task_id = workstreams.primary_task_id(ws_meta, ws_graph)
-        nodes, edges = workstreams.primary_subgraph(ws_graph, task_id)
+        # The canvas renders the WHOLE workstream, not a one-hop projection
+        # around the focal node: a drafter can chain documents (focal → ED →
+        # the sources that ED references), and clipping to one hop made every
+        # document beyond the first invisible. `primary_task_id` still marks
+        # which node the view centres on.
+        nodes, edges = ws_graph.get("nodes", []), ws_graph.get("edges", [])
         out_nodes = [
             {
                 "id": n["id"],
@@ -967,14 +1104,10 @@ def create_app(
                 "NODE_NOT_FOUND",
                 f"Node {node_id} not found in workstream {workstream_id}",
             )
-        ws_meta = workstreams.load_workstream(workstreams_dir, workstream_id)
-        task_id = workstreams.primary_task_id(ws_meta, ws_graph)
-        sub_nodes, sub_edges = workstreams.primary_subgraph(ws_graph, task_id)
-        sub_ids = {n["id"] for n in sub_nodes}
-        # A node shown on the canvas takes its neighbours from the primary
-        # subgraph (so an anchor shared with a sibling draft still lists only
-        # this draft); a node outside it falls back to the whole graph.
-        edge_scope = sub_edges if node_id in sub_ids else ws_graph.get("edges", [])
+        # Neighbours are read from the whole workstream, matching the canvas —
+        # a document chained off another document is a real neighbour and must
+        # be listed.
+        edge_scope = ws_graph.get("edges", [])
         first_order = [
             {
                 "id": nid,
@@ -985,6 +1118,11 @@ def create_app(
             if nid in all_by_id
         ]
         node_concepts = concepts.load_concepts(workstreams_dir, workstream_id, node_id)
+        # Four ordered blocks: neighbours → recent activity → metadata → concepts.
+        # `metadata` is the nine-field regulatory profile (formerly served under
+        # `concepts`); `concepts` now carries the extracted axis pills. The two
+        # are distinct: metadata is the document's regulatory identity, concepts
+        # are what it talks about.
         return {
             "id": node["id"],
             "node_type": node.get("node_type"),
@@ -996,12 +1134,8 @@ def create_app(
             "ismp_classification": node.get("ismp_classification"),
             "pursuant_to": node.get("pursuant_to"),
             "first_order_neighbours": first_order,
-            "second_order_neighbours": {
-                "status": "placeholder",
-                "message": "N/A in demo",
-            },
             "recent_activity": node.get("recent_activity", []),
-            "concepts": (
+            "metadata": (
                 {"status": "available", **node_concepts}
                 if node_concepts is not None
                 else {
@@ -1009,6 +1143,162 @@ def create_app(
                     "message": "Concept extraction not enabled in MVP1",
                 }
             ),
+            "concepts": _node_concepts_block(workstreams_dir, workstream_id, node_id),
+            # Retained after the four ordered blocks — still a placeholder
+            # disclosure, and dropping it would churn five consumers for no
+            # gain in this story.
+            "second_order_neighbours": {
+                "status": "placeholder",
+                "message": "N/A in demo",
+            },
+        }
+
+    @app.delete("/api/workstreams/{workstream_id}/nodes/{node_id}")
+    def delete_workstream_node(workstream_id: str, node_id: str) -> Any:
+        """Remove a node and everything that only existed because of it.
+
+        Cascades on purpose: the node, every edge touching it, those edges'
+        findings, and the node's own anchors and axis cache. Half-deleting would
+        leave findings citing a document that is gone, or anchors belonging to no
+        node — states no read path can render honestly.
+
+        The focal task node is refused: `primary_task_id` points at it and it is
+        the one legal target for the first document added, so removing it would
+        strand the workstream.
+        """
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        node = next((n for n in ws_graph.get("nodes", []) if n["id"] == node_id), None)
+        if node is None:
+            return _ws_error(
+                404,
+                "NODE_NOT_FOUND",
+                f"Node {node_id} not found in workstream {workstream_id}",
+            )
+        ws_meta = workstreams.load_workstream(workstreams_dir, workstream_id)
+        if node_id == workstreams.primary_task_id(ws_meta, ws_graph):
+            return _ws_error(
+                409,
+                "FOCAL_NODE_PROTECTED",
+                "The working draft is this workstream's anchor and cannot be "
+                "deleted. Delete the documents around it instead.",
+            )
+
+        removed_edges = workstreams.remove_node(ws_graph, node_id)
+        for edge_id in removed_edges:
+            workstreams.findings_path(workstreams_dir, workstream_id, edge_id).unlink(
+                missing_ok=True
+            )
+        document_id = node.get("document_id") or node_id
+        ws_anchors.anchors_path(workstreams_dir, workstream_id, node_id).unlink(
+            missing_ok=True
+        )
+        ws_anchors.source_path(workstreams_dir, workstream_id, node_id).unlink(
+            missing_ok=True
+        )
+        (
+            _ws_axes_dir(workstreams_dir, workstream_id) / f"axes-{document_id}.json"
+        ).unlink(missing_ok=True)
+        workstreams.save_graph(workstreams_dir, workstream_id, ws_graph)
+        return {
+            "id": node_id,
+            "removed_edges": removed_edges,
+        }
+
+    @app.delete("/api/workstreams/{workstream_id}/edges/{edge_id}")
+    def delete_workstream_edge(workstream_id: str, edge_id: str) -> Any:
+        """Remove one linkage, leaving both documents in place.
+
+        The edge's findings go with it — they describe a relationship that no
+        longer exists — but each document keeps its own passages and concepts,
+        so the pair can be re-connected and re-analysed later.
+        """
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        if not workstreams.remove_edge(ws_graph, edge_id):
+            return _ws_error(
+                404,
+                "EDGE_NOT_FOUND",
+                f"Edge {edge_id} not found in workstream {workstream_id}",
+            )
+        # Absent findings is the common case (an unanalysed edge), not an error.
+        workstreams.findings_path(workstreams_dir, workstream_id, edge_id).unlink(
+            missing_ok=True
+        )
+        workstreams.save_graph(workstreams_dir, workstream_id, ws_graph)
+        return {"id": edge_id}
+
+    @app.post("/api/workstreams/{workstream_id}/nodes/{node_id}/extract-concepts")
+    def extract_node_concepts(workstream_id: str, node_id: str) -> Any:
+        """Derive a chunked document's concepts (axes) from its anchors.
+
+        SYNCHRONOUS by design: the drafter waits while it runs (one small-model
+        call per anchor), because a queue plus job status is machinery this demo
+        does not need. The per-anchor cache in `arm_g` makes a re-run on
+        unchanged anchors a hit — no model call, same axes — so this doubles as
+        a cheap pre-warm for the analyze route's stage 1.
+
+        Every side effect (cache write, activity entry) lands only after a fully
+        successful extraction, so a failure leaves the node exactly as it was.
+        """
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        node = next((n for n in ws_graph.get("nodes", []) if n["id"] == node_id), None)
+        if node is None:
+            return _ws_error(
+                404,
+                "NODE_NOT_FOUND",
+                f"Node {node_id} not found in workstream {workstream_id}",
+            )
+
+        index = ws_anchors.build_index(workstreams_dir, workstream_id)
+        document_id = node.get("document_id") or node_id
+        if not index.by_document(document_id):
+            return _ws_error(
+                409,
+                "NOT_SEGMENTED",
+                f"Node {node_id} has not been segmented into passages",
+            )
+
+        try:
+            extract_axes_fn(
+                index,
+                document_id,
+                axes_dir=_ws_axes_dir(workstreams_dir, workstream_id),
+            )
+        except Exception as exc:  # model / creds / unparseable reply
+            return _ws_error(
+                502, "EXTRACTION_FAILED", f"Concept extraction failed: {exc}"
+            )
+
+        # Append the activity entry only once — a cache-hit re-run must not
+        # stack duplicate "axes extracted" lines on the node.
+        activity = node.setdefault("recent_activity", [])
+        if not any(entry.get("event") == "axes extracted" for entry in activity):
+            activity.append(
+                {
+                    "event": "axes extracted",
+                    "author": directory.owner().get("name"),
+                    "at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+                }
+            )
+            workstreams.save_graph(workstreams_dir, workstream_id, ws_graph)
+
+        return {
+            "node_id": node_id,
+            "concepts": _node_concepts_block(
+                workstreams_dir, workstream_id, document_id
+            ),
+            "recent_activity": activity,
         }
 
     @app.get("/api/workstreams/{workstream_id}/edges/{edge_id}")
@@ -1064,12 +1354,38 @@ def create_app(
             return _ws_error(
                 404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
             )
-        body = await request.json()
-        if not isinstance(body, dict):
+        # Two request shapes: `multipart/form-data` (a JSON `payload` part plus a
+        # single `attachment` file — the chunking path this screen uses), and the
+        # legacy plain-JSON body (a node whose document is fetched by URL, or
+        # none at all). An attachment, when present, takes precedence for ingest.
+        body, upload, is_form = await _parse_node_create(request)
+        if body is None:
             return _ws_error(400, "EDGE_REQUIRED", "Request body must be an object")
+        # The chunking screen always posts a form with a file. A form POST that
+        # carries no file is a missing attachment, not a legacy no-document add.
+        if is_form and upload is None:
+            return _ws_error(
+                400,
+                "ATTACHMENT_REQUIRED",
+                "Attach a document to add it to the graph.",
+                field="attachment",
+            )
         problem = workstreams.validate_node_create(body)
         if problem is not None:
-            return _ws_error(*problem)
+            return _ws_error(
+                *problem,
+                field="doc_class" if problem[1] == "INVALID_DOC_CLASS" else None,
+            )
+        # An attached document must declare how to break it up — the drafter
+        # chooses; the tool never guesses (a wrong guess yields useless passages).
+        if upload is not None and "doc_class" not in body:
+            return _ws_error(
+                400,
+                "INVALID_DOC_CLASS",
+                "Choose how the document should be broken up: "
+                "structured-rules, semi-structured, or prose.",
+                field="doc_class",
+            )
         node_ids = {n["id"] for n in ws_graph.get("nodes", [])}
         for edge in body["edges"]:
             if edge["target_node_id"] not in node_ids:
@@ -1083,11 +1399,48 @@ def create_app(
         skip_ingest = body.pop("skip_ingest", False) is True
         source_url = (body.get("source_url") or "").strip()
 
-        # Auto-ingest: download the source document up front so a failure aborts
-        # the request (422) before the node is persisted. Deferring the markdown
-        # write until after add_node gives us the real, collision-suffixed id.
+        # Ingest AND segment up front, so any failure aborts the request before
+        # a node is persisted — no half-formed node, and no anchors file for a
+        # node that does not exist. The markdown write is deferred until after
+        # add_node, which is what yields the real collision-suffixed id.
         markdown: Optional[str] = None
-        if source_url and not skip_ingest:
+        anchors: Optional[list[Any]] = None
+        if upload is not None:
+            try:
+                markdown = await _ingest_upload(upload, converter)
+            except UnreadableDocumentError as exc:
+                return _ws_error(
+                    422,
+                    "INGEST_FAILED",
+                    f"The attached document could not be read; try a different "
+                    f"file ({exc}).",
+                    field="attachment",
+                )
+            doc_class = body["doc_class"]
+            # Segment against the PROSPECTIVE node id. add_node re-derives the
+            # same id from the same title against the same graph, so the anchors'
+            # document_id matches the node it lands on.
+            provisional_id = workstreams.make_node_id(
+                body.get("title", "node"), node_ids
+            )
+            try:
+                anchors = segment(provisional_id, markdown, doc_class)
+            except Exception as exc:  # UnknownDocumentIdError / segmenter failure
+                return _ws_error(
+                    422,
+                    "CHUNKING_FAILED",
+                    f"This document can't be broken up as {doc_class} — try "
+                    f"prose or semi-structured ({exc}).",
+                    field="doc_class",
+                )
+            if not anchors:
+                return _ws_error(
+                    422,
+                    "NO_PASSAGES",
+                    "The document produced no passages and can't be added.",
+                    field="attachment",
+                )
+        elif source_url and not skip_ingest:
             try:
                 markdown = ingest_from_url(source_url)
             except UnreadableDocumentError as exc:
@@ -1098,23 +1451,94 @@ def create_app(
                     field="source_url",
                 )
 
-        new_node, created = workstreams.add_node(ws_graph, body)
+        new_node, created = workstreams.add_node(
+            ws_graph, body, chunked=anchors is not None
+        )
+
+        if anchors is not None:
+            ws_anchors.save(workstreams_dir, workstream_id, new_node["id"], anchors)
 
         if markdown is not None:
-            artifact_path = Path(artifacts_dir) / f"{new_node['id']}.md"
-            artifact_path.parent.mkdir(parents=True, exist_ok=True)
-            artifact_path.write_text(markdown, encoding="utf-8")
+            # Beside the workstream's anchors, not in a flat global dir: node ids
+            # are unique only WITHIN a workstream, so two workstreams each adding
+            # a "RMiT 2025" would otherwise write the same path and clobber.
+            source = ws_anchors.source_path(
+                workstreams_dir, workstream_id, new_node["id"]
+            )
+            source.parent.mkdir(parents=True, exist_ok=True)
+            source.write_text(markdown, encoding="utf-8")
 
         workstreams.save_graph(workstreams_dir, workstream_id, ws_graph)
-        return JSONResponse(
-            status_code=201,
-            content={
-                "id": new_node["id"],
-                "node_type": new_node["node_type"],
-                "title": new_node["title"],
-                "created_edges": [{**edge, "analysed": False} for edge in created],
-            },
+        content: dict[str, Any] = {
+            "id": new_node["id"],
+            "node_type": new_node["node_type"],
+            "title": new_node["title"],
+            "created_edges": [{**edge, "analysed": False} for edge in created],
+        }
+        if anchors is not None:
+            content["document_id"] = new_node["document_id"]
+            content["doc_class"] = new_node["doc_class"]
+            content["anchor_count"] = len(anchors)
+        return JSONResponse(status_code=201, content=content)
+
+    @app.post("/api/workstreams/{workstream_id}/edges", status_code=201)
+    async def create_workstream_edge(workstream_id: str, request: Request) -> Any:
+        """Connect two nodes that are already on the canvas.
+
+        Until this route, an edge could only be declared while adding a NEW
+        node, so linking two existing documents meant removing and re-adding one
+        — destroying its passages and concepts. Drawing the link runs no
+        analysis; that stays an explicit, separate action.
+        """
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        body = await request.json()
+        if not isinstance(body, dict):
+            return _ws_error(
+                400,
+                "EDGE_REQUIRED",
+                "source_node_id, target_node_id and edge_type are required.",
+            )
+        problem = workstreams.validate_edge_create(body)
+        if problem is not None:
+            return _ws_error(*problem)
+
+        node_ids = {n["id"] for n in ws_graph.get("nodes", [])}
+        for node_id in (body["source_node_id"], body["target_node_id"]):
+            # Same-workstream only — a node from elsewhere is simply unknown here.
+            if node_id not in node_ids:
+                return _ws_error(
+                    404,
+                    "NODE_NOT_FOUND",
+                    f"Node {node_id} not found in workstream {workstream_id}",
+                )
+
+        source, target = workstreams.resolve_edge_direction(
+            ws_graph, body["source_node_id"], body["target_node_id"]
         )
+        edge_type = body["edge_type"]
+        # A duplicate is the same pair joined by the same type in the same
+        # direction; a DIFFERENT type between the pair is a legitimate second
+        # relationship and is allowed alongside.
+        if any(
+            e.get("source") == source
+            and e.get("target") == target
+            and e.get("edge_type") == edge_type
+            for e in ws_graph.get("edges", [])
+        ):
+            return _ws_error(
+                409,
+                "DUPLICATE_EDGE",
+                f"A {edge_type} connection already exists between these two "
+                f"documents.",
+            )
+
+        record = workstreams.add_edge(ws_graph, source, target, edge_type)
+        workstreams.save_graph(workstreams_dir, workstream_id, ws_graph)
+        return JSONResponse(status_code=201, content={**record, "analysed": False})
 
     @app.post("/api/workstreams/{workstream_id}/edges/{edge_id}/analyze")
     def analyze_workstream_edge(workstream_id: str, edge_id: str) -> Any:
@@ -1166,7 +1590,10 @@ def create_app(
             # so no separate preparation step is needed. Any stage failing — incl.
             # the whole-doc coverage pass — raises here, surfacing as 502 with NO
             # partial write, since save_findings runs only after a full success.
-            result = run_arm_g_fn(src_doc, tgt_doc)
+            analyze_fn = injected_run_arm_g_fn or _make_default_run_arm_g(
+                artifacts_dir, workstreams_dir, workstream_id
+            )
+            result = analyze_fn(src_doc, tgt_doc)
         except Exception as exc:  # live model / creds / network failure
             return _ws_error(
                 502,
@@ -1505,7 +1932,8 @@ def create_app(
         ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
         if ws_graph is None:
             return _ws_error(
-                404, "WORKSTREAM_NOT_FOUND",
+                404,
+                "WORKSTREAM_NOT_FOUND",
                 f"Workstream {workstream_id} not found",
             )
         node = _task_node(ws_graph, workstream_id, node_id)

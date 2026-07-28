@@ -1,12 +1,17 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { Loader2, Search, Sparkles, X } from "lucide-react";
+import { Loader2, Search, Sparkles, Trash2, X } from "lucide-react";
 
 import { AnalyzeProgressBar } from "@/components/AnalyzeProgressBar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { fetchEdgeDetail } from "@/lib/api";
+import { deleteEdge, fetchEdgeDetail } from "@/lib/api";
 import { useAnalyzeEdge } from "@/lib/hooks/useAnalyzeEdge";
 import { labelStyle, labelText } from "@/lib/labels";
 
@@ -52,6 +57,19 @@ export function EdgeDetailPanel({
   const query = useQuery({
     queryKey: ["edge", workstreamId, edgeId],
     queryFn: () => fetchEdgeDetail(workstreamId, edgeId),
+  });
+  // Two-step delete: removing a linkage also drops its findings and cannot be
+  // undone, so the first click only arms the action.
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const remove = useMutation({
+    mutationFn: () => deleteEdge(workstreamId, edgeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["workstream", workstreamId, "graph"],
+      });
+      // The linkage this panel describes is gone — close it.
+      onClose?.();
+    },
   });
   const analyze = useAnalyzeEdge(workstreamId, edgeId, {
     onSuccess: () => {
@@ -200,6 +218,50 @@ export function EdgeDetailPanel({
               </div>
             );
           })
+        )}
+      </div>
+
+      <div className="border-t border-border/60 p-4">
+        {confirmDelete ? (
+          <div className="space-y-1.5 rounded-lg border border-red-300/60 bg-red-50/60 p-2">
+            <p className="text-xs text-red-700">
+              Remove this linkage
+              {analysed ? ` and its ${edge.findings.length} finding(s)` : ""}?
+              Both documents stay — only the connection goes. This cannot be
+              undone.
+            </p>
+            <div className="flex gap-1.5">
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex-1"
+                onClick={() => setConfirmDelete(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                className="flex-1 bg-red-600 text-white hover:bg-red-700"
+                disabled={remove.isPending}
+                onClick={() => remove.mutate()}
+              >
+                {remove.isPending ? "Deleting…" : "Delete"}
+              </Button>
+            </div>
+            {remove.isError && (
+              <p role="alert" className="text-xs text-red-700">
+                Could not delete this linkage.
+              </p>
+            )}
+          </div>
+        ) : (
+          <Button
+            variant="outline"
+            className="w-full border-red-300/60 text-red-700 hover:bg-red-50"
+            onClick={() => setConfirmDelete(true)}
+          >
+            <Trash2 /> Delete linkage
+          </Button>
         )}
       </div>
     </div>

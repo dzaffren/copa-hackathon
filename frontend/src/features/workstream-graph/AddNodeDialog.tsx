@@ -12,8 +12,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { createNode } from "@/lib/api";
-import type { EdgeType, GraphNode, NodeType } from "@/lib/types";
+import { createNode, HttpError } from "@/lib/api";
+import type { DocClass, EdgeType, GraphNode, NodeType } from "@/lib/types";
 import { NODE_LEGEND, NODE_LEGEND_ORDER } from "./legend";
 
 const EDGE_TYPE_OPTIONS: EdgeType[] = [
@@ -23,9 +23,56 @@ const EDGE_TYPE_OPTIONS: EdgeType[] = [
   "parallel-to",
 ];
 
+/** The three segmenters, with the guidance a drafter needs to pick correctly.
+ *  Getting this wrong is the difference between citable passages and rubble,
+ *  which is why it is asked rather than inferred. */
+const DOC_CLASS_OPTIONS: { value: DocClass; label: string; hint: string }[] = [
+  {
+    value: "semi-structured",
+    label: "Semi-structured",
+    hint: "Headings and numbered paragraphs — most standards and papers.",
+  },
+  {
+    value: "prose",
+    label: "Prose",
+    hint: "Flowing text with no reliable numbering.",
+  },
+  {
+    value: "structured-rules",
+    label: "Structured rules",
+    hint: "Numbered BNM policy documents only (e.g. RMiT).",
+  },
+];
+
+/** Plain-language messages for the failures this form can provoke. The server's
+ *  own message is shown when it carries more detail. */
+const ERROR_COPY: Record<string, string> = {
+  ATTACHMENT_REQUIRED: "Attach a document to add it to the graph.",
+  INVALID_DOC_CLASS: "Choose how the document should be broken up.",
+  INGEST_FAILED: "The document could not be read. Try a different file.",
+  CHUNKING_FAILED:
+    "This document can't be broken up that way. Try prose or semi-structured.",
+  NO_PASSAGES: "The document produced no passages and can't be added.",
+  EDGE_REQUIRED:
+    "Connect the document to at least one node already on the canvas.",
+};
+
 interface EdgeRow {
   target_node_id: string;
   edge_type: string;
+}
+
+/** Seed the edge rows when the dialog opens.
+ *
+ *  A document must connect to at least one node already on the canvas, so on a
+ *  brand-new workstream — where the focal node is the ONLY possible target —
+ *  there is nothing to choose. Pre-filling that row means the first document can
+ *  be added without the drafter hunting for the one legal answer; with several
+ *  candidates the choice is theirs, so we seed nothing.
+ */
+function defaultEdges(nodes: GraphNode[]): EdgeRow[] {
+  if (nodes.length !== 1) return [];
+  return [{ target_node_id: nodes[0].id, edge_type: "contributes-to" }];
 }
 
 interface AddNodeDialogProps {
@@ -57,10 +104,13 @@ export function AddNodeDialog({
   const [description, setDescription] = useState("");
   const [sourceUrl, setSourceUrl] = useState("");
   const [autoIngest, setAutoIngest] = useState(true);
-  const [edges, setEdges] = useState<EdgeRow[]>([]);
+  const [edges, setEdges] = useState<EdgeRow[]>(() => defaultEdges(nodes));
+  const [attachment, setAttachment] = useState<File | null>(null);
+  const [docClass, setDocClass] = useState<DocClass>("semi-structured");
 
   const completeEdges = edges.filter((e) => e.target_node_id && e.edge_type);
-  const canSubmit = title.trim().length > 0 && completeEdges.length > 0;
+  const canSubmit =
+    title.trim().length > 0 && completeEdges.length > 0 && attachment !== null;
 
   function reset() {
     setNodeType("international-standard");
@@ -68,22 +118,29 @@ export function AddNodeDialog({
     setDescription("");
     setSourceUrl("");
     setAutoIngest(true);
-    setEdges([]);
+    setEdges(defaultEdges(nodes));
+    setAttachment(null);
+    setDocClass("semi-structured");
   }
 
   const mutation = useMutation({
     mutationFn: () =>
-      createNode(workstreamId, {
-        node_type: nodeType,
-        title: title.trim(),
-        description: description.trim() || null,
-        source_url: sourceUrl.trim() || null,
-        edges: completeEdges.map((e) => ({
-          target_node_id: e.target_node_id,
-          edge_type: e.edge_type as EdgeType,
-        })),
-        ...(autoIngest ? {} : { skip_ingest: true }),
-      }),
+      createNode(
+        workstreamId,
+        {
+          node_type: nodeType,
+          title: title.trim(),
+          description: description.trim() || null,
+          source_url: sourceUrl.trim() || null,
+          doc_class: docClass,
+          edges: completeEdges.map((e) => ({
+            target_node_id: e.target_node_id,
+            edge_type: e.edge_type as EdgeType,
+          })),
+          ...(autoIngest ? {} : { skip_ingest: true }),
+        },
+        attachment,
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["workstream", workstreamId, "graph"],
@@ -92,6 +149,13 @@ export function AddNodeDialog({
       onOpenChange(false);
     },
   });
+
+  const error = mutation.error;
+  const errorCode = error instanceof HttpError ? error.code : undefined;
+  const errorField = error instanceof HttpError ? error.field : undefined;
+  const errorMessage = error
+    ? ((errorCode && ERROR_COPY[errorCode]) ?? error.message)
+    : null;
 
   const addRow = () =>
     setEdges((rows) => [...rows, { target_node_id: "", edge_type: "" }]);
@@ -102,6 +166,17 @@ export function AddNodeDialog({
       rows.map((r, idx) => (idx === i ? { ...r, ...patch } : r)),
     );
 
+  // Seed the pre-filled edge row when the dialog OPENS, not at mount: the page
+  // keeps this dialog mounted permanently, so at mount the graph query has not
+  // resolved and `nodes` is still empty. `seededFor` makes it fire once per
+  // opening without clobbering rows the drafter has since edited.
+  const [seededFor, setSeededFor] = useState<string | null>(null);
+  if (open && seededFor !== workstreamId) {
+    setSeededFor(workstreamId);
+    if (edges.length === 0) setEdges(defaultEdges(nodes));
+  }
+  if (!open && seededFor !== null) setSeededFor(null);
+
   return (
     <Dialog
       open={open}
@@ -110,7 +185,10 @@ export function AddNodeDialog({
         onOpenChange(o);
       }}
     >
-      <DialogContent className="glass max-h-[90vh] max-w-lg overflow-y-auto">
+      {/* The dialog is a column: header and footer stay put while only the body
+          scrolls. Scrolling the whole DialogContent let a tall form (node type
+          grid + method picker + edge rows) push its own footer out of the box. */}
+      <DialogContent className="glass flex max-h-[90vh] max-w-lg flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle>Add node</DialogTitle>
           <DialogDescription>
@@ -119,7 +197,7 @@ export function AddNodeDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
           <div>
             <span className="mb-1.5 block text-sm font-medium">Node type</span>
             <div
@@ -212,11 +290,56 @@ export function AddNodeDialog({
             <span className="mb-1 block font-medium">Attachment</span>
             <input
               type="file"
-              className="block text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-sm file:text-foreground"
+              className={cn(
+                "block text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-sm file:text-foreground",
+                errorField === "attachment" && "text-red-500",
+              )}
               aria-label="Attachment"
               accept=".pdf,.docx"
+              onChange={(e) => setAttachment(e.target.files?.[0] ?? null)}
             />
           </label>
+
+          <div>
+            <span className="mb-1.5 block text-sm font-medium">
+              Breaking-up method
+            </span>
+            <div
+              role="radiogroup"
+              aria-label="Breaking-up method"
+              className={cn(
+                "space-y-1.5",
+                errorField === "doc_class" && "rounded-lg ring-1 ring-red-400",
+              )}
+            >
+              {DOC_CLASS_OPTIONS.map((option) => {
+                const selected = option.value === docClass;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    aria-label={option.value}
+                    onClick={() => setDocClass(option.value)}
+                    className={cn(
+                      "block w-full rounded-lg border px-3 py-2 text-left transition",
+                      selected
+                        ? "border-primary/60 bg-primary/10 ring-1 ring-primary/40"
+                        : "border-border/60 hover:bg-accent/50",
+                    )}
+                  >
+                    <span className="block text-xs font-medium">
+                      {option.label}
+                    </span>
+                    <span className="block text-[11px] text-muted-foreground">
+                      {option.hint}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           <div>
             <div className="mb-1.5 flex items-center justify-between">
@@ -281,6 +404,12 @@ export function AddNodeDialog({
               </ul>
             )}
           </div>
+
+          {errorMessage && (
+            <p role="alert" className="text-sm text-red-500">
+              {errorMessage}
+            </p>
+          )}
         </div>
 
         <DialogFooter>
@@ -300,11 +429,7 @@ export function AddNodeDialog({
             disabled={!canSubmit || mutation.isPending}
             onClick={() => mutation.mutate()}
           >
-            {mutation.isPending
-              ? sourceUrl.trim() && autoIngest
-                ? "Downloading & ingesting…"
-                : "Adding…"
-              : "Add to graph"}
+            {mutation.isPending ? "Chunking…" : "Add to graph"}
           </Button>
         </DialogFooter>
       </DialogContent>

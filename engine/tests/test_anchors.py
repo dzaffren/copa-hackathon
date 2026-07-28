@@ -185,12 +185,29 @@ def test_structured_rules_uses_policy_short_name_for_anchor_id():
     assert not anchors[0]["anchor_id"].startswith("rmit ")
 
 
-def test_structured_rules_raises_for_unknown_document_id():
-    # A document_id with no entry in POLICY_SHORT_NAMES must raise a clear
-    # wrapped error, not a bare KeyError. Naming the offending document_id in
-    # the message is the "diagnose without a debugger" contract.
-    with pytest.raises(UnknownDocumentIdError, match="not-a-real-doc"):
-        structured_rules_segment("not-a-real-doc", "1.1 Some clause text.\n")
+def test_structured_rules_accepts_a_document_id_outside_the_shortname_table():
+    """POLICY_SHORT_NAMES is a citation-prefix convenience, NOT a gate.
+
+    A drafter's node id comes from their title (`"RMiT 2025"` -> `"rmit-2025"`),
+    never a corpus key, so gating on the table made the structured-rules method
+    they picked always fail. The prefix is derived from the id instead.
+    """
+    anchors = structured_rules_segment(
+        "rmit-2025", "1.1 A financial institution shall do the thing.\n"
+    )
+
+    assert len(anchors) == 1
+    assert anchors[0]["anchor_id"] == "Rmit 2025 1.1"
+
+
+def test_structured_rules_still_prefers_a_curated_shortname():
+    """A known corpus id keeps its pretty prefix, so BNM citations still read
+    "RMiT 17.1" rather than a derived approximation."""
+    anchors = structured_rules_segment(
+        "rmit", "17.1 A financial institution shall do the thing.\n"
+    )
+
+    assert anchors[0]["anchor_id"] == "RMiT 17.1"
 
 
 def test_structured_rules_registered_by_default():
@@ -646,3 +663,30 @@ def test_prose_registered_by_default():
     assert len(anchors) == 2
     assert all(a["doc_class"] == "prose" for a in anchors)
     assert all(a["document_id"] == "prose-doc" for a in anchors)
+
+
+def test_semi_structured_disambiguates_a_repeated_numeric_path():
+    """A real BNM ED restarts numbering per part, so the same numeric path
+    appears in two unrelated sections. AnchorIndex rejects duplicate ids, so the
+    repeat occurrence takes a `#n` suffix while the first keeps the bare id."""
+    md = """# PART B POLICY REQUIREMENTS
+
+7 Governance
+
+S 7.1 The board shall exercise effective oversight of the arrangements.
+
+# A. Obtaining consent
+
+7 Consent
+
+S 7.1 A data consumer shall obtain express consent before disclosure.
+"""
+    anchors = semi_structured_segment("ed-open-finance-2025", md)
+    ids = [a["anchor_id"] for a in anchors]
+
+    assert len(ids) == len(set(ids)), f"duplicate ids: {ids}"
+    # The first occurrence keeps the bare id; the repeat is suffixed.
+    assert "ed-open-finance-2025 7" in ids
+    assert "ed-open-finance-2025 7#2" in ids
+    # And the index accepts them.
+    AnchorIndex(anchors)
