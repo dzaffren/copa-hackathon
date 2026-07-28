@@ -1,0 +1,1488 @@
+[
+  {
+    "anchor_id": "bis-papers-168 chunk#0",
+    "anchor_label": "bis-papers-168 chunk#0",
+    "text": "<figure>\n\nBIS\n\n</figure>\n\n<figure>\n</figure>\n\n# BIS Papers No 168\n\nOpening doors to open\nfinance: evidence from the\ninternational experience\n\nby Hakan Eroglu, Giulio Cornelli, Jon Frost, Friederike\nRühmann and Vatsala Shreeti\nMonetary and Economic Department",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"BIS Papers No 168\" chunk#1",
+    "anchor_label": "bis-papers-168 \"BIS Papers No 168\" chunk#1",
+    "text": "March 2026\n\nJEL classification: O33, D43, G21.\nKeywords: Open finance, financial inclusion,\ncompetition, data sharing\n\nThe views expressed in this publication are those of the authors and do not\nnecessarily reflect the views of the BIS or its member central banks.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "BIS Papers No 168"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"BIS Papers No 168\" chunk#2",
+    "anchor_label": "bis-papers-168 \"BIS Papers No 168\" chunk#2",
+    "text": "This publication is available on the BIS website (www.bis.org).\n\nBank for International Settlements 2026. All rights reserved. Brief excerpts may be\nreproduced or translated provided the source is stated.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "BIS Papers No 168"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Opening doors to open finance: evidence from the international experience\" chunk#3",
+    "anchor_label": "bis-papers-168 \"Opening doors to open finance: evidence from the international experience\" chunk#3",
+    "text": "# Opening doors to open finance: evidence from the international experience\n\nHakan Eroglu, Giulio Cornelli, Jon Frost, Friederike Rühmann and Vatsala Shreeti1\nMarch 2026\n\n## Abstract\n\nOpen finance is transforming the financial system, with rapid adoption in several\njurisdictions in the years since its introduction. By enabling the sharing and use of\ncustomer-permissioned data, open finance can foster innovation, competition and\nfinancial inclusion. Early evidence highlights a role for open finance in breaking\nthrough data silos, reducing information asymmetries and driving venture capital\ninvestment. Successful implementation depends on standardised data sharing\nprotocols and interoperability that enable seamless payment system connectivity and\ndata exchange, all underpinned by robust regulatory frameworks. This paper\nexamines international experiences with open finance, shedding light on its impact\non competition, market entry and financial access, while discussing the challenges\nthat remain.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Opening doors to open finance: evidence from the international experience"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Abstract\" chunk#4",
+    "anchor_label": "bis-papers-168 \"Abstract\" chunk#4",
+    "text": "Keywords: open finance, financial inclusion, competition, data sharing.\nJEL codes: O33, D43, G21.\n\n1\nHakan Eroglu (hakan.eroglu@bisih.org) is an Adviser at the Bank for International Settlements\nInnovation Hub (BISIH) Hong Kong Centre and leads BISIH's Project Aperta for cross-border data\nportability. Giulio Cornelli (giulio.cornelli@bis.org) is an Economist in Financial Markets at the Bank\nfor International Settlements (BIS). Jon Frost (jon.frost@bis.org) is Head of Innovation and the Digital\nEconomy at the BIS and a research affiliate of the Cambridge Centre for Alternative Finance (CCAF).\nFriederike Rühmann (fruehmann@worldbank.org) is a Senior Financial Sector Specialist at the World\nBank and a Secondee to the BIS Financial Stability Institute (FSI). Vatsala Shreeti\n(vatsala.shreeti@bis.org) is an Economist in Innovation and the Digital Economy at the BIS. The\nauthors thank Tom Carpenter (Mastercard), Matheus Rauber Coradin (Central Bank of Brazil), Derya\nDemirbüker (Interbank Card Center of Türkiye), Shalini Gupta (Sahamati), Anton Joachim (Open\nBanking Limited, UK), Young Jin Kim (Korea Financial Telecommunications and Clearing Institute) and\nNicky Valind (Konsentus) for providing data.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Abstract"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Abstract\" chunk#5",
+    "anchor_label": "bis-papers-168 \"Abstract\" chunk#5",
+    "text": "The authors would like to thank Iñaki Aldasoro, Elif Cansu\nAkoğuz, Yulia Burkova, Maria Teresa Chimienti, Valeria Garcia, Guillermo Galicia Rabadan, Gaston\nGelos, Kiran Gopinath, Linda Jeng, Rudraksh Kansal, Leonardo Luna, Alejo Macaya, Fredesvinda\nMontes, Harish Natarajan, Rafaela Nougeira, Bénédicte Nolens, Ariadne Plaitakis, Alex Rizzi and Hyun\nSong Shin for valuable comments, and Alison Arnot for editorial support. The views expressed here\nare those of the authors and do not necessarily reflect those of the BIS or the World Bank.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Abstract"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"1. Introduction\" chunk#6",
+    "anchor_label": "bis-papers-168 \"1. Introduction\" chunk#6",
+    "text": "## 1. Introduction\n\nData are the lifeblood of modern economic decision-making, driving innovation and\ngrowth. Yet access to (personal) data remains uneven across different actors in the\neconomy, and users (data subjects) often have limited control over their data and\nhow they are used. In response, many jurisdictions are rethinking how data are shared\nand governed to empower users and broaden participation in the digital economy.\nIn the financial sector, many authorities have introduced open banking or open\nfinance initiatives.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "1. Introduction"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"1. Introduction\" chunk#7",
+    "anchor_label": "bis-papers-168 \"1. Introduction\" chunk#7",
+    "text": "Open finance refers to the sharing and use of customer-permissioned data by\nfinancial institutions with third-party firms, other financial institutions and developers,\nto build applications and services.2 Open banking is a narrower concept and refers to\nthe sharing and use of customer-permissioned data by banks with such third parties.\nBoth can include both \"read access\" and \"write access\" to data. Read access allows\nfor service provision based on viewing or reading the data. Write access allows for\nservice provision based on modifying the data. Open finance practices can arise from\ncustomer demands or as a result of policies. Some of the first mandated open banking\nand open finance initiatives include the United Kingdom (UK) Open Banking\nframework (Fingleton Associates and ODI (2014)); the European Union (EU) Second\nPayment Services Directive (PSD2) (EU (2015)) with a stronger focus on payments; and\nAustralia's Consumer Data Right, which adopts an economy-wide open data\napproach (Productivity Commission (2017), Farrell (2023).3 Over time, other\njurisdictions like Brazil, India, South Korea and Türkiye have adopted similar\nframeworks. By 2024, 95 jurisdictions had some form of an open banking or finance\npolicy framework in place with varied objectives, like promoting competition and\ninnovation and enhancing consumer protection and financial inclusion (CCAF (2024),\nCGAP et al (2024).4",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "1. Introduction"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"1. Introduction\" chunk#8",
+    "anchor_label": "bis-papers-168 \"1. Introduction\" chunk#8",
+    "text": "2\nThroughout this paper, \"open finance\" refers to both open banking and broader open finance\ninitiatives. Whereas open banking focuses primarily on bank accounts, open finance extends further\nto cover a broader range of financial products, including insurance, securities and mortgages. An\neven broader concept, used in some cases, is \"open data\", which may cover customer-permissioned\ndata sharing in other industries beyond the financial sector - such as healthcare, utilities,\ntelecommunications or taxes. See Graph A.1 in the appendix.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "1. Introduction"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"1. Introduction\" chunk#9",
+    "anchor_label": "bis-papers-168 \"1. Introduction\" chunk#9",
+    "text": "3\nIn other jurisdictions, like the United States, some market-driven bilateral agreements to share\nfinancial data, particularly between banks and financial technology (fintech) companies, emerged\nprior to any regulation. Data access and sharing initially developed through market-led\narrangements, eg bilateral agreements and connectivity based on application programming\ninterfaces (APIs). There were implementations aligned with the Financial Data Exchange (FDX)\nstandard, as well as legacy non-API techniques such as screen scraping used by some fintech\naggregators. Section 1033 of the Dodd-Frank Wall Street Reform and Consumer Protection Act gives\nconsumers a right to access information on their financial products and services and to authorise\nthird parties to access that information on their behalf. The Consumer Financial Protection Bureau\n(CFPB) has advanced this through rulemaking.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "1. Introduction"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"1. Introduction\" chunk#10",
+    "anchor_label": "bis-papers-168 \"1. Introduction\" chunk#10",
+    "text": "4\nMeanwhile, 52% of Alliance for Financial Inclusion (AFI) members (spanning 88 countries) are still in\nthe initial exploration phase of open finance, and 4% have fully implemented frameworks (AFI Digital\nFinancial Services Working Group (2024)). Members' top motivations include improving financial\ninclusion and customer choice (each 21%), followed by innovation (20%) and enhanced competition\n(16%) (AFI (2025). Regulation has been an enabler of such frameworks and is not just a reaction to\ninnovation (OECD (2024)).",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "1. Introduction"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"1. Introduction\" chunk#11",
+    "anchor_label": "bis-papers-168 \"1. Introduction\" chunk#11",
+    "text": "Open finance policies emerged largely as a response to the growing concerns\nabout data monopolies and lack of competition in payment markets. Large financial\ninstitutions generate and control vast amounts of data, which can then feed into\nimproving existing services and providing new ones. New services can generate even\nmore data, which can be used to further entrench market dominance by large\nfinancial institutions.5 This can create barriers to competition and innovation. Open\nfinance seeks to break this loop by promoting data portability and interoperability,\nallowing consumers to share their financial data securely with third-party providers\n(see Vives (2019)). This shift aligns with broader efforts to create a more inclusive,\ncompetitive financial ecosystem while addressing the risks posed by data-driven\nmonopolies.6",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "1. Introduction"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"1. Introduction\" chunk#12",
+    "anchor_label": "bis-papers-168 \"1. Introduction\" chunk#12",
+    "text": "In this paper, we provide evidence on the international experience with open\nfinance. We draw on new data from jurisdictions with advanced open finance\nframeworks, as well as from academic research. We show that in some jurisdictions\nwhere open finance frameworks are operational, they have facilitated the entry of new\ntypes of intermediaries, like third-party financial technology (fintech) firms and large\ntechnology companies (big techs). Open finance has also promoted greater customer\nchoice through tailored financial products and services and enhanced access for\nindividuals and firms to financial services, notably new payment methods, and credit.\nWhile there are certainly challenges in implementation, and policy frameworks have\nhad to adapt to experience, early evidence has been broadly positive.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "1. Introduction"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"1. Introduction\" chunk#13",
+    "anchor_label": "bis-papers-168 \"1. Introduction\" chunk#13",
+    "text": "We contribute to the literature on open banking and open finance (see eg Xie\nand Hu (2024) and Jeng (2023) by collecting this international evidence in one place.\nThis complements studies that focus on one jurisdiction (eg Alok et al (2024), Babina\net al (2025) and World Bank (2024)). We also shed light on whether theoretical\npredictions (eg Jones and Tonetti (2020), He et al (2023) and Goldstein et al (2023))\nare borne out in practice. We show that, in some cases, there are measurable changes\nin jurisdictions with open finance. But additional work will be needed to better\nunderstand that causal impact of policies and further effects as these frameworks are\nrolled out and adapted.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "1. Introduction"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"1. Introduction\" chunk#14",
+    "anchor_label": "bis-papers-168 \"1. Introduction\" chunk#14",
+    "text": "The paper is organised as follows. Section 2 outlines the origins of open banking\nand open finance initiatives. Section 3 presents international evidence on the\nadoption of open finance and describes its impact on competition, entry of new\nproviders, venture capital (VC) investment and access to credit. Section 4 discusses\nchallenges and lessons to date. Finally, section 5 concludes.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "1. Introduction"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#15",
+    "anchor_label": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#15",
+    "text": "## 2. Origins and adoption of open finance and open banking\n\nBefore full-fledged regulatory frameworks, open banking existed in rudimentary\nforms in private sector practices. This included third-party providers using techniques",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "2. Origins and adoption of open finance and open banking"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#16",
+    "anchor_label": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#16",
+    "text": "5\nIn the context of large technology (big tech) companies' entry into finance, such a dynamic is often\ncalled the data-network-activities (DNA) loop (BIS (2019)).\n\n6\nRisks include cyber threats, privacy breaches, data misuse, algorithmic bias, market concentration and\nunclear accountability that can undermine consumer protection and ecosystem stability if not\ngoverned effectively (Bonvino and Giorgino (2026).",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "2. Origins and adoption of open finance and open banking"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#17",
+    "anchor_label": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#17",
+    "text": "such as \"screen scraping\" or \"reverse engineering\", which allowed their customers to\ntransfer data into their budgeting, lending and payment apps.7 As concerns around\npersistent data monopolies in the financial sector gained traction, calls grew for\nconsumer-permissioned data sharing via standardised application programming\ninterfaces (APIs), either through regulatory intervention or through private\ninitiatives.8",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "2. Origins and adoption of open finance and open banking"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#18",
+    "anchor_label": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#18",
+    "text": "Rather than relying on screen scraping, reverse engineering or bilateral file\ntransfers, APIs allow systems to communicate automatically. This communication\ntakes place under clear technical rules that specify how requests are made (eg for\naccount balances or payment initiation) and how responses are returned. This ensures\nthat customer-permissioned data are shared in a consistent, secure and auditable\nway, while banks retain control over authentication, monitoring and access\nmanagement. APIs form the backbone of scalable and interoperable open finance\necosystems and are the primary mechanism through which third-party providers can\naccess and exchange data with larger financial institutions. Standardised APIs go one\nstep further by simplifying integration for all stakeholders, enabling broad\nparticipation, lowering technical barriers for new financial services providers and\nminimising duplication of effort.9",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "2. Origins and adoption of open finance and open banking"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#19",
+    "anchor_label": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#19",
+    "text": "Jurisdictions have followed a diverse set of approaches to open banking and\nopen finance, driven by their unique goals. These approaches can be classified into\nthree broad categories: (i) regulatory-driven prescriptive approaches, requiring banks\nto share customer-permissioned data using eg unified technical API standards and\nthird parties to register with supervisors; (ii) facilitative approaches, where authorities\npublish guidelines and recommended practices;10 and (iii) market-driven approaches,\nwhere no explicit rules require or prohibit data sharing. In the third case, the\necosystem evolves largely through commercial private sector arrangements (BCBS\n(2019)). The choice of regulatory approaches can depend on various factors, including",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "2. Origins and adoption of open finance and open banking"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#20",
+    "anchor_label": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#20",
+    "text": "7\nScreen scraping refers to the practice of using customers' online banking credentials, with their\nconsent, to log into on their behalf and extract data directly from a bank (or financial institution)\nwebsite. Reverse engineering involves analysing existing banking interfaces or software to replicate\ntheir functionality or enable data access without relying on official documentation or standardised\nAPIs. This is often used by third parties prior to the introduction of open banking frameworks.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "2. Origins and adoption of open finance and open banking"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#21",
+    "anchor_label": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#21",
+    "text": "8\nAPIs are the \"set of routines, protocols and tools for building software applications\" that provide\nstandardised interfaces for secure data exchange between banks and third parties (BCBS (2019)).\n\n9\nOpen banking and open finance can serve as so-called digital public infrastructure (DPI) by providing\nshared, interoperable rails that enable secure data exchange and service connectivity across financial\nparticipants. Built on technical building blocks such as open API standards, digital identity and\nconsent layers, trust and governance frameworks, and connectivity and aggregation services, these\ninfrastructures support reliable data portability and service interoperability. By embedding common\nprotocols for authentication, authorisation and data management, open finance can act as\nfoundational digital infrastructure. This supports enhancing competition, inclusion and innovation\nwhile maintaining user trust and financial system resilience. For insights on this in the Indian context,\nsee D'Silva et al (2019).",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "2. Origins and adoption of open finance and open banking"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#22",
+    "anchor_label": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#22",
+    "text": "10\nFacilitative approaches vary in how actively regulators get involved, ranging from light-touch\nguidance (eg Singapore's non-binding MAS API Playbook or New Zealand's early industry-led\nPayments NZ model) to more proactive encouragement (like Hong Kong's phased Open API\nFramework that sets expectations without mandating participation). This spectrum shows that\nregulators can influence progress while keeping data sharing voluntary, distinguishing facilitative\nmodels from prescriptive ones (Monetary Authority Singapore (2016), Payments New Zealand (2026),\nHKMA (2018)). For an overview of approaches by jurisdiction, see Graph A.2 in the appendix.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "2. Origins and adoption of open finance and open banking"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#23",
+    "anchor_label": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#23",
+    "text": "banking sector concentration, quality of digital infrastructure, cultural norms and laws\naround data privacy and the broader political economy of the jurisdiction. Notably,\nall of these approaches can be implemented through either centralised or\ndecentralised technical architectures.11",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "2. Origins and adoption of open finance and open banking"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#24",
+    "anchor_label": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#24",
+    "text": "The EU was among the first to formalise open banking through PSD2, which\ncreated a harmonised regime for third-party access to payment accounts. It required\nbanks to provide both read and write permissions (account information and payment\ninitiation services) underpinned by strong customer authentication. PSD2 exemplifies\nthe regulatory mandate approach. The UK also followed this approach in parallel to\nPSD2 by mandating the nine largest banks to fund and implement a common $\\mathrm { A P I }$\nstandard and central directory. This mandated technical interoperability and\ngovernance, driving adoption at scale (The Paypers (2019)).",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "2. Origins and adoption of open finance and open banking"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#25",
+    "anchor_label": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#25",
+    "text": "Other jurisdictions have adopted facilitative frameworks that support open\nbanking development through voluntary participation and industry coordination,\nrather than through regulatory mandates. Authorities typically promote\nstandardisation and interoperability by issuing guidelines, technical playbooks and\nphased roadmaps, while leaving the market to determine adoption speed and scope.\nFor instance, the Monetary Authority of Singapore (MAS (2016)) encourages open\ndata exchange through its API Playbook, which provides governance principles,\ncommon data standards and consent frameworks without mandating bank\nparticipation. It also provides complementary initiatives, such as SGFinDex, which\nenable individuals to aggregate and share their financial data across institutions.\nSimilarly, the Hong Kong Monetary Authority (HKMA (2018) launched its Open API\nFramework in phases, beginning with open product data and gradually expanding to\ninclude customer and transactional interfaces. These facilitative approaches can foster\ninnovation and interoperability through shared technical infrastructure, connectivity\nand trust frameworks, while allowing flexibility for market-led evolution.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "2. Origins and adoption of open finance and open banking"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#26",
+    "anchor_label": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#26",
+    "text": "There are also examples of the third approach. In the United States, open banking\nhas historically evolved through market-led initiatives, with financial institutions and\nfintechs forming bilateral data sharing arrangements using private aggregation\nservices. However, this landscape may shift, as the Consumer Financial Protection\nBureau (CFPB) finalised the Personal Financial Data Rights rule in late 2024 under\nSection 1033 of the Dodd-Frank Act, establishing a regulatory framework for\nconsumer-permissioned data sharing (Arner et al 2025)). The CFPB has since\nreopened the rulemaking process to modify and refine this framework, signalling a\ntransition from a market-based model towards a more regulated one (CFPB (2025).",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "2. Origins and adoption of open finance and open banking"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#27",
+    "anchor_label": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#27",
+    "text": "Concurrently with the adoption of open banking and open finance initiatives,\ntheir use is rising rapidly. While data on adoption are not universally available, and\n\n11\nIn a centralised architecture, as in India and Türkiye, a single entity or common infrastructure\nmanages key functions such as directories, trust/identity verification or data switching between\nproviders (eg financial institutions) and recipients (eg third-party providers), simplifying participation\nand interoperability but creating dependency on that central node. By contrast, a decentralised\narchitecture, as seen in Europe's PSD2 implementation and Brazil's open finance model, relies on\ndirect bilateral connections via standardised APIs between data holders and users, offering greater\nflexibility but potentially raising coordination costs and implementation burdens for each ecosystem\nparticipant (World Bank (2024).",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "2. Origins and adoption of open finance and open banking"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#28",
+    "anchor_label": "bis-papers-168 \"2. Origins and adoption of open finance and open banking\" chunk#28",
+    "text": "do not always use comparable definitions, data on users and API calls can be\nillustrative. 12\n\nAmong the G20 jurisdictions for which data are available - Australia, Brazil, India,\nKorea, the UK, Türkiye and the US - Korea has the highest open finance adoption\n(Graph 1.A), with 36 million subscribers, 194 million registered accounts and an\naverage of 20 API calls per person per month as of December 2023.13 The swift\nadvance in Korea may be driven by its mature digital payments ecosystem and the\nwidespread use of personal finance management apps, which had already integrated\nwith earlier forms of open banking (CCAF (2025), World Bank (2024). Per capita use",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "2. Origins and adoption of open finance and open banking"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#29",
+    "anchor_label": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#29",
+    "text": "## API-based open finance is taking off in several jurisdictions around the world Graph 1\n\n<figure>\n\nA. Number of open finance users is rising ... 1\n\nB. ... along with more open finance API calls\n\n% of population",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "API-based open finance is taking off in several jurisdictions around the world Graph 1"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#30",
+    "anchor_label": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#30",
+    "text": "No of API calls\n\nNo of API calls per capita\n\n50\n\n0.10\n\n60\n\n40\n\n0.08\n\n40\n\n30\n\n0.06\n\n20\n\n0.04\n\n20\n\n10\n\n0.02\n\n0\n\n0\n\n0.00\n\n2021\n\n2022\n\n2023\n\n2024\n\n2025\n\n2022\n\n2023\n\n2024\n\nAPI users:\n\nBR\n\nGB\n\nIN\nKR\n\nAPI calls per month (Ihs):",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "API-based open finance is taking off in several jurisdictions around the world Graph 1"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#31",
+    "anchor_label": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#31",
+    "text": "$B R$\n\n$G B ^ { 2 }$\n\nIN (rhs)3\n\nTR\n\nUS\n\n$\\mathrm { K R } ^ { 4 }$\n\n$\\mathrm { T R } ^ { 2 }$\n\n</figure>\n\n1\nFor BR, based on stock of active consents. For GB, based on total number of users. For IN, based on cumulative number of accounts linked.\nFor KR, based on total number of API subscribers as of December 2023. For US, based on cumulative number of users. 2 Based on successful\nAPI calls. 3 Estimated as incremental consents fulfilled multiplied by 10. This corresponds to the number of data fetches facilitated through\nthese consents in the lifetime of a consent. 4 Based on average total number of API calls in a day as of December 2023.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "API-based open finance is taking off in several jurisdictions around the world Graph 1"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#32",
+    "anchor_label": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#32",
+    "text": "Sources: IMF, World Economic Outlook; BKM - the Interbank Card Center of Türkiye; Financial Data Exchange, \"FDX hits 94 million accounts,\nCFPB publishes FDX's standard-setting application\", 2024; Korea Financial Telecommunications & Clearings Institute; openbanking.org.uk;\nopenfinancebrasil.org.br; Sahamati; authors' calculations.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "API-based open finance is taking off in several jurisdictions around the world Graph 1"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#33",
+    "anchor_label": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#33",
+    "text": "12\nAdoption of open finance can be measured in various ways, from basic indicators such as the number\nof registered users and API call volumes to more advanced system performance metrics, including\nsuccess rates and response times. An API call refers to any transaction that involves secure, customer-\npermissioned data exchange using an API. This can be used as a measure of the intensity of use of\nopen finance by individuals and businesses. See BIS (2020). Broader assessments may also track\necosystem coverage (eg participating institutions and data types), user behaviour patterns (such as\nconsent activity) and market development (including active third-party providers and use-case\nuptake). For example, in Brazil authorities track headline indicators, such as participating institutions,\nregistered customers and active consents, alongside more detailed measures like API call volumes,\nsuccess rates and the distribution of calls across data types. They also distinguish between consent\ncreation and actual data sharing, helping to identify the difference between nominal adoption and\nreal use (Zetta (2024)).",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "API-based open finance is taking off in several jurisdictions around the world Graph 1"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#34",
+    "anchor_label": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#34",
+    "text": "13\nThis is nearly 70% of the population. Note that the number of subscribers likely includes some double\ncounting, as the same individual may subscribe to or hold accounts with multiple financial institutions.\nData source: Korea Financial Telecommunications & Clearings Institute (KFTC).",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "API-based open finance is taking off in several jurisdictions around the world Graph 1"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#35",
+    "anchor_label": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#35",
+    "text": "is highest in Brazil with 55 calls per user per month in March 2025 (Graph 1.B). That\nmay reflect the relative ease of integration of open finance transactions with other\nwidespread services, such as fast payments. Other jurisdictions, like the UK and US,\nare catching up, as seen in the number of users and API calls. India and Türkiye are\nalso seeing quick growth in open finance use, but from a much lower base. Australia\nrecorded around 13 API calls per capita for the banking sector in December 2025.14",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "API-based open finance is taking off in several jurisdictions around the world Graph 1"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#36",
+    "anchor_label": "bis-papers-168 \"API-based open finance is taking off in several jurisdictions around the world Graph 1\" chunk#36",
+    "text": "Low adoption rates remain a persistent challenge for open finance in many\njurisdictions. \"Read-only\" open banking may attract a small, financially savvy segment,\nwhile models that include payment initiation, such as in the UK, see faster uptake.\nOpen finance can scale more effectively when embedded in everyday payments\nrather than offered solely as a data sharing tool (Lux and Zhao (2025)). 15",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "API-based open finance is taking off in several jurisdictions around the world Graph 1"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"3. Impact on market entry, competition and financial inclusion\" chunk#37",
+    "anchor_label": "bis-papers-168 \"3. Impact on market entry, competition and financial inclusion\" chunk#37",
+    "text": "## 3. Impact on market entry, competition and financial inclusion\n\nDespite being in early stages, open finance is facilitating the entry of new providers\nof financial services and new business models. In the EU and the UK, for instance, over\n4,500 third-party providers of financial services have entered the market for retail\nfinancial services as of December 2024 (Graph 2.A). The vast majority operate across\nborders, through the EU's so-called passporting rules.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "3. Impact on market entry, competition and financial inclusion"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"3. Impact on market entry, competition and financial inclusion\" chunk#38",
+    "anchor_label": "bis-papers-168 \"3. Impact on market entry, competition and financial inclusion\" chunk#38",
+    "text": "14\nData are taken from the Australian Consumer Data Right performance dashboard\n(https://www.cdr.gov.au/performance), selecting \"Banking\" as the sector and using the monthly view\nof \"API Invocations\" (API calls). Calculation: 374 million API calls + 28.2 million population = ~ 13 API\ncalls per capita (December 2025).",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "3. Impact on market entry, competition and financial inclusion"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"3. Impact on market entry, competition and financial inclusion\" chunk#39",
+    "anchor_label": "bis-papers-168 \"3. Impact on market entry, competition and financial inclusion\" chunk#39",
+    "text": "15\nReimsbach-Kounatze and Molnar (2024) offer additional evidence explaining why the uptake of data\nportability remains limited despite the presence of formal portability rights. Survey findings indicate\nthat both awareness and actual usage of such rights under general data protection frameworks are\nlow. Users are frequently discouraged by the complexity of the processes involved, concerns about\npotential risks and the effort required to actively manage data transfers. In contrast, open banking\nregimes have achieved significantly higher levels of usage by embedding data portability in\nstandardised, API-based mechanisms that operate seamlessly in the background and are directly\nconnected to specific services. This distinction between user-driven portability and integrated,\nservice-oriented data sharing helps clarify why the mere existence of formal rights has not resulted\nin widespread adoption.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "3. Impact on market entry, competition and financial inclusion"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#40",
+    "anchor_label": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#40",
+    "text": "## Open finance and related policies are promoting greater competition\n\nGraph 2\n\nA. In Europe, more third-party providers (TPPs)1 have\nentered the market\n\n<figure>\n\nNumber of TPPs\n\nCumulative number of switches, in millions",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Open finance and related policies are promoting greater competition"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#41",
+    "anchor_label": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#41",
+    "text": "4,000\n\n11\n\n3,000\n\n10\n\n2,000\n\n9\n\n1,000\n\n8\n\n0\n\n7\n\n2020\n\n2021\n\n2022\n\n2023\n\n2024\n\n2021\n\n2022\n\n2023\n\n2024\n\nNumber of TPPs:\n\nHome-regulated\n\nPassported\n\nCumulative current account switches\n\n</figure>\n\nB. In the UK, over 11 million people have switched\naccounts with a dedicated switching service",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Open finance and related policies are promoting greater competition"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#42",
+    "anchor_label": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#42",
+    "text": "1 TPPs active in the European Union (EU) and United Kingdom (UK) operating within the home market or across borders using \"passporting\".\nThe drop in December 2020 corresponds to the withdrawal of the eIDAS certificates of UK TPPs as the Brexit transition period ended on\n31 December 2020 (for further details see Financial Conduct Authority, \"FCA announces changes to open banking identification requirements\".\n11 March 2020; and Banfico, \"Brexit, elDAS revocation and FCA changes to open banking identification requirements\", 24 November 2020.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Open finance and related policies are promoting greater competition"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#43",
+    "anchor_label": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#43",
+    "text": "Sources: Konsentus, Third Party Provider Open Banking Tracker; Pay.UK; authors' calculations.\n\nOpen finance and related initiatives are helping consumers to switch providers\nmore easily.16 In the UK, the average length of a customer banking relationship is\n14 years. This is a full two years longer than the average (romantic) domestic\nrelationship, at 12 years (Fenton (2020)). Open finance frameworks can make it easier\nfor clients to \"port\" data, including know-your-customer information and other\nverified identity and financial account data, from one provider to another. Data\nportability allows customers, with their explicit strong customer authentication and\nconsent, to authorise the secure transfer or reuse of data relating to products and\nservices that fall within the scope of the open finance ecosystem. The data are then\ntransferred from one institution or service provider to another through standardised,\nencrypted APIs, ensuring privacy and control over personal information. This can\nsimplify account opening and facilitate the transfer of recurring payments or standing\ninstructions, reduce frictions in switching between providers and enable more\nintegrated cross-provider financial services journeys in an open finance environment.\nWhile not formally part of the open finance framework, a related UK initiative - the\nCurrent Account Switch Service - has helped over 11 million individuals to switch\ncurrent accounts among over 50 banks and building societies (Graph 2.B).",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Open finance and related policies are promoting greater competition"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#44",
+    "anchor_label": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#44",
+    "text": "This\nunderscores the extensive user demand for such services that can be further\npromoted by open finance. 17",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Open finance and related policies are promoting greater competition"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#45",
+    "anchor_label": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#45",
+    "text": "16\nRecent theoretical work also shows that open banking and open finance can enhance competition in\ncredit markets but increase prices in payments markets. See Akoğuz et al (2025). This points to the\nneed to account for cross-market spillovers when analysing the global effects of open banking\npolicies.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Open finance and related policies are promoting greater competition"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#46",
+    "anchor_label": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#46",
+    "text": "17\nThe service is owned and operated by Pay.UK Ltd, a non-profit limited company that operates UK\ninterbank payment systems.\n\nIn some cases, open finance policies can have a measurable impact on\ninvestment and on firms' access to credit. With a sample of 21 jurisdictions with open\nbanking policies and using a staggered event study, Babina et al (2025) find that\nfintech VC funding increased (in volume and number of projects) significantly in the\nyear following the introduction of the policies (Graph 3.A). This increase in VC funding\nfor fintech companies underscores that open banking policies may be able to reduce\nbarriers to entry and encourage smaller financial services providers to enter the\nmarket. Open finance may also benefit financial inclusion. 18 For the UK specifically,\nBabina et al (2025) find that the open banking policy allowed small and medium-sized\nenterprises (SMEs) to form new credit relationships with non-bank lenders, although\nthe gains are the largest for the firms that had access to credit previously (Graph 3.B).\nOther recent work shows that open banking enables small businesses to diversify the\ntypes of assets that they use as collateral (eg accounts receivable or inventory) and\nenhances credit provision to underserved and younger firms (Yu (2024), Xiong\n(2024).19",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Open finance and related policies are promoting greater competition"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#47",
+    "anchor_label": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#47",
+    "text": "Open banking and open finance are expanding worldwide, but effects are not\nuniform across jurisdictions, sectors and business models. One recent survey (World\nEconomic Forum and CCAF (2025)) finds a range of views: some fintechs find them\neffective (29%), while others report limited usefulness or availability (24% ineffective;\n23% unavailable but beneficial). Perceptions also differ by region and sector, with\nEuropean, Middle East and North African (MENA) and Asia-Pacific fintechs generally\nmore positive (42%, 33% and 31% effective, respectively). Overall, fintechs in\nadvanced economies view frameworks more favourably than emerging market and\ndeveloping economies (34% vs 23%). Furthermore, sectors like digital capital raising\nshow the greatest dissatisfaction (40% ineffective), while high-satisfaction sectors\ninclude lending (39% effective), payments (36%) and wealth tech (37%).",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Open finance and related policies are promoting greater competition"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#48",
+    "anchor_label": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#48",
+    "text": "The impact of open finance on financial inclusion goes beyond firms. When\nborrowers who are deemed risky gain control over their personal data, they tend to\ndisclose their payment information more frequently. This increased transparency\nleads to higher loan approval rates, lower interest rates and lower ex post defaults\n(Nam (2023)). As users assert more control over their data, they become more\nconfident in sharing data with fintechs. This leads to fintechs offering lower loan rates,\nin particular to traditionally underserved groups (Doerr er al (2023)). Further, when\nlenders have access to more granular, real-time financial data, credit allocation can\nbecome more efficient, reducing information asymmetries and costs, for both new\nentrants such as fintechs and incumbents like banks (Bianchi et al 2024; Alok et al\n(2024).20",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Open finance and related policies are promoting greater competition"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#49",
+    "anchor_label": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#49",
+    "text": "18\nFinancial inclusion can be defined as universal access to, and use of, a wide range of reasonably priced\nfinancial services. While this is often equated with access for individuals or households to transaction\naccounts, it neglects the much wider issues of access for individuals, households and (small)\nbusinesses to the full range of financial services. See Frost et al (2021).",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Open finance and related policies are promoting greater competition"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#50",
+    "anchor_label": "bis-papers-168 \"Open finance and related policies are promoting greater competition\" chunk#50",
+    "text": "19\nNote that in addition to the credit expansion effect, Xiong (2024) highlights an important trade-off\nbetween screening efficiency and screening cost that arises due to open banking policies.\n\n20\nBeyond effects on fintech investment, credit access and financial inclusion, open finance can also\ninfluence bank valuations. Akyildirim et al (2025) examine stock market reactions of more than 3,400\nbanks in G12 countries following open finance-related announcements and find that bank stocks\ntypically decline around announcement dates. This may reflect concerns about competition and\ncompliance costs.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Open finance and related policies are promoting greater competition"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Competition in lending is driving investment and SME lending\" chunk#51",
+    "anchor_label": "bis-papers-168 \"Competition in lending is driving investment and SME lending\" chunk#51",
+    "text": "## Competition in lending is driving investment and SME lending\n\nGraph 3\n\nA. Open finance policies have driven fintech investment1\n\n<figure>\n<figcaption>B. Open finance led to greater lending to UK SMEs2</figcaption>",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Competition in lending is driving investment and SME lending"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Competition in lending is driving investment and SME lending\" chunk#52",
+    "anchor_label": "bis-papers-168 \"Competition in lending is driving investment and SME lending\" chunk#52",
+    "text": "USD mn\n\nNumber of new lending relationships\n\n2\n\n0.04\n\n0.03\n\n1\n\n0.02\n\n0\n\n0.01\n\n-1\n\n0.00\n\n-2\n\n-0.01\n\n-5 -4 -3 -2 -1 0 1 2\nYears after open banking initiative\n\n2015\n\n2016\n\n2017\n\n2018\n\n2019\n\nYear\n\nLn(fintech VC investment):",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Competition in lending is driving investment and SME lending"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Competition in lending is driving investment and SME lending\" chunk#53",
+    "anchor_label": "bis-papers-168 \"Competition in lending is driving investment and SME lending\" chunk#53",
+    "text": "Point estimate\n95% confidence intervals\n\nNew lending relationships:\n\nPoint estimate\n95% confidence intervals\n\n</figure>\n\n1 Changes in the natural logarithm (ln) of fintech venture capital (VC) investment activity before and after the passage of open finance policies\nin 21 jurisdictions. 2 Changes in new lending relationship formation for small and medium-sized enterprises (SMEs) affected by the UK\nCommercial Credit Data Sharing (CCDS) policy.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Competition in lending is driving investment and SME lending"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Competition in lending is driving investment and SME lending\" chunk#54",
+    "anchor_label": "bis-papers-168 \"Competition in lending is driving investment and SME lending\" chunk#54",
+    "text": "Source: Babina et al (2025).\n\nWithin the umbrella of open banking and open finance frameworks, payments\ndata have played a particularly salient role. By facilitating the sharing of digital\npayments data, open finance can provide lenders with high-frequency, verifiable\ninformation on borrowers who may lack formal credit histories. Evidence from India\nshows that incorporating digital payments data can improve the prediction of loan\ndelinquency, strengthening both underwriting and post-disbursal monitoring of\ncredit (Rishabh (2026). Data from digital payments can also expand access to capital\nfrom fintech lenders at cheaper interest rates (Ghosh et al (2025)). Evidence from\nChina shows that adoption of digital payments enhances financial inclusion and\naccess to credit through the portability of payments data (Ouyang (2021)).",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Competition in lending is driving investment and SME lending"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#55",
+    "anchor_label": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#55",
+    "text": "### 4. Challenges and lessons to date\n\nThe benefits of open finance are tangible, but implementation has not been without\nchallenges. Experience to date highlights significant differences across regimes which\neventually influence their success. Core challenges are around standardisation in data\nsharing, data governance and the transition from open banking to open finance,\nalongside the absence of a clear regulatory mandate in some jurisdictions (IIF 2025)).\nOther challenges include commercial misalignment, insufficient consumer trust and",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "4. Challenges and lessons to date"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#56",
+    "anchor_label": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#56",
+    "text": "legacy technical systems that may make incumbent institutions cautious in sharing\ndata.21\n\nA key issue is the absence of data sharing standards that are both politically\nenforceable and technically harmonised. Differences across jurisdictions in the\nstructure and implementation of open finance reflect policy choices shaped by\nnational contexts. In jurisdictions with facilitated or market-led approaches, where\nregulation is minimal or absent, there can be slower adoption and higher compliance\ncosts for firms as they navigate inconsistent standards and limited coordination. By\ncontrast, those mandating standardised APIs have enabled smoother implementation\nof open banking. For example, the UK's approach has improved interoperability and\nreduced integration costs for third-party providers, fostering greater innovation\n(CMA (2017)). In Türkiye, non-standard market practices prior to regulation posed\nsignificant barriers to interoperability. Localising standards and building centralised\ninfrastructure enabled a more structured rollout and reduced friction for participants.\nOverall, mandating well-defined technical standards is a prerequisite for scalable and\ninteroperable open finance.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "4. Challenges and lessons to date"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#57",
+    "anchor_label": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#57",
+    "text": "Moreover, ensuring fairness in data sharing between traditional institutions and\nnew entrants, including fintech and big tech firms, remains a key policy concern.\nBanks are mandated under regulations like PSD2 in the EU to share customer financial\ndata with third-party providers, such as fintechs, when customers consent. This is\nintended to foster innovation and competition.22 However, non-banks, fintech\ncompanies or big techs are not subject to equivalent obligations, even though some\nof them may hold vast amounts of data that are relevant for the financial sector.\nAsymmetric data sharing and access can cause market distortions, hamper regulatory\nclarity or reinforce the DNA loop in the case of big techs providing financial services.\nRecent theoretical research shows that if open banking policies empower fintechs\ndisproportionately, borrowers can be worse off (He et al (2023).23 Moreover, consent\nalone may be insufficient to protect consumers and may need to be be\ncomplemented by a robust data and consumer protection framework. This includes\neffective oversight, privacy-by-design measures and safeguards against risks arising\nfrom eg data analytics and algorithms (Natarajan 2023)).",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "4. Challenges and lessons to date"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#58",
+    "anchor_label": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#58",
+    "text": "A distinct challenge is expanding from open banking, focused only on transaction\ndata, to open finance. Broader frameworks, covering insurance, pensions, investments\nand mortgages, face gaps in regulation, complex data protection regimes and higher\ninfrastructure costs, particularly for smaller institutions. An important effort in this\ndirection is the design and implementation of data frameworks, which underpin\nstability, consumer protection and innovation. Ultimately, advancing open finance\npolicies requires regulatory clarity, resilient infrastructure and institutional\ncoordination.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "4. Challenges and lessons to date"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#59",
+    "anchor_label": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#59",
+    "text": "While open finance is primarily implemented at the domestic level, the rising\ncross-border mobility of individuals and businesses reveals a key gap. Specifically,\n\n21\nMurray and Buckenham (2025) note that some of these challenges have complicated the shift\ntowards a fully functioning open finance system in the UK, for instance.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "4. Challenges and lessons to date"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#60",
+    "anchor_label": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#60",
+    "text": "22\nOne approach adopted in certain jurisdictions is to make participation mandatory. While this\napproach has generally helped address the historical concentration of data among incumbents, there\nis currently no evidence to suggest that it is a necessary condition for achieving a level playing field.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "4. Challenges and lessons to date"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#61",
+    "anchor_label": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#61",
+    "text": "national API infrastructures and data sharing practices may not be sufficient for\nindividuals and businesses that straddle borders to access financial services in line\nwith their needs. Supporting cross-border access to financial services requires striking\na balance between data sovereignty imperatives and interoperability between\ndomestic open finance infrastructures, alignment on technical standards, consent\nmanagement systems and governance models to enable secure and user-\npermissioned cross-border portability of financial data.24 Bonvino and Giorgino\n(2026) argue that the open finance ecosystem can unlock greater innovation,\ncompetition and long-term sustainability when all stakeholders actively collaborate\nand co-evolve by harmonising standards, sharing data responsibly and jointly\ndeveloping infrastructure and governance frameworks. The challenges of doing this\nare, naturally, even greater for stakeholders in different jurisdictions.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "4. Challenges and lessons to date"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#62",
+    "anchor_label": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#62",
+    "text": "Meanwhile, ensuring wide participation in open finance and addressing\nstructural (behavioural) barriers to adoption remain key. Evidence from Brazil shows\nthat adoption is lower among less-educated and low-income individuals (CGAP\n(2023)). Adoption rates also vary by gender, with men more likely to use open finance\nthan women.25 In other cases, willingness to share data remains limited even when\nbenefits are clearly presented. For example, when respondents were shown potential\nadvantages such as improved loan terms or higher credit limits, only 27% indicated\nthat they would share data to obtain those benefits (CGAP (2023). $I n \\quad I n d i a , a \\quad C G A P$\nsurvey shows similar trends. Of approximately 2,000 smartphone users, only 12% were\nfamiliar with account aggregators and 20% were willing to share financial data\n(Salman and Fernandez Vidal (2024). Both awareness and willingness were markedly\nlower among women, rural residents and individuals with lower levels of education.\nAmong loan applicants, only 10% reported using the account aggregator mechanism\ndespite significant efficiency gains reported by financial service providers.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "4. Challenges and lessons to date"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#63",
+    "anchor_label": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#63",
+    "text": "Finally, data access pricing is emerging as an important next stage in the\nevolution of open finance policies. Recent policy discussions have focused on how\ndata should be valued and priced. For example, in 2025 JPMorgan introduced fees\nfor third-party providers to access its consumer data, prompting renewed attention\nto the economic implications of data sharing arrangements (Shevlin (2025). In the\nEU, ongoing deliberations on the scope of the Financial Data Access (FiDA) regulation,\nincluding proposals to exclude certain large technology firms, reflect broader\nconcerns about market structure, eligibility criteria and reciprocity of access (Moens\nand Tamma (2025)). The proposed FiDA regulation represents a transformative but\nchallenging shift towards an EU-wide open data economy. It would significantly\nexpand PSD2 by mandating real-time access to a broad range of financial data, with\nthe aim of empowering customers and stimulating innovation (Euro Banking\nAssociation (2025). These developments have revived debates over whether\nmeasures perceived as protecting incumbent institutions could inadvertently limit\ncompetition and innovation. An opposing view is that pricing mechanisms can be\nviewed as legitimate compensation for the maintenance of proprietary infrastructure,",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "4. Challenges and lessons to date"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#64",
+    "anchor_label": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#64",
+    "text": "24\nProject Aperta by the BIS Innovation Hub explores innovative approaches to global interoperability,\noffering harmonised features, functionalities, use cases, security protocols, operating procedures and\ntrust frameworks to support cross-border data portability in open finance.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "4. Challenges and lessons to date"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#65",
+    "anchor_label": "bis-papers-168 \"4. Challenges and lessons to date\" chunk#65",
+    "text": "25\nThis may reflect differences in risk aversion and preferences towards data sharing. See Armantier et\nal (2025).\n\ncyber security investments and the operational costs associated with secure data\nsharing systems.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "4. Challenges and lessons to date"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"5. Conclusion\" chunk#66",
+    "anchor_label": "bis-papers-168 \"5. Conclusion\" chunk#66",
+    "text": "### 5. Conclusion\n\nOverall, jurisdictions' experiences suggest that realising the promise of open finance\nhinges on further refining open banking and open finance frameworks over time. The\nconcept of open finance has been around for some time, but for many jurisdictions,\nimplementation is still in its early days.26 In this light, authorities can continue to learn\nfrom the experience of peer jurisdictions. Open finance holds strong potential to\nenhance consumer empowerment, promote competition, drive innovation and\nadvance financial inclusion, while requiring careful risk mitigation.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "5. Conclusion"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"5. Conclusion\" chunk#67",
+    "anchor_label": "bis-papers-168 \"5. Conclusion\" chunk#67",
+    "text": "There are a number of open questions where further research will be needed.\nWhile the initial evidence highlights the benefits of open finance in fostering fair\ncompetition, innovation and financial inclusion, more work is needed to understand\nthe long-term impacts on market structure, financial intermediation and consumer\nwelfare. Moreover, the role of data protection, privacy frameworks and pricing\nmechanisms for data access in shaping the adoption and success of open finance\ninitiatives remains underexplored. Future research could examine the trade-off\nbetween data sovereignty/privacy and gains from open finance initiatives. Another\ninteresting avenue to explore could be how variations in open finance frameworks\nacross jurisdictions affect consumer trust and participation in financial markets.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "5. Conclusion"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"5. Conclusion\" chunk#68",
+    "anchor_label": "bis-papers-168 \"5. Conclusion\" chunk#68",
+    "text": "Advancing open finance will also require deeper investigation of key\nperformance indicators. This could include providing incentives to market\nparticipants, improving consent management mechanisms and establishing clear\nliability frameworks to ensure transparency, security and accountability (OECD 2023).\nOpen finance has the potential to bridge critical data and market gaps by expanding\nbeyond sharing of consumer data to include SME transaction-level information,\nparticularly sex-disaggregated data for women-owned businesses and alternative\ndata for SME credit scoring. Leveraging these data sources globally could advance\nfinancial inclusion by offering tailored financial products and services and closing\ncredit gaps for underserved enterprises. It could also inform research on how inclusive\ndata sharing frameworks can strengthen economic resilience and foster inclusive\ngrowth.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "5. Conclusion"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"5. Conclusion\" chunk#69",
+    "anchor_label": "bis-papers-168 \"5. Conclusion\" chunk#69",
+    "text": "Addressing these research gaps will be critical to designing resilient, inclusive\nand trustworthy open finance ecosystems that balance innovation with consumer\nprotection and market integrity.\n\n26\nSee Graph A.3 in the appendix for a timeline of implementation in different jurisdictions. In some\njurisdictions, eg India, the ecosystem is beginning to mature and show a wider variety of providers\nand use cases (see Graph A.4 in the appendix). As more jurisdictions launch open banking and open\nfinance frameworks and as these are adopted, the evidence base will grow further.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "5. Conclusion"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#70",
+    "anchor_label": "bis-papers-168 \"References\" chunk#70",
+    "text": "## References\n\nAkoğuz, E C, T Roukny and T Vadasz (2025): \"The Interoperability of Financial data\",\navailable at SSRN: https://ssrn.com/abstract=5169568.\n\nAkyildirim, E, S Corbet, A Mukherjee and M Ryan (2025): \"Global perspectives on open\nbanking: regulatory impacts and market response\", Journal of International Financial\nMarkets, Institutions and Money, vol 101, no 102159, June.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#71",
+    "anchor_label": "bis-papers-168 \"References\" chunk#71",
+    "text": "Alliance for Financial Inclusion (AFI) (2025): \"Policy development and implementation\nguide for inclusive open finance\", Guideline Note, no 56, January.\n\nAlok, S, P Ghosh, N Kulkarni and M Puri (2024): \"Open banking and digital payments:\nimplications for credit access\", National Bureau of Economic Research (NBER) Working\nPaper Series, no 33259, December.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#72",
+    "anchor_label": "bis-papers-168 \"References\" chunk#72",
+    "text": "Armantier, O, S Doerr, J Frost, A Fuster and K Shue (2025): \"Nothing to hide? Gender\nand age differences in willingness to share data\", BIS Working Papers, no 1187,\nOctober.\n\nArner, D, C Wang, R Buckley and D Zetzsche (2025): \"Building open finance: from\npolicy to infrastructure\", Centre for Finance, Technology and Entrepreneurship (CFTE)\nAcademic and Industry Paper Series, January.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#73",
+    "anchor_label": "bis-papers-168 \"References\" chunk#73",
+    "text": "Babina, T, S Bahaj, G Buchak, F De Marco, A Foulis, W Gornall, F Mazzola and T Yu\n(2025): \"Customer data access and fintech entry: early evidence from open banking\",\nJournal of Financial Economics, vol 169, no 103950, July.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#74",
+    "anchor_label": "bis-papers-168 \"References\" chunk#74",
+    "text": "Bank for International Settlements (BIS) (2019): \"Big tech in finance: opportunities and\nrisks\", Annual Economic Report 2019, chapter III, June.\n\n\\- (2020): Enabling open finance through APIs, report by the BIS Consultative\nGroup on Innovation and the Digital Economy (CGIDE), December.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#75",
+    "anchor_label": "bis-papers-168 \"References\" chunk#75",
+    "text": "Basel Committee on Banking Supervision (BCBS) (2019): Report on open banking and\napplication programming interfaces (APIs), Bank for International Settlements,\nNovember.\n\nBianchi, M, S Garz, M Bouvard, H Özyilmaz and A Yamashita (2024): How can\ninteroperability improve financial inclusion? Research insights from the FIT IN Initiative,\nToulouse School of Economics.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#76",
+    "anchor_label": "bis-papers-168 \"References\" chunk#76",
+    "text": "Bonvino, C and M Giorgino (2026): \"Strategic data democratization toward open\nfinance: stakeholders' implications\", Financial Innovation, vol 12, no 35,\nhttps://doi.org/10.1186/s40854-025-00878-6.\n\nCambridge Centre for Alternative Finance (CCAF) (2024): The global state of open\nbanking and open finance, University of Cambridge Judge Business School.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#77",
+    "anchor_label": "bis-papers-168 \"References\" chunk#77",
+    "text": "(2025): The APAC state of open banking and open finance report, University of\nCambridge Judge Business School, June.\n\nCGAP (2023): \"Open finance: lessons from Brazil\", webinar, November,\nhttps://www.cgap.org/events/open-finance-lessons-brazil.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#78",
+    "anchor_label": "bis-papers-168 \"References\" chunk#78",
+    "text": "Competition and Markets Authority (CMA) (2017): The retail banking market\ninvestigation order 2017, gov.uk, February.\n\nConsumer Financial Protection Bureau (CFPB) (2025): \"Required rulemaking on\npersonal financial data rights\", August, https://www.consumerfinance.gov/personal-\nfinancial-data-rights.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#79",
+    "anchor_label": "bis-papers-168 \"References\" chunk#79",
+    "text": "D'Silva, D, Z Filkova, F Packer and S Tiwari (2019): \"The design of digital financial\ninfrastructure: lessons from India\", BIS Papers, no 106, December.\n\nDoerr, S, L Gambacorta, L Guiso and M Sanchez del Villar (2023): \"Privacy regulation\nand fintech lending\", BIS Working Papers, no 1103, June.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#80",
+    "anchor_label": "bis-papers-168 \"References\" chunk#80",
+    "text": "Euro Banking Association (2025): \"Financial Data Access (FIDA): the catalyst for an\nopen data economy?\", EBA Open Finance Working Group.\n\nEuropean Union (EU) (2015): \"Directive (EU) 2015/2366 of the European Parliament\nand of the Council of 25 November 2015 on payment services in the internal market,\namending Directives 2002/65/EC, 2009/110/EC and 2013/36/EU and Regulation (EU)\nNo 1093/2010, and repealing Directive 2007/64/EC (text with EEA relevance)\",\n25 November.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#81",
+    "anchor_label": "bis-papers-168 \"References\" chunk#81",
+    "text": "Farrell, S (2023): Banking on data: evaluating open banking and data rights in banking\nlaw, Kluwer Law International.\n\nFenton, A (2020): \"UK adults more loyal to banks than their partners, study finds\",\nYahoo Finance UK, 11 September.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#82",
+    "anchor_label": "bis-papers-168 \"References\" chunk#82",
+    "text": "Fingleton Associates and Open Data Institute (ODI) (2014): Data sharing and\nopen data for banks, a report for HM Treasury and Cabinet Office, September.\n\nFrost, J, L Gambacorta and H S Shin (2021): \"From financial innovation to inclusion\",\nInternational Monetary Fund Finance & Development, Spring.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#83",
+    "anchor_label": "bis-papers-168 \"References\" chunk#83",
+    "text": "Ghosh, P, B Vallee and Y Zeng (2025): \"FinTech lending and cashless payments\",\nJournal of Finance, November.\n\nGoldstein, I, C Huang and L Yang (2023): \"Open banking under maturity\ntransformation\", mimeo.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#84",
+    "anchor_label": "bis-papers-168 \"References\" chunk#84",
+    "text": "Government of Argentina (2025): \"Decreto 353/2025\" (\"Decree 353/2025\"), 22 May,\nhttps://servicios.infoleg.gob.ar/infolegInternet/anexos/410000-\n414999/413071/texact.htm.\n\nHe, Z, J Huang and J Zhou (2023): \"Open banking: credit market competition when\nborrowers own the data\", Journal of Financial Economics, vol 147, no 2.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#85",
+    "anchor_label": "bis-papers-168 \"References\" chunk#85",
+    "text": "Hong Kong Monetary Authority (HKMA) (2018): Open API framework for the banking\nsector and the launch of open API on HKMA's website, July,\nhttps://www.hkma.gov.hk/eng/news-and-media/press-releases/2018/07/20180718-\n5/f.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#86",
+    "anchor_label": "bis-papers-168 \"References\" chunk#86",
+    "text": "Institute of International Finance (IIF) (2025): \"Data frameworks - trends and\nimplementation challenges in open banking, open finance, and open data\", IIF Data\nNotes, March.\n\nJeng, L (ed) (2023): Open banking, Oxford University Press.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#87",
+    "anchor_label": "bis-papers-168 \"References\" chunk#87",
+    "text": "Jones, C and C Tonetti (2020): \"Nonrivalry and the economics of data\", American\nEconomic Review, vol 110, no 9.\n\nLux, M and O Zhao (2025): \"Open banking: lessons, challenges, and opportunities\",\nGeorgetown University's Psaros Center for Financial Markets and Policy, McDonough\nSchool of Business, January.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#88",
+    "anchor_label": "bis-papers-168 \"References\" chunk#88",
+    "text": "Moens, B and P Tamma (2025): \"EU to block big tech from new financial data sharing\nsystem\", Financial Times, 21 September, https://www.ft.com/content/6596876f-c831-\n482c-878c-78c1499ef543.\n\nMonetary Authority of Singapore (MAS) (2016): \"ABS-MAS Financial World Finance-\nas-a-service: API playbook\", https://www.mas.gov.sg/-/media/mas/smart-financial-\ncentre/api/absmasapiplaybook.pdf.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#89",
+    "anchor_label": "bis-papers-168 \"References\" chunk#89",
+    "text": "Murray, A and J Buckenham (2025): \"Open banking and open finance in the UK\",\nFinancial Conduct Authority Research Note, October.\n\nNam, R (2023): \"Open banking and customer data sharing: implications for fintech\nborrowers\", Leibniz Institute Sustainable Architecture for Finance in Europe (SAFE)\nWorking Papers, no 364, October.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#90",
+    "anchor_label": "bis-papers-168 \"References\" chunk#90",
+    "text": "Natarajan, H (2023): \"Regulatory aspects of open banking: the experience thus far\",\nEuropean Economy, April.\n\nOrganization for Economic Co-operation and Development (OECD) (2024):\n\"Competition, fintechs and open banking: an overview of recent developments in\nLatin America and the Caribbean\", OECD Roundtables on Competition Policy Papers,\nhttps://doi.org/10.1787/20758677.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#91",
+    "anchor_label": "bis-papers-168 \"References\" chunk#91",
+    "text": "(2023): \"Open finance policy considerations\", OECD Business and Finance\nPolicy Papers, https://doi.org/10.1787/19ef3608-en.\n\nOuyang, S (2021): \"Cashless payment and financial inclusion\", available at SSRN,\nno 3948925.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#92",
+    "anchor_label": "bis-papers-168 \"References\" chunk#92",
+    "text": "Payments New Zealand (2026): \"World class payments for Aotearoa New Zealand\",\nhttps://www.paymentsnz.co.nz/.\n\nPetralia, K, T Philippon and T Rice (2019): \"Banking disrupted? Financial intermediation\nin an era of transformational technology\", Geneva Reports on the World Economy, no\n22, September.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#93",
+    "anchor_label": "bis-papers-168 \"References\" chunk#93",
+    "text": "Productivity Commission (2017): \"Data availability and use: overview and\nrecommendations\", Australian Government Productivity Commission Inquiry Report,\nno 82, 31 March.\n\nReimsbach-Kounatze, C and A Molnar (2024): \"The impact of data portability on user\nempowerment, innovation, and competition\", OECD Going Digital Toolkit Notes,\nno 25, https://doi.org/10.1787/319f420f-en.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#94",
+    "anchor_label": "bis-papers-168 \"References\" chunk#94",
+    "text": "Rishabh, K (2026): \"Beyond the bureau: interoperable payment data for loan screening\nand monitoring\", Journal of Financial Intermediation, vol 65, no 101196.\n\nSalman, A and M Fernandez Vidal (2024): \"Trust and awareness will be key for open\nfinance adoption in India\", CGAP blog, 19 April.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#95",
+    "anchor_label": "bis-papers-168 \"References\" chunk#95",
+    "text": "Shevlin, R (2025): \"JPMorgan Chase is right to charge fintechs for data access\", Forbes,\n16 July, https://www.forbes.com/sites/ronshevlin/2025/07/16/jpmorgan-chase-is-\nright-to-charge-fintechs-for-data-access/.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#96",
+    "anchor_label": "bis-papers-168 \"References\" chunk#96",
+    "text": "The Paypers (2019): The open banking report 2019 - insights into the global open\nbanking landscape, September.\n\nVives, X (2019): \"Digital disruption in banking\", Annual Review of Financial Economics,\nvol 11.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#97",
+    "anchor_label": "bis-papers-168 \"References\" chunk#97",
+    "text": "World Bank (2024): \"Open finance: the Korean experience and opportunities and\nchallenges for the East Asia and Pacific Region\", May.\n\nWorld Economic Forum and CCAF (2025): The future of global fintech: from rapid\nexpansion to sustainable growth - second edition, Insight Report, June.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#98",
+    "anchor_label": "bis-papers-168 \"References\" chunk#98",
+    "text": "Xie, C and S Hu (2024): \"Open banking: an early review\", Journal of Internet and Digital\nEconomics, vol 4, no 2.\n\nXiong, R (2024): \"Open banking and fintech lending: evidence from a crowdfunding\nplatform\", https://ssrn.com/abstract=5046894.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#99",
+    "anchor_label": "bis-papers-168 \"References\" chunk#99",
+    "text": "Yu, T (2024): \"Data as collateral: open banking for small business lending\",\nhttps://papers.ssrn.com/sol3/papers.cfm?abstract id=5147405.\n\nZetta (2024): \"Lessons for the future of open finance: the view from Brazil\",\nhttps://somoszetta.org.br/wp-",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"References\" chunk#100",
+    "anchor_label": "bis-papers-168 \"References\" chunk#100",
+    "text": "content/uploads/2024/09/Zetta OpenFinance ENG DIGITAL V1.pdf.\n\n## Appendix\n\n## Further insights on open finance\n\nThis appendix gives further information on open finance.27 To start with, Graph A.1\nvisualises the scope of open banking, which includes deposit accounts and electronic\nwallets (e-wallets). Open finance can include a broader set of products, including\nloans, insurance and investment products like stocks or exchange-traded funds (ETFs).\nAn even broader term is open data, which may include data from other sectors\nbeyond financial services, such as utilities, telecom, transit, etc. Each of these can\ninclude both read access and write access. Read access allows for service provision\nbased on viewing or reading the data. Write access allows for service provision based\non modifying the data.28",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "References"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#101",
+    "anchor_label": "bis-papers-168 \"Further insights on open finance\" chunk#101",
+    "text": "<figure>\n<figcaption>Scope of open banking and open finance Graph A.1</figcaption>\n\nOpen finance\n\nOpen data\n\nOpen banking\n\nProduct scope\n\nUtilities\n\nLoans\n\nMortgages\n\nStocks\n\nProduct\nscope\n\nDeposit\naccount",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Further insights on open finance"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#102",
+    "anchor_label": "bis-papers-168 \"Further insights on open finance\" chunk#102",
+    "text": "E-wallet\n\nTelecom\n\nRead access: account balance, transaction\nhistory\n\nInsurance\n\nETFs\n\nWrite access: payment initiation on bank\ndeposit account, or an e-wallet\n\nRead access: open banking scope, plus product pricing and\ncontract information, etc",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Further insights on open finance"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#103",
+    "anchor_label": "bis-papers-168 \"Further insights on open finance\" chunk#103",
+    "text": "Write access: open banking scope, plus open\nan account, terminate/apply for a mortgage,\nbuy/sell stocks, etc\n\nTransit\n\n</figure>\n\nSources: CCAF (2024); BIS.\n\n27\nThere are several other definitions of open banking and open finance. The Geneva Report for World\nEconomy describes \"open banking\" as a consumer right to access and share banking data (Petralia\net al (2019)). The Basel Committee's 2019 report similarly defined open banking as banks sharing\ncustomer-permissioned data with third parties (BCBS (2019). The World Bank, International Monetary\nFund (IMF), Bank for International Settlements (BIS) and CGAP define open finance as an innovation\nthat facilitates customer-permissioned access to and use of customer data held by financial\ninstitutions in order to provide new and enhanced services and develop innovative business models\n(CGAP et al (2024)).",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Further insights on open finance"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#104",
+    "anchor_label": "bis-papers-168 \"Further insights on open finance\" chunk#104",
+    "text": "28\nFor example, in the EU, PSD2 already provides a form of \"write access\" by allowing licensed payment\ninitiation service providers (PISPs) to initiate payments directly from a user's bank account with their",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Further insights on open finance"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#105",
+    "anchor_label": "bis-papers-168 \"Further insights on open finance\" chunk#105",
+    "text": "Jurisdictions differ in their approach to open finance. The Cambridge Centre for\nAlternative Finance (CCAF) gives an overview (Graph A.2). Some jurisdictions, such as\nthe European Union, the United Kingdom, Canada, Brazil and India, have regulation-\nled approaches, while others, including China, Japan and Mexico, have market-led\napproaches. The United States is classified by CCAF as regulation-led, given the work\nof the Consumer Financial Protection Bureau (CFPB), but in practice it may be better\nclassified as market-led. Argentina has transitioned from a market-driven approach\nto a regulation-led approach by implementing formal open finance rules through\ngovernment decree and central bank regulation (Government of Argentina (2025)).\nThe CCAF does not classify the framework in Korea, where open finance is widely\nadopted.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Further insights on open finance"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#106",
+    "anchor_label": "bis-papers-168 \"Further insights on open finance\" chunk#106",
+    "text": "<figure>\n<figcaption>Open finance frameworks: regulation-led vs market-driven Graph A.2</figcaption>\n\n$K$\n\nMarket-Driven\n\n$F$\n\nRegulation-Led\n\n</figure>\n\nThe use of this map does not constitute, and should not be construed as constituting, an expression of a position by the BIS regarding the legal\nstatus of, or sovereignty of any territory or its authorities, to the delimitation of international frontiers and boundaries and/or to the name and\ndesignation of any territory, city or area.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Further insights on open finance"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#107",
+    "anchor_label": "bis-papers-168 \"Further insights on open finance\" chunk#107",
+    "text": "Note that the overview does not cover all known open finance frameworks, and classifications may change over time.\n\nSource: CCAF (2024).\n\nThe stage of development of open banking and open finance also differs.\nGraph A.3 gives a timeline with the years in which regulatory changes were enacted\nto facilitate the transition towards an open banking or open finance ecosystem,\nincluding live implementation in some jurisdictions. In most cases, jurisdictions begin\nby establishing a regulatory framework for open banking before expanding their\nfinancial services to encompass a broader range of products and services under the\nopen finance model. A few (eg Bahrain, India) moved in parallel. As of the latest\nassessment, only a few have progressed to the stage of implementing open finance.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Further insights on open finance"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#108",
+    "anchor_label": "bis-papers-168 \"Further insights on open finance\" chunk#108",
+    "text": "consent, demonstrating how modifying data (eg submitting a payment order) enables automated\nservices.\n\nAs more jurisdictions launch live open banking or open finance systems, there will be\na larger evidence base to assess the impact in practice.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Further insights on open finance"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#109",
+    "anchor_label": "bis-papers-168 \"Further insights on open finance\" chunk#109",
+    "text": "Timeline for year of legislation/regulation/guidance issues vs year of live\nimplementation of open banking and open finance\n\nGraph A3\n\n<figure>\n\nOpen banking\n\nOpen finance\n\nCountry\n\n2018\n\n2019\n\n2020\n\n2021",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Further insights on open finance"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#110",
+    "anchor_label": "bis-papers-168 \"Further insights on open finance\" chunk#110",
+    "text": "2022\n\n2023\n\n2024\n\nBahrain\n\nIndia\n\nAustralia\n\nKorea\n\nIsrael\n\nBrazil\n\nNigeria\n\nJordan\n\nUAE\n\nOpen banking\nlegislation\npassed\n\nOpen\nbanking\nlive\n\nOpen finance\nlegislation\npassed\n\nOpen\nfinance\nlive\n\n</figure>",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Further insights on open finance"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#111",
+    "anchor_label": "bis-papers-168 \"Further insights on open finance\" chunk#111",
+    "text": "<table>\n<tr>\n<th>Country</th>\n<th colspan=\"2\">2016 2017</th>\n<th>2018</th>\n<th>2019</th>\n<th>2020</th>\n<th>2021</th>\n<th>2022</th>\n<th>2023</th>\n<th>2024</th>\n</tr>\n<tr>\n<td>UK</td>\n<td colspan=\"2\"></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Australia</td>\n<td colspan=\"2\"></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Bahrain</td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>EU</td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Korea</td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>India</td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Georgia</td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Türkiye</td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Israel</td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Brazil</td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Nigeria</td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Jordan</td>\n<td></td>\n<td></td>\n<td></",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Further insights on open finance"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#112",
+    "anchor_label": "bis-papers-168 \"Further insights on open finance\" chunk#112",
+    "text": "td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Saudi Arabia</td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>UAE</td>\n<td colspan=\"2\"></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n</tr>\n</table>",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Further insights on open finance"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#113",
+    "anchor_label": "bis-papers-168 \"Further insights on open finance\" chunk#113",
+    "text": "Source: CCAF (2024).\n\nIndia, which was a relatively early mover, gives insights into the maturation $o f$\nopen finance ecosystems. Over time, the financial system has seen broader use cases,\ngreater provider diversity and more structured governance models. For instance,\nthird-party providers are enabling an expanding range of financial services, reflecting\na more diverse set of intermediaries entering the open finance ecosystem. While non-\nbank financial corporations continue to hold the lion's share, accounting for nearly\ntwo-thirds of third-party providers, stockbrokers have gained some share relative to\ninvestment advisers and private banks (Graph A.4.A). Moreover, while consents for\nlending surpassed the 100 million mark in the early months of 2025, their share in the\ntotal number of consents has steadily declined since the end of 2023, suggesting that,\nover time, users are increasingly adopting other financial services as well\n(Graph A.4.B).",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Further insights on open finance"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Further insights on open finance\" chunk#114",
+    "anchor_label": "bis-papers-168 \"Further insights on open finance\" chunk#114",
+    "text": "Graph A.4\n\n## In India, the open finance ecosystem is maturing\n\n### A. A growing diversity of different TPPs\n\n<figure>\n<figcaption>B. Consents for lending have passed 100 million</figcaption>\n\n100\n\n80",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Further insights on open finance"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"A. A growing diversity of different TPPs\" chunk#115",
+    "anchor_label": "bis-papers-168 \"A. A growing diversity of different TPPs\" chunk#115",
+    "text": "60\n\n40\n\n20\n\n0\n\nQ3 2022 Q1 2023 Q3 2023 Q1 2024 Q3 2024 Q1 2025\n\n</figure>\n\nPercentage of consents by TPP category:\n\nNon-banking financial corporations\n\nP2P lending\n\nRegistered investment advisers\n\nPublic banks",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "A. A growing diversity of different TPPs"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"A. A growing diversity of different TPPs\" chunk#116",
+    "anchor_label": "bis-papers-168 \"A. A growing diversity of different TPPs\" chunk#116",
+    "text": "Private banks\n\nStockbrokers\n\nOthers\n1\n\n%\n\n<figure>\n\nMillions\n\n%\n\n100\n\n82.5\n\n80\n\n80.0\n\n60\n\n77.5\n\n40\n\n75.0\n\n20\n\n72.5\n\n0\n\n1\n\n1\n\n70.0\n\n2022\n\n2023\n\n2024\n\nConsents for lending/credit:\n\nCumulative (Ihs)\n\n% of total consents (rhs)",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "A. A growing diversity of different TPPs"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"A. A growing diversity of different TPPs\" chunk#117",
+    "anchor_label": "bis-papers-168 \"A. A growing diversity of different TPPs\" chunk#117",
+    "text": "</figure>\n\nTPP = third-party providers.\n\n1 Includes alternative investment fund, asset management companies, housing finance companies, insurance brokers, insurance companies,\nprepaid payment instruments and trade receivables discounting systems, regional rural banks and small finance banks and retirement advisers.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "A. A growing diversity of different TPPs"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"A. A growing diversity of different TPPs\" chunk#118",
+    "anchor_label": "bis-papers-168 \"A. A growing diversity of different TPPs\" chunk#118",
+    "text": "Source: Sahamati.\n\n## Glossary\n\nApplication programming interface (API): the set of routines, protocols and tools\nfor building software applications that provide standardised interfaces for secure data\nexchange between banks and third parties. Open API: an interface that provides a\nmeans of accessing data based on a public standard.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "A. A growing diversity of different TPPs"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Glossary\" chunk#119",
+    "anchor_label": "bis-papers-168 \"Glossary\" chunk#119",
+    "text": "Open banking: the sharing and leveraging of customer-permissioned data by banks\nwith third parties.\n\nOpen data: the sharing and leveraging of customer-permissioned data in other\nindustries beyond the financial sector - such as healthcare, utilities,\ntelecommunications or taxes.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Glossary"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Glossary\" chunk#120",
+    "anchor_label": "bis-papers-168 \"Glossary\" chunk#120",
+    "text": "Open finance: the sharing and leveraging of customer-permissioned data by\nfinancial institutions with third parties. While open banking focuses primarily on bank\naccounts, open finance covers a broader range of financial products, including\ninsurance, securities and mortgages.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Glossary"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Glossary\" chunk#121",
+    "anchor_label": "bis-papers-168 \"Glossary\" chunk#121",
+    "text": "Private API: an interface that provides a means of accessing data based on a private\nstandard.\n\nPSD2: the European Union's Second Payment Services Directive.\n\nReciprocity: a characteristic of data sharing in an open finance ecosystem in which\neligible entities participate both as data holders and as data users (ie contribute to\nand benefit from shared data). In open banking, open finance and open data contexts,\ndata sharing should only happen with customer consent.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Glossary"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Glossary\" chunk#122",
+    "anchor_label": "bis-papers-168 \"Glossary\" chunk#122",
+    "text": "Reverse engineering: analysing existing banking interfaces or software to replicate\ntheir functionality or enable data access, without relying on official documentation or\nstandardised APIs. This is often used by third parties prior to the introduction of open\nbanking frameworks.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Glossary"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "bis-papers-168 \"Glossary\" chunk#123",
+    "anchor_label": "bis-papers-168 \"Glossary\" chunk#123",
+    "text": "Screen scraping: the practice of using customers' online banking credentials, with\ntheir consent, to log into on their behalf and extract data directly from a bank (or\nfinancial institution) website.\n\nTPPs: Third-party providers, including fintechs, big techs and other (usually non-\nbank) intermediaries.",
+    "doc_class": "prose",
+    "document_id": "bis-papers-168",
+    "heading_path": [
+      "Glossary"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  }
+]

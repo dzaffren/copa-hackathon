@@ -1,0 +1,16 @@
+{
+  "id": "open-finance-pd-2026",
+  "name": "Open Finance PD . 2026",
+  "deliverable_type": "Policy Document",
+  "role": "own",
+  "description": "PD consolidating the 2025 Open Finance ED against peer guidance.",
+  "primary_task_id": "open-finance-pd-2026-pd",
+  "target_publication": "Q4 2026",
+  "owner": {
+    "id": "ar",
+    "name": "Aisyah R."
+  },
+  "reviewers": [],
+  "access": "team_only",
+  "created_at": "2026-07-28T03:20:29.895447Z"
+}

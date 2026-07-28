@@ -1,0 +1,1365 @@
+[
+  {
+    "anchor_id": "hkma-open-api-framework 1(HKMA)",
+    "anchor_label": "hkma-open-api-framework 1(HKMA)",
+    "text": "related implementation plan.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "I. INTRODUCTION",
+      "Background",
+      "1"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 2",
+    "anchor_label": "hkma-open-api-framework 2",
+    "text": "The key benefits of Open API can be reaped only if it is widely,\nsecurely and cost-effectively implemented in the banking sector.\nThe HKMA will therefore work closely with the banking industry\nin implementing Open API effectively, securely and smoothly\nthrough the development of the governance structure and\nnecessary guidance during the implementation process.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "I. INTRODUCTION",
+      "Background"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 3",
+    "anchor_label": "hkma-open-api-framework 3",
+    "text": "In developing the proposed Open API framework, the HKMA\ninvited nomination of Open API contacts from 20 retail and three\nforeign banks, hosted a workshop on 15 August 2017 and held\ndiscussions with Open API contacts throughout September and\nOctober 2017. A draft Open API framework was then proposed\nand opened for industry consultation from 11 January 2018 to 15\nMarch 2018. This Open API framework contains the necessary\nrevisions after the consultation. It becomes effective from the date\nof publication.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "I. INTRODUCTION",
+      "Background"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 4.1",
+    "anchor_label": "hkma-open-api-framework 4.1",
+    "text": "ensure the competitiveness and relevance of the banking\nsector;",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "I. INTRODUCTION",
+      "Policy Objectives",
+      "4"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 4.2",
+    "anchor_label": "hkma-open-api-framework 4.2",
+    "text": "provide a secure, controlled and convenient operating\nenvironment to allow banks and their partners1 (called\nthird party service providers, or TSPs, in this\nframework), to work together and develop\ninnovative/integrated banking services that improve\ncustomer experience; and",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "I. INTRODUCTION",
+      "Policy Objectives",
+      "4"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 4.3",
+    "anchor_label": "hkma-open-api-framework 4.3",
+    "text": "keep up with international developments in the delivery\nof banking services.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "I. INTRODUCTION",
+      "Policy Objectives",
+      "4"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 5",
+    "anchor_label": "hkma-open-api-framework 5",
+    "text": "APIs can be seen as the interfaces between software applications,\nboth within an organisation and between organisations. APIs\nenable communication between software applications where one\napplication calls upon the functionality of or passes data to\nanother application. 2",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "II. OPEN API"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 6",
+    "anchor_label": "hkma-open-api-framework 6",
+    "text": "APIs enable secure, controlled, cost-effective and granular access\nto data and/or functionality of systems. Open APIs, in the context\nof this document, refer to APIs that allow third party access to\nsystems belonging to an organisation. However, Open APIs for\nthe banking industry do not necessarily mean that any third party\ncan freely access a bank's system without restriction, because\nbanks still need to ensure adequate controls such as security and\nconsumer protection.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "II. OPEN API"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 7",
+    "anchor_label": "hkma-open-api-framework 7",
+    "text": "This Open API framework focuses only on the retail banking\noperation in Hong Kong at the initial stage as it covers the\nservices offered to the largest group of customers. However,",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Applicability"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 1",
+    "anchor_label": "hkma-open-api-framework 1",
+    "text": "\" Including other banks",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Applicability"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 2#2",
+    "anchor_label": "hkma-open-api-framework 2#2",
+    "text": "Association May 2016\n\nbanks are welcome to extend the framework to any other banking\nbusiness as they see fit.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Applicability"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 8.1",
+    "anchor_label": "hkma-open-api-framework 8.1",
+    "text": "The implementation of Open API would bring many\nbenefits and efficiency gain to the banking industry and\nto its customers. Feedback from the banking industry\nindicates that it is desirable to implement Open APIs to\nprovide better services to satisfy the demands of its\ncustomers. Banks are therefore expected to implement the\nOpen API framework in the timeline set out in the\nframework. The HKMA will monitor the implementation\nclosely, and act accordingly to ensure market adoption\nand encourage use cases.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Guiding Principles",
+      "8"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 8.2",
+    "anchor_label": "hkma-open-api-framework 8.2",
+    "text": "The HKMA has taken note of the mandatory approach\nadopted by some jurisdictions such as the EU, the UK\nand Australia but has decided that a collaborative and\nphased approach is an appropriate approach for Hong\nKong for the time being. The HKMA will monitor the\nprogress of Open API implementation in Hong Kong and\nfurther consider the need for new regulatory measures if\nnecessary.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Guiding Principles",
+      "8"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 8.3",
+    "anchor_label": "hkma-open-api-framework 8.3",
+    "text": "The framework is intended to be high-level in order\nto allow banks the flexibility in implementing Open\nAPI as part of their strategy. The HKMA does not\nwish to prescribe how banks should adopt Open API\ndown to implementation steps.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Guiding Principles",
+      "8"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 8.4",
+    "anchor_label": "hkma-open-api-framework 8.4",
+    "text": "High-level Open API functions have been selected on the\nbasis of their potential benefits to banks and customers,\nand identified in order of priority.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Guiding Principles",
+      "8"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 8.5",
+    "anchor_label": "hkma-open-api-framework 8.5",
+    "text": "Existing international or industry practices have been\nleveraged in the framework in order to ensure ease of\nimplementation and speedy development of Open APIs.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Guiding Principles",
+      "8"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 9.1",
+    "anchor_label": "hkma-open-api-framework 9.1",
+    "text": "Open API functions and deployment timeframe;",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Scope of the Open API Framework",
+      "9"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 9.2",
+    "anchor_label": "hkma-open-api-framework 9.2",
+    "text": "Open API technical standards on architecture, security\nand data;",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Scope of the Open API Framework",
+      "9"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 9.3",
+    "anchor_label": "hkma-open-api-framework 9.3",
+    "text": "TSP governance model;",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Scope of the Open API Framework",
+      "9"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 9.4",
+    "anchor_label": "hkma-open-api-framework 9.4",
+    "text": "Open API facilitation measures; and",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Scope of the Open API Framework",
+      "9"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 9.5",
+    "anchor_label": "hkma-open-api-framework 9.5",
+    "text": "Open API ongoing development.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Scope of the Open API Framework",
+      "9"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 10",
+    "anchor_label": "hkma-open-api-framework 10",
+    "text": "The scope and selection of Open API functions are the key and\nthe first step because the correct identification could lead to early\nimplementation. At the same time, the industry's desire for a\nprogressive and step-by-step approach to implement Open APIs\nbeginning with a less risky set of functions is recognised.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Scope and Development Timeframe of Open API Functions"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 11.1",
+    "anchor_label": "hkma-open-api-framework 11.1",
+    "text": "Product and service information - \"Read-only\"\ninformation offered by banks on details of their products\nand services;",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation",
+      "11"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 11.2",
+    "anchor_label": "hkma-open-api-framework 11.2",
+    "text": "Subscription\nand\nnew\napplications\nfor\nproduct/service - Customer acquisition process such as\nallowing online submissions/application of credit cards,\nloans or other bank products;",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation",
+      "11"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 11.3",
+    "anchor_label": "hkma-open-api-framework 11.3",
+    "text": "Account information - Retrieval and alteration (where\napplicable) of account information (balance, transaction\nhistory, limits, payment schedules, etc.) of authenticated\ncustomers for stand-alone or aggregated views; and",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation",
+      "11"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 11.4",
+    "anchor_label": "hkma-open-api-framework 11.4",
+    "text": "Transactions - Banking transactions and payment or\nscheduled payments/transfer initiated by authenticated\ncustomers.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation",
+      "11"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 12",
+    "anchor_label": "hkma-open-api-framework 12",
+    "text": "It was further agreed that the types of protection required for each\nof the four categories of Open API implementation should be in a\nprogressive manner as follows:\n\n<table>\n<tr>\n<th>Categories of Open API</th>\n<th>Protections required</th>\n</tr>\n<tr>\n<td>Product and service information</td>\n<td>· Authentication of bank sites · Integrity of data · Authentication of TSPs</td>\n</tr>\n<tr>\n<td>Subscription and new applications for product/service</td>\n<td>· Authentication of bank sites · Integrity and confidentiality of data · Authentication of TSPs</td>\n</tr>\n<tr>\n<td>Account information</td>\n<td>· Authentication of bank sites · Integrity and confidentiality of data</td>\n</tr>\n<tr>\n<td>Transactions</td>\n<td>· Authentication of TSPs · Authorisation of customers</td>\n</tr>\n</table>\n\nA phased approach",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 13",
+    "anchor_label": "hkma-open-api-framework 13",
+    "text": "Owing to the increased sensitivity of data and therefore the\nincreased risks involved in each subsequent category, the\nprotective measures required will be more complicated. Therefore,\n\na four-phased approach matching the four categories of Open API,\nis recommended.\n\nIt is envisaged that the deployment of Product and service\ninformation will be similar to an open data initiative which the\ninformation technology industry is already familiar with. The\nimplementation and timeline for the deployment should therefore\nbe relatively simple and short.\n\nSubsequent phases of Open APIs would involve more\nsophisticated technology, security and authentication\ninfrastructure, and therefore may require more development\nefforts. However, as banks would have accumulated experience in\nprior phases, timelines of the subsequent phases are not expected\nto be disproportionately long.\n\nBased on the comments received from the consultation, the\nproposed six-month timeline after the publication of this\nframework for launching Product and service information\n(referred as Phase I) Open APIs by banks remains. The proposed\n12-month timeline for Subscription and new applications\n(referred as Phase II) is relaxed to 12 - 15 months to allow the\nindustry more time for preparation.\n\nFor the subsequent phases, Open APIs would allow even more\ninnovative and convenient services. As the complexity and risk of\nopening up data of all customers increase, the technology and\ninfrastructure to support, monitor and secure the Open API access\nbecome more complex and critical. The HKMA will therefore\nclosely monitor the situation and take into consideration local and\ninternational developments, and decide the timeline with the\nindustry during the coming 12 months.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 14",
+    "anchor_label": "hkma-open-api-framework 14",
+    "text": "",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 15",
+    "anchor_label": "hkma-open-api-framework 15",
+    "text": "",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 16",
+    "anchor_label": "hkma-open-api-framework 16",
+    "text": "",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 17",
+    "anchor_label": "hkma-open-api-framework 17",
+    "text": "",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 18",
+    "anchor_label": "hkma-open-api-framework 18",
+    "text": "<table>\n<tr>\n<th>Phase</th>\n<th>Categories of Open APIS</th>\n<th>Timeline after the publication of this Open API framework</th>\n</tr>\n<tr>\n<td>I</td>\n<td>Product and service information</td>\n<td>Six months</td>\n</tr>\n<tr>\n<td>II</td>\n<td>Subscription and new applications for product/service</td>\n<td>12 - 15 months</td>\n</tr>\n<tr>\n<td>III</td>\n<td>Account information</td>\n<td>To be set out within the next 12 months</td>\n</tr>\n<tr>\n<td>IV</td>\n<td>Transactions</td>\n<td>To be set out within the next 12 months</td>\n</tr>\n</table>",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 19",
+    "anchor_label": "hkma-open-api-framework 19",
+    "text": "It should be noted that the suggested timeline above represents\nthe latest expected dates for banks to make available the Open\nAPIs indicated. Individual banks are welcome to advance their\nown programme, either for completion of individual phases or for\nintroducing Open APIs for those categories that have not yet been\nset out in the timeframe. For example, a bank may choose to\nmake available Open APIs for conducting transactions on their\nproducts and services during Phase I at the same time as they\nlaunch their Product and service information Open APIs.\nHowever these banks should ensure that commensurate level of\nprotections3 and suitable TSP governance arrangements are in\nplace with appropriate contracts to clearly define the\nresponsibility, liability, control and customer protections.\n\nOpen API functions",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 20",
+    "anchor_label": "hkma-open-api-framework 20",
+    "text": "Throughout the discussion and consultation period, the HKMA\nrecognises the industry's desire to see a common set of Open",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 3#2",
+    "anchor_label": "hkma-open-api-framework 3#2",
+    "text": "the applicable requirements related to consumer protection (including applicable consumer protection\nprovisions set out in the Code of Banking Practice) and the applicable regulatory requirements related\nto customer data protection.\n\nAPIs for better interoperability. However, a number of\ninternational banks operating in Hong Kong have already\nimplemented their group standard for implementing Open APIs at\nglobal or regional levels, and have demonstrated elsewhere that\nrequiring banks to adhere to a prescribed set of standardised Open\nAPI functions is challenging.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 21",
+    "anchor_label": "hkma-open-api-framework 21",
+    "text": "Some opinions from the technology sector also indicate that it\nwould be more desirable for banks to quickly offer Open APIs\nthan to wait for standardised Open APIs that would take time to\nemerge. Furthermore, it is believed that once an ecosystem has\nbeen developed and becomes mature, convergence to\nstandardised Open APIs will likely occur in response to the needs\nof the market.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 22",
+    "anchor_label": "hkma-open-api-framework 22",
+    "text": "Taking into account the practices and experience of the UK,\nSingapore and Japan, and the feedback during the consultation\nexercise, high-level core-banking Open API functions are\nspecified for deployment and further set out in Annex $\\mathrm { A } .$",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 23",
+    "anchor_label": "hkma-open-api-framework 23",
+    "text": "In this connection, banks are expected to provide the HKMA with\nroad maps of Open API implementation (Product and service\ninformation within two months, and Subscription and $n e w$\napplications within eight months from the publication of this\nframework). Banks are also expected to explain how their road\nmaps meet the general scope described in Annex $\\mathrm { A }$ (and in the\ncase of gaps, the reasons).",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 24",
+    "anchor_label": "hkma-open-api-framework 24",
+    "text": "",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 25",
+    "anchor_label": "hkma-open-api-framework 25",
+    "text": "The HKMA plans to publish a summary (covering at least the\nfunctions to implement and their timelines) of the road maps for\nindividual banks so that the industry can better plan for service\nofferings. The publication will also reduce the workload of banks\nin providing such information to individual prospective TSPs.\n\nBanks are always welcome to implement Open APIs ahead of\ntime or implement functions that have not been specified in this\nframework.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "III. OPEN API FRAMEWORK",
+      "Categorisation"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 26",
+    "anchor_label": "hkma-open-api-framework 26",
+    "text": "Based on international practice and the feedback during the\nconsultation exercise, the recommended architecture and security\nstandards are listed in Annex B.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "Architecture, Security and Data Standards"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 27",
+    "anchor_label": "hkma-open-api-framework 27",
+    "text": "While certain technical standards have been prescribed, they\ncannot be considered as the only standards that cover all security\nrequirements. Banks should always make reference to industry\nsound practices, relevant regulatory and internal requirements,\nand apply holistic controls on information and cybersecurity\nbased on a risk- and principle-based approach to protect banks'\nsystems as well as bank and consumer data.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "Architecture, Security and Data Standards"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 28",
+    "anchor_label": "hkma-open-api-framework 28",
+    "text": "To help speedy and timely implementation, banks may decide\ntheir own data specification. Banks, however, should publish such\ndefinition (often called \"data dictionary\") using industry practices\nnormally in use, such as OpenAPI Specification (also known as\nSwagger).",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "Architecture, Security and Data Standards"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 29",
+    "anchor_label": "hkma-open-api-framework 29",
+    "text": "In order to strike a balance between innovation and customer\nprotection, it is preferred that TSPs offer solutions under a\npartnership arrangement with banks. Banks are therefore expected\nto adopt a formal TSP governance process.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 30.1",
+    "anchor_label": "hkma-open-api-framework 30.1",
+    "text": "due diligence on bilateral engagements with TSPs\ncovering all aspects of TSP governance according to the\n\nnature of the engagement, and established policies and\nprocedures of the banks.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "30"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 30.2",
+    "anchor_label": "hkma-open-api-framework 30.2",
+    "text": "Central entity - A central entity is funded and formed in\nagreement by all the banks involved to develop a\ncommon set of TSP governance criteria and assessment\nservice so that the process may be streamlined and made\nmore efficient.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "30"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 30.3",
+    "anchor_label": "hkma-open-api-framework 30.3",
+    "text": "Bilateral with a common baseline - A set of TSP\ngovernance common baseline is developed and agreed by\nbanks. While banks may add in their own unique\nrequirements, the baseline approach streamlines the\nonboarding process.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "30"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 31.1",
+    "anchor_label": "hkma-open-api-framework 31.1",
+    "text": "The TSP governance processes for different categories of\nOpen APIs are summarised below:\n\n<table>\n<tr>\n<th>Open APIs</th>\n<th>TSP governance processes</th>\n</tr>\n<tr>\n<td rowspan=\"3\">Those specified under Phase I</td>\n<td>· Banks should establish simple TSP</td>\n</tr>\n<tr>\n<td>registration process with basic</td>\n</tr>\n<tr>\n<td>consumer protection measures in place.</td>\n</tr>\n<tr>\n<td>Those</td>\n<td>· Banks should have in place:</td>\n</tr>\n<tr>\n<td rowspan=\"4\">specified under Phase II and beyond</td>\n<td>i. onboarding checks on TSPs;</td>\n</tr>\n<tr>\n<td>ii. ongoing monitoring on TSPs;</td>\n</tr>\n<tr>\n<td>and</td>\n</tr>\n<tr>\n<td>iii. bilateral contractual relationship with TSPs.</td>\n</tr>\n</table>",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "31"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 31.2.1",
+    "anchor_label": "hkma-open-api-framework 31.2.1",
+    "text": "A number of banks may agree on the scope of\nthe common baseline onboarding checks\namong themselves to facilitate easier\nonboarding; and",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "31",
+      "31.2 The aforementioned onboarding check process may be carried out as below:"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 31.2.2",
+    "anchor_label": "hkma-open-api-framework 31.2.2",
+    "text": "TSP may re-use common baseline materials\nprepared for one bank to submit to another.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "31",
+      "31.2 The aforementioned onboarding check process may be carried out as below:"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 31.3.1",
+    "anchor_label": "hkma-open-api-framework 31.3.1",
+    "text": "Banks conduct their own assessments of TSPs.\nA bank may also, subject to its own risk\nevaluation, consider a TSP that has been\nsuccessfully assessed by another bank;",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "31",
+      "31.3"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 31.3.2",
+    "anchor_label": "hkma-open-api-framework 31.3.2",
+    "text": "Banks appoint their own assessors to carry out\nthe assessments of TSPs. A bank may also,\nsubject to its own risk evaluation, consider\nTSPs that has been successfully assessed by\nanother assessor; or",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "31",
+      "31.3"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 31.3.3",
+    "anchor_label": "hkma-open-api-framework 31.3.3",
+    "text": "Banks appoint common assessor(s) to carry\nout the assessments of TSPs.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "31",
+      "31.3"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 32",
+    "anchor_label": "hkma-open-api-framework 32",
+    "text": "Details of each of these processes, together with the\nrecommended scopes for the onboarding checks and commercial\ncontracts, are listed in the following sections.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 33",
+    "anchor_label": "hkma-open-api-framework 33",
+    "text": "The HKMA wishes to clarify that the comprehensive TSP\ngovernance process is only necessary for Phase II and beyond.\n\nFor Phase I where banks open up Product and service information\nas open data, the HKMA expects banks to have a simple\nregistration process in place for consumer protection purpose,\nunless a bank decides to implement more advanced\nfunctionalities.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase I"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 34.1",
+    "anchor_label": "hkma-open-api-framework 34.1",
+    "text": "Capacity planning - Banks can gauge the degree of\ninterest and plan the necessary capacity on the\ninfrastructure;",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase I",
+      "34"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 34.2",
+    "anchor_label": "hkma-open-api-framework 34.2",
+    "text": "Relationship management - Banks can start engaging\npotential TSPs, and understanding their business models\nand plans to prepare for the implementation of phases $\\Pi$\nto $\\mathrm { I V }$ and",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase I",
+      "34"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 34.3.1",
+    "anchor_label": "hkma-open-api-framework 34.3.1",
+    "text": "TSPs should notify banks of their\nproducts/services which fall within the scope\nof and are bound by the terms and conditions;",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase I",
+      "34",
+      "34.3"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 34.3.2(i)",
+    "anchor_label": "hkma-open-api-framework 34.3.2(i)",
+    "text": "explicit to their customers that the collection\nof personal data is neither carried out by banks\nnor directly related to bank business, and (iii)\ncomply with the applicable laws and guidance\non the protection of personal data; and",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase I",
+      "34",
+      "34.3",
+      "34.3.2"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 35",
+    "anchor_label": "hkma-open-api-framework 35",
+    "text": "Banks are expected to have the registration process in place\nwithin the timeline of Phase $I .$ Banks should allow TSPs Open\nAPI access to Product and service information only if the TSPs\nare registered and agree to the relevant terms and conditions.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase I"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 15#2",
+    "anchor_label": "hkma-open-api-framework 15#2",
+    "text": "HKMA will provide facilitation as required.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase II and beyond",
+      "Onboarding check/common baseline development"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 38",
+    "anchor_label": "hkma-open-api-framework 38",
+    "text": "The goal of developing a common baseline is to facilitate and\nstreamline banks' engagement with TSPs through agreements and\ncreate a level playing field. $\\mathrm { T h e }$ common baseline should\ntherefore aim to simplify and encourage adoption of Open APIs\nby the banks with TSPs, and allow a greater variety of services\nand convenience that is beneficial to the customer. It is therefore\nin the interest of the banking sector to agree on the scope (a list of\nquestions and requirements) of the common baseline as far as\npossible and endeavour to minimise any additional requirements.\nThe common baseline should cover at least the elements listed in\nthe recommended scope below. Banks may choose to carry out",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase II and beyond",
+      "Onboarding check/common baseline development"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 36",
+    "anchor_label": "hkma-open-api-framework 36",
+    "text": "",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase II and beyond",
+      "Onboarding check/common baseline development"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 37",
+    "anchor_label": "hkma-open-api-framework 37",
+    "text": "additional checks that fit their needs but they should ensure that\nthose checks are reasonable and not excessive.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase II and beyond",
+      "Onboarding check/common baseline development"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 39",
+    "anchor_label": "hkma-open-api-framework 39",
+    "text": "With the common baseline in place, TSPs may prepare a set of\nstandard documents or evidence to satisfy the common\nrequirements of multiple banks during the due diligence process.\nThis is expected to save efforts for both banks and TSPs.\n\nScope of the common baseline",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase II and beyond",
+      "Onboarding check/common baseline development"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 40.1",
+    "anchor_label": "hkma-open-api-framework 40.1",
+    "text": "Business - Including financial soundness, reputation,\nquality of management, and appropriateness of business\noperations; and",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase II and beyond",
+      "Onboarding check/common baseline development",
+      "40"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 40.2",
+    "anchor_label": "hkma-open-api-framework 40.2",
+    "text": "Risk management - Including capabilities and controls $o f$\nthe TSPs in the areas of risk management, business and\ntechnical expertise in the field, customer and data\nprotection measures (including the avoidance of\nexcessive collection of personal data), cybersecurity and\nIT controls (including, among others, confidentiality,\nintegrity and availability, monitoring and mitigation\nmeasures, and contingency planning).",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase II and beyond",
+      "Onboarding check/common baseline development",
+      "40"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 41",
+    "anchor_label": "hkma-open-api-framework 41",
+    "text": "However, given the objective of the common baseline as a means\nof facilitation, the requirements set out therein should be fair and\nreasonable, and compensate with the risks involved.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase II and beyond",
+      "Onboarding check/common baseline development"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 42",
+    "anchor_label": "hkma-open-api-framework 42",
+    "text": "The industry, through its own initiatives and efforts, may develop\na streamlined assessment model (including the involvement of a\ncentral entity/assessor) to assess the common baseline when the\nindustry deems appropriate.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase II and beyond",
+      "A streamlined assessment model"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 43",
+    "anchor_label": "hkma-open-api-framework 43",
+    "text": "The streamlined assessment model is meant to reduce efforts for\nboth banks and TSPs to carry out onboarding checks. The\ndevelopment and agreement by multiple banks on a set of\ncommon baseline assessment benchmarks/criteria would be the\nprerequisite for this model.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase II and beyond",
+      "A streamlined assessment model"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 44.1",
+    "anchor_label": "hkma-open-api-framework 44.1",
+    "text": "basis to recognise the common baseline assessment\nperformed by each other; or",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase II and beyond",
+      "A streamlined assessment model",
+      "44"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 44.2",
+    "anchor_label": "hkma-open-api-framework 44.2",
+    "text": "entity/accessor) to carry out the common baseline\nassessment for them and agree bilaterally or multilaterally if\nthey would recognise the common baseline assessment\nperformed by these assessors.\n\nOngoing monitoring of TSPs",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase II and beyond",
+      "A streamlined assessment model",
+      "44"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 45",
+    "anchor_label": "hkma-open-api-framework 45",
+    "text": "It is also suggested that there should be a risk-based ongoing\nmonitoring mechanism for banks to ensure that TSPs continue to\nmeet the relevant parts of the common baseline (or equivalent\nassessment) after the initial assessment process.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Phase II and beyond",
+      "A streamlined assessment model"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 46",
+    "anchor_label": "hkma-open-api-framework 46",
+    "text": "Banks should negotiate bilaterally with TSPs on commercial\ncontracts in addition to the TSP onboarding assessment and\nongoing monitoring.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Commercial contract"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 47",
+    "anchor_label": "hkma-open-api-framework 47",
+    "text": "It is expected that the contract terms with TSPs should define,\nwhere applicable, areas on legal4, business5, security and",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Commercial contract"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 4",
+    "anchor_label": "hkma-open-api-framework 4",
+    "text": "\" Such as the roles and responsibilities, data ownership and governing law.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Commercial contract"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 5#2",
+    "anchor_label": "hkma-open-api-framework 5#2",
+    "text": "Such as commercial terms and Open API charging model.\n\ncontrolo, consumer protection7 and any other relevant aspects.\nHowever, banks should not use commercial contracts to impose\nunnecessary requirements to create entry barriers for TSPs.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Commercial contract"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 48",
+    "anchor_label": "hkma-open-api-framework 48",
+    "text": "In order to ensure public trust and consumer protection, banks are\nexpected to publish a list of partnering TSPs and their relevant\nproducts (such as mobile apps or websites) for Phase II and\nbeyond. The HKMA may work with the industry to centrally\nprovide to the public with a list of partnering TSPs and their\nrelevant products. In this connection, banks should provide\nupdates to the list in a timely manner.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Publication of partnership for consumer protection"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 49",
+    "anchor_label": "hkma-open-api-framework 49",
+    "text": "In addition, banks should monitor the Internet regularly to see if\nthere are third party websites, apps and similar scams which\npurported to be operated by the banks' partnering TSPs under the\nOpen API framework or claimed to be partnering with the banks\nwhen they are not. Whenever banks become aware of these cases,\nbanks should notify promptly their customers and the public\nthrough issuing press releases (or similarly effective means).\n\nLiability",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Publication of partnership for consumer protection"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 50",
+    "anchor_label": "hkma-open-api-framework 50",
+    "text": "In line with the relevant clause in the Code of Banking Practice, a\ncustomer should not be responsible for any direct loss suffered by\nhim/her as a result of unauthorised transactions conducted",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Publication of partnership for consumer protection"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 6#2",
+    "anchor_label": "hkma-open-api-framework 6#2",
+    "text": "consequences of failing to fulfil them, the right to assess TSP's relevant controls and their effectiveness\nin fulfilling the common baseline, and timely reporting and notification of significant incidents (e.g.\ndata leakage).",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Publication of partnership for consumer protection"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 7#2",
+    "anchor_label": "hkma-open-api-framework 7#2",
+    "text": "to customers succinct and easy-to-understand summary on the use and purpose of collecting the\npersonal data and key highlights of the terms and conditions of the services offered.), customer data\nprotection (including, among others, appropriate control and safeguards in relation to the collection,\nuse, holding and erasure of customer data for complying with the applicable laws and guidance on the\nprotection of personal data, the consent model for storing or sharing customer data), commitment not to\nstore customers' e-banking credentials, responsible conduct, protection of customers against fraud,\ncomplaint handling mechanism with accessible channels for interacting with customers to deal with\ntheir enquiries and complaints, redress measures, clear liability and settlement arrangement between\nthe bank and the partnering TSP for compensating customers' loss arising from unauthorised\ntransactions, and purchase of liability insurance by the TSP (where appropriate, such as when high-risk\ntransactions are involved).\n\nthrough his/her account attributable to the services offered by\nTSP using banks' Open API unless he/she acts fraudulently or\nwith gross negligence. In these cases, banks and TSP should\nprovide refund to customers according to the liability and\nsettlement arrangement defined in their contractual terms.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Publication of partnership for consumer protection"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 51",
+    "anchor_label": "hkma-open-api-framework 51",
+    "text": "Given the wide range of service offerings made possible with\nOpen API, liabilities between banks and TSPs will be dependent\non the actual mode of operation. Banks and TSPs should\ntherefore define and agree a clear liability and settlement\narrangement to protect customers in the cases of loss, and\ncommunicate clearly to customers.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "TSP Governance",
+      "Publication of partnership for consumer protection"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 52.1",
+    "anchor_label": "hkma-open-api-framework 52.1",
+    "text": "A single point of reference (may also be known as a\nrepository or a dashboard) of all Open APIs offered by\nbanks will facilitate ease of access by TSPs. During the\ndiscussion process, some banks suggested that it would\nbe desirable for the Data Studio of the Hong Kong\nScience and Technology Parks to take up this dashboard\nrole. Hence, it is recommended that all Open APIs from\nPhase I onwards are listed under the Data Studio.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "Open API Facilitation",
+      "52"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 52.2",
+    "anchor_label": "hkma-open-api-framework 52.2",
+    "text": "The listing of Open APIs under the Data Studio will not\npreclude banks from using other repositories. The\nindustry or individual banks are free to list their Open\nAPIs in multiple repositories.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "Open API Facilitation",
+      "52"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 52.3",
+    "anchor_label": "hkma-open-api-framework 52.3",
+    "text": "For details on how to use each Open API, banks may host\nthe information on their own websites or leverage the\ndashboard. However, details of the Open API functions,\narchitecture, security and data definitions (as referred in\n\nAnnex B) should be clearly published using OpenAPI\nSpecification or similar standards when supported.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "Open API Facilitation",
+      "52"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 52.4",
+    "anchor_label": "hkma-open-api-framework 52.4",
+    "text": "Furthermore, banks should provide examples and testing\nenvironment with data (including artificial customer data\nif necessary) to assist TSPs in using their Open APIs.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "Open API Facilitation",
+      "52"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 53",
+    "anchor_label": "hkma-open-api-framework 53",
+    "text": "The HKMA plans to facilitate adoption activities such as\npartnering with interested parties on promotion, and organising\neducational events and competitions on the use of Open APIs\namong the industry. The HKMA will also consider hosting\nseminars and workshops for banks and technology companies to\nshare use case ideas or experience gained elsewhere.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "Open API Facilitation"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 54",
+    "anchor_label": "hkma-open-api-framework 54",
+    "text": "",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "Open API Ongoing Development"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 55",
+    "anchor_label": "hkma-open-api-framework 55",
+    "text": "Once Open APIs have been implemented by banks, there needs to\nbe a body to review the relevance of the architecture, security and\ndata standards on an ongoing basis. The body may also take on\nother industry-wide tasks, such as coordination and consumer\neducation, where needed.\n\nIn the longer term, if harmonisation of Open $A P I$ functions is\ndesired by the industry, the body can also take on this task to\nwork with the industry to achieve interoperability.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "Open API Ongoing Development"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 56",
+    "anchor_label": "hkma-open-api-framework 56",
+    "text": "As the Open API ecosystem is a partnership between banks and\nTSPs, the body that work on the continuous development of Open\nAPIs is expected to maintain dialogues with the TSP community.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "Open API Ongoing Development"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 57",
+    "anchor_label": "hkma-open-api-framework 57",
+    "text": "The HKAB have expressed full support for Open APIs as one of\nthe HKMA's seven initiatives for \"A New Era of Smart Banking\"\nand confirmed that a committee will work on this continuous\ndevelopment of Open APIs with the HKMA to support the\nchanging needs of the industry as technology evolves.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "Open API Ongoing Development"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 58",
+    "anchor_label": "hkma-open-api-framework 58",
+    "text": "As the Open API ecosystem is evolving, this Open API\nframework aims to provide a directional guide to help the\ncommencement of building the underlying fabric. The HKMA\nintends to work with the industry to review the framework from\ntime to time, create a sustainable ecosystem, and ensure the\nimplementation by banks and the development of innovation\nproducts to meet the needs of customers.",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "Way Forward"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  },
+  {
+    "anchor_id": "hkma-open-api-framework 58(REST)",
+    "anchor_label": "hkma-open-api-framework 58(REST)",
+    "text": "common communication protocols in use for Open APIs. Under\nthese respective communication protocols, data formats of\nJavaScript Object Notation (JSON) and extensible Markup\nLanguage (XML) are usually used.\n\nB 3.\nDue to their practicality and wide acceptance by the industry,\nREST is recommended as the communication protocol and JSON\nas the data format.\n\nSecurity:\n\nB 4.\nSecurity, including authentication, integrity, confidentiality and\nauthorisation, is required for all four categories of Open APIs for\nthe reasons indicated in paragraph 12 in the main paper.\n\nB 5.\nFor authentication of bank sites and TSPs, and integrity and\nconfidentiality checks of data transmitted, properly registered and\nconfigured X.509 digital certificate is recommended to ensure\nthat product and service information is extracted from genuine\nbank sites.\n\nB 6.\nTransport Layer Security (TLS), on the other hand, provides\nintegrity checking and encryption protection to the data being\ntransmitted, regardless of whether it is transmitted from bank to\nTSP or vice versa.\n\nB 7.\n\nBanks should continue to apply the risk-based approach to use\ntheir own authentication methods (such as username/password\nand two-factor authentication where appropriate) for bank\ncustomers. They should only grant access privileges to TSPs on\ncustomers' requests. OAuth 2.0 is recommended as the\nauthorisation method as it is an industry standard.\n\nB 8.\nThe various recommended security protection requirements and\ntechnologies are summarised below:\n\n<table>\n<tr>\n<th>Protection required</th>\n<th>Technology</th>\n</tr>\n<tr>\n<td>Authentication of bank sites and TSPs</td>\n<td>X.509</td>\n</tr>\n<tr>\n<td>Integrity and confidentiality of data</td>\n<td>TLS</td>\n</tr>\n<tr>\n<td>Authentication of customers</td>\n<td>Bank's own method</td>\n</tr>\n<tr>\n<td>Authorisation of customers</td>\n<td>OAuth 2.0</td>\n</tr>\n</table>",
+    "doc_class": "semi-structured",
+    "document_id": "hkma-open-api-framework",
+    "heading_path": [
+      "Open API Framework for the Hong Kong Banking Sector",
+      "Architecture:"
+    ],
+    "page_span": null,
+    "parent_anchor": null
+  }
+]

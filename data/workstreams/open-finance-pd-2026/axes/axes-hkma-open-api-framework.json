@@ -1,0 +1,1074 @@
+{
+  "document_id": "hkma-open-api-framework",
+  "model": "claude-haiku-4-5",
+  "anchors": [
+    {
+      "anchor_id": "hkma-open-api-framework 1(HKMA)",
+      "text_hash": "ab536e07da63f901",
+      "axis_cap": 5,
+      "axes": [
+        "implementation planning and execution",
+        "related policy coordination",
+        "implementation roadmap documentation",
+        "cross-functional implementation alignment",
+        "implementation schedule and milestones"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 2",
+      "text_hash": "a73021ce7f70e9e2",
+      "axis_cap": 5,
+      "axes": [
+        "open banking API implementation governance",
+        "banking sector API security standards",
+        "API cost-effectiveness and efficiency",
+        "industry-regulator implementation coordination",
+        "open API deployment guidance and framework"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 3",
+      "text_hash": "662c9868d480b5cf",
+      "axis_cap": 5,
+      "axes": [
+        "open banking application programming interface framework",
+        "regulatory consultation process timeline",
+        "industry stakeholder engagement mechanism",
+        "framework development and revision procedure",
+        "regulatory framework effective date"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 4.1",
+      "text_hash": "e2a9ca9a05af606f",
+      "axis_cap": 5,
+      "axes": [
+        "banking sector competitiveness",
+        "financial sector relevance",
+        "competitive positioning objectives",
+        "sectoral viability standards",
+        "market competitiveness maintenance"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 4.2",
+      "text_hash": "097bb728b6aa15bf",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider governance",
+        "banking innovation framework",
+        "operational environment security standards",
+        "bank-partner collaboration infrastructure",
+        "customer experience enhancement objectives"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 4.3",
+      "text_hash": "23a3d7771e995c23",
+      "axis_cap": 5,
+      "axes": [
+        "international banking service delivery evolution",
+        "cross-border financial service standards",
+        "global banking practice monitoring",
+        "regulatory coordination on service delivery",
+        "international competitive parity requirements"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 5",
+      "text_hash": "b12a5deb08b6c5c7",
+      "axis_cap": 5,
+      "axes": [
+        "inter-application communication protocols",
+        "intra-organizational system interfaces",
+        "cross-organizational data exchange",
+        "software application integration architecture",
+        "functional dependency interfaces"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 6",
+      "text_hash": "51f563b4fa9077b3",
+      "axis_cap": 5,
+      "axes": [
+        "third-party access to banking systems",
+        "application programming interface security controls",
+        "granular data access permissions",
+        "consumer protection in open banking",
+        "cost-effective data sharing mechanisms"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 7",
+      "text_hash": "b093468c93703f60",
+      "axis_cap": 5,
+      "axes": [
+        "scope of open banking framework",
+        "retail banking service coverage",
+        "customer segment prioritization",
+        "geographic jurisdiction applicability",
+        "phased implementation approach"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 1",
+      "text_hash": "ec4385d5694bcd64",
+      "axis_cap": 5,
+      "axes": [
+        "banking sector participation scope",
+        "peer institution inclusion criteria",
+        "interbank coordination requirement",
+        "systemic financial institution coverage",
+        "competitive entity involvement"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 2#2",
+      "text_hash": "fa2acebe6e93d6ea",
+      "axis_cap": 5,
+      "axes": [
+        "voluntary framework extension scope",
+        "discretionary application to additional business lines",
+        "banking business coverage flexibility",
+        "framework adaptability beyond prescribed domains",
+        "regulatory framework optionality"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 8.1",
+      "text_hash": "73afca2780dd8fcc",
+      "axis_cap": 5,
+      "axes": [
+        "open banking API implementation timeline",
+        "regulatory monitoring of technology adoption",
+        "third-party service provider integration framework",
+        "market adoption enforcement mechanisms",
+        "customer service delivery modernization requirements"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 8.2",
+      "text_hash": "690193cf8b889de2",
+      "axis_cap": 5,
+      "axes": [
+        "open banking api implementation approach",
+        "regulatory mandate versus collaborative framework",
+        "phased implementation strategy",
+        "cross-jurisdictional regulatory alignment monitoring",
+        "discretionary future regulatory intervention"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 8.3",
+      "text_hash": "fcf88ee675b1ed56",
+      "axis_cap": 5,
+      "axes": [
+        "open banking API adoption framework",
+        "regulatory prescriptiveness level",
+        "implementation flexibility for financial institutions",
+        "strategic technology deployment discretion",
+        "high-level guidance versus detailed specification"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 8.4",
+      "text_hash": "e49ca2ab66140c7b",
+      "axis_cap": 5,
+      "axes": [
+        "open API function selection criteria",
+        "stakeholder benefit assessment framework",
+        "API prioritization methodology",
+        "bank and customer value proposition",
+        "high-level API functionality scope"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 8.5",
+      "text_hash": "12440f4ade868a78",
+      "axis_cap": 5,
+      "axes": [
+        "international best practice adoption",
+        "industry standard alignment",
+        "open API implementation methodology",
+        "regulatory framework harmonization",
+        "development timeline acceleration"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 9.1",
+      "text_hash": "43c2a25433ca35b7",
+      "axis_cap": 5,
+      "axes": [
+        "open API function scope",
+        "API deployment timeline",
+        "third-party API integration",
+        "API capability requirements",
+        "implementation schedule for open standards"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 9.2",
+      "text_hash": "c3c0ddc11ad9c038",
+      "axis_cap": 5,
+      "axes": [
+        "open API technical standards",
+        "API architecture specifications",
+        "API security standards",
+        "API data handling requirements",
+        "third-party integration technical requirements"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 9.3",
+      "text_hash": "d8c615e728385506",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider governance",
+        "outsourcing arrangement oversight structure",
+        "service provider accountability framework",
+        "operational control and monitoring model",
+        "delegation of critical functions arrangement"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 9.4",
+      "text_hash": "d50beb5238fd0e51",
+      "axis_cap": 5,
+      "axes": [
+        "open API implementation requirements",
+        "third-party system interoperability",
+        "data access standardization",
+        "API technical specifications",
+        "fintech integration framework"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 9.5",
+      "text_hash": "70a730368bbe332b",
+      "axis_cap": 5,
+      "axes": [
+        "open application programming interface standards",
+        "API infrastructure maintenance",
+        "continuous technology modernization",
+        "interoperability framework evolution",
+        "third-party access architecture"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 10",
+      "text_hash": "027afe8f36e9005a",
+      "axis_cap": 5,
+      "axes": [
+        "open API function scope definition",
+        "API risk-based implementation sequencing",
+        "phased API rollout approach",
+        "function selection methodology",
+        "early implementation planning"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 11.1",
+      "text_hash": "1fb494816948091f",
+      "axis_cap": 5,
+      "axes": [
+        "product disclosure requirements",
+        "service feature transparency",
+        "customer information access rights",
+        "bank product documentation standards",
+        "read-only information delivery mechanism"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 11.2",
+      "text_hash": "a81838e393ede363",
+      "axis_cap": 5,
+      "axes": [
+        "customer acquisition channels",
+        "product application submission methods",
+        "digital onboarding capabilities",
+        "new account opening procedures",
+        "credit product application processes"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 11.3",
+      "text_hash": "625318545dd40c5c",
+      "axis_cap": 5,
+      "axes": [
+        "customer account data access",
+        "transaction history disclosure",
+        "balance and limit retrieval",
+        "account aggregation services",
+        "authenticated customer information viewing"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 11.4",
+      "text_hash": "961e74c38d34b28d",
+      "axis_cap": 5,
+      "axes": [
+        "authenticated customer transaction initiation",
+        "banking transaction types",
+        "payment and transfer operations",
+        "scheduled payment mechanisms",
+        "customer authentication requirements"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 12",
+      "text_hash": "ab2d2c7e4aa6195f",
+      "axis_cap": 5,
+      "axes": [
+        "open API security classification by data sensitivity",
+        "progressive protection requirements framework",
+        "authentication requirements for financial data access",
+        "data integrity and confidentiality controls by API category",
+        "third-party service provider authentication standards"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 13",
+      "text_hash": "60e43b43f169c5ff",
+      "axis_cap": 5,
+      "axes": [
+        "API implementation phasing strategy",
+        "data sensitivity risk categorization",
+        "security infrastructure complexity escalation",
+        "regulatory implementation timeline",
+        "industry preparation and transition period"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 18",
+      "text_hash": "3a0c5d4322fa80e0",
+      "axis_cap": 5,
+      "axes": [
+        "open API implementation phasing",
+        "API data category exposure timeline",
+        "product information disclosure requirement",
+        "account data access framework",
+        "transaction data API rollout schedule"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 19",
+      "text_hash": "a92878f893d2baed",
+      "axis_cap": 5,
+      "axes": [
+        "open API implementation timeline",
+        "phased API rollout schedule",
+        "third-party service provider governance",
+        "API consumer protection requirements",
+        "liability and responsibility allocation framework"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 20",
+      "text_hash": "3232550866640e7c",
+      "axis_cap": 5,
+      "axes": [
+        "industry consultation process",
+        "open banking standards harmonization",
+        "regulatory guidance development timeline",
+        "stakeholder engagement framework",
+        "common technical standards adoption"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 3#2",
+      "text_hash": "b0183d3b0691e315",
+      "axis_cap": 5,
+      "axes": [
+        "consumer protection regulatory requirements",
+        "customer data protection standards",
+        "open API standardization and interoperability",
+        "international banking group standards coordination",
+        "prescribed API functionality specifications"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 21",
+      "text_hash": "6ed98331463deeca",
+      "axis_cap": 5,
+      "axes": [
+        "open API implementation timeline",
+        "standardized API development and convergence",
+        "banking technology ecosystem maturation",
+        "market-driven technical standards adoption",
+        "third-party API access strategy"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 22",
+      "text_hash": "2d2a4bb8de1b3ca0",
+      "axis_cap": 5,
+      "axes": [
+        "open API core banking functions",
+        "international regulatory practice integration",
+        "stakeholder consultation incorporation",
+        "API technical specification standards",
+        "jurisdictional comparative policy analysis"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 23",
+      "text_hash": "5bff5d2a23b0951c",
+      "axis_cap": 5,
+      "axes": [
+        "open application programming interface implementation timeline",
+        "technology roadmap disclosure requirements",
+        "regulatory reporting of implementation gaps",
+        "phased api capability deployment schedule",
+        "supervisory alignment with framework scope"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 25",
+      "text_hash": "1c486875044f8226",
+      "axis_cap": 5,
+      "axes": [
+        "open banking implementation roadmap disclosure",
+        "regulatory timeline publication requirements",
+        "third-party service provider coordination",
+        "early adoption of technical standards",
+        "API functionality implementation flexibility"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 26",
+      "text_hash": "fc5a9943362418ae",
+      "axis_cap": 5,
+      "axes": [
+        "international best practice alignment",
+        "security standards framework",
+        "architectural design standards",
+        "consultation feedback incorporation",
+        "technical standards specification"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 27",
+      "text_hash": "de8a35ed15b2efed",
+      "axis_cap": 5,
+      "axes": [
+        "cybersecurity technical standards",
+        "information security controls framework",
+        "industry best practices reference",
+        "risk-based security approach",
+        "data protection requirements"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 28",
+      "text_hash": "0c8ebbb34cc9aca1",
+      "axis_cap": 5,
+      "axes": [
+        "data specification autonomy",
+        "data dictionary publication requirements",
+        "industry standard compliance for technical documentation",
+        "API specification standardization",
+        "transparency in data format definitions"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 29",
+      "text_hash": "77a9641dda9af786",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider governance framework",
+        "bank oversight of fintech partnerships",
+        "innovation and consumer protection balance",
+        "formal partnership arrangement requirements",
+        "third-party risk management process"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 30.1",
+      "text_hash": "ba10abef570745c8",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider due diligence",
+        "vendor governance assessment scope",
+        "engagement-risk-based diligence approach",
+        "institutional policies and procedures framework",
+        "bilateral counterparty evaluation requirements"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 30.2",
+      "text_hash": "2825e73e9686ae64",
+      "axis_cap": 5,
+      "axes": [
+        "central entity establishment and governance",
+        "inter-bank coordination mechanism",
+        "third-party service provider governance standards",
+        "assessment service standardization",
+        "operational efficiency streamlining"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 30.3",
+      "text_hash": "b098f88c3f090641",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider governance framework",
+        "industry-wide baseline standards development",
+        "vendor onboarding streamlining mechanisms",
+        "institution-specific risk requirement flexibility",
+        "collaborative standard-setting processes"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 31.1",
+      "text_hash": "9567817ddf17cc04",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider registration requirements",
+        "third-party service provider onboarding procedures",
+        "third-party service provider ongoing monitoring",
+        "open API governance framework by implementation phase",
+        "consumer protection measures for API access"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 31.2.1",
+      "text_hash": "1c7d2686e43714ff",
+      "axis_cap": 5,
+      "axes": [
+        "customer onboarding standardization",
+        "multi-bank coordination mechanisms",
+        "baseline due diligence procedures",
+        "industry-wide onboarding harmonization",
+        "scope of know-your-customer checks"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 31.2.2",
+      "text_hash": "a2fd406f1d8aabaf",
+      "axis_cap": 5,
+      "axes": [
+        "baseline material reusability across entities",
+        "standardized submission documentation",
+        "regulatory filing efficiency",
+        "common disclosure templates",
+        "inter-institutional material sharing"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 31.3.1",
+      "text_hash": "9fa00d67b1548472",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider risk assessment",
+        "bank-led TSP evaluation methodology",
+        "reliance on peer assessments",
+        "third-party service provider due diligence",
+        "outsourced service provider vetting standards"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 31.3.2",
+      "text_hash": "443a75e0423ad1c7",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider assessment methodology",
+        "assessor selection and appointment process",
+        "mutual recognition of third-party assessor evaluations",
+        "bank discretion in risk assessment acceptance",
+        "cross-bank assessor credential portability"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 31.3.3",
+      "text_hash": "87a3d9bea10a964b",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider assessment",
+        "assessor appointment mechanism",
+        "shared assessment resource model",
+        "outsourced vendor evaluation",
+        "assessment delegation and governance"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 32",
+      "text_hash": "e3b9b433b2aecaf6",
+      "axis_cap": 5,
+      "axes": [
+        "client onboarding procedures",
+        "customer due diligence scope",
+        "commercial contract requirements",
+        "third-party verification standards",
+        "documentation and record-keeping specifications"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 33",
+      "text_hash": "2ea5cebd9734f627",
+      "axis_cap": 5,
+      "axes": [
+        "open banking implementation phasing",
+        "data governance requirements by implementation phase",
+        "consumer protection framework for open data",
+        "registration process requirements",
+        "third-party service provider governance scope"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 34.1",
+      "text_hash": "b481040e0b26520d",
+      "axis_cap": 5,
+      "axes": [
+        "infrastructure capacity planning",
+        "demand forecasting for banking services",
+        "resource allocation based on market interest",
+        "operational infrastructure sizing",
+        "service delivery capacity assessment"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 34.2",
+      "text_hash": "d70a103cf3864ae0",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider engagement",
+        "business model assessment and due diligence",
+        "implementation phase preparation",
+        "relationship management framework",
+        "operational readiness planning"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 34.3.1",
+      "text_hash": "e1f21381c52e9172",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider disclosure obligations",
+        "product and service scope notification",
+        "terms and conditions applicability",
+        "bank notification requirements",
+        "third-party service inventory"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 34.3.2(i)",
+      "text_hash": "4e97c021bceed622",
+      "axis_cap": 5,
+      "axes": [
+        "third-party data collection disclosure",
+        "customer transparency requirements",
+        "scope of banking business activities",
+        "personal data protection compliance",
+        "non-bank service provider oversight"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 35",
+      "text_hash": "dd80ff5b02c05360",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider registration requirements",
+        "open API access conditions",
+        "implementation timeline for regulatory phases",
+        "data access control for unregistered entities",
+        "terms and conditions enforcement for API access"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 15#2",
+      "text_hash": "31eb373878c0a862",
+      "axis_cap": 5,
+      "axes": [
+        "regulatory authority facilitation role",
+        "discretionary assistance provision",
+        "regulator support mechanisms",
+        "case-by-case facilitation authority",
+        "regulatory accommodation scope"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 38",
+      "text_hash": "921935b8aa15ab88",
+      "axis_cap": 5,
+      "axes": [
+        "open API standardization and adoption",
+        "third-party service provider engagement framework",
+        "interoperability baseline requirements",
+        "banking sector scope harmonization",
+        "customer service convenience standards"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 36",
+      "text_hash": "e3b0c44298fc1c14",
+      "axis_cap": 5,
+      "axes": [
+        "payment processing system",
+        "transaction routing mechanism",
+        "domestic remittance infrastructure",
+        "cross-border transfer capability",
+        "settlement finality rules"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 37",
+      "text_hash": "015a5c912592767c",
+      "axis_cap": 5,
+      "axes": [
+        "entity risk assessment scope",
+        "supplementary compliance checks",
+        "reasonableness standard for controls",
+        "proportionality of compliance measures",
+        "customized control framework design"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 39",
+      "text_hash": "4748e006ec8dc09b",
+      "axis_cap": 5,
+      "axes": [
+        "due diligence standardization",
+        "third-party service provider documentation requirements",
+        "multi-party compliance efficiency",
+        "common baseline framework scope",
+        "evidence package standardization"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 40.1",
+      "text_hash": "e47d872fa629045a",
+      "axis_cap": 5,
+      "axes": [
+        "financial soundness assessment",
+        "reputation risk evaluation",
+        "management quality standards",
+        "business operations appropriateness",
+        "business model governance"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 40.2",
+      "text_hash": "1c1e875633e2cdf8",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider risk management capabilities",
+        "cybersecurity and IT control standards",
+        "data protection and personal data minimization",
+        "business and technical expertise requirements",
+        "operational resilience and contingency planning"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 41",
+      "text_hash": "6ea1ad8667050d65",
+      "axis_cap": 5,
+      "axes": [
+        "baseline standard fairness and reasonableness",
+        "risk-adjusted regulatory requirements",
+        "compensatory mechanism design",
+        "common baseline objective",
+        "proportionality between requirements and risk"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 42",
+      "text_hash": "6c4ed1b10059082f",
+      "axis_cap": 5,
+      "axes": [
+        "industry self-regulatory assessment frameworks",
+        "streamlined compliance evaluation models",
+        "common baseline assessment methodologies",
+        "central assessment entity governance",
+        "industry-led regulatory initiative timing"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 43",
+      "text_hash": "0c881f664e7770e7",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider onboarding efficiency",
+        "common assessment criteria standardization",
+        "baseline benchmarks for vendor evaluation",
+        "multi-bank coordination on due diligence",
+        "operational burden reduction for financial institutions"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 44.1",
+      "text_hash": "a0c7707ceb626f85",
+      "axis_cap": 5,
+      "axes": [
+        "mutual recognition of baseline assessments",
+        "cross-institution assessment equivalence",
+        "common assessment framework adoption",
+        "regulatory assessment reciprocity",
+        "baseline compliance standard harmonization"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 44.2",
+      "text_hash": "ab2044dffbf6ce09",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider assessment",
+        "baseline assessment recognition and mutual agreement",
+        "bilateral and multilateral assessment acceptance",
+        "ongoing monitoring of service providers",
+        "assessor delegation and substitution"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 45",
+      "text_hash": "9af637991ab390d3",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider oversight",
+        "ongoing compliance monitoring mechanism",
+        "risk-based assessment frequency",
+        "post-onboarding vendor governance",
+        "baseline standard maintenance verification"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 46",
+      "text_hash": "d43444aa4555c235",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider contract negotiation",
+        "bilateral commercial agreement terms",
+        "third-party service provider onboarding assessment",
+        "third-party service provider ongoing monitoring",
+        "vendor relationship management framework"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 47",
+      "text_hash": "73d36ace048803d4",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider contract terms",
+        "legal obligation specification in vendor agreements",
+        "business requirement definition in contracts",
+        "security requirement specification in contracts",
+        "vendor agreement scope definition"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 4",
+      "text_hash": "33120633581a653f",
+      "axis_cap": 5,
+      "axes": [
+        "organizational roles and responsibilities",
+        "data ownership assignment",
+        "governing law designation",
+        "contractual governance framework",
+        "operational accountability structure"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 5#2",
+      "text_hash": "00f5e383d1b3b1cf",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider market access",
+        "open API pricing transparency",
+        "commercial contract terms regulation",
+        "anti-competitive barrier prevention",
+        "consumer protection in third-party arrangements"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 48",
+      "text_hash": "490b18540c34284d",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider disclosure requirements",
+        "consumer-facing product listing obligations",
+        "public trust and transparency mechanisms",
+        "partnering service provider registry",
+        "information update frequency and timeliness"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 49",
+      "text_hash": "98002626959fd9d2",
+      "axis_cap": 5,
+      "axes": [
+        "third-party impersonation monitoring",
+        "fraudulent website and application detection",
+        "customer notification procedures",
+        "public disclosure obligations",
+        "scam alert communication protocols"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 50",
+      "text_hash": "ded64bbd0c1148ef",
+      "axis_cap": 5,
+      "axes": [
+        "unauthorized transaction liability",
+        "customer loss protection",
+        "banking code compliance",
+        "direct loss allocation",
+        "fraud risk responsibility"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 6#2",
+      "text_hash": "e219097fc87856e8",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider control assessment rights",
+        "baseline compliance verification mechanisms",
+        "incident reporting and notification requirements",
+        "cybersecurity incident significance thresholds",
+        "third-party control effectiveness evaluation"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 7#2",
+      "text_hash": "5556d91d65c9aa16",
+      "axis_cap": 5,
+      "axes": [
+        "customer data collection and transparency",
+        "personal data protection and safeguards",
+        "customer consent and data sharing framework",
+        "fraud protection and unauthorized transaction liability",
+        "complaint handling and customer redress mechanisms"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 51",
+      "text_hash": "f8287595d1f99984",
+      "axis_cap": 5,
+      "axes": [
+        "liability allocation between financial institutions and third parties",
+        "open banking api operational risk framework",
+        "settlement arrangement governance between partners",
+        "customer loss protection mechanisms",
+        "consumer disclosure requirements for service providers"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 52.1",
+      "text_hash": "fd86598a6b4a3955",
+      "axis_cap": 5,
+      "axes": [
+        "API registry and centralized discovery mechanism",
+        "third-party service provider access facilitation",
+        "open banking API standardization and listing",
+        "shared infrastructure for API exposure",
+        "government-hosted API repository role"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 52.2",
+      "text_hash": "61ed8ff5f3dbff31",
+      "axis_cap": 5,
+      "axes": [
+        "open API repository designation",
+        "multiple API listing permission",
+        "API discoverability infrastructure",
+        "data repository standards",
+        "industry API registry optionality"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 52.3",
+      "text_hash": "4e28b20f02fd7aab",
+      "axis_cap": 5,
+      "axes": [
+        "open API documentation requirements",
+        "API specification standards compliance",
+        "API security disclosure",
+        "API architecture transparency",
+        "API data definition publication"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 52.4",
+      "text_hash": "004c9b7a4d1e2f1b",
+      "axis_cap": 5,
+      "axes": [
+        "testing environment provision",
+        "sample data availability",
+        "API documentation and support",
+        "third-party service provider assistance",
+        "sandbox or development environment access"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 53",
+      "text_hash": "5625d0505012019f",
+      "axis_cap": 5,
+      "axes": [
+        "open API adoption facilitation",
+        "industry engagement and partnership activities",
+        "educational outreach programming",
+        "use case knowledge sharing mechanisms",
+        "cross-sector collaboration initiatives"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 55",
+      "text_hash": "57d4b865e5558ca3",
+      "axis_cap": 5,
+      "axes": [
+        "open API architecture review governance",
+        "ongoing security standards assessment",
+        "data standards maintenance and oversight",
+        "industry coordination and harmonization body",
+        "API interoperability standardization framework"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 56",
+      "text_hash": "6ec54cd483bab993",
+      "axis_cap": 5,
+      "axes": [
+        "open API ecosystem governance",
+        "bank-TSP partnership coordination",
+        "third-party service provider engagement",
+        "API standards development process",
+        "stakeholder consultation requirements"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 57",
+      "text_hash": "3da7278483fb209c",
+      "axis_cap": 5,
+      "axes": [
+        "open application programming interface adoption",
+        "financial institution technology modernization initiatives",
+        "banking industry standards development committee",
+        "api ecosystem governance and coordination",
+        "technology evolution industry support framework"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 58",
+      "text_hash": "ac24d8567a2e922e",
+      "axis_cap": 5,
+      "axes": [
+        "open API framework governance",
+        "financial ecosystem standards development",
+        "bank implementation requirements",
+        "innovation product development oversight",
+        "customer needs alignment in fintech"
+      ]
+    },
+    {
+      "anchor_id": "hkma-open-api-framework 58(REST)",
+      "text_hash": "174bb2116614f962",
+      "axis_cap": 5,
+      "axes": [
+        "open API communication protocol standards",
+        "API data format specifications",
+        "open banking security requirements",
+        "API authentication and authorization mechanisms",
+        "data transmission encryption and integrity controls"
+      ]
+    }
+  ]
+}
