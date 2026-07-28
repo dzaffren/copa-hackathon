@@ -123,7 +123,14 @@ def edge_is_analysed(root: Union[str, Path], workstream_id: str, edge_id: str) -
 def list_workstreams(root: Union[str, Path]) -> list[dict[str, Any]]:
     """Project every workstream's `workstream.json` onto the sidebar list shape
     `{id, name, deliverable_type, role}`. Directories without a `workstream.json`
-    are skipped. Sorted by directory name for a stable order."""
+    are skipped. Sorted by directory name for a stable order.
+
+    A workstream marked `"hidden": true` is omitted. That lets a stale fixture
+    stay on disk — the engine test suite reads several of them by id — without
+    cluttering the drafter's sidebar with workstreams they should not pick. Only
+    THIS listing honours the flag: every direct-id route still serves a hidden
+    workstream, so nothing that already links to one breaks.
+    """
     root = Path(root)
     out: list[dict[str, Any]] = []
     if not root.exists():
@@ -133,6 +140,8 @@ def list_workstreams(root: Union[str, Path]) -> list[dict[str, Any]]:
         if not meta_path.exists():
             continue
         ws = _read_json(meta_path)
+        if ws.get("hidden") is True:
+            continue
         out.append(
             {
                 "id": ws.get("id", d.name),
