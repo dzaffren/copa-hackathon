@@ -157,9 +157,32 @@ const TASK_V0_0: TaskResponse = {
   draft_empty: true,
 };
 
+// A focal node exactly as `create_workstream` scaffolds it: identity only. No
+// document is attached yet, so the engine has no source_name/format/status/
+// last_edited_at to report and answers with nulls. The Task Screen has to open
+// on this — it is the first thing a drafter sees in a new workstream.
+const TASK_SCAFFOLDED: TaskResponse = {
+  task: {
+    id: "opres-pd-fresh",
+    title: "Operational Resilience PD (PD)",
+    source_name: null,
+    format: null,
+    description: "Newly created workstream — no document attached yet.",
+    status: null,
+    owner: { id: "ar", name: "Aisyah R." },
+    reviewers: [],
+    clause_count: 0,
+    last_edited_at: null,
+  },
+  neighbours: [],
+  workflow: DRAFT_WORKFLOW,
+  draft_empty: true,
+};
+
 const TASKS: Record<string, TaskResponse> = {
   "opres-pd-v0-3": TASK_V0_3,
   "opres-pd-v0-0": TASK_V0_0,
+  "opres-pd-fresh": TASK_SCAFFOLDED,
 };
 
 // Mutable per-task workflow overrides, so a PATCH .../workflow round-trips

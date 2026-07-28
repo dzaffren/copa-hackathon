@@ -320,3 +320,46 @@ def test_seeded_fixtures_use_the_access_enum(tmp_path):
     for path in (REPO_ROOT / "data" / "workstreams").glob("*/workstream.json"):
         ws = json.loads(path.read_text(encoding="utf-8"))
         assert ws["access"] in workstreams.ACCESS_LEVELS, path
+
+
+# --- The freshly scaffolded focal task is openable --------------------------
+# `create_workstream` seeds the focal node with five keys; the seeded fixture
+# task nodes carry sixteen. The Task Screen read path must fill the identity
+# fields from the workstream record rather than hand the client nulls it will
+# dereference.
+
+
+def test_GET_task_on_a_new_workstream_inherits_owner_from_the_workstream(tmp_path):
+    client, _ = _make_client(tmp_path)
+    created = _create(client).json()
+    body = client.get(
+        f"/api/workstreams/{created['id']}/tasks/{created['primary_task_id']}"
+    ).json()
+    assert body["task"]["owner"] == {"id": "ar", "name": "Aisyah R."}
+    assert [r["id"] for r in body["task"]["reviewers"]] == ["fm", "ps"]
+
+
+def test_GET_task_on_a_new_workstream_reports_an_empty_draft(tmp_path):
+    """No document is attached yet — the expected starting state, not an error."""
+    client, _ = _make_client(tmp_path)
+    created = _create(client).json()
+    body = client.get(
+        f"/api/workstreams/{created['id']}/tasks/{created['primary_task_id']}"
+    ).json()
+    assert body["draft_empty"] is True
+    assert body["task"]["clause_count"] == 0
+
+
+def test_GET_task_draft_empty_is_false_once_the_draft_has_content(tmp_path):
+    """`clause_count` is never written to the graph, so a live workstream's
+    draft state has to come from the saved draft itself."""
+    client, _ = _make_client(tmp_path)
+    created = _create(client).json()
+    ws, task = created["id"], created["primary_task_id"]
+    put = client.put(
+        f"/api/workstreams/{ws}/tasks/{task}/draft",
+        json={"content_html": "<p>1.1 The financial institution shall…</p>"},
+    )
+    assert put.status_code == 200, put.text
+    body = client.get(f"/api/workstreams/{ws}/tasks/{task}").json()
+    assert body["draft_empty"] is False
