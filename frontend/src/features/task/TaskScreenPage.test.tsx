@@ -332,3 +332,37 @@ describe("TaskScreenPage — wrong node type", () => {
     ).toBeInTheDocument();
   });
 });
+
+describe("TaskScreenPage — a freshly scaffolded focal task", () => {
+  // A new workstream's focal node carries identity only, so the engine reports
+  // null for source_name/format/status/last_edited_at. The screen used to throw
+  // on `task.owner.name`, and with no error boundary that blanked the whole app
+  // — Open task looked like a dead button.
+  const FRESH_URL = "/workstreams/opres-v2/tasks/opres-pd-fresh";
+
+  it("opens without crashing when the document fields are absent", async () => {
+    renderApp(FRESH_URL);
+    expect(
+      await screen.findByRole("heading", {
+        name: "Operational Resilience PD (PD)",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("source-card")).toBeInTheDocument();
+  });
+
+  it("names the owner and says no document is attached, never 'null'", async () => {
+    renderApp(FRESH_URL);
+    const source = await screen.findByTestId("source-card");
+    expect(within(source).getByText("Aisyah R.")).toBeInTheDocument();
+    expect(within(source).getByText("No document attached")).toBeInTheDocument();
+    // No stringified null / epoch date leaks into the UI.
+    expect(source).not.toHaveTextContent(/null/i);
+    expect(source).not.toHaveTextContent(/1970/);
+  });
+
+  it("presents the empty draft as the starting state, not an error", async () => {
+    renderApp(FRESH_URL);
+    expect(await screen.findByTestId("empty-draft-card")).toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+});

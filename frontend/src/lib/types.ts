@@ -30,17 +30,23 @@ export interface Person {
 
 // --- Task Screen (unchanged from #36) --------------------------------------
 
+// Every field below the identity pair is nullable because a focal node
+// scaffolded by `create_workstream` carries identity only — no document is
+// attached, so there is no source name, format, status or edit stamp to report.
+// `owner` is filled from the workstream record, but stays nullable: nothing
+// guarantees a record has one, and a non-null type here is what let a live
+// workstream crash the Task Screen.
 export interface Task {
   id: string;
   title: string;
-  source_name: string;
-  format: string;
-  description: string;
-  status: string;
-  owner: Person;
+  source_name: string | null;
+  format: string | null;
+  description: string | null;
+  status: string | null;
+  owner: Person | null;
   reviewers: Person[];
   clause_count: number;
-  last_edited_at: string;
+  last_edited_at: string | null;
 }
 
 export interface Neighbour {

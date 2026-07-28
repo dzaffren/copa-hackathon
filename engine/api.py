@@ -671,7 +671,17 @@ def create_app(
                     }
                 )
 
-            clause_count = node.get("clause_count", 0)
+            # A focal node scaffolded by `create_workstream` carries only its
+            # identity (id/type/title/description/source_url) — owner and
+            # reviewers live on the workstream record, which is where they were
+            # captured. Fall back to it so a newly created task is as complete
+            # as a seeded one; the node still wins when it has its own.
+            record = workstreams.load_workstream(workstreams_dir, workstream_id) or {}
+            draft = drafts.load(workstreams_dir, workstream_id, node_id)
+            # `clause_count` is a seeded-fixture field nothing writes, so it
+            # cannot tell us whether a live draft has been written. The saved
+            # draft can, and it is the thing the emptiness claim is about.
+            draft_empty = not (draft.get("content_html") or "").strip()
             task = {
                 "id": node["id"],
                 "title": node.get("title"),
@@ -679,10 +689,11 @@ def create_app(
                 "format": node.get("format"),
                 "description": node.get("description"),
                 "status": node.get("status"),
-                "owner": node.get("owner"),
-                "reviewers": node.get("reviewers", []),
-                "clause_count": clause_count,
-                "last_edited_at": node.get("last_edited_at"),
+                "owner": node.get("owner") or record.get("owner"),
+                "reviewers": node.get("reviewers") or record.get("reviewers", []),
+                "clause_count": node.get("clause_count", 0),
+                "last_edited_at": node.get("last_edited_at")
+                or draft.get("last_saved_at"),
             }
             workflow = tasks.load_workflow(
                 workstreams_dir, workstream_id, node_id, node.get("status")
@@ -691,7 +702,7 @@ def create_app(
                 "task": task,
                 "workflow": workflow,
                 "neighbours": neighbours,
-                "draft_empty": clause_count == 0,
+                "draft_empty": draft_empty,
             }
         except Exception:  # noqa: BLE001 — contract: any load error → 500
             return _ws_error(
