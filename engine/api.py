@@ -1153,6 +1153,84 @@ def create_app(
             },
         }
 
+    @app.delete("/api/workstreams/{workstream_id}/nodes/{node_id}")
+    def delete_workstream_node(workstream_id: str, node_id: str) -> Any:
+        """Remove a node and everything that only existed because of it.
+
+        Cascades on purpose: the node, every edge touching it, those edges'
+        findings, and the node's own anchors and axis cache. Half-deleting would
+        leave findings citing a document that is gone, or anchors belonging to no
+        node — states no read path can render honestly.
+
+        The focal task node is refused: `primary_task_id` points at it and it is
+        the one legal target for the first document added, so removing it would
+        strand the workstream.
+        """
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        node = next((n for n in ws_graph.get("nodes", []) if n["id"] == node_id), None)
+        if node is None:
+            return _ws_error(
+                404,
+                "NODE_NOT_FOUND",
+                f"Node {node_id} not found in workstream {workstream_id}",
+            )
+        ws_meta = workstreams.load_workstream(workstreams_dir, workstream_id)
+        if node_id == workstreams.primary_task_id(ws_meta, ws_graph):
+            return _ws_error(
+                409,
+                "FOCAL_NODE_PROTECTED",
+                "The working draft is this workstream's anchor and cannot be "
+                "deleted. Delete the documents around it instead.",
+            )
+
+        removed_edges = workstreams.remove_node(ws_graph, node_id)
+        for edge_id in removed_edges:
+            workstreams.findings_path(workstreams_dir, workstream_id, edge_id).unlink(
+                missing_ok=True
+            )
+        document_id = node.get("document_id") or node_id
+        ws_anchors.anchors_path(workstreams_dir, workstream_id, node_id).unlink(
+            missing_ok=True
+        )
+        (
+            _ws_axes_dir(workstreams_dir, workstream_id) / f"axes-{document_id}.json"
+        ).unlink(missing_ok=True)
+        workstreams.save_graph(workstreams_dir, workstream_id, ws_graph)
+        return {
+            "id": node_id,
+            "removed_edges": removed_edges,
+        }
+
+    @app.delete("/api/workstreams/{workstream_id}/edges/{edge_id}")
+    def delete_workstream_edge(workstream_id: str, edge_id: str) -> Any:
+        """Remove one linkage, leaving both documents in place.
+
+        The edge's findings go with it — they describe a relationship that no
+        longer exists — but each document keeps its own passages and concepts,
+        so the pair can be re-connected and re-analysed later.
+        """
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        if not workstreams.remove_edge(ws_graph, edge_id):
+            return _ws_error(
+                404,
+                "EDGE_NOT_FOUND",
+                f"Edge {edge_id} not found in workstream {workstream_id}",
+            )
+        # Absent findings is the common case (an unanalysed edge), not an error.
+        workstreams.findings_path(workstreams_dir, workstream_id, edge_id).unlink(
+            missing_ok=True
+        )
+        workstreams.save_graph(workstreams_dir, workstream_id, ws_graph)
+        return {"id": edge_id}
+
     @app.post("/api/workstreams/{workstream_id}/nodes/{node_id}/extract-concepts")
     def extract_node_concepts(workstream_id: str, node_id: str) -> Any:
         """Derive a chunked document's concepts (axes) from its anchors.

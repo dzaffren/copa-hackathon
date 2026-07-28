@@ -579,6 +579,31 @@ def add_edge(
     return record
 
 
+def remove_node(graph: dict[str, Any], node_id: str) -> list[str]:
+    """Drop a node and every edge touching it, in place.
+
+    Returns the ids of the removed edges so the caller can clean up their
+    findings files — an edge whose endpoint is gone can never be reviewed or
+    re-analysed, so leaving its findings behind would orphan them.
+    """
+    removed = [
+        e["id"]
+        for e in graph.get("edges", [])
+        if e.get("source") == node_id or e.get("target") == node_id
+    ]
+    graph["nodes"] = [n for n in graph.get("nodes", []) if n["id"] != node_id]
+    graph["edges"] = [e for e in graph.get("edges", []) if e["id"] not in removed]
+    return removed
+
+
+def remove_edge(graph: dict[str, Any], edge_id: str) -> bool:
+    """Drop one edge in place, leaving both endpoint nodes. Returns whether it
+    was found — un-linking two documents must not remove the documents."""
+    before = len(graph.get("edges", []))
+    graph["edges"] = [e for e in graph.get("edges", []) if e["id"] != edge_id]
+    return len(graph.get("edges", [])) < before
+
+
 def connections_to_findings(result: dict[str, Any]) -> list[dict[str, Any]]:
     """Adapt an `engine.connections.find_connections` result into the
     workstream findings shape the Review/Task screens read.

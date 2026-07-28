@@ -8,6 +8,8 @@ import type {
   CreateEdgeRequest,
   CreateEdgeResponse,
   CreateNodeRequest,
+  DeleteEdgeResponse,
+  DeleteNodeResponse,
   CreateNodeResponse,
   CreateWorkstreamRequest,
   CreateWorkstreamResponse,
@@ -86,6 +88,14 @@ async function postJson<T>(url: string, body?: unknown): Promise<T> {
     headers: { "Content-Type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
+  if (!res.ok) {
+    return throwHttpError(res);
+  }
+  return (await res.json()) as T;
+}
+
+async function deleteJson<T>(url: string): Promise<T> {
+  const res = await fetch(url, { method: "DELETE" });
   if (!res.ok) {
     return throwHttpError(res);
   }
@@ -215,6 +225,26 @@ export function createEdge(
   return postJson<CreateEdgeResponse>(
     `${API_BASE}/api/workstreams/${workstreamId}/edges`,
     body,
+  );
+}
+
+/** Remove a node, its linkages, and the artefacts that only existed for it. */
+export function deleteNode(
+  workstreamId: string,
+  nodeId: string,
+): Promise<DeleteNodeResponse> {
+  return deleteJson<DeleteNodeResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/nodes/${nodeId}`,
+  );
+}
+
+/** Remove one linkage. Both documents stay; only the relationship goes. */
+export function deleteEdge(
+  workstreamId: string,
+  edgeId: string,
+): Promise<DeleteEdgeResponse> {
+  return deleteJson<DeleteEdgeResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/edges/${edgeId}`,
   );
 }
 

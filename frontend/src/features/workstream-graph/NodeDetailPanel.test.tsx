@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { describe, it, expect } from "vitest";
-import { screen } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 
@@ -263,5 +263,78 @@ describe("NodeDetailPanel", () => {
       /concept extraction failed/i,
     );
     expect(screen.queryAllByTestId("concept-pill")).toHaveLength(0);
+  });
+
+  // --- delete node ----------------------------------------------------------
+
+  it("takes two clicks to delete, and names what will be lost", async () => {
+    seedNode(ENRICHED_SUPERVISORY_LETTER);
+    const onClose = vi.fn();
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="rmit-v2-2025"
+        nodeId="bnm-supervisory-letter-rmit-2025"
+        onSelectNode={() => {}}
+        onClose={onClose}
+      />,
+      "/workstreams/rmit-v2-2025",
+    );
+
+    await screen.findByText("supervisory-letter");
+    // First click only arms it — nothing is deleted yet.
+    await userEvent.click(screen.getByRole("button", { name: /delete node/i }));
+    expect(screen.getByText(/cannot be undone/i)).toBeInTheDocument();
+    expect(onClose).not.toHaveBeenCalled();
+
+    let called = false;
+    server.use(
+      http.delete("*/api/workstreams/:ws/nodes/:nodeId", () => {
+        called = true;
+        return HttpResponse.json({ id: "x", removed_edges: [] });
+      }),
+    );
+    await userEvent.click(screen.getByRole("button", { name: /^delete$/i }));
+
+    await waitFor(() => expect(called).toBe(true));
+    // The node is gone, so the panel describing it closes.
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+  });
+
+  it("cancelling the confirmation deletes nothing", async () => {
+    seedNode(ENRICHED_SUPERVISORY_LETTER);
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="rmit-v2-2025"
+        nodeId="bnm-supervisory-letter-rmit-2025"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/rmit-v2-2025",
+    );
+
+    await screen.findByText("supervisory-letter");
+    await userEvent.click(screen.getByRole("button", { name: /delete node/i }));
+    await userEvent.click(screen.getByRole("button", { name: /cancel/i }));
+
+    expect(screen.queryByText(/cannot be undone/i)).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /delete node/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("does not offer delete for the focal task node", async () => {
+    // The seeded opres task node comes from the default MSW handler.
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="opres-v2"
+        nodeId="opres-pd-v0-3"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/opres-v2",
+    );
+
+    await screen.findByRole("button", { name: /open task/i });
+    expect(
+      screen.queryByRole("button", { name: /delete node/i }),
+    ).not.toBeInTheDocument();
   });
 });

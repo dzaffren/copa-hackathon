@@ -6,6 +6,7 @@ import {
   ExternalLink,
   FileText,
   Link2,
+  Trash2,
   Loader2,
   Scale,
   ShieldCheck,
@@ -16,7 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { extractConcepts, fetchNodeDetail } from "@/lib/api";
+import { deleteNode, extractConcepts, fetchNodeDetail } from "@/lib/api";
 import type { ConceptsAvailable, GraphNode } from "@/lib/types";
 import { AddEdgeDialog } from "./AddEdgeDialog";
 import { nodeStyle } from "./legend";
@@ -118,6 +119,10 @@ export function NodeDetailPanel({
   const navigate = useNavigate();
   const [conceptsOpen, setConceptsOpen] = useState(false);
   const [addEdgeOpen, setAddEdgeOpen] = useState(false);
+  // Two-step delete: the first click arms it, the second commits. Deletion
+  // cascades (linkages, findings, passages, concepts) and cannot be undone, so
+  // a single click must never be enough.
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: ["node", workstreamId, nodeId],
@@ -132,6 +137,16 @@ export function NodeDetailPanel({
       queryClient.invalidateQueries({
         queryKey: ["node", workstreamId, nodeId],
       });
+    },
+  });
+  const remove = useMutation({
+    mutationFn: () => deleteNode(workstreamId, nodeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["workstream", workstreamId, "graph"],
+      });
+      // The node this panel describes no longer exists — close it.
+      onClose?.();
     },
   });
 
@@ -411,6 +426,53 @@ export function NodeDetailPanel({
           open={addEdgeOpen}
           onOpenChange={setAddEdgeOpen}
         />
+
+        {/* The focal working draft is the workstream's anchor — the server
+            refuses to delete it, so the action is not offered for a task. */}
+        {!isTask &&
+          (confirmDelete ? (
+            <div className="space-y-1.5 rounded-lg border border-red-300/60 bg-red-50/60 p-2">
+              <p className="text-xs text-red-700">
+                Delete this document, its {node.first_order_neighbours.length}{" "}
+                linkage
+                {node.first_order_neighbours.length === 1 ? "" : "s"} and any
+                findings on them? Its passages and concepts go too. This cannot
+                be undone.
+              </p>
+              <div className="flex gap-1.5">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setConfirmDelete(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  className="flex-1 bg-red-600 text-white hover:bg-red-700"
+                  disabled={remove.isPending}
+                  onClick={() => remove.mutate()}
+                >
+                  {remove.isPending ? "Deleting…" : "Delete"}
+                </Button>
+              </div>
+              {remove.isError && (
+                <p role="alert" className="text-xs text-red-700">
+                  Could not delete this node.
+                </p>
+              )}
+            </div>
+          ) : (
+            <Button
+              variant="outline"
+              className="w-full border-red-300/60 text-red-700 hover:bg-red-50"
+              onClick={() => setConfirmDelete(true)}
+            >
+              <Trash2 /> Delete node
+            </Button>
+          ))}
+
         {isTask ? (
           <Button
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90"

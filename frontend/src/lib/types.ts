@@ -318,6 +318,16 @@ export interface CreateNodeResponse {
   anchor_count?: number;
 }
 
+export interface DeleteNodeResponse {
+  id: string;
+  /** Ids of the edges removed with the node — their findings went too. */
+  removed_edges: string[];
+}
+
+export interface DeleteEdgeResponse {
+  id: string;
+}
+
 export interface AnalyzeResponse {
   id: string;
   /** The finder can genuinely surface nothing for a pair — see CLAUDE.md's
