@@ -643,6 +643,13 @@ def semi_structured_segment(
     join_sep = " §" if section_mark else " "
 
     anchors: list[Anchor] = []
+    # A numeric path is NOT unique across a real document: BNM EDs restart
+    # numbering per part, so `7` can appear under "PART B POLICY REQUIREMENTS"
+    # and again under "A. Obtaining consent". `AnchorIndex` rejects duplicate
+    # ids outright, so a repeat occurrence takes a `#n` suffix. The FIRST
+    # occurrence keeps the bare id, so citations already recorded against it
+    # stay valid.
+    seen_ids: dict[str, int] = {}
     for leaf_index in _identify_leaves(headings):
         leaf = headings[leaf_index]
         # Only emit anchors for headings that have a numeric identity — a
@@ -654,6 +661,10 @@ def semi_structured_segment(
 
         numeric_path = leaf.num_path
         anchor_id = f"{prefix}{join_sep}{numeric_path}"
+        occurrence = seen_ids.get(anchor_id, 0) + 1
+        seen_ids[anchor_id] = occurrence
+        if occurrence > 1:
+            anchor_id = f"{anchor_id}#{occurrence}"
         text = _text_for_leaf(source_markdown, headings, leaf_index)
         heading_path = _heading_path_labels(headings, leaf_index)
 

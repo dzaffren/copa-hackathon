@@ -1051,7 +1051,12 @@ def create_app(
             )
         ws_meta = workstreams.load_workstream(workstreams_dir, workstream_id)
         task_id = workstreams.primary_task_id(ws_meta, ws_graph)
-        nodes, edges = workstreams.primary_subgraph(ws_graph, task_id)
+        # The canvas renders the WHOLE workstream, not a one-hop projection
+        # around the focal node: a drafter can chain documents (focal → ED →
+        # the sources that ED references), and clipping to one hop made every
+        # document beyond the first invisible. `primary_task_id` still marks
+        # which node the view centres on.
+        nodes, edges = ws_graph.get("nodes", []), ws_graph.get("edges", [])
         out_nodes = [
             {
                 "id": n["id"],
@@ -1099,14 +1104,10 @@ def create_app(
                 "NODE_NOT_FOUND",
                 f"Node {node_id} not found in workstream {workstream_id}",
             )
-        ws_meta = workstreams.load_workstream(workstreams_dir, workstream_id)
-        task_id = workstreams.primary_task_id(ws_meta, ws_graph)
-        sub_nodes, sub_edges = workstreams.primary_subgraph(ws_graph, task_id)
-        sub_ids = {n["id"] for n in sub_nodes}
-        # A node shown on the canvas takes its neighbours from the primary
-        # subgraph (so an anchor shared with a sibling draft still lists only
-        # this draft); a node outside it falls back to the whole graph.
-        edge_scope = sub_edges if node_id in sub_ids else ws_graph.get("edges", [])
+        # Neighbours are read from the whole workstream, matching the canvas —
+        # a document chained off another document is a real neighbour and must
+        # be listed.
+        edge_scope = ws_graph.get("edges", [])
         first_order = [
             {
                 "id": nid,

@@ -59,8 +59,11 @@ def test_GET_workstreams_lists_seeded_workstreams(tmp_path):
 def test_GET_graph_returns_seeded_opres_workstream(tmp_path):
     client, _ = _make_client(tmp_path)
     body = client.get(f"/api/workstreams/{_OPRES}/graph").json()
-    assert len(body["nodes"]) == 8  # one PD + seven anchors (sibling draft excluded)
-    assert len(body["edges"]) == 7
+    # The canvas renders the WHOLE workstream — a drafter can chain documents
+    # (focal -> ED -> the sources ED references), and a one-hop projection made
+    # everything past the first document invisible. The sibling draft shows too.
+    assert len(body["nodes"]) == 10
+    assert len(body["edges"]) == 10
     assert body["primary_task_id"] == _TASK
     edges = {e["id"]: e for e in body["edges"]}
     assert edges[_BCBS_EDGE]["analysed"] is True
@@ -125,14 +128,16 @@ def test_GET_node_detail_concepts_available_when_offline_enriched(tmp_path):
     assert body["pursuant_to"] == "FSA 2013 §143"
 
 
-def test_GET_node_detail_resource_node_lists_only_primary_task(tmp_path):
+def test_GET_node_detail_lists_every_neighbour_in_the_workstream(tmp_path):
     client, _ = _make_client(tmp_path)
     body = client.get(f"/api/workstreams/{_OPRES}/nodes/bcbs-opres-2021").json()
     assert body["node_type"] == "international-standard"
     neighbour_ids = [n["id"] for n in body["first_order_neighbours"]]
-    # bcbs also has an edge to the empty sibling draft, but the node panel is
-    # scoped to the primary subgraph, so only the v0.3 draft shows.
-    assert neighbour_ids == [_TASK]
+    # Neighbours match the canvas: bcbs is joined to BOTH drafts, so both list.
+    # Scoping this to a one-hop subgraph hid documents chained off another
+    # document, which is a shape a drafter can legitimately build.
+    assert _TASK in neighbour_ids
+    assert "opres-pd-v0-0" in neighbour_ids
 
 
 def test_GET_node_detail_unknown_node_returns_404(tmp_path):

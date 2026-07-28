@@ -646,3 +646,30 @@ def test_prose_registered_by_default():
     assert len(anchors) == 2
     assert all(a["doc_class"] == "prose" for a in anchors)
     assert all(a["document_id"] == "prose-doc" for a in anchors)
+
+
+def test_semi_structured_disambiguates_a_repeated_numeric_path():
+    """A real BNM ED restarts numbering per part, so the same numeric path
+    appears in two unrelated sections. AnchorIndex rejects duplicate ids, so the
+    repeat occurrence takes a `#n` suffix while the first keeps the bare id."""
+    md = """# PART B POLICY REQUIREMENTS
+
+7 Governance
+
+S 7.1 The board shall exercise effective oversight of the arrangements.
+
+# A. Obtaining consent
+
+7 Consent
+
+S 7.1 A data consumer shall obtain express consent before disclosure.
+"""
+    anchors = semi_structured_segment("ed-open-finance-2025", md)
+    ids = [a["anchor_id"] for a in anchors]
+
+    assert len(ids) == len(set(ids)), f"duplicate ids: {ids}"
+    # The first occurrence keeps the bare id; the repeat is suffixed.
+    assert "ed-open-finance-2025 7" in ids
+    assert "ed-open-finance-2025 7#2" in ids
+    # And the index accepts them.
+    AnchorIndex(anchors)
