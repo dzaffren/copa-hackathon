@@ -176,16 +176,34 @@ def test_no_concepts_are_extracted_on_add(tmp_path):
 # --- Failure paths: every one leaves graph.json untouched -------------------
 
 
-def test_structured_rules_on_a_non_bnm_document_is_rejected(tmp_path):
+def test_structured_rules_runs_on_any_numbered_document(tmp_path):
+    """POLICY_SHORT_NAMES is a citation-prefix convenience, not a gate: a node id
+    comes from the drafter's title (never a corpus key), so gating on the table
+    made the method they picked always fail. The clause regex needs nothing from
+    it — the prefix is derived from the id."""
     client, dst = _client(tmp_path)
+
+    res = _post(client, _payload(doc_class="structured-rules"))
+
+    assert res.status_code == 201, res.text
+    body = res.json()
+    assert body["doc_class"] == "structured-rules"
+    assert body["anchor_count"] > 0
+    anchors = ws_anchors.load(dst, _OPRES, body["id"])
+    # The derived prefix leads every citation, so ids stay readable.
+    assert all(a["doc_class"] == "structured-rules" for a in anchors)
+
+
+def test_a_document_with_no_numbered_clauses_yields_no_passages(tmp_path):
+    """structured-rules on prose finds nothing to cite — reported as
+    NO_PASSAGES rather than a half-formed node."""
+    client, dst = _client(tmp_path, markdown="Just flowing prose, no numbering.")
     before = _graph(dst)
 
     res = _post(client, _payload(doc_class="structured-rules"))
 
     assert res.status_code == 422
-    body = res.json()
-    assert body["code"] == "CHUNKING_FAILED"
-    assert body["field"] == "doc_class"
+    assert res.json()["code"] == "NO_PASSAGES"
     assert _graph(dst) == before
 
 
@@ -289,7 +307,8 @@ def test_an_unknown_workstream_is_404(tmp_path):
 
 def test_no_anchors_file_is_written_on_any_failure(tmp_path):
     client, dst = _client(tmp_path)
-    _post(client, _payload(doc_class="structured-rules"))
+    # An invalid doc_class is refused before ingest, so nothing is persisted.
+    _post(client, _payload(doc_class="auto"))
     assert not (dst / _OPRES / "anchors").exists()
 
 
