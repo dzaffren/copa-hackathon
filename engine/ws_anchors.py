@@ -32,6 +32,22 @@ def anchors_path(
     return Path(workstreams_dir) / workstream_id / "anchors" / f"{node_id}.json"
 
 
+def source_path(
+    workstreams_dir: Union[str, Path], workstream_id: str, node_id: str
+) -> Path:
+    """Where a node's ingested markdown lives.
+
+    Per-workstream, like the anchors beside it: node ids are only unique WITHIN
+    a workstream, so a flat global directory let two workstreams that each added
+    a "RMiT 2025" both write `rmit-2025.md` and silently clobber one another. It
+    also meant a workstream's provenance did not travel with the workstream.
+
+    Nothing reads this back today — it is kept so a chunked document's source
+    text can be inspected or re-segmented without re-uploading the PDF.
+    """
+    return Path(workstreams_dir) / workstream_id / "sources" / f"{node_id}.md"
+
+
 def load(
     workstreams_dir: Union[str, Path], workstream_id: str, node_id: str
 ) -> list[Anchor]:

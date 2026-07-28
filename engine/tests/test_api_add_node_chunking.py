@@ -63,8 +63,8 @@ class _FakeConverter:
 def _client(tmp_path, markdown: str = SEMI_MD):
     dst = tmp_path / "workstreams"
     shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
-    # artifacts_dir is redirected too: the route writes the ingested markdown
-    # there, and the committed data/artifacts/ must gain nothing from a test run.
+    # artifacts_dir is redirected too (it holds the clause/anchor indexes); the
+    # committed store must gain nothing from a test run.
     app = create_app(
         workstreams_dir=dst,
         artifacts_dir=tmp_path / "artifacts",
@@ -314,10 +314,57 @@ def test_no_anchors_file_is_written_on_any_failure(tmp_path):
 
 def test_the_committed_stores_gain_nothing_from_a_run(tmp_path):
     """The ingested markdown and anchors land under tmp_path only — the real
-    data/artifacts/ and data/workstreams/ must stay untouched."""
-    client, _ = _client(tmp_path)
+    committed data/artifacts/ and data/workstreams/ must stay untouched."""
+    client, dst = _client(tmp_path)
     node_id = _post(client, _payload()).json()["id"]
 
     assert not (REPO_ROOT / "data" / "artifacts" / f"{node_id}.md").exists()
+    assert not (REPO_ROOT / "data" / "workstreams" / _OPRES / "sources").exists()
     assert not (REPO_ROOT / "data" / "workstreams" / _OPRES / "anchors").exists()
-    assert (tmp_path / "artifacts" / f"{node_id}.md").exists()
+    assert ws_anchors.source_path(dst, _OPRES, node_id).exists()
+
+
+def test_the_ingested_markdown_lands_beside_the_workstreams_anchors(tmp_path):
+    """Per-workstream, not a flat global dir: node ids are unique only WITHIN a
+    workstream, so two workstreams each adding a "RMiT 2025" would otherwise
+    write the same path and clobber one another."""
+    client, dst = _client(tmp_path)
+    node_id = _post(client, _payload()).json()["id"]
+
+    source = ws_anchors.source_path(dst, _OPRES, node_id)
+    assert source.exists()
+    assert source == dst / _OPRES / "sources" / f"{node_id}.md"
+    assert source.read_text(encoding="utf-8") == SEMI_MD
+    # Nothing lands in the flat artifacts dir any more.
+    assert not (tmp_path / "artifacts" / f"{node_id}.md").exists()
+
+
+def test_two_workstreams_can_add_the_same_titled_document(tmp_path):
+    """The collision the flat layout allowed: identical titles in different
+    workstreams derive the same node id, so their sources must not share a path."""
+    client, dst = _client(tmp_path)
+    other = "rmit-v2-2025"
+
+    a = _post(client, _payload()).json()["id"]
+    b = client.post(
+        f"/api/workstreams/{other}/nodes",
+        data={
+            "payload": json.dumps(
+                {
+                    **_payload(),
+                    "edges": [
+                        {"target_node_id": "rmit-pd-v2", "edge_type": "references"}
+                    ],
+                }
+            )
+        },
+        files={"attachment": ("x.pdf", b"%PDF fake", "application/pdf")},
+    ).json()["id"]
+
+    assert a == b  # same title -> same node id in each workstream
+    # ...but each workstream keeps its own copy.
+    assert ws_anchors.source_path(dst, _OPRES, a).exists()
+    assert ws_anchors.source_path(dst, other, b).exists()
+    assert ws_anchors.source_path(dst, _OPRES, a) != ws_anchors.source_path(
+        dst, other, b
+    )

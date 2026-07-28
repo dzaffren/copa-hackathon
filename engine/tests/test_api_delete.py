@@ -45,6 +45,9 @@ def _client(tmp_path):
         json.dumps({"document_id": _BCBS, "model": "m", "anchors": []}),
         encoding="utf-8",
     )
+    src = ws_anchors.source_path(dst, _OPRES, _BCBS)
+    src.parent.mkdir(parents=True, exist_ok=True)
+    src.write_text("1.1 Ingested markdown.\n", encoding="utf-8")
     return TestClient(create_app(workstreams_dir=dst)), dst
 
 
@@ -78,6 +81,8 @@ def test_deleting_a_node_cascades_to_its_edges_and_artefacts(tmp_path):
     assert not (dst / _OPRES / "findings" / f"{_BCBS_EDGE}.json").exists()
     assert not ws_anchors.anchors_path(dst, _OPRES, _BCBS).exists()
     assert not (dst / _OPRES / "axes" / f"axes-{_BCBS}.json").exists()
+    # The ingested markdown goes too — it is provenance for a node that is gone.
+    assert not ws_anchors.source_path(dst, _OPRES, _BCBS).exists()
 
 
 def test_deleting_a_node_leaves_every_other_node_and_edge_intact(tmp_path):

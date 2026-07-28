@@ -1196,6 +1196,9 @@ def create_app(
         ws_anchors.anchors_path(workstreams_dir, workstream_id, node_id).unlink(
             missing_ok=True
         )
+        ws_anchors.source_path(workstreams_dir, workstream_id, node_id).unlink(
+            missing_ok=True
+        )
         (
             _ws_axes_dir(workstreams_dir, workstream_id) / f"axes-{document_id}.json"
         ).unlink(missing_ok=True)
@@ -1456,9 +1459,14 @@ def create_app(
             ws_anchors.save(workstreams_dir, workstream_id, new_node["id"], anchors)
 
         if markdown is not None:
-            artifact_path = Path(artifacts_dir) / f"{new_node['id']}.md"
-            artifact_path.parent.mkdir(parents=True, exist_ok=True)
-            artifact_path.write_text(markdown, encoding="utf-8")
+            # Beside the workstream's anchors, not in a flat global dir: node ids
+            # are unique only WITHIN a workstream, so two workstreams each adding
+            # a "RMiT 2025" would otherwise write the same path and clobber.
+            source = ws_anchors.source_path(
+                workstreams_dir, workstream_id, new_node["id"]
+            )
+            source.parent.mkdir(parents=True, exist_ok=True)
+            source.write_text(markdown, encoding="utf-8")
 
         workstreams.save_graph(workstreams_dir, workstream_id, ws_graph)
         content: dict[str, Any] = {
