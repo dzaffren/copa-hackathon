@@ -155,4 +155,38 @@ describe("AddNodeDialog", () => {
       screen.getByRole("button", { name: /add to graph/i }),
     ).toBeDisabled();
   });
+
+  // --- first document on a brand-new workstream ----------------------------
+
+  it("pre-fills the edge row when the focal node is the only target", async () => {
+    const focalOnly: GraphNode[] = [NODES[0]];
+    renderWithProviders(
+      <AddNodeDialog
+        workstreamId="opres-v2"
+        nodes={focalOnly}
+        open
+        onOpenChange={vi.fn()}
+      />,
+    );
+
+    // The row exists already, pointing at the one legal target.
+    expect(screen.getByLabelText("Edge 1 target")).toHaveValue("opres-pd-v0-3");
+    expect(screen.getByLabelText("Edge 1 type")).toHaveValue("contributes-to");
+
+    // So title + attachment is all that stands between here and submitting.
+    await userEvent.type(screen.getByLabelText("Title"), "BCBS OpRes 2021");
+    await attachFile();
+    expect(screen.getByRole("button", { name: /add to graph/i })).toBeEnabled();
+  });
+
+  it("does not pre-fill when several targets exist", () => {
+    renderDialog(); // NODES has two entries
+    expect(screen.queryByLabelText("Edge 1 target")).not.toBeInTheDocument();
+    // The empty-state hint stands in for the row the drafter must add. (The
+    // same sentence is also in the dialog description, hence getAllByText.)
+    expect(
+      screen.getAllByText(/at least one edge to an existing node is required/i)
+        .length,
+    ).toBeGreaterThan(0);
+  });
 });

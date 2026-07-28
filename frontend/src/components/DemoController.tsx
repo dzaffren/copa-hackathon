@@ -113,10 +113,14 @@ export function DemoController() {
   }
 
   return (
+    // `pointer-events-none` on the bar with `pointer-events-auto` on its
+    // controls: as a bottom-centred fixed element it otherwise swallows clicks
+    // meant for whatever sits beneath it (it was intercepting the new-workstream
+    // form's submit button). Only the toolbar's own buttons are clickable now.
     <div
       role="toolbar"
       aria-label="Demo walkthrough"
-      className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2 text-sm shadow-md"
+      className="pointer-events-none fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2 text-sm shadow-md [&_button]:pointer-events-auto [&_select]:pointer-events-auto"
     >
       <button
         type="button"

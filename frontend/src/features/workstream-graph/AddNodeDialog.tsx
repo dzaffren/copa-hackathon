@@ -62,6 +62,19 @@ interface EdgeRow {
   edge_type: string;
 }
 
+/** Seed the edge rows when the dialog opens.
+ *
+ *  A document must connect to at least one node already on the canvas, so on a
+ *  brand-new workstream — where the focal node is the ONLY possible target —
+ *  there is nothing to choose. Pre-filling that row means the first document can
+ *  be added without the drafter hunting for the one legal answer; with several
+ *  candidates the choice is theirs, so we seed nothing.
+ */
+function defaultEdges(nodes: GraphNode[]): EdgeRow[] {
+  if (nodes.length !== 1) return [];
+  return [{ target_node_id: nodes[0].id, edge_type: "contributes-to" }];
+}
+
 interface AddNodeDialogProps {
   workstreamId: string;
   nodes: GraphNode[];
@@ -91,7 +104,7 @@ export function AddNodeDialog({
   const [description, setDescription] = useState("");
   const [sourceUrl, setSourceUrl] = useState("");
   const [autoIngest, setAutoIngest] = useState(true);
-  const [edges, setEdges] = useState<EdgeRow[]>([]);
+  const [edges, setEdges] = useState<EdgeRow[]>(() => defaultEdges(nodes));
   const [attachment, setAttachment] = useState<File | null>(null);
   const [docClass, setDocClass] = useState<DocClass>("semi-structured");
 
@@ -105,7 +118,7 @@ export function AddNodeDialog({
     setDescription("");
     setSourceUrl("");
     setAutoIngest(true);
-    setEdges([]);
+    setEdges(defaultEdges(nodes));
     setAttachment(null);
     setDocClass("semi-structured");
   }
@@ -153,6 +166,17 @@ export function AddNodeDialog({
       rows.map((r, idx) => (idx === i ? { ...r, ...patch } : r)),
     );
 
+  // Seed the pre-filled edge row when the dialog OPENS, not at mount: the page
+  // keeps this dialog mounted permanently, so at mount the graph query has not
+  // resolved and `nodes` is still empty. `seededFor` makes it fire once per
+  // opening without clobbering rows the drafter has since edited.
+  const [seededFor, setSeededFor] = useState<string | null>(null);
+  if (open && seededFor !== workstreamId) {
+    setSeededFor(workstreamId);
+    if (edges.length === 0) setEdges(defaultEdges(nodes));
+  }
+  if (!open && seededFor !== null) setSeededFor(null);
+
   return (
     <Dialog
       open={open}
@@ -161,7 +185,10 @@ export function AddNodeDialog({
         onOpenChange(o);
       }}
     >
-      <DialogContent className="glass max-h-[90vh] max-w-lg overflow-y-auto">
+      {/* The dialog is a column: header and footer stay put while only the body
+          scrolls. Scrolling the whole DialogContent let a tall form (node type
+          grid + method picker + edge rows) push its own footer out of the box. */}
+      <DialogContent className="glass flex max-h-[90vh] max-w-lg flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle>Add node</DialogTitle>
           <DialogDescription>
@@ -170,7 +197,7 @@ export function AddNodeDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
           <div>
             <span className="mb-1.5 block text-sm font-medium">Node type</span>
             <div
