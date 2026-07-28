@@ -115,11 +115,16 @@ Note this is _not_ `data/references/`, which is public and tracked.
   `differs-on`. `engine/tests/test_taxonomy_traces.py` guards this. The competing
   `verdict` vocabulary (`Consensus`/`Conflict`/`Gap`/`Duplicate`/`Partial`) went with
   `verdicts.py`, so "conflict" now means exactly one thing.
-- **The API is a fixture projection, not a model client.** Every route reads
-  `data/workstreams/`; the `analyze` route replays `workstreams.canned_analysis` for
-  the demo pair and returns `no_matching_source` otherwise. `create_app()` takes no
-  model seam, so the service _cannot_ reach a model — editing `connections.py` will
-  not change what the demo renders.
+- **Read routes are fixture projections; `analyze` and `copilot` are live.** The GET
+  routes (graph, node/edge detail, review, findings, cross-links) are projections over
+  `data/workstreams/`. But `create_app()` exposes injectable model seams —
+  `run_arm_g_fn`, `copilot_reply_fn`, `copilot_stream_fn` — and the `analyze` route
+  (`POST .../edges/{edge_id}/analyze`) calls `run_arm_g_fn(src_doc, tgt_doc)`, whose
+  default adapter runs the real Arm G pipeline (`engine/arm_g.py`, which calls
+  `engine.llm.call_chat`) against `data/artifacts/anchor-index.json`. `canned_analysis`
+  no longer exists. Tests inject stubs for these seams, so CI needs no model or creds —
+  but the running service **does** reach a model on `analyze`/`copilot`. (The `verdicts`/
+  `connections` legacy finder is retained only as a rollback seam.)
 
 ## Learnings
 
