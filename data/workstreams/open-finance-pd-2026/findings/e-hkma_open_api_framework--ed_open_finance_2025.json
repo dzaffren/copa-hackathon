@@ -1,6 +1,6 @@
 [
   {
-    "summary": "Both provide for ongoing risk-based monitoring/oversight of third-party service providers to ensure continued compliance with baseline requirements.",
+    "summary": "Both require ongoing risk-based monitoring of third-party service providers to keep them meeting baseline requirements.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -21,7 +21,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both require assessment/extension of TSP capabilities in risk management, cybersecurity, IT controls and customer/data protection as part of onboarding and ongoing operations.",
+    "summary": "Both require assessing third-party providers' risk management, cybersecurity, IT controls and customer data protection.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -42,7 +42,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both require compliance with applicable personal data protection laws in the context of sharing customer data with third parties/TSPs.",
+    "summary": "Both require compliance with personal data protection laws when sharing customer data with third parties.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -63,7 +63,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both address customer data protection safeguards and compliance with data privacy laws as a core requirement for data sharing arrangements with third parties.",
+    "summary": "Both treat customer data protection and compliance with data privacy laws as core to data sharing.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -84,7 +84,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both specify technical/API requirements for participants: A sets out core-banking Open API functions for deployment, B requires compliance with platform API specifications and technology requirements.",
+    "summary": "Both set API requirements: the HKMA framework specifies core-banking Open API functions; the draft requires meeting platform API specifications.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -105,7 +105,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "A's Open API facilitation measures and B's technology/operational requirements for platform participation both address enabling infrastructure and procedural requirements for data-sharing arrangements.",
+    "summary": "Both cover the infrastructure and procedures enabling data sharing: HKMA facilitation measures and the draft's platform requirements.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -126,7 +126,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "A leverages existing international/industry practices to shape its Open API framework, while B's technology and operational requirements likewise draw on established practices for API specifications and operational resilience.",
+    "summary": "Both draw on existing international and industry practices for their API and technology requirements.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -168,7 +168,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "HKMA's collaborative, phased, non-mandatory approach to Open API adoption differs from BNM's mandated FSP obligations with fixed commencement timelines for data sharing.",
+    "summary": "The HKMA framework takes a voluntary, phased approach; the draft mandates FSP obligations with fixed commencement dates.",
     "label": "differs-on",
     "sentiment": "loosen",
     "source_clauses": [
@@ -193,7 +193,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "HKMA allows banks flexibility to advance their own Open API rollout timeline while BNM sets a firm mandatory commencement date for open finance obligations.",
+    "summary": "The HKMA framework lets banks advance their own rollout timeline; the draft sets a firm mandatory commencement date.",
     "label": "differs-on",
     "sentiment": "loosen",
     "source_clauses": [
@@ -218,7 +218,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both frameworks address TSP/FSP governance and technology operations management for third-party participation in API-based data sharing.",
+    "summary": "Both address governance and technology operations management for third-party participation in data sharing.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -239,7 +239,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "TSP governance model requirements correspond to the technology and operational requirements an FSP must comply with when participating in an open finance platform.",
+    "summary": "The HKMA framework's TSP governance model matches the draft's technology and operational requirements for platform participation.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -281,7 +281,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "The requirement for a secure, controlled environment enabling banks and TSPs to collaborate parallels the requirement for FSPs to extend technology operations management to support open finance activities involving third parties.",
+    "summary": "Both require a secure environment for working with third parties: HKMA's controlled operating environment and the draft's extended technology operations.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -302,7 +302,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both address requirements for banks/FSPs to manage and oversee third-party service providers involved in API/open finance arrangements, though HKMA frames this as bilateral due diligence with reliance on prior assessments while BNM frames it as extending general technology operations management to cover TSPs.",
+    "summary": "Both require oversight of third-party providers; HKMA uses bilateral due diligence while the draft extends general technology operations management.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -327,7 +327,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "HKMA's read-only product and service information sharing corresponds narrowly to BNM's broader defined 'scope of prescribed information' that a data provider must share with a data consumer, reflecting a difference in scope of what information sharing entails.",
+    "summary": "HKMA shares only read-only product and service information; the draft's prescribed information scope is broader.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -348,7 +348,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both address consumer protection mechanisms in response to issues arising from third-party arrangements—HKMA requiring banks to monitor for scams and notify customers/public, BNM requiring assistance, complaints handling and redress mechanisms—though the specific mechanisms differ.",
+    "summary": "Both address consumer protection for third-party problems, but through different mechanisms.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -363,13 +363,13 @@
         "text": "assistance, complaints handling and redress mechanisms."
       }
     ],
-    "scope_note": null,
+    "scope_note": "HKMA requires monitoring for scams and notifying customers; the draft requires assistance, complaints handling and redress mechanisms.",
     "supported": true,
     "id": "bc1c2d972c91",
     "review_state": "pending"
   },
   {
-    "summary": "Both frameworks anticipate extension of their scope beyond the immediate banking/financial sector context—HKMA welcoming banks to extend the Open API framework to any other banking business, and BNM envisioning open finance principles supporting broader data-sharing arrangements beyond the financial industry.",
+    "summary": "Both foresee extending their scope: HKMA to other banking business, the draft to data sharing beyond finance.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -411,7 +411,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both require attention to customer/consumer data protection, but HKMA ties this to specific consumer protection code provisions while the ED requires escalation of breaches to the board.",
+    "summary": "Both address data protection, but HKMA cites consumer protection code provisions while the draft requires escalating breaches to the board.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -432,7 +432,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both address protection of customer data, but HKMA frames it as a regulatory compliance requirement while the ED frames it as technology/cyber risk controls over data exchanged.",
+    "summary": "Both protect customer data, but HKMA frames it as regulatory compliance and the draft as technology and cyber controls.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -453,7 +453,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both require banks/FSPs to govern and manage third-party service providers involved in open API/open finance arrangements, including due diligence and risk-based oversight.",
+    "summary": "Both require governing and managing third-party providers, including due diligence and risk-based oversight.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -482,7 +482,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both address third-party assessment practices, with HKMA allowing reliance on another bank's TSP assessment while the ED requires robust independent TSP management practices.",
+    "summary": "Both address third-party assessment, but HKMA lets a bank rely on another's assessment while the draft requires robust independent management.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -503,7 +503,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "HKMA adopts a collaborative, phased approach without a fixed mandatory timeline for Open API implementation, whereas the ED mandates specific commencement dates for FSP open finance obligations.",
+    "summary": "The HKMA framework has no fixed mandatory timeline for Open API rollout; the draft mandates specific commencement dates.",
     "label": "differs-on",
     "sentiment": "loosen",
     "source_clauses": [
@@ -524,7 +524,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both address obtaining customer consent before personal/customer data is shared with or collected by third parties.",
+    "summary": "Both require customer consent before customer data is shared with or collected by third parties.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -543,7 +543,7 @@
         "text": "An FSP that is a data consumer shall ensure that any third-party service provider\ninvolved in handling customer information, whether related to an open finance\narrangement (including that associated with outsourcing or cloud computing\narrangements), complies with relevant requirements relating to data privacy,\nconfidentiality and security, as set out in the Policy Document on Management\nof Customer Information and Permitted Disclosures, the Policy Document on\nRisk Management and Information Technology, and the Policy Document on\nOutsourcing.\n\nS 11.9 An FSP shall ensure that customer information is not shared with any third-party\nservice provider without the customer's explicit consent, in line with the\nrequirements stipulated in paragraph 10.1 of this Policy Document.\n\nS 11.10 For the purposes of paragraph 11.8, an FSP shall ensure the obligation to\nsafeguard customer information is adequately reflected in the service level\nagreement with the third-party service provider, in line with paragraph 12.4 of the\nPolicy Document on Management of Customer Information and Permitted\nDisclosures."
       }
     ],
-    "scope_note": "Both require explicit consumer awareness/consent regarding third-party data handling.",
+    "scope_note": "Both require explicit customer awareness and consent regarding third-party data handling.",
     "supported": true,
     "id": "bfcd637fac86",
     "review_state": "pending"
@@ -570,7 +570,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both establish technical standards/requirements covering architecture, security and data handling for open banking/finance implementations.",
+    "summary": "Both set technical standards for architecture, security and data handling.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -595,7 +595,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both address governance and oversight requirements for third-party service providers involved in the open API/finance ecosystem, though HKMA proposes a shared central assessment entity while BNM places compliance obligations directly on the FSP.",
+    "summary": "Both address third-party governance, but HKMA proposes a shared central assessment entity while the draft places compliance on the FSP.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -637,7 +637,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both frameworks establish phased/staged timelines for implementation obligations, though HKMA phases governance complexity (simple registration in Phase I vs comprehensive TSP governance later) while BNM phases specific interface obligations by set dates.",
+    "summary": "Both phase in obligations, but HKMA phases governance complexity while the draft phases specific interface obligations by set dates.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -679,7 +679,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both documents allow banks/FSPs to define their own technical specifications while requiring adherence to broader API/technology standards.",
+    "summary": "Both let banks define their own technical specifications while requiring adherence to broader API standards.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -700,7 +700,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both address requirements for third-party service providers to notify or comply with obligations related to the services/products they support within the open API/finance ecosystem.",
+    "summary": "Both set third-party obligations: HKMA has TSPs notify banks of in-scope products; the draft requires TSP data compliance.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -721,7 +721,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both specify security/protection requirements (authentication, integrity, confidentiality) for data and API transactions, though HKMA differentiates by API category while BNM applies broader cyber risk and API security controls uniformly.",
+    "summary": "Both set security requirements, but HKMA varies protections by API category while the draft applies cyber and API controls uniformly.",
     "label": "differs-on",
     "sentiment": "tighten",
     "source_clauses": [
@@ -742,7 +742,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both reference leveraging existing standards/practices for technology implementation to ensure ease and consistency.",
+    "summary": "Both rely on existing standards and practices for technology implementation.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -763,7 +763,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both provisions address implementation timelines for open API/finance interfaces, though HKMA leaves timing to be specified per function while BNM's exposure draft prescribes concrete commencement dates.",
+    "summary": "Both cover implementation timelines, but HKMA leaves timing to be set per function while the draft prescribes concrete commencement dates.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -784,7 +784,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both frameworks address the role of third-party service providers (TSPs) in enabling data-sharing services, but HKMA requires banks to adopt formal governance over TSP partnerships while BNM's draft simply defines TSPs without prescribing a governance process.",
+    "summary": "Both mention third-party providers, but HKMA requires banks to adopt formal TSP governance while the draft only defines them.",
     "label": "differs-on",
     "sentiment": "loosen",
     "source_clauses": [
@@ -805,7 +805,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "On consent management infrastructure, document B requires a real-time consent dashboard reflecting renewal, revocation and expiration status. Document A provides for TSP governance and customer authorisation but does not address any customer-facing consent dashboard or requirement to reflect consent status in real time.",
+    "summary": "The draft requires a real-time consent dashboard; the HKMA framework has no such requirement.",
     "label": "silent-on",
     "sentiment": null,
     "source_clauses": [],
@@ -815,13 +815,13 @@
         "text": "\"explicit and deliberate\" consent by a customer as there is no way to definitively establish that the\ncustomer consented to the pre-ticked box and the applicable statement/term.\n\nS 10.4 An FSP shall ensure that the consent dashboard reflects the real-time status of\nconsent and is updated immediately upon any renewal, revocation or expiration\nof consent."
       }
     ],
-    "scope_note": "B mandates a real-time consent dashboard; A is silent on any consent status interface.",
+    "scope_note": "The dashboard must reflect consent status in real time and update on any renewal, revocation or expiration.",
     "supported": true,
     "id": "e8dd23689842",
     "review_state": "pending"
   },
   {
-    "summary": "On voluntariness of consent, document B prohibits bundled/blanket consent, pre-ticked boxes, and coercion, and mandates that revocation be as straightforward as granting consent. Document A refers to a consent model in its consumer protection footnote but does not address the prohibition of bundled consent, pre-ticked boxes, or the standard for revocation.",
+    "summary": "The draft bans bundled consent, pre-ticked boxes and coercion, and requires easy revocation; the HKMA framework does not.",
     "label": "silent-on",
     "sentiment": null,
     "source_clauses": [],
@@ -835,13 +835,13 @@
         "text": "Revocable upon request - A customer must be allowed to revoke their\nconsent given for the disclosure of information at any time unless such\ndisclosure is necessary for the data consumer to comply with any legal or\ncontractual requirements. Furthermore, the customer must be informed of\ntheir rights to revoke the consent and how to effect such revocation of\nconsent. The process for revoking consent must be as straightforward as\nit was to obtain the consent."
       }
     ],
-    "scope_note": "B sets granular rules on the manner of consent and revocation; A does not.",
+    "scope_note": "The draft sets granular rules on how consent is obtained and revoked; the HKMA framework does not.",
     "supported": true,
     "id": "b5f6242b0907",
     "review_state": "pending"
   },
   {
-    "summary": "On board and senior management governance, document B requires the board and senior management to exercise effective oversight of the FSP's open finance implementation and escalate material security/confidentiality breaches to the board. Document A assigns implementation to banks generally and to the HKMA for monitoring, but does not address any board or senior management oversight obligation for Open API arrangements.",
+    "summary": "The draft requires board and senior management oversight of open finance; the HKMA framework has no such requirement.",
     "label": "silent-on",
     "sentiment": null,
     "source_clauses": [],
@@ -855,13 +855,13 @@
         "text": "ensure that material issues and concerns relating to the FSP's open\nfinance arrangements are promptly escalated to the board, which include\nbut are not limited to breaches of customer information security and\nconfidentiality."
       }
     ],
-    "scope_note": "B imposes internal governance/oversight at board level; A has no equivalent provision.",
+    "scope_note": "The draft requires board-level oversight and escalation of security breaches; the HKMA framework has no equivalent.",
     "supported": true,
     "id": "51a335b179ac",
     "review_state": "pending"
   },
   {
-    "summary": "On data breach response, document B requires FSPs to maintain a breach handling and response plan for theft, loss, misuse or unauthorised access to customer information, including escalation procedures and clear lines of responsibility. Document A addresses TSP monitoring and scam notification but does not mandate a customer information breach handling and response plan.",
+    "summary": "The draft requires a customer-information breach handling and response plan; the HKMA framework does not.",
     "label": "silent-on",
     "sentiment": null,
     "source_clauses": [],
@@ -871,13 +871,13 @@
         "text": "breach handling and response plan in the event of theft, loss, misuse or\nunauthorised access, modification or disclosure of customer information\nassociated with an open finance arrangement. The plan must, at a minimum,\ninclude escalation procedures and a clear line of responsibility to contain the\ncustomer information breach and take remedial actions."
       }
     ],
-    "scope_note": "B requires a formal breach response plan; A does not address breach handling plans.",
+    "scope_note": "The plan must cover theft, loss, misuse or unauthorised access, with escalation procedures and clear responsibility.",
     "supported": true,
     "id": "3bcf81430ab8",
     "review_state": "pending"
   },
   {
-    "summary": "On inclusive interface design, document B encourages data consumers to adopt principles of inclusivity, accessibility and usability for underserved segments including persons with disabilities and those with basic digital literacy. Document A addresses developer/TSP-facing repositories and testing environments but does not address accessibility or inclusive design for underserved customer segments.",
+    "summary": "The draft encourages inclusive, accessible interface design for underserved customers; the HKMA framework does not.",
     "label": "silent-on",
     "sentiment": null,
     "source_clauses": [],
@@ -887,13 +887,13 @@
         "text": "S 8.1\nAn FSP may participate2 as a data provider or a data consumer on an open\nfinance platform, subject to meeting relevant requirements in this Policy\nDocument and that specified by the platform operator."
       }
     ],
-    "scope_note": "B addresses accessibility/inclusivity of customer interfaces; A is silent on this.",
+    "scope_note": "The draft addresses accessibility and inclusivity of customer interfaces; the HKMA framework is silent on this.",
     "supported": true,
     "id": "bce1c057e0ad",
     "review_state": "pending"
   },
   {
-    "summary": "On customer liability for unauthorised transactions, document A (HKMA) provides that a customer is not responsible for direct loss from unauthorised transactions via Open API unless acting fraudulently or with gross negligence, and requires banks and TSPs to define a clear liability and settlement/refund arrangement. Document B addresses breach handling and redress mechanisms but does not establish any allocation of customer liability or refund arrangement for unauthorised transactions.",
+    "summary": "The HKMA framework sets a customer-liability standard for unauthorised transactions; the draft does not.",
     "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [
@@ -912,13 +912,13 @@
         "text": "assistance, complaints handling and redress mechanisms."
       }
     ],
-    "scope_note": "A sets a substantive customer-liability standard for unauthorised transactions; B does not.",
+    "scope_note": "The draft covers complaints handling and redress but sets no customer liability or refund arrangement for unauthorised transactions.",
     "supported": true,
     "id": "f57ab00c1b2f",
     "review_state": "pending"
   },
   {
-    "summary": "On public transparency of partnering TSPs, document A requires banks to publish and maintain a list of partnering TSPs and their products for Phase II and beyond, and to monitor the Internet for scams impersonating partnering TSPs and notify the public. Document B addresses TSP oversight and breach response but does not require publication of a partnering-TSP list or proactive monitoring for impersonation scams.",
+    "summary": "The HKMA framework requires publishing a partnering-TSP list and monitoring for impersonation scams; the draft does not.",
     "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [
@@ -932,13 +932,13 @@
       }
     ],
     "target_clauses": [],
-    "scope_note": "A imposes public TSP-list publication and anti-scam monitoring; B is silent.",
+    "scope_note": "The partnering-TSP list must be published from Phase II onward and kept updated.",
     "supported": true,
     "id": "aaf8d1a92a79",
     "review_state": "pending"
   },
   {
-    "summary": "On centralised industry facilitation, document A provides for HKMA-led facilitation measures including a common Open API dashboard/repository (Data Studio), promotional and educational events, and an ongoing development body to review standards. Document B addresses phased regulatory rollout by BNM but does not establish any equivalent facilitation infrastructure such as a central API repository or industry development body.",
+    "summary": "The HKMA framework provides central facilitation infrastructure and a standing development body; the draft does not.",
     "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [
@@ -956,13 +956,13 @@
       }
     ],
     "target_clauses": [],
-    "scope_note": "A creates facilitation infrastructure and a standing development body; B has no such provisions.",
+    "scope_note": "The HKMA framework sets up a common API repository, promotional events, and a body to review standards; the draft has none.",
     "supported": true,
     "id": "30dfffd2618e",
     "review_state": "pending"
   },
   {
-    "summary": "On testing support for API adopters, document A requires banks to provide examples and a testing environment with data (including artificial customer data) to assist TSPs in using their Open APIs. Document B addresses API specification compliance and platform technical requirements but does not require provision of test environments or sample data to data consumers.",
+    "summary": "The HKMA framework requires banks to provide test environments and sample data; the draft does not.",
     "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [
@@ -977,13 +977,13 @@
         "text": "An FSP participating in an open finance arrangement shall also comply with\ntechnology and operational requirements of the open finance platform for which\nthe FSP is a member. This may include, but is not limited to, requirements in\nrelation to the user journey, API specifications, uptime requirements, operational\nprocedures and requirements for independent review relating to the operational\nresilience of its technology functions."
       }
     ],
-    "scope_note": "A mandates testing environments and sample data; B does not address this.",
+    "scope_note": "Banks must provide examples and a testing environment, including artificial customer data, to help third parties use their APIs.",
     "supported": true,
     "id": "256e582cdec7",
     "review_state": "pending"
   },
   {
-    "summary": "On implementation road maps, document A requires banks to submit Open API implementation road maps to the HKMA within specified timeframes and to explain gaps against the defined scope, with the HKMA publishing summaries. Document B specifies commencement timelines but does not require submission of individual implementation road maps or publication of road map summaries.",
+    "summary": "The HKMA framework requires banks to submit implementation road maps, which it publishes; the draft does not.",
     "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [
@@ -1002,7 +1002,7 @@
         "text": "S 9.1\nThe obligations of a mandated FSP as specified under paragraph 8.4 shall\ncommence in accordance with the timeline specified in Appendix 2.\n\nS 9.2\nA mandated FSP shall commence its obligation under paragraph 8.6 to provide\ndocument submission and single account view interfaces by 1 January 2028 or\n\nthe date on which the FSP's obligations under paragraph 8.4 commence,\nwhichever is later."
       }
     ],
-    "scope_note": "A requires road-map submission and publication; B is silent on road-map obligations.",
+    "scope_note": "Banks must submit road maps within set timeframes and explain any gaps against the defined scope; the HKMA publishes summaries.",
     "supported": true,
     "id": "79c459926ca3",
     "review_state": "pending"

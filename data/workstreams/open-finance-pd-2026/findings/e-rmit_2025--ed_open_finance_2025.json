@@ -1,6 +1,6 @@
 [
   {
-    "summary": "Both provisions set the scope for managing technology and cyber risk, calibrated to the institution's risk profile and operations.",
+    "summary": "Both set the scope for managing technology and cyber risk, scaled to the institution's size and operations.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -21,7 +21,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both clauses specify the effective/commencement date of the respective policy document, though the actual dates differ.",
+    "summary": "Both set an effective date, but they differ: RMiT starts 28 November 2025, the draft 1 January 2027.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -42,7 +42,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both require robust oversight and management of risks arising from engagement of third-party service providers for critical technology functions.",
+    "summary": "Both require strong oversight of the risks from using third-party service providers for critical technology.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -63,7 +63,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Open finance document explicitly ties FSP compliance obligations back to RMiT's Part C requirements on technology risk management, aligning with RMiT's own third-party oversight expectations.",
+    "summary": "The draft points FSPs to RMiT Part C, matching RMiT's own expectations on third-party oversight.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -84,7 +84,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both require board-level engagement and escalation on emerging technology and cyber risk matters affecting the institution's operations.",
+    "summary": "Both require board-level attention: RMiT on evolving tech and cyber risk, the draft on escalating open finance issues.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -105,7 +105,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "RMiT assigns senior management the role of advising the board on technology risk, while the open finance document places escalation of material issues directly on the FSP to the board, reflecting a different locus of responsibility for board communication.",
+    "summary": "RMiT routes technology-risk advice to senior management; the draft routes material issues straight to the board.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -126,7 +126,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both address the need for enhanced technology risk management frameworks to address emerging or cloud-related risks, mirrored in the open finance requirement to extend technology operations management practices.",
+    "summary": "Both call for extending technology risk controls to new activities: RMiT for emerging tech, the draft for open finance.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -147,7 +147,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both provisions require robust breach/incident handling arrangements to protect customer data, though RMIT's is a general fraud/compromise safeguard while the open finance policy specifies detailed breach-response plan elements.",
+    "summary": "Both require plans to handle customer-data incidents: RMiT for fraud or compromise, the draft for open finance breaches.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -168,7 +168,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "The RMIT policy document is expressly incorporated by reference in the open finance policy's requirement that FSPs adhere to RMIT Part C expectations for their open finance participation.",
+    "summary": "The draft incorporates RMiT by reference, requiring FSPs to follow its Part C expectations.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -189,7 +189,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both provisions address enhancing cyber resilience and managing technology/cyber risk, one at the institution level (RMIT Appendix 5) and one specifically for open finance arrangements.",
+    "summary": "Both address cyber resilience: RMiT institution-wide, the draft for open finance arrangements.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -210,7 +210,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "RMIT's board-level technology risk appetite requirement is broader in scope than the open finance policy's narrower focus on technology and cyber risks specific to open finance arrangements.",
+    "summary": "RMiT's board-set technology risk appetite is broader; the draft covers only tech and cyber risks for open finance.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -231,7 +231,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both introductory statements recognise the growing role of technology in financial services and the resulting need for institutions to manage associated risks and secure customer information.",
+    "summary": "Both openings recognise technology's growing role in finance and the resulting need to manage risk and secure customer data.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -252,7 +252,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "RMIT's specific requirement to identify vulnerabilities from undeployed patches or EOL systems is a narrower technical instance of the broader technology and cyber risk management expected under the open finance arrangement.",
+    "summary": "RMiT's specific patch and end-of-life vulnerability check is a narrower case of the draft's broad technology risk management.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -273,7 +273,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "RMIT's requirement that the risk management framework support robust technology risk assessments aligns with the open finance policy's requirement to adhere to RMIT Part C processes when applicable.",
+    "summary": "Both align on technology risk assessments: RMiT requires them, the draft directs FSPs to RMiT Part C.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -294,7 +294,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both provisions reference the Policy Document on Risk Management in Technology (RMIT) as the governing framework for technology risk expectations, with the open finance document explicitly directing compliance to RMIT Part C.",
+    "summary": "Both point to RMiT as the technology-risk framework; the draft directs FSPs to its Part C.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -315,7 +315,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Identification of technology risks (including emerging technology risks) under RMIT aligns with the open finance requirement to manage technology and cyber risks arising from open finance participation.",
+    "summary": "Both cover identifying technology risks: RMiT including emerging tech, the draft for open finance participation.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -336,7 +336,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "The board's oversight of the technology risk management framework and cyber resilience framework corresponds to the open finance requirement for FSPs to manage technology and cyber risks in open finance arrangements.",
+    "summary": "Both address managing technology and cyber risk: RMiT via board oversight of its frameworks, the draft for open finance.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -357,7 +357,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both address incident response planning for security compromises, but RMIT focuses on cryptographic key compromise-recovery plans while the open finance document focuses on customer information breach handling, reflecting different scopes within the same incident-response topic.",
+    "summary": "Both cover incident response planning, but RMiT targets cryptographic key compromise while the draft targets customer information breaches.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -378,7 +378,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both address security principles ensuring confidentiality, integrity, and availability of customer/counterparty data or data exchanged in arrangements.",
+    "summary": "Both require protecting the confidentiality, integrity, and availability of customer data.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -399,7 +399,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "RMiT's general applicability to all financial institutions underpins the open finance policy's requirement that FSPs comply with Part C regulatory processes of the RMiT policy document for their technology-related activities.",
+    "summary": "RMiT applies to all financial institutions, underpinning the draft's requirement that FSPs follow RMiT Part C.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -420,7 +420,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Disaster recovery/backup capability requirements align with the open finance requirement for operational resilience measures and independent review of technology functions.",
+    "summary": "Both address operational resilience: RMiT via disaster recovery and backup, the draft via platform resilience requirements and independent review.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -441,7 +441,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both frameworks address the scope of technology and cyber risk management obligations, with RMiT setting the baseline applicability and the open finance document extending it to open finance activities specifically.",
+    "summary": "RMiT sets the baseline scope for tech and cyber risk duties; the draft extends it to open finance.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -462,7 +462,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "RMiT's general requirement for financial institutions to manage technology risk in service provision aligns with the Open Finance policy's scope covering management of technology and cyber risks associated with open finance arrangements.",
+    "summary": "Both cover managing technology risk in financial services, the draft focusing on open finance arrangements.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -483,7 +483,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "RMiT's requirement for board/senior management oversight and accountability for third-party service provider risks aligns with the Open Finance policy's requirement that FSPs adhere to relevant RMiT-based regulatory processes when participating in open finance arrangements.",
+    "summary": "RMiT's board oversight of third-party risks aligns with the draft's requirement that FSPs follow RMiT Part C.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -504,7 +504,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "RMiT's accountability provision for engagement of third-party service providers aligns with the Open Finance policy's definition of third-party service provider, both addressing the same category of external entities handling technology/customer information services.",
+    "summary": "Both address third-party service providers: RMiT sets accountability for them, the draft defines the term.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -525,7 +525,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "RMiT's requirement for an annual technology audit plan covering third-party service providers aligns with the Open Finance policy's requirement for FSPs to regularly monitor the effectiveness of controls over information sharing arrangements.",
+    "summary": "Both require ongoing checks of controls: RMiT via an annual technology audit, the draft via regular monitoring.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -546,7 +546,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "RMiT's requirement for independent external review of technology risk management differs from the Open Finance policy's requirement for FSPs to internally monitor control effectiveness, reflecting different assurance mechanisms (external review vs. self-monitoring) for similar risk oversight objectives.",
+    "summary": "RMiT can require an independent external review, while the draft relies on the FSP's own regular monitoring of controls.",
     "label": "differs-on",
     "sentiment": "tighten",
     "source_clauses": [
@@ -567,7 +567,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both address technology and cyber risk management controls for digital/open finance services.",
+    "summary": "Both address technology and cyber risk controls for digital or open finance services.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -588,7 +588,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "RMiT's enterprise-wide technology risk management function underpins the RMiT expectations referenced for open finance participants.",
+    "summary": "RMiT's enterprise-wide technology risk function underpins the RMiT expectations the draft requires open finance participants to follow.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -609,7 +609,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Data centre control procedures and technology security controls are part of the broader technology risk management expectations that open finance arrangements must adhere to.",
+    "summary": "RMiT's data centre controls fall under the technology risk expectations the draft requires open finance participants to follow.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -630,7 +630,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both provisions require robust technology security controls (secure transmission, authentication, safeguards) for digital/open finance services.",
+    "summary": "Both require strong security controls: RMiT for digital services, the draft for secure transmission and authentication in open finance.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -651,7 +651,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Security arrangements and controls in RMiT align with the secure transmission and authentication safeguards required for open finance data sharing.",
+    "summary": "Both require security controls: RMiT generally, the draft for secure transmission and authentication in open finance data sharing.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -672,7 +672,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both address technology security controls that assure resilience and safe operation of digital/technology-enabled services.",
+    "summary": "Both require technology controls for safe, resilient services: RMiT for digital services, the draft for open finance platforms.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -693,7 +693,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "RMiT's requirement to implement the technology and cyber risk frameworks parallels the open finance requirement for FSPs to comply with technology and operational requirements of the platform, though scope and framework specifics differ.",
+    "summary": "Both require implementing technology requirements, but RMiT means its own frameworks while the draft means the open finance platform's.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -714,7 +714,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Open finance ED requires FSPs to follow RMiT Part C technology risk management expectations, including CISO designation and responsibilities.",
+    "summary": "The draft requires FSPs to follow RMiT Part C, including its CISO designation and responsibilities.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -735,7 +735,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Board oversight of technology risk under RMiT is incorporated by reference into open finance participants' regulatory obligations via Part C adherence.",
+    "summary": "RMiT's board-oversight duties apply to open finance participants through the draft's requirement to follow RMiT Part C.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -756,7 +756,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Incident recovery requirements under RMiT are applicable to open finance participants through the Part C adherence obligation.",
+    "summary": "RMiT's incident recovery requirements apply to open finance participants through the draft's requirement to follow RMiT Part C.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -777,7 +777,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Continuous monitoring of third party cybersecurity posture under RMiT forms part of the technology risk expectations open finance FSPs must adhere to.",
+    "summary": "RMiT's continuous monitoring of third-party cybersecurity applies to open finance participants through the draft's RMiT Part C requirement.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -798,7 +798,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both address the broader governance of technology and cyber risk management, with the CISO role central to RMiT's approach and open finance ED referencing the management of technology and cyber risks generally.",
+    "summary": "Both address governing technology and cyber risk: RMiT through the CISO role, the draft for open finance.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -819,7 +819,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "On customer-facing interface design, document B recommends that data consumers adopt principles of inclusivity, accessibility and usability, with particular attention to underserved segments including persons with disabilities and those with basic digital literacy. Document A does not address accessibility or inclusive design of customer interfaces.",
+    "summary": "Only the draft addresses inclusive, accessible interface design for customers; RMiT is silent on this.",
     "label": "silent-on",
     "sentiment": null,
     "source_clauses": [],
@@ -835,7 +835,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "On the data provider/data consumer roles in information sharing arrangements, document B establishes contractual open finance arrangements defining obligations of data providers to share prescribed customer information upon authorised request and data consumers to access it. Document A has no concept of a mandated information-sharing obligation between financial institutions.",
+    "summary": "Only the draft creates a mandated customer information-sharing arrangement between firms; RMiT has no such concept.",
     "label": "silent-on",
     "sentiment": null,
     "source_clauses": [],
@@ -855,7 +855,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "On cryptography, document A requires a robust cryptography policy covering encryption algorithms, cryptographic key lifecycle management, HSM/TEE protected storage, certificate authority usage, and compromise-recovery plans. Document B has no provision addressing cryptographic controls or key management despite governing secure transmission of customer information.",
+    "summary": "RMiT requires a full cryptography and key management policy; the draft has no equivalent requirement.",
     "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [
@@ -884,7 +884,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "On patch and end-of-life system management, document A requires a patch and EOL management framework, prohibiting operation on outdated or end-of-life systems and requiring timely patch deployment. Document B has no provision addressing patch management or end-of-life technology.",
+    "summary": "RMiT requires a patch and end-of-life management framework; the draft has no such provision.",
     "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [
@@ -904,7 +904,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "On cyber incident response, document A requires a comprehensive Cyber Incident Response Plan with CERT roles, out-of-band communication infrastructure, and annual cyber drill exercises. Document B addresses breach handling plans for customer information but has no provision for cyber drill testing or out-of-band communication infrastructure.",
+    "summary": "RMiT requires a full cyber incident response plan with drills and backup communications; the draft only requires breach handling.",
     "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [
@@ -933,7 +933,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "On red team and security testing, document A requires realistic Red Team simulation attacks at least once every three years and permits crowdsourced security testing programs. Document B has no provision for red team exercises or offensive security testing.",
+    "summary": "RMiT requires red team simulation attacks and allows crowdsourced testing; the draft has no such requirement.",
     "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [
@@ -953,7 +953,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "On data centre resilience, document A requires data centres to have redundant capacity, no single point of failure, and a periodic data centre resilience and risk assessment (DCRA) by a competent external party at least every three years. Document B has no provision addressing data centre resilience or physical infrastructure assessments.",
+    "summary": "RMiT requires data centre resilience and periodic external assessments; the draft has no such provision.",
     "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [
@@ -977,7 +977,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "On cyber insurance and loss provisioning, document A requires financial institutions to review loss provision arrangements and, where cyber insurance is adopted, to ensure coverage adequacy and manage conflicts of interest with insurers. Document B has no provision addressing cyber insurance or loss provisioning.",
+    "summary": "RMiT requires reviewing loss provisions and cyber insurance adequacy; the draft has no such provision.",
     "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [
@@ -1001,7 +1001,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "On technology audit, document A requires dedicated technology audit resources with specialised competencies, an annual technology audit plan, and BAC oversight of the internal technology audit function. Document B has no provision addressing technology audit function or audit planning.",
+    "summary": "RMiT requires a dedicated technology audit function with an annual plan; the draft has no such provision.",
     "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [
@@ -1025,7 +1025,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "On network resilience, document A requires a secure enterprise network with no single point of failure, real-time bandwidth monitoring, a network design blueprint, and periodic network resilience assessments (NRA). Document B has no provision addressing network resilience or network architecture safeguards.",
+    "summary": "RMiT requires network resilience safeguards, a design blueprint, and periodic assessments; the draft has no such provision.",
     "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [
@@ -1049,7 +1049,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "On designated security leadership, document A requires the designation of a Chief Information Security Officer (CISO) with defined independence, authority, certification and responsibilities. Document B assigns oversight to the board and senior management but has no provision for a designated CISO role.",
+    "summary": "RMiT requires a designated CISO; the draft assigns oversight to the board and senior management but requires no CISO.",
     "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [
@@ -1074,7 +1074,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "On phased implementation timelines for mandated participants, document B sets specific commencement dates for data provider obligations and single account view/document submission interfaces (e.g. 1 January 2028). Document A has no provision for mandated staged rollout of information-sharing obligations across firm categories.",
+    "summary": "Only the draft sets phased start dates for mandated open finance obligations; RMiT has no such rollout.",
     "label": "silent-on",
     "sentiment": null,
     "source_clauses": [],
