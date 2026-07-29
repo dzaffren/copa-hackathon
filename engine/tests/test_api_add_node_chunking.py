@@ -16,7 +16,7 @@ import shutil
 
 from fastapi.testclient import TestClient
 
-from engine import ws_anchors
+from engine import workstreams, ws_anchors
 from engine.api import create_app
 from engine.config import REPO_ROOT
 
@@ -426,6 +426,22 @@ def test_a_context_document_without_one_is_still_accepted(tmp_path):
     assert res.json()["task_type"] is None
     node = next(n for n in _graph(dst)["nodes"] if n["id"] == res.json()["id"])
     assert "task_type" not in node
+
+
+def test_an_invalid_node_type_is_reported_before_a_missing_kind():
+    """Order is the contract: `validate_node_create` names the TOPMOST problem
+    on the form, and node type sits above task type on it. A body broken in both
+    places must not send the drafter to the second control first."""
+    problem = workstreams.validate_node_create(
+        {
+            "node_type": "working-draft",  # not one of the eight
+            "title": "OpRes Industry Briefing",
+            "edges": [{"target_node_id": _TASK, "edge_type": "references"}],
+        }
+    )
+
+    assert problem is not None
+    assert problem[1] == "INVALID_NODE_TYPE"
 
 
 def test_two_workstreams_can_add_the_same_titled_document(tmp_path):
