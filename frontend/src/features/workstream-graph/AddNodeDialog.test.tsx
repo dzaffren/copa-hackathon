@@ -202,6 +202,72 @@ describe("AddNodeDialog", () => {
     }
   });
 
+  it("keeps Add to graph disabled for a working draft with no kind picked", async () => {
+    renderDialog();
+    await userEvent.click(screen.getByRole("radio", { name: "task" }));
+    await userEvent.type(screen.getByLabelText("Title"), "OpRes Briefing");
+    await attachFile();
+    await addCompleteRow(1, "opres-pd-v0-3", "references");
+
+    // Everything else the server asks for is present; only the kind is missing.
+    expect(
+      screen.getByRole("button", { name: /add to graph/i }),
+    ).toBeDisabled();
+
+    await userEvent.click(screen.getByRole("radio", { name: "DECK" }));
+    expect(screen.getByRole("button", { name: /add to graph/i })).toBeEnabled();
+  });
+
+  it("discards the kind when the drafter switches away from working draft", async () => {
+    renderDialog();
+    await userEvent.click(screen.getByRole("radio", { name: "task" }));
+    await userEvent.click(screen.getByRole("radio", { name: "FAQ" }));
+    await userEvent.click(
+      screen.getByRole("radio", { name: "international-standard" }),
+    );
+    await userEvent.click(screen.getByRole("radio", { name: "task" }));
+
+    const group = screen.getByRole("radiogroup", { name: "Task type" });
+    expect(within(group).getByRole("radio", { name: "FAQ" })).not.toBeChecked();
+  });
+
+  it("sends task_type for a working draft", async () => {
+    const createNode = vi
+      .spyOn(api, "createNode")
+      .mockResolvedValue({} as never);
+    renderDialog();
+    await userEvent.click(screen.getByRole("radio", { name: "task" }));
+    await userEvent.click(screen.getByRole("radio", { name: "DECK" }));
+    await userEvent.type(screen.getByLabelText("Title"), "OpRes Briefing");
+    await attachFile();
+    await addCompleteRow(1, "rmit-pd-2025", "references");
+    await userEvent.click(
+      screen.getByRole("button", { name: /add to graph/i }),
+    );
+
+    await waitFor(() => expect(createNode).toHaveBeenCalled());
+    expect(createNode.mock.calls[0][1].task_type).toBe("DECK");
+    createNode.mockRestore();
+  });
+
+  it("omits task_type entirely for a context document", async () => {
+    const createNode = vi
+      .spyOn(api, "createNode")
+      .mockResolvedValue({} as never);
+    renderDialog();
+    await userEvent.type(screen.getByLabelText("Title"), "BCBS OpRes 2021");
+    await attachFile();
+    await addCompleteRow(1, "opres-pd-v0-3", "references");
+    await userEvent.click(
+      screen.getByRole("button", { name: /add to graph/i }),
+    );
+
+    await waitFor(() => expect(createNode).toHaveBeenCalled());
+    // Absent, not null: the server rejects the key outright on a non-task node.
+    expect(createNode.mock.calls[0][1]).not.toHaveProperty("task_type");
+    createNode.mockRestore();
+  });
+
   // --- first document on a brand-new workstream ----------------------------
 
   it("pre-fills the edge row when the focal node is the only target", async () => {

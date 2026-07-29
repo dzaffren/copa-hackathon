@@ -283,6 +283,9 @@ export type DocClass = "structured-rules" | "semi-structured" | "prose";
 
 export interface CreateNodeRequest {
   node_type: NodeType;
+  /** Required when `node_type` is `task`, refused otherwise — the server sends
+   *  `INVALID_TASK_TYPE` / `TASK_TYPE_NOT_ALLOWED` rather than dropping it. */
+  task_type?: TaskTypeCode;
   title: string;
   description?: string | null;
   source_url?: string | null;
@@ -315,6 +318,7 @@ export interface CreatedEdge {
 export interface CreateNodeResponse {
   id: string;
   node_type: NodeType;
+  task_type?: TaskTypeCode | null;
   title: string;
   created_edges: CreatedEdge[];
   /** Present only when a document was attached and chunked. */

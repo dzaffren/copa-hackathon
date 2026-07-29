@@ -61,6 +61,8 @@ const ERROR_COPY: Record<string, string> = {
   NO_PASSAGES: "The document produced no passages and can't be added.",
   EDGE_REQUIRED:
     "Connect the document to at least one node already on the canvas.",
+  INVALID_TASK_TYPE: "Choose what kind of deliverable this is.",
+  TASK_TYPE_NOT_ALLOWED: "Only a working draft carries a deliverable kind.",
 };
 
 interface EdgeRow {
@@ -117,10 +119,14 @@ export function AddNodeDialog({
 
   const completeEdges = edges.filter((e) => e.target_node_id && e.edge_type);
   const canSubmit =
-    title.trim().length > 0 && completeEdges.length > 0 && attachment !== null;
+    title.trim().length > 0 &&
+    completeEdges.length > 0 &&
+    attachment !== null &&
+    (nodeType !== "task" || taskType !== null);
 
   function reset() {
     setNodeType("international-standard");
+    setTaskType(null);
     setTitle("");
     setDescription("");
     setSourceUrl("");
@@ -136,6 +142,7 @@ export function AddNodeDialog({
         workstreamId,
         {
           node_type: nodeType,
+          ...(nodeType === "task" && taskType ? { task_type: taskType } : {}),
           title: title.trim(),
           description: description.trim() || null,
           source_url: sourceUrl.trim() || null,
