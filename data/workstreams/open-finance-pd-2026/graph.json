@@ -100,6 +100,27 @@
           "at": "2026-07-29T07:17:33.187396Z"
         }
       ]
+    },
+    {
+      "id": "abs-mas-api-playbook",
+      "node_type": "international-standard",
+      "title": "ABS-MAS API Playbook",
+      "description": "This Playbook will serve as a comprehensive guide in\nidentifying and developing the APIs in your organisation. The requisite data and information standards supporting these APIs are also defined. This Playbook has also been developed as a reference guide for industry adoption in the wider ASEAN region who are embarking on similar API programs.",
+      "source_url": null,
+      "document_id": "abs-mas-api-playbook",
+      "doc_class": "prose",
+      "recent_activity": [
+        {
+          "event": "node created",
+          "author": "Aisyah R.",
+          "at": "2026-07-29T07:50:51.247184Z"
+        },
+        {
+          "event": "chunking completed",
+          "author": "Aisyah R.",
+          "at": "2026-07-29T07:50:51.247184Z"
+        }
+      ]
     }
   ],
   "edges": [
@@ -126,6 +147,12 @@
       "source": "rmit-2025",
       "target": "ed-open-finance-2025",
       "edge_type": "parallel-to"
+    },
+    {
+      "id": "e-abs_mas_api_playbook--ed_open_finance_2025",
+      "source": "abs-mas-api-playbook",
+      "target": "ed-open-finance-2025",
+      "edge_type": "references"
     }
   ]
 }
