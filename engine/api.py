@@ -317,6 +317,17 @@ def _ws_error(
     return JSONResponse(status_code=status_code, content=content)
 
 
+# Which input on the add-node form each `validate_node_create` failure belongs
+# to, so the dialog can ring the offending control instead of showing a banner.
+# A codes-not-listed-here failure (EDGE_REQUIRED, INVALID_NODE_TYPE) has no
+# single input to blame and gets no `field`.
+_NODE_CREATE_ERROR_FIELDS: dict[str, str] = {
+    "INVALID_DOC_CLASS": "doc_class",
+    "INVALID_TASK_TYPE": "task_type",
+    "TASK_TYPE_NOT_ALLOWED": "task_type",
+}
+
+
 def _ws_axes_dir(workstreams_dir: Path, workstream_id: str) -> Path:
     """Where a workstream's axis cache lives — beside its graph and findings, so
     a workstream prepared ahead of a demo travels with its concepts."""
@@ -1136,6 +1147,10 @@ def create_app(
         return {
             "id": node["id"],
             "node_type": node.get("node_type"),
+            # None for a context document, and for a working draft that predates
+            # the deliverable vocabulary — the retired seeded drafts are not
+            # backfilled, so the panel must render the chip conditionally.
+            "task_type": node.get("task_type"),
             "title": node.get("title"),
             "issuer": node.get("issuer"),
             "short_type": node.get("short_type"),
@@ -1382,10 +1397,7 @@ def create_app(
             )
         problem = workstreams.validate_node_create(body)
         if problem is not None:
-            return _ws_error(
-                *problem,
-                field="doc_class" if problem[1] == "INVALID_DOC_CLASS" else None,
-            )
+            return _ws_error(*problem, field=_NODE_CREATE_ERROR_FIELDS.get(problem[1]))
         # An attached document must declare how to break it up — the drafter
         # chooses; the tool never guesses (a wrong guess yields useless passages).
         if upload is not None and "doc_class" not in body:
@@ -1482,6 +1494,9 @@ def create_app(
         content: dict[str, Any] = {
             "id": new_node["id"],
             "node_type": new_node["node_type"],
+            # Echoed so the client can confirm what was stored; None for every
+            # node type but `task`, which is the only kind that carries one.
+            "task_type": new_node.get("task_type"),
             "title": new_node["title"],
             "created_edges": [{**edge, "analysed": False} for edge in created],
         }

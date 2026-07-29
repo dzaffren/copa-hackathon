@@ -393,6 +393,11 @@ def create_workstream(
     focal_node: dict[str, Any] = {
         "id": focal_id,
         "node_type": "task",
+        # The CODE, not the label — the title suffix above and the detail chip
+        # both derive from it, so "(PD)" reads as a suffix rather than "(Policy
+        # Document)". The workstream record stores the label instead; that
+        # asymmetry is deliberate (see the comment block above TASK_TYPES).
+        "task_type": body["deliverable_type"],
         "title": focal_title,
         "description": (body.get("description") or "").strip() or None,
         "source_url": None,
@@ -451,12 +456,18 @@ def make_edge_id(source: str, target: str) -> str:
 def validate_node_create(body: dict[str, Any]) -> Optional[tuple[int, str, str]]:
     """Validate an add-node request body. Returns `None` when valid, else the
     `(status, code, message)` for the first rule broken, checked in this order:
-    node type, then `doc_class` (when supplied), then ≥1 edge, then each edge's
-    type and a present target.
+    node type, then `task_type`, then `doc_class` (when supplied), then ≥1 edge,
+    then each edge's type and a present target. The order mirrors the form, so
+    the response always points at the topmost problem on it.
 
     `doc_class` is optional here because the legacy JSON path adds a node
     without a document to chunk. The route requires it whenever an attachment
     is present — presence of the file is what makes the choice meaningful.
+
+    `task_type` is required of a working draft and refused of everything else.
+    Refused rather than silently dropped: a client sending a deliverable kind
+    for an act of law has misunderstood the contract, and swallowing it hides
+    that until someone wonders why the kind never appears.
     """
     if body.get("node_type") not in NODE_TYPES:
         return (
@@ -464,6 +475,16 @@ def validate_node_create(body: dict[str, Any]) -> Optional[tuple[int, str, str]]
             "INVALID_NODE_TYPE",
             f"node_type must be one of the eight flat types, got "
             f"{body.get('node_type')!r}",
+        )
+    is_task = body.get("node_type") == "task"
+    if is_task and body.get("task_type") not in TASK_TYPES:
+        return (400, "INVALID_TASK_TYPE", "Choose what kind of deliverable this is.")
+    if not is_task and "task_type" in body:
+        return (
+            400,
+            "TASK_TYPE_NOT_ALLOWED",
+            f"Only a working draft carries a deliverable kind; "
+            f"{body['node_type']!r} does not.",
         )
     if "doc_class" in body and body.get("doc_class") not in DOC_CLASSES:
         return (
@@ -519,6 +540,12 @@ def add_node(
     node: dict[str, Any] = {
         "id": node_id,
         "node_type": body["node_type"],
+        # Only a working draft is a deliverable Aisyah is producing, so only a
+        # task node carries a kind — and where there is none the key is absent
+        # rather than null, the fixtures' convention for `issuer` and
+        # `pursuant_to`. Set in the same literal as `node_type` (its structural
+        # twin) so a validation failure can never leave a half-typed node.
+        **({"task_type": body["task_type"]} if body["node_type"] == "task" else {}),
         "title": body.get("title", node_id),
         "description": body.get("description"),
         "source_url": body.get("source_url"),
