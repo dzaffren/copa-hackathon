@@ -451,7 +451,7 @@ No database. Fixture files under `data/workstreams/` are the store.
 
 ### Negative Constraints
 
-- Do NOT alter the 8-value `NODE_TYPES` or the 4-value `EDGE_TYPES` vocabularies. `task_type` is a second, orthogonal question.
+- Do NOT alter the 8-value `NODE_TYPES` or the 3-value `EDGE_TYPES` vocabularies (`contributes-to` was retired on 29 Jul 2026 — do not reintroduce it). `task_type` is a second, orthogonal question.
 - Do NOT add `task_type` to `engine/concepts.py::CONCEPT_FIELDS`. The profile side-file stays nine fields; `task_type` lives on the node.
 - Do NOT rewrite `deliverable_type` in any existing `workstream.json`.
 - Do NOT backfill `task_type` into `opres-v2`, `rmit-v2-2025`, `open-finance-ed`, or `_cross`.
