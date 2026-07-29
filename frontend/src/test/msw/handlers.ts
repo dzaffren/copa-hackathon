@@ -17,6 +17,7 @@ import type {
   ReviewFinding,
   ReviewState,
   TaskResponse,
+  TaskTypeCode,
   TaskWorkflow,
   WorkstreamGraph,
   WorkstreamSummary,
@@ -386,6 +387,8 @@ interface GraphNodeFull extends GraphNode {
   description: string | null;
   source_url: string | null;
   document_id: string | null;
+  /** Set on a working draft only; `null` on every published context document. */
+  task_type: TaskTypeCode | null;
 }
 
 const GRAPH_NODES: Record<string, GraphNodeFull> = {
@@ -398,6 +401,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     description: "Working draft of the OpRes Policy Document.",
     source_url: null,
     document_id: "opres-v1-2025-draft",
+    task_type: "PD",
   },
   "bcbs-opres-2021": {
     id: "bcbs-opres-2021",
@@ -409,6 +413,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
       "Basel Committee Principles for Operational Resilience (2021).",
     source_url: "https://www.bis.org/bcbs/publ/d509.htm",
     document_id: null,
+    task_type: null,
   },
   "fsb-3rd-party": {
     id: "fsb-3rd-party",
@@ -419,6 +424,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     description: "FSB third-party risk management toolkit (2023).",
     source_url: "https://www.fsb.org",
     document_id: null,
+    task_type: null,
   },
   "hkma-spm-or2": {
     id: "hkma-spm-or2",
@@ -429,6 +435,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     description: "HKMA Supervisory Policy Manual OR-2.",
     source_url: "https://www.hkma.gov.hk",
     document_id: null,
+    task_type: null,
   },
   "rmit-pd-2025": {
     id: "rmit-pd-2025",
@@ -439,6 +446,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     description: "BNM RMiT policy document, reissued 28 Nov 2025.",
     source_url: "https://www.bnm.gov.my",
     document_id: "rmit-v2-2025",
+    task_type: null,
   },
   "fsa-2013-143": {
     id: "fsa-2013-143",
@@ -449,6 +457,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     description: "Financial Services Act 2013, section 143.",
     source_url: "https://www.bnm.gov.my",
     document_id: null,
+    task_type: null,
   },
   "abm-position": {
     id: "abm-position",
@@ -459,6 +468,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     description: "ABM position paper on operational resilience.",
     source_url: null,
     document_id: null,
+    task_type: null,
   },
   "opres-dp-2025": {
     id: "opres-dp-2025",
@@ -470,6 +480,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
       "Operational Resilience Discussion Paper, December 2025 — the consultation the v0.3 PD draft follows.",
     source_url: null,
     document_id: "opres-v1-2025-draft",
+    task_type: null,
   },
 };
 
@@ -639,6 +650,7 @@ function buildNodeDetail(nodeId: string): NodeDetail | null {
   return {
     id: node.id,
     node_type: node.node_type,
+    task_type: node.task_type,
     title: node.title,
     issuer: node.issuer,
     short_type: node.short_type,
@@ -1694,6 +1706,7 @@ export const handlers = [
     // `attachment` file — the chunking path) or a plain JSON body.
     type NodeBody = {
       node_type: string;
+      task_type?: TaskTypeCode;
       title: string;
       doc_class?: string;
       edges: Array<{ target_node_id: string; edge_type: string }>;
@@ -1718,6 +1731,8 @@ export const handlers = [
       {
         id,
         node_type: body.node_type,
+        // Echoed as the route does — present only when the client sent it.
+        ...(body.task_type === undefined ? {} : { task_type: body.task_type }),
         title: body.title,
         ...(attached
           ? {

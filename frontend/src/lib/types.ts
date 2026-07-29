@@ -224,6 +224,9 @@ export interface ConceptsAvailable {
 export interface NodeDetail {
   id: string;
   node_type: NodeType;
+  /** The deliverable kind, set once at creation and thereafter read-only.
+   *  `null` on a context document, and on a legacy draft that carries none. */
+  task_type: TaskTypeCode | null;
   title: string;
   issuer: string | null;
   short_type: string | null;
@@ -283,6 +286,9 @@ export type DocClass = "structured-rules" | "semi-structured" | "prose";
 
 export interface CreateNodeRequest {
   node_type: NodeType;
+  /** Required when `node_type` is `task`, refused otherwise — the server sends
+   *  `INVALID_TASK_TYPE` / `TASK_TYPE_NOT_ALLOWED` rather than dropping it. */
+  task_type?: TaskTypeCode;
   title: string;
   description?: string | null;
   source_url?: string | null;
@@ -315,6 +321,7 @@ export interface CreatedEdge {
 export interface CreateNodeResponse {
   id: string;
   node_type: NodeType;
+  task_type?: TaskTypeCode | null;
   title: string;
   created_edges: CreatedEdge[];
   /** Present only when a document was attached and chunked. */
@@ -466,18 +473,25 @@ export type SSEEvent =
 
 // --- New Workstream --------------------------------------------------------
 
-/** Wire codes for the deliverable dropdown. The server maps these to the human
- *  labels the fixtures store ("PD" → "Policy Document"). */
-export type DeliverableTypeCode = "PD" | "ED" | "DP" | "Other";
+/** Wire codes for the eight deliverable kinds BNM publishes — the one vocabulary
+ *  asked at workstream creation and of every new working draft. Mirrors
+ *  `engine/workstreams.py::TASK_TYPES`, whose order this preserves. */
+export type TaskTypeCode =
+  "PD" | "DP" | "ED" | "FAQ" | "DECK" | "FEEDBACK" | "BENCHMARK" | "OTHERS";
 
-export const DELIVERABLE_TYPE_OPTIONS: {
-  code: DeliverableTypeCode;
-  label: string;
-}[] = [
-  { code: "PD", label: "Policy Document (PD)" },
-  { code: "ED", label: "Exposure Draft (ED)" },
-  { code: "DP", label: "Discussion Paper (DP)" },
-  { code: "Other", label: "Other" },
+/** Drafter-facing labels. These differ from the labels the engine STORES
+ *  ("PD" → "Policy Document"): a picker needs the short form visible, because
+ *  the code is what an auto-generated draft title embeds. The asymmetry is
+ *  deliberate and documented above `TASK_TYPES` in the engine. */
+export const TASK_TYPE_OPTIONS: { code: TaskTypeCode; label: string }[] = [
+  { code: "PD", label: "PD — Policy Document" },
+  { code: "DP", label: "DP — Discussion Paper" },
+  { code: "ED", label: "ED — Exposure Draft" },
+  { code: "FAQ", label: "FAQ" },
+  { code: "DECK", label: "Engagement Deck" },
+  { code: "FEEDBACK", label: "Feedback Template for Industry" },
+  { code: "BENCHMARK", label: "Peer Benchmarking" },
+  { code: "OTHERS", label: "Others" },
 ];
 
 export type AccessLevel = "team_only" | "department_wide";
@@ -490,7 +504,7 @@ export interface Person {
 export interface CreateWorkstreamRequest {
   name: string;
   description?: string;
-  deliverable_type: DeliverableTypeCode;
+  deliverable_type: TaskTypeCode;
   target_publication?: string;
   reviewer_ids: string[];
   access: AccessLevel;
