@@ -53,7 +53,8 @@ jobs:
             azure-ai-inference \
             openai \
             bleach \
-            'markitdown[pdf,docx]'
+            rank-bm25 \
+            'markitdown[az-doc-intel,pdf,docx]'
 
       - name: Run engine tests
         # PYTHONPATH=. so `import engine` resolves without an editable install.
