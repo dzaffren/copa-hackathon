@@ -476,14 +476,10 @@ def validate_node_create(body: dict[str, Any]) -> Optional[tuple[int, str, str]]
             f"node_type must be one of the eight flat types, got "
             f"{body.get('node_type')!r}",
         )
-    if body.get("node_type") == "task":
-        if body.get("task_type") not in TASK_TYPES:
-            return (
-                400,
-                "INVALID_TASK_TYPE",
-                "Choose what kind of deliverable this is.",
-            )
-    elif "task_type" in body:
+    is_task = body.get("node_type") == "task"
+    if is_task and body.get("task_type") not in TASK_TYPES:
+        return (400, "INVALID_TASK_TYPE", "Choose what kind of deliverable this is.")
+    if not is_task and "task_type" in body:
         return (
             400,
             "TASK_TYPE_NOT_ALLOWED",
