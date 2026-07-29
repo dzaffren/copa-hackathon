@@ -182,6 +182,9 @@ def test_GET_edge_detail_returns_not_analysed_when_findings_file_absent(tmp_path
     body = client.get(f"/api/workstreams/{_OPRES}/edges/{_FSB_EDGE}").json()
     assert body["status"] == "not_analysed"
     assert body["findings"] == []
+    # opres-v2 is a retired fixture that still stores the removed
+    # `contributes-to` type; the read projection passes any stored type through
+    # rather than validating it, so retired graphs keep rendering.
     assert body["edge_type"] == "contributes-to"
     assert body["source"]["id"] == _TASK
     assert body["target"]["id"] == "fsb-3rd-party"
@@ -306,7 +309,7 @@ def test_POST_node_rejects_invalid_node_type_400_INVALID_NODE_TYPE(tmp_path):
         json={
             "node_type": "cluster",
             "title": "X",
-            "edges": [{"target_node_id": _TASK, "edge_type": "contributes-to"}],
+            "edges": [{"target_node_id": _TASK, "edge_type": "references"}],
         },
     )
     assert res.status_code == 400
@@ -335,7 +338,7 @@ def test_POST_node_writes_graph_and_returns_created_edges(tmp_path):
             "node_type": "international-standard",
             "title": "BCBS OpRes 2021 Companion Guide",
             "description": "Companion to the 2021 principles",
-            "edges": [{"target_node_id": _TASK, "edge_type": "contributes-to"}],
+            "edges": [{"target_node_id": _TASK, "edge_type": "references"}],
         },
     )
     assert res.status_code == 201
@@ -366,7 +369,7 @@ def test_POST_node_rejects_edge_to_unknown_target_400_INVALID_EDGE_TARGET(tmp_pa
         json={
             "node_type": "international-standard",
             "title": "X",
-            "edges": [{"target_node_id": "ghost-node", "edge_type": "contributes-to"}],
+            "edges": [{"target_node_id": "ghost-node", "edge_type": "references"}],
         },
     )
     assert res.status_code == 400
@@ -381,7 +384,7 @@ def test_POST_node_unknown_workstream_returns_404_WORKSTREAM_NOT_FOUND(tmp_path)
         json={
             "node_type": "international-standard",
             "title": "X",
-            "edges": [{"target_node_id": _TASK, "edge_type": "contributes-to"}],
+            "edges": [{"target_node_id": _TASK, "edge_type": "references"}],
         },
     )
     assert res.status_code == 404

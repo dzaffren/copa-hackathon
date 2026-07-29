@@ -23,7 +23,7 @@ describe("WorkstreamGraphPage", () => {
     // Click the analysed BCBS edge → three finding cards, no Analyze CTA.
     await userEvent.click(
       screen.getByRole("button", {
-        name: /^edge contributes-to opres-pd-v0-3 to bcbs-opres-2021/,
+        name: /^edge references opres-pd-v0-3 to bcbs-opres-2021/,
       }),
     );
     expect(

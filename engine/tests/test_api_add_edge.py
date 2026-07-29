@@ -69,7 +69,8 @@ def test_a_task_endpoint_is_forced_to_be_the_source(tmp_path):
     OUTGOING edges, so a connection drawn toward the draft is stored reversed."""
     client, dst = _client(tmp_path)
 
-    # `references` — the fixture already has task→BCBS as contributes-to.
+    # `references` — the fixture already joins task→BCBS with the retired
+    # `contributes-to`, so this is a new type between the pair, not a duplicate.
     body = _post(client, _BCBS, _TASK, "references").json()
 
     assert body["source"] == _TASK
@@ -95,8 +96,8 @@ def test_the_new_edge_is_not_analysed_and_writes_no_findings(tmp_path):
     assert not (dst / _OPRES / "findings" / f"{body['id']}.json").exists()
 
 
-def test_each_of_the_four_edge_types_is_accepted(tmp_path):
-    for edge_type in ("supersedes", "references", "contributes-to", "parallel-to"):
+def test_each_of_the_three_edge_types_is_accepted(tmp_path):
+    for edge_type in ("supersedes", "references", "parallel-to"):
         client, dst = _client(tmp_path / edge_type)
         res = _post(client, _BCBS, _HKMA, edge_type)
         assert res.status_code == 201, edge_type
@@ -141,14 +142,27 @@ def test_an_exact_duplicate_is_refused(tmp_path):
 
 
 def test_a_seeded_edge_cannot_be_duplicated(tmp_path):
-    """The fixture already links the task to BCBS with contributes-to."""
+    """The fixture already links the task to the FSA with references."""
     client, dst = _client(tmp_path)
     before = _graph(dst)
 
-    res = _post(client, _TASK, _BCBS, "contributes-to")
+    res = _post(client, _TASK, "fsa-2013-143", "references")
 
     assert res.status_code == 409
     assert res.json()["code"] == "DUPLICATE_EDGE"
+    assert _graph(dst) == before
+
+
+def test_the_retired_contributes_to_type_is_refused(tmp_path):
+    """`contributes-to` was retired in favour of `references` (29 Jul 2026). It
+    survives on disk in the retired fixtures but can no longer be written."""
+    client, dst = _client(tmp_path)
+    before = _graph(dst)
+
+    res = _post(client, _BCBS, _HKMA, "contributes-to")
+
+    assert res.status_code == 400
+    assert res.json()["code"] == "INVALID_EDGE_TYPE"
     assert _graph(dst) == before
 
 

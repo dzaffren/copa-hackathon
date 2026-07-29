@@ -95,7 +95,7 @@ test("build Open Finance PD . 2026 from scratch and analyse a linkage", async ({
     file: "ED_Open_Finance_2025.pdf",
     docClass: "semi-structured",
     connectTo: "Open Finance PD . 2026 (PD)",
-    edgeType: "contributes-to",
+    edgeType: "references",
   });
 
   // --- 3. HKMA + BIS → the ED node -----------------------------------------
@@ -131,7 +131,7 @@ test("build Open Finance PD . 2026 from scratch and analyse a linkage", async ({
 
   // --- 5. Analyse the focal ↔ ED linkage -----------------------------------
   await page
-    .getByRole("button", { name: /^edge contributes-to .*open-finance/i })
+    .getByRole("button", { name: /^edge references .*open-finance/i })
     .first()
     .click();
   const analyze = page.getByRole("button", { name: /analyz/i });

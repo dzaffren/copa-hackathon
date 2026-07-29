@@ -13,8 +13,7 @@ export type NodeType =
   | "supervisory-letter"
   | "others";
 
-export type EdgeType =
-  "contributes-to" | "parallel-to" | "references" | "supersedes";
+export type EdgeType = "parallel-to" | "references" | "supersedes";
 
 export type WorkstreamRole = "own" | "review" | "delivered";
 

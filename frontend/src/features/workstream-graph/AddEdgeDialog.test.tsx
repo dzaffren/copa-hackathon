@@ -84,7 +84,7 @@ describe("AddEdgeDialog", () => {
     expect(submit).toBeEnabled();
   });
 
-  it("offers all four connection types", () => {
+  it("offers all three connection types", () => {
     renderDialog();
     const options = screen
       .getByLabelText("Connection type")
@@ -92,12 +92,7 @@ describe("AddEdgeDialog", () => {
     const values = Array.from(options)
       .map((o) => o.getAttribute("value"))
       .filter(Boolean);
-    expect(values).toEqual([
-      "supersedes",
-      "references",
-      "contributes-to",
-      "parallel-to",
-    ]);
+    expect(values).toEqual(["supersedes", "references", "parallel-to"]);
   });
 
   it("creates the connection and closes", async () => {

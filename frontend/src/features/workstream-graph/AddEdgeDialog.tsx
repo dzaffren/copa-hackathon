@@ -16,7 +16,6 @@ import type { EdgeType, GraphNode } from "@/lib/types";
 const EDGE_TYPE_OPTIONS: EdgeType[] = [
   "supersedes",
   "references",
-  "contributes-to",
   "parallel-to",
 ];
 

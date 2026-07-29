@@ -26,6 +26,9 @@ test.describe("Workstream graph screen", () => {
     // Inspect the analysed BCBS edge → three finding cards, no Analyze CTA.
     await page
       .getByRole("button", {
+        // opres-v2 is a retired fixture and still stores the removed
+        // `contributes-to` edge type on disk; the read projection passes it
+        // through unchanged.
         name: /^edge contributes-to opres-pd-v0-3 to bcbs-opres-2021/,
       })
       .click();

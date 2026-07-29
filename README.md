@@ -10,7 +10,7 @@ policymaker's head.
 
 **Workstream Brain makes that map explicit.** Each workstream becomes a knowledge
 graph: documents are nodes, joined by structural edges (`supersedes`,
-`references`, `contributes-to`, `parallel-to`). The engine reads clause pairs
+`references`, `parallel-to`). The engine reads clause pairs
 across a draft and its anchors and proposes **linkages** — each one labelled,
 each one quoting the exact clause it relies on. The drafter reviews, accepts, or
 corrects. The demo climax is **cross-workstream drift**: two workstreams running

@@ -19,7 +19,6 @@ import { NODE_LEGEND, NODE_LEGEND_ORDER } from "./legend";
 const EDGE_TYPE_OPTIONS: EdgeType[] = [
   "supersedes",
   "references",
-  "contributes-to",
   "parallel-to",
 ];
 
@@ -72,7 +71,7 @@ interface EdgeRow {
  */
 function defaultEdges(nodes: GraphNode[]): EdgeRow[] {
   if (nodes.length !== 1) return [];
-  return [{ target_node_id: nodes[0].id, edge_type: "contributes-to" }];
+  return [{ target_node_id: nodes[0].id, edge_type: "references" }];
 }
 
 interface AddNodeDialogProps {

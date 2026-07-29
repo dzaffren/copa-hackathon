@@ -32,7 +32,7 @@ const EDGES: GraphEdge[] = [
     id: "e1",
     source: "opres-pd-v0-3",
     target: "bcbs-opres-2021",
-    edge_type: "contributes-to",
+    edge_type: "references",
     analysed: true,
     findings_count: 3,
   },
@@ -65,7 +65,7 @@ describe("GraphCanvas", () => {
   it("clicking an edge dispatches onSelectEdge with the edge id", async () => {
     const { onSelectEdge } = setup();
     await userEvent.click(
-      screen.getByRole("button", { name: /^edge contributes-to/ }),
+      screen.getByRole("button", { name: /^edge references/ }),
     );
     expect(onSelectEdge).toHaveBeenCalledWith("e1");
   });

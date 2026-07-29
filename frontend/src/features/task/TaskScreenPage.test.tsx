@@ -60,12 +60,12 @@ describe("TaskScreenPage — neighbour list", () => {
     const rows = screen.getAllByTestId("neighbour-row");
 
     const expected = [
-      ["BCBS OpRes 2021", "contributes-to · international-standard"],
-      ["FSB 3rd-Party Toolkit", "contributes-to · international-standard"],
-      ["HKMA SPM OR-2", "contributes-to · peer-regulator"],
+      ["BCBS OpRes 2021", "references · international-standard"],
+      ["FSB 3rd-Party Toolkit", "references · international-standard"],
+      ["HKMA SPM OR-2", "references · peer-regulator"],
       ["RMiT PD (28 Nov 2025)", "parallel-to · internal-published"],
       ["FSA 2013 §143", "references · act-law"],
-      ["ABM position paper", "contributes-to · industry-input"],
+      ["ABM position paper", "references · industry-input"],
       ["OpRes DP (Dec 2025)", "references · internal-published"],
     ];
 

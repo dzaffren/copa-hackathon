@@ -128,7 +128,7 @@
       "id": "e-open_finance_pd_2026_pd--ed_open_finance_2025",
       "source": "open-finance-pd-2026-pd",
       "target": "ed-open-finance-2025",
-      "edge_type": "contributes-to"
+      "edge_type": "references"
     },
     {
       "id": "e-hkma_open_api_framework--ed_open_finance_2025",

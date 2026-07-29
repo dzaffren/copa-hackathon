@@ -27,8 +27,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional, Union
 
-# The eight flat node types and four structural edge types (spec Business Rules
+# The eight flat node types and three structural edge types (spec Business Rules
 # & Constraints). Type is picked once at add-time and validated here.
+#
+# `contributes-to` was retired on 29 Jul 2026 — it never said anything
+# `references` didn't, so an anchor feeding a drafting task is now just a
+# reference. Retired workstream fixtures (opres-v2, rmit-v2-2025) still carry
+# it on disk; the READ projections pass any stored `edge_type` through
+# untouched, so those graphs keep rendering. Only new writes are constrained.
 NODE_TYPES: frozenset[str] = frozenset(
     {
         "task",
@@ -41,9 +47,7 @@ NODE_TYPES: frozenset[str] = frozenset(
         "others",
     }
 )
-EDGE_TYPES: frozenset[str] = frozenset(
-    {"supersedes", "references", "contributes-to", "parallel-to"}
-)
+EDGE_TYPES: frozenset[str] = frozenset({"supersedes", "references", "parallel-to"})
 
 # The three segmentation strategies a drafter may pick when attaching a
 # document (`engine.anchors` registers exactly these). Declared, never
@@ -461,7 +465,7 @@ def validate_node_create(body: dict[str, Any]) -> Optional[tuple[int, str, str]]
             return (
                 400,
                 "INVALID_EDGE_TYPE",
-                f"edge_type must be one of the four structural types, got "
+                f"edge_type must be one of the three structural types, got "
                 f"{edge.get('edge_type')!r}",
             )
     return None
@@ -547,7 +551,7 @@ def validate_edge_create(body: dict[str, Any]) -> Optional[tuple[int, str, str]]
         return (
             400,
             "INVALID_EDGE_TYPE",
-            f"edge_type must be one of the four structural types, got "
+            f"edge_type must be one of the three structural types, got "
             f"{edge_type!r}",
         )
     if source == target:

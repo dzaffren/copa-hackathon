@@ -75,7 +75,7 @@ def _ws(tmp_path: Path) -> Path:
                         "id": "e-live",
                         "source": "opres-pd-v0-3",
                         "target": "bcbs-opres-2021",
-                        "edge_type": "contributes-to",
+                        "edge_type": "references",
                     }
                 ],
             }

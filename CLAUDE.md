@@ -195,7 +195,10 @@ workstream_id)`, per-node files under `data/workstreams/<ws>/anchors/`), falling
 - **State:** TanStack Query for all server state; no Redux/Zustand.
 - **Node types (8):** task, internal-published, international-standard, peer-regulator,
   act-law, industry-input, supervisory-letter, others.
-- **Edge types (4):** supersedes, references, contributes-to, parallel-to.
+- **Edge types (3):** supersedes, references, parallel-to. `contributes-to` was
+  retired on 29 Jul 2026 (folded into `references`); `engine.workstreams.EDGE_TYPES`
+  refuses it on write, but the retired fixtures (`opres-v2`, `rmit-v2-2025`) still
+  store it and the read projections pass it through, so don't "fix" those graphs.
 - **Finding labels (5):** aligns-with, differs-on, conflicts-with, silent-on, goes-beyond.
 - **Sentiment (3, differs-on only):** tighten, loosen, neutral.
 - **CORS:** FastAPI includes CORS middleware allowing origin `http://localhost:5173`.

@@ -70,7 +70,7 @@ describe("AddNodeDialog", () => {
     renderDialog();
     await userEvent.type(screen.getByLabelText("Title"), "Companion Guide");
     await attachFile();
-    await addCompleteRow(1, "opres-pd-v0-3", "contributes-to");
+    await addCompleteRow(1, "opres-pd-v0-3", "references");
     expect(screen.getByRole("button", { name: /add to graph/i })).toBeEnabled();
   });
 
@@ -78,7 +78,7 @@ describe("AddNodeDialog", () => {
     renderDialog();
     await userEvent.type(screen.getByLabelText("Title"), "Companion Guide");
     await attachFile();
-    await addCompleteRow(1, "opres-pd-v0-3", "contributes-to");
+    await addCompleteRow(1, "opres-pd-v0-3", "references");
     expect(screen.getByRole("button", { name: /add to graph/i })).toBeEnabled();
     await userEvent.click(
       screen.getByRole("button", { name: "Remove edge 1" }),
@@ -100,7 +100,7 @@ describe("AddNodeDialog", () => {
     renderDialog();
     await userEvent.type(screen.getByLabelText("Title"), "Companion Guide");
     const file = await attachFile();
-    await addCompleteRow(1, "opres-pd-v0-3", "contributes-to");
+    await addCompleteRow(1, "opres-pd-v0-3", "references");
     await addCompleteRow(2, "rmit-pd-2025", "parallel-to");
     await userEvent.click(screen.getByRole("radio", { name: "prose" }));
     expect(screen.getByRole("button", { name: /add to graph/i })).toBeEnabled();
@@ -150,7 +150,7 @@ describe("AddNodeDialog", () => {
   it("Add to graph stays disabled without an attachment", async () => {
     renderDialog();
     await userEvent.type(screen.getByLabelText("Title"), "Companion Guide");
-    await addCompleteRow(1, "opres-pd-v0-3", "contributes-to");
+    await addCompleteRow(1, "opres-pd-v0-3", "references");
     expect(
       screen.getByRole("button", { name: /add to graph/i }),
     ).toBeDisabled();
@@ -171,7 +171,7 @@ describe("AddNodeDialog", () => {
 
     // The row exists already, pointing at the one legal target.
     expect(screen.getByLabelText("Edge 1 target")).toHaveValue("opres-pd-v0-3");
-    expect(screen.getByLabelText("Edge 1 type")).toHaveValue("contributes-to");
+    expect(screen.getByLabelText("Edge 1 type")).toHaveValue("references");
 
     // So title + attachment is all that stands between here and submitting.
     await userEvent.type(screen.getByLabelText("Title"), "BCBS OpRes 2021");

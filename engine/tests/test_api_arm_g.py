@@ -71,13 +71,13 @@ def _ws(tmp_path: Path) -> Path:
                         "id": "e-sibling",
                         "source": "opres-pd-v0-3",
                         "target": "bcbs",
-                        "edge_type": "contributes-to",
+                        "edge_type": "references",
                     },
                     {
                         "id": "e-noref",
                         "source": "opres-pd-v0-3",
                         "target": "noref",
-                        "edge_type": "contributes-to",
+                        "edge_type": "references",
                     },
                 ],
             }
