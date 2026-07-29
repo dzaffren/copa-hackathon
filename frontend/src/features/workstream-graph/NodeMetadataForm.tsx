@@ -54,27 +54,42 @@ function toFormState(initial: ConceptsAvailable | null): FormState {
   return state;
 }
 
+/** One typed value, or `null` when the drafter left it blank. Whitespace is not
+ *  a value: "cleared" and "never set" are one state on disk, which is what
+ *  "blank means not set yet" requires. */
+function text(raw: string): string | null {
+  return raw.trim() || null;
+}
+
+/** A comma-separated line as its members: trimmed, with empty ones dropped so a
+ *  stray or trailing comma cannot store a blank keyword. An empty result is
+ *  `null` rather than `[]`, matching `text`'s treatment of a cleared field. */
+function list(raw: string): string[] | null {
+  const members = raw
+    .split(",")
+    .map((m) => m.trim())
+    .filter((m) => m.length > 0);
+  return members.length > 0 ? members : null;
+}
+
 /** Turn the edited strings back into the wire shape.
  *
- *  Blank, whitespace-only, and an emptied list all become `null`: "cleared" and
- *  "never set" are one state, which is what "blank means not set yet" requires.
- *  All nine keys are always present — the server replaces the profile whole, so
- *  an omitted key would silently clear a value the drafter did not touch. */
+ *  Written out field by field rather than looped: the server replaces the profile
+ *  whole, so an omitted key silently clears a value the drafter never touched.
+ *  Spelling the nine out means the compiler catches a missing one, which a loop
+ *  over `CONCEPT_FIELD_ORDER` could only do behind a cast. */
 function toRequest(values: FormState): NodeMetadataRequest {
-  const body = {} as Record<ConceptField, string | string[] | null>;
-  for (const [field] of CONCEPT_FIELD_ORDER) {
-    const raw = values[field];
-    if (LIST_FIELDS.has(field)) {
-      const members = raw
-        .split(",")
-        .map((m) => m.trim())
-        .filter((m) => m.length > 0);
-      body[field] = members.length > 0 ? members : null;
-    } else {
-      body[field] = raw.trim() || null;
-    }
-  }
-  return body as unknown as NodeMetadataRequest;
+  return {
+    policy_owner: text(values.policy_owner),
+    applicability: text(values.applicability),
+    empowerment_framework: text(values.empowerment_framework),
+    requirement: text(values.requirement),
+    issuance_date: text(values.issuance_date),
+    effective_date: text(values.effective_date),
+    keywords: list(values.keywords),
+    legal_basis: list(values.legal_basis),
+    ismp_classification: text(values.ismp_classification),
+  };
 }
 
 interface NodeMetadataFormProps {
