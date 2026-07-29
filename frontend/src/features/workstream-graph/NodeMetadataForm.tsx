@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
-import type { ConceptsAvailable } from "@/lib/types";
+import { saveNodeMetadata } from "@/lib/api";
+import type { ConceptsAvailable, NodeMetadataRequest } from "@/lib/types";
 import {
   asList,
   CONCEPT_FIELD_ORDER,
@@ -37,6 +39,29 @@ function toFormState(initial: ConceptsAvailable | null): FormState {
   return state;
 }
 
+/** Turn the edited strings back into the wire shape.
+ *
+ *  Blank, whitespace-only, and an emptied list all become `null`: "cleared" and
+ *  "never set" are one state, which is what "blank means not set yet" requires.
+ *  All nine keys are always present — the server replaces the profile whole, so
+ *  an omitted key would silently clear a value the drafter did not touch. */
+function toRequest(values: FormState): NodeMetadataRequest {
+  const body = {} as Record<ConceptField, string | string[] | null>;
+  for (const [field] of CONCEPT_FIELD_ORDER) {
+    const raw = values[field];
+    if (LIST_FIELDS.has(field)) {
+      const members = raw
+        .split(",")
+        .map((m) => m.trim())
+        .filter((m) => m.length > 0);
+      body[field] = members.length > 0 ? members : null;
+    } else {
+      body[field] = raw.trim() || null;
+    }
+  }
+  return body as unknown as NodeMetadataRequest;
+}
+
 interface NodeMetadataFormProps {
   workstreamId: string;
   nodeId: string;
@@ -61,10 +86,23 @@ export function NodeMetadataForm({
   initial,
   onDone,
 }: NodeMetadataFormProps) {
+  const queryClient = useQueryClient();
   const [values, setValues] = useState<FormState>(() => toFormState(initial));
 
   const update = (field: ConceptField, value: string) =>
     setValues((v) => ({ ...v, [field]: value }));
+
+  // The form is NOT reset or unmounted on failure — a drafter who typed a date
+  // and lost the connection must be able to press Save again, not retype it.
+  const mutation = useMutation({
+    mutationFn: () => saveNodeMetadata(workstreamId, nodeId, toRequest(values)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["node", workstreamId, nodeId],
+      });
+      onDone();
+    },
+  });
 
   return (
     <div className="mt-2 space-y-3">
@@ -98,15 +136,23 @@ export function NodeMetadataForm({
       ))}
 
       <div className="flex gap-2">
-        <Button type="button" variant="outline" size="sm" onClick={onDone}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={mutation.isPending}
+          onClick={onDone}
+        >
           Cancel
         </Button>
         <Button
           type="button"
           size="sm"
           className="bg-primary text-primary-foreground hover:bg-primary/90"
+          disabled={mutation.isPending}
+          onClick={() => mutation.mutate()}
         >
-          Save
+          {mutation.isPending ? "Saving…" : "Save"}
         </Button>
       </div>
     </div>
