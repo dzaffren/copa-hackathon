@@ -568,10 +568,20 @@ def test_POST_copilot_honours_every_recorded_kind(task_type: str, tmp_path):
     assert captured["intent"] == task_type
 
 
-def test_POST_copilot_404_when_node_is_not_a_task(tmp_path):
+@pytest.mark.parametrize(
+    ("workstream_id", "node_id"),
+    [
+        (_OPRES, _ANCHOR),
+        ("open-finance-pd-2026", "bis-papers-168"),
+    ],
+)
+def test_POST_copilot_404_when_node_is_not_a_task(workstream_id, node_id, tmp_path):
+    """Dropping `intent` widened no door: an anchor node is still refused, and
+    still with `TASK_NOT_FOUND` — `_task_node` uses one code for both "not a
+    task" and "no such node"."""
     client = _make_copilot_client(tmp_path, lambda **kwargs: {"role": "copilot", "text": "x"})
     res = client.post(
-        f"/api/workstreams/{_OPRES}/tasks/{_ANCHOR}/copilot",
+        f"/api/workstreams/{workstream_id}/tasks/{node_id}/copilot",
         json={"message": "hi"},
     )
     assert res.status_code == 404
