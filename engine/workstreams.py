@@ -273,23 +273,20 @@ TASK_TYPES: dict[str, str] = {
     "OTHERS": "Others",
 }
 
-
-def task_type_code_for_label(label: Optional[str]) -> Optional[str]:
-    """The code whose label matches, or None. Derived from TASK_TYPES so the
-    two directions cannot drift."""
-    if label is None:
-        return None
-    for code, code_label in TASK_TYPES.items():
-        if code_label == label:
-            return code
-    return None
-
-
 ACCESS_LEVELS: frozenset[str] = frozenset({"team_only", "department_wide"})
 
 NAME_MIN, NAME_MAX = 3, 120
 DESCRIPTION_MAX = 500
 TARGET_PUBLICATION_MAX = 60
+
+
+def task_type_code_for_label(label: Optional[str]) -> Optional[str]:
+    """The code whose label matches, or None. Derived from TASK_TYPES so the
+    two directions cannot drift."""
+    for code, code_label in TASK_TYPES.items():
+        if code_label == label:
+            return code
+    return None
 
 
 def validate_workstream_create(body: dict[str, Any]) -> Optional[tuple[str, str, str]]:
