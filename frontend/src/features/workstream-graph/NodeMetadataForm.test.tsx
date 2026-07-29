@@ -214,4 +214,78 @@ describe("NodeMetadataForm", () => {
     expect(onDone).toHaveBeenCalled();
     expect(putCalled).toBe(false);
   });
+
+  it("disables both buttons and reads Saving… while the save is in flight", async () => {
+    let release: (() => void) | null = null;
+    server.use(
+      http.put(
+        "*/api/workstreams/:ws/nodes/:nodeId/metadata",
+        async ({ params }) => {
+          await new Promise<void>((resolve) => {
+            release = resolve;
+          });
+          return HttpResponse.json({
+            node_id: params.nodeId as string,
+            metadata: EMPTY_PROFILE,
+          });
+        },
+      ),
+    );
+    renderWithProviders(
+      <NodeMetadataForm
+        workstreamId="rmit-v2-2025"
+        nodeId="rmit-pd-v2"
+        initial={EMPTY_PROFILE}
+        onDone={() => {}}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: /^save$/i }));
+
+    // A second click must not fire a second write while the first is unresolved.
+    const saving = await screen.findByRole("button", { name: /saving…/i });
+    expect(saving).toBeDisabled();
+    expect(screen.getByRole("button", { name: /^cancel$/i })).toBeDisabled();
+
+    release?.();
+  });
+
+  it("keeps the drafter's values and explains a save that could not be completed", async () => {
+    server.use(
+      http.put("*/api/workstreams/:ws/nodes/:nodeId/metadata", () =>
+        HttpResponse.json(
+          {
+            code: "METADATA_TOO_LARGE",
+            message: "requirement exceeds 2000 characters.",
+            field: "requirement",
+          },
+          { status: 413 },
+        ),
+      ),
+    );
+    renderWithProviders(
+      <NodeMetadataForm
+        workstreamId="rmit-v2-2025"
+        nodeId="rmit-pd-v2"
+        initial={EMPTY_PROFILE}
+        onDone={() => {}}
+      />,
+    );
+
+    await userEvent.type(
+      screen.getByLabelText("Effective date"),
+      "28 November 2025",
+    );
+    await userEvent.click(screen.getByRole("button", { name: /^save$/i }));
+
+    // The refusal is explained in the drafter's terms, not the server's code.
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /too long — shorten it/i,
+    );
+    // Nothing typed is lost, and Save is live again so she can retry.
+    expect(screen.getByLabelText("Effective date")).toHaveValue(
+      "28 November 2025",
+    );
+    expect(screen.getByRole("button", { name: /^save$/i })).toBeEnabled();
+  });
 });

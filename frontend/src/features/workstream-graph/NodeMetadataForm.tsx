@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
-import { saveNodeMetadata } from "@/lib/api";
+import { cn } from "@/lib/utils";
+import { HttpError, saveNodeMetadata } from "@/lib/api";
 import type { ConceptsAvailable, NodeMetadataRequest } from "@/lib/types";
 import {
   asList,
@@ -16,6 +17,20 @@ const MULTILINE_FIELDS = new Set<ConceptField>([
   "empowerment_framework",
   "requirement",
 ]);
+
+/** Plain-language copy for the refusals a save can provoke. Most of these should
+ *  be unreachable from this form — it sends exactly the nine known keys and never
+ *  `task_type` — but a refusal the drafter cannot read is worse than a verbose
+ *  map, and the server's own message is the fallback. */
+const ERROR_COPY: Record<string, string> = {
+  METADATA_TOO_LARGE: "That value is too long — shorten it and try again.",
+  INVALID_METADATA: "That value could not be saved. Check it and try again.",
+  UNKNOWN_METADATA_FIELD: "That field is not part of the profile.",
+  TASK_TYPE_IMMUTABLE:
+    "A deliverable kind is set when the document is created and cannot be changed.",
+  WORKSTREAM_NOT_FOUND: "This workstream is no longer available.",
+  NODE_NOT_FOUND: "This document is no longer in the workstream.",
+};
 
 const fieldClass =
   "w-full rounded-md border border-border/70 bg-background/60 px-3 py-2 text-sm outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/40";
@@ -104,36 +119,57 @@ export function NodeMetadataForm({
     },
   });
 
+  const error = mutation.error;
+  const errorCode = error instanceof HttpError ? error.code : undefined;
+  const errorField = error instanceof HttpError ? error.field : undefined;
+  const errorMessage = error
+    ? ((errorCode && ERROR_COPY[errorCode]) ?? error.message)
+    : null;
+
   return (
     <div className="mt-2 space-y-3">
-      {CONCEPT_FIELD_ORDER.map(([field, label]) => (
-        <label key={field} className="block text-sm">
-          <span className="mb-1 block text-xs font-medium text-muted-foreground">
-            {label}
-          </span>
-          {MULTILINE_FIELDS.has(field) ? (
-            <textarea
-              className={fieldClass}
-              rows={3}
-              aria-label={label}
-              value={values[field]}
-              onChange={(e) => update(field, e.target.value)}
-            />
-          ) : (
-            <input
-              className={fieldClass}
-              aria-label={label}
-              value={values[field]}
-              onChange={(e) => update(field, e.target.value)}
-            />
-          )}
-          {field === "empowerment_framework" && (
-            <span className="mt-1 block text-[11px] text-muted-foreground">
-              Quote this word-for-word from the document.
+      {CONCEPT_FIELD_ORDER.map(([field, label]) => {
+        // The server names the field at fault, so the offending input is ringed
+        // rather than leaving the drafter to guess which of nine it means.
+        const inputClass = cn(
+          fieldClass,
+          errorField === field && "border-red-400 ring-1 ring-red-400",
+        );
+        return (
+          <label key={field} className="block text-sm">
+            <span className="mb-1 block text-xs font-medium text-muted-foreground">
+              {label}
             </span>
-          )}
-        </label>
-      ))}
+            {MULTILINE_FIELDS.has(field) ? (
+              <textarea
+                className={inputClass}
+                rows={3}
+                aria-label={label}
+                value={values[field]}
+                onChange={(e) => update(field, e.target.value)}
+              />
+            ) : (
+              <input
+                className={inputClass}
+                aria-label={label}
+                value={values[field]}
+                onChange={(e) => update(field, e.target.value)}
+              />
+            )}
+            {field === "empowerment_framework" && (
+              <span className="mt-1 block text-[11px] text-muted-foreground">
+                Quote this word-for-word from the document.
+              </span>
+            )}
+          </label>
+        );
+      })}
+
+      {errorMessage && (
+        <p role="alert" className="text-sm text-red-500">
+          {errorMessage}
+        </p>
+      )}
 
       <div className="flex gap-2">
         <Button
