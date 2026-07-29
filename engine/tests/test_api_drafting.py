@@ -555,15 +555,17 @@ def test_POST_copilot_400_for_an_empty_message(tmp_path):
     assert res.json()["code"] == "MESSAGE_REQUIRED"
 
 
-@pytest.mark.parametrize("intent", list(workstreams.TASK_TYPES))
-def test_POST_copilot_accepts_every_preset(intent: str, tmp_path):
-    client = _make_copilot_client(tmp_path, lambda **kwargs: {"role": "copilot", "text": "x"})
+@pytest.mark.parametrize("task_type", list(workstreams.TASK_TYPES))
+def test_POST_copilot_honours_every_recorded_kind(task_type: str, tmp_path):
+    """Every one of the eight kinds reaches the seam as recorded — no kind is
+    silently coerced to the old "Policy Document" default."""
+    client, captured = _capturing_client(tmp_path, task_type=task_type)
     res = client.post(
         f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
-        json={"intent": intent, "message": "hi"},
+        json={"message": "hi"},
     )
     assert res.status_code == 200
-    assert res.json()["reply"]["text"]
+    assert captured["intent"] == task_type
 
 
 def test_POST_copilot_404_when_node_is_not_a_task(tmp_path):
@@ -614,6 +616,30 @@ def test_POST_copilot_stream_returns_sse_events(tmp_path):
     body = res.text
     assert "event: token" in body
     assert "event: done" in body
+
+
+def test_POST_copilot_stream_resolves_the_intent_from_the_task_node(tmp_path):
+    """The streaming route resolves the kind exactly as the blocking one does —
+    the resolution lives in `_resolve_intent`, not in either route."""
+    captured = {}
+
+    def capture_stream(**kwargs):
+        captured.update(kwargs)
+        yield "event: done\ndata: {}\n\n"
+
+    dst = tmp_path / "workstreams"
+    shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
+    _rewrite_task_type(dst, "FEEDBACK")
+    client = TestClient(create_app(workstreams_dir=dst, copilot_stream_fn=capture_stream))
+
+    res = client.post(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot/stream",
+        json={"message": "hi"},
+    )
+
+    assert res.status_code == 200
+    assert "text/event-stream" in res.headers["content-type"]
+    assert captured["intent"] == "FEEDBACK"
 
 
 def test_POST_copilot_stream_400_for_empty_message(tmp_path):
