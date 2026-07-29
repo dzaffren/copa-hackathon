@@ -1,4 +1,7 @@
-# 🧠 Workstream Brain
+# 🧠 Project SELARAS
+
+**S**emantic **E**ngine for **L**inkage **A**nalysis across **R**egulatory
+**A**rtefacts & **S**tandards.
 
 **AI for policy consistency — COPA Hackathon 2026 (Bank Negara Malaysia).**
 
@@ -8,7 +11,7 @@ regulators, acts of law, industry feedback, and BNM's own published policies.
 Today the map of how those anchors relate to the draft lives in one senior
 policymaker's head.
 
-**Workstream Brain makes that map explicit.** Each workstream becomes a knowledge
+**SELARAS makes that map explicit.** Each workstream becomes a knowledge
 graph: documents are nodes, joined by structural edges (`supersedes`,
 `references`, `parallel-to`). The engine reads clause pairs
 across a draft and its anchors and proposes **linkages** — each one labelled,
@@ -16,8 +19,8 @@ each one quoting the exact clause it relies on. The drafter reviews, accepts, or
 corrects. The demo climax is **cross-workstream drift**: two workstreams running
 in parallel that touch the same concept and don't yet know it.
 
-> **Pitch defence:** a chatbot answers _"what does the rule say"_. Workstream
-> Brain answers _"what does my draft disagree with, and where's the proof"_ —
+> **Pitch defence:** a chatbot answers _"what does the rule say"_. SELARAS
+> answers _"what does my draft disagree with, and where's the proof"_ —
 > and it survives the policymaker rotating out.
 
 Built entirely on **public** documents. Demonstrated on two real workstreams in
@@ -70,7 +73,7 @@ checking out verbatim. A later experiment on the OpRes × Open Finance pair foun
 
 ```
 engine/          FastAPI read service, clause index, finder→critic linkage loop
-frontend/        Workstream Brain app (Vite + React 18 + TanStack Query)  ← UI work lands here
+frontend/        The SELARAS app (Vite + React 18 + TanStack Query)  ← UI work lands here
 data/
 ├── corpus/      Parsed BNM policy PDFs (public)
 ├── references/  External standards — Basel, MAS TRM, PDPA (public)
@@ -88,8 +91,14 @@ read `INDEX.md` first) · `docs/poc/workstream-brain/` (clickable UX reference).
 `docs/poc/{policy-consistency-ai,drafter-knowledge-graph}/` and
 `docs/specs/{rulebook-radar,reconciliation-workbench}/`. Their **code** is gone: the
 reconciliation-workbench Next.js app (`web/`), the verdict/submission/paragraph read
-path, and their HTTP routes were removed on 16 Jul 2026 when Workstream Brain became
+path, and their HTTP routes were removed on 16 Jul 2026 when SELARAS became
 the end state. A spec referencing them describes a repo that no longer exists.
+
+> **Renamed 30 Jul 2026.** The product was called **Workstream Brain** through
+> discovery and the first builds. Directory names (`docs/specs/workstream-brain/`,
+> `docs/poc/workstream-brain/`) keep the old slug as historical record, and so do
+> superseded specs and learnings. "Workstream" on its own is still live domain
+> vocabulary — `data/workstreams/`, `/api/workstreams/*` — and is unaffected.
 
 > **Confidential:** `docs/references/` is git-ignored and internal — never commit
 > anything under it. Note this is _not_ `data/references/`, which is public and

@@ -1,4 +1,4 @@
-"""Tests for the Workstream Brain — Graph Screen API routes.
+"""Tests for the Project SELARAS — Graph Screen API routes.
 
 Each test copies the real seeded `data/workstreams/` fixtures into a `tmp_path`
 and points `create_app(workstreams_dir=...)` at the copy. GET tests therefore

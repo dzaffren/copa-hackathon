@@ -1,6 +1,6 @@
 # Widen the linkage taxonomy in the knowledge-graph engine
 
-**Epic:** [Workstream Brain MVP1 — Overview](spec.md)
+**Epic:** [Project SELARAS MVP1 — Overview](spec.md)
 **Ticket:** TBD
 **Type:** Technical — Engine
 
@@ -14,7 +14,7 @@ Cross-workstream drift is invisible today because senior policymakers carry link
 
 **Desired state:** Every finding the engine emits carries exactly one of five semantic labels: `aligns-with`, `differs-on`, `conflicts-with`, `silent-on`, or `goes-beyond`. Findings labelled `differs-on` may additionally carry a sentiment tag of `tighten`, `loosen`, or `neutral`. The direction convention is fixed: the first document in a pair is treated as "our" side (the workstream's own document) and the second as "their" side (the anchor). The retired experiment trace can be re-processed under the new taxonomy without losing any of the twelve supported linkages it originally produced.
 
-**Trigger:** The Workstream Brain MVP1 epic depends on the widened taxonomy — every downstream screen (workstream graph edge-detail, review linkages, task pairwise comparison, drafting workspace linkage tabs) renders semantic labels as label pills and filters on them. Building any downstream screen against the old three-way vocabulary would force a rework once this story lands, so this story ships first.
+**Trigger:** The Project SELARAS MVP1 epic depends on the widened taxonomy — every downstream screen (workstream graph edge-detail, review linkages, task pairwise comparison, drafting workspace linkage tabs) renders semantic labels as label pills and filters on them. Building any downstream screen against the old three-way vocabulary would force a rework once this story lands, so this story ships first.
 
 ## Scope
 

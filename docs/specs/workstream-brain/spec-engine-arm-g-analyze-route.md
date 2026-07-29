@@ -30,7 +30,7 @@ Replaces the current single-pass finding pipeline on the analyze route with the 
   - Any change to the review or accept/dismiss workflow.
   - Building a cost or performance dashboard.
   - Supporting real-time streaming of findings as they arrive during a run.
-  - Changes to the frontend or the Workstream Brain graph screen.
+  - Changes to the frontend or the Project SELARAS graph screen.
 
 ## Goals
 
@@ -62,7 +62,7 @@ Replaces the current single-pass finding pipeline on the analyze route with the 
 
 ```gherkin
 Background:
-  Given Aisyah is the policy drafter working in Workstream Brain
+  Given Aisyah is the policy drafter working in Project SELARAS
   And the Open Finance workstream contains a link between the Open Finance ED response and the HKMA Open API framework
   And the RMiT workstream contains a link between the OpRes PD v0.3 draft and the RMiT published standard
 ```

@@ -1,4 +1,4 @@
-"""FastAPI read service for Workstream Brain.
+"""FastAPI read service for Project SELARAS.
 
 A thin, read-only HTTP service over the per-workstream fixture store in
 `data/workstreams/`: one directory per workstream holding a `graph.json`
@@ -15,7 +15,7 @@ module-level `app` for `uvicorn engine.api:app` defaults to `data/workstreams`.
 Scope note: this used to also serve the superseded reconciliation-workbench read
 path — clause/graph/node/paragraph routes over `data/artifacts/`, a live
 `POST /connections/find`, and role-gated submission upload. All of that was
-removed when Workstream Brain became the end state. `engine.clauses` and
+removed when Project SELARAS became the end state. `engine.clauses` and
 `engine.connections` (the clause index and the five-label finder→critic loop)
 remain — they are the current engine, exercised by `scripts/run_finder_trace.py`
 and the taxonomy tests, and are simply not mounted as HTTP routes today.
@@ -61,7 +61,7 @@ from engine import (
     ws_anchors,
 )
 
-# The Workstream Brain fixture store (Task 1): one directory per workstream, each
+# The Project SELARAS fixture store (Task 1): one directory per workstream, each
 # holding a `graph.json` (`{"nodes": [...], "edges": [...]}`) and a `findings/`
 # folder of `{edge_id}.json` connection arrays. Injectable so tests point it at a
 # tmp/fixture dir; the module-level `app` defaults it to `data/workstreams`.
@@ -309,7 +309,7 @@ def _review_queue_items(workstreams_dir: Path) -> list[dict[str, Any]]:
 def _ws_error(
     status_code: int, code: str, message: str, field: Optional[str] = None
 ) -> JSONResponse:
-    """Error body for the Workstream Brain routes: `{code, message}` (Task 1
+    """Error body for the Project SELARAS routes: `{code, message}` (Task 1
     contract), plus an optional `field` (e.g. which endpoint of an edge lacks
     an ingested document) included only when given."""
     content: dict[str, Any] = {"code": code, "message": message}
@@ -544,10 +544,10 @@ def create_app(
     converter: Any = None,
     extract_axes_fn: Any = _default_extract_axes,
 ) -> FastAPI:
-    """Construct the Workstream Brain read API against injected dependencies.
+    """Construct the Project SELARAS read API against injected dependencies.
 
     Args:
-        workstreams_dir: the Workstream Brain fixture store (one dir per
+        workstreams_dir: the Project SELARAS fixture store (one dir per
             workstream with a `graph.json` + `findings/{edge_id}.json`);
             injectable so tests point it at a fixture/tmp dir. Defaults to
             `data/workstreams`.
@@ -589,7 +589,7 @@ def create_app(
         A configured `FastAPI` app. No network, credentials, or build artifacts
         are required — every route is a projection over `workstreams_dir`.
     """
-    app = FastAPI(title="Workstream Brain — read API")
+    app = FastAPI(title="Project SELARAS — read API")
 
     # CORS: allow the Vite dev server and common local ports to reach the API.
     from fastapi.middleware.cors import CORSMiddleware
@@ -610,7 +610,7 @@ def create_app(
     # for rollback.
     injected_run_arm_g_fn = run_arm_g_fn
 
-    # --- Workstream Brain — Task Screen routes (Task 1) --------------------
+    # --- Project SELARAS — Task Screen routes (Task 1) ----------------------
     # Read-only projections over a per-workstream `graph.json` + `findings/`
     # fixture store. A neighbour is "analysed" iff its edge has a findings file;
     # `findings_count` is that file's length. `draft_empty` is derived from the
@@ -785,7 +785,7 @@ def create_app(
             return []
         return json.loads(findings_path.read_text(encoding="utf-8"))
 
-    # --- Workstream Brain — Graph Screen routes (spec-workstream-graph) -----
+    # --- Project SELARAS — Graph Screen routes (spec-workstream-graph) ------
     # The drafter's hero screen: a canvas of the workstream's primary draft +
     # its anchors. Same `{code, message}` error body and derived-`analysed`
     # convention as the Task Screen routes above. Node/edge shapes stay on the
@@ -1634,7 +1634,7 @@ def create_app(
             "findings_count": len(findings),
         }
 
-    # --- Workstream Brain — Review Linkages routes -------------------------
+    # --- Project SELARAS — Review Linkages routes ---------------------------
     # The pairwise clause reader. Clause text is served from each finding's own
     # `source_clauses` / `target_clauses` records, NOT re-parsed from a clause
     # index: `data/artifacts/clause-index.json` covers only the RMiT documents,
@@ -1734,7 +1734,7 @@ def create_app(
         all_findings = findings.load(workstreams_dir, workstream_id, edge_id)
         return {"finding": updated, "counts": findings.counts(all_findings)}
 
-    # --- Workstream Brain — Drafting Workspace routes ----------------------
+    # --- Project SELARAS — Drafting Workspace routes ------------------------
     # The editor plus its three-tab context panel. Same `{code, message}` error
     # body as above. The Copilot is a live Azure AI Foundry Claude call (see
     # `engine/copilot.py`) with a deterministic citation guardrail — every

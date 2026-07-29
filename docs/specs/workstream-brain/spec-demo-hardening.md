@@ -18,7 +18,7 @@
 **Ticket:** —
 **Type:** Overview — sequencing for a set of technical specs (mostly superseded)
 
-This is the umbrella spec for firming up Workstream Brain ahead of the COPA
+This is the umbrella spec for firming up Project SELARAS ahead of the COPA
 Hackathon demo on **5 August 2026** (written 28 July — an eight-day, single-builder
 runway). It names the work, splits it into what must ship before the demo and what
 stays a credible roadmap, and fixes the build order. Each Tier 1 item has its own

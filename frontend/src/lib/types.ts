@@ -1,4 +1,4 @@
-// Contract types mirroring the Workstream Brain FastAPI engine.
+// Contract types mirroring the Project SELARAS FastAPI engine.
 // Task Screen: `GET /api/workstreams/{id}/tasks/{nodeId}`, `.../edges/{edgeId}/findings`.
 // Graph Screen: `GET /api/workstreams`, `.../{id}/graph`, `.../nodes/{id}`,
 //   `.../edges/{id}`, `POST .../nodes`, `POST .../edges/{id}/analyze`.

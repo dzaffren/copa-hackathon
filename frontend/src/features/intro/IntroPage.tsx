@@ -70,7 +70,9 @@ export function IntroPage() {
     if (reduceMotion) return;
     // Let the entrance stagger start, then draw the edges in — a beat after
     // the scene appears, not simultaneously with it.
-    const id = requestAnimationFrame(() => setTimeout(() => setEdgesDrawn(true), 300));
+    const id = requestAnimationFrame(() =>
+      setTimeout(() => setEdgesDrawn(true), 300),
+    );
     return () => cancelAnimationFrame(id);
   }, [reduceMotion]);
 
@@ -107,7 +109,11 @@ export function IntroPage() {
           rather than straight rigid lines, so it reads as a quiet halo behind
           the headline instead of a technical wireframe competing with it. */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        <svg className="h-full w-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+        <svg
+          className="h-full w-full"
+          preserveAspectRatio="none"
+          viewBox="0 0 100 100"
+        >
           {EDGES.map(({ from, to, draw }) => {
             const a = NODE_BY_ID[from];
             const b = NODE_BY_ID[to];
@@ -135,7 +141,8 @@ export function IntroPage() {
                     ? {
                         strokeDasharray: length,
                         strokeDashoffset: edgesDrawn ? 0 : length,
-                        transition: "stroke-dashoffset 1.8s var(--ease-out-expo)",
+                        transition:
+                          "stroke-dashoffset 1.8s var(--ease-out-expo)",
                       }
                     : undefined
                 }
@@ -148,7 +155,9 @@ export function IntroPage() {
             key={n.id}
             className={[
               "absolute rounded-full",
-              n.isTask ? "h-3 w-3 animate-[glowPulse_2.6s_ease-in-out_infinite]" : "h-1.5 w-1.5 opacity-50",
+              n.isTask
+                ? "h-3 w-3 animate-[glowPulse_2.6s_ease-in-out_infinite]"
+                : "h-1.5 w-1.5 opacity-50",
               "motion-reduce:animate-none",
             ].join(" ")}
             style={{
@@ -165,7 +174,11 @@ export function IntroPage() {
       <div className="absolute left-6 top-6 z-10 sm:left-8 sm:top-8">
         <div
           className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-to-br from-primary/30 to-primary/10 ring-1 ring-primary/40 motion-reduce:animate-none"
-          style={{ animation: reduceMotion ? undefined : "fadeSlideDown 0.4s var(--ease-out-expo) both" }}
+          style={{
+            animation: reduceMotion
+              ? undefined
+              : "fadeSlideDown 0.4s var(--ease-out-expo) both",
+          }}
         >
           <span className="font-['Fraunces'] text-xs font-semibold tracking-widest text-primary">
             BNM
@@ -176,7 +189,11 @@ export function IntroPage() {
       <div className="relative z-10 flex min-h-screen w-full flex-col items-center justify-center px-6 text-center">
         <p
           className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground motion-reduce:opacity-100"
-          style={{ animation: reduceMotion ? undefined : "fadeSlideUp 0.5s 0.2s var(--ease-out-expo) both" }}
+          style={{
+            animation: reduceMotion
+              ? undefined
+              : "fadeSlideUp 0.5s 0.2s var(--ease-out-expo) both",
+          }}
         >
           COPA Hackathon 2026 · Must-Win 10
         </p>
@@ -184,25 +201,53 @@ export function IntroPage() {
         <h1
           className="mt-4 font-['Fraunces'] text-5xl font-semibold tracking-tight text-transparent motion-reduce:opacity-100 sm:text-6xl"
           style={{
-            backgroundImage: "linear-gradient(to right, hsl(var(--foreground)), hsl(var(--primary)))",
+            backgroundImage:
+              "linear-gradient(to right, hsl(var(--foreground)), hsl(var(--primary)))",
             WebkitBackgroundClip: "text",
             backgroundClip: "text",
-            animation: reduceMotion ? undefined : "fadeSlideUp 0.5s 0.4s var(--ease-out-expo) both",
+            animation: reduceMotion
+              ? undefined
+              : "fadeSlideUp 0.5s 0.4s var(--ease-out-expo) both",
           }}
         >
-          Workstream Brain
+          Project SELARAS
         </h1>
 
         <p
+          className="mt-3 max-w-lg text-sm font-medium leading-relaxed text-foreground/70 motion-reduce:opacity-100"
+          style={{
+            animation: reduceMotion
+              ? undefined
+              : "fadeSlideUp 0.5s 0.5s var(--ease-out-expo) both",
+          }}
+        >
+          <span className="text-primary">S</span>emantic{" "}
+          <span className="text-primary">E</span>ngine for{" "}
+          <span className="text-primary">L</span>inkage{" "}
+          <span className="text-primary">A</span>nalysis across{" "}
+          <span className="text-primary">R</span>egulatory{" "}
+          <span className="text-primary">A</span>rtefacts &amp;{" "}
+          <span className="text-primary">S</span>tandards
+        </p>
+
+        <p
           className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground motion-reduce:opacity-100"
-          style={{ animation: reduceMotion ? undefined : "fadeSlideUp 0.5s 0.6s var(--ease-out-expo) both" }}
+          style={{
+            animation: reduceMotion
+              ? undefined
+              : "fadeSlideUp 0.5s 0.6s var(--ease-out-expo) both",
+          }}
         >
           AI-powered policy consistency for Bank Negara Malaysia.
         </p>
 
         <div
           className="mt-8 flex flex-wrap items-center justify-center gap-2.5 motion-reduce:opacity-100"
-          style={{ animation: reduceMotion ? undefined : "fadeSlideUp 0.5s 0.8s var(--ease-out-expo) both" }}
+          style={{
+            animation: reduceMotion
+              ? undefined
+              : "fadeSlideUp 0.5s 0.8s var(--ease-out-expo) both",
+          }}
         >
           {PROPOSITIONS.map(({ icon: Icon, text }) => (
             <span
@@ -219,7 +264,11 @@ export function IntroPage() {
           type="button"
           onClick={() => navigate("/")}
           className="mt-10 flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-violet-600 px-8 py-3 font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-transform duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-105 hover:shadow-primary/40 active:scale-95 motion-reduce:opacity-100"
-          style={{ animation: reduceMotion ? undefined : "fadeSlideUp 0.5s 1s var(--ease-out-expo) both" }}
+          style={{
+            animation: reduceMotion
+              ? undefined
+              : "fadeSlideUp 0.5s 1s var(--ease-out-expo) both",
+          }}
         >
           Enter Demo <ArrowRight className="h-4 w-4" />
         </button>

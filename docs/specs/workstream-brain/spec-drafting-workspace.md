@@ -2,7 +2,7 @@
 
 **Ticket:** TBD
 
-**Epic:** [Workstream Brain MVP1 — Overview](spec.md)
+**Epic:** [Project SELARAS MVP1 — Overview](spec.md)
 
 The drafting workspace is where a drafter writes the working policy document with all the context they built up during review sitting next to their editor. A styled document surface takes the right side of the screen; a three-tab side panel on the left holds accepted linkages, related linkages between neighbour documents, and a Drafting Copilot chat. This story ensures the drafter never has to leave the workspace to remember what they agreed with, what peers have already said, or what a preamble should look like.
 

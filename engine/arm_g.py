@@ -137,7 +137,7 @@ def _load_axes_cache(document_id: str, axes_dir: Optional[Path] = None) -> dict:
 
     `axes_dir` defaults to the module-level `AXES_DIR` so the experiment runner
     and `scripts/run_finder_trace.py` keep their existing location; the
-    Workstream Brain routes pass the per-workstream `axes/` dir instead.
+    Project SELARAS routes pass the per-workstream `axes/` dir instead.
     """
     path = (axes_dir or AXES_DIR) / f"axes-{document_id}.json"
     if path.exists():
@@ -204,7 +204,7 @@ def extract_axes_for_document(
     either forces re-extraction. The refreshed cache is written back to disk.
 
     ``axes_dir`` selects where that cache lives; it defaults to the module-level
-    ``AXES_DIR`` (the experiment location) and the Workstream Brain routes pass
+    ``AXES_DIR`` (the experiment location) and the Project SELARAS routes pass
     the per-workstream ``axes/`` dir so a workstream's cache travels with it.
 
     Returns ``{anchor_id: [axis, ...]}`` for every anchor in the document.

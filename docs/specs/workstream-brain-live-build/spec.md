@@ -5,7 +5,7 @@
 ## Summary
 
 This epic lets a policy drafter build a complete policy workstream live in the
-Workstream Brain app — create the workstream, add source documents, have each
+Project SELARAS app — create the workstream, add source documents, have each
 document broken into citable passages, extract its concepts, connect documents
 to one another, and run linkage analysis — with every result saved durably so a
 workstream built ahead of time survives to the demo. It replaces the reliance on
