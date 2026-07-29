@@ -412,3 +412,55 @@ def test_repeated_identical_saves_are_idempotent(tmp_path):
     assert second.status_code == 200
     assert path.read_bytes() == after_first
     assert second.json() == first.json()
+
+
+def test_a_legacy_side_file_missing_the_newer_keys_is_upgraded_on_save(tmp_path):
+    """Test 14: a side-file written before the last two fields existed still loads,
+    and the first save through this route brings it up to all nine keys.
+
+    No backfill migration: `load_concepts` returns the raw dict, so the missing
+    keys read back as `None` and the panel renders them "Not set" — which is
+    honest, because nobody ever recorded them.
+    """
+    client, workstreams_dir = _make_client(tmp_path)
+    path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    legacy = {
+        "policy_owner": "Aisyah R.",
+        "applicability": "Licensed banks.",
+        "empowerment_framework": None,
+        "requirement": None,
+        "issuance_date": None,
+        "effective_date": None,
+        "keywords": ["open finance"],
+    }
+    path.write_text(json.dumps(legacy, indent=2) + "\n", encoding="utf-8")
+
+    before = client.get(
+        "/api/workstreams/open-finance-pd-2026/nodes/bis-papers-168"
+    ).json()["metadata"]
+    assert before["status"] == "available"
+    assert before["policy_owner"] == "Aisyah R."
+    assert before.get("legal_basis") is None
+    assert before.get("ismp_classification") is None
+
+    response = client.put(
+        _metadata_url("open-finance-pd-2026", "bis-papers-168"),
+        json={
+            "policy_owner": "Aisyah R.",
+            "applicability": "Licensed banks.",
+            "empowerment_framework": None,
+            "requirement": None,
+            "issuance_date": None,
+            "effective_date": None,
+            "keywords": ["open finance"],
+            "legal_basis": ["FSA 2013"],
+            "ismp_classification": None,
+        },
+    )
+
+    assert response.status_code == 200
+    upgraded = json.loads(path.read_text(encoding="utf-8"))
+    assert list(upgraded) == list(CONCEPT_FIELDS)
+    assert upgraded["legal_basis"] == ["FSA 2013"]
+    assert upgraded["ismp_classification"] is None
