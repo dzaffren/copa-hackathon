@@ -587,4 +587,8 @@ These three need a real round-trip to the filesystem to mean anything — persis
 
 **Locator strategies:** `getByRole("button", { name: /^edit$/i })` for the edit toggle; `getByLabel(<field label>)` for each input, reusing the `CONCEPT_FIELD_ORDER` labels; `getByRole("button", { name: /^save$/i })` and `/^cancel$/i`; `getByTestId("task-type-chip")` for the read-only kind.
 
+**Match chip text exactly.** `keywords` and `legal_basis` render their values as sibling `<span>` chips inside one `<dd>`, so a non-exact `getByText("open banking")` resolves to the containing `<dd>` — which holds all three keywords and reads as not visible. Scope to the profile list and pass `{ exact: true }`. Found the hard way; the assertion failed while the data was correct on disk.
+
+**Node selection:** the graph renders to a single `<canvas>`, so there is no per-node DOM element in a real browser — this spec shares the `openNode` canvas-sweep helper described in [spec-shared-task-type.md](spec-shared-task-type.md)'s Verification section.
+
 **Fixture hygiene:** the spec writes `data/workstreams/open-finance-pd-2026/concepts/bis-papers-168.json`, a tracked path. Note in a comment that `git checkout data/workstreams/open-finance-pd-2026` (and deleting that untracked file) restores the tree, following `add-node-chunking.spec.ts`'s precedent.
