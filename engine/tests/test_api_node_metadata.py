@@ -141,3 +141,119 @@ def test_a_save_overwrites_an_existing_profile_whole(tmp_path):
     assert [metadata[field] for field in CONCEPT_FIELDS if field != "policy_owner"] == [
         None
     ] * 8
+
+
+def test_saved_values_round_trip_through_the_node_detail_route(tmp_path):
+    """Test 3: what she saves is what she sees when she comes back.
+
+    The claim of the whole story is persistence, so the read path has to be the
+    one asserted against — not just the PUT's own echo of its input.
+    """
+    client, _ = _make_client(tmp_path)
+    client.put(
+        _metadata_url("open-finance-pd-2026", "bis-papers-168"),
+        json={"policy_owner": "Priya S.", "keywords": ["operational resilience"]},
+    )
+
+    body = client.get(
+        "/api/workstreams/open-finance-pd-2026/nodes/bis-papers-168"
+    ).json()
+
+    assert body["metadata"]["status"] == "available"
+    assert body["metadata"]["keywords"] == ["operational resilience"]
+    assert body["metadata"]["policy_owner"] == "Priya S."
+
+
+def test_an_unknown_key_is_refused_and_nothing_is_written(tmp_path):
+    """Test 4: a typo'd key is named, not silently dropped.
+
+    Dropping it would lose the drafter's edit without telling her — she would
+    save, see the field empty, and have no way to know why.
+    """
+    client, workstreams_dir = _make_client(tmp_path)
+    path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
+
+    response = client.put(
+        _metadata_url("open-finance-pd-2026", "bis-papers-168"),
+        json={"policy_owner_name": "Aisyah R."},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["code"] == "UNKNOWN_METADATA_FIELD"
+    assert response.json()["field"] == "policy_owner_name"
+    assert not path.exists()
+
+
+def test_task_type_in_the_body_is_refused_as_immutable(tmp_path):
+    """Test 5: the deliverable kind is set at creation and cannot be changed here.
+
+    Refused rather than ignored, and with its own code rather than
+    UNKNOWN_METADATA_FIELD: `task_type` is a real field, it just is not this
+    route's to write.
+    """
+    client, workstreams_dir = _make_client(tmp_path)
+    path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
+
+    response = client.put(
+        _metadata_url("open-finance-pd-2026", "bis-papers-168"),
+        json={"task_type": "FAQ", "policy_owner": "Aisyah R."},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["code"] == "TASK_TYPE_IMMUTABLE"
+    assert response.json()["field"] == "task_type"
+    assert not path.exists()
+
+
+def test_a_wrong_typed_scalar_field_is_refused(tmp_path):
+    """Test 6: a scalar field takes a string or null, and says which field failed."""
+    client, _ = _make_client(tmp_path)
+
+    response = client.put(
+        _metadata_url("open-finance-pd-2026", "bis-papers-168"),
+        json={"policy_owner": 42},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["code"] == "INVALID_METADATA"
+    assert response.json()["field"] == "policy_owner"
+
+
+def test_a_non_string_list_member_is_refused(tmp_path):
+    """Test 7: one bad chip fails the whole list, naming the list."""
+    client, _ = _make_client(tmp_path)
+
+    response = client.put(
+        _metadata_url("open-finance-pd-2026", "bis-papers-168"),
+        json={"keywords": ["cloud", 7]},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["code"] == "INVALID_METADATA"
+    assert response.json()["field"] == "keywords"
+
+
+def test_blank_input_normalises_to_null(tmp_path):
+    """Test 8: "cleared" and "never set" are one state on disk.
+
+    A whitespace-only string and an empty list both mean the drafter left the
+    field alone, and blank means "not set yet" — so both must store as `null`,
+    or the panel would render a field as filled in with nothing in it.
+    """
+    client, workstreams_dir = _make_client(tmp_path)
+
+    response = client.put(
+        _metadata_url("open-finance-pd-2026", "bis-papers-168"),
+        json={"policy_owner": "   ", "keywords": [], "applicability": ""},
+    )
+
+    assert response.status_code == 200
+    metadata = response.json()["metadata"]
+    assert metadata["policy_owner"] is None
+    assert metadata["keywords"] is None
+    assert metadata["applicability"] is None
+
+    path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
+    saved = json.loads(path.read_text(encoding="utf-8"))
+    assert saved["policy_owner"] is None
+    assert saved["keywords"] is None
