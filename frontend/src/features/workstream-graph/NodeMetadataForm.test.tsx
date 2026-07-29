@@ -5,6 +5,7 @@ import { http, HttpResponse } from "msw";
 
 import { renderWithProviders } from "@/test/utils";
 import { server } from "@/test/msw/server";
+import { METADATA_SAVE_FAILS_NODE_ID } from "@/test/msw/handlers";
 import type { NodeMetadataRequest } from "@/lib/types";
 import { NodeMetadataForm } from "./NodeMetadataForm";
 
@@ -287,5 +288,28 @@ describe("NodeMetadataForm", () => {
       "28 November 2025",
     );
     expect(screen.getByRole("button", { name: /^save$/i })).toBeEnabled();
+  });
+
+  it("reports a refusal it has no copy for using the server's own message", async () => {
+    // The shared mock refuses this node id, so the failure path needs no
+    // per-test handler override.
+    renderWithProviders(
+      <NodeMetadataForm
+        workstreamId="rmit-v2-2025"
+        nodeId={METADATA_SAVE_FAILS_NODE_ID}
+        initial={EMPTY_PROFILE}
+        onDone={() => {}}
+      />,
+    );
+
+    await userEvent.type(screen.getByLabelText("Policy owner"), "Priya S.");
+    await userEvent.click(screen.getByRole("button", { name: /^save$/i }));
+
+    // No ERROR_COPY entry for SAVE_FAILED, so the server's message is shown
+    // rather than a generic apology that hides what happened.
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /could not be saved/i,
+    );
+    expect(screen.getByLabelText("Policy owner")).toHaveValue("Priya S.");
   });
 });
