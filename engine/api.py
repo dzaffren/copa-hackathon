@@ -1326,6 +1326,54 @@ def create_app(
             "recent_activity": activity,
         }
 
+    @app.put("/api/workstreams/{workstream_id}/nodes/{node_id}/metadata")
+    async def put_node_metadata(
+        workstream_id: str, node_id: str, request: Request
+    ) -> Any:
+        """Record the drafter's own account of a document's regulatory identity.
+
+        A FULL REPLACEMENT of the nine-field profile, not a patch: the form
+        always sends all nine, and `save_concepts` writes the whole key set, so a
+        field the client omits lands as `null`. That makes a save exactly what the
+        drafter saw on screen, with no stale value surviving underneath.
+
+        The two 404 guards are the security boundary, not merely a courtesy:
+        `concepts_path` interpolates both ids into a filesystem path, so
+        resolving them against the loaded graph first is what stops a `../` in
+        `node_id` writing outside the workstream. Validation likewise runs before
+        any write, so a rejected save leaves the side-file exactly as it was.
+        """
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        node = next((n for n in ws_graph.get("nodes", []) if n["id"] == node_id), None)
+        if node is None:
+            return _ws_error(
+                404,
+                "NODE_NOT_FOUND",
+                f"Node {node_id} not found in workstream {workstream_id}",
+            )
+
+        try:
+            body = await request.json()
+        except Exception:  # unparseable body — the same class of error as a non-object
+            return _ws_error(400, "INVALID_METADATA", "Metadata must be an object.")
+        problem = concepts.validate_metadata(body)
+        if problem is not None:
+            status, code, message, field = problem
+            return _ws_error(status, code, message, field=field)
+
+        saved = concepts.normalise_metadata(body)
+        concepts.save_concepts(workstreams_dir, workstream_id, node_id, saved)
+        # Re-read rather than project what we sent: `save_concepts` owns the
+        # normalisation to all nine keys, and reading the file back is what makes
+        # the response provably the stored profile — which is what lets the client
+        # drop it straight into its node-detail cache.
+        stored = concepts.load_concepts(workstreams_dir, workstream_id, node_id) or {}
+        return {"node_id": node_id, "metadata": {"status": "available", **stored}}
+
     @app.get("/api/workstreams/{workstream_id}/edges/{edge_id}")
     def get_workstream_edge_detail(workstream_id: str, edge_id: str) -> Any:
         ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
