@@ -259,6 +259,57 @@ describe("NodeDetailPanel", () => {
     expect(screen.getByText("third-party risk")).toBeInTheDocument();
   });
 
+  it("lists a working draft's deliverable kind on its profile, uneditable", async () => {
+    seedNode({
+      ...ENRICHED_SUPERVISORY_LETTER,
+      id: "rmit-faq-v1",
+      node_type: "task",
+      task_type: "FAQ",
+      title: "RMiT FAQ — v1",
+    });
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="rmit-v2-2025"
+        nodeId="rmit-faq-v1"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/rmit-v2-2025",
+    );
+
+    await screen.findByText("task");
+    await userEvent.click(screen.getByRole("button", { name: /^metadata$/i }));
+
+    // The first row of the profile, reading the drafter-facing label. "FAQ" now
+    // appears twice: the badge-row chip and this profile row.
+    expect(screen.getByText("Task type")).toBeInTheDocument();
+    expect(screen.getAllByText("FAQ")).toHaveLength(2);
+
+    // It stays static text in edit mode — set once at creation, never an input.
+    await userEvent.click(screen.getByRole("button", { name: /^edit$/i }));
+    expect(screen.getByText("Task type")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Task type")).not.toBeInTheDocument();
+    // Every other field is still editable.
+    expect(screen.getByLabelText("Policy owner")).toBeEnabled();
+  });
+
+  it("shows no Task type row on a published context document", async () => {
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="opres-v2"
+        nodeId="bcbs-opres-2021"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/opres-v2",
+    );
+
+    await screen.findByText("international-standard");
+    await userEvent.click(screen.getByRole("button", { name: /^metadata$/i }));
+
+    // A standard is never asked what kind of deliverable it is.
+    expect(screen.queryByText("Task type")).not.toBeInTheDocument();
+    expect(screen.getByText("Policy owner")).toBeInTheDocument();
+  });
+
   // --- Concepts (extracted axes) -------------------------------------------
 
   it("shows the four sections in order: neighbours, activity, metadata, concepts", async () => {
