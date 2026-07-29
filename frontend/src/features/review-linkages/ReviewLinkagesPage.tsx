@@ -3,17 +3,21 @@ import { Link, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { fetchReview, setReviewState, HttpError } from "@/lib/api";
+import { labelSeverityRank } from "@/lib/labels";
 import type { ReviewFinding, ReviewResponse, ReviewState } from "@/lib/types";
 import { ClausePane } from "./ClausePane";
 import { FindingCard } from "./FindingCard";
 
-/** Dismissed findings sink to the bottom; everything else holds file order.
- *  A view concern only — the engine never reorders the findings file. */
+/** Dismissed findings sink to the bottom; the rest sort by attention order
+ *  (conflicts-with → differs-on → silent-on → goes-beyond → aligns-with), as
+ *  every finding list in the app does. A view concern only — the engine never
+ *  reorders the findings file. */
 function forDisplay(findings: ReviewFinding[]): ReviewFinding[] {
   return [...findings].sort((a, b) => {
     const aOut = a.review_state === "dismissed" ? 1 : 0;
     const bOut = b.review_state === "dismissed" ? 1 : 0;
-    return aOut - bOut;
+    if (aOut !== bOut) return aOut - bOut;
+    return labelSeverityRank(a.label) - labelSeverityRank(b.label);
   });
 }
 
@@ -72,7 +76,10 @@ export function ReviewLinkagesPage() {
   if (!data) return null;
 
   const { edge, counts } = data;
-  const pending = Math.max(0, counts.total - counts.accepted - counts.dismissed);
+  const pending = Math.max(
+    0,
+    counts.total - counts.accepted - counts.dismissed,
+  );
   const sourceLit = active?.source_clauses.map((c) => c.clause_number) ?? [];
   const targetLit = active?.target_clauses.map((c) => c.clause_number) ?? [];
 

@@ -1,0 +1,4592 @@
+{
+  "document_id": "rmit-2025",
+  "model": "claude-haiku-4-5",
+  "anchors": [
+    {
+      "anchor_id": "Rmit 2025 1.1",
+      "text_hash": "72471d57592d5ab6",
+      "axis_cap": 5,
+      "axes": [
+        "technology adoption in financial services",
+        "operational dependency on digital infrastructure",
+        "financial institution technology requirements",
+        "digitalization of service delivery",
+        "technology risk management obligations"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 1.1(a)",
+      "text_hash": "a82a461f0b88d806",
+      "axis_cap": 5,
+      "axes": [
+        "operational resilience capability investment",
+        "IT system complexity management",
+        "operational disruption prevention",
+        "risk control infrastructure",
+        "specialized expertise requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 1.1(b)",
+      "text_hash": "3a10bb1ab6d265d2",
+      "axis_cap": 5,
+      "axes": [
+        "cybersecurity standards and requirements",
+        "digital threat mitigation",
+        "public trust and confidence objectives",
+        "evolving crime prevention measures",
+        "financial system security posture"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 1.1(c)",
+      "text_hash": "72134f0607310fed",
+      "axis_cap": 5,
+      "axes": [
+        "third-party risk interconnection",
+        "systemic risk transmission prevention",
+        "counterparty linkage monitoring",
+        "operational resilience through vendor management",
+        "consolidated risk oversight framework"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 1.1(d)",
+      "text_hash": "a3528775afa8d8bd",
+      "axis_cap": 5,
+      "axes": [
+        "operational resilience building",
+        "cyber threat sophistication management",
+        "malicious cyber attack preparedness",
+        "global cyber risk environment",
+        "cyber risk mitigation strategy"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 1.1(e)",
+      "text_hash": "8456ace706657f4f",
+      "axis_cap": 5,
+      "axes": [
+        "ethical technology deployment",
+        "responsible technology use",
+        "inclusive economic growth",
+        "technology governance principles",
+        "digital equity and access"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 1.2",
+      "text_hash": "3b24888748b2d0c1",
+      "axis_cap": 5,
+      "axes": [
+        "technology risk management framework",
+        "cyber risk governance requirements",
+        "risk control proportionality by institution size",
+        "third-party technology linkage risk",
+        "digitalization risk exposure assessment"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 1.3",
+      "text_hash": "bdf6c84da2c9f5a7",
+      "axis_cap": 5,
+      "axes": [
+        "enforcement action scope",
+        "personal liability for directors and officers",
+        "employee accountability for compliance",
+        "supervisory sanction triggers",
+        "designated provision enforcement mechanism"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 1.4",
+      "text_hash": "55c196eb159a97dd",
+      "axis_cap": 5,
+      "axes": [
+        "technology risk management deficiency assessment",
+        "material weakness identification in risk controls",
+        "regulatory non-compliance risk from operational failures",
+        "supervisory intervention triggers and thresholds",
+        "remediation urgency and timeline expectations"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 1.4(a)",
+      "text_hash": "4fba0b94e17b9156",
+      "axis_cap": 5,
+      "axes": [
+        "independent external technology risk assessment",
+        "third-party technology risk review",
+        "technology risk management audit scope",
+        "external review mandate for technology governance",
+        "technology risk control validation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 1.4(b)",
+      "text_hash": "cb4748c30867691c",
+      "axis_cap": 5,
+      "axes": [
+        "remediation plan development",
+        "remediation plan implementation",
+        "corrective action requirements",
+        "institutional compliance obligations",
+        "deficiency resolution framework"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 1.4(c)",
+      "text_hash": "2c1a2bd0f0c06d0a",
+      "axis_cap": 5,
+      "axes": [
+        "additional capital requirement",
+        "capital buffer mandate",
+        "supplementary capital threshold",
+        "capital adequacy threshold",
+        "prudential capital reserve"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 1.4(d)",
+      "text_hash": "392308af6588e324",
+      "axis_cap": 5,
+      "axes": [
+        "corrective action mandate",
+        "supervisory remediation authority",
+        "weakness remediation timeframe",
+        "sustainable compliance restoration",
+        "institution-specific corrective measures"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 2.1",
+      "text_hash": "0ff4de91f1a3deff",
+      "axis_cap": 5,
+      "axes": [
+        "policy scope definition",
+        "financial institution coverage",
+        "applicability conditions",
+        "regulatory perimeter",
+        "conditional policy application"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 2.2",
+      "text_hash": "2e507a6d1209d55f",
+      "axis_cap": 5,
+      "axes": [
+        "scope exemptions by institution type",
+        "regulatory applicability carve-outs",
+        "institution-specific compliance exclusions",
+        "tiered regulatory coverage",
+        "conditional rule applicability"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 2.2(a)",
+      "text_hash": "c20be74ae20a43d6",
+      "axis_cap": 5,
+      "axes": [
+        "statutory cross-reference framework",
+        "financial services regulatory statute",
+        "legislative authority citation",
+        "multi-section regulatory provision",
+        "foundational regulatory act designation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 2.2(i)",
+      "text_hash": "7b7808c2d325a2dd",
+      "axis_cap": 5,
+      "axes": [
+        "e-money issuer eligibility criteria",
+        "permissible e-money business participants",
+        "e-money license scope and qualification",
+        "e-money institution classification",
+        "authorized payment service provider types"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 2.2(ii)",
+      "text_hash": "55c9bcab5284ad6e",
+      "axis_cap": 5,
+      "axes": [
+        "merchant acquirer licensing scope",
+        "non-bank payment processor regulation",
+        "merchant acquiring entity classification",
+        "payment intermediary registration requirements",
+        "acquirer regulatory perimeter"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 2.2(iii)",
+      "text_hash": "816befa9b164215c",
+      "axis_cap": 5,
+      "axes": [
+        "intermediary institution regulatory scope",
+        "remittance service provider classification",
+        "policy document legal authority",
+        "regulatory requirements foundation",
+        "statutory basis for rules"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 2.2(iv)",
+      "text_hash": "5e957cf716ac4f78",
+      "axis_cap": 5,
+      "axes": [
+        "intermediary institution classification",
+        "remittance service provider regulation",
+        "money transfer business scope",
+        "financial intermediary categories",
+        "non-bank payment service providers"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 2.2(b)",
+      "text_hash": "ec6b800f9b33d9e5",
+      "axis_cap": 5,
+      "axes": [
+        "Islamic financial services regulatory framework",
+        "statutory authority citation",
+        "cross-sectional regulatory provisions",
+        "legislative instrument reference",
+        "compliance framework hierarchy"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 2.2(c)",
+      "text_hash": "21bfa585e6a6a109",
+      "axis_cap": 5,
+      "axes": [
+        "statutory authority for institution regulation",
+        "development finance institution governance",
+        "legislative framework cross-reference",
+        "regulatory powers delegation",
+        "financial institution operating mandate"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 2.2(d)",
+      "text_hash": "73f473cb7ce2125b",
+      "axis_cap": 5,
+      "axes": [
+        "money services business licensing authority",
+        "statutory regulatory framework",
+        "financial services legislation citation",
+        "regulatory compliance references",
+        "jurisdictional legal authority"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 3.2",
+      "text_hash": "e79f4119d9e8f375",
+      "axis_cap": 5,
+      "axes": [
+        "policy document legal authority",
+        "statutory instrument scope",
+        "regulatory guidance issuance basis",
+        "multi-act regulatory framework",
+        "guidance effective date"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 4.1",
+      "text_hash": "9f2882266c8de422",
+      "axis_cap": 5,
+      "axes": [
+        "policy effective date",
+        "policy commencement",
+        "exceptions to effective date",
+        "transitional provisions",
+        "interpretation and application"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 5.1",
+      "text_hash": "3f4191f8633c858c",
+      "axis_cap": 5,
+      "axes": [
+        "definitional hierarchy and precedence",
+        "cross-regulatory terminology alignment",
+        "policy document scope and applicability",
+        "legislative reference incorporation",
+        "term definition authority and sources"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 5.2",
+      "text_hash": "1e14f62489215afd",
+      "axis_cap": 5,
+      "axes": [
+        "distinction between mandatory standards and advisory guidance",
+        "compliance obligation classification framework",
+        "enforcement action triggers and consequences",
+        "regulatory interpretation and supplementary provisions",
+        "transitional provision integration into standards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 6.1",
+      "text_hash": "ccb56b89a6f66b5c",
+      "axis_cap": 5,
+      "axes": [
+        "policy document hierarchy and integration",
+        "regulatory instrument cross-reference requirements",
+        "amendment and reissuance protocols",
+        "supplementary guidance incorporation",
+        "central bank guidance applicability"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 6.1(a)",
+      "text_hash": "54ea0cc709faa26e",
+      "axis_cap": 5,
+      "axes": [
+        "data management governance framework",
+        "management information systems requirements",
+        "regulatory guidance issuance date",
+        "financial institution reporting infrastructure",
+        "data quality and control standards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 6.1(b)",
+      "text_hash": "35b3769666b0e76d",
+      "axis_cap": 5,
+      "axes": [
+        "management information systems framework",
+        "data management governance",
+        "development financial institution reporting",
+        "management information system standards",
+        "data quality and integrity requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 6.1(c)",
+      "text_hash": "b574ae00cf044e8c",
+      "axis_cap": 5,
+      "axes": [
+        "risk governance framework",
+        "organizational risk management structure",
+        "board-level risk oversight",
+        "risk policy documentation and issuance",
+        "regulatory compliance effective date"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 6.1(d)",
+      "text_hash": "3d8f7727af5399c4",
+      "axis_cap": 5,
+      "axes": [
+        "new product introduction procedures",
+        "product approval governance",
+        "policy issuance and effective dates",
+        "product risk assessment framework",
+        "new product documentation requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 6.1(e)",
+      "text_hash": "836a7d55d3b2e64f",
+      "axis_cap": 5,
+      "axes": [
+        "policy issuance date",
+        "compliance framework establishment",
+        "regulatory policy documentation",
+        "compliance regime effective date",
+        "policy publication and notification"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 7.1",
+      "text_hash": "61a8b9521ce9bde6",
+      "axis_cap": 5,
+      "axes": [
+        "policy document supersession",
+        "regulatory guidance hierarchy",
+        "prior guideline revocation",
+        "circular and notification replacement",
+        "effective date of policy change"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 7.1(a)",
+      "text_hash": "b8a74359b7ef6302",
+      "axis_cap": 5,
+      "axes": [
+        "electronic banking service provision",
+        "financial institution operational guidance",
+        "digital banking regulatory framework",
+        "e-banking service delivery standards",
+        "regulatory guideline issuance and amendment"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 7.1(b)",
+      "text_hash": "746ffb155372c9b3",
+      "axis_cap": 5,
+      "axes": [
+        "electronic banking fraud prevention measures",
+        "fraud combating specifications",
+        "digital payment system security standards",
+        "anti-fraud control requirements",
+        "banking channel fraud mitigation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 7.1(c)",
+      "text_hash": "8915ae34fe02c3bc",
+      "axis_cap": 5,
+      "axes": [
+        "internet banking fraud prevention",
+        "mobile banking security measures",
+        "monetized fraud combat mechanisms",
+        "digital channel fraud risk management",
+        "remote banking channel controls"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 7.1(d)",
+      "text_hash": "a396edafc6caeb99",
+      "axis_cap": 5,
+      "axes": [
+        "technology risk governance framework",
+        "operational resilience requirements",
+        "risk management policy scope",
+        "technology sector regulatory oversight",
+        "risk assessment methodology standards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.1",
+      "text_hash": "bade24898982ebc5",
+      "axis_cap": 5,
+      "axes": [
+        "technology risk appetite framework",
+        "board approval of risk appetite",
+        "alignment with institutional risk strategy",
+        "board governance of technology risk",
+        "risk appetite statement integration"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.1(a)",
+      "text_hash": "a0a683d36bc39488",
+      "axis_cap": 5,
+      "axes": [
+        "IT strategic planning horizon",
+        "cybersecurity strategic planning scope",
+        "board approval of technology strategy",
+        "strategic plan adequacy review",
+        "alignment of IT strategy with business objectives"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.1(b)",
+      "text_hash": "aef49d3fe108966c",
+      "axis_cap": 5,
+      "axes": [
+        "technology risk management framework oversight",
+        "cyber resilience framework implementation",
+        "operational continuity requirements",
+        "financial services delivery resilience",
+        "board-level technology risk governance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.1(c)",
+      "text_hash": "f365534e57c81beb",
+      "axis_cap": 5,
+      "axes": [
+        "senior management accountability for IT risk assessment",
+        "critical system risk assessment robustness",
+        "emerging technology risk evaluation",
+        "IT and cyber risk mitigation controls",
+        "IT strategy execution risk governance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.1(d)",
+      "text_hash": "f81638805e368cbb",
+      "axis_cap": 5,
+      "axes": [
+        "IT policy review cadence",
+        "technology governance review frequency",
+        "risk-based review depth assessment",
+        "operational complexity documentation",
+        "framework update triggers"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.1(e)",
+      "text_hash": "a77c509e01f2699c",
+      "axis_cap": 5,
+      "axes": [
+        "technology risk assessment framework",
+        "application review risk management",
+        "technology deployment risk evaluation",
+        "regulatory submission risk support",
+        "technology-related risk governance structure"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.3",
+      "text_hash": "dc2e6661aaffbce9",
+      "axis_cap": 5,
+      "axes": [
+        "board committee designation for technology oversight",
+        "technology governance committee composition",
+        "board-level committee responsibilities",
+        "technology risk oversight structure",
+        "committee membership requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.4",
+      "text_hash": "cc00b4befdd424ec",
+      "axis_cap": 5,
+      "axes": [
+        "board-level cyber risk oversight",
+        "technology risk governance",
+        "board discussion facilitation mechanisms",
+        "evolving threat landscape adaptation",
+        "board competency in emerging risks"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.4(a)",
+      "text_hash": "744b9dc04873ccec",
+      "axis_cap": 5,
+      "axes": [
+        "technology risk monitoring",
+        "cyber threat intelligence",
+        "information security threat assessment",
+        "regular risk reporting cadence",
+        "emerging technology risk oversight"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.4(b)",
+      "text_hash": "ffa57450235596e6",
+      "axis_cap": 5,
+      "axes": [
+        "cyber risk discussion scope",
+        "strategic impact assessment of cyber incidents",
+        "reputational risk from cyber events",
+        "liquidity risk from cyber disruption",
+        "operational resilience discussion requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.4(c)",
+      "text_hash": "fc9fa2a4c74e05bb",
+      "axis_cap": 5,
+      "axes": [
+        "cybersecurity awareness training participation",
+        "staff training program requirements",
+        "security culture development",
+        "mandatory security education",
+        "personnel competency in information security"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.5",
+      "text_hash": "c9d503702438c8a2",
+      "axis_cap": 5,
+      "axes": [
+        "internal audit function effectiveness oversight",
+        "technology audit staff competence requirements",
+        "audit scope and procedures governance",
+        "technology audit frequency and scheduling",
+        "corrective action closure monitoring and timeliness"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.6",
+      "text_hash": "41485e3afcef3563",
+      "axis_cap": 5,
+      "axes": [
+        "senior management accountability for technology risk",
+        "cybersecurity risk oversight responsibility",
+        "day-to-day operational risk management",
+        "executive responsibility allocation",
+        "cyber risk governance framework"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.6(a)",
+      "text_hash": "73eab691f2fd98b0",
+      "axis_cap": 5,
+      "axes": [
+        "board-approved risk management framework implementation",
+        "risk appetite operationalization into policy",
+        "risk tolerance translation to procedures",
+        "consistency between framework and operational policies",
+        "enterprise risk framework integration"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.6(b)",
+      "text_hash": "a5c2b7696569b4d0",
+      "axis_cap": 5,
+      "axes": [
+        "crisis management plan requirements",
+        "service disruption recovery procedures",
+        "escalation protocols and triggers",
+        "customer impact assessment",
+        "recovery action timing and urgency"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.6(i)",
+      "text_hash": "d37e2fc74e3dc349",
+      "axis_cap": 5,
+      "axes": [
+        "disruption duration threshold",
+        "impact recovery timeframe",
+        "business continuity resilience period",
+        "operational downtime tolerance",
+        "critical function restoration window"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.6(ii)",
+      "text_hash": "3e01709c2fbf12a8",
+      "axis_cap": 5,
+      "axes": [
+        "disruption impact scope",
+        "customer base exposure measurement",
+        "incident severity quantification",
+        "affected population metrics",
+        "systemic impact assessment criteria"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.6(iii)",
+      "text_hash": "c0dba1ed1b1004a8",
+      "axis_cap": 5,
+      "axes": [
+        "transaction volume metrics",
+        "transaction value measurement",
+        "financial impact quantification",
+        "affected transaction counting",
+        "materiality assessment basis"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.6(c)",
+      "text_hash": "22f16da0b8e758e9",
+      "axis_cap": 5,
+      "axes": [
+        "board reporting cadence",
+        "key performance indicator disclosure",
+        "risk control effectiveness monitoring",
+        "board performance oversight",
+        "management information systems requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.7",
+      "text_hash": "a0fd27eaee4ba4ce",
+      "axis_cap": 5,
+      "axes": [
+        "senior management governance structure",
+        "technology oversight committee composition",
+        "cross-functional coordination mechanism",
+        "cyber and technology function integration",
+        "business unit representation in governance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.7(a)",
+      "text_hash": "d1e71265f61c9b98",
+      "axis_cap": 5,
+      "axes": [
+        "strategic technology planning oversight",
+        "technology policy formulation and governance",
+        "technology procedure implementation",
+        "board-level technology governance",
+        "strategic plan execution monitoring"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.7(b)",
+      "text_hash": "43847361a6939cb2",
+      "axis_cap": 5,
+      "axes": [
+        "board reporting cadence for technology matters",
+        "technology governance disclosure frequency",
+        "key technology risk communication to board",
+        "board oversight of technology function",
+        "timeliness standards for executive reporting"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 8.7(c)",
+      "text_hash": "c7bf1531f5a78218",
+      "axis_cap": 5,
+      "axes": [
+        "technology policy deviation approval process",
+        "technology risk assessment requirements",
+        "material deviation reporting to board",
+        "technology governance oversight",
+        "risk-based policy exception framework"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.1",
+      "text_hash": "62843391a7068df3",
+      "axis_cap": 5,
+      "axes": [
+        "risk management framework integration",
+        "enterprise risk management governance",
+        "third-party risk management function",
+        "risk management framework comprehensiveness",
+        "institutional risk management accountability"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.2",
+      "text_hash": "fa5bd0dea8cb7b84",
+      "axis_cap": 5,
+      "axes": [
+        "transaction risk management framework components",
+        "mandatory framework elements",
+        "transaction risk governance structure",
+        "required policy documentation scope",
+        "operational risk control requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.2(a)",
+      "text_hash": "4f5f16f2d91e6d17",
+      "axis_cap": 5,
+      "axes": [
+        "technology risk definition",
+        "operational risk classification",
+        "risk taxonomy standards",
+        "technology-related risk scope",
+        "risk categorization framework"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.2(b)",
+      "text_hash": "d5a99f386138baf0",
+      "axis_cap": 5,
+      "axes": [
+        "technology risk management accountability structure",
+        "cross-functional technology risk governance",
+        "hierarchical risk responsibility assignment",
+        "technology risk reporting arrangements",
+        "organizational role clarity for risk oversight"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.2(c)",
+      "text_hash": "f2e8d21380a5e38f",
+      "axis_cap": 5,
+      "axes": [
+        "technology risk identification",
+        "emerging technology risk assessment",
+        "technology adoption risk management",
+        "financial institution technology exposure",
+        "new technology risk classification"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.2(d)",
+      "text_hash": "9e9d1128c7d6888b",
+      "axis_cap": 5,
+      "axes": [
+        "information asset risk classification",
+        "system criticality assessment",
+        "data criticality tiering",
+        "information security risk categorization",
+        "asset-level risk rating framework"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.2(e)",
+      "text_hash": "34167a7ee044a29c",
+      "axis_cap": 5,
+      "axes": [
+        "risk measurement methodology",
+        "risk assessment framework",
+        "quantitative modeling approaches",
+        "risk metric definition",
+        "risk identification and classification"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.2(f)",
+      "text_hash": "128100a421fb54b9",
+      "axis_cap": 5,
+      "axes": [
+        "risk control framework",
+        "risk mitigation measures",
+        "control design and implementation",
+        "risk management procedures",
+        "mitigating control effectiveness"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.2(g)",
+      "text_hash": "0fa5cf20a606c731",
+      "axis_cap": 5,
+      "axes": [
+        "material risk detection",
+        "continuous monitoring requirements",
+        "risk identification timeliness",
+        "monitoring frequency and methodology",
+        "risk response triggers"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.2(h)",
+      "text_hash": "b02247ef5ba98e92",
+      "axis_cap": 5,
+      "axes": [
+        "technology risk assessment accuracy",
+        "information system effectiveness requirements",
+        "risk profile monitoring and updating",
+        "technology risk documentation currency",
+        "IT risk governance framework"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.2(i)",
+      "text_hash": "332e36e2ec4ce8b4",
+      "axis_cap": 5,
+      "axes": [
+        "critical third party service provider identification",
+        "technology function dependency mapping",
+        "key resource inventory and classification",
+        "interconnected party risk assessment",
+        "critical operational infrastructure documentation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.2(j)",
+      "text_hash": "dd4d9b329d144f98",
+      "axis_cap": 5,
+      "axes": [
+        "scenario analysis for critical systems",
+        "business continuity readiness assessment",
+        "severe stress condition testing",
+        "critical system recovery capacity",
+        "operational resilience under extreme scenarios"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.2(k)",
+      "text_hash": "ad02789bb00b4652",
+      "axis_cap": 5,
+      "axes": [
+        "incident management policy framework",
+        "service disruption impact mitigation",
+        "system restoration procedures",
+        "service recovery timeframe",
+        "operational continuity objectives"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.3",
+      "text_hash": "020a6fd5a65d1bd7",
+      "axis_cap": 5,
+      "axes": [
+        "technology risk management function establishment",
+        "independent risk oversight structure",
+        "enterprise-wide technology risk governance",
+        "technology risk accountability framework",
+        "dedicated risk management unit requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.3(a)",
+      "text_hash": "ed2851c6c1461aae",
+      "axis_cap": 5,
+      "axes": [
+        "regulatory framework implementation",
+        "risk management framework adoption",
+        "compliance architecture establishment",
+        "framework deployment timeline",
+        "institutional capability building"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.3(b)",
+      "text_hash": "f2f2fa4c8444ff5b",
+      "axis_cap": 5,
+      "axes": [
+        "critical technology project oversight",
+        "risk tolerance impact assessment",
+        "escalation procedures for material risks",
+        "board-level deliberation requirements",
+        "technology risk governance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.3(c)",
+      "text_hash": "f4512742d76ca558",
+      "axis_cap": 5,
+      "axes": [
+        "independent board reporting on third-party assessments",
+        "third-party risk assessment oversight",
+        "board-level independent review function",
+        "senior management reporting on vendor evaluations",
+        "independent assurance on outsourced assessments"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.4",
+      "text_hash": "170898af92cc834d",
+      "axis_cap": 5,
+      "axes": [
+        "chief information security officer designation",
+        "technology risk management governance",
+        "CISO functional authority and independence",
+        "information security leadership resource allocation",
+        "executive accountability for cybersecurity"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.4(a)",
+      "text_hash": "e8e9866b4f7deeda",
+      "axis_cap": 5,
+      "axes": [
+        "independence from operational technology",
+        "governance separation from IT operations",
+        "operational independence requirements",
+        "day-to-day technology operations exclusion",
+        "organizational separation from technology functions"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.4(b)",
+      "text_hash": "c6f770fa3cbcf729",
+      "axis_cap": 5,
+      "axes": [
+        "technology risk disclosure to governance",
+        "emerging technology risk monitoring",
+        "board-level risk reporting requirements",
+        "senior management risk communication",
+        "technology risk profile assessment"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.4(c)",
+      "text_hash": "87ac93157ea3971d",
+      "axis_cap": 5,
+      "axes": [
+        "technical skills in emerging and legacy technologies",
+        "audit and governance expertise requirements",
+        "risk management competency standards",
+        "IT and cybersecurity program execution capability",
+        "third-party risk management expertise"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.4(d)",
+      "text_hash": "7b0362912e67d3f0",
+      "axis_cap": 5,
+      "axes": [
+        "professional certification requirements",
+        "credential verification standards",
+        "qualification documentation",
+        "competency attestation",
+        "certification scope and eligibility"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.5",
+      "text_hash": "f06dab27b8fc08fb",
+      "axis_cap": 5,
+      "axes": [
+        "chief information security officer accountability",
+        "information asset protection mandate",
+        "technology security responsibility",
+        "information security governance structure",
+        "comprehensive security coverage scope"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.5(a)",
+      "text_hash": "612532dd6265ac39",
+      "axis_cap": 5,
+      "axes": [
+        "risk management framework formulation",
+        "credit risk framework implementation policy",
+        "regulatory framework effectiveness assessment",
+        "institutional policy development",
+        "risk management governance structure"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.5(b)",
+      "text_hash": "6dfcc3b43874ceea",
+      "axis_cap": 5,
+      "axes": [
+        "compliance enforcement mechanisms",
+        "technology regulatory requirements",
+        "policy framework adherence",
+        "regulatory requirement implementation",
+        "technology governance oversight"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 9.5(c)",
+      "text_hash": "709d07848fd02594",
+      "axis_cap": 5,
+      "axes": [
+        "technology risk advisory to senior management",
+        "cybersecurity risk profile monitoring",
+        "technology security risk assessment",
+        "senior management information requirements",
+        "operational technology risk reporting"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.1",
+      "text_hash": "bd2020e8495f92b8",
+      "axis_cap": 5,
+      "axes": [
+        "technology project governance framework",
+        "project oversight roles and responsibilities",
+        "technology risk assessment protocols",
+        "project lifecycle risk monitoring",
+        "governance structure proportionality requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.2",
+      "text_hash": "ee7b7328e9e61735",
+      "axis_cap": 5,
+      "axes": [
+        "technology project implementation risk assessment",
+        "operational resilience impact from project failure",
+        "technology deployment risk identification scope",
+        "critical risk area coverage requirements",
+        "business continuity threat from technology projects"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.2(a)",
+      "text_hash": "cbfd1866c240a7db",
+      "axis_cap": 5,
+      "axes": [
+        "vendor resource adequacy assessment",
+        "technology project implementation capacity",
+        "concurrent project portfolio management",
+        "staffing and competency requirements",
+        "technology project duration and scale evaluation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.2(b)",
+      "text_hash": "843c7a9ad43ad0e6",
+      "axis_cap": 5,
+      "axes": [
+        "technology implementation complexity assessment",
+        "unproven technology risk evaluation",
+        "vendor technology integration risk",
+        "data migration and cleansing risk",
+        "system customization scope and risk"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.2(c)",
+      "text_hash": "0ee101154876bfba",
+      "axis_cap": 5,
+      "axes": [
+        "security control adequacy assessment",
+        "lifecycle cybersecurity control implementation",
+        "data confidentiality breach mitigation",
+        "security control configuration standards",
+        "cybersecurity risk exposure management"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.2(d)",
+      "text_hash": "ad54ea00274f0acf",
+      "axis_cap": 5,
+      "axes": [
+        "scope change risk mitigation",
+        "user requirement specification completeness",
+        "business needs fulfillment",
+        "project scope management",
+        "requirements documentation standards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.2(e)",
+      "text_hash": "35fcfecb4daac99a",
+      "axis_cap": 5,
+      "axes": [
+        "system testing strategy robustness",
+        "user acceptance testing requirements",
+        "fault discovery and mitigation",
+        "functionality error prevention",
+        "system risk reduction through testing"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.2(f)",
+      "text_hash": "703ab1e292462e2c",
+      "axis_cap": 5,
+      "axes": [
+        "system deployment appropriateness",
+        "fallback strategy design",
+        "system stability risk mitigation",
+        "operational continuity arrangements",
+        "technology resilience planning"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.2(g)",
+      "text_hash": "ba5e52d9d98e0953",
+      "axis_cap": 5,
+      "axes": [
+        "disaster recovery readiness assessment",
+        "operational continuity testing post-implementation",
+        "system change operational impact evaluation",
+        "recovery capability adequacy verification",
+        "technology implementation operational resilience"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.3",
+      "text_hash": "ff13d2c454a1ee28",
+      "axis_cap": 5,
+      "axes": [
+        "board reporting cadence",
+        "senior management risk oversight",
+        "project implementation monitoring",
+        "ongoing risk reporting requirements",
+        "governance review frequency"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.4",
+      "text_hash": "e9fecba0ce56eaeb",
+      "axis_cap": 5,
+      "axes": [
+        "enterprise technology architecture framework",
+        "system development and acquisition strategy governance",
+        "technology architecture design and implementation standards",
+        "business goal alignment through technology planning",
+        "financial institution technology governance structure"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.4(a)",
+      "text_hash": "67b9a8d139a8e903",
+      "axis_cap": 5,
+      "axes": [
+        "technology inventory and mapping",
+        "system architecture documentation",
+        "technology baseline components",
+        "technology rationale and justification",
+        "enterprise technology governance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.4(b)",
+      "text_hash": "6e8a85e405aed067",
+      "axis_cap": 5,
+      "axes": [
+        "technology infrastructure documentation",
+        "system interconnectivity and dependencies mapping",
+        "single point of failure identification",
+        "security controls design",
+        "fallback facility architecture"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.4(c)",
+      "text_hash": "c62bf8df096d8f05",
+      "axis_cap": 5,
+      "axes": [
+        "business impact analysis methodology",
+        "business function mapping",
+        "organizational unit mapping",
+        "application inventory and classification",
+        "data asset mapping"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.4(d)",
+      "text_hash": "384d26f9f22cdeb9",
+      "axis_cap": 5,
+      "axes": [
+        "network infrastructure design principles",
+        "technology control framework",
+        "IT security policy governance",
+        "infrastructure maintenance standards",
+        "network security architecture requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.4(e)",
+      "text_hash": "0893be8c382184ee",
+      "axis_cap": 5,
+      "axes": [
+        "long-term strategic planning",
+        "organizational evolution priorities",
+        "future direction framework",
+        "multi-year strategic roadmap",
+        "institutional development guidance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.5",
+      "text_hash": "6a905358ea57f205",
+      "axis_cap": 5,
+      "axes": [
+        "system development lifecycle phases",
+        "IT implementation methodology",
+        "change management procedures",
+        "system testing requirements",
+        "decommissioning protocols"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.5(a)",
+      "text_hash": "89155b18ec11e5ae",
+      "axis_cap": 5,
+      "axes": [
+        "business strategy alignment",
+        "enterprise architecture governance",
+        "strategic execution capability",
+        "organizational design for strategy implementation",
+        "business continuity planning framework"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.5(b)",
+      "text_hash": "6755db8652b843bc",
+      "axis_cap": 5,
+      "axes": [
+        "risk management framework alignment with business objectives",
+        "risk governance and policy development",
+        "enterprise risk strategy",
+        "business objective integration in risk management",
+        "risk policy implementation and practice"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.5(c)",
+      "text_hash": "befd18a75fa8a258",
+      "axis_cap": 5,
+      "axes": [
+        "information confidentiality requirements",
+        "information integrity safeguards",
+        "information availability assurance",
+        "customer data protection standards",
+        "counterparty information security"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.6",
+      "text_hash": "8256744472950638",
+      "axis_cap": 5,
+      "axes": [
+        "security requirements for rapid development methodologies",
+        "IT security compliance automation for system releases",
+        "vulnerability discovery and testing procedures",
+        "unauthorized access prevention controls",
+        "governance and compliance in agile development environments"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.7",
+      "text_hash": "36160c8cf4e6604d",
+      "axis_cap": 5,
+      "axes": [
+        "production environment isolation requirements",
+        "development and testing environment segregation",
+        "virtual infrastructure isolation controls",
+        "unauthorised system change mitigation",
+        "cloud multi-tenancy risk management"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.8",
+      "text_hash": "ba149073402ac82b",
+      "axis_cap": 5,
+      "axes": [
+        "system testing methodology",
+        "pre-deployment testing requirements",
+        "user requirement verification",
+        "robust system performance validation",
+        "sensitive test data protection and authorization"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.9",
+      "text_hash": "e3696ea0ea0e2cfc",
+      "axis_cap": 5,
+      "axes": [
+        "system testing scope and types",
+        "unit testing requirements",
+        "integration testing requirements",
+        "security testing requirements",
+        "stress and load testing requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.10",
+      "text_hash": "d48e8a32c0638275",
+      "axis_cap": 5,
+      "axes": [
+        "source code review requirements",
+        "critical system change control",
+        "code security standards",
+        "secure development practices",
+        "pre-deployment code validation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.11",
+      "text_hash": "a1a81edb64c803c9",
+      "axis_cap": 5,
+      "axes": [
+        "system change approval procedures",
+        "independent review requirements",
+        "contingency planning for implementation failures",
+        "business continuity testing protocols",
+        "material system change governance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.12",
+      "text_hash": "b51b37e27de5756e",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider obligations",
+        "critical systems outsourcing governance",
+        "contractual requirements for vendors",
+        "third-party operational resilience",
+        "outsourced infrastructure control mechanisms"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.12(a)",
+      "text_hash": "89eccf1dffe32b79",
+      "axis_cap": 5,
+      "axes": [
+        "advance notice requirement for system changes",
+        "IT system change notification procedures",
+        "third-party change management obligations",
+        "operational impact disclosure timing",
+        "critical system modification notice period"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.12(b)",
+      "text_hash": "8fdf8d02d65e1981",
+      "axis_cap": 5,
+      "axes": [
+        "secure by design principles adoption",
+        "IT system development methodology",
+        "cyber risk mitigation requirements",
+        "supply chain risk propagation",
+        "third-party cyber risk controls"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.12(c)",
+      "text_hash": "dd3fecfa485da49a",
+      "axis_cap": 5,
+      "axes": [
+        "source code accessibility requirements",
+        "business continuity arrangements",
+        "operational resilience documentation",
+        "critical system redundancy",
+        "recovery capability maintenance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.13",
+      "text_hash": "918836087c225328",
+      "axis_cap": 5,
+      "axes": [
+        "critical systems decommissioning procedures",
+        "customer impact mitigation during system transitions",
+        "business continuity planning requirements",
+        "contingency plan testing obligations",
+        "operational resilience during infrastructure changes"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.14",
+      "text_hash": "66c55aa533061452",
+      "axis_cap": 5,
+      "axes": [
+        "automated security assessment tools",
+        "software development lifecycle automation",
+        "code scanning and vulnerability detection",
+        "change management process automation",
+        "cyber threat response capability"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.15",
+      "text_hash": "c56d597281d868b1",
+      "axis_cap": 5,
+      "axes": [
+        "third-party software risk assessment",
+        "cyber supply chain incident impact",
+        "business continuity threat from vendor dependencies",
+        "operational resilience of external technology providers",
+        "vendor cyber risk management considerations"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.15(a)",
+      "text_hash": "b4f9a0a170079aa6",
+      "axis_cap": 5,
+      "axes": [
+        "software bill of materials adoption",
+        "vulnerability identification automation",
+        "third-party software component risk monitoring",
+        "continuous security vulnerability scanning",
+        "supply chain software security oversight"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.15(b)",
+      "text_hash": "55caed80a083b65e",
+      "axis_cap": 5,
+      "axes": [
+        "open-source software security governance",
+        "source code repository access controls",
+        "third-party platform security monitoring",
+        "secure coding practice adoption",
+        "vulnerability assessment and remediation cadence"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.16",
+      "text_hash": "84d8ba55f15ee621",
+      "axis_cap": 5,
+      "axes": [
+        "shadow IT risk identification",
+        "shadow IT risk mitigation",
+        "information security policy development",
+        "system lifecycle management",
+        "unauthorized technology governance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.17",
+      "text_hash": "8aa10ed2858d2a19",
+      "axis_cap": 5,
+      "axes": [
+        "known security vulnerability remediation",
+        "system patching and maintenance requirements",
+        "technology end-of-life management",
+        "outdated platform phase-out obligations",
+        "digital service security baseline standards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.17(a)",
+      "text_hash": "f05278b9f045ea3b",
+      "axis_cap": 5,
+      "axes": [
+        "security baseline maintenance",
+        "technology component hardening",
+        "baseline accuracy and currency",
+        "security configuration standards",
+        "baseline documentation updates"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.17(b)",
+      "text_hash": "f8c8a88c8ef228a1",
+      "axis_cap": 5,
+      "axes": [
+        "patch release deployment cadence",
+        "software update timeliness",
+        "continuous monitoring requirements",
+        "security patch management",
+        "system maintenance frequency"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.17(c)",
+      "text_hash": "cf21a7bbd2ecaf1d",
+      "axis_cap": 5,
+      "axes": [
+        "end-of-life technology system management",
+        "technology infrastructure remediation planning",
+        "legacy system replacement timelines",
+        "operational technology system renewal",
+        "technology risk mitigation implementation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.17(d)",
+      "text_hash": "0ca9332c7878f872",
+      "axis_cap": 5,
+      "axes": [
+        "management approval for technology exceptions",
+        "unsupported technology risk assessment requirements",
+        "technology phase-out timeline requirements",
+        "exception review frequency and cadence",
+        "legacy technology risk management oversight"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.18",
+      "text_hash": "9af4c334abe0edf0",
+      "axis_cap": 5,
+      "axes": [
+        "patch management framework",
+        "end-of-life software management",
+        "software vulnerability remediation procedures",
+        "technology lifecycle governance",
+        "vendor support and update protocols"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.18(a)",
+      "text_hash": "30c3fd19cf3d2183",
+      "axis_cap": 5,
+      "axes": [
+        "technology asset inventory and cataloging",
+        "vulnerability identification and assessment",
+        "patch management and deployment status",
+        "end-of-life system risk assessment",
+        "technology infrastructure security monitoring"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.18(b)",
+      "text_hash": "9834e2d9a1c528f6",
+      "axis_cap": 5,
+      "axes": [
+        "patch deployment severity classification",
+        "vulnerability remediation priority framework",
+        "patch deployment timeline standards",
+        "vulnerability assessment criteria",
+        "security update deployment procedures"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.18(c)",
+      "text_hash": "025f911b3cc04f1d",
+      "axis_cap": 5,
+      "axes": [
+        "pre-deployment compatibility testing",
+        "patch management procedures",
+        "system disruption mitigation",
+        "connected system impact assessment",
+        "operational continuity safeguards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.18(d)",
+      "text_hash": "229d40a11b600eac",
+      "axis_cap": 5,
+      "axes": [
+        "patch deployment workflow governance",
+        "approval processes for system updates",
+        "testing requirements for patches",
+        "monitoring of patch deployment activities",
+        "tracking and documentation of patch management"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.18(e)",
+      "text_hash": "e4f7658d259c0bf1",
+      "axis_cap": 5,
+      "axes": [
+        "end-user communication requirements",
+        "transition planning and disclosure",
+        "stakeholder awareness obligations",
+        "orderly wind-down procedures",
+        "consumer notification standards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.19",
+      "text_hash": "46c4490d60f79af6",
+      "axis_cap": 5,
+      "axes": [
+        "technology security monitoring",
+        "security control effectiveness assessment",
+        "technology disruption risk management",
+        "emerging technology integration protocols",
+        "continuous control adequacy review"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.19(a)",
+      "text_hash": "cf0636a4f8154668",
+      "axis_cap": 5,
+      "axes": [
+        "board-level technology risk reporting",
+        "emerging technology impact assessment",
+        "business continuity technology risks",
+        "technology landscape monitoring obligations",
+        "governance technology oversight"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.19(b)",
+      "text_hash": "7f678b97de11de51",
+      "axis_cap": 5,
+      "axes": [
+        "long-term strategic planning horizon",
+        "resource allocation for risk management",
+        "cyber threat landscape monitoring",
+        "organizational capability development",
+        "emerging adversary tactic anticipation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.19(c)",
+      "text_hash": "31b544fd8babfa02",
+      "axis_cap": 5,
+      "axes": [
+        "technology infrastructure migration planning",
+        "system security preservation during transition",
+        "operational reliability during technology change",
+        "migration roadmap development and governance",
+        "orderly technology transition management"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.20",
+      "text_hash": "94f0692ced4c4c8b",
+      "axis_cap": 5,
+      "axes": [
+        "cryptography policy framework",
+        "cryptographic control standards",
+        "data protection requirements",
+        "information security controls",
+        "important data classification"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.20(a)",
+      "text_hash": "51a318c628b0faf7",
+      "axis_cap": 5,
+      "axes": [
+        "encryption algorithm standards adoption",
+        "message authentication standards",
+        "cryptographic hash function standards",
+        "digital signature standards",
+        "random number generation standards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.20(b)",
+      "text_hash": "b9e2d3dac22202f6",
+      "axis_cap": 5,
+      "axes": [
+        "cryptographic key lifecycle management",
+        "key generation and distribution controls",
+        "key storage and recovery procedures",
+        "key revocation and destruction protocols",
+        "cryptographic key security requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.20(c)",
+      "text_hash": "2a0b581a9d3eef7e",
+      "axis_cap": 5,
+      "axes": [
+        "cryptographic algorithm review cadence",
+        "critical system cryptography standards",
+        "customer-facing application security assessment",
+        "weakened protocol detection and remediation",
+        "third-party linked system cryptographic controls"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.20(d)",
+      "text_hash": "240d07ab9bf7426a",
+      "axis_cap": 5,
+      "axes": [
+        "cryptographic inventory scope",
+        "cryptographic algorithm documentation",
+        "cryptographic tool cataloging",
+        "cryptographic rationale disclosure",
+        "cryptographic system mapping"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.20(e)",
+      "text_hash": "54e904aa59ee741b",
+      "axis_cap": 5,
+      "axes": [
+        "cryptographic key compromise response planning",
+        "incident escalation procedures",
+        "key regeneration protocols",
+        "business continuity interim measures",
+        "compromise impact containment strategies"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.21",
+      "text_hash": "bddd2d0e2fca8a24",
+      "axis_cap": 5,
+      "axes": [
+        "cryptographic control assessment",
+        "information confidentiality protection",
+        "data integrity assurance",
+        "authentication mechanism requirements",
+        "non-repudiation controls"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.21(a)",
+      "text_hash": "9ed0ec05a3a3e03a",
+      "axis_cap": 5,
+      "axes": [
+        "encryption key ownership and control",
+        "customer information data protection",
+        "key custodian independence requirements",
+        "unauthorized access risk mitigation",
+        "non-critical system exemptions"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.21(b)",
+      "text_hash": "566fdec7cec6918c",
+      "axis_cap": 5,
+      "axes": [
+        "encryption key management controls",
+        "third-party cryptographic service oversight",
+        "industry standard cryptographic compliance",
+        "third-party risk appetite alignment",
+        "outsourced security function governance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.21(d)",
+      "text_hash": "14c4a2e2471614c0",
+      "axis_cap": 5,
+      "axes": [
+        "cryptographic control resource requirements",
+        "system capacity planning for encryption",
+        "network traffic visibility impact assessment",
+        "encrypted data monitoring limitations",
+        "risk-benefit analysis of cryptographic measures"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.22",
+      "text_hash": "f492ef2028b8d161",
+      "axis_cap": 5,
+      "axes": [
+        "cryptographic protocol selection standards",
+        "cryptographic key protection requirements",
+        "key storage environment security controls",
+        "hardware security module deployment criteria",
+        "risk-based cryptographic infrastructure classification"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.23",
+      "text_hash": "398ef85332c3352c",
+      "axis_cap": 5,
+      "axes": [
+        "public key certificate issuance and management",
+        "certificate authority recognition standards",
+        "cryptographic key protection requirements",
+        "digital signature legal enforceability",
+        "certificate renewal and lifecycle governance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.24",
+      "text_hash": "9feafac1973b227a",
+      "axis_cap": 5,
+      "axes": [
+        "data centre resilience objectives",
+        "data centre availability targets",
+        "business continuity capability requirements",
+        "infrastructure recovery time objectives",
+        "operational resilience infrastructure specification"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.25",
+      "text_hash": "b664f2c960226533",
+      "axis_cap": 5,
+      "axes": [
+        "data centre redundancy requirements",
+        "single point of failure elimination",
+        "business continuity infrastructure design",
+        "backup capacity component provisioning",
+        "network distribution path redundancy"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.26",
+      "text_hash": "b398e9c539d15afc",
+      "axis_cap": 5,
+      "axes": [
+        "production data centre physical security requirements",
+        "critical systems infrastructure redundancy",
+        "disaster risk mitigation for data centre location",
+        "continuous monitoring and fault alerting systems",
+        "data centre component maintenance standards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.27",
+      "text_hash": "8665424819b29af1",
+      "axis_cap": 5,
+      "axes": [
+        "data centre operations control procedures",
+        "batch processing management automation",
+        "production system change implementation procedures",
+        "error handling and exception management",
+        "operational resilience and continuity controls"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.28",
+      "text_hash": "5dc677673f8eb974",
+      "axis_cap": 5,
+      "axes": [
+        "data centre operational segregation",
+        "production environment access control",
+        "vendor access authorization requirements",
+        "programmer access monitoring protocols",
+        "incompatible activity separation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.29",
+      "text_hash": "39c04baab27502c0",
+      "axis_cap": 5,
+      "axes": [
+        "system capacity planning requirements",
+        "peak processing period management",
+        "technology infrastructure change management",
+        "business growth forecast integration",
+        "operational capacity assessment methodology"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.30",
+      "text_hash": "2529bb7002390ab2",
+      "axis_cap": 5,
+      "axes": [
+        "real-time operational monitoring requirements",
+        "capacity utilization tracking mechanisms",
+        "alert system design and responsiveness",
+        "performance metric threshold governance",
+        "monitoring framework periodic review cadence"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.31",
+      "text_hash": "461e5600555c17fc",
+      "axis_cap": 5,
+      "axes": [
+        "digital service resilience enhancement",
+        "delivery channel resilience measures",
+        "key service continuity requirements",
+        "operational resilience for digital infrastructure",
+        "systemic service availability standards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.31(a)",
+      "text_hash": "af66fac899f91c31",
+      "axis_cap": 5,
+      "axes": [
+        "service degradation detection capability",
+        "early warning system implementation",
+        "intermittent failure identification",
+        "operational resilience monitoring mechanisms",
+        "implementation deadline for system safeguards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.31(i)",
+      "text_hash": "9065ddba7ed0b3ec",
+      "axis_cap": 5,
+      "axes": [
+        "transaction failure detection",
+        "service availability measurement",
+        "operational performance monitoring",
+        "system outage identification",
+        "service level measurement accuracy"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.31(ii)",
+      "text_hash": "e5bbef7759dce5d6",
+      "axis_cap": 5,
+      "axes": [
+        "customer impact measurement during disruptions",
+        "affected customer count monitoring",
+        "transaction volume tracking during outages",
+        "service disruption severity assessment",
+        "operational incident impact metrics"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.31(iii)",
+      "text_hash": "6a05f0ae7faccdf5",
+      "axis_cap": 5,
+      "axes": [
+        "service disruption escalation threshold",
+        "customer impact materiality definition",
+        "senior management notification trigger",
+        "transaction volume disruption threshold",
+        "operational incident escalation procedures"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.31(b)",
+      "text_hash": "cf494dc65393b6d1",
+      "axis_cap": 5,
+      "axes": [
+        "IT system interdependency assessment",
+        "digital service continuity risk",
+        "vulnerability identification and mitigation",
+        "multi-channel service interruption prevention",
+        "periodic operational resilience review"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.31(c)",
+      "text_hash": "5ad523526c1fafac",
+      "axis_cap": 5,
+      "axes": [
+        "stand-in processing arrangement implementation deadline",
+        "service continuity capability deployment requirements",
+        "digital service prioritization for resilience",
+        "customer disclosure on service terms and risks",
+        "fraud risk mitigation and responsibility allocation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.32",
+      "text_hash": "a7379436d86ab261",
+      "axis_cap": 5,
+      "axes": [
+        "critical system availability requirements",
+        "maximum unplanned downtime tolerance",
+        "customer-facing service continuity standards",
+        "incident recovery time objectives",
+        "rolling measurement period for availability metrics"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.33",
+      "text_hash": "d261f78d1f40ee8b",
+      "axis_cap": 5,
+      "axes": [
+        "critical infrastructure designation threshold",
+        "regulatory encouragement versus mandatory compliance",
+        "entity type scope and coverage",
+        "cybersecurity measure implementation guidance",
+        "NCII entity exclusion criteria"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.34",
+      "text_hash": "c58825dacbad9c8b",
+      "axis_cap": 5,
+      "axes": [
+        "technology diversity in critical systems",
+        "concentration risk in infrastructure technology",
+        "operational resilience through vendor diversification",
+        "critical system dependency management",
+        "similar technology risk exposure limits"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.35",
+      "text_hash": "560216fa9c8e847c",
+      "axis_cap": 5,
+      "axes": [
+        "digital service interruption response",
+        "customer impact mitigation during outages",
+        "performance degradation management",
+        "delivery channel resilience",
+        "operational incident response procedures"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.35(a)",
+      "text_hash": "8abe0dc29a9a208a",
+      "axis_cap": 5,
+      "axes": [
+        "service resumption timeline",
+        "alternative arrangement activation",
+        "escalation procedures for outages",
+        "performance stabilization targets",
+        "scenario-based recovery planning"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.35(b)",
+      "text_hash": "476e2ba2e1efdb70",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider accountability",
+        "performance degradation management framework",
+        "service level recovery arrangements",
+        "operational coordination with external providers",
+        "formalized contingency response procedures"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.35(c)",
+      "text_hash": "e00d7c9798c19175",
+      "axis_cap": 5,
+      "axes": [
+        "customer notification requirements for service disruptions",
+        "communication plan for operational incidents",
+        "customer feedback volume management",
+        "service recovery status update frequency",
+        "alternative service option disclosure"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.35(d)",
+      "text_hash": "4b90693143854bb7",
+      "axis_cap": 5,
+      "axes": [
+        "digital service availability transparency",
+        "real-time performance status disclosure",
+        "customer access to service status information",
+        "digital infrastructure monitoring and reporting",
+        "corporate website service status publication"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.35(e)",
+      "text_hash": "2a9a20b657385147",
+      "axis_cap": 5,
+      "axes": [
+        "service availability disclosure frequency",
+        "operational resilience reporting cadence",
+        "quarterly performance metric reporting",
+        "disclosure timeline and deadline",
+        "historical uptime track record publication"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.36",
+      "text_hash": "26ec50c37d5ae0c0",
+      "axis_cap": 5,
+      "axes": [
+        "enterprise network architecture and design",
+        "system scalability requirements",
+        "cybersecurity infrastructure standards",
+        "business continuity capacity planning",
+        "technology infrastructure resilience"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.37",
+      "text_hash": "5678151cd1f39380",
+      "axis_cap": 5,
+      "axes": [
+        "critical system network reliability requirements",
+        "single point of failure elimination",
+        "network fault resilience",
+        "cyber threat protection for critical systems",
+        "network service redundancy standards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.38",
+      "text_hash": "6f2cadd2520295b4",
+      "axis_cap": 5,
+      "axes": [
+        "network fault prevention measures",
+        "component redundancy requirements",
+        "service diversity standards",
+        "alternate routing provisions",
+        "infrastructure resilience controls"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.39",
+      "text_hash": "e76d4e832cbf0a7c",
+      "axis_cap": 5,
+      "axes": [
+        "real-time network monitoring requirements",
+        "bandwidth utilization measurement and thresholds",
+        "network resilience performance metrics",
+        "traffic anomaly detection processes",
+        "system disruption alert mechanisms"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.40",
+      "text_hash": "91102ad0beecb22d",
+      "axis_cap": 5,
+      "axes": [
+        "network service design standards",
+        "critical system resilience requirements",
+        "data confidentiality protection",
+        "data integrity safeguards",
+        "system availability assurance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.41",
+      "text_hash": "aae958ae16773807",
+      "axis_cap": 5,
+      "axes": [
+        "network architecture documentation",
+        "internal and external interface mapping",
+        "physical and logical connectivity disclosure",
+        "network segmentation identification",
+        "infrastructure design blueprint requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.42",
+      "text_hash": "4a5a10e30d5ceb17",
+      "axis_cap": 5,
+      "axes": [
+        "network device log retention period",
+        "forensic investigation data preservation",
+        "operational log sufficiency standards",
+        "incident investigation documentation requirements",
+        "cybersecurity audit trail retention"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.43",
+      "text_hash": "24c0f31e6011bf78",
+      "axis_cap": 5,
+      "axes": [
+        "intra-group operational risk isolation",
+        "system compromise contagion prevention",
+        "network segmentation requirements",
+        "logical segregation implementation",
+        "group-wide operational resilience safeguards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.44",
+      "text_hash": "a7cc23a326b23b6d",
+      "axis_cap": 5,
+      "axes": [
+        "business continuity backup strategy",
+        "recovery time objective framework",
+        "operational resilience procedures",
+        "backup system requirements",
+        "business recovery capability standards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.44(a)",
+      "text_hash": "ad9747022f9e52e1",
+      "axis_cap": 5,
+      "axes": [
+        "backup data lifecycle management",
+        "data restoration procedures",
+        "backup procedure documentation",
+        "business continuity data retention",
+        "disaster recovery capability"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.44(b)",
+      "text_hash": "ae2fd98d41e2e1e3",
+      "axis_cap": 5,
+      "axes": [
+        "critical data backup requirements",
+        "operating system software recovery capability",
+        "production program backup standards",
+        "transaction and master file retention",
+        "event log preservation for recovery"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.44(c)",
+      "text_hash": "269924a5268ea09f",
+      "axis_cap": 5,
+      "axes": [
+        "backup site environmental controls",
+        "backup media storage location security",
+        "access control to backup facilities",
+        "backup data physical security requirements",
+        "offsite backup infrastructure standards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.44(d)",
+      "text_hash": "be992f314e2a5370",
+      "axis_cap": 5,
+      "axes": [
+        "removable media data protection",
+        "sensitive data storage controls",
+        "data transportation security standards",
+        "equivalent control frameworks",
+        "minimum control specifications"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.44(e)",
+      "text_hash": "1005d4ab9b50e394",
+      "axis_cap": 5,
+      "axes": [
+        "backup and restoration testing frequency",
+        "recovery capability validation",
+        "backup failure remediation procedures",
+        "root cause analysis requirements",
+        "business continuity testing cadence"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.44(f)",
+      "text_hash": "d2cb888a1f345a58",
+      "axis_cap": 5,
+      "axes": [
+        "independent risk assessment requirement",
+        "backup storage and delivery management",
+        "sensitive data protection controls",
+        "control adequacy evaluation",
+        "end-to-end system security assessment"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.45",
+      "text_hash": "9c9702e5826e140f",
+      "axis_cap": 5,
+      "axes": [
+        "backup system integrity and tamper-proofing",
+        "isolated recovery environment architecture",
+        "critical service recovery time objective",
+        "ransomware resilience and data loss mitigation",
+        "business continuity testing for cyber incidents"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.46",
+      "text_hash": "37aaef2adf1c4a4a",
+      "axis_cap": 5,
+      "axes": [
+        "third party service provider oversight",
+        "critical technology function outsourcing",
+        "technology service security and reliability",
+        "board and senior management accountability for outsourced risks",
+        "regulatory compliance in third party engagements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.47",
+      "text_hash": "530faf5166da8583",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider due diligence",
+        "pre-engagement vendor assessment",
+        "ongoing vendor monitoring requirements",
+        "service provider onboarding controls",
+        "continuous third-party oversight"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 Appendix 8",
+      "text_hash": "f9675c07c643ebdf",
+      "axis_cap": 5,
+      "axes": [
+        "appendix document structure",
+        "supplementary regulatory guidance",
+        "substantive rule reference materials",
+        "numbered regulatory provisions",
+        "regulatory filing annexes"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.48",
+      "text_hash": "b701c3df911d32b0",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider engagement requirements",
+        "service level agreement minimum content standards",
+        "contractual performance metrics specification",
+        "outsourced service provider governance",
+        "third-party operational resilience documentation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.48(a)",
+      "text_hash": "7589a420bd27024b",
+      "axis_cap": 5,
+      "axes": [
+        "regulator examination and inspection rights",
+        "third-party access to financial institution records",
+        "scope of regulatory information access",
+        "internal governance documentation disclosure requirements",
+        "management information and decision-making process transparency"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.48(b)",
+      "text_hash": "d7ef8a7ba8b19302",
+      "axis_cap": 5,
+      "axes": [
+        "third-party subcontracting notification requirements",
+        "prior notice period for outsourced services",
+        "materiality threshold for subcontractor engagement",
+        "service provider disclosure obligations",
+        "critical function subcontracting approval"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.48(c)",
+      "text_hash": "5c996565c8855b93",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider contractual obligations",
+        "confidentiality and secrecy compliance requirements",
+        "post-engagement confidentiality provisions",
+        "service level agreement content requirements",
+        "data integrity and non-disclosure commitments"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.48(d)",
+      "text_hash": "2cca7937b4583d5c",
+      "axis_cap": 5,
+      "axes": [
+        "disaster recovery arrangements",
+        "backup capability requirements",
+        "business continuity infrastructure",
+        "operational resilience contingency planning",
+        "crisis recovery procedures"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.48(e)",
+      "text_hash": "d9afbebda4530528",
+      "axis_cap": 5,
+      "axes": [
+        "service availability targets",
+        "uptime performance standards",
+        "operational availability requirements",
+        "service continuity commitments",
+        "critical system resilience thresholds"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.48(f)",
+      "text_hash": "7402565fc56d3d69",
+      "axis_cap": 5,
+      "axes": [
+        "third party service provider exit arrangements",
+        "business continuity contingency planning",
+        "data recovery time objectives",
+        "vendor termination contingency procedures",
+        "data portability and recoverability requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.48(g)",
+      "text_hash": "51ec191a73c350a9",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider notification obligations",
+        "cyber incident disclosure requirements",
+        "service disruption reporting timelines",
+        "subcontractor incident accountability",
+        "customer data breach notification duties"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.48(h)",
+      "text_hash": "e6b64f570889e6cd",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider compliance standards",
+        "internationally recognized standards adoption",
+        "key personnel competency maintenance",
+        "professional certification requirements",
+        "vendor staff skills and training"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.48(i)",
+      "text_hash": "3e362e847eced86b",
+      "axis_cap": 5,
+      "axes": [
+        "third party service provider security training",
+        "vendor security awareness program participation",
+        "security education program scope",
+        "third party risk management through training",
+        "conditional vendor education requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.49",
+      "text_hash": "1885af47c7695d4f",
+      "axis_cap": 5,
+      "axes": [
+        "third-party cybersecurity monitoring requirements",
+        "continuous monitoring cadence",
+        "real-time incident detection capability",
+        "vendor cybersecurity risk assessment",
+        "incident management framework"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.49(a)",
+      "text_hash": "48a1e5ddf1eae407",
+      "axis_cap": 5,
+      "axes": [
+        "IT infrastructure footprint measurement",
+        "third-party data access inventory",
+        "cyber-attack surface mitigation",
+        "external stress state management",
+        "regular cyber-risk monitoring cadence"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.49(b)",
+      "text_hash": "538c8a83ccc86db2",
+      "axis_cap": 5,
+      "axes": [
+        "third-party risk mitigation",
+        "product-specific vendor controls",
+        "security policy adoption requirements",
+        "vendor risk assessment framework",
+        "third-party security standards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.49(c)",
+      "text_hash": "708b23cf781d16f7",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider incident response",
+        "software vulnerability detection protocols",
+        "security incident containment procedures",
+        "software update risk management",
+        "incident response plan requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.49(d)",
+      "text_hash": "d4977e3be1047340",
+      "axis_cap": 5,
+      "axes": [
+        "prioritized security control identification",
+        "third-party service provider assurance frequency",
+        "control tiering by criticality",
+        "vendor attestation cadence",
+        "high-priority control validation requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.49(e)",
+      "text_hash": "c2d3706e46e7e836",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider monitoring",
+        "cyber incident disclosure requirements",
+        "technology incident reporting frequency",
+        "outsourced service provider oversight",
+        "incident monitoring cadence"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.49(f)",
+      "text_hash": "77996beea19e2362",
+      "axis_cap": 5,
+      "axes": [
+        "automated testing processes",
+        "technology implementation for compliance",
+        "metric validation automation",
+        "operational testing infrastructure",
+        "testing efficiency mechanisms"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.49(g)",
+      "text_hash": "8a27b472be155d14",
+      "axis_cap": 5,
+      "axes": [
+        "breach response procedures",
+        "threshold exceedance investigation",
+        "control gap remediation",
+        "failed assertion management",
+        "incident response protocols"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.50",
+      "text_hash": "0d5d13f8f873d262",
+      "axis_cap": 5,
+      "axes": [
+        "cloud service risk assessment requirements",
+        "multi-tenant architecture risk evaluation",
+        "pre-adoption cloud risk analysis",
+        "shared resource security risks",
+        "internet-based service delivery risks"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.50(a)",
+      "text_hash": "2658796a009f72bc",
+      "axis_cap": 5,
+      "axes": [
+        "deployment model complexity",
+        "technology infrastructure sophistication",
+        "system architecture design tier",
+        "operational deployment capability level",
+        "implementation complexity classification"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.50(b)",
+      "text_hash": "b291d54108230655",
+      "axis_cap": 5,
+      "axes": [
+        "cloud infrastructure adoption",
+        "legacy system migration",
+        "technology platform transition",
+        "system modernization timeline",
+        "infrastructure deployment methodology"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.50(c)",
+      "text_hash": "e20c5a442c8a7a9b",
+      "axis_cap": 5,
+      "axes": [
+        "cloud infrastructure geographic location",
+        "geopolitical risk assessment",
+        "cross-border data residency requirements",
+        "legal jurisdiction compliance impediments",
+        "regulatory requirement enforceability by jurisdiction"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.50(d)",
+      "text_hash": "f02f9880892f29b1",
+      "axis_cap": 5,
+      "axes": [
+        "data segregation requirements",
+        "tenant isolation mechanisms",
+        "shared infrastructure governance",
+        "co-mingled data risk management",
+        "multi-tenant environment controls"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.50(e)",
+      "text_hash": "ffe5a438b4bd294d",
+      "axis_cap": 5,
+      "axes": [
+        "vendor lock-in risk mitigation",
+        "application portability requirements",
+        "system interoperability standards",
+        "data migration and switching capability",
+        "multi-vendor technical compatibility"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.50(f)",
+      "text_hash": "f105443bfb9d9387",
+      "axis_cap": 5,
+      "axes": [
+        "cloud infrastructure security customization",
+        "data protection controls",
+        "technology system security configuration",
+        "infrastructure hardening options",
+        "security baseline flexibility"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.50(g)",
+      "text_hash": "f58dffe7be794ba2",
+      "axis_cap": 5,
+      "axes": [
+        "third-party cyber risk",
+        "cloud service provider dependency",
+        "operational resilience to cyber threats",
+        "outsourced infrastructure security exposure",
+        "concentration risk in service providers"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.50(h)",
+      "text_hash": "8bb10a03b41dfd6f",
+      "axis_cap": 5,
+      "axes": [
+        "cloud service provider exit procedures",
+        "data recovery and retrieval upon termination",
+        "third-party service termination requirements",
+        "operational continuity after vendor exit",
+        "data security during service transition"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.50(i)",
+      "text_hash": "bf9d248d84f2a512",
+      "axis_cap": 5,
+      "axes": [
+        "cloud service provider liability scope",
+        "service provider responsibility allocation",
+        "cloud vendor limitation of liability",
+        "demarcation of contractual obligations",
+        "cloud service provider accountability framework"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.50(j)",
+      "text_hash": "1418c66aed32ea6f",
+      "axis_cap": 5,
+      "axes": [
+        "cloud computing capability maintenance",
+        "regulatory compliance on ongoing basis",
+        "international standards compliance",
+        "cloud infrastructure operational continuity",
+        "technology standard adherence"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.51",
+      "text_hash": "7efdc66fc018566e",
+      "axis_cap": 5,
+      "axes": [
+        "public cloud infrastructure risk assessment",
+        "critical system control framework",
+        "alternative risk management practice justification",
+        "control measure effectiveness demonstration",
+        "regulatory deviation burden of proof"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.52",
+      "text_hash": "693cde5d3521c03a",
+      "axis_cap": 5,
+      "axes": [
+        "customer data protection requirements",
+        "cloud service information safeguards",
+        "data ownership and control retention",
+        "cryptographic key management",
+        "unauthorized access and disclosure prevention"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.53",
+      "text_hash": "d81dfd063f8381f2",
+      "axis_cap": 5,
+      "axes": [
+        "user access control policy",
+        "identification and authentication requirements",
+        "authorization framework for IT assets",
+        "risk-based access granularity",
+        "unauthorized access risk management"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.54",
+      "text_hash": "fbe62842295d81a8",
+      "axis_cap": 5,
+      "axes": [
+        "adherence to regulatory principles",
+        "financial institution governance framework",
+        "principles-based regulatory compliance",
+        "institutional conduct standards",
+        "regulatory principle implementation requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.54(a)",
+      "text_hash": "6f725944c7d23ac6",
+      "axis_cap": 5,
+      "axes": [
+        "default access control posture",
+        "explicit authorization requirement",
+        "IT asset access governance",
+        "principle of least privilege implementation",
+        "user access approval framework"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.54(b)",
+      "text_hash": "88c8bc01836ebece",
+      "axis_cap": 5,
+      "axes": [
+        "least privilege access control principle",
+        "user permission scope limitation",
+        "role-based access rights assignment",
+        "IT asset access authorization",
+        "minimum necessary system permissions"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.54(c)",
+      "text_hash": "97f5d68ead34a8c7",
+      "axis_cap": 5,
+      "axes": [
+        "temporary access provisioning",
+        "time-limited credential grant",
+        "access duration restrictions",
+        "work-based access scope",
+        "session expiration policy"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.54(d)",
+      "text_hash": "28729148d69a4d3b",
+      "axis_cap": 5,
+      "axes": [
+        "segregation of duties framework",
+        "system security feature modification controls",
+        "independent operation authority limitations",
+        "dual-control and approval requirements",
+        "security circumvention prevention mechanisms"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.54(i)",
+      "text_hash": "1cc10e1f47338eb3",
+      "axis_cap": 5,
+      "axes": [
+        "authentication strength requirements",
+        "risk-based access control",
+        "remote access security",
+        "critical activity protection",
+        "environmental risk differentiation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.54(ii)",
+      "text_hash": "2da8f1b346bc550e",
+      "axis_cap": 5,
+      "axes": [
+        "identity verification robustness standards",
+        "credential provisioning requirements",
+        "impersonation risk mitigation",
+        "user authentication method specification",
+        "identity proofing procedures"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.54(iii)",
+      "text_hash": "048ac225cf1a0040",
+      "axis_cap": 5,
+      "axes": [
+        "user identity uniqueness requirement",
+        "credential-to-user mapping",
+        "access accountability mechanism",
+        "confidential asset access control",
+        "authentication binding standard"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.54(iv)",
+      "text_hash": "a601315e0d775bc1",
+      "axis_cap": 5,
+      "axes": [
+        "information technology infrastructure",
+        "operational systems environment",
+        "technology platform configuration",
+        "system operations scope",
+        "IT service delivery perimeter"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.54(e)",
+      "text_hash": "c75c22b1a367d169",
+      "axis_cap": 5,
+      "axes": [
+        "dual authorization requirements",
+        "transaction control framework",
+        "access control procedures",
+        "segregation of duties",
+        "activity risk classification"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.54(f)",
+      "text_hash": "7f2dc31a4c4ca5e0",
+      "axis_cap": 5,
+      "axes": [
+        "user authentication mechanisms",
+        "authorization framework design",
+        "asset criticality classification",
+        "access control risk-based tiering",
+        "IT security control implementation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.55",
+      "text_hash": "14dff7b92dc95464",
+      "axis_cap": 5,
+      "axes": [
+        "multi-factor authentication requirement",
+        "social engineering attack mitigation",
+        "authentication factor composition",
+        "critical system access control",
+        "biometric and possession factor implementation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.56",
+      "text_hash": "f4f46d2ecd0bf7ec",
+      "axis_cap": 5,
+      "axes": [
+        "user access control matrix",
+        "role-based access rights definition",
+        "access authorization and approval structure",
+        "periodic access rights review cadence",
+        "access matrix maintenance requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.57(a)",
+      "text_hash": "0e32eccfc600878a",
+      "axis_cap": 5,
+      "axes": [
+        "access control management",
+        "system access monitoring",
+        "enterprise-wide access governance",
+        "access control effectiveness",
+        "information security controls"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.57(b)",
+      "text_hash": "5355b5720e339e76",
+      "axis_cap": 5,
+      "axes": [
+        "cyber incident detection and flagging",
+        "incident investigation procedures",
+        "containment protocols",
+        "anomaly identification mechanisms",
+        "incident response timeliness"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 10.57(c)",
+      "text_hash": "29b06eb4db42eacb",
+      "axis_cap": 5,
+      "axes": [
+        "user activity logging in critical systems",
+        "audit trail retention period",
+        "log review cadence and timeliness",
+        "cybersecurity incident investigation support",
+        "operational record retention requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.1",
+      "text_hash": "327eb866e1d17cd7",
+      "axis_cap": 5,
+      "axes": [
+        "cyber risk management governance",
+        "enterprise-wide cyber risk accountability",
+        "business and technology line coordination",
+        "collective responsibility for cyber risk",
+        "cyber risk management organizational structure"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.2",
+      "text_hash": "9eb3e2a464566e62",
+      "axis_cap": 5,
+      "axes": [
+        "cyber risk governance framework",
+        "cyber resilience objectives and risk tolerance",
+        "operational resilience against cyber attacks",
+        "cyber threat identification and protection capabilities",
+        "third-party cyber risk management"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.3",
+      "text_hash": "219617b553830407",
+      "axis_cap": 5,
+      "axes": [
+        "capital reserve fund minimum composition",
+        "required fund components",
+        "capital reserve fund structure",
+        "mandatory reserve fund elements",
+        "baseline capital reserve requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.3(a)",
+      "text_hash": "13de01d0351589fb",
+      "axis_cap": 5,
+      "axes": [
+        "cyber risk landscape assessment",
+        "institutional cyber risk awareness",
+        "business operation cyber exposure",
+        "cybersecurity posture evaluation",
+        "cyber risk context understanding"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.3(b)",
+      "text_hash": "4a1dab85ac18e0e7",
+      "axis_cap": 5,
+      "axes": [
+        "critical system identification and classification",
+        "information asset inventory and assessment",
+        "operational interdependency mapping",
+        "cyber risk profile documentation",
+        "third-party connectivity assessment"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.3(c)",
+      "text_hash": "398b7d69c7ee235c",
+      "axis_cap": 5,
+      "axes": [
+        "cybersecurity threat identification and assessment",
+        "vulnerability identification and remediation",
+        "cybersecurity countermeasure implementation",
+        "digital service resilience against cyber-attacks",
+        "reputational risk management from cyber incidents"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.3(d)",
+      "text_hash": "b65994e47a7f1b3b",
+      "axis_cap": 5,
+      "axes": [
+        "cybersecurity architecture standards",
+        "defense-in-depth implementation requirements",
+        "zero-trust security framework adoption",
+        "data and infrastructure protection measures",
+        "evolving threat mitigation practices"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.3(e)",
+      "text_hash": "717d350d7103fa3c",
+      "axis_cap": 5,
+      "axes": [
+        "cybersecurity incident detection timeliness",
+        "continuous monitoring infrastructure",
+        "surveillance system requirements",
+        "real-time threat identification",
+        "incident detection methodology"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.3(f)",
+      "text_hash": "4a374c04ad882da0",
+      "axis_cap": 5,
+      "axes": [
+        "incident response procedures",
+        "crisis management planning",
+        "cyber breach containment protocols",
+        "recovery time objectives",
+        "damage mitigation frameworks"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.3(g)",
+      "text_hash": "3aa5135b8b525d9e",
+      "axis_cap": 5,
+      "axes": [
+        "interinstitutional information sharing protocols",
+        "cyber resilience collaboration frameworks",
+        "fraud prevention coordination mechanisms",
+        "financial market infrastructure participation",
+        "secure data exchange standards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.3(h)",
+      "text_hash": "930bafc1e2a61cca",
+      "axis_cap": 5,
+      "axes": [
+        "technology asset inventory management",
+        "centralized asset tracking systems",
+        "automated inventory control mechanisms",
+        "technology infrastructure cataloging",
+        "asset lifecycle documentation requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.3(i)",
+      "text_hash": "f5911116530c7c0a",
+      "axis_cap": 5,
+      "axes": [
+        "cyber risk management function",
+        "cyber threat analysis",
+        "cyber risk assessment",
+        "threat intelligence timeliness",
+        "cyber risk reporting"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.4",
+      "text_hash": "d0ad6a63495367e4",
+      "axis_cap": 5,
+      "axes": [
+        "critical infrastructure designation criteria",
+        "cybersecurity compliance requirements",
+        "regulatory agency directive implementation",
+        "national cybersecurity standards adoption",
+        "NCII entity obligations and governance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.5",
+      "text_hash": "74260c283f6fca00",
+      "axis_cap": 5,
+      "axes": [
+        "control framework adoption",
+        "internal control requirements",
+        "institutional governance standards",
+        "risk mitigation procedures",
+        "compliance control design"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 Appendix 5",
+      "text_hash": "5e8de92935397324",
+      "axis_cap": 5,
+      "axes": [
+        "cyber attack resilience",
+        "operational continuity under cyber threats",
+        "cyber incident preparedness",
+        "information security risk mitigation",
+        "business resilience requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.6",
+      "text_hash": "1bec8bc78a1198fd",
+      "axis_cap": 5,
+      "axes": [
+        "adversarial simulation testing frequency",
+        "infrastructure vulnerability assessment cadence",
+        "red team exercise requirements",
+        "proactive threat identification methodology",
+        "triennial security testing mandate"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.7",
+      "text_hash": "09d3f10835237bd7",
+      "axis_cap": 5,
+      "axes": [
+        "crowdsourced security testing programs",
+        "supplementary security assessment methods",
+        "IT environment security testing",
+        "service provider credibility requirements",
+        "third-party cybersecurity vendor management"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.8",
+      "text_hash": "918f40c0024d98e2",
+      "axis_cap": 5,
+      "axes": [
+        "cybersecurity operational responsibilities",
+        "cyber-attack lifecycle phase management",
+        "risk mitigation measures implementation",
+        "cybersecurity governance framework",
+        "business continuity cyber resilience"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.8(a)",
+      "text_hash": "d393570a2a4d3a1c",
+      "axis_cap": 5,
+      "axes": [
+        "information gathering activities",
+        "threat assessment methodology",
+        "surveillance and monitoring scope",
+        "preliminary investigation procedures",
+        "risk identification techniques"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.8(b)",
+      "text_hash": "af5085bbffda5086",
+      "axis_cap": 5,
+      "axes": [
+        "weapons development regulation",
+        "military technology control",
+        "dual-use technology oversight",
+        "export restrictions for armaments",
+        "proliferation risk management"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.8(c)",
+      "text_hash": "bae96b0ba78aa30d",
+      "axis_cap": 5,
+      "axes": [
+        "service delivery mechanisms",
+        "distribution channels",
+        "operational delivery requirements",
+        "performance delivery standards",
+        "delivery infrastructure"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.8(d)",
+      "text_hash": "eb00cb6e7a823d87",
+      "axis_cap": 5,
+      "axes": [
+        "exploitation definition and scope",
+        "abusive conduct classification",
+        "harm to vulnerable persons",
+        "illicit activity categorization",
+        "consumer protection violation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.8(e)",
+      "text_hash": "df0dbabf8ac0e43d",
+      "axis_cap": 5,
+      "axes": [
+        "physical infrastructure deployment",
+        "equipment commissioning procedures",
+        "facility setup requirements",
+        "system implementation timeline",
+        "on-site installation standards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.8(f)",
+      "text_hash": "25b7fdf67ed5ce94",
+      "axis_cap": 5,
+      "axes": [
+        "regulatory enforcement mechanism",
+        "direct regulatory authority",
+        "prescriptive compliance requirement",
+        "regulator-mandated control structure",
+        "administrative directive implementation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.8(g)",
+      "text_hash": "7d8a1c6a513a5fee",
+      "axis_cap": 5,
+      "axes": [
+        "data exfiltration risk",
+        "unauthorized data removal",
+        "information security breach",
+        "data loss prevention",
+        "cyber incident classification"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.9",
+      "text_hash": "29b3d32228da51e7",
+      "axis_cap": 5,
+      "axes": [
+        "technology infrastructure monitoring",
+        "anomaly detection in systems",
+        "security control compromise prevention",
+        "proactive threat detection requirements",
+        "security posture maintenance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.9(a)",
+      "text_hash": "d65044b823ee1231",
+      "axis_cap": 5,
+      "axes": [
+        "security operations center establishment",
+        "cybersecurity monitoring infrastructure",
+        "security personnel competency requirements",
+        "technology security tools and systems",
+        "proactive threat detection capabilities"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.9(b)",
+      "text_hash": "9828d46f0359b061",
+      "axis_cap": 5,
+      "axes": [
+        "critical systems monitoring scope",
+        "supporting infrastructure monitoring coverage",
+        "operational resilience monitoring perimeter",
+        "system criticality assessment",
+        "monitoring comprehensiveness requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.9(c)",
+      "text_hash": "ea33db2e71fabbb1",
+      "axis_cap": 5,
+      "axes": [
+        "vulnerability assessment frequency",
+        "penetration testing cadence",
+        "security posture review periodicity",
+        "cybersecurity testing methodology",
+        "internal security evaluation requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.10",
+      "text_hash": "eb609c15445d93ff",
+      "axis_cap": 5,
+      "axes": [
+        "cyber threat intelligence collection and analysis",
+        "cyber threat detection processes",
+        "data breach incident identification",
+        "misinformation monitoring over digital channels",
+        "threat information evaluation procedures"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.11",
+      "text_hash": "d794e74859921d71",
+      "axis_cap": 5,
+      "axes": [
+        "anomalous activity investigation protocols",
+        "incident response escalation procedures",
+        "complexity-based response differentiation",
+        "flagged activity handling requirements",
+        "cyber incident response framework"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.12",
+      "text_hash": "4a689582fb5b2349",
+      "axis_cap": 5,
+      "axes": [
+        "cyber crisis management policy framework",
+        "cyber incident scenario planning and response",
+        "cyber incident escalation procedures",
+        "business continuity and disaster recovery planning",
+        "cyber incident stakeholder communication protocols"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.13",
+      "text_hash": "3e5008dbcca05818",
+      "axis_cap": 5,
+      "axes": [
+        "incident response plan requirements",
+        "cybersecurity incident procedures",
+        "comprehensive response framework",
+        "incident management governance",
+        "cyber risk mitigation planning"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.13(a)",
+      "text_hash": "9529c382a0c64414",
+      "axis_cap": 5,
+      "axes": [
+        "incident response team governance structure",
+        "cybersecurity incident escalation procedures",
+        "roles and responsibilities definition",
+        "incident response invocation triggers",
+        "emergency response reporting hierarchy"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.13(b)",
+      "text_hash": "749bf7b9ec850ed2",
+      "axis_cap": 5,
+      "axes": [
+        "incident detection mechanisms",
+        "damage assessment procedures",
+        "forensic evidence preservation",
+        "compromise identification processes",
+        "incident response timeliness"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.13(c)",
+      "text_hash": "4157f014dd21654e",
+      "axis_cap": 5,
+      "axes": [
+        "incident containment procedures",
+        "threat removal and eradication",
+        "business continuity restoration",
+        "damage minimization measures",
+        "remedial action implementation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.13(d)",
+      "text_hash": "8259749cedae73a5",
+      "axis_cap": 5,
+      "axes": [
+        "incident recovery procedures",
+        "business continuity contingency planning",
+        "operational resilience redundancy requirements",
+        "recovery time objectives",
+        "post-incident resumption protocols"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.14",
+      "text_hash": "9b8d313e70eec6cf",
+      "axis_cap": 5,
+      "axes": [
+        "incident response team member competency",
+        "incident response plan familiarity",
+        "crisis management personnel training",
+        "emergency contact availability requirements",
+        "business continuity team accessibility"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.15",
+      "text_hash": "f53b3f4e312f0e52",
+      "axis_cap": 5,
+      "axes": [
+        "out-of-band communication infrastructure",
+        "business continuity communication channels",
+        "crisis communication redundancy",
+        "stakeholder notification during service disruption",
+        "primary system backup communication protocols"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.16",
+      "text_hash": "2bc351b5a93eb491",
+      "axis_cap": 5,
+      "axes": [
+        "crisis incident response plan testing frequency",
+        "cyber threat scenario coverage and design",
+        "out-of-band communication method validation",
+        "board and senior management participation in drills",
+        "third-party service provider involvement in exercises"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.16(a)",
+      "text_hash": "59cf1b40d538314c",
+      "axis_cap": 5,
+      "axes": [
+        "cyber incident escalation procedures",
+        "internal communication protocols for incidents",
+        "external communication protocols for incidents",
+        "incident impact level classification",
+        "incident response decision-making framework"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.16(b)",
+      "text_hash": "4adda6bf78872a0f",
+      "axis_cap": 5,
+      "axes": [
+        "incident response team readiness",
+        "third party service provider coordination",
+        "recovery process effectiveness",
+        "cyber emergency response capability",
+        "disaster recovery support arrangements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.17",
+      "text_hash": "e6e0c6db5700c13b",
+      "axis_cap": 5,
+      "axes": [
+        "cyber loss provisioning adequacy",
+        "extreme adverse event scenario analysis",
+        "cyber incident impact mitigation",
+        "cyber insurance coverage assessment",
+        "loss reserve sufficiency review"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.17(a)",
+      "text_hash": "5d0ff1234be8e987",
+      "axis_cap": 5,
+      "axes": [
+        "insurance policy scope adequacy",
+        "information security event coverage",
+        "liability risk coverage assessment",
+        "operational risk exposure mapping",
+        "insurance-risk alignment requirement"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.17(b)",
+      "text_hash": "3924a8d349ef8620",
+      "axis_cap": 5,
+      "axes": [
+        "insurance policy terms and conditions documentation",
+        "warranty and attestation coverage alignment",
+        "crisis response procedure integration",
+        "IT service change impact on insurance coverage",
+        "unintended coverage exclusion prevention"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.17(c)",
+      "text_hash": "801ad32d3a37434a",
+      "axis_cap": 5,
+      "axes": [
+        "cyber insurance policy obligations and operational independence",
+        "conflict of interest management in insurance arrangements",
+        "insurer cost minimization versus policyholder interests",
+        "expert appointment and recommendation acceptance protocols",
+        "financial institution fiduciary duty preservation under insurance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.18",
+      "text_hash": "2f17ddc7bc35438a",
+      "axis_cap": 5,
+      "axes": [
+        "cyber incident notification requirement",
+        "operational risk reporting obligation",
+        "business continuity incident disclosure",
+        "regulator notification timeline and process",
+        "merchant acquiring service incident reporting"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.19",
+      "text_hash": "cea078dc7f7d75fc",
+      "axis_cap": 5,
+      "axes": [
+        "cyber threat intelligence sharing obligations",
+        "industry information sharing platforms",
+        "threat intelligence participation requirements",
+        "resource allocation for collaborative initiatives",
+        "data protection compliance in information sharing"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 11.20",
+      "text_hash": "a7fdbfe5fe85fd95",
+      "axis_cap": 5,
+      "axes": [
+        "cyber threat collaboration frameworks",
+        "stakeholder coordination in cybersecurity",
+        "regulatory authority engagement requirements",
+        "information sharing on cyber incidents",
+        "cooperative defense mechanisms"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.1",
+      "text_hash": "fcc362912e4277df",
+      "axis_cap": 5,
+      "axes": [
+        "digital service security controls",
+        "technology risk management integration",
+        "cybersecurity framework expansion",
+        "digital service assurance requirements",
+        "financial institution risk governance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.1(a)",
+      "text_hash": "1a4ebf0d9452c930",
+      "axis_cap": 5,
+      "axes": [
+        "minimum security control standards",
+        "delivery channel security requirements",
+        "confidentiality and integrity safeguards",
+        "customer information protection measures",
+        "regular security assessment cadence"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.1(b)",
+      "text_hash": "d508eb68ed1df4e1",
+      "axis_cap": 5,
+      "axes": [
+        "user authentication requirements",
+        "transaction authorization controls",
+        "impersonation risk mitigation",
+        "fraud prevention measures",
+        "minimum security control standards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.1(c)",
+      "text_hash": "dec0233ee406e3db",
+      "axis_cap": 5,
+      "axes": [
+        "physical security controls",
+        "logical access controls",
+        "control measure implementation",
+        "information system safeguards",
+        "facility protection requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.2",
+      "text_hash": "cb844f43b0334e35",
+      "axis_cap": 5,
+      "axes": [
+        "digital services security control implementation",
+        "security control compliance timeline",
+        "phased implementation requirements",
+        "digital infrastructure security standards",
+        "transitional compliance obligations"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.2(a)",
+      "text_hash": "673df787df97eaa3",
+      "axis_cap": 5,
+      "axes": [
+        "alternative compliance pathway documentation",
+        "equivalence demonstration requirements",
+        "mitigation effectiveness justification",
+        "comparative effectiveness disclosure",
+        "substantiation of alternative measures"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.2(b)",
+      "text_hash": "21df208b9add79fa",
+      "axis_cap": 5,
+      "axes": [
+        "fraud liability allocation",
+        "control gap consequences",
+        "control deficiency accountability",
+        "fraud risk responsibility",
+        "operational control failure liability"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.3",
+      "text_hash": "a6940495af5a5ec8",
+      "axis_cap": 5,
+      "axes": [
+        "digital fraud threat monitoring",
+        "cyber defense enhancement requirements",
+        "financial institution fraud vigilance obligations",
+        "customer protection against emerging fraud",
+        "cyber risk framework strengthening"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.3(a)",
+      "text_hash": "a6a703637bcceee6",
+      "axis_cap": 5,
+      "axes": [
+        "cybersecurity threat identification scope",
+        "customer device security coverage",
+        "mobile device risk management",
+        "network access point security",
+        "countermeasure implementation scope"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.3(b)",
+      "text_hash": "389785f392fd90b4",
+      "axis_cap": 5,
+      "axes": [
+        "defense-in-depth security architecture",
+        "mobile application security controls",
+        "customer device data protection",
+        "banking data encryption and safeguarding",
+        "digital service application security requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.3(c)",
+      "text_hash": "0c653c1c22f839cb",
+      "axis_cap": 5,
+      "axes": [
+        "continuous threat monitoring and detection",
+        "mobile application security surveillance",
+        "vulnerability remediation timeliness",
+        "security control upgrade protocols",
+        "digital service endpoint protection"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.3(d)",
+      "text_hash": "5b9819537b6cfbb4",
+      "axis_cap": 5,
+      "axes": [
+        "incident response procedures",
+        "cybersecurity breach containment",
+        "customer notification protocols",
+        "digital service security incident management",
+        "damage mitigation procedures"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.3(e)",
+      "text_hash": "f3cf977a57e3fe7e",
+      "axis_cap": 5,
+      "axes": [
+        "operational coordination framework",
+        "incident response procedures",
+        "fraud defense capability",
+        "countermeasure deployment speed",
+        "multi-function institution governance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.3(f)",
+      "text_hash": "4ca1843eec880dd4",
+      "axis_cap": 5,
+      "axes": [
+        "senior management review cadence for fraud controls",
+        "digital fraud management effectiveness assessment",
+        "fraud escalation threshold definition",
+        "victim impact consideration in fraud response",
+        "emerging fraud environment monitoring"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.3(g)",
+      "text_hash": "8d707b6cf29a1f8d",
+      "axis_cap": 5,
+      "axes": [
+        "board notification of management review outcomes",
+        "public confidence in digital service security",
+        "reputation risk mitigation",
+        "management review reporting to governance",
+        "industry reputation protection"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.4",
+      "text_hash": "ffe008b342f8cef7",
+      "axis_cap": 5,
+      "axes": [
+        "fraud detection rule update cadence",
+        "account takeover prevention mechanisms",
+        "fraud pattern identification and response",
+        "risk analytics for fraud detection",
+        "continuous fraud detection capability enhancement"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.5",
+      "text_hash": "445484c0bd8337aa",
+      "axis_cap": 5,
+      "axes": [
+        "digital service risk mitigation",
+        "operational risk from technology delivery",
+        "digital channel risk management",
+        "technology infrastructure risk governance",
+        "service delivery resilience requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.5(a)",
+      "text_hash": "9784e5e846b7b8c5",
+      "axis_cap": 5,
+      "axes": [
+        "phishing risk mitigation",
+        "secure communication channel requirements",
+        "compensating control framework",
+        "communication channel security standards",
+        "exploit vulnerability management"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.5(b)",
+      "text_hash": "174c8f87ea1296c1",
+      "axis_cap": 5,
+      "axes": [
+        "customer advance notification requirements",
+        "control implementation communication",
+        "user adoption facilitation",
+        "operational disruption mitigation",
+        "pre-deployment customer disclosure"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.5(c)",
+      "text_hash": "6303cebeb8658051",
+      "axis_cap": 5,
+      "axes": [
+        "customer authentication verification methods",
+        "outsourced service provider identification",
+        "call authenticity verification procedures",
+        "customer communication channel security",
+        "third-party service provider transparency requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.6",
+      "text_hash": "3956e18fae1d25a4",
+      "axis_cap": 5,
+      "axes": [
+        "customer control over payment card transaction types",
+        "digital fraud risk mitigation mechanisms",
+        "card activation and deactivation functionality",
+        "financial institution liability for digital service security",
+        "duty of care in digital banking services"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.7",
+      "text_hash": "dd6a2f9280a07926",
+      "axis_cap": 5,
+      "axes": [
+        "consumer awareness programme effectiveness",
+        "digital services fraud risk education",
+        "customer competency in cybersecurity",
+        "continuous review of security training",
+        "financial institution customer education requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.7(a)",
+      "text_hash": "1bfc36653f7f9b16",
+      "axis_cap": 5,
+      "axes": [
+        "fraud detection awareness content",
+        "modus operandi intelligence dissemination",
+        "timely threat information updates",
+        "staff fraud training materials",
+        "emerging fraud risk communication"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.7(b)",
+      "text_hash": "22b55669c5fa9696",
+      "axis_cap": 5,
+      "axes": [
+        "customer communication on authentication methods",
+        "genuine channel verification guidance",
+        "security measure disclosure requirements",
+        "e-banking website authenticity verification",
+        "mobile application security transparency"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.7(c)",
+      "text_hash": "0a7db44702d7a096",
+      "axis_cap": 5,
+      "axes": [
+        "real-time risk alerting mechanisms",
+        "security control implementation monitoring",
+        "absence of protective measure detection",
+        "operational risk notification timing",
+        "control gap identification and escalation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.7(d)",
+      "text_hash": "3a3012d509a90d91",
+      "axis_cap": 5,
+      "axes": [
+        "customer fraud risk awareness",
+        "security feature education methods",
+        "interactive training delivery mechanisms",
+        "customer financial literacy programs",
+        "fraud prevention control communication"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.8",
+      "text_hash": "10ec4c558d7214cc",
+      "axis_cap": 5,
+      "axes": [
+        "customer fraud reporting mechanisms",
+        "account suspension procedures",
+        "account reactivation procedures",
+        "fraud response timeliness requirements",
+        "customer access to account control features"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.8(a)",
+      "text_hash": "ba37290be337b05a",
+      "axis_cap": 5,
+      "axes": [
+        "self-service account deactivation mechanism",
+        "consumer control over account access",
+        "security features for account termination",
+        "user-initiated service suspension capability",
+        "emergency account shutdown procedures"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.8(b)",
+      "text_hash": "214c3f12b9cf0a0b",
+      "axis_cap": 5,
+      "axes": [
+        "customer service center staffing adequacy",
+        "contact center operational effectiveness",
+        "customer assistance response timeliness",
+        "distressed customer support capability",
+        "consumer service resource allocation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.8(c)",
+      "text_hash": "60ed1dedeb2e55ce",
+      "axis_cap": 5,
+      "axes": [
+        "customer access restoration timeline",
+        "digital service continuity recovery",
+        "service outage remediation standards",
+        "validation procedures for service reinstatement",
+        "reasonable timeframe definition for recovery"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.9",
+      "text_hash": "7d74a570d8da84c0",
+      "axis_cap": 5,
+      "axes": [
+        "fraud risk mitigation measures",
+        "customer data breach response",
+        "incident handling procedures",
+        "customer protection requirements",
+        "compromise disclosure and remediation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.9(a)",
+      "text_hash": "0b0a802906bfdb65",
+      "axis_cap": 5,
+      "axes": [
+        "customer account monitoring intensity",
+        "affected customer identification and oversight",
+        "monitoring scope and coverage",
+        "account-level supervisory procedures",
+        "customer risk assessment frequency"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.9(b)",
+      "text_hash": "90298a08b3fdcc1c",
+      "axis_cap": 5,
+      "axes": [
+        "customer notification requirements",
+        "fraud risk mitigation disclosure",
+        "consumer information provision",
+        "incident communication procedures",
+        "protective measure guidance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 12.9(c)",
+      "text_hash": "da190b5c4587bfe1",
+      "axis_cap": 5,
+      "axes": [
+        "credential revocation and reissuance procedures",
+        "payment instrument compromise response",
+        "fraud detection and remediation protocols",
+        "data breach credential management",
+        "exploitation risk mitigation mechanisms"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 13.1",
+      "text_hash": "49c30daf6a1d970f",
+      "axis_cap": 5,
+      "axes": [
+        "technology audit scope determination",
+        "audit frequency calibration",
+        "audit intensity adjustment",
+        "system criticality assessment",
+        "risk-based audit planning"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 13.2",
+      "text_hash": "a747527599837eb8",
+      "axis_cap": 5,
+      "axes": [
+        "technology audit plan annual review",
+        "critical technology services audit frequency",
+        "third-party service provider audit coverage",
+        "external system interface audit scope",
+        "post-implementation review requirements for technology enhancements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 13.3",
+      "text_hash": "a6bb70e351f1c822",
+      "axis_cap": 5,
+      "axes": [
+        "internal audit function staffing requirements",
+        "technology audit specialist competencies",
+        "professional certification standards for auditors",
+        "audit resource adequacy and allocation",
+        "auditor knowledge of technology systems"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 13.4",
+      "text_hash": "2061319dbae9fdd8",
+      "axis_cap": 5,
+      "axes": [
+        "technology audit independence and objectivity",
+        "advisory role conflict management",
+        "third-party service provider oversight",
+        "post-implementation review scope",
+        "internal audit planning phase involvement"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 14.1",
+      "text_hash": "807ba71a1e6c2672",
+      "axis_cap": 5,
+      "axes": [
+        "data centre resilience assessment frequency",
+        "external service provider technical competence requirements",
+        "third-party data centre assurance reliance criteria",
+        "board-level governance of infrastructure risk assessments",
+        "material change triggers for reassessment"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 14.2",
+      "text_hash": "e7f27d18a7d2f029",
+      "axis_cap": 5,
+      "axes": [
+        "network resilience assessment cadence",
+        "external service provider appointment requirements",
+        "risk assessment scope and coverage",
+        "board-level governance of resilience outcomes",
+        "proportionate control alignment with risk appetite"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 15.1",
+      "text_hash": "249b2f0bca999b67",
+      "axis_cap": 5,
+      "axes": [
+        "cybersecurity awareness training cadence",
+        "staff technology education requirements",
+        "training program effectiveness measurement",
+        "cyber threat landscape currency",
+        "third-party service provider inclusion in training"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 15.2",
+      "text_hash": "851468e304819e65",
+      "axis_cap": 5,
+      "axes": [
+        "staff competency requirements",
+        "technology operations training",
+        "cybersecurity personnel training",
+        "risk management staff qualification",
+        "continuous professional development"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 15.3",
+      "text_hash": "d7cb3f2801ca6dbd",
+      "axis_cap": 5,
+      "axes": [
+        "board member technology competency",
+        "board oversight capability requirements",
+        "technology awareness training cadence",
+        "governance training on emerging technologies",
+        "director knowledge and information provision"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 16.1",
+      "text_hash": "77ba46135cc8d023",
+      "axis_cap": 5,
+      "axes": [
+        "digital service launch notification requirements",
+        "regulatory pre-approval for digital offerings",
+        "enhanced digital service disclosure procedures",
+        "financial institution notification timing",
+        "new product introduction regulatory oversight"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 16.2",
+      "text_hash": "90f45ec3803dfdf7",
+      "axis_cap": 5,
+      "axes": [
+        "digital service launch requirements",
+        "new product notification procedures",
+        "regulatory submission obligations",
+        "compliance measures for novel services",
+        "central bank notification protocols"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 16.2(a)",
+      "text_hash": "1f00ca8f1c5af94a",
+      "axis_cap": 5,
+      "axes": [
+        "risk identification and assessment",
+        "risk management strategy development",
+        "accountability assignment for risk oversight",
+        "risk control framework design",
+        "risk mitigation policy formulation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 16.2(b)",
+      "text_hash": "bbdaecac30e32309",
+      "axis_cap": 5,
+      "axes": [
+        "information security controls",
+        "physical security measures",
+        "access control frameworks",
+        "security incident response procedures",
+        "security governance and oversight"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 16.2(c)",
+      "text_hash": "56aea3deea222c27",
+      "axis_cap": 5,
+      "axes": [
+        "material contract terms",
+        "condition precedent disclosure",
+        "agreement modification procedures",
+        "contractual obligation specificity",
+        "transaction documentation requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 16.2(d)",
+      "text_hash": "44b663f681414563",
+      "axis_cap": 5,
+      "axes": [
+        "client rights documentation",
+        "service commitment standards",
+        "customer protection framework",
+        "disclosure of terms and conditions",
+        "institutional accountability mechanisms"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 16.2(e)",
+      "text_hash": "37172d915397dc97",
+      "axis_cap": 5,
+      "axes": [
+        "privacy policy disclosure requirements",
+        "consumer privacy notice content",
+        "privacy statement publication",
+        "data handling transparency obligations",
+        "privacy practice communication standards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 16.2(f)",
+      "text_hash": "d3e7c836d92ce28e",
+      "axis_cap": 5,
+      "axes": [
+        "third-party outsourcing arrangements",
+        "external website link partnerships",
+        "strategic alliance governance",
+        "third-party relationship documentation",
+        "outsourcing agreement finalization"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 16.3",
+      "text_hash": "f3f59989a2e5fc0d",
+      "axis_cap": 5,
+      "axes": [
+        "digital service modification scope",
+        "enhancement criteria assessment",
+        "service upgrade eligibility",
+        "digital capability improvement threshold",
+        "existing platform enhancement requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 Appendix 6",
+      "text_hash": "a3d7c58761b36ec7",
+      "axis_cap": 5,
+      "axes": [
+        "technology enhancement notification requirements",
+        "simplified reporting framework for operational changes",
+        "risk assessment for technology modifications",
+        "risk mitigation measures documentation",
+        "regulator notification procedures for system upgrades"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 16.4",
+      "text_hash": "a91561b771f71c3e",
+      "axis_cap": 5,
+      "axes": [
+        "digital service enhancement scope",
+        "notification exemption criteria",
+        "pre-notification operational requirements",
+        "financial institution notification procedures",
+        "regulatory change management framework"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 16.4(a)",
+      "text_hash": "0346a1c4d09ff3a5",
+      "axis_cap": 5,
+      "axes": [
+        "independent external assurance requirement",
+        "technology risk assessment",
+        "digital service security controls",
+        "third-party audit engagement",
+        "assurance reporting format"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 16.4(b)",
+      "text_hash": "a71bbbe3903aa47a",
+      "axis_cap": 5,
+      "axes": [
+        "digital services readiness attestation",
+        "chief information security officer sign-off requirements",
+        "senior management governance approval for digital initiatives",
+        "material enhancement notification and confirmation",
+        "board-level oversight of digital service implementation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 16.5",
+      "text_hash": "1490ca95d6a41f1f",
+      "axis_cap": 5,
+      "axes": [
+        "independent external assurance provider qualification",
+        "assurance provider competence requirements",
+        "assurance provider track record assessment",
+        "scope of independent assurance coverage",
+        "assurance compliance with regulatory standards"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 16.6",
+      "text_hash": "b13087fc4c218592",
+      "axis_cap": 5,
+      "axes": [
+        "document submission upon regulator request",
+        "regulatory information disclosure obligations",
+        "supervisory access to institutional records",
+        "regulator-initiated document review",
+        "compliance with examination demands"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 16.7",
+      "text_hash": "5fe0bed55077f4ce",
+      "axis_cap": 5,
+      "axes": [
+        "digital services launch notification procedures",
+        "pre-approval deployment of digital enhancements",
+        "cloud services regulatory consultation requirements",
+        "emerging technology implementation notification framework",
+        "compliance certification for technology service offerings"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 17.1",
+      "text_hash": "08927938b28b7a8a",
+      "axis_cap": 5,
+      "axes": [
+        "cloud technology adoption approval process",
+        "emerging technology risk assessment requirements",
+        "critical systems technology governance",
+        "pre-adoption regulatory consultation trigger",
+        "vendor technology risk mitigation demonstration"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 17.1(a)",
+      "text_hash": "e21c446b0cbb5fef",
+      "axis_cap": 5,
+      "axes": [
+        "cloud adoption risk assessment",
+        "emerging technology risk evaluation",
+        "risk mitigation measure identification",
+        "public cloud risk framework",
+        "technology implementation impact analysis"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 Appendix 10",
+      "text_hash": "275040a0811c6d2e",
+      "axis_cap": 5,
+      "axes": [
+        "cloud service risk classification",
+        "customer data processing oversight",
+        "cross-border data transmission controls",
+        "emerging technology regulatory framework",
+        "higher-risk service compliance requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 Appendix 9",
+      "text_hash": "158f5761a0abb129",
+      "axis_cap": 5,
+      "axes": [
+        "risk assessment report format",
+        "board-level technology readiness attestation",
+        "critical system cloud adoption governance",
+        "third-party pre-implementation technology review",
+        "emerging technology deployment procedural requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 17.2",
+      "text_hash": "b63cabe656904b60",
+      "axis_cap": 5,
+      "axes": [
+        "critical system technology change notification requirements",
+        "public cloud adoption disclosure obligation",
+        "emerging technology implementation reporting",
+        "regulatory approval process for system changes",
+        "documentation and compliance evidence submission"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 17.2(a)",
+      "text_hash": "2801f6f08c5234cc",
+      "axis_cap": 5,
+      "axes": [
+        "prior consultation requirement for critical system technology",
+        "cloud computing adoption governance",
+        "emerging technology deployment approval",
+        "regulator notification of critical infrastructure changes",
+        "first-time technology implementation clearance"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 17.2(b)",
+      "text_hash": "65d14466de59e717",
+      "axis_cap": 5,
+      "axes": [
+        "cloud technology risk management",
+        "emerging technology risk framework",
+        "technology risk governance enhancement",
+        "operational technology risk management",
+        "third-party technology risk oversight"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 17.2(c)",
+      "text_hash": "5b23d272672ceba0",
+      "axis_cap": 5,
+      "axes": [
+        "independent assurance on risk management framework",
+        "cloud risk management framework governance",
+        "emerging technology risk governance",
+        "third-party attestation requirements",
+        "risk framework independent verification"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 17.2(d)",
+      "text_hash": "ff4666988d0e5f3a",
+      "axis_cap": 5,
+      "axes": [
+        "incident response plan adequacy",
+        "adverse event preparedness",
+        "third-party assurance requirements",
+        "operational continuity planning",
+        "unexpected event contingency coverage"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 17.3",
+      "text_hash": "ea81789364baaf26",
+      "axis_cap": 5,
+      "axes": [
+        "cloud adoption notification threshold",
+        "emerging technology adoption disclosure requirements",
+        "materiality standard for technology change notification",
+        "prior assessment and representation update obligations",
+        "regulatory notification exemption for non-material technology enhancements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 17.4",
+      "text_hash": "79097c1f459359a8",
+      "axis_cap": 5,
+      "axes": [
+        "regulatory authority discretionary directive power",
+        "financial institution compliance with supervisory directions",
+        "regulatory guidance deviation explanation requirements",
+        "supervisory consultation and notification procedures",
+        "regulatory timeline for directive implementation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 17.5",
+      "text_hash": "792d035e6d6565a7",
+      "axis_cap": 5,
+      "axes": [
+        "cloud services adoption roadmap",
+        "emerging technology implementation planning",
+        "outsourcing plan documentation requirements",
+        "technology risk assessment and documentation",
+        "regulatory reporting and supervisory review access"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.1",
+      "text_hash": "e1c5ad12edb4342e",
+      "axis_cap": 5,
+      "axes": [
+        "technology risk management gap analysis",
+        "compliance remediation action plan",
+        "regulatory submission deadline",
+        "ongoing compliance monitoring and assessment",
+        "enhanced requirement implementation tracking"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2",
+      "text_hash": "25fc3b1b8f8cb728",
+      "axis_cap": 5,
+      "axes": [
+        "regulatory submission requirements",
+        "self-assessment and gap analysis documentation",
+        "supervisory authority reporting",
+        "sensitive data encryption standards",
+        "removable media access controls"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(a)",
+      "text_hash": "c8a7695d1c41cb15",
+      "axis_cap": 5,
+      "axes": [
+        "fraud detection system enhancement triggers",
+        "fraud technique identification and response",
+        "fraud rule update timeliness requirements",
+        "internal fraud intelligence integration",
+        "external fraud intelligence sharing participation"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(i)",
+      "text_hash": "0c2de1ddd0e66eed",
+      "axis_cap": 5,
+      "axes": [
+        "customer data scope and supply chain visibility",
+        "information security controls enforceability",
+        "service level agreement terms and performance metrics",
+        "cloud service provider accountability and oversight",
+        "sub-contractor management and contractual alignment"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(ii)",
+      "text_hash": "5b15e701ce89a4b6",
+      "axis_cap": 5,
+      "axes": [
+        "device security verification",
+        "compromised system detection",
+        "endpoint integrity assurance",
+        "malware and compromise screening",
+        "application deployment environment controls"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(iii)",
+      "text_hash": "9be22677f504e524",
+      "axis_cap": 5,
+      "axes": [
+        "penetration testing requirement",
+        "cybersecurity vulnerability identification",
+        "vulnerability remediation obligation",
+        "system security testing",
+        "risk assessment methodology"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(b)",
+      "text_hash": "ed33ff60b679dca3",
+      "axis_cap": 5,
+      "axes": [
+        "fraud detection parameter calibration",
+        "fraud typology monitoring and assessment",
+        "fraud case management procedures",
+        "fraud playbook update cadence",
+        "cross-jurisdictional fraud intelligence integration"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(c)",
+      "text_hash": "36af42242c888228",
+      "axis_cap": 5,
+      "axes": [
+        "device fingerprinting attributes",
+        "device profile change detection",
+        "fingerprinting bypass prevention",
+        "location and network identifier tracking",
+        "operating system and hardware characteristic monitoring"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(d)",
+      "text_hash": "2b5a80a7d593d222",
+      "axis_cap": 5,
+      "axes": [
+        "authentication control bypass risks",
+        "account takeover attack vectors",
+        "identity fraud prevention mechanisms",
+        "artificial intelligence misuse threats",
+        "digital service access security"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(e)",
+      "text_hash": "2f1768bb03174c4c",
+      "axis_cap": 5,
+      "axes": [
+        "vulnerability classification criteria",
+        "risk scoring methodology",
+        "customer vulnerability identification",
+        "fraud victim protection measures",
+        "financial literacy risk adjustment"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(f)",
+      "text_hash": "2dfc616796cb05dc",
+      "axis_cap": 7,
+      "axes": [
+        "biometric authentication credential management",
+        "session hijacking detection and termination",
+        "cyber risk notification to customers",
+        "account access restoration procedures",
+        "device profiling and customer consent",
+        "suspicious transaction investigation and verification",
+        "transaction blocking notification timeline"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(g)",
+      "text_hash": "b9643aa2ecabeca6",
+      "axis_cap": 5,
+      "axes": [
+        "cyber incident loss provisioning adequacy",
+        "fraud detection capability standards",
+        "digital retail transaction monitoring",
+        "customer risk profiling for fraud detection",
+        "behavioral analysis frameworks"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(h)",
+      "text_hash": "fb11c12d541b96ed",
+      "axis_cap": 5,
+      "axes": [
+        "API security assessment frequency",
+        "penetration testing requirements",
+        "static code security testing",
+        "dynamic security testing",
+        "periodic security evaluation cadence"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(j)",
+      "text_hash": "4de5105d37d9406a",
+      "axis_cap": 5,
+      "axes": [
+        "access token revocation procedures",
+        "API key compromise response",
+        "credential management during security incidents",
+        "timely access credential withdrawal mechanisms",
+        "incident-driven system access controls"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(iv)",
+      "text_hash": "17cbe393eeea6287",
+      "axis_cap": 5,
+      "axes": [
+        "device-host communication security",
+        "end-to-end encryption requirements",
+        "secure channel establishment",
+        "data transmission protection",
+        "cryptographic communication protocols"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(v)",
+      "text_hash": "b17af2c6137203c2",
+      "axis_cap": 5,
+      "axes": [
+        "mobile device data storage restrictions",
+        "sensitive data handling on mobile platforms",
+        "mobile device security controls",
+        "information classification and device eligibility",
+        "data residency requirements for mobile systems"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(vi)",
+      "text_hash": "0bee2e8823c6315b",
+      "axis_cap": 5,
+      "axes": [
+        "transaction confirmation notification",
+        "customer notification requirements",
+        "successful transaction disclosure",
+        "real-time transaction alerting",
+        "consumer transaction acknowledgment"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(vii)",
+      "text_hash": "d7743303848f6eae",
+      "axis_cap": 5,
+      "axes": [
+        "suspicious transaction notification",
+        "customer alert mechanism",
+        "fraud detection disclosure",
+        "real-time transaction monitoring communication",
+        "suspicious activity reporting to customer"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(viii)",
+      "text_hash": "d4a1b833e7cea92c",
+      "axis_cap": 5,
+      "axes": [
+        "fraudulent application detection and removal",
+        "application distribution platform oversight",
+        "continuous monitoring requirements",
+        "counterfeit software takedown procedures",
+        "third-party marketplace compliance obligations"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(ix)",
+      "text_hash": "0ade7271b78ffa1f",
+      "axis_cap": 5,
+      "axes": [
+        "application distribution platform controls",
+        "inter-application data transfer governance",
+        "third-party platform access restrictions",
+        "software deployment channel oversight",
+        "application integration security requirements"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(x)",
+      "text_hash": "a1898f259d2be7d2",
+      "axis_cap": 5,
+      "axes": [
+        "transaction identification",
+        "unique identifier generation",
+        "transaction coding scheme",
+        "per-transaction tracking mechanism",
+        "transaction-level reference assignment"
+      ]
+    },
+    {
+      "anchor_id": "Rmit 2025 18.2(xi)",
+      "text_hash": "9094d72a43f42f93",
+      "axis_cap": 5,
+      "axes": [
+        "third-party service provider operational resilience",
+        "vendor IT infrastructure and system reliability",
+        "key-person risk mitigation in outsourced functions",
+        "business continuity and disaster recovery capabilities",
+        "information security controls for confidential data handling"
+      ]
+    }
+  ]
+}

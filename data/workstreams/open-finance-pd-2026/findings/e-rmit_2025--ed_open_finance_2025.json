@@ -1,0 +1,1202 @@
+[
+  {
+    "summary": "Both provisions specify the effective date of the respective policy document.",
+    "label": "differs-on",
+    "sentiment": "neutral",
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 4.1",
+        "text": "This policy document comes into effect on 28 November 2025 except where\notherwise stated explicitly in this policy document.\n\n### 5 Interpretation"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 4.1",
+        "text": "This Policy Document comes into effect on 1 January 2027, subject to the\ntransition arrangements set out in paragraph 9."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "00336448722b",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both documents provide that terms follow definitions in FSA, IFSA and DFIA unless otherwise defined, though the RMIT version also references MSBA.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 5.1",
+        "text": "The terms and expressions used in this policy document shall have the same\nmeanings assigned to them in the FSA, IFSA, DFIA or MSBA, as the case may\nbe, unless otherwise defined in this policy document."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 5.1",
+        "text": "The terms and expressions used in this Policy Document shall have the same\nmeanings assigned to them in the FSA, IFSA and DFIA, as the case may be,\nunless otherwise defined in this Policy Document."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "1c1fa0cc55cc",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMIT's overarching objective to manage technology and cyber risk aligns with the open finance policy's focus on managing technology and cyber risks associated with open finance participation.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 1.2",
+        "text": "This policy document sets out the Bank's policy objectives and minimum\nrequirements to improve financial institutions' management of technology risk,\nincluding cyber risk. In applying this policy document, a financial institution\nshall have regard to the size and complexity of its operations, the level of\ntechnology use and its external stress exposure. Accordingly, larger and more\ncomplex financial institutions, or those with a high degree of digitalisation and\nlinkages with third parties, are required to adopt more robust risk controls that\ncommensurate with the increased technology risk exposure of the institution."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 1.4(a)(b)(c)(d)(e)(f)",
+        "text": "the management of technology and cyber risks associated with open\nfinance."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "0bcde278c6d1",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMIT's requirement to implement robust technology security controls for digital services aligns with the open finance document's requirement to extend technology operations and cybersecurity controls to open finance activities.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 12.1",
+        "text": "Securing digital services is an integral part of financial institution's risk\nmanagement. A financial institution must expand its CRF to implement robust\ntechnology security controls in providing digital services which assure the\nfollowing:"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 12.2",
+        "text": "An FSP shall ensure that its technology operations management practices are\nappropriately extended to support its open finance activities. This includes, but\nis not limited to, controls for ensuring effective and safe implementation of IT\nsystems, robust third-party service provider management, and operational\nresilience measures to ensure the availability, integrity and confidentiality of data\nexchanged through open finance arrangements.\n\nS 12.3 An FSP shall ensure that its cyber risk management capabilities and\ncybersecurity controls are also appropriately extended to govern, identify,\nprevent, detect, respond and address cyber risks associated with open finance\nactivities. This includes for the FSP to implement robust API security controls,\nstrengthening digital fraud detection and management, as well as take steps to\nsecure technology networks and internal systems from potential external risks\narising from the FSP's participation in an open finance arrangement.\n\nS"
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "2cdaee79252f",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both require robust oversight and management of third-party service provider risks, with RMIT placing accountability on the board/senior management and the open finance document extending these controls to open finance arrangements.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 10.46",
+        "text": "The board and senior management of the financial institution must exercise\neffective oversight and address associated risks when engaging third party\nservice providers30 for critical technology functions and systems. The\nfinancial institution remains accountable for managing all risks that arise from\nengagement of third party service providers, to ensure security and reliability\nof technology services in compliance with all relevant regulatory\nrequirements prescribed in this policy document."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 12.2",
+        "text": "An FSP shall ensure that its technology operations management practices are\nappropriately extended to support its open finance activities. This includes, but\nis not limited to, controls for ensuring effective and safe implementation of IT\nsystems, robust third-party service provider management, and operational\nresilience measures to ensure the availability, integrity and confidentiality of data\nexchanged through open finance arrangements.\n\nS 12.3 An FSP shall ensure that its cyber risk management capabilities and\ncybersecurity controls are also appropriately extended to govern, identify,\nprevent, detect, respond and address cyber risks associated with open finance\nactivities. This includes for the FSP to implement robust API security controls,\nstrengthening digital fraud detection and management, as well as take steps to\nsecure technology networks and internal systems from potential external risks\narising from the FSP's participation in an open finance arrangement.\n\nS"
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "b4bcd345eeee",
+    "review_state": "pending"
+  },
+  {
+    "summary": "The open finance document explicitly incorporates RMIT's Part C expectations, directly referencing the same RMIT policy document.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 7.1(d)",
+        "text": "Policy Document on Risk Management in Technology (RMIT) issued on"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 12.4",
+        "text": "An FSP shall adhere to relevant regulatory processes applicable to its\nparticipation in an open finance arrangement, in line with expectations as set out\nin Part C of the Policy Document on Risk Management in Technology, as may\nbe applicable.\n\nS"
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "8ecf92f886c4",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both provisions cite the statutory basis for the policy document under sections of the FSA, IFSA and DFIA, though the RMiT document additionally cites the MSBA.",
+    "label": "differs-on",
+    "sentiment": "neutral",
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 3.2",
+        "text": "The guidance in this policy document is issued pursuant to section 266 of the\nFSA, section 277 of the IFSA, section 126 of the DFIA and section 74 of the\nMSBA.\n\n### 4 Effective date"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 3.2",
+        "text": "The guidance in this Policy Document is issued pursuant to section 266 of the\nFSA, section 277 of the IFSA and section 126 of the DFIA."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "52b0c1212b9c",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both provisions cite the statutory basis for the policy document under the FSA/IFSA/DFIA framework.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 2.2(a)",
+        "text": "sections 47(1), $4 7 \\left( 2 \\right) \\left( d \\right)$ and 143(2) of the Financial Services Act 2013\n(FSA);"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 3.1(a)(b)(c)",
+        "text": "(DFIA)."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "dee8158f0d15",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both require financial institutions/FSPs to establish incident/breach handling procedures to mitigate risks to customers from data compromise or unauthorised access.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 12.9",
+        "text": "In addition to effective incident handling procedures, a financial institution\nmust adopt additional measures to mitigate risk to customers arising from any\nincident involving potential fraud or compromise of customer data. This shall\ninclude-"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 11.12",
+        "text": "breach handling and response plan in the event of theft, loss, misuse or\nunauthorised access, modification or disclosure of customer information\nassociated with an open finance arrangement. The plan must, at a minimum,\ninclude escalation procedures and a clear line of responsibility to contain the\ncustomer information breach and take remedial actions."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "6889ead164d2",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both address planning for containment and escalation in response to security incidents (cryptographic key compromise vs. customer information breach), sharing a common incident-response planning theme.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 10.20(e)",
+        "text": "the development and testing of compromise-recovery plans in the event\nof a cryptographic key compromise. This must set out the escalation\nprocess, procedures for keys regeneration, interim measures, changes\nto business-as-usual protocols and containment strategies or options to\nminimise the impact of a compromise."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 11.12",
+        "text": "breach handling and response plan in the event of theft, loss, misuse or\nunauthorised access, modification or disclosure of customer information\nassociated with an open finance arrangement. The plan must, at a minimum,\ninclude escalation procedures and a clear line of responsibility to contain the\ncustomer information breach and take remedial actions."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "1d55c05c4065",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both set out the general expectation for financial institutions/FSPs to invest in expertise, risk controls and manage technology and cyber risk arising from the use of technology in financial services.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 1.1",
+        "text": "With the prevalent use of technology in the provision of financial services,\nfinancial institutions must-"
+      },
+      {
+        "clause_number": "Rmit 2025 1.1(a)",
+        "text": "invest in the required expertise and risk controls to prevent operational\ndisruptions given the complexity of Information Technology (IT) systems;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 1.4(a)(b)(c)(d)(e)(f)",
+        "text": "the management of technology and cyber risks associated with open\nfinance."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "3b04de00da3b",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both provisions specify the effective date of the policy document, but with different effective dates and transition considerations.",
+    "label": "differs-on",
+    "sentiment": "neutral",
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 6.1(e)",
+        "text": "Policy Document on Compliance issued on 10 May 2016;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 4.1",
+        "text": "This Policy Document comes into effect on 1 January 2027, subject to the\ntransition arrangements set out in paragraph 9."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "a39a71bfbd86",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both reference the Policy Document on Risk Management in Technology (RMIT) as the governing framework for technology risk management, with the open finance document explicitly requiring adherence to RMIT Part C.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 7.1(d)",
+        "text": "Policy Document on Risk Management in Technology (RMIT) issued on"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 12.4",
+        "text": "An FSP shall adhere to relevant regulatory processes applicable to its\nparticipation in an open finance arrangement, in line with expectations as set out\nin Part C of the Policy Document on Risk Management in Technology, as may\nbe applicable.\n\nS"
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "6858f53d9d5d",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMIT's requirement for boards to endorse a robust technology risk management framework and cyber resilience framework aligns with the open finance document's mandate to manage technology and cyber risks associated with open finance arrangements.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 8.1(b)",
+        "text": "endorse and oversee the effective implementation of a sound and robust\ntechnology risk management framework (TRMF) and cyber resilience\nframework (CRF), as required to be developed under paragraphs 9.1\nand 11.2, for the continuity of operations and delivery of financial\nservices;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 1.4(a)(b)(c)(d)(e)(f)",
+        "text": "the management of technology and cyber risks associated with open\nfinance."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "9901c8c385c1",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both address the need for clear governance and responsibility structures for managing technology and cyber risk, whether generally under RMIT or specifically for open finance arrangements.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 9.2(b)",
+        "text": "clear responsibilities assigned for the management of technology risk at\ndifferent levels and across functions, with appropriate governance and\nreporting arrangements;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 1.4(a)(b)(c)(d)(e)(f)",
+        "text": "the management of technology and cyber risks associated with open\nfinance."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "ec41ae6084bc",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMIT's enhancement of the technology risk framework to manage cloud and emerging technology risks aligns with the open finance document's focus on managing technology and cyber risks in the emerging open finance ecosystem.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 17.2(b)",
+        "text": "has enhanced the technology risk management framework to manage\ncloud or emerging technology risks;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 1.4(a)(b)(c)(d)(e)(f)",
+        "text": "the management of technology and cyber risks associated with open\nfinance."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "67561db283bd",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMIT's Appendix 5 on enhancing resilience to cyber-attacks aligns with the open finance document's requirement to manage cyber risks associated with open finance.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 Appendix 5",
+        "text": "Appendix 5 to enhance its resilience to cyber-attacks."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 1.4(a)(b)(c)(d)(e)(f)",
+        "text": "the management of technology and cyber risks associated with open\nfinance."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "132725276c4a",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMIT's requirement for advising senior management on technology risk and security matters, including the institution's technology security risk profile, aligns with the open finance document's broader mandate to manage technology and cyber risks for open finance participation.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 9.5(c)",
+        "text": "advising senior management on technology risk and security matters,\nincluding developments in the financial institution's technology security\nrisk profile in relation to its business and operations."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 1.4(a)(b)(c)(d)(e)(f)",
+        "text": "the management of technology and cyber risks associated with open\nfinance."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "2b51bc985945",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMIT's requirement for an effective information system to keep the technology risk profile accurate and up to date supports the same objective as the open finance document's mandate to manage technology and cyber risks in open finance arrangements.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 9.2(h)",
+        "text": "effective information system to ensure the technology risk profile\nremains accurate and up to date;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 1.4(a)(b)(c)(d)(e)(f)",
+        "text": "the management of technology and cyber risks associated with open\nfinance."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "a983e042b28a",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMIT's requirement for board-level discussion on the rapidly evolving technology and cyber risk landscape aligns with the open finance document's governance expectations for managing technology and cyber risks associated with open finance.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 8.4",
+        "text": "To promote effective discussion at the board level amidst a rapidly evolving\ntechnology and cyber risk landscape, the board must-"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 1.4(a)(b)(c)(d)(e)(f)",
+        "text": "the management of technology and cyber risks associated with open\nfinance."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "565122c9504b",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both provisions require financial institutions/FSPs to actively manage technology and cyber risks arising from use of technology in financial services, though RMiT is generic and the ED is scoped specifically to open finance risks.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 1.1",
+        "text": "With the prevalent use of technology in the provision of financial services,\nfinancial institutions must-"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 1.4(a)(b)(c)(d)(e)(f)",
+        "text": "the management of technology and cyber risks associated with open\nfinance."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "14b077b9ce7f",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMiT requires financial institutions to adopt leading security policies/controls to mitigate product-specific third-party risks, while the ED requires FSPs to ensure secure transmission, authentication, and equivalent safeguards for customer information shared via third-party open finance arrangements — both address third-party risk mitigation for data sharing but with different specificity.",
+    "label": "differs-on",
+    "sentiment": "neutral",
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 10.49(b)",
+        "text": "adopt leading security policies and controls to mitigate product-specific\nthird party risks;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 11.2(a)(b)(c)(d)(a)(b)",
+        "text": "S 11.5 An FSP shall ensure that any transmission of customer information through an\nopen finance arrangement is conducted through secure means, in line with\nrelevant requirements set out in the Policy Document on Risk Management in\nTechnology. Without limiting the generality of paragraph 11.4, a data provider\nshall authenticate the customer and authorise consent using a reliable and\neffective authentication procedure (e.g. multi-factor authentication) before\ngranting a data consumer access to the customer's information.\n\nS 11.6 An FSP that is a data consumer shall ensure that customer information received\nfrom another FSP through an open finance arrangement is subject to safeguards\nthat are at least equivalent to those applicable to the FSP's own customer\ninformation.\n\nS 11.7 An FSP shall regularly monitor the effectiveness of these controls to ensure that\nthey remain responsive to changing threats."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "713da3942955",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMiT mandates retention of ownership/control of encryption keys to prevent unauthorised access to data, while the ED mandates authentication and safeguards equivalent to the FSP's own data to prevent unauthorised access/misuse of customer information shared through open finance — both target unauthorised access risk to customer data but via different control mechanisms.",
+    "label": "differs-on",
+    "sentiment": "neutral",
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 10.21(a)",
+        "text": "except for non-critical systems or applications that do not contain\ncustomer information, the financial institution must retain ownership and\ncontrol of the encryption keys (themselves or with an independent key\ncustodian) to minimize the risk of unauthorised access to the data;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 11.2(a)(b)(c)(d)(a)(b)",
+        "text": "S 11.5 An FSP shall ensure that any transmission of customer information through an\nopen finance arrangement is conducted through secure means, in line with\nrelevant requirements set out in the Policy Document on Risk Management in\nTechnology. Without limiting the generality of paragraph 11.4, a data provider\nshall authenticate the customer and authorise consent using a reliable and\neffective authentication procedure (e.g. multi-factor authentication) before\ngranting a data consumer access to the customer's information.\n\nS 11.6 An FSP that is a data consumer shall ensure that customer information received\nfrom another FSP through an open finance arrangement is subject to safeguards\nthat are at least equivalent to those applicable to the FSP's own customer\ninformation.\n\nS 11.7 An FSP shall regularly monitor the effectiveness of these controls to ensure that\nthey remain responsive to changing threats."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "af51587a3c68",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both define scope conditions for eligible e-money issuers subject to the respective policy framework.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 2.2(i)",
+        "text": "eligible e-money issuers;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 12.5(a)(b)(c)",
+        "text": "an eligible EMI operating a network-based e-money solution with an\naggregate distinct count of active users 13 larger than five million."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "e29965090e25",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both identify eligible EMIs as a category of covered institution under the policy document.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 2.2(i)",
+        "text": "eligible e-money issuers;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 11(a)(b)(c)(d)(e)(f)(g)",
+        "text": "an eligible EMI;\n\n\"individual customer\" refers to a natural person aged 18 years and above, in\nrespect of accounts which are under the sole control of that one person;\n\n\"mandated financial service provider\" or \"mandated FSP\" refers to an FSP\nas specified in Appendix 1;\n\n\"scope of prescribed information\" refers to the scope of personal financial\ninformation relating to a customer that a data provider is obligated to share with\na data consumer subject to the customer's consent as specified in Appendix 1;\n\n\"small and medium enterprise\" or \"SME\" refers to an entity defined as such\nin the Guideline for New SME Definition issued by the SME Corporation\nMalaysia in October 2013, as amended or modified from time to time;\n\n\"senior management\" refers to the chief executive officer and senior officers\nof an FSP;\n\n\"open finance\" refers to a framework that enables permissioned sharing of\ncustomer information between a data provider and a data consumer in a secure,\nopen, accessible, interoperable, and timely manner;\n\n\"open finance arrangement\" refers to a contractual relationship established\nbetween a data provider and a data consumer to enable the permissioned\nsharing of customer information through an open finance platform;\n\n\"open finance platform\" or \"platform\" refers to a technical infrastructure,\nsystem or utility that enables consent capture and secure transmission of\ncustomer information in an open finance arrangement;\n\n\"open finance platform operator\" or \"platform operator\" refers to any person\nwho operates an open finance platform;\n\n\"third-party service provider\" refers to an external entity providing services to\nan FSP that involves the handling of customer information, whether or not those\nservices are in relation to open finance."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "400c362cadbe",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both address the establishment/implementation of technology and cyber risk management frameworks (TRMF/CRF vs open finance tech/cyber risk management).",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 9.3(a)",
+        "text": "implementing the TRMF and CRF;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 1.4(a)(b)(c)(d)(e)(f)",
+        "text": "the management of technology and cyber risks associated with open\nfinance."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "86f8f5488bc7",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both cover oversight of critical technology risks/projects and escalation of associated issues.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 9.3(b)",
+        "text": "advising on critical technology projects and ensuring critical issues that\nmay have an impact on the financial institution's risk tolerance are\nadequately deliberated or escalated in a timely manner; and"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 1.4(a)(b)(c)(d)(e)(f)",
+        "text": "the management of technology and cyber risks associated with open\nfinance."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "6d912876c5cd",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both require adherence to relevant regulatory/technology risk processes when engaging third-party service providers for critical technology functions.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 10.46",
+        "text": "The board and senior management of the financial institution must exercise\neffective oversight and address associated risks when engaging third party\nservice providers30 for critical technology functions and systems. The\nfinancial institution remains accountable for managing all risks that arise from\nengagement of third party service providers, to ensure security and reliability\nof technology services in compliance with all relevant regulatory\nrequirements prescribed in this policy document."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 12.4",
+        "text": "An FSP shall adhere to relevant regulatory processes applicable to its\nparticipation in an open finance arrangement, in line with expectations as set out\nin Part C of the Policy Document on Risk Management in Technology, as may\nbe applicable.\n\nS"
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "3fa97f3e4ca8",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both address third-party service provider engagement, defining accountability for services handling customer/technology data.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 10.46",
+        "text": "The board and senior management of the financial institution must exercise\neffective oversight and address associated risks when engaging third party\nservice providers30 for critical technology functions and systems. The\nfinancial institution remains accountable for managing all risks that arise from\nengagement of third party service providers, to ensure security and reliability\nof technology services in compliance with all relevant regulatory\nrequirements prescribed in this policy document."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 (a)(b)(c)(d)",
+        "text": ""
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "9dbe661c71a7",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both concern data management/governance frameworks, including disposal and lifecycle handling of customer/data information.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 6.1(a)",
+        "text": "Guidelines on Data Management and MIS Framework issued on 23\nOctober 2008;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 11.2(a)(b)(c)(d)",
+        "text": "mandate secure disposal of customer information upon expiry of its use.\n\nS 11.3 An FSP shall continually review its data governance and privacy policies to\nensure that they remain adequate, relevant and operate effectively in response\nto changes in the operating environment."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "1029f4904acd",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both relate to maintaining and reviewing data management/governance policies for adequacy and effectiveness.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 6.1(a)",
+        "text": "Guidelines on Data Management and MIS Framework issued on 23\nOctober 2008;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 (a)(b)(c)(d)",
+        "text": ""
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "355deb1a647d",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMiT mandates an independent external review of technology risk management, whereas the open finance document only requires continual internal review of data governance and privacy policies, reflecting a stricter external verification requirement.",
+    "label": "differs-on",
+    "sentiment": "tighten",
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 1.4(a)",
+        "text": "require an independent external review of the overall or specific areas of\nthe financial institution's technology risk management;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 (a)(b)(c)(d)",
+        "text": ""
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "b88b5dbd6134",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMiT requires arrangements for third-party service providers to comply with recognised standards; the open finance ED similarly mandates robust third-party service provider management as part of extended technology operations.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 10.48(h)",
+        "text": "requirements for the third party service providers to comply with the\nrelevant internationally recognised standards and ensure their key staff\nkeep their skills up-to-date with the relevant certifications; and"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 12.2",
+        "text": "An FSP shall ensure that its technology operations management practices are\nappropriately extended to support its open finance activities. This includes, but\nis not limited to, controls for ensuring effective and safe implementation of IT\nsystems, robust third-party service provider management, and operational\nresilience measures to ensure the availability, integrity and confidentiality of data\nexchanged through open finance arrangements.\n\nS 12.3 An FSP shall ensure that its cyber risk management capabilities and\ncybersecurity controls are also appropriately extended to govern, identify,\nprevent, detect, respond and address cyber risks associated with open finance\nactivities. This includes for the FSP to implement robust API security controls,\nstrengthening digital fraud detection and management, as well as take steps to\nsecure technology networks and internal systems from potential external risks\narising from the FSP's participation in an open finance arrangement.\n\nS"
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "56edcf284b1d",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMiT's requirement for independent external review of technology risk management aligns with the open finance ED's requirement for independent review relating to operational resilience of technology functions.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 1.4(a)",
+        "text": "require an independent external review of the overall or specific areas of\nthe financial institution's technology risk management;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 12.5",
+        "text": "An FSP participating in an open finance arrangement shall also comply with\ntechnology and operational requirements of the open finance platform for which\nthe FSP is a member. This may include, but is not limited to, requirements in\nrelation to the user journey, API specifications, uptime requirements, operational\nprocedures and requirements for independent review relating to the operational\nresilience of its technology functions."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "564d8f096a57",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMiT's requirement for disaster recovery and backup capability corresponds to the open finance ED's operational resilience measures ensuring availability, integrity and confidentiality of data.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 10.48(d)",
+        "text": "arrangements for disaster recovery and backup capability, where\napplicable;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 12.2",
+        "text": "An FSP shall ensure that its technology operations management practices are\nappropriately extended to support its open finance activities. This includes, but\nis not limited to, controls for ensuring effective and safe implementation of IT\nsystems, robust third-party service provider management, and operational\nresilience measures to ensure the availability, integrity and confidentiality of data\nexchanged through open finance arrangements.\n\nS 12.3 An FSP shall ensure that its cyber risk management capabilities and\ncybersecurity controls are also appropriately extended to govern, identify,\nprevent, detect, respond and address cyber risks associated with open finance\nactivities. This includes for the FSP to implement robust API security controls,\nstrengthening digital fraud detection and management, as well as take steps to\nsecure technology networks and internal systems from potential external risks\narising from the FSP's participation in an open finance arrangement.\n\nS"
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "611a72dde5b2",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMiT's recovery and contingency plans to swiftly resume operations align with the open finance ED's operational resilience measures for open finance activities.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 11.13(d)",
+        "text": "Recovery\n\nImplement multiple strategies including contingency plans as part of\nincident recovery to swiftly resume business operations and significantly\nenhance redundancy and resilience; and"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 12.2",
+        "text": "An FSP shall ensure that its technology operations management practices are\nappropriately extended to support its open finance activities. This includes, but\nis not limited to, controls for ensuring effective and safe implementation of IT\nsystems, robust third-party service provider management, and operational\nresilience measures to ensure the availability, integrity and confidentiality of data\nexchanged through open finance arrangements.\n\nS 12.3 An FSP shall ensure that its cyber risk management capabilities and\ncybersecurity controls are also appropriately extended to govern, identify,\nprevent, detect, respond and address cyber risks associated with open finance\nactivities. This includes for the FSP to implement robust API security controls,\nstrengthening digital fraud detection and management, as well as take steps to\nsecure technology networks and internal systems from potential external risks\narising from the FSP's participation in an open finance arrangement.\n\nS"
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "36e1557cf70a",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both require cyber risk management capabilities/frameworks to cover identification, protection, detection, response and recovery of systems, including for third-party/external risks.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 11.2",
+        "text": "A financial institution must develop a CRF which clearly articulates its\ngovernance for managing cyber risks, its cyber resilience objectives and its\nrisk tolerance, with due regard to the evolving cyber threat environment.\nObjectives of the CRF shall include ensuring operational resilience against\nextreme but plausible cyber-attacks. The framework must be able to support\nthe effective identification, protection, detection, response, and recovery\n(IPDRR) of systems and data hosted on-premises or by third party service\nproviders from internal and external cyber-attacks."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 12.5",
+        "text": "An FSP participating in an open finance arrangement shall also comply with\ntechnology and operational requirements of the open finance platform for which\nthe FSP is a member. This may include, but is not limited to, requirements in\nrelation to the user journey, API specifications, uptime requirements, operational\nprocedures and requirements for independent review relating to the operational\nresilience of its technology functions."
+      }
+    ],
+    "scope_note": "General cyber risk framework alignment; target clause 12.3 text appears embedded under 12.5 anchor in this batch.",
+    "supported": true,
+    "id": "6e1f8f2c9130",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both call for enhancing resilience against cyber-attacks, with RMiT setting the overarching resilience objective and the open finance ED extending cyber risk controls to open finance activities.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 Appendix 5",
+        "text": "Appendix 5 to enhance its resilience to cyber-attacks."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 12.5",
+        "text": "An FSP participating in an open finance arrangement shall also comply with\ntechnology and operational requirements of the open finance platform for which\nthe FSP is a member. This may include, but is not limited to, requirements in\nrelation to the user journey, API specifications, uptime requirements, operational\nprocedures and requirements for independent review relating to the operational\nresilience of its technology functions."
+      }
+    ],
+    "scope_note": "Target text includes cyber risk extension requirements (12.3) embedded under this anchor.",
+    "supported": true,
+    "id": "7bddab3074eb",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMiT requires robust technology security controls for digital services; the open finance ED requires technology operations management practices, including IT system controls and operational resilience, to be extended to open finance activities.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 12.1",
+        "text": "Securing digital services is an integral part of financial institution's risk\nmanagement. A financial institution must expand its CRF to implement robust\ntechnology security controls in providing digital services which assure the\nfollowing:"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 12.2",
+        "text": "An FSP shall ensure that its technology operations management practices are\nappropriately extended to support its open finance activities. This includes, but\nis not limited to, controls for ensuring effective and safe implementation of IT\nsystems, robust third-party service provider management, and operational\nresilience measures to ensure the availability, integrity and confidentiality of data\nexchanged through open finance arrangements.\n\nS 12.3 An FSP shall ensure that its cyber risk management capabilities and\ncybersecurity controls are also appropriately extended to govern, identify,\nprevent, detect, respond and address cyber risks associated with open finance\nactivities. This includes for the FSP to implement robust API security controls,\nstrengthening digital fraud detection and management, as well as take steps to\nsecure technology networks and internal systems from potential external risks\narising from the FSP's participation in an open finance arrangement.\n\nS"
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "8baec60bd507",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both cite statutory legal basis provisions under the Development Financial Institutions Act 2002 (DFIA) for the respective policy documents.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 2.2(c)",
+        "text": "sections 41(1), 41(2)(b) and 116(1) of the Development Financial\nInstitutions Act 2002 $\\left( \\mathrm { D F I A } \\right)$ and"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 3.2",
+        "text": "The guidance in this Policy Document is issued pursuant to section 266 of the\nFSA, section 277 of the IFSA and section 126 of the DFIA."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "11d5664f2476",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMiT requires practical means for customers to verify authenticity of financial institution calls, while the open finance ED requires reliable authentication procedures for customer consent and data access.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 12.5(c)",
+        "text": "practical ways for customers to verify the authenticity of calls made by\nthe financial institution or its appointed outsourced service providers."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 11.2(a)(b)(c)(d)(a)(b)",
+        "text": "S 11.5 An FSP shall ensure that any transmission of customer information through an\nopen finance arrangement is conducted through secure means, in line with\nrelevant requirements set out in the Policy Document on Risk Management in\nTechnology. Without limiting the generality of paragraph 11.4, a data provider\nshall authenticate the customer and authorise consent using a reliable and\neffective authentication procedure (e.g. multi-factor authentication) before\ngranting a data consumer access to the customer's information.\n\nS 11.6 An FSP that is a data consumer shall ensure that customer information received\nfrom another FSP through an open finance arrangement is subject to safeguards\nthat are at least equivalent to those applicable to the FSP's own customer\ninformation.\n\nS 11.7 An FSP shall regularly monitor the effectiveness of these controls to ensure that\nthey remain responsive to changing threats."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "77733c013be9",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMiT requires continuous monitoring to detect material risks; the open finance ED requires regular monitoring of control effectiveness against changing threats.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 9.2(g)",
+        "text": "continuous monitoring to timely detect and address any material risks;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 11.2(a)(b)(c)(d)(a)(b)",
+        "text": "S 11.5 An FSP shall ensure that any transmission of customer information through an\nopen finance arrangement is conducted through secure means, in line with\nrelevant requirements set out in the Policy Document on Risk Management in\nTechnology. Without limiting the generality of paragraph 11.4, a data provider\nshall authenticate the customer and authorise consent using a reliable and\neffective authentication procedure (e.g. multi-factor authentication) before\ngranting a data consumer access to the customer's information.\n\nS 11.6 An FSP that is a data consumer shall ensure that customer information received\nfrom another FSP through an open finance arrangement is subject to safeguards\nthat are at least equivalent to those applicable to the FSP's own customer\ninformation.\n\nS 11.7 An FSP shall regularly monitor the effectiveness of these controls to ensure that\nthey remain responsive to changing threats."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "b312668d9c27",
+    "review_state": "pending"
+  },
+  {
+    "summary": "Both address security arrangements and controls, with RMiT specifying them as a customer-facing requirement and the open finance ED requiring compliance with platform-level technology and operational security requirements.",
+    "label": "aligns-with",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 16.2(b)",
+        "text": "security arrangements and controls;"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 12.5",
+        "text": "An FSP participating in an open finance arrangement shall also comply with\ntechnology and operational requirements of the open finance platform for which\nthe FSP is a member. This may include, but is not limited to, requirements in\nrelation to the user journey, API specifications, uptime requirements, operational\nprocedures and requirements for independent review relating to the operational\nresilience of its technology functions."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "c59975fa264f",
+    "review_state": "pending"
+  },
+  {
+    "summary": "RMiT's policy objective to manage technology and cyber risk proportionate to institution complexity differs from the open finance ED's framing of digital growth as the rationale for secure information infrastructures, though both address the same underlying digital risk context.",
+    "label": "differs-on",
+    "sentiment": "neutral",
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 1.2",
+        "text": "This policy document sets out the Bank's policy objectives and minimum\nrequirements to improve financial institutions' management of technology risk,\nincluding cyber risk. In applying this policy document, a financial institution\nshall have regard to the size and complexity of its operations, the level of\ntechnology use and its external stress exposure. Accordingly, larger and more\ncomplex financial institutions, or those with a high degree of digitalisation and\nlinkages with third parties, are required to adopt more robust risk controls that\ncommensurate with the increased technology risk exposure of the institution."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 1.1",
+        "text": "As the financial sector continues to evolve in the digital age, the volume of\ncustomer information processed has grown significantly alongside the\nincreasing shift of transactions to digital platforms. This underscores the\nimportance of having strong infrastructures that enable the secure access,\nsharing and processing of financial information, which is a critical foundation for\nmaintaining trust and resilience in an increasingly digital financial system."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "4bc5d2fcabc8",
+    "review_state": "pending"
+  },
+  {
+    "summary": "On open finance data-sharing roles, the open finance document (theirs) establishes the data provider / data consumer / platform operator framework and requires data consumers to apply safeguards to received customer information at least equivalent to those for their own information (paras 5.2, 11.6). Our RMIT document is silent on any data provider/data consumer role structure or the obligation to extend equivalent protection to customer information received from another institution through a permissioned sharing arrangement.",
+    "label": "silent-on",
+    "sentiment": null,
+    "source_clauses": [],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 5.2",
+        "text": "\"S\" denotes a standard, an obligation, a requirement, specification, direction,\ncondition and any interpretative, supplemental and transitional provisions that\nmust be complied with. Non-compliance may result in enforcement action;\n\n\"G\" denotes guidance which may consist of statements or information intended\nto promote common understanding and advice or recommendations that are\nencouraged to be adopted;\n\n\"banking institution\" refers to a licensed bank, licensed investment bank or\nlicensed Islamic bank;\n\n\"banking group\" refers to a group comprising a banking institution and other\nbanking institutions that control, or are controlled by, or are under common\ncontrol with, the banking institution;\n\n\"board\" refers to the board of directors of an FSP, including a committee of the\nboard where the responsibilities of the board set out in this Policy Document\nhave been delegated to such a committee;\n\n\"customer\" refers to any person who uses, has used or may be intending to\nuse1 any financial service or product offered by any FSP;\n\n\"customer information\" refers to any information relating to the affairs or the\naccount of any customer of any FSP in whatever form, including in the form of a\nrecord, book, register, correspondence, other document or material;\n\n\"data provider\" refers to an FSP that holds customer information and is\nresponsible for responding to any authorised information sharing request\ninitiated by the customer in relation to an open finance arrangement, by making\navailable to the corresponding data consumer the customer information\nspecified;\n\n\"data consumer\" refers to an FSP that is authorised by the customer to access\ntheir information from a data provider upon obtaining customer's consent for the"
+      },
+      {
+        "clause_number": "ed-open-finance-2025 11.2(a)(b)(c)(d)(a)(b)",
+        "text": "S 11.5 An FSP shall ensure that any transmission of customer information through an\nopen finance arrangement is conducted through secure means, in line with\nrelevant requirements set out in the Policy Document on Risk Management in\nTechnology. Without limiting the generality of paragraph 11.4, a data provider\nshall authenticate the customer and authorise consent using a reliable and\neffective authentication procedure (e.g. multi-factor authentication) before\ngranting a data consumer access to the customer's information.\n\nS 11.6 An FSP that is a data consumer shall ensure that customer information received\nfrom another FSP through an open finance arrangement is subject to safeguards\nthat are at least equivalent to those applicable to the FSP's own customer\ninformation.\n\nS 11.7 An FSP shall regularly monitor the effectiveness of these controls to ensure that\nthey remain responsive to changing threats."
+      },
+      {
+        "clause_number": "ed-open-finance-2025 8",
+        "text": "S 8.1\nAn FSP may participate2 as a data provider or a data consumer on an open\nfinance platform, subject to meeting relevant requirements in this Policy\nDocument and that specified by the platform operator."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "c033f4b5f412",
+    "review_state": "pending"
+  },
+  {
+    "summary": "On customer-facing interface design for inclusion, the open finance document (theirs) encourages adopting principles of inclusivity, accessibility and usability for underserved segments including persons with basic digital literacy and persons with disabilities when designing customer-facing interfaces (para 8.7). Our RMIT document does not address inclusive or accessible design of customer-facing digital service interfaces for underserved or disabled users.",
+    "label": "silent-on",
+    "sentiment": null,
+    "source_clauses": [],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 4",
+        "text": "b) Single account view, where the mandated FSP offers, as part of its internet\nbanking and mobile banking interfaces, the option for a customer to\ndisplay relevant information from their accounts with other data providers\nthrough the platform.\n\nG 8.7 An FSP participating in an open finance platform as a data consumer may\nconsider adopting principles of inclusivity, accessibility and usability when\ndesigning customer-facing interfaces. Particular attention may be given to\nunderserved segments (including individuals with basic digital literacy and\npersons with disabilities) who may face challenges with overly sophisticated\ninterfaces."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "cecce4fe8d9f",
+    "review_state": "pending"
+  },
+  {
+    "summary": "On cryptography controls, our RMIT document (ours) establishes a detailed cryptography policy covering encryption algorithm standards, cryptographic key lifecycle management, periodic algorithm review, HSM/TEE protected storage and key-compromise recovery plans (paras 10.20-10.23). The open finance document has no provision addressing cryptographic key management, algorithm standards, or key-compromise recovery for the secure transmission of customer information it references.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 10.20",
+        "text": "A financial institution must establish a robust and resilient cryptography\npolicy to promote the adoption of strong cryptographic controls for protection\nof important data and information. This policy, at a minimum, shall address\nrequirements for-"
+      },
+      {
+        "clause_number": "Rmit 2025 10.21",
+        "text": "A financial institution must conduct due diligence and evaluate the\ncryptographic controls associated with the technology used in order to\nprotect the confidentiality, integrity, authentication, authorisation and non-\nrepudiation of information. Additionally, a financial institution must ensure the\nfollowing:"
+      },
+      {
+        "clause_number": "Rmit 2025 10.22",
+        "text": "A financial institution must ensure cryptographic controls are based on the\neffective implementation of suitable cryptographic protocols. The protocols\nshall include secret and public cryptographic key protocols, both of which\nshall reflect a high degree of protection to the applicable secret or private\ncryptographic keys. The selection of such protocols must be based on\nrecognised international standards and tested accordingly. Commensurate\nwith the level of risk, secret cryptographic key and private-cryptographic key\nstorage and encryption / decryption computation must be undertaken in a\nprotected environment, supported by a hardware security module (HSM),\ntrusted execution environment (TEE) or similarly secured devices."
+      },
+      {
+        "clause_number": "Rmit 2025 10.23",
+        "text": "A financial institution shall store public cryptographic keys in a certificate\nissued by a Certificate Authority, as appropriate to the level of risk. Such\ncertificates associated with customers shall be issued by recognised\nCertificate Authorities. The financial institution must ensure that the\nimplementation of authentication and signature protocols using such\ncertificates are subject to strong protection to ensure that the use of private\ncryptographic keys corresponding to the user certificates are legally binding\nand irrefutable. The initial issuance and subsequent renewal of such\ncertificates must be consistent with industry best practices and applicable\nlegal / regulatory specifications."
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 11.2(a)(b)(c)(d)(a)(b)",
+        "text": "S 11.5 An FSP shall ensure that any transmission of customer information through an\nopen finance arrangement is conducted through secure means, in line with\nrelevant requirements set out in the Policy Document on Risk Management in\nTechnology. Without limiting the generality of paragraph 11.4, a data provider\nshall authenticate the customer and authorise consent using a reliable and\neffective authentication procedure (e.g. multi-factor authentication) before\ngranting a data consumer access to the customer's information.\n\nS 11.6 An FSP that is a data consumer shall ensure that customer information received\nfrom another FSP through an open finance arrangement is subject to safeguards\nthat are at least equivalent to those applicable to the FSP's own customer\ninformation.\n\nS 11.7 An FSP shall regularly monitor the effectiveness of these controls to ensure that\nthey remain responsive to changing threats."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "0e4a19ab1c32",
+    "review_state": "pending"
+  },
+  {
+    "summary": "On service availability standards, our RMIT document (ours) prescribes quantitative availability targets for critical systems such as cumulative unplanned downtime of not more than 4 hours on a rolling 12-month basis and maximum tolerable downtime of 120 minutes per incident, plus stand-in processing arrangements and service-availability disclosure (paras 10.31-10.32, 10.35). The open finance document references uptime requirements only by deferring to the platform operator and sets no quantitative downtime or availability thresholds of its own.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 10.31",
+        "text": "A financial institution shall enhance the resilience of key digital services25 and\ndelivery channels26 through the following measures:"
+      },
+      {
+        "clause_number": "Rmit 2025 10.32",
+        "text": "For critical systems, where there is a reasonable expectation for immediate\ndelivery of service to customers or dealings with counterparties, a financial\ninstitution must ensure that these systems are designed for high availability\nwith a cumulative unplanned downtime affecting the interface with customers\nor counterparties of not more than 4 hours on a rolling 12 months basis and\na maximum tolerable downtime of 120 minutes per incident."
+      },
+      {
+        "clause_number": "Rmit 2025 10.35",
+        "text": "During an interruption of digital services or delivery channels, including\nperiods of performance degradation or intermittent failures, a financial\ninstitution shall respond promptly and effectively to minimise the impact on\nits customers. This includes but not limited to-"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 12.5",
+        "text": "An FSP participating in an open finance arrangement shall also comply with\ntechnology and operational requirements of the open finance platform for which\nthe FSP is a member. This may include, but is not limited to, requirements in\nrelation to the user journey, API specifications, uptime requirements, operational\nprocedures and requirements for independent review relating to the operational\nresilience of its technology functions."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "58e6beee0b07",
+    "review_state": "pending"
+  },
+  {
+    "summary": "On cyber incident response and recovery, our RMIT document (ours) requires a comprehensive Cyber Incident Response Plan, CERT governance, out-of-band communication infrastructure, annual cyber drill exercises and cyber insurance/loss provisioning review (paras 11.13-11.17). The open finance document requires only a breach handling and response plan for customer information breaches (para 11.12) and is silent on CERT structure, out-of-band communication, cyber drills and loss-provision/insurance arrangements.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 11.13",
+        "text": "A financial institution must establish and implement a comprehensive Cyber\nIncident Response Plan (CIRP). The CIRP must address the following:"
+      },
+      {
+        "clause_number": "Rmit 2025 11.15",
+        "text": "A financial institution shall establish a secure and reliable out-of-band\ncommunication infrastructure for both internal and external stakeholders to\nensure continued coordination and communication if the primary\ncommunication infrastructure is compromised or rendered unavailable during\na crisis."
+      },
+      {
+        "clause_number": "Rmit 2025 11.16",
+        "text": "A financial institution must conduct an annual cyber drill exercise to test the\neffectiveness of its CIRP including the out-of-band communication methods,\nbased on various current and emerging threat scenarios (e.g. social\nengineering), with the involvement of key stakeholders including members of\nthe board, senior management and relevant third party service providers.\nThe result of the annual cyber drill exercise must be reported to the board in\na timely manner. The out-of-band communication methods must also be\ntested regularly as part of the institutions cyber drill exercises. The test\nscenarios must include scenarios designed to test-"
+      },
+      {
+        "clause_number": "Rmit 2025 11.17",
+        "text": "A financial institution shall review its loss provision arrangements to ensure\nits adequacy to cover cyber incidents based on its scenario analysis of\nextreme adverse events. Where cyber insurance is adopted to mitigate\nimpact of cyber incidents, the financial institution shall-"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 11.12",
+        "text": "breach handling and response plan in the event of theft, loss, misuse or\nunauthorised access, modification or disclosure of customer information\nassociated with an open finance arrangement. The plan must, at a minimum,\ninclude escalation procedures and a clear line of responsibility to contain the\ncustomer information breach and take remedial actions."
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "3f13f1d8efb9",
+    "review_state": "pending"
+  },
+  {
+    "summary": "On technology audit, our RMIT document (ours) requires a dedicated technology audit function with certified resources, an annual technology audit plan, and BAC oversight of audit scope and corrective action closure (paras 8.5, 13.1-13.4). The open finance document contains no provision for a technology audit function or independent audit coverage of open finance technology activities.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 13.1",
+        "text": "A financial institution must ensure that the scope, frequency, and intensity of\ntechnology audits are commensurate with the complexity, sophistication and\ncriticality of technology systems and applications."
+      },
+      {
+        "clause_number": "Rmit 2025 13.2",
+        "text": "A financial institution must establish annual review on its technology audit plan\nthat provides appropriate frequency and coverage of critical technology\nservices, third party service providers, material external system interfaces,\ndelayed or prematurely terminated critical technology projects and post-\nimplementation review of new or material enhancements of technology\nservices."
+      },
+      {
+        "clause_number": "Rmit 2025 13.3",
+        "text": "A financial institution must ensure the internal audit function must have\ndedicated technology audit resources with specialised competencies and\nprofessionally certified. The technology audit resources shall be adequately\nconversant with the developing sophisticate of the financial institution's\ntechnology systems, delivery channels and have sound knowledge in the\nareas audited."
+      },
+      {
+        "clause_number": "Rmit 2025 13.4",
+        "text": "The technology audit resources may be enlisted to provide advice on\ncompliance and adequacy of control processes during the planning and\ndevelopment phases of new major products, systems, adoption of third party\nservice providers or technology operations. In such cases, the technology\nauditors participating in this capacity are expected to carefully consider\nwhether such an advisory or consulting role can materially impair their\nindependence or objectivity in performing post-implementation reviews of the\nproducts, systems and operations concerned.\n\n### 14 External Party Assurance"
+      }
+    ],
+    "target_clauses": [],
+    "scope_note": null,
+    "supported": true,
+    "id": "c884fcf5d67e",
+    "review_state": "pending"
+  },
+  {
+    "summary": "On CISO designation, our RMIT document (ours) requires designation of a Chief Information Security Officer with defined independence, authority, technical certification and responsibilities for technology risk management (paras 9.3-9.5). The open finance document is silent on any requirement to designate a CISO or an equivalent independent security officer for open finance activities.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 9.4",
+        "text": "A financial institution must designate a Chief Information Security $^ { 1 3 }$\n(CISO) by whatever name called, to be responsible for the technology risk\nmanagement function of the financial institution. The financial institution must\nensure that the CISO has sufficient authority, independence and resources 14.\nThe CISO shall-"
+      },
+      {
+        "clause_number": "Rmit 2025 9.5",
+        "text": "The CISO shall be responsible for ensuring that the financial institution's\ninformation assets and technologies are adequately protected, which\nincludes-"
+      }
+    ],
+    "target_clauses": [],
+    "scope_note": null,
+    "supported": true,
+    "id": "b88513d045a5",
+    "review_state": "pending"
+  },
+  {
+    "summary": "On red team and vulnerability testing, our RMIT document (ours) requires realistic Red Team simulation attacks at least once every three years, vulnerability assessment and penetration testing via a Security Operations Center, and optional crowdsourced security testing (paras 11.6, 11.7, 11.9). The open finance document does not address red team simulations, SOC-based monitoring or penetration testing regimes for open finance technology environments.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 11.6",
+        "text": "A financial institution must conduct a realistic \"Red Team34\" simulation attack\non its infrastructure at least once every three years to proactively identify and\nmanage potential vulnerabilities."
+      },
+      {
+        "clause_number": "Rmit 2025 11.7",
+        "text": "A financial institution may implement crowdsourced security testing programs\nas a complement to existing security assessments, in order to thoroughly test\nthe security of their IT environment. The financial institution must engage\nreputable and credible service providers to facilitate the program.\n\n#### Cybersecurity Operations"
+      },
+      {
+        "clause_number": "Rmit 2025 11.9",
+        "text": "A financial institution must ensure continuous and proactive monitoring and\ntimely detection of anomalous activities in its technology infrastructure to\nprevent potential compromise of its security controls or weakening of its\nsecurity posture. This shall include-"
+      }
+    ],
+    "target_clauses": [],
+    "scope_note": null,
+    "supported": true,
+    "id": "7b4f00440e03",
+    "review_state": "pending"
+  },
+  {
+    "summary": "On patch and end-of-life system management, our RMIT document (ours) requires a patch and EOL management framework prohibiting systems running with known vulnerabilities or outdated/EOL technology, with security baselines, timely patching and management-approved exceptions (paras 10.17-10.18). The open finance document has no provision addressing patch management or end-of-life technology for institutions participating in open finance.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 10.17",
+        "text": "A financial institution must ensure that all systems including digital services\nare not running with known security vulnerabilities20, on outdated platform or\nend-of-life (EOL) technology systems. In this regard, a financial institution\nmust-"
+      },
+      {
+        "clause_number": "Rmit 2025 10.18",
+        "text": "A financial institution must establish a patch and EOL management\nframework which addresses among others the following requirements:"
+      }
+    ],
+    "target_clauses": [],
+    "scope_note": null,
+    "supported": true,
+    "id": "2a845e45cc85",
+    "review_state": "pending"
+  },
+  {
+    "summary": "On system backup and restoration, our RMIT document (ours) requires a robust backup strategy including tamper-proof backup arrangements and an isolated recovery environment to resume critical services against destructive cyber-attacks such as ransomware (paras 10.44-10.45). The open finance document does not address backup, restoration or isolated recovery environments for the customer information it governs.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 10.44",
+        "text": "A financial institution must establish a robust backup strategy and\nprocedures to meet business recovery objectives. At a minimum, a financial\ninstitution shall-"
+      },
+      {
+        "clause_number": "Rmit 2025 10.45",
+        "text": "A financial institution shall establish a tamper-proof backup arrangement and\nan isolated recovery environment to enable timely resumption of critical\nbanking and payment services within its tolerable level in the event of\ndestructive cyber-attacks such as widespread data loss caused by\nransomware.\n\n## Third Party Service Provider Management"
+      }
+    ],
+    "target_clauses": [],
+    "scope_note": null,
+    "supported": true,
+    "id": "6512b971c25a",
+    "review_state": "pending"
+  },
+  {
+    "summary": "On regulatory notification for technology adoption, our RMIT document (ours) requires prior consultation with the Bank before first-time adoption of public cloud or emerging technology for critical systems and notification for subsequent adoptions with defined risk assessment and assurance requirements (paras 17.1-17.5). The open finance document defers regulatory processes generically to RMIT Part C (para 12.4) but has no standalone cloud/emerging technology consultation or notification requirement.",
+    "label": "goes-beyond",
+    "sentiment": null,
+    "source_clauses": [
+      {
+        "clause_number": "Rmit 2025 17.1",
+        "text": "A financial institution is required to consult the Bank prior to the first-time\nadoption of a public cloud or emerging technology for critical systems. During\nthe consultation, the financial institution must demonstrate that specific risks\nassociated with the use of these technologies have been adequately\nconsidered and addressed to the satisfaction of the Bank, in order to proceed\nwith the adoption of the public cloud for critical systems for the first time. The\nfinancial institution shall undertake the following prior to consulting the Bank\non its adoption of public cloud for critical systems:"
+      },
+      {
+        "clause_number": "Rmit 2025 17.2",
+        "text": "A financial institution shall notify the Bank on any subsequent adoption of a\npublic cloud or emerging technology for critical system, by submitting the\nnotification together with the necessary updates to all the information required\nunder paragraph 17.1, subject to the financial institution having complied with\nthe following requirements and included documentation and information to\ndemonstrate such compliance in the notification submitted to the Bank that\nthe financial institution:"
+      }
+    ],
+    "target_clauses": [
+      {
+        "clause_number": "ed-open-finance-2025 12.4",
+        "text": "An FSP shall adhere to relevant regulatory processes applicable to its\nparticipation in an open finance arrangement, in line with expectations as set out\nin Part C of the Policy Document on Risk Management in Technology, as may\nbe applicable.\n\nS"
+      }
+    ],
+    "scope_note": null,
+    "supported": true,
+    "id": "0cf328646663",
+    "review_state": "pending"
+  }
+]
