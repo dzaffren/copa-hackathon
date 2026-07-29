@@ -1,6 +1,6 @@
 # Anchor segmentation — replace regex ClauseIndex with a multi-strategy AnchorIndex
 
-**Epic:** [Workstream Brain MVP1 — Overview](spec.md)
+**Epic:** [Project SELARAS MVP1 — Overview](spec.md)
 **Ticket:** TBD
 **Type:** Technical — Engine
 **Parent:** [spec.md](spec.md)

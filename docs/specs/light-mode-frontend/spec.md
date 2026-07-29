@@ -2,11 +2,11 @@
 
 **Ticket:** TBD
 
-Convert the Workstream Brain app from its current dark-only theme to a single, production-quality light theme. The drafter works in a clean, institutional light interface with a deep indigo accent, a gently pulsing highlight on whatever is selected, and the interactive graph kept as a framed dark viewport. This removes the current half-tuned light theme (which looks unfinished) and the theme toggle, leaving one polished look.
+Convert the Project SELARAS app from its current dark-only theme to a single, production-quality light theme. The drafter works in a clean, institutional light interface with a deep indigo accent, a gently pulsing highlight on whatever is selected, and the interactive graph kept as a framed dark viewport. This removes the current half-tuned light theme (which looks unfinished) and the theme toggle, leaving one polished look.
 
 ## User Story
 
-As a policy drafter (Aisyah R.), I want the Workstream Brain app to present a single, polished light interface so that the tool feels finished and professional when I use it and when it is demonstrated to approving management.
+As a policy drafter (Aisyah R.), I want the Project SELARAS app to present a single, polished light interface so that the tool feels finished and professional when I use it and when it is demonstrated to approving management.
 
 ## Background & Context
 

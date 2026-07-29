@@ -1,6 +1,6 @@
 """Readability guard for demo-visible finding phrasing.
 
-The Workstream Brain demo shows *committed* findings (build-and-persist), so the
+The Project SELARAS demo shows *committed* findings (build-and-persist), so the
 phrasing an audience reads is whatever sits in ``data/workstreams/*/findings/``,
 not something a live model produces on the day. This module locks the
 plain-language bar from
@@ -71,15 +71,17 @@ def test_demo_findings_exist() -> None:
 )
 def test_summary_is_short(source: str, finding: dict) -> None:
     summary = finding.get("summary") or ""
-    assert summary.strip(), f"{source}: finding {finding.get('id')} has an empty summary"
+    assert (
+        summary.strip()
+    ), f"{source}: finding {finding.get('id')} has an empty summary"
     words = _word_count(summary)
     assert words <= SUMMARY_MAX_WORDS, (
         f"{source}: finding {finding.get('id')} summary is {words} words "
         f"(cap {SUMMARY_MAX_WORDS}): {summary!r}"
     )
-    assert "—" not in summary, (
-        f"{source}: finding {finding.get('id')} summary uses an em dash: {summary!r}"
-    )
+    assert (
+        "—" not in summary
+    ), f"{source}: finding {finding.get('id')} summary uses an em dash: {summary!r}"
 
 
 @pytest.mark.parametrize(

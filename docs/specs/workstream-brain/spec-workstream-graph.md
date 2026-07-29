@@ -1,6 +1,6 @@
 # Workstream Graph Screen
 
-**Epic:** [Workstream Brain MVP1 — Overview](spec.md)
+**Epic:** [Project SELARAS MVP1 — Overview](spec.md)
 
 **Ticket:** TBD
 

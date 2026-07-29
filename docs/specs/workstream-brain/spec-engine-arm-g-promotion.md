@@ -233,7 +233,7 @@ All stages live in the new module `engine/arm_g.py`, orchestrated by `run_arm_g(
 
 This epic has no end-user-visible UI changes. The journey from the drafter's perspective is identical to today — the improvement is entirely in quality and speed under the hood.
 
-1. **Drafter requests analysis** — Aisyah opens a document pair in Workstream Brain and clicks Analyze. _(Story 3: route wiring)_
+1. **Drafter requests analysis** — Aisyah opens a document pair in Project SELARAS and clicks Analyze. _(Story 3: route wiring)_
 2. **Engine runs the Arm G pipeline** — Axis extraction (cached if already done), retrieval, batched same-topic finder, suppression build, whole-document coverage finder, merge and validate. _(Story 2: pipeline)_
 3. **Findings appear** — Same output shape as today. Same-topic findings and coverage findings combined in one list, all verbatim-cited. Coverage findings now genuinely one-sided — no more mislabelled disagreements. _(Story 2 + 3)_
 4. **Drafter reviews** — Unchanged from today. Accepts, dismisses, or flags for follow-up.

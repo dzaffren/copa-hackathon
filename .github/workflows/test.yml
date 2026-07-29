@@ -1,6 +1,6 @@
 name: Tests
 
-# Runs the engine (pytest) and Workstream Brain frontend (vitest) suites.
+# Runs the engine (pytest) and Project SELARAS frontend (vitest) suites.
 #
 # Why this exists: until now no workflow ran a single test. The only automated
 # gate was the confidentiality path check, which is why a rebuild in #34 could

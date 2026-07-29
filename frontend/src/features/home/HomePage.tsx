@@ -102,7 +102,11 @@ function StatTile({
  * work: New Workstream and the cross-workstream Institution Map.
  */
 export function HomePage() {
-  const { data: workstreams, isPending, isError } = useQuery({
+  const {
+    data: workstreams,
+    isPending,
+    isError,
+  } = useQuery({
     queryKey: ["workstreams"],
     queryFn: fetchWorkstreams,
   });
@@ -119,7 +123,7 @@ export function HomePage() {
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-primary/80">
-              Workstream Brain
+              Project SELARAS
             </p>
             <h1 className="mt-1 text-3xl font-bold tracking-tight">
               Your workstreams
@@ -173,7 +177,10 @@ export function HomePage() {
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {isPending ? (
             [0, 1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="glass flex flex-col gap-3 rounded-2xl p-5">
+              <div
+                key={i}
+                className="glass flex flex-col gap-3 rounded-2xl p-5"
+              >
                 <Skeleton className="h-5 w-24" />
                 <Skeleton className="h-5 w-3/4" />
                 <Skeleton className="h-3 w-1/2" />

@@ -325,7 +325,7 @@ Then the concepts section shows the same topic pills that were extracted during 
 ## Permissions & Security
 
 - **Scope:** Internal demo API (`/api/workstreams/*`), same surface as every other
-  Workstream Brain route; no per-user authorization in MVP1.
+  Project SELARAS route; no per-user authorization in MVP1.
 - **Authorization:** None beyond the existing CORS allow-list (`http://localhost:5173`).
 - **Input validation:** `workstream_id` and `node_id` are path segments resolved
   against `data/workstreams/`; no request body is required for `extract-concepts`

@@ -1,20 +1,32 @@
 # COPA Hackathon — Agent Guide
 
-AI for BNM policy consistency (COPA Hackathon 2026, Must-Win 10). **Workstream Brain**
-is the current product: each policy workstream (DP / ED / PD under active drafting) is
-a knowledge graph of documents joined by structural edges, and AI-found linkages between
-clause pairs surface as findings the drafter reviews and accepts before drafting.
-Findings carry a **five-label semantic taxonomy** — `aligns-with` / `differs-on` /
-`conflicts-with` / `silent-on` / `goes-beyond`.
+AI for BNM policy consistency (COPA Hackathon 2026, Must-Win 10). **Project SELARAS**
+— **S**emantic **E**ngine for **L**inkage **A**nalysis across **R**egulatory
+**A**rtefacts & **S**tandards — is the current product: each policy workstream
+(DP / ED / PD under active drafting) is a knowledge graph of documents joined by
+structural edges, and AI-found linkages between clause pairs surface as findings the
+drafter reviews and accepts before drafting. Findings carry a **five-label semantic
+taxonomy** — `aligns-with` / `differs-on` / `conflicts-with` / `silent-on` /
+`goes-beyond`.
 
 Working code lives in `engine/` (FastAPI + the finder→critic loop), `frontend/` (the
-Workstream Brain app), plus earlier iterations kept as reference. This is **not** a
+SELARAS app), plus earlier iterations kept as reference. This is **not** a
 docs-only repo.
+
+> **Renamed 30 Jul 2026 — "Workstream Brain" is the old product name.** The current
+> product is **Project SELARAS**; use that in prose, UI copy, and new specs. The old
+> name survives deliberately in three places, and none of them is a bug to fix:
+> directory slugs (`docs/specs/workstream-brain/`, `docs/poc/workstream-brain/`, and
+> the `deploy-poc.yml` paths that publish them), superseded specs, and
+> `docs/learnings/`. **"Workstream" alone is still live domain vocabulary** —
+> `data/workstreams/`, `/api/workstreams/*`, the workstream fixtures — and the rename
+> does not touch it.
 
 > **Iteration history — read this before trusting any spec.** Four generations, each
 > superseding the last: policy-consistency-ai → rulebook-radar → reconciliation-workbench
-> → **workstream-brain (current)**. Older specs and POCs are retained as historical record
-> and are explicitly _not_ buildable. `Conflict / Duplication / Gap` is **retired**
+> → **workstream-brain, now Project SELARAS (current)**. Older specs and POCs are
+> retained as historical record and are explicitly _not_ buildable.
+> `Conflict / Duplication / Gap` is **retired**
 > vocabulary from the rulebook-radar era — `engine/tests/test_taxonomy_traces.py::test_no_retired_vocabulary_as_label`
 > asserts it never reappears as a finding `label`.
 
@@ -59,7 +71,7 @@ matching clause found" — never invent one. Preserve this in any spec or POC ed
   `data/workstreams/`. Also holds `clauses.py` (the clause index / verbatim guarantee)
   and `connections.py` (the five-label finder→critic loop) — the current engine, not
   yet mounted as HTTP routes; exercised by `scripts/run_finder_trace.py` and tests.
-- `frontend/` — **the Workstream Brain app** (Vite + React 18 + Tailwind + shadcn/ui).
+- `frontend/` — **the SELARAS app** (Vite + React 18 + Tailwind + shadcn/ui).
   The only frontend. This is where UI work lands.
 - `data/corpus/` — the parsed BNM policy PDFs; `data/workstreams/` — workstream
   fixtures (`opres-v2`, `outsourcing-v2`, `rmit-v2-2025`), which the API reads;
@@ -82,7 +94,7 @@ matching clause found" — never invent one. Preserve this in any spec or POC ed
 > **The legacy code is gone** (16 Jul 2026). `web/` (the reconciliation-workbench
 > Next.js app), `engine/{verdicts,submissions,read_model}.py`, the clause/graph/
 > paragraph/submission HTTP routes, and `scripts/export_poc_snapshot.py` were all
-> removed when Workstream Brain became the end state. If a spec or POC references
+> removed when SELARAS became the end state. If a spec or POC references
 > them, that spec is describing a repo that no longer exists.
 
 **Docs:** `docs/discovery/` (briefs per iteration), `docs/adr/` (decisions),
@@ -96,7 +108,7 @@ Note this is _not_ `data/references/`, which is public and tracked.
 - Specs are non-technical and grounded in real clauses (RMiT 17.1/17.2,
   Outsourcing 12.1, Operational Resilience 1.1 — note "OpRes 6.11" is a phantom
   clause, not in the parsed corpus).
-- **Personas.** Aisyah R. is the policy drafter throughout. The Workstream Brain
+- **Personas.** Aisyah R. is the policy drafter throughout. The SELARAS
   demo runs on **OpRes PD v0.3** as the task node (the editable working draft);
   every other document in the workstream is published, read-only context. An
   approving manager gives the final sign-off. There is **no separate reviewer
@@ -187,7 +199,7 @@ workstream_id)`, per-node files under `data/workstreams/<ws>/anchors/`), falling
   workstream-brain reads `data/workstreams/`, not `data/artifacts/`. See
   `docs/learnings/blocker-engine-build-silently-narrows-artifacts.md`.
 
-## Frontend conventions (Workstream Brain app)
+## Frontend conventions (the SELARAS app)
 
 - **The frontend is `frontend/`** — Vite + React 18 + TypeScript + Tailwind + shadcn/ui.
 - **Graph library:** `react-force-graph-2d` for all interactive graph canvases.

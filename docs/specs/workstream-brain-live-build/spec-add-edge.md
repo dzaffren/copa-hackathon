@@ -42,7 +42,7 @@ analysis.
 ## Target User & Persona
 
 - **Who:** Aisyah R., the policy drafter assembling a policy workstream in the
-  Workstream Brain app.
+  Project SELARAS app.
 - **Context:** She is mid-build, viewing a document's detail panel on the canvas,
   and recognises that this document relates to another document already in the
   same workstream.
@@ -324,7 +324,7 @@ Validation order in the route (first failure wins), with the concrete outcome:
 ## Permissions & Security
 
 - **Scope:** Public workstream API (`/api/workstreams/*`), consistent with every
-  other Workstream Brain route. No auth layer exists in the engine; do not add one.
+  other Project SELARAS route. No auth layer exists in the engine; do not add one.
 - **Authorization:** None beyond the existing routes. The fixture store is the only
   state.
 - **Input validation:**

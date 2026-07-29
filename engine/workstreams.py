@@ -1,4 +1,4 @@
-"""Workstream Brain — Graph Screen persistence helpers.
+"""Project SELARAS — Graph Screen persistence helpers.
 
 Read/write helpers over the per-workstream fixture store used by the Workstream
 Graph hero screen (spec docs/specs/workstream-brain/spec-workstream-graph.md):
