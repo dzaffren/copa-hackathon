@@ -398,6 +398,36 @@ def test_an_out_of_vocabulary_deliverable_kind_is_refused(tmp_path):
     assert _graph(dst) == before
 
 
+def test_a_context_document_carrying_a_deliverable_kind_is_refused(tmp_path):
+    """A standard is not a deliverable Aisyah is producing. Refused rather than
+    silently dropped: a client sending one has misunderstood the contract, and
+    swallowing it hides that until someone wonders where the kind went."""
+    client, dst = _client(tmp_path)
+    before = _graph(dst)
+
+    res = _post(client, _payload(task_type="PD"))
+
+    assert res.status_code == 400
+    body = res.json()
+    assert body["code"] == "TASK_TYPE_NOT_ALLOWED"
+    assert body["field"] == "task_type"
+    assert _graph(dst) == before
+
+
+def test_a_context_document_without_one_is_still_accepted(tmp_path):
+    """The unchanged majority path. `not in` rather than `is None`: absent means
+    absent on disk, the fixtures' convention for `issuer` and `pursuant_to`, and
+    an explicit null would read as a kind someone failed to fill in."""
+    client, dst = _client(tmp_path)
+
+    res = _post(client, _payload())
+
+    assert res.status_code == 201, res.text
+    assert res.json()["task_type"] is None
+    node = next(n for n in _graph(dst)["nodes"] if n["id"] == res.json()["id"])
+    assert "task_type" not in node
+
+
 def test_two_workstreams_can_add_the_same_titled_document(tmp_path):
     """The collision the flat layout allowed: identical titles in different
     workstreams derive the same node id, so their sources must not share a path."""
