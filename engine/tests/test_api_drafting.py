@@ -499,6 +499,35 @@ def test_POST_copilot_does_not_reject_an_intent_outside_the_vocabulary(tmp_path)
     assert captured["intent"] == "ED"
 
 
+def test_POST_copilot_falls_back_to_the_workstreams_deliverable_type(tmp_path):
+    """A task node predating the task-type epic carries no `task_type`, so the
+    kind is read off the workstream record — which stores the LABEL ("Exposure
+    Draft"), hence the reverse map to its code."""
+    client, captured = _capturing_client(
+        tmp_path, task_type=None, deliverable_type="Exposure Draft"
+    )
+    res = client.post(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
+        json={"message": "hi"},
+    )
+    assert res.status_code == 200
+    assert captured["intent"] == "ED"
+
+
+def test_POST_copilot_falls_back_to_PD_when_nothing_is_recorded(tmp_path):
+    """Neither the node nor the record has a kind: the Copilot still answers,
+    framed as a policy document. It never asks, and it never errors."""
+    client, captured = _capturing_client(
+        tmp_path, task_type=None, deliverable_type=None
+    )
+    res = client.post(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
+        json={"message": "hi"},
+    )
+    assert res.status_code == 200
+    assert captured["intent"] == "PD"
+
+
 def test_the_deleted_intent_error_code_appears_nowhere_in_the_engine():
     """The error code is deleted, not merely unreachable — grep the source so a
     re-introduction anywhere in `engine/` fails here rather than in review.
