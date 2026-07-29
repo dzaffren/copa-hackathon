@@ -385,6 +385,19 @@ def test_a_task_node_without_a_deliverable_kind_is_refused(tmp_path):
     assert _graph(dst) == before
 
 
+def test_an_out_of_vocabulary_deliverable_kind_is_refused(tmp_path):
+    """The eight kinds are a closed set — a kind outside it is as invalid as
+    none at all, so a typo cannot invent a ninth."""
+    client, dst = _client(tmp_path)
+    before = _graph(dst)
+
+    res = _post(client, _payload(**{**_TASK_NODE, "task_type": "Manifesto"}))
+
+    assert res.status_code == 400
+    assert res.json()["code"] == "INVALID_TASK_TYPE"
+    assert _graph(dst) == before
+
+
 def test_two_workstreams_can_add_the_same_titled_document(tmp_path):
     """The collision the flat layout allowed: identical titles in different
     workstreams derive the same node id, so their sources must not share a path."""
