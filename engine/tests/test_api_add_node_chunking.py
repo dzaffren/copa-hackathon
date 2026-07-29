@@ -339,6 +339,33 @@ def test_the_ingested_markdown_lands_beside_the_workstreams_anchors(tmp_path):
     assert not (tmp_path / "artifacts" / f"{node_id}.md").exists()
 
 
+# --- task_type: the deliverable kind of a working draft ---------------------
+# A drafter can add a SECOND working draft to a workstream that already has one
+# (an engagement deck accompanying a policy document), and the one question
+# asked of it that is never asked of a context document is what KIND of
+# deliverable it is. The answer lands on the node in graph.json, not the
+# concepts side-file: like `node_type` it is structural and written once.
+
+_TASK_NODE = {
+    "node_type": "task",
+    "task_type": "DECK",
+    "title": "OpRes Industry Briefing",
+    "description": "Slides for the 14 August industry engagement session.",
+}
+
+
+def test_a_task_node_is_created_with_its_deliverable_kind(tmp_path):
+    client, dst = _client(tmp_path)
+
+    res = _post(client, _payload(**_TASK_NODE))
+
+    assert res.status_code == 201, res.text
+    body = res.json()
+    assert body["task_type"] == "DECK"
+    node = next(n for n in _graph(dst)["nodes"] if n["id"] == body["id"])
+    assert node["task_type"] == "DECK"
+
+
 def test_two_workstreams_can_add_the_same_titled_document(tmp_path):
     """The collision the flat layout allowed: identical titles in different
     workstreams derive the same node id, so their sources must not share a path."""

@@ -519,6 +519,12 @@ def add_node(
     node: dict[str, Any] = {
         "id": node_id,
         "node_type": body["node_type"],
+        # Only a working draft is a deliverable Aisyah is producing, so only a
+        # task node carries a kind — and where there is none the key is absent
+        # rather than null, the fixtures' convention for `issuer` and
+        # `pursuant_to`. Set in the same literal as `node_type` (its structural
+        # twin) so a validation failure can never leave a half-typed node.
+        **({"task_type": body["task_type"]} if body["node_type"] == "task" else {}),
         "title": body.get("title", node_id),
         "description": body.get("description"),
         "source_url": body.get("source_url"),

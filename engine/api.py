@@ -1482,6 +1482,9 @@ def create_app(
         content: dict[str, Any] = {
             "id": new_node["id"],
             "node_type": new_node["node_type"],
+            # Echoed so the client can confirm what was stored; None for every
+            # node type but `task`, which is the only kind that carries one.
+            "task_type": new_node.get("task_type"),
             "title": new_node["title"],
             "created_edges": [{**edge, "analysed": False} for edge in created],
         }
