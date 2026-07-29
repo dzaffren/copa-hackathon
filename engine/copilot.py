@@ -227,7 +227,7 @@ def _system_prompt(task_title: str, intent: str, context: str) -> str:
         "sentences instead.\n"
         "- Use Markdown for structure and emphasis: bold for key terms, bullet "
         "lists for enumerations, and short headings where they aid clarity.\n\n"
-        f"INTENT PRESET: the drafter has selected '{intent}'. Treat this as "
+        f"DELIVERABLE KIND: this task is a '{intent}'. Treat this as "
         "light framing for tone and format only (for example 'DP' favours "
         "discussion-paper question framing, 'PD' favours policy-document "
         "prose). It never licenses inventing content.\n\n"
