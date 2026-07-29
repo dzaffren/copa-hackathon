@@ -97,3 +97,47 @@ def test_a_first_save_creates_the_side_file(tmp_path):
     saved = json.loads(path.read_text(encoding="utf-8"))
     assert list(saved) == list(CONCEPT_FIELDS)
     assert sum(1 for value in saved.values() if value is None) == 7
+
+
+def test_a_save_overwrites_an_existing_profile_whole(tmp_path):
+    """Test 2: a save is a full replacement, not a patch.
+
+    Deliberate: the form always sends all nine fields, so a field absent from the
+    body is one the drafter cleared — leaving the stored value in place would show
+    her something she had just deleted.
+
+    The fixture's `rmit-pd-v2` profile carries only `policy_owner`, so this fills
+    it out first; a replacement is only observable against a populated profile.
+    """
+    client, workstreams_dir = _make_client(tmp_path)
+    path = concepts_path(workstreams_dir, "rmit-v2-2025", "rmit-pd-v2")
+    assert json.loads(path.read_text(encoding="utf-8"))["policy_owner"] == "Aisyah R."
+
+    populated = client.put(
+        _metadata_url("rmit-v2-2025", "rmit-pd-v2"),
+        json={
+            "policy_owner": "Aisyah R.",
+            "applicability": "Licensed banks.",
+            "empowerment_framework": "Issued pursuant to section 143(2) of the FSA 2013.",
+            "requirement": "Maintain technology risk controls.",
+            "issuance_date": "28 November 2025",
+            "effective_date": "28 November 2025",
+            "keywords": ["technology risk", "cloud"],
+            "legal_basis": ["FSA 2013"],
+            "ismp_classification": "Prudential",
+        },
+    )
+    assert populated.status_code == 200
+    assert all(value is not None for value in populated.json()["metadata"].values())
+
+    response = client.put(
+        _metadata_url("rmit-v2-2025", "rmit-pd-v2"),
+        json={"policy_owner": "Farid M."},
+    )
+
+    assert response.status_code == 200
+    metadata = response.json()["metadata"]
+    assert metadata["policy_owner"] == "Farid M."
+    assert [metadata[field] for field in CONCEPT_FIELDS if field != "policy_owner"] == [
+        None
+    ] * 8
