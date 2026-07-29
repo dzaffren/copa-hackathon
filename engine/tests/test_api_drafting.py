@@ -381,13 +381,20 @@ def _rewrite_deliverable_type(dst, deliverable_type):
     path.write_text(json.dumps(record, indent=2), encoding="utf-8")
 
 
-def _make_copilot_client(tmp_path, reply_fn, *, task_type=_UNSET, deliverable_type=_UNSET):
+def _copy_workstreams(tmp_path, *, task_type=_UNSET, deliverable_type=_UNSET):
+    """The throwaway `data/workstreams/` copy, optionally with the recorded
+    deliverable kind rewritten on the task node and/or the workstream record."""
     dst = tmp_path / "workstreams"
     shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
     if task_type is not _UNSET:
         _rewrite_task_type(dst, task_type)
     if deliverable_type is not _UNSET:
         _rewrite_deliverable_type(dst, deliverable_type)
+    return dst
+
+
+def _make_copilot_client(tmp_path, reply_fn, **kwargs):
+    dst = _copy_workstreams(tmp_path, **kwargs)
     return TestClient(create_app(workstreams_dir=dst, copilot_reply_fn=reply_fn))
 
 
@@ -605,9 +612,8 @@ def test_POST_copilot_502_when_the_live_call_fails(tmp_path):
 # The streaming variant of the copilot route. `copilot_stream_fn` is injected
 # so tests stub the generator with no network or credentials.
 
-def _make_stream_client(tmp_path, stream_fn):
-    dst = tmp_path / "workstreams"
-    shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
+def _make_stream_client(tmp_path, stream_fn, **kwargs):
+    dst = _copy_workstreams(tmp_path, **kwargs)
     return TestClient(create_app(workstreams_dir=dst, copilot_stream_fn=stream_fn))
 
 
@@ -637,10 +643,7 @@ def test_POST_copilot_stream_resolves_the_intent_from_the_task_node(tmp_path):
         captured.update(kwargs)
         yield "event: done\ndata: {}\n\n"
 
-    dst = tmp_path / "workstreams"
-    shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
-    _rewrite_task_type(dst, "FEEDBACK")
-    client = TestClient(create_app(workstreams_dir=dst, copilot_stream_fn=capture_stream))
+    client = _make_stream_client(tmp_path, capture_stream, task_type="FEEDBACK")
 
     res = client.post(
         f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot/stream",
