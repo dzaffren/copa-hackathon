@@ -24,6 +24,8 @@ import type {
   Person,
   ReviewQueueResponse,
   NodeDetail,
+  NodeMetadataRequest,
+  NodeMetadataResponse,
   PatchReviewStateResponse,
   ReviewResponse,
   ReviewState,
@@ -213,6 +215,22 @@ export function extractConcepts(
 ): Promise<ExtractConceptsResponse> {
   return postJson<ExtractConceptsResponse>(
     `${API_BASE}/api/workstreams/${workstreamId}/nodes/${nodeId}/extract-concepts`,
+  );
+}
+
+/** Replace a document's nine-field regulatory profile.
+ *
+ *  A full replacement, not a patch: the server writes whatever it is given
+ *  whole, so `body` must always carry all nine keys. A field the drafter
+ *  cleared is sent as `null` and lands as "not set". */
+export function saveNodeMetadata(
+  workstreamId: string,
+  nodeId: string,
+  body: NodeMetadataRequest,
+): Promise<NodeMetadataResponse> {
+  return putJson<NodeMetadataResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/nodes/${nodeId}/metadata`,
+    body,
   );
 }
 
