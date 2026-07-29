@@ -1,16 +1,23 @@
-"""Node-detail regulatory metadata: legal basis, ISMP classification, and the
-supervisory-letter document type.
+"""Node-detail regulatory metadata: legal basis, ISMP classification, the
+supervisory-letter document type, and the drafter's own edits to the profile.
 
 Phase 2 surfaces `legal_basis` and `ismp_classification` (added to the concept
 sidecar) through the node-detail route, and confirms the supervisory-letter node
 type is first-class end to end.
+
+The write side (`PUT .../nodes/{node_id}/metadata`) lets the drafter record what
+she knows about any document in any workstream. It is a full replacement of the
+nine-field profile, not a patch, and every rejection happens before any
+filesystem write.
 """
 
+import json
 import shutil
 
 from fastapi.testclient import TestClient
 
 from engine.api import create_app
+from engine.concepts import CONCEPT_FIELDS, concepts_path
 from engine.config import REPO_ROOT
 
 
@@ -18,6 +25,10 @@ def _make_client(tmp_path):
     dst = tmp_path / "workstreams"
     shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
     return TestClient(create_app(workstreams_dir=dst)), dst
+
+
+def _metadata_url(workstream_id, node_id):
+    return f"/api/workstreams/{workstream_id}/nodes/{node_id}/metadata"
 
 
 def test_supervisory_letter_is_a_first_class_node_type_with_a_profile(tmp_path):
@@ -49,3 +60,40 @@ def test_new_concept_fields_are_present_for_every_enriched_document(tmp_path):
         assert concepts["status"] == "available"
         assert "legal_basis" in concepts
         assert "ismp_classification" in concepts
+
+
+def test_a_first_save_creates_the_side_file(tmp_path):
+    """Test 1: a node nobody prepared has no side-file; the first save makes one.
+
+    Absence is the ordinary case, not an error — the drafter opens a document
+    with an empty profile and fills in the two fields she is confident about.
+    """
+    client, workstreams_dir = _make_client(tmp_path)
+    path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
+    assert not path.exists()
+
+    response = client.put(
+        _metadata_url("open-finance-pd-2026", "bis-papers-168"),
+        json={
+            "policy_owner": "Priya S.",
+            "applicability": None,
+            "empowerment_framework": None,
+            "requirement": None,
+            "issuance_date": None,
+            "effective_date": None,
+            "keywords": ["operational resilience"],
+            "legal_basis": None,
+            "ismp_classification": None,
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["node_id"] == "bis-papers-168"
+    assert body["metadata"]["status"] == "available"
+    assert body["metadata"]["policy_owner"] == "Priya S."
+    assert body["metadata"]["keywords"] == ["operational resilience"]
+
+    saved = json.loads(path.read_text(encoding="utf-8"))
+    assert list(saved) == list(CONCEPT_FIELDS)
+    assert sum(1 for value in saved.values() if value is None) == 7
