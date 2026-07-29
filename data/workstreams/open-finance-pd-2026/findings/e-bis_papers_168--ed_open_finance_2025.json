@@ -1,6 +1,6 @@
 [
   {
-    "summary": "Both discuss secure, consent-driven data sharing mechanisms using authentication and standardised protocols to protect customer information as it moves between providers.",
+    "summary": "Both call for secure, consent-based data sharing using customer authentication and standardised protocols.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -21,7 +21,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both address the requirement for explicit customer consent before data is shared/transferred to third parties in the open finance ecosystem, though BNM specifies a distinct, separate consent obligation for third-party engagements.",
+    "summary": "Both require customer consent before sharing data; the draft adds a separate consent for third parties.",
     "label": "differs-on",
     "sentiment": "tighten",
     "source_clauses": [
@@ -42,7 +42,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both identify financial inclusion as a key motivation/benefit of open finance frameworks.",
+    "summary": "Both name financial inclusion as a key benefit of open finance.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -63,7 +63,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "The BIS paper's core themes (financial inclusion, competition, data sharing) and BNM's regulatory framework goal both address the objectives of open finance, but BNM frames it around balancing innovation with prudent risk management rather than research-oriented competition/inclusion metrics.",
+    "summary": "Both state open finance goals; the BIS paper frames them as research themes, the draft as a risk-managed framework.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -84,7 +84,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both address the timing and rollout of open finance/banking initiatives, but the BIS paper surveys international legislative and go-live milestones across countries while BNM sets out its own gradual, phased implementation approach for the domestic industry.",
+    "summary": "Both cover rollout timing; the BIS paper surveys milestones across countries, the draft sets a phased domestic rollout.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -105,7 +105,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both discuss the importance of standardised, machine-readable data-sharing formats/interfaces to enable interoperable open finance implementation.",
+    "summary": "Both stress standardised, machine-readable data-sharing formats to make open finance interoperable.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -126,7 +126,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both frame data sharing standards/technical harmonisation as central to an efficient, resilient regulatory framework for open finance.",
+    "summary": "Both treat data-sharing standards as central to an efficient, resilient open finance framework.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -147,7 +147,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both establish that data sharing under open finance/open banking arrangements must be predicated on explicit customer consent.",
+    "summary": "Both require explicit customer consent before data is shared under open finance.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -168,7 +168,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both address the challenge of extending data protection/privacy regimes as open finance frameworks broaden beyond transaction data, while balancing innovation and risk.",
+    "summary": "Both address protecting data as open finance broadens beyond banking, balancing innovation against risk.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -189,7 +189,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both depict open finance as a stepping stone toward a broader open data ecosystem extending beyond the financial sector.",
+    "summary": "Both see open finance as a step toward a broader open data ecosystem beyond finance.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -210,7 +210,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both concern the scope and eligibility of parties permitted to access shared data under open finance/data regulations, though the source raises debates on reciprocity and pricing (e.g. FiDA) while the target focuses on consent-based access for third-party service providers.",
+    "summary": "Both concern access to shared data; the BIS paper debates pricing and eligibility, the draft sets consent-based safeguards.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -231,7 +231,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both texts frame open finance/open banking as central to building trust and resilience in an increasingly digital financial system, with international experience showing broadly positive outcomes for customer access and choice.",
+    "summary": "Both see open finance as key to trust and resilience in a digital financial system, with positive early results.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -252,7 +252,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both acknowledge that open finance frameworks must adapt policy over time to balance innovation benefits against implementation risks.",
+    "summary": "Both accept that open finance rules must adapt over time to balance innovation and risk.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -273,7 +273,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both documents address the staged/phased timeline of rolling out open banking and open finance requirements across jurisdictions or industry participants.",
+    "summary": "Both address the staged, phased rollout of open banking and open finance requirements.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -294,7 +294,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both are glossary/definitions sections establishing core terminology (APIs, standards, reciprocity vs open finance, platform, data provider/consumer) needed to operationalise an open finance regime.",
+    "summary": "Both define the core terms needed to operate an open finance regime.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -315,7 +315,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "A describes a market-driven emergence of bilateral API arrangements and legacy techniques (e.g. screen scraping) prior to regulation in the US, whereas B mandates a standardised, machine-readable platform interface for data requests as part of a regulated open finance framework.",
+    "summary": "The BIS paper describes market-led bilateral APIs before regulation; the draft mandates a standardised platform interface.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -336,7 +336,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "A highlights a market-led approach where data sharing arrangements developed before formal regulation, while B sets out an ex-ante regulatory framework governing how open finance data sharing must be conducted.",
+    "summary": "The BIS paper describes data sharing that grew before regulation; the draft sets an upfront regulatory framework.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -357,7 +357,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both texts highlight open finance's benefits for consumers—greater access, better-informed decisions, credit access, and financial inclusion.",
+    "summary": "Both highlight open finance's consumer benefits: better access, informed decisions, credit, and financial inclusion.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -378,7 +378,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "A describes the US's historically market-driven, bilateral-agreement approach to data sharing prior to regulation, while B mandates a structured regulatory framework from the outset for open finance in Malaysia.",
+    "summary": "The BIS paper describes the US's market-led approach; the draft sets a structured regulatory framework from the start.",
     "label": "differs-on",
     "sentiment": "tighten",
     "source_clauses": [
@@ -403,7 +403,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "A raises challenges of cross-border interoperability, standards alignment and consent management for data portability, while B's vision extends open finance principles to broader domestic and regional data sharing initiatives aligned with global standards.",
+    "summary": "The BIS paper flags cross-border interoperability and consent challenges; the draft extends principles to regional data sharing.",
     "label": "differs-on",
     "sentiment": "neutral",
     "source_clauses": [
@@ -424,7 +424,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "A's discussion of consent management systems and governance models for data sharing parallels B's formal definitions of open finance arrangements, platforms, and consent-based information sharing.",
+    "summary": "Both address consent management and governance for data sharing, which the draft anchors in formal definitions.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -445,7 +445,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "A's definition of open data as sharing customer-permissioned data beyond the financial sector (healthcare, utilities, telecoms, taxes) matches BNM's vision of extending open finance principles to a broader Open Data ecosystem across other sectors.",
+    "summary": "Both extend data sharing beyond finance: the BIS paper defines open data, the draft envisions a national Open Data ecosystem.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -466,7 +466,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "A's definition of open banking as customer-permissioned sharing of data by banks with third parties aligns with B's framing of open finance as consent-driven information sharing that gives customers control over how their data is shared.",
+    "summary": "Both define data sharing as customer-permissioned: the BIS paper on open banking, the draft on consent-driven control.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -487,7 +487,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both sources emphasize designing open finance frameworks that balance innovation with consumer protection, risk management and market/system integrity.",
+    "summary": "Both stress balancing innovation with consumer protection, risk management, and market integrity.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -508,7 +508,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "A's goal of building inclusive open finance ecosystems aligns with B's identification of financial inclusion as a key benefit of open finance for customers.",
+    "summary": "Both treat financial inclusion as a goal of open finance.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -529,7 +529,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both discuss open finance/open data extending beyond the financial sector to other industries and public data ecosystems.",
+    "summary": "Both discuss open data extending beyond finance to other industries and public data.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -550,7 +550,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "The BIS paper notes jurisdictions are at varying stages of open finance implementation and that regulation acts as an enabler, while BNM's document sets out a phased, multi-year rollout to allow orderly adoption.",
+    "summary": "Both see open finance as an evolving rollout: the BIS paper across jurisdictions, the draft as a phased domestic plan.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -571,7 +571,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "Both emphasize that open finance holds strong potential for innovation and competition but requires careful risk management/prudent balance between innovation and risk.",
+    "summary": "Both see strong potential for innovation and competition but stress careful risk management.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -592,7 +592,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "The BIS conclusion frames open finance as an evolving, multi-year process still in early implementation stages for many jurisdictions, matching BNM's approach of gradual phasing to build stakeholder confidence.",
+    "summary": "Both view open finance as an evolving, multi-year process still early in implementation.",
     "label": "aligns-with",
     "sentiment": null,
     "source_clauses": [
@@ -613,7 +613,7 @@
     "review_state": "pending"
   },
   {
-    "summary": "On the topic of breach handling and incident response, document B (Bank Negara) requires FSPs to maintain a breach handling and response plan with escalation procedures and clear lines of responsibility for theft, loss, misuse or unauthorised access to customer information in open finance arrangements (11.12). Document A (BIS paper) mentions cyber threats and privacy breaches as risks but has no provision requiring an incident response or breach-containment plan.",
+    "summary": "The draft requires a breach handling and response plan; the BIS paper is silent on incident response.",
     "label": "silent-on",
     "sentiment": null,
     "source_clauses": [],
@@ -623,13 +623,13 @@
         "text": "breach handling and response plan in the event of theft, loss, misuse or\nunauthorised access, modification or disclosure of customer information\nassociated with an open finance arrangement. The plan must, at a minimum,\ninclude escalation procedures and a clear line of responsibility to contain the\ncustomer information breach and take remedial actions."
       }
     ],
-    "scope_note": "B sets an operational breach-response obligation; A only notes cyber/privacy breaches as abstract risks.",
+    "scope_note": "The BIS paper has no provision requiring an incident-response or breach-containment plan.",
     "supported": true,
     "id": "89c69687e5a5",
     "review_state": "pending"
   },
   {
-    "summary": "On the topic of board and senior management governance of open finance, document B (Bank Negara) mandates that the board and senior management exercise effective oversight of implementation and that material issues such as customer information security breaches be escalated to the board (7.1, 7.2, and 7(b)(c)...). Document A (BIS paper) discusses institutional coordination and governance frameworks at ecosystem level but has no provision assigning internal governance/oversight responsibilities to a firm's board or senior management.",
+    "summary": "The draft requires board-level oversight of open finance; the BIS paper covers only ecosystem governance.",
     "label": "silent-on",
     "sentiment": null,
     "source_clauses": [],
@@ -643,13 +643,13 @@
         "text": "ensure that material issues and concerns relating to the FSP's open\nfinance arrangements are promptly escalated to the board, which include\nbut are not limited to breaches of customer information security and\nconfidentiality."
       }
     ],
-    "scope_note": "B imposes firm-level board accountability; A addresses only ecosystem-level governance frameworks.",
+    "scope_note": "The BIS paper has no provision assigning internal oversight duties to a firm's board or senior management.",
     "supported": true,
     "id": "75ba964043a2",
     "review_state": "pending"
   },
   {
-    "summary": "On the topic of consent voluntariness and prohibition of bundled/coerced consent, document B (Bank Negara) prohibits data consumers from compelling, coercing or misleading customers, bars bundled/blanket consent and pre-ticked opt-out consent, and requires straightforward revocability (10(a), 8(c)(d), 11). Document A (BIS paper) notes that 'consent alone may be insufficient' but has no provision prohibiting bundled consent or specifying how consent must be obtained to be valid.",
+    "summary": "The draft sets detailed rules for valid consent, banning bundled or coerced consent; the BIS paper is silent.",
     "label": "silent-on",
     "sentiment": null,
     "source_clauses": [],
@@ -667,7 +667,7 @@
         "text": "\"explicit and deliberate\" consent by a customer as there is no way to definitively establish that the\ncustomer consented to the pre-ticked box and the applicable statement/term.\n\nS 10.4 An FSP shall ensure that the consent dashboard reflects the real-time status of\nconsent and is updated immediately upon any renewal, revocation or expiration\nof consent."
       }
     ],
-    "scope_note": "B sets detailed rules on how valid consent must be captured; A only observes consent may be insufficient without a robust framework.",
+    "scope_note": "The BIS paper has no provision on how consent must be captured to be valid, such as barring bundled or pre-ticked consent.",
     "supported": true,
     "id": "2231f75988f9",
     "review_state": "pending"

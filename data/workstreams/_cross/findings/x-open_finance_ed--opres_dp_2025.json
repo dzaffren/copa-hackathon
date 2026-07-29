@@ -1,9 +1,9 @@
 [
   {
-    "summary": "Open finance's operational resilience obligations for ensuring continuity during disruptions, system downtime, API outages, and third-party failures directly embody the operational resilience themes and business continuity requirements discussed in the discussion paper.",
+    "summary": "Both documents require keeping services running during disruptions; open finance covers API outages, the discussion paper covers critical operations.",
     "label": "aligns-with",
     "sentiment": null,
-    "scope_note": "Open finance frames continuity around availability, integrity and confidentiality of data exchanged, whereas the discussion paper's continuity concept centres on identifying and preserving 'critical operations and/or services' more broadly; alignment is thematic rather than a one-to-one requirement mapping.",
+    "scope_note": "Open finance frames continuity around data availability; the discussion paper focuses more broadly on preserving critical operations and services, so the alignment is thematic rather than requirement-by-requirement.",
     "supported": true,
     "source_clauses": [
       {
@@ -31,10 +31,10 @@
     ]
   },
   {
-    "summary": "Open finance's reliance on third-party service providers and cloud/outsourcing arrangements maps directly to the discussion paper's concerns on external dependency management and third-party oversight requirements.",
+    "summary": "The discussion paper's third-party risk concerns go further than open finance's, adding concentration and systemic risk beyond data-handling oversight.",
     "label": "goes-beyond",
     "sentiment": null,
-    "scope_note": "Open finance's third-party obligations are anchored to data privacy/confidentiality/security (via the Customer Information, RMIT and Outsourcing policy documents), while the discussion paper's third-party concern extends to substitutability, concentration and systemic risk which open finance does not explicitly address.",
+    "scope_note": "Open finance's third-party rules focus on data privacy, confidentiality and security, while the discussion paper also covers substitutability, concentration and systemic risk that open finance does not address.",
     "supported": true,
     "source_clauses": [
       {
@@ -62,7 +62,7 @@
     ]
   },
   {
-    "summary": "Open finance's cyber and API security control requirements correspond to the discussion paper's emphasis on managing cyber threats and vulnerabilities in software supply chains and interfaces.",
+    "summary": "Both documents stress cyber and API security; open finance sets controls, the discussion paper flags supply-chain and interface threats.",
     "label": "aligns-with",
     "sentiment": null,
     "scope_note": null,
@@ -93,10 +93,10 @@
     ]
   },
   {
-    "summary": "Open finance's requirement for board and senior management oversight of resilient and secure operations aligns with the discussion paper's call for board-level ownership and accountability for operational resilience.",
+    "summary": "The discussion paper goes beyond open finance by naming one person ultimately accountable for resilience, not just general board oversight.",
     "label": "goes-beyond",
     "sentiment": null,
-    "scope_note": "Open finance does not mandate a single ultimately-accountable person for operational resilience outcomes (cf. OpRes 6.3 Responsibility Mapping); it relies on general board/senior-management oversight applied to open finance activities.",
+    "scope_note": "Open finance relies on general board and senior management oversight; it does not require a single ultimately accountable person as OpRes 6.3 Responsibility Mapping does.",
     "supported": true,
     "source_clauses": [
       {
@@ -128,10 +128,10 @@
     ]
   },
   {
-    "summary": "Both documents rely on the same underlying policy documents (BCM, RMIT, Outsourcing, Risk Governance, Operational Risk) as the foundation for operational resilience and technology risk management.",
+    "summary": "Both documents build on the same underlying policy documents (BCM, RMIT, Outsourcing) as the foundation for resilience and technology risk.",
     "label": "aligns-with",
     "sentiment": null,
-    "scope_note": "The two documents cite differing effective/issuance dates for the same instruments (e.g. RMIT issued 1 June 2023 per Open Finance 6.1(h) vs 28 November 2025 per OpRes footnote 6); the shared foundation holds but versions may differ.",
+    "scope_note": "The two documents cite different issuance dates for the same instruments (e.g. RMIT: 1 June 2023 versus 28 November 2025), so the shared foundation holds but versions may differ.",
     "supported": true,
     "source_clauses": [
       {
@@ -167,10 +167,10 @@
     ]
   },
   {
-    "summary": "Open finance's independent review requirements relating to operational resilience of technology functions correspond to the discussion paper's emphasis on scenario testing and validation of recovery capabilities.",
+    "summary": "Open finance requires independent review of technology resilience; the discussion paper instead emphasises scenario testing and validating recovery.",
     "label": "differs-on",
     "sentiment": "tighten",
-    "scope_note": "Open finance requires independent review/audit and assurance coverage but does not prescribe severe-but-plausible scenario testing; the connection to OpRes scenario-testing themes is aspirational. OpRes 5.3 (board technical literacy) dropped as not supported by the cited open finance clauses.",
+    "scope_note": "Open finance requires independent review and assurance but does not prescribe severe-but-plausible scenario testing, so the link to the discussion paper's testing themes is aspirational.",
     "supported": true,
     "source_clauses": [
       {
@@ -194,10 +194,10 @@
     ]
   },
   {
-    "summary": "Open finance's concentration of participation on shared platforms and common data-sharing infrastructure amplifies the systemic and concentration risks the discussion paper identifies from interconnected shared infrastructures.",
+    "summary": "Open finance's shared-platform participation adds to the systemic and concentration risks the discussion paper identifies from interconnected infrastructure.",
     "label": "aligns-with",
     "sentiment": null,
-    "scope_note": "This is an inferred systemic-risk linkage; open finance clauses describe interface/platform obligations rather than explicitly recognising concentration risk, so the mapping is analytical rather than textual.",
+    "scope_note": "Open finance clauses describe platform and interface obligations rather than naming concentration risk, so this systemic-risk link is analytical rather than stated in the text.",
     "supported": true,
     "source_clauses": [
       {
@@ -225,10 +225,10 @@
     ]
   },
   {
-    "summary": "Open finance's uptime and availability requirements for platform participation reflect the discussion paper's low-tolerance-for-downtime expectations and consumer sensitivity to service outages.",
+    "summary": "Open finance sets uptime and availability requirements; the discussion paper frames this as low tolerance for downtime and impact tolerances.",
     "label": "differs-on",
     "sentiment": "tighten",
-    "scope_note": "Open finance sets uptime requirements via platform membership rules rather than defining impact tolerances; the discussion paper's impact-tolerance/MTD/RTO concepts (OpRes 2.9(d)) are broader than open finance's uptime obligations.",
+    "scope_note": "Open finance sets uptime through platform membership rules rather than impact tolerances; the discussion paper's impact-tolerance, MTD and RTO concepts are broader than uptime obligations.",
     "supported": true,
     "source_clauses": [
       {
@@ -256,10 +256,10 @@
     ]
   },
   {
-    "summary": "Open finance's customer information breach handling and incident response plan requirements correspond to the discussion paper's emphasis on effective incident response, timely escalation, and remediation of weaknesses.",
+    "summary": "Open finance requires customer-information breach handling and response plans; the discussion paper covers broader incident response, escalation and remediation.",
     "label": "differs-on",
     "sentiment": "tighten",
-    "scope_note": "Open finance breach handling is scoped specifically to customer information breaches under the PDPA and Customer Information policy document, narrower than the discussion paper's general operational incident response and continuous-learning themes.",
+    "scope_note": "Open finance breach handling is limited to customer information breaches under the PDPA and Customer Information policy document, narrower than the discussion paper's general incident response themes.",
     "supported": true,
     "source_clauses": [
       {
@@ -291,7 +291,7 @@
     ]
   },
   {
-    "summary": "Open finance's requirement to establish and maintain business continuity plans covering service continuity in the event of disruptions maps to the discussion paper's reliance on the BCM policy document for continuity of critical business functions.",
+    "summary": "Both require business continuity plans; open finance covers open-finance disruptions, the discussion paper relies on the BCM policy document.",
     "label": "aligns-with",
     "sentiment": null,
     "scope_note": null,
@@ -322,10 +322,10 @@
     ]
   },
   {
-    "summary": "Open finance's requirement to ensure data consumers apply safeguards at least equivalent to their own, and to manage risks posed to and by other participants, reflects the discussion paper's theme of mapping and managing internal and external interdependencies across interconnected institutions.",
+    "summary": "Open finance manages data-sharing risks between participants; the discussion paper maps broader people, process, technology and facility interdependencies.",
     "label": "differs-on",
     "sentiment": "tighten",
-    "scope_note": "Open finance's dependency concern is data-flow specific (risks arising from information received from data providers and posed to data consumers) rather than the full people/process/technology/facilities mapping envisaged in OpRes 3.3(b).",
+    "scope_note": "Open finance's dependency concern is limited to data flows between providers and consumers, not the full people, process, technology and facilities mapping in OpRes 3.3(b).",
     "supported": true,
     "source_clauses": [
       {
@@ -353,10 +353,10 @@
     ]
   },
   {
-    "summary": "Open finance's framing of secure, resilient data-sharing infrastructure as foundational to trust and resilience in an increasingly digital financial system echoes the discussion paper's context of rising digitalisation, deeper dependency chains, and the imperative to sustain continuity of essential digital services.",
+    "summary": "Both documents tie secure digital infrastructure to trust and resilience amid rising digitalisation and deeper dependency chains.",
     "label": "aligns-with",
     "sentiment": null,
-    "scope_note": "Contextual/thematic alignment on digitalisation and resilience objectives rather than an operative requirement mapping.",
+    "scope_note": "This is contextual, thematic alignment on digitalisation and resilience objectives rather than a mapping between operative requirements.",
     "supported": true,
     "source_clauses": [
       {
