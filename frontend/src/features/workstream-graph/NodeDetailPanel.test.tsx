@@ -310,6 +310,54 @@ describe("NodeDetailPanel", () => {
     expect(screen.getByText("Policy owner")).toBeInTheDocument();
   });
 
+  it("abandoning a profile edit changes nothing", async () => {
+    seedNode(ENRICHED_SUPERVISORY_LETTER);
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="rmit-v2-2025"
+        nodeId="bnm-supervisory-letter-rmit-2025"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/rmit-v2-2025",
+    );
+
+    await screen.findByText("supervisory-letter");
+    await userEvent.click(screen.getByRole("button", { name: /^edit$/i }));
+    const applicability = screen.getByLabelText("Applicability");
+    await userEvent.clear(applicability);
+    await userEvent.type(applicability, "Everyone");
+    await userEvent.click(screen.getByRole("button", { name: /^cancel$/i }));
+
+    // Read mode returns with the stored value, not the typed one.
+    expect(screen.queryByLabelText("Applicability")).not.toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Financial institutions subject to the RMiT policy document",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Everyone")).not.toBeInTheDocument();
+  });
+
+  it("keeps the Edit button out of the disclosure toggle", async () => {
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="opres-v2"
+        nodeId="bcbs-opres-2021"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/opres-v2",
+    );
+
+    await screen.findByText("international-standard");
+    const edit = screen.getByRole("button", { name: /^edit$/i });
+    // A button nested inside a button is invalid HTML and breaks keyboard
+    // activation of both, so the two must be siblings.
+    expect(edit.parentElement?.closest("button")).toBeNull();
+    expect(
+      screen.getByRole("button", { name: /^metadata$/i }).contains(edit),
+    ).toBe(false);
+  });
+
   // --- Concepts (extracted axes) -------------------------------------------
 
   it("shows the four sections in order: neighbours, activity, metadata, concepts", async () => {
