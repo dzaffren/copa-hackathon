@@ -10,6 +10,7 @@ import {
   resetDraft,
   resetLinkageReview,
   resetReviewState,
+  resetSavedMetadata,
   resetTaskWorkflow,
 } from "./msw/handlers";
 
@@ -22,7 +23,8 @@ class ResizeObserverStub {
   disconnect() {}
 }
 globalThis.ResizeObserver =
-  globalThis.ResizeObserver ?? (ResizeObserverStub as unknown as typeof ResizeObserver);
+  globalThis.ResizeObserver ??
+  (ResizeObserverStub as unknown as typeof ResizeObserver);
 
 // jsdom implements no layout engine, so Element.scrollIntoView does not exist.
 // The review screen's clause panes call it to bring a cited clause into view;
@@ -45,6 +47,7 @@ afterEach(() => {
   resetCreatedWorkstreams();
   resetTaskWorkflow();
   resetLinkageReview();
+  resetSavedMetadata();
 });
 
 afterAll(() => server.close());

@@ -228,6 +228,37 @@ describe("NodeDetailPanel", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("Edit turns the profile into a form and a save shows the new values", async () => {
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="opres-v2"
+        nodeId="bcbs-opres-2021"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/opres-v2",
+    );
+
+    await screen.findByText("international-standard");
+    await userEvent.click(screen.getByRole("button", { name: /^edit$/i }));
+
+    // Read mode's flat values are replaced by inputs.
+    const owner = screen.getByLabelText("Policy owner");
+    await userEvent.type(owner, "Priya S.");
+    await userEvent.type(
+      screen.getByLabelText("Keywords"),
+      "operational resilience, third-party risk",
+    );
+    await userEvent.click(screen.getByRole("button", { name: /^save$/i }));
+
+    // Back to read mode, showing what she saved — the panel refetched the node.
+    await waitFor(() =>
+      expect(screen.queryByLabelText("Policy owner")).not.toBeInTheDocument(),
+    );
+    expect(await screen.findByText("Priya S.")).toBeInTheDocument();
+    expect(screen.getByText("operational resilience")).toBeInTheDocument();
+    expect(screen.getByText("third-party risk")).toBeInTheDocument();
+  });
+
   // --- Concepts (extracted axes) -------------------------------------------
 
   it("shows the four sections in order: neighbours, activity, metadata, concepts", async () => {
