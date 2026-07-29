@@ -9,10 +9,9 @@ guardrail (`_build_grounding_context` assembling only citable clauses,
 
 import json
 
-from engine import findings
+from engine import copilot, findings, workstreams
 from engine.clauses import ClauseIndex
 from engine.copilot import (
-    INTENTS,
     META_SENTINEL,
     NO_MATCHING_CLAUSE,
     _build_grounding_context,
@@ -568,6 +567,11 @@ def test_copilot_reply_stream_yields_error_event_on_stream_fn_exception(tmp_path
     assert "credentials" in error_events[0]["data"]["message"]
 
 
-def test_intents_tuple_has_the_seven_presets():
-    assert len(INTENTS) == 7
-    assert "PD" in INTENTS
+def test_the_deliverable_vocabulary_is_the_eight_shared_task_types():
+    """The Copilot no longer owns a vocabulary of its own: its old seven-preset
+    `INTENTS` tuple is gone, replaced by the one shared `TASK_TYPES` map."""
+    assert list(workstreams.TASK_TYPES) == [
+        "PD", "DP", "ED", "FAQ", "DECK", "FEEDBACK", "BENCHMARK", "OTHERS",
+    ]
+    assert workstreams.TASK_TYPES["PD"] == "Policy Document"
+    assert not hasattr(copilot, "INTENTS")
