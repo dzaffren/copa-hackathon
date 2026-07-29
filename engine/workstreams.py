@@ -393,6 +393,11 @@ def create_workstream(
     focal_node: dict[str, Any] = {
         "id": focal_id,
         "node_type": "task",
+        # The CODE, not the label — the title suffix above and the detail chip
+        # both derive from it, so "(PD)" reads as a suffix rather than "(Policy
+        # Document)". The workstream record stores the label instead; that
+        # asymmetry is deliberate (see the comment block above TASK_TYPES).
+        "task_type": body["deliverable_type"],
         "title": focal_title,
         "description": (body.get("description") or "").strip() or None,
         "source_url": None,

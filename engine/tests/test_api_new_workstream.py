@@ -207,6 +207,27 @@ def test_POST_seeds_exactly_one_focal_node_per_deliverable_type(
     assert "document_id" not in nodes[0]
 
 
+@pytest.mark.parametrize("code, label", list(workstreams.TASK_TYPES.items()))
+def test_POST_focal_node_stores_the_code_while_the_record_stores_the_label(
+    tmp_path, code, label
+):
+    """The deliberate asymmetry, pinned for all eight kinds: the graph node holds
+    the CODE (the title suffix and the detail chip derive from it) while
+    workstream.json holds the LABEL (the sidebar renders it raw). Parametrized off
+    TASK_TYPES itself so a ninth kind cannot be added without covering it.
+    """
+    client, dst = _make_client(tmp_path)
+    ws_id = _create(
+        client, name=f"Kind {code} workstream", deliverable_type=code
+    ).json()["id"]
+
+    node = _graph(dst, ws_id)["nodes"][0]
+    meta = json.loads((dst / ws_id / "workstream.json").read_text(encoding="utf-8"))
+    assert node["task_type"] == code
+    assert node["title"].endswith(f"({code})")
+    assert meta["deliverable_type"] == label
+
+
 def test_POST_new_workstream_appears_in_the_sidebar_list_with_a_role(tmp_path):
     """The sidebar renders `role` as a badge on every row, so a created
     workstream without one would render an empty badge."""
