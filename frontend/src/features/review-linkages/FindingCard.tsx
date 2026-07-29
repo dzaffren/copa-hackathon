@@ -46,6 +46,7 @@ export function FindingCard({
     <article
       data-testid="finding-card"
       data-finding-id={finding.id}
+      data-label={finding.label}
       data-active={isActive || undefined}
       data-review-state={finding.review_state}
       aria-current={isActive}

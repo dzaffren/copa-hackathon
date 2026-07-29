@@ -8,6 +8,7 @@ import {
   fetchTask,
   saveDraft,
 } from "@/lib/api";
+import { bySeverity } from "@/lib/labels";
 import type { LinkageCard } from "@/lib/types";
 import { EditorPane, type EditorPaneHandle } from "./EditorPane";
 import { LinkageRefCard } from "./LinkageRefCard";
@@ -83,8 +84,10 @@ export function DraftingWorkspacePage() {
     save.mutate(next);
   }
 
-  const reviewedCards = reviewed.data?.findings ?? [];
-  const relatedCards = related.data?.findings ?? [];
+  // Both side-panel lists render in attention order (conflicts-with first,
+  // aligns-with last), the same order the review screen and edge detail use.
+  const reviewedCards = bySeverity(reviewed.data?.findings ?? []);
+  const relatedCards = bySeverity(related.data?.findings ?? []);
 
   const tabs: { key: TabKey; label: string; count: number | null }[] = [
     { key: "reviewed", label: "Reviewed", count: reviewedCards.length },

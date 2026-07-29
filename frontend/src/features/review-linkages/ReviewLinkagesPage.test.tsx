@@ -15,6 +15,14 @@ function card(index: number): HTMLElement {
   return cards()[index];
 }
 
+/** The first card carrying `label`. Cards render in attention order, not file
+ *  order, so a test that wants a specific finding must ask for it by label. */
+function cardByLabel(label: string): HTMLElement {
+  const found = cards().find((c) => c.getAttribute("data-label") === label);
+  if (!found) throw new Error(`no finding card labelled ${label}`);
+  return found;
+}
+
 async function loadReview(edge = BCBS_EDGE) {
   renderApp(url(edge));
   await screen.findByRole("heading", { level: 1 });
@@ -32,17 +40,32 @@ describe("ReviewLinkagesPage — landing", () => {
       }),
     ).toBeInTheDocument();
 
+    // The panes filter to the auto-selected card's clauses, and the fixture's
+    // most urgent finding is the goes-beyond one on OpRes PD 4.7.
     const source = screen.getByLabelText("source clauses");
     const target = screen.getByLabelText("target clauses");
-    expect(within(source).getByText("OpRes PD 4.4")).toBeInTheDocument();
+    expect(within(source).getByText("OpRes PD 4.7")).toBeInTheDocument();
     expect(
       within(target).getByText("BCBS OpRes Principle 7"),
     ).toBeInTheDocument();
     expect(cards()).toHaveLength(3);
   });
 
-  it("shows verbatim clause text, not a truncated summary", async () => {
+  it("orders the cards by attention, most urgent first", async () => {
     await loadReview();
+    // Fixture: two aligns-with + one goes-beyond. goes-beyond outranks
+    // aligns-with, so it leads regardless of its position in the file.
+    expect(cards().map((c) => c.getAttribute("data-label"))).toEqual([
+      "goes-beyond",
+      "aligns-with",
+      "aligns-with",
+    ]);
+  });
+
+  it("shows verbatim clause text, not a truncated summary", async () => {
+    const user = userEvent.setup();
+    await loadReview();
+    await user.click(cardByLabel("aligns-with"));
     const source = screen.getByLabelText("source clauses");
     expect(
       within(source).getByText(
@@ -122,11 +145,11 @@ describe("ReviewLinkagesPage — accept / dismiss / reopen", () => {
   it("dismissing greys the card, sinks it to the bottom, and offers Reopen", async () => {
     const user = userEvent.setup();
     await loadReview();
-    const dismissedSummary = within(card(0)).getByText(
-      /Dependency mapping/,
-    ).textContent;
+    const target = cardByLabel("aligns-with");
+    const dismissedSummary =
+      within(target).getByText(/Dependency mapping/).textContent;
 
-    await user.click(within(card(0)).getByRole("button", { name: "Dismiss" }));
+    await user.click(within(target).getByRole("button", { name: "Dismiss" }));
 
     await waitFor(() =>
       expect(screen.getByTestId("count-dismissed")).toHaveTextContent(

@@ -1,9 +1,5 @@
 import { useState } from "react";
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Loader2, Search, Sparkles, Trash2, X } from "lucide-react";
 
@@ -13,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { deleteEdge, fetchEdgeDetail } from "@/lib/api";
 import { useAnalyzeEdge } from "@/lib/hooks/useAnalyzeEdge";
-import { labelStyle, labelText } from "@/lib/labels";
+import { bySeverity, labelStyle, labelText } from "@/lib/labels";
 
 interface EdgeDetailPanelProps {
   workstreamId: string;
@@ -130,8 +126,8 @@ export function EdgeDetailPanel({
           </Badge>
         </div>
         <h2 className="text-base font-bold leading-tight">
-          {edge.source.title}{" "}
-          <span className="text-muted-foreground">↔</span> {edge.target.title}
+          {edge.source.title} <span className="text-muted-foreground">↔</span>{" "}
+          {edge.target.title}
         </h2>
       </div>
 
@@ -182,7 +178,9 @@ export function EdgeDetailPanel({
             )}
           </div>
         ) : (
-          edge.findings.map((f, i) => {
+          // Attention order, not file order: a conflict must not sit below the
+          // alignments that happened to precede it in the findings file.
+          bySeverity(edge.findings).map((f, i) => {
             const style = labelStyle(f.label);
             return (
               <div

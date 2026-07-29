@@ -26,7 +26,13 @@ async function loadWorkspace() {
  *  Reviewed tab is populated by the real path rather than a seeded fixture. */
 async function acceptOnReviewScreen(user: ReturnType<typeof userEvent.setup>) {
   renderApp(`/workstreams/opres-v2/edges/${BCBS_EDGE}/review`);
-  const card = (await screen.findAllByTestId("finding-card"))[0];
+  // By label, not position: the review screen orders cards by attention
+  // (conflicts-with → … → aligns-with), so index 0 is not the aligns-with
+  // finding on OpRes PD 4.4 that the assertions below are about.
+  await screen.findAllByTestId("finding-card");
+  const card = screen
+    .getAllByTestId("finding-card")
+    .find((c) => c.getAttribute("data-label") === "aligns-with")!;
   await user.click(within(card).getByRole("button", { name: "Accept" }));
   await waitFor(() =>
     expect(screen.getByTestId("count-accepted")).toHaveTextContent(
@@ -188,7 +194,9 @@ describe("DraftingWorkspacePage — Copilot tab", () => {
     expect(screen.getByText(/UK PRA — PS6\/21/)).toBeInTheDocument();
     expect(screen.getByText(/MAS — BCM Guidelines/)).toBeInTheDocument();
     expect(screen.getByText(/HKMA — SA-2 Module/)).toBeInTheDocument();
-    expect(screen.getByText(/BCBS — OpRes Principles 2021/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/BCBS — OpRes Principles 2021/),
+    ).toBeInTheDocument();
 
     expect(screen.getByText("Aligned")).toBeInTheDocument();
     expect(screen.getAllByText("Gap detected")).toHaveLength(2);
