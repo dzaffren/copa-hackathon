@@ -68,7 +68,7 @@ export function Sidebar({
                 Project SELARAS
               </span>
               <span className="truncate text-[10px] text-muted-foreground">
-                Policy drafting intelligence
+                Policy coherence intelligence
               </span>
             </span>
           </Link>
