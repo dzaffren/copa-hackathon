@@ -33,3 +33,16 @@ npx playwright test
 
 `playwright.config.ts` starts the Vite dev server automatically (`npm run dev`)
 and reuses one if already running. The backend must be up separately.
+
+## Selecting a node
+
+The graph is drawn by `react-force-graph-2d` into a single `<canvas>`, so in a
+real browser there is **no per-node DOM element to click**. The accessible
+one-button-per-node DOM that the Vitest suite uses comes from the test stub
+(`src/test/mocks/react-force-graph-2d.tsx`) and does not exist under Playwright.
+The only DOM handles on a node are the detail panel's neighbour chips — see the
+`openNode` helper in `add-task-node.spec.ts`, which sweeps the canvas for any
+node then walks the chips to the one it wants. Specs written against
+`getByRole("button", { name: <node title> })` or `svg circle` (`add-edge`,
+`add-node-chunking`, `workstream-graph`) predate the canvas renderer and no
+longer pass.
