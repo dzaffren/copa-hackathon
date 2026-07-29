@@ -156,6 +156,52 @@ describe("AddNodeDialog", () => {
     ).toBeDisabled();
   });
 
+  // --- task type (deliverable kind) ----------------------------------------
+
+  it("asks for a task type only once the node is a working draft", async () => {
+    renderDialog();
+    expect(
+      screen.queryByRole("radiogroup", { name: "Task type" }),
+    ).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("radio", { name: "task" }));
+
+    const group = screen.getByRole("radiogroup", { name: "Task type" });
+    const options = within(group).getAllByRole("radio");
+    expect(options.map((o) => o.getAttribute("aria-label"))).toEqual([
+      "PD",
+      "DP",
+      "ED",
+      "FAQ",
+      "DECK",
+      "FEEDBACK",
+      "BENCHMARK",
+      "OTHERS",
+    ]);
+    // Nothing is preselected — the drafter must say which kind this is.
+    expect(
+      options.every((o) => o.getAttribute("aria-checked") === "false"),
+    ).toBe(true);
+  });
+
+  it("never asks a published context document for a task type", async () => {
+    renderDialog();
+    for (const nodeType of [
+      "international-standard",
+      "act-law",
+      "peer-regulator",
+      "industry-input",
+      "supervisory-letter",
+      "internal-published",
+      "others",
+    ]) {
+      await userEvent.click(screen.getByRole("radio", { name: nodeType }));
+      expect(
+        screen.queryByRole("radiogroup", { name: "Task type" }),
+      ).not.toBeInTheDocument();
+    }
+  });
+
   // --- first document on a brand-new workstream ----------------------------
 
   it("pre-fills the edge row when the focal node is the only target", async () => {

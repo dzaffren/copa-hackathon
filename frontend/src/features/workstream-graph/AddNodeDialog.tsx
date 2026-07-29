@@ -13,7 +13,14 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { createNode, HttpError } from "@/lib/api";
-import type { DocClass, EdgeType, GraphNode, NodeType } from "@/lib/types";
+import {
+  TASK_TYPE_OPTIONS,
+  type DocClass,
+  type EdgeType,
+  type GraphNode,
+  type NodeType,
+  type TaskTypeCode,
+} from "@/lib/types";
 import { NODE_LEGEND, NODE_LEGEND_ORDER } from "./legend";
 
 const EDGE_TYPE_OPTIONS: EdgeType[] = [
@@ -99,6 +106,7 @@ export function AddNodeDialog({
 }: AddNodeDialogProps) {
   const queryClient = useQueryClient();
   const [nodeType, setNodeType] = useState<NodeType>("international-standard");
+  const [taskType, setTaskType] = useState<TaskTypeCode | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [sourceUrl, setSourceUrl] = useState("");
@@ -213,7 +221,13 @@ export function AddNodeDialog({
                     role="radio"
                     aria-checked={selected}
                     aria-label={t}
-                    onClick={() => setNodeType(t)}
+                    onClick={() => {
+                      setNodeType(t);
+                      // A deliverable kind belongs to a working draft only, so
+                      // switching away discards it — a stale pick must never
+                      // reach the server, which refuses it (TASK_TYPE_NOT_ALLOWED).
+                      if (t !== "task") setTaskType(null);
+                    }}
                     className={cn(
                       "flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-left text-[11px] font-medium transition",
                       selected
@@ -234,6 +248,48 @@ export function AddNodeDialog({
               })}
             </div>
           </div>
+
+          {/* Asked of a working draft only: a standard, act, or industry paper
+              is not a deliverable Aisyah is producing. No colour dots here —
+              those encode node type. */}
+          {nodeType === "task" && (
+            <div>
+              <span className="mb-1.5 block text-sm font-medium">
+                Task type
+              </span>
+              <div
+                role="radiogroup"
+                aria-label="Task type"
+                className={cn(
+                  "grid grid-cols-2 gap-1.5 sm:grid-cols-3",
+                  errorField === "task_type" &&
+                    "rounded-lg ring-1 ring-red-400",
+                )}
+              >
+                {TASK_TYPE_OPTIONS.map((option) => {
+                  const selected = option.code === taskType;
+                  return (
+                    <button
+                      key={option.code}
+                      type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      aria-label={option.code}
+                      onClick={() => setTaskType(option.code)}
+                      className={cn(
+                        "flex items-center rounded-lg border px-2 py-1.5 text-left text-[11px] font-medium transition",
+                        selected
+                          ? "border-primary/60 bg-primary/10 ring-1 ring-primary/40"
+                          : "border-border/60 hover:bg-accent/50",
+                      )}
+                    >
+                      <span className="truncate">{option.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           <label className="block text-sm">
             <span className="mb-1 block font-medium">Title</span>
