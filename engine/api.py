@@ -447,6 +447,38 @@ def _html_to_text(html: str) -> str:
     return text.strip()
 
 
+def _resolve_intent(node: dict[str, Any], ws_record: Optional[dict[str, Any]]) -> str:
+    """The deliverable kind the Copilot frames its help for, resolved server-side.
+
+    The drafter is never asked: they answered when they created the draft, so the
+    answer is read back off the working draft instead of off the request body.
+
+    Order, first hit wins:
+      1. the task node's `task_type` — the code recorded on the working draft;
+      2. the workstream record's `deliverable_type`, reverse-mapped from label to
+         code (the record stores "Policy Document", not "PD");
+      3. `"PD"`.
+
+    Steps 2 and 3 are NOT dead code, and are not reachable through the app
+    either: every task node created since the task-type epic carries a
+    `task_type`, so only a legacy node predating it can fall through to step 2,
+    and only a legacy workstream record missing `deliverable_type` too can reach
+    step 3. They are cheap insurance against a fixture or a hand-edited graph
+    that predates the epic, and they guarantee `_system_prompt` never
+    interpolates `None`.
+    """
+    node_task_type = node.get("task_type")
+    if node_task_type:
+        return str(node_task_type)
+    if ws_record is not None:
+        from_record = workstreams.task_type_code_for_label(
+            ws_record.get("deliverable_type")
+        )
+        if from_record:
+            return from_record
+    return "PD"
+
+
 def _parse_copilot_request(
     body: dict[str, Any],
 ) -> Union[dict[str, Any], JSONResponse]:
@@ -454,14 +486,12 @@ def _parse_copilot_request(
     routes pass to `engine.copilot`, or a `JSONResponse` error. `draft_html` is
     the drafter's LIVE editor content (possibly unsaved), flattened to text;
     `draft_selection` is their highlighted passage. Both are non-citable context
-    (see `engine.copilot._build_grounding_context`)."""
-    intent = body.get("intent")
-    if intent not in workstreams.TASK_TYPES:
-        return _ws_error(
-            400,
-            "INVALID_INTENT",
-            f"intent must be one of {list(workstreams.TASK_TYPES)}, got {intent!r}",
-        )
+    (see `engine.copilot._build_grounding_context`).
+
+    `intent` is deliberately NOT read here: the server resolves it from the task
+    node (`_resolve_intent`) and each route passes it on explicitly. A body that
+    still carries an `intent` is ignored rather than rejected — a stale client
+    should not get a 400 for sending a field the server no longer wants."""
     message = body.get("message")
     if not isinstance(message, str) or not message.strip():
         return _ws_error(400, "MESSAGE_REQUIRED", "message must be a non-empty string")
@@ -486,7 +516,6 @@ def _parse_copilot_request(
     )
 
     return {
-        "intent": intent,
         "message": message,
         "history": history,
         "referenced_finding_ids": referenced_finding_ids,
@@ -1986,9 +2015,11 @@ def create_app(
             return fields
 
         clause_index = load_clause_index(artifacts_dir)
+        record = workstreams.load_workstream(workstreams_dir, workstream_id)
         try:
             reply = copilot_reply_fn(
                 node=node,
+                intent=_resolve_intent(node, record),
                 clause_index=clause_index,
                 workstreams_dir=workstreams_dir,
                 workstream_id=workstream_id,
@@ -2020,8 +2051,10 @@ def create_app(
             return fields
 
         clause_index = load_clause_index(artifacts_dir)
+        record = workstreams.load_workstream(workstreams_dir, workstream_id)
         sse_generator = copilot_stream_fn(
             node=node,
+            intent=_resolve_intent(node, record),
             clause_index=clause_index,
             workstreams_dir=workstreams_dir,
             workstream_id=workstream_id,

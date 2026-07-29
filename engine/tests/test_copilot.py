@@ -567,6 +567,39 @@ def test_copilot_reply_stream_yields_error_event_on_stream_fn_exception(tmp_path
     assert "credentials" in error_events[0]["data"]["message"]
 
 
+def test_the_prompt_states_the_kind_without_claiming_the_drafter_chose_it(tmp_path):
+    """The drafter no longer selects a kind, so the prompt must not tell the model
+    they did — it states what the document IS. The citation guardrail either side
+    of that line is unchanged, and asserted here so a reword cannot quietly take
+    it with it."""
+    clause_index = _clause_index({})
+    node = {"id": "n1", "title": "RMiT FAQ", "document_id": None}
+    captured = {}
+
+    def stub_turn(system, messages):
+        captured["system"] = system
+        return "ok"
+
+    copilot_reply(
+        node=node,
+        intent="FAQ",
+        history=[],
+        message="help me draft a section",
+        referenced_finding_ids=[],
+        clause_index=clause_index,
+        workstreams_dir=tmp_path,
+        workstream_id=_WORKSTREAM,
+        turn_fn=stub_turn,
+    )
+
+    system = captured["system"]
+    assert "FAQ" in system
+    assert "has selected" not in system
+    # The guardrail must survive the reword verbatim.
+    assert "never licenses inventing content" in system
+    assert copilot.NO_MATCHING_CLAUSE in system
+
+
 def test_the_deliverable_vocabulary_is_the_eight_shared_task_types():
     """The Copilot no longer owns a vocabulary of its own: its old seven-preset
     `INTENTS` tuple is gone, replaced by the one shared `TASK_TYPES` map."""
