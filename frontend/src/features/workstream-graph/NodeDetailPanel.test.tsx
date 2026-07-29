@@ -199,6 +199,35 @@ describe("NodeDetailPanel", () => {
     ).toBeGreaterThan(0);
   });
 
+  it("offers a fillable profile, not a dead end, on a node nobody prepared", async () => {
+    // The seeded BCBS node has no side-file, so its metadata arrives as the
+    // placeholder shape the four other consumers still read.
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="opres-v2"
+        nodeId="bcbs-opres-2021"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/opres-v2",
+    );
+
+    await screen.findByText("international-standard");
+    await userEvent.click(screen.getByRole("button", { name: /^metadata$/i }));
+
+    // Every field is named and honestly empty — eight "Not set" plus the ISMP
+    // row, which is pending rather than merely unfilled.
+    expect(screen.getAllByText("Not set")).toHaveLength(8);
+    expect(screen.getByText("Policy owner")).toBeInTheDocument();
+    expect(screen.getByText("ISMP classification")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Pending — RH publication form/),
+    ).toBeInTheDocument();
+    // The MVP1 apology must never reach the drafter again.
+    expect(
+      screen.queryByText(/concept extraction not enabled/i),
+    ).not.toBeInTheDocument();
+  });
+
   // --- Concepts (extracted axes) -------------------------------------------
 
   it("shows the four sections in order: neighbours, activity, metadata, concepts", async () => {

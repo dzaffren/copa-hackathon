@@ -25,41 +25,19 @@ import {
 } from "@/lib/types";
 import { AddEdgeDialog } from "./AddEdgeDialog";
 import { nodeStyle } from "./legend";
+import {
+  asList,
+  CONCEPT_FIELD_ORDER,
+  ISMP_PENDING,
+  LIST_FIELDS,
+} from "./metadata";
+import { NodeMetadataForm } from "./NodeMetadataForm";
 
 function conceptsAvailable(
   concepts: ConceptsAvailable | { status: string; message: string },
 ): concepts is ConceptsAvailable {
   return concepts.status === "available";
 }
-
-/** Normalise a concept value to a display list (a list stays a list, a scalar
- *  becomes one item, null/undefined becomes empty). Lets `keywords` and
- *  `legal_basis` render as chips regardless of older scalar side-files. */
-function asList(value: string[] | string | null | undefined): string[] {
-  if (value == null) return [];
-  return Array.isArray(value) ? value : [value];
-}
-
-// Display order + labels for the regulatory-profile concept fields. `legal_basis`
-// and `ismp_classification` were added for Cross-Workstream Intelligence — a
-// shared Act or classification is a strong overlap signal.
-const CONCEPT_FIELD_ORDER: [keyof Omit<ConceptsAvailable, "status">, string][] =
-  [
-    ["policy_owner", "Policy owner"],
-    ["applicability", "Applicability"],
-    ["empowerment_framework", "Empowerment framework"],
-    ["requirement", "Requirement"],
-    ["issuance_date", "Issuance date"],
-    ["effective_date", "Effective date"],
-    ["keywords", "Keywords"],
-    ["legal_basis", "Legal basis"],
-    ["ismp_classification", "ISMP classification"],
-  ];
-
-// Fields whose values render as chips rather than a single line.
-const CHIP_FIELDS = new Set(["keywords", "legal_basis"]);
-
-const ISMP_PENDING = "Pending — RH publication form";
 
 interface NodeDetailPanelProps {
   workstreamId: string;
@@ -122,6 +100,9 @@ export function NodeDetailPanel({
 }: NodeDetailPanelProps) {
   const navigate = useNavigate();
   const [conceptsOpen, setConceptsOpen] = useState(false);
+  // The profile is read-only until Edit is pressed: several fields hold
+  // word-for-word quotations, so a stray keystroke must not be able to alter one.
+  const [metadataEditing, setMetadataEditing] = useState(false);
   const [addEdgeOpen, setAddEdgeOpen] = useState(false);
   // Two-step delete: the first click arms it, the second commits. Deletion
   // cascades (linkages, findings, passages, concepts) and cannot be undone, so
@@ -183,6 +164,10 @@ export function NodeDetailPanel({
   // carries the extracted axis pills rendered in its own section below.
   const concepts = node.metadata;
   const enriched = conceptsAvailable(concepts);
+  // `null` when the node has no side-file yet. The placeholder shape stays in the
+  // response for the cross-workstream consumers that read it; the panel simply
+  // renders an empty-but-fillable profile from it instead of its message.
+  const profile = enriched ? concepts : null;
   const style = nodeStyle(node.node_type);
   const isTask = node.node_type === "task";
   const subBadge = [node.issuer, node.short_type].filter(Boolean).join(" · ");
@@ -207,6 +192,19 @@ export function NodeDetailPanel({
   // document, which is never asked what kind of deliverable it is.
   const taskTypeLabel =
     TASK_TYPE_OPTIONS.find((o) => o.code === node.task_type)?.label ?? null;
+
+  // First row of the profile on a working draft, and static text in edit mode
+  // too: the deliverable kind is set once at creation and is never an input.
+  // A context document is never asked what kind of deliverable it is, so it gets
+  // no such row at all.
+  const taskTypeRow = taskTypeLabel && (
+    <div className="mt-2 text-sm">
+      <span className="block text-xs font-medium text-muted-foreground">
+        Task type
+      </span>
+      <span className="block">{taskTypeLabel}</span>
+    </div>
+  );
 
   return (
     <div className="flex h-full flex-col animate-in slide-in-from-right-4 duration-200">
@@ -316,37 +314,71 @@ export function NodeDetailPanel({
         </section>
 
         <section>
-          <button
-            type="button"
-            onClick={() => setConceptsOpen((o) => !o)}
-            aria-expanded={conceptsOpen}
-            className="flex w-full items-center justify-between text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-          >
-            <span>Metadata</span>
-            <ChevronDown
-              className={cn(
-                "h-4 w-4 transition-transform",
-                conceptsOpen && "rotate-180",
-              )}
-            />
-          </button>
+          {/* The Edit button is a SIBLING of the disclosure toggle, not nested
+              inside it — a button within a button is invalid HTML and breaks
+              keyboard activation of both. */}
+          <div className="flex items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={() => setConceptsOpen((o) => !o)}
+              aria-expanded={conceptsOpen}
+              className="flex flex-1 items-center justify-between text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+            >
+              <span>Metadata</span>
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 transition-transform",
+                  conceptsOpen && "rotate-180",
+                )}
+              />
+            </button>
+            {/* Offered on every node type: the prepared profiles already cover
+                context documents, so restricting editing to working drafts would
+                leave those uncorrectable. */}
+            {!metadataEditing && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-6 px-2 text-[11px]"
+                onClick={() => {
+                  setConceptsOpen(true);
+                  setMetadataEditing(true);
+                }}
+              >
+                Edit
+              </Button>
+            )}
+          </div>
           {conceptsOpen &&
-            (conceptsAvailable(concepts) ? (
-              <dl className="mt-2 space-y-2 text-sm">
-                {CONCEPT_FIELD_ORDER.map(([field, label]) => {
-                  const value = concepts[field];
-                  const chips = CHIP_FIELDS.has(field) ? asList(value) : null;
-                  const pending =
-                    field === "ismp_classification" && value == null
-                      ? ISMP_PENDING
-                      : null;
-                  return (
-                    <div key={field}>
-                      <dt className="text-xs font-medium text-muted-foreground">
-                        {label}
-                      </dt>
-                      {chips ? (
-                        chips.length > 0 ? (
+            (metadataEditing ? (
+              <>
+                {taskTypeRow}
+                <NodeMetadataForm
+                  workstreamId={workstreamId}
+                  nodeId={node.id}
+                  initial={profile}
+                  onDone={() => setMetadataEditing(false)}
+                />
+              </>
+            ) : (
+              <>
+                {taskTypeRow}
+                <dl className="mt-2 space-y-2 text-sm">
+                  {CONCEPT_FIELD_ORDER.map(([field, label]) => {
+                    // A node with no side-file yet reads as nine empty fields
+                    // rather than an apology: every one of them is fillable.
+                    const value = profile?.[field] ?? null;
+                    const chips = LIST_FIELDS.has(field) ? asList(value) : null;
+                    const pending =
+                      field === "ismp_classification" && value == null
+                        ? ISMP_PENDING
+                        : null;
+                    return (
+                      <div key={field}>
+                        <dt className="text-xs font-medium text-muted-foreground">
+                          {label}
+                        </dt>
+                        {chips && chips.length > 0 ? (
                           <dd className="flex flex-wrap gap-1">
                             {chips.map((c) => (
                               <span
@@ -358,27 +390,23 @@ export function NodeDetailPanel({
                             ))}
                           </dd>
                         ) : (
-                          <dd className="text-muted-foreground">
-                            Not available
+                          <dd
+                            className={cn(
+                              (!value || pending) && "text-muted-foreground",
+                            )}
+                          >
+                            {/* "Not set" is a state a drafter can change, unlike
+                              the old "not available". */}
+                            {(typeof value === "string" ? value : null) ??
+                              pending ??
+                              "Not set"}
                           </dd>
-                        )
-                      ) : (
-                        <dd
-                          className={cn(
-                            (!value || pending) && "text-muted-foreground",
-                          )}
-                        >
-                          {value ?? pending ?? "Not available"}
-                        </dd>
-                      )}
-                    </div>
-                  );
-                })}
-              </dl>
-            ) : (
-              <p className="mt-2 text-sm text-muted-foreground">
-                {concepts.message}
-              </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </dl>
+              </>
             ))}
         </section>
 
