@@ -366,6 +366,25 @@ def test_a_task_node_is_created_with_its_deliverable_kind(tmp_path):
     assert node["task_type"] == "DECK"
 
 
+def test_a_task_node_without_a_deliverable_kind_is_refused(tmp_path):
+    """The add-node form refuses a working draft with no kind the same way it
+    refuses one with no title — and, like every other failure on this route,
+    leaves graph.json untouched."""
+    client, dst = _client(tmp_path)
+    payload = _payload(**_TASK_NODE)
+    del payload["task_type"]
+    before = _graph(dst)
+
+    res = _post(client, payload)
+
+    assert res.status_code == 400
+    body = res.json()
+    assert body["code"] == "INVALID_TASK_TYPE"
+    assert body["field"] == "task_type"
+    assert body["message"] == "Choose what kind of deliverable this is."
+    assert _graph(dst) == before
+
+
 def test_two_workstreams_can_add_the_same_titled_document(tmp_path):
     """The collision the flat layout allowed: identical titles in different
     workstreams derive the same node id, so their sources must not share a path."""

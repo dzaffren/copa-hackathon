@@ -317,6 +317,17 @@ def _ws_error(
     return JSONResponse(status_code=status_code, content=content)
 
 
+# Which input on the add-node form each `validate_node_create` failure belongs
+# to, so the dialog can ring the offending control instead of showing a banner.
+# A codes-not-listed-here failure (EDGE_REQUIRED, INVALID_NODE_TYPE) has no
+# single input to blame and gets no `field`.
+_NODE_CREATE_ERROR_FIELDS: dict[str, str] = {
+    "INVALID_DOC_CLASS": "doc_class",
+    "INVALID_TASK_TYPE": "task_type",
+    "TASK_TYPE_NOT_ALLOWED": "task_type",
+}
+
+
 def _ws_axes_dir(workstreams_dir: Path, workstream_id: str) -> Path:
     """Where a workstream's axis cache lives — beside its graph and findings, so
     a workstream prepared ahead of a demo travels with its concepts."""
@@ -1382,10 +1393,7 @@ def create_app(
             )
         problem = workstreams.validate_node_create(body)
         if problem is not None:
-            return _ws_error(
-                *problem,
-                field="doc_class" if problem[1] == "INVALID_DOC_CLASS" else None,
-            )
+            return _ws_error(*problem, field=_NODE_CREATE_ERROR_FIELDS.get(problem[1]))
         # An attached document must declare how to break it up — the drafter
         # chooses; the tool never guesses (a wrong guess yields useless passages).
         if upload is not None and "doc_class" not in body:

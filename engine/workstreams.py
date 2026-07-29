@@ -451,12 +451,18 @@ def make_edge_id(source: str, target: str) -> str:
 def validate_node_create(body: dict[str, Any]) -> Optional[tuple[int, str, str]]:
     """Validate an add-node request body. Returns `None` when valid, else the
     `(status, code, message)` for the first rule broken, checked in this order:
-    node type, then `doc_class` (when supplied), then ≥1 edge, then each edge's
-    type and a present target.
+    node type, then `task_type`, then `doc_class` (when supplied), then ≥1 edge,
+    then each edge's type and a present target. The order mirrors the form, so
+    the response always points at the topmost problem on it.
 
     `doc_class` is optional here because the legacy JSON path adds a node
     without a document to chunk. The route requires it whenever an attachment
     is present — presence of the file is what makes the choice meaningful.
+
+    `task_type` is required of a working draft and refused of everything else.
+    Refused rather than silently dropped: a client sending a deliverable kind
+    for an act of law has misunderstood the contract, and swallowing it hides
+    that until someone wonders why the kind never appears.
     """
     if body.get("node_type") not in NODE_TYPES:
         return (
@@ -464,6 +470,20 @@ def validate_node_create(body: dict[str, Any]) -> Optional[tuple[int, str, str]]
             "INVALID_NODE_TYPE",
             f"node_type must be one of the eight flat types, got "
             f"{body.get('node_type')!r}",
+        )
+    if body.get("node_type") == "task":
+        if body.get("task_type") not in TASK_TYPES:
+            return (
+                400,
+                "INVALID_TASK_TYPE",
+                "Choose what kind of deliverable this is.",
+            )
+    elif "task_type" in body:
+        return (
+            400,
+            "TASK_TYPE_NOT_ALLOWED",
+            f"Only a working draft carries a deliverable kind; "
+            f"{body['node_type']!r} does not.",
         )
     if "doc_class" in body and body.get("doc_class") not in DOC_CLASSES:
         return (
