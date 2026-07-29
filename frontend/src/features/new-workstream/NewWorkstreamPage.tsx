@@ -5,10 +5,10 @@ import { X } from "lucide-react";
 
 import { createWorkstream, fetchReviewers, HttpError } from "@/lib/api";
 import {
-  DELIVERABLE_TYPE_OPTIONS,
+  TASK_TYPE_OPTIONS,
   type AccessLevel,
-  type DeliverableTypeCode,
   type Person,
+  type TaskTypeCode,
 } from "@/lib/types";
 
 /** The three-card create form.
@@ -26,8 +26,7 @@ export function NewWorkstreamPage() {
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [deliverableType, setDeliverableType] =
-    useState<DeliverableTypeCode>("PD");
+  const [deliverableType, setDeliverableType] = useState<TaskTypeCode>("PD");
   const [targetPublication, setTargetPublication] = useState("");
   const [reviewers, setReviewers] = useState<Person[]>([]);
   const [access, setAccess] = useState<AccessLevel>("team_only");
@@ -143,12 +142,12 @@ export function NewWorkstreamPage() {
               <select
                 value={deliverableType}
                 onChange={(e) =>
-                  setDeliverableType(e.target.value as DeliverableTypeCode)
+                  setDeliverableType(e.target.value as TaskTypeCode)
                 }
                 aria-label="Deliverable type"
                 className="mt-1 w-full rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-primary/60"
               >
-                {DELIVERABLE_TYPE_OPTIONS.map((o) => (
+                {TASK_TYPE_OPTIONS.map((o) => (
                   <option key={o.code} value={o.code}>
                     {o.label}
                   </option>

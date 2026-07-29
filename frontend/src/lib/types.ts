@@ -466,18 +466,25 @@ export type SSEEvent =
 
 // --- New Workstream --------------------------------------------------------
 
-/** Wire codes for the deliverable dropdown. The server maps these to the human
- *  labels the fixtures store ("PD" → "Policy Document"). */
-export type DeliverableTypeCode = "PD" | "ED" | "DP" | "Other";
+/** Wire codes for the eight deliverable kinds BNM publishes — the one vocabulary
+ *  asked at workstream creation and of every new working draft. Mirrors
+ *  `engine/workstreams.py::TASK_TYPES`, whose order this preserves. */
+export type TaskTypeCode =
+  "PD" | "DP" | "ED" | "FAQ" | "DECK" | "FEEDBACK" | "BENCHMARK" | "OTHERS";
 
-export const DELIVERABLE_TYPE_OPTIONS: {
-  code: DeliverableTypeCode;
-  label: string;
-}[] = [
-  { code: "PD", label: "Policy Document (PD)" },
-  { code: "ED", label: "Exposure Draft (ED)" },
-  { code: "DP", label: "Discussion Paper (DP)" },
-  { code: "Other", label: "Other" },
+/** Drafter-facing labels. These differ from the labels the engine STORES
+ *  ("PD" → "Policy Document"): a picker needs the short form visible, because
+ *  the code is what an auto-generated draft title embeds. The asymmetry is
+ *  deliberate and documented above `TASK_TYPES` in the engine. */
+export const TASK_TYPE_OPTIONS: { code: TaskTypeCode; label: string }[] = [
+  { code: "PD", label: "PD — Policy Document" },
+  { code: "DP", label: "DP — Discussion Paper" },
+  { code: "ED", label: "ED — Exposure Draft" },
+  { code: "FAQ", label: "FAQ" },
+  { code: "DECK", label: "Engagement Deck" },
+  { code: "FEEDBACK", label: "Feedback Template for Industry" },
+  { code: "BENCHMARK", label: "Peer Benchmarking" },
+  { code: "OTHERS", label: "Others" },
 ];
 
 export type AccessLevel = "team_only" | "department_wide";
@@ -490,7 +497,7 @@ export interface Person {
 export interface CreateWorkstreamRequest {
   name: string;
   description?: string;
-  deliverable_type: DeliverableTypeCode;
+  deliverable_type: TaskTypeCode;
   target_publication?: string;
   reviewer_ids: string[];
   access: AccessLevel;

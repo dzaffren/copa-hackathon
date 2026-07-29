@@ -46,6 +46,34 @@ describe("NewWorkstreamPage — landing", () => {
     expect(screen.getByLabelText("Deliverable type")).toHaveValue("PD");
   });
 
+  it("offers all eight deliverable kinds, in vocabulary order", async () => {
+    await loadForm();
+    const select = screen.getByLabelText("Deliverable type");
+    const options = within(select).getAllByRole("option");
+    expect(options.map((o) => o.getAttribute("value"))).toEqual([
+      "PD",
+      "DP",
+      "ED",
+      "FAQ",
+      "DECK",
+      "FEEDBACK",
+      "BENCHMARK",
+      "OTHERS",
+    ]);
+    // The dropdown shows the drafter-facing label, which for the three coded
+    // kinds prefixes the short form the generated draft title embeds.
+    expect(options.map((o) => o.textContent)).toEqual([
+      "PD — Policy Document",
+      "DP — Discussion Paper",
+      "ED — Exposure Draft",
+      "FAQ",
+      "Engagement Deck",
+      "Feedback Template for Industry",
+      "Peer Benchmarking",
+      "Others",
+    ]);
+  });
+
   it("never offers the owner as a reviewer of her own workstream", async () => {
     await loadForm();
     await screen.findByRole("button", { name: "+ Farid M." });
