@@ -137,6 +137,43 @@ describe("NodeDetailPanel", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows the deliverable kind as a chip, by label not code", async () => {
+    seedNode({
+      ...ENRICHED_SUPERVISORY_LETTER,
+      id: "opres-industry-briefing",
+      node_type: "task",
+      task_type: "DECK",
+      title: "OpRes Industry Briefing",
+    });
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="opres-v2"
+        nodeId="opres-industry-briefing"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/opres-v2",
+    );
+
+    // The drafter reads "Engagement Deck", never the stored "DECK".
+    expect(await screen.findByTestId("task-type-chip")).toHaveTextContent(
+      "Engagement Deck",
+    );
+  });
+
+  it("shows no deliverable chip for a published context document", async () => {
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="opres-v2"
+        nodeId="bcbs-opres-2021"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/opres-v2",
+    );
+
+    await screen.findByText("international-standard");
+    expect(screen.queryByTestId("task-type-chip")).not.toBeInTheDocument();
+  });
+
   it("renders keyword + legal-basis chips in the Metadata disclosure", async () => {
     seedNode(ENRICHED_SUPERVISORY_LETTER);
     renderWithProviders(

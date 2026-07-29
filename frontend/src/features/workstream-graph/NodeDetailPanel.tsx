@@ -18,7 +18,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { deleteNode, extractConcepts, fetchNodeDetail } from "@/lib/api";
-import type { ConceptsAvailable, GraphNode } from "@/lib/types";
+import {
+  TASK_TYPE_OPTIONS,
+  type ConceptsAvailable,
+  type GraphNode,
+} from "@/lib/types";
 import { AddEdgeDialog } from "./AddEdgeDialog";
 import { nodeStyle } from "./legend";
 
@@ -198,6 +202,12 @@ export function NodeDetailPanel({
     node.ismp_classification;
   const ismpBadge = ismpValue ?? (enriched ? ISMP_PENDING : null);
 
+  // The chip reads the drafter-facing label, never the stored code — "DECK" is
+  // a title suffix, not something to show as a badge. Absent for a context
+  // document, which is never asked what kind of deliverable it is.
+  const taskTypeLabel =
+    TASK_TYPE_OPTIONS.find((o) => o.code === node.task_type)?.label ?? null;
+
   return (
     <div className="flex h-full flex-col animate-in slide-in-from-right-4 duration-200">
       <PanelHeader onClose={onClose} />
@@ -206,6 +216,14 @@ export function NodeDetailPanel({
           <Badge className={cn("border uppercase tracking-wide", style.badge)}>
             {node.node_type}
           </Badge>
+          {taskTypeLabel && (
+            <span
+              data-testid="task-type-chip"
+              className="inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary"
+            >
+              {taskTypeLabel}
+            </span>
+          )}
           {subBadge && (
             <span className="text-xs text-muted-foreground">{subBadge}</span>
           )}

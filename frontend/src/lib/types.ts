@@ -224,6 +224,9 @@ export interface ConceptsAvailable {
 export interface NodeDetail {
   id: string;
   node_type: NodeType;
+  /** The deliverable kind, set once at creation and thereafter read-only.
+   *  `null` on a context document, and on a legacy draft that carries none. */
+  task_type: TaskTypeCode | null;
   title: string;
   issuer: string | null;
   short_type: string | null;
