@@ -257,6 +257,28 @@ export interface ExtractConceptsResponse {
   recent_activity: RecentActivity[];
 }
 
+/** The nine editable profile fields. Every key is sent on every save — the
+ *  server does a full replacement, so an omitted field is stored as null. That
+ *  is what makes "clear a field" and "never filled it in" the same state. */
+export interface NodeMetadataRequest {
+  policy_owner: string | null;
+  applicability: string | null;
+  empowerment_framework: string | null;
+  requirement: string | null;
+  issuance_date: string | null;
+  effective_date: string | null;
+  keywords: string[] | null;
+  legal_basis: string[] | null;
+  ismp_classification: string | null;
+}
+
+export interface NodeMetadataResponse {
+  node_id: string;
+  /** The saved profile in the GET's `metadata` shape, so the client can drop it
+   *  straight into its cache. */
+  metadata: ConceptsAvailable;
+}
+
 export interface EdgeEndpoint {
   id: string;
   title: string;

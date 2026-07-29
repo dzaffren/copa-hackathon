@@ -1,5 +1,6 @@
 import { http, HttpResponse } from "msw";
 import type {
+  ConceptsAvailable,
   Connection,
   CreateWorkstreamRequest,
   CreateWorkstreamResponse,
@@ -633,6 +634,19 @@ const TASK_ACTIVITY = [
   },
 ];
 
+/** Profiles saved through the PUT within a single test run, so an edit-then-read
+ *  round-trip behaves like the real side-file store. `resetSavedMetadata()`
+ *  clears it between tests. */
+const savedMetadata = new Map<string, ConceptsAvailable>();
+
+export function resetSavedMetadata() {
+  savedMetadata.clear();
+}
+
+/** A node id a test can PUT to when it needs the save to be refused, so the
+ *  failure path is reachable without overriding the handler. */
+export const METADATA_SAVE_FAILS_NODE_ID = "node-that-cannot-be-saved";
+
 function buildNodeDetail(nodeId: string): NodeDetail | null {
   const node = GRAPH_NODES[nodeId];
   if (!node) return null;
@@ -664,10 +678,14 @@ function buildNodeDetail(nodeId: string): NodeDetail | null {
     })),
     second_order_neighbours: { status: "placeholder", message: "N/A in demo" },
     recent_activity: node.node_type === "task" ? TASK_ACTIVITY : [],
-    metadata: {
-      status: "placeholder",
-      message: "Concept extraction not enabled in MVP1",
-    },
+    // Un-enriched by default — the placeholder shape the four cross-workstream
+    // consumers still read. Once a test saves a profile, the GET returns it.
+    metadata:
+      savedMetadata.get(nodeId) ??
+      ({
+        status: "placeholder",
+        message: "Concept extraction not enabled in MVP1",
+      } as const),
     concepts: { status: "not_extracted", axes: [] },
   };
 }
@@ -1746,6 +1764,21 @@ export const handlers = [
       { status: 201 },
     );
   }),
+  // Mirrors the route's full replacement: whatever the nine-field body carries is
+  // stored whole and echoed back in the GET's `metadata` shape.
+  http.put(
+    "*/api/workstreams/:workstreamId/nodes/:nodeId/metadata",
+    async ({ request, params }) => {
+      const nodeId = params.nodeId as string;
+      if (nodeId === METADATA_SAVE_FAILS_NODE_ID) {
+        return jsonError(502, "SAVE_FAILED", "The profile could not be saved");
+      }
+      const body = (await request.json()) as Record<string, unknown>;
+      const metadata = { status: "available", ...body } as ConceptsAvailable;
+      savedMetadata.set(nodeId, metadata);
+      return HttpResponse.json({ node_id: nodeId, metadata });
+    },
+  ),
   http.post(
     "*/api/workstreams/:workstreamId/edges/:edgeId/analyze",
     ({ params }) => {

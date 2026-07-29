@@ -199,6 +199,165 @@ describe("NodeDetailPanel", () => {
     ).toBeGreaterThan(0);
   });
 
+  it("offers a fillable profile, not a dead end, on a node nobody prepared", async () => {
+    // The seeded BCBS node has no side-file, so its metadata arrives as the
+    // placeholder shape the four other consumers still read.
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="opres-v2"
+        nodeId="bcbs-opres-2021"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/opres-v2",
+    );
+
+    await screen.findByText("international-standard");
+    await userEvent.click(screen.getByRole("button", { name: /^metadata$/i }));
+
+    // Every field is named and honestly empty — eight "Not set" plus the ISMP
+    // row, which is pending rather than merely unfilled.
+    expect(screen.getAllByText("Not set")).toHaveLength(8);
+    expect(screen.getByText("Policy owner")).toBeInTheDocument();
+    expect(screen.getByText("ISMP classification")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Pending — RH publication form/),
+    ).toBeInTheDocument();
+    // The MVP1 apology must never reach the drafter again.
+    expect(
+      screen.queryByText(/concept extraction not enabled/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it("Edit turns the profile into a form and a save shows the new values", async () => {
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="opres-v2"
+        nodeId="bcbs-opres-2021"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/opres-v2",
+    );
+
+    await screen.findByText("international-standard");
+    await userEvent.click(screen.getByRole("button", { name: /^edit$/i }));
+
+    // Read mode's flat values are replaced by inputs.
+    const owner = screen.getByLabelText("Policy owner");
+    await userEvent.type(owner, "Priya S.");
+    await userEvent.type(
+      screen.getByLabelText("Keywords"),
+      "operational resilience, third-party risk",
+    );
+    await userEvent.click(screen.getByRole("button", { name: /^save$/i }));
+
+    // Back to read mode, showing what she saved — the panel refetched the node.
+    await waitFor(() =>
+      expect(screen.queryByLabelText("Policy owner")).not.toBeInTheDocument(),
+    );
+    expect(await screen.findByText("Priya S.")).toBeInTheDocument();
+    expect(screen.getByText("operational resilience")).toBeInTheDocument();
+    expect(screen.getByText("third-party risk")).toBeInTheDocument();
+  });
+
+  it("lists a working draft's deliverable kind on its profile, uneditable", async () => {
+    seedNode({
+      ...ENRICHED_SUPERVISORY_LETTER,
+      id: "rmit-faq-v1",
+      node_type: "task",
+      task_type: "FAQ",
+      title: "RMiT FAQ — v1",
+    });
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="rmit-v2-2025"
+        nodeId="rmit-faq-v1"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/rmit-v2-2025",
+    );
+
+    await screen.findByText("task");
+    await userEvent.click(screen.getByRole("button", { name: /^metadata$/i }));
+
+    // The first row of the profile, reading the drafter-facing label. "FAQ" now
+    // appears twice: the badge-row chip and this profile row.
+    expect(screen.getByText("Task type")).toBeInTheDocument();
+    expect(screen.getAllByText("FAQ")).toHaveLength(2);
+
+    // It stays static text in edit mode — set once at creation, never an input.
+    await userEvent.click(screen.getByRole("button", { name: /^edit$/i }));
+    expect(screen.getByText("Task type")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Task type")).not.toBeInTheDocument();
+    // Every other field is still editable.
+    expect(screen.getByLabelText("Policy owner")).toBeEnabled();
+  });
+
+  it("shows no Task type row on a published context document", async () => {
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="opres-v2"
+        nodeId="bcbs-opres-2021"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/opres-v2",
+    );
+
+    await screen.findByText("international-standard");
+    await userEvent.click(screen.getByRole("button", { name: /^metadata$/i }));
+
+    // A standard is never asked what kind of deliverable it is.
+    expect(screen.queryByText("Task type")).not.toBeInTheDocument();
+    expect(screen.getByText("Policy owner")).toBeInTheDocument();
+  });
+
+  it("abandoning a profile edit changes nothing", async () => {
+    seedNode(ENRICHED_SUPERVISORY_LETTER);
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="rmit-v2-2025"
+        nodeId="bnm-supervisory-letter-rmit-2025"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/rmit-v2-2025",
+    );
+
+    await screen.findByText("supervisory-letter");
+    await userEvent.click(screen.getByRole("button", { name: /^edit$/i }));
+    const applicability = screen.getByLabelText("Applicability");
+    await userEvent.clear(applicability);
+    await userEvent.type(applicability, "Everyone");
+    await userEvent.click(screen.getByRole("button", { name: /^cancel$/i }));
+
+    // Read mode returns with the stored value, not the typed one.
+    expect(screen.queryByLabelText("Applicability")).not.toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Financial institutions subject to the RMiT policy document",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Everyone")).not.toBeInTheDocument();
+  });
+
+  it("keeps the Edit button out of the disclosure toggle", async () => {
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="opres-v2"
+        nodeId="bcbs-opres-2021"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/opres-v2",
+    );
+
+    await screen.findByText("international-standard");
+    const edit = screen.getByRole("button", { name: /^edit$/i });
+    // A button nested inside a button is invalid HTML and breaks keyboard
+    // activation of both, so the two must be siblings.
+    expect(edit.parentElement?.closest("button")).toBeNull();
+    expect(
+      screen.getByRole("button", { name: /^metadata$/i }).contains(edit),
+    ).toBe(false);
+  });
+
   // --- Concepts (extracted axes) -------------------------------------------
 
   it("shows the four sections in order: neighbours, activity, metadata, concepts", async () => {
