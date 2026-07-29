@@ -464,3 +464,32 @@ def test_a_legacy_side_file_missing_the_newer_keys_is_upgraded_on_save(tmp_path)
     assert list(upgraded) == list(CONCEPT_FIELDS)
     assert upgraded["legal_basis"] == ["FSA 2013"]
     assert upgraded["ismp_classification"] is None
+
+
+def test_a_body_that_is_not_an_object_is_refused(tmp_path):
+    """A JSON array or bare string is not a profile. Named separately from the
+    field-level type checks because there is no field to blame."""
+    client, _ = _make_client(tmp_path)
+
+    for body in (["policy_owner"], "policy_owner", 7):
+        response = client.put(
+            _metadata_url("open-finance-pd-2026", "bis-papers-168"), json=body
+        )
+        assert response.status_code == 400
+        assert response.json()["code"] == "INVALID_METADATA"
+        assert "field" not in response.json()
+
+
+def test_a_bare_string_list_field_is_stored_as_is(tmp_path):
+    """`keywords` and `legal_basis` tolerate a scalar, because older side-files
+    carry one and the panel's `asList` already renders either shape. Nothing
+    splits it on commas — that is the form's job, not the route's."""
+    client, _ = _make_client(tmp_path)
+
+    response = client.put(
+        _metadata_url("open-finance-pd-2026", "bis-papers-168"),
+        json={"keywords": "cloud, technology risk"},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["metadata"]["keywords"] == "cloud, technology risk"
