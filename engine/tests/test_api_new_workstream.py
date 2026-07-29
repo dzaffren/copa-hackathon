@@ -46,6 +46,41 @@ class _Omit:
 _OMIT = _Omit()
 
 
+# --- The shared deliverable vocabulary -------------------------------------
+
+
+def test_task_types_are_the_eight_kinds_in_order():
+    """Order is contractual: the frontend renders the dropdown in map order, so
+    the drafter always meets PD first and Others last."""
+    assert list(workstreams.TASK_TYPES.items()) == [
+        ("PD", "Policy Document"),
+        ("DP", "Discussion Paper"),
+        ("ED", "Exposure Draft"),
+        ("FAQ", "FAQ"),
+        ("DECK", "Engagement Deck"),
+        ("FEEDBACK", "Feedback Template for Industry"),
+        ("BENCHMARK", "Peer Benchmarking"),
+        ("OTHERS", "Others"),
+    ]
+
+
+@pytest.mark.parametrize(
+    "label, expected",
+    [
+        ("Policy Document", "PD"),
+        ("Feedback Template for Industry", "FEEDBACK"),
+        ("Others", "OTHERS"),
+        ("Nonsense", None),
+        ("Other", None),
+        (None, None),
+    ],
+)
+def test_task_type_code_for_label_reverses_the_map(label, expected):
+    """workstream.json stores the label, graph nodes the code, so something has
+    to map back — derived from TASK_TYPES so the two directions cannot drift."""
+    assert workstreams.task_type_code_for_label(label) == expected
+
+
 # --- GET /api/reviewers ----------------------------------------------------
 
 
@@ -153,7 +188,11 @@ def test_POST_focal_node_carries_no_document(tmp_path):
         ("Operational Resilience PD v0.3", "PD"),
         ("Open Finance ED response", "ED"),
         ("Climate Risk DP", "DP"),
-        ("Supervisory Notes compilation", "Other"),
+        ("RMiT FAQ", "FAQ"),
+        ("OpRes Industry Briefing", "DECK"),
+        ("OpRes Feedback Form", "FEEDBACK"),
+        ("MAS Technology Risk Scan", "BENCHMARK"),
+        ("Supervisory Notes compilation", "OTHERS"),
     ],
 )
 def test_POST_seeds_exactly_one_focal_node_per_deliverable_type(
@@ -186,6 +225,31 @@ def test_POST_stores_the_human_deliverable_label_not_the_code(tmp_path):
     client, _ = _make_client(tmp_path)
     body = _create(client, deliverable_type="ED").json()
     assert body["deliverable_type"] == "Exposure Draft"
+
+
+@pytest.mark.parametrize(
+    "type_code, label",
+    [
+        ("FAQ", "FAQ"),
+        ("DECK", "Engagement Deck"),
+        ("FEEDBACK", "Feedback Template for Industry"),
+        ("BENCHMARK", "Peer Benchmarking"),
+        ("OTHERS", "Others"),
+    ],
+)
+def test_POST_stores_the_label_for_the_newly_expressible_kinds(
+    tmp_path, type_code, label
+):
+    """The four kinds a drafter previously had to record as "Other" — plus
+    "Others" itself — each store their own label, so the sidebar stops calling
+    an FAQ and an engagement deck the same thing."""
+    client, dst = _make_client(tmp_path)
+    res = _create(client, name=f"Kind {type_code}", deliverable_type=type_code)
+    assert res.status_code == 201
+    ws_id = res.json()["id"]
+    assert res.json()["deliverable_type"] == label
+    meta = json.loads((dst / ws_id / "workstream.json").read_text(encoding="utf-8"))
+    assert meta["deliverable_type"] == label
 
 
 def test_POST_with_only_the_required_fields(tmp_path):
@@ -254,6 +318,14 @@ def test_POST_name_that_slugifies_to_nothing_still_gets_an_id(tmp_path):
         ),
         (
             {"deliverable_type": "Manifesto"},
+            "INVALID_DELIVERABLE_TYPE",
+            "deliverable_type",
+        ),
+        # "Other" was the fourth option of the retired four-code list; the
+        # shared vocabulary spells it "OTHERS", and the old spelling is now as
+        # invalid as anything else outside the eight.
+        (
+            {"deliverable_type": "Other"},
             "INVALID_DELIVERABLE_TYPE",
             "deliverable_type",
         ),

@@ -50,7 +50,6 @@ from engine.copilot import copilot_reply_stream as _default_copilot_reply_stream
 from engine.config import REPO_ROOT
 from engine import (
     concepts,
-    copilot,
     cross_intel,
     directory,
     drafts,
@@ -446,11 +445,11 @@ def _parse_copilot_request(
     `draft_selection` is their highlighted passage. Both are non-citable context
     (see `engine.copilot._build_grounding_context`)."""
     intent = body.get("intent")
-    if intent not in copilot.INTENTS:
+    if intent not in workstreams.TASK_TYPES:
         return _ws_error(
             400,
             "INVALID_INTENT",
-            f"intent must be one of {list(copilot.INTENTS)}, got {intent!r}",
+            f"intent must be one of {list(workstreams.TASK_TYPES)}, got {intent!r}",
         )
     message = body.get("message")
     if not isinstance(message, str) or not message.strip():

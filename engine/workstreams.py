@@ -249,12 +249,28 @@ def edges_between(
 # which is just owner + reviewers restated, while the form captures an actual
 # policy choice. The three seeded fixtures were converted — losslessly, since
 # each one's list was exactly its owner plus its reviewers.
+#
+# TASK_TYPES is now shared beyond this form: the add-node dialog asks it of every
+# new working draft, and the Copilot reads the recorded answer instead of asking
+# again. It replaces the four-code `DELIVERABLE_TYPES` and the Copilot's own
+# seven-preset `INTENTS` — two lists describing one idea, which had drifted apart
+# far enough that an FAQ could only be recorded as "Other". Deleted outright
+# rather than aliased, because an alias is how they drifted in the first place.
 
-DELIVERABLE_TYPES: dict[str, str] = {
+# The eight deliverable kinds BNM actually publishes, code -> label, in the order
+# the drafter is offered them. The code is what an auto-generated draft title
+# embeds ("OpRes Feedback Form (FEEDBACK)"), which is why the longer kinds carry
+# a short form at all — the full label is unreadable inside a title. Note
+# "OTHERS", not the retired "Other": one spelling everywhere.
+TASK_TYPES: dict[str, str] = {
     "PD": "Policy Document",
-    "ED": "Exposure Draft",
     "DP": "Discussion Paper",
-    "Other": "Other",
+    "ED": "Exposure Draft",
+    "FAQ": "FAQ",
+    "DECK": "Engagement Deck",
+    "FEEDBACK": "Feedback Template for Industry",
+    "BENCHMARK": "Peer Benchmarking",
+    "OTHERS": "Others",
 }
 
 ACCESS_LEVELS: frozenset[str] = frozenset({"team_only", "department_wide"})
@@ -262,6 +278,15 @@ ACCESS_LEVELS: frozenset[str] = frozenset({"team_only", "department_wide"})
 NAME_MIN, NAME_MAX = 3, 120
 DESCRIPTION_MAX = 500
 TARGET_PUBLICATION_MAX = 60
+
+
+def task_type_code_for_label(label: Optional[str]) -> Optional[str]:
+    """The code whose label matches, or None. Derived from TASK_TYPES so the
+    two directions cannot drift."""
+    for code, code_label in TASK_TYPES.items():
+        if code_label == label:
+            return code
+    return None
 
 
 def validate_workstream_create(body: dict[str, Any]) -> Optional[tuple[str, str, str]]:
@@ -300,10 +325,10 @@ def validate_workstream_create(body: dict[str, Any]) -> Optional[tuple[str, str,
             f"Target publication must be {TARGET_PUBLICATION_MAX} characters or fewer.",
             "target_publication",
         )
-    if body.get("deliverable_type") not in DELIVERABLE_TYPES:
+    if body.get("deliverable_type") not in TASK_TYPES:
         return (
             "INVALID_DELIVERABLE_TYPE",
-            f"deliverable_type must be one of {sorted(DELIVERABLE_TYPES)}, "
+            f"deliverable_type must be one of {sorted(TASK_TYPES)}, "
             f"got {body.get('deliverable_type')!r}",
             "deliverable_type",
         )
@@ -376,7 +401,7 @@ def create_workstream(
     record: dict[str, Any] = {
         "id": ws_id,
         "name": name,
-        "deliverable_type": DELIVERABLE_TYPES[body["deliverable_type"]],
+        "deliverable_type": TASK_TYPES[body["deliverable_type"]],
         # Anything you create, you own — which is also what makes the sidebar's
         # role badge render.
         "role": "own",

@@ -14,7 +14,7 @@ import shutil
 import pytest
 from fastapi.testclient import TestClient
 
-from engine import copilot
+from engine import workstreams
 from engine.api import create_app
 from engine.config import REPO_ROOT
 
@@ -442,7 +442,7 @@ def test_POST_copilot_400_for_an_empty_message(tmp_path):
     assert res.json()["code"] == "MESSAGE_REQUIRED"
 
 
-@pytest.mark.parametrize("intent", copilot.INTENTS)
+@pytest.mark.parametrize("intent", list(workstreams.TASK_TYPES))
 def test_POST_copilot_accepts_every_preset(intent: str, tmp_path):
     client = _make_copilot_client(tmp_path, lambda **kwargs: {"role": "copilot", "text": "x"})
     res = client.post(
