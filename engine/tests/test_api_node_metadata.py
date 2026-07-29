@@ -257,3 +257,158 @@ def test_blank_input_normalises_to_null(tmp_path):
     saved = json.loads(path.read_text(encoding="utf-8"))
     assert saved["policy_owner"] is None
     assert saved["keywords"] is None
+
+
+def test_an_over_long_field_is_refused(tmp_path):
+    """Test 9: 2000 characters per scalar field, and past it nothing is written."""
+    client, workstreams_dir = _make_client(tmp_path)
+    path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
+
+    response = client.put(
+        _metadata_url("open-finance-pd-2026", "bis-papers-168"),
+        json={"requirement": "x" * 2001},
+    )
+
+    assert response.status_code == 413
+    assert response.json()["code"] == "METADATA_TOO_LARGE"
+    assert response.json()["field"] == "requirement"
+    assert not path.exists()
+
+
+def test_a_field_at_the_limit_is_accepted(tmp_path):
+    """The cap is inclusive — 2000 characters is a valid clause quote, and only
+    2001 is too many. Pins which side of the boundary rejects."""
+    client, _ = _make_client(tmp_path)
+
+    response = client.put(
+        _metadata_url("open-finance-pd-2026", "bis-papers-168"),
+        json={"requirement": "x" * 2000},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["metadata"]["requirement"] == "x" * 2000
+
+
+def test_too_many_list_members_are_refused(tmp_path):
+    """Test 10: at most 50 chips."""
+    client, workstreams_dir = _make_client(tmp_path)
+    path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
+
+    response = client.put(
+        _metadata_url("open-finance-pd-2026", "bis-papers-168"),
+        json={"keywords": [f"keyword {n}" for n in range(51)]},
+    )
+
+    assert response.status_code == 413
+    assert response.json()["code"] == "METADATA_TOO_LARGE"
+    assert response.json()["field"] == "keywords"
+    assert not path.exists()
+
+
+def test_an_over_long_list_member_is_refused(tmp_path):
+    """The other half of the list cap: 50 members, each at most 200 characters."""
+    client, _ = _make_client(tmp_path)
+
+    response = client.put(
+        _metadata_url("open-finance-pd-2026", "bis-papers-168"),
+        json={"legal_basis": ["FSA 2013", "x" * 201]},
+    )
+
+    assert response.status_code == 413
+    assert response.json()["code"] == "METADATA_TOO_LARGE"
+    assert response.json()["field"] == "legal_basis"
+
+
+def test_unknown_workstream_and_unknown_node_are_404_before_any_write(tmp_path):
+    """Test 11: both ids are resolved against the graph before anything is written."""
+    client, workstreams_dir = _make_client(tmp_path)
+    before = sorted(p for p in workstreams_dir.rglob("*") if p.is_file())
+
+    missing_ws = client.put(
+        _metadata_url("nope", "x"), json={"policy_owner": "Aisyah R."}
+    )
+    assert missing_ws.status_code == 404
+    assert missing_ws.json()["code"] == "WORKSTREAM_NOT_FOUND"
+
+    missing_node = client.put(
+        _metadata_url("open-finance-pd-2026", "nope"),
+        json={"policy_owner": "Aisyah R."},
+    )
+    assert missing_node.status_code == 404
+    assert missing_node.json()["code"] == "NODE_NOT_FOUND"
+
+    assert sorted(p for p in workstreams_dir.rglob("*") if p.is_file()) == before
+
+
+def test_a_traversal_shaped_node_id_writes_nothing_anywhere(tmp_path):
+    """Test 12: a traversal-shaped node id never reaches the filesystem.
+
+    `concepts_path` interpolates `node_id` straight into a path, so
+    `../../escape` would write outside the workstream if it ever got as far as
+    the write. Two layers stop it, and this pins both — asserting only the status
+    code would not catch a write that happened before the refusal, so what is
+    asserted is that no new file appeared anywhere under `tmp_path`.
+
+    The percent-encoded form the spec names is refused by Starlette's router
+    before the handler runs, so it carries the router's `{"detail": ...}` rather
+    than a `_ws_error` body. That is a stricter outcome than the spec assumed,
+    not a weaker one; the separator-shaped ids that DO reach the handler are
+    covered below.
+    """
+    client, workstreams_dir = _make_client(tmp_path)
+    before = sorted(p for p in tmp_path.rglob("*") if p.is_file())
+
+    response = client.put(
+        "/api/workstreams/open-finance-pd-2026/nodes/..%2F..%2Fescape/metadata",
+        json={"policy_owner": "Aisyah R."},
+    )
+
+    assert response.status_code == 404
+    assert sorted(p for p in tmp_path.rglob("*") if p.is_file()) == before
+    assert not (tmp_path / "escape.json").exists()
+    assert not (workstreams_dir.parent / "escape.json").exists()
+
+
+def test_a_traversal_id_that_reaches_the_handler_is_node_not_found(tmp_path):
+    """The other half of Test 12: the guard itself, not the router.
+
+    A backslash-separated id routes as one path segment, so it lands in the
+    handler with the separators intact — which is exactly the case the
+    NODE_NOT_FOUND guard has to catch, and the reason it must precede the write
+    rather than merely accompany it.
+    """
+    client, _ = _make_client(tmp_path)
+    before = sorted(p for p in tmp_path.rglob("*") if p.is_file())
+
+    response = client.put(
+        "/api/workstreams/open-finance-pd-2026/nodes/..%5C..%5Cescape/metadata",
+        json={"policy_owner": "Aisyah R."},
+    )
+
+    assert response.status_code == 404
+    assert response.json()["code"] == "NODE_NOT_FOUND"
+    assert sorted(p for p in tmp_path.rglob("*") if p.is_file()) == before
+
+
+def test_repeated_identical_saves_are_idempotent(tmp_path):
+    """Test 13: the same payload twice yields a byte-identical file and the same 200."""
+    client, workstreams_dir = _make_client(tmp_path)
+    path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
+    payload = {
+        "policy_owner": "Priya S.",
+        "keywords": ["operational resilience", "third-party risk"],
+        "legal_basis": ["FSA 2013"],
+    }
+
+    first = client.put(
+        _metadata_url("open-finance-pd-2026", "bis-papers-168"), json=payload
+    )
+    assert first.status_code == 200
+    after_first = path.read_bytes()
+
+    second = client.put(
+        _metadata_url("open-finance-pd-2026", "bis-papers-168"), json=payload
+    )
+    assert second.status_code == 200
+    assert path.read_bytes() == after_first
+    assert second.json() == first.json()
