@@ -1147,6 +1147,10 @@ def create_app(
         return {
             "id": node["id"],
             "node_type": node.get("node_type"),
+            # None for a context document, and for a working draft that predates
+            # the deliverable vocabulary — the retired seeded drafts are not
+            # backfilled, so the panel must render the chip conditionally.
+            "task_type": node.get("task_type"),
             "title": node.get("title"),
             "issuer": node.get("issuer"),
             "short_type": node.get("short_type"),

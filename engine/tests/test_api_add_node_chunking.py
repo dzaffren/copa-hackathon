@@ -444,6 +444,18 @@ def test_an_invalid_node_type_is_reported_before_a_missing_kind():
     assert problem[1] == "INVALID_NODE_TYPE"
 
 
+def test_node_detail_projects_the_recorded_deliverable_kind(tmp_path):
+    """The round trip the drafter performs: add the deck, then open it. The
+    detail panel renders the chip from this key."""
+    client, _ = _client(tmp_path)
+    node_id = _post(client, _payload(**_TASK_NODE)).json()["id"]
+
+    detail = client.get(f"/api/workstreams/{_OPRES}/nodes/{node_id}").json()
+
+    assert detail["node_type"] == "task"
+    assert detail["task_type"] == "DECK"
+
+
 def test_two_workstreams_can_add_the_same_titled_document(tmp_path):
     """The collision the flat layout allowed: identical titles in different
     workstreams derive the same node id, so their sources must not share a path."""
