@@ -3,6 +3,7 @@
     {
       "id": "open-finance-pd-2026-pd",
       "node_type": "task",
+      "task_type": "PD",
       "title": "Open Finance PD . 2026 (PD)",
       "description": "PD consolidating the 2025 Open Finance ED against peer guidance.",
       "source_url": null
