@@ -352,37 +352,11 @@ export interface AnalyzeResponse {
 
 // --- Drafting Workspace ----------------------------------------------------
 
-/** The seven Copilot intent presets. Cosmetic in MVP1 beyond keying the
- *  scripted reply map — they signal the surface area the tool will cover. */
-export type CopilotIntent =
-  | "PD"
-  | "DP"
-  | "ED"
-  | "FAQ"
-  | "Engagement Deck"
-  | "Feedback Template for Industry"
-  | "Peer Benchmarking";
-
-export const COPILOT_INTENTS: CopilotIntent[] = [
-  "PD",
-  "DP",
-  "ED",
-  "FAQ",
-  "Engagement Deck",
-  "Feedback Template for Industry",
-  "Peer Benchmarking",
-];
-
-/** Human labels for the intent dropdown. The wire values stay terse. */
-export const COPILOT_INTENT_LABELS: Record<CopilotIntent, string> = {
-  PD: "PD — Policy Document",
-  DP: "DP — Discussion Paper",
-  ED: "ED — Exposure Draft",
-  FAQ: "FAQ",
-  "Engagement Deck": "Engagement Deck",
-  "Feedback Template for Industry": "Feedback Template for Industry",
-  "Peer Benchmarking": "Peer Benchmarking",
-};
+// The Copilot's intent preset vocabulary lived here as `CopilotIntent` /
+// `COPILOT_INTENTS` / `COPILOT_INTENT_LABELS`. It is gone: the deliverable kind
+// is now `TASK_TYPE_OPTIONS` above, recorded on the task node at creation, and
+// the server reads it off that node. The drafter is never asked what they are
+// drafting, so there is no dropdown and no client-sent `intent`.
 
 export interface LinkageEndpoint {
   id: string;

@@ -9,13 +9,7 @@ import {
   RotateCcw,
   Send,
 } from "lucide-react";
-import {
-  COPILOT_INTENTS,
-  COPILOT_INTENT_LABELS,
-  type CopilotDraftContext,
-  type CopilotIntent,
-  type LinkageCard,
-} from "@/lib/types";
+import { type CopilotDraftContext, type LinkageCard } from "@/lib/types";
 
 interface CopilotTabProps {
   workstreamId: string;
@@ -262,7 +256,6 @@ const CHIPS = [
 ];
 
 export function CopilotTab({ onInsertSnippet }: CopilotTabProps) {
-  const [intent, setIntent] = useState<CopilotIntent>("PD");
   const [messages, setMessages] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -292,22 +285,6 @@ export function CopilotTab({ onInsertSnippet }: CopilotTabProps) {
 
   return (
     <div className="flex h-full flex-col" data-testid="copilot-tab">
-      <label className="block px-1 pb-2">
-        <span className="sr-only">Intent preset</span>
-        <select
-          aria-label="Intent preset"
-          value={intent}
-          onChange={(e) => setIntent(e.target.value as CopilotIntent)}
-          className="w-full rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-sm outline-none focus:border-primary/60"
-        >
-          {COPILOT_INTENTS.map((i) => (
-            <option key={i} value={i}>
-              {COPILOT_INTENT_LABELS[i]}
-            </option>
-          ))}
-        </select>
-      </label>
-
       <div
         ref={scrollRef}
         className="flex-1 space-y-4 overflow-y-auto px-1 pb-2"
@@ -415,7 +392,11 @@ export function CopilotTab({ onInsertSnippet }: CopilotTabProps) {
 
             {messages.map((m, i) =>
               m.role === "user" ? (
-                <div key={i} data-testid="chat-user" className="flex justify-end">
+                <div
+                  key={i}
+                  data-testid="chat-user"
+                  className="flex justify-end"
+                >
                   <p className="max-w-[85%] rounded-lg bg-primary px-2.5 py-1.5 text-sm leading-snug text-primary-foreground">
                     {m.text}
                   </p>

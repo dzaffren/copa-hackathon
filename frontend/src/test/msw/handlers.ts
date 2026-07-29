@@ -1,7 +1,6 @@
 import { http, HttpResponse } from "msw";
 import type {
   Connection,
-  CopilotIntent,
   CreateWorkstreamRequest,
   CreateWorkstreamResponse,
   CrossLink,
@@ -1405,18 +1404,13 @@ export const handlers = [
     "*/api/workstreams/:workstreamId/tasks/:nodeId/copilot",
     async ({ request }) => {
       const body = (await request.json()) as {
-        intent: CopilotIntent;
         message?: string;
         history?: { role: string; text: string }[];
         referenced_finding_ids?: string[];
       };
-      const script = COPILOT_SCRIPT[body.intent];
-      if (!script) {
-        return HttpResponse.json(
-          { code: "INVALID_INTENT", message: `bad intent ${body.intent}` },
-          { status: 400 },
-        );
-      }
+      // No `intent` on the wire: the server resolves the deliverable kind from
+      // the task node itself, so the mock serves the one script unconditionally.
+      const script = COPILOT_SCRIPT.PD;
       if (!body.message || !body.message.trim()) {
         return HttpResponse.json(
           { code: "MESSAGE_REQUIRED", message: "message must be non-empty" },
@@ -1441,17 +1435,10 @@ export const handlers = [
     "*/api/workstreams/:workstreamId/tasks/:nodeId/copilot/stream",
     async ({ request }) => {
       const body = (await request.json()) as {
-        intent: CopilotIntent;
         message?: string;
         history?: { role: string; text: string }[];
       };
-      const script = COPILOT_SCRIPT[body.intent];
-      if (!script) {
-        return HttpResponse.json(
-          { code: "INVALID_INTENT", message: `bad intent ${body.intent}` },
-          { status: 400 },
-        );
-      }
+      const script = COPILOT_SCRIPT.PD;
       if (!body.message?.trim()) {
         return HttpResponse.json(
           { code: "MESSAGE_REQUIRED", message: "message must be non-empty" },
