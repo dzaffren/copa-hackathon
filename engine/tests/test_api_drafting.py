@@ -352,10 +352,66 @@ def test_PUT_draft_does_not_touch_the_committed_fixture(tmp_path):
 # `find_connections_fn` — no network/credentials touched here.
 
 
-def _make_copilot_client(tmp_path, reply_fn):
+_UNSET = object()  # "leave the fixture alone", distinct from "remove the key"
+
+
+def _rewrite_task_type(dst, task_type):
+    """Set (or, with `None`, remove) `task_type` on the copied task node."""
+    path = dst / _OPRES / "graph.json"
+    graph = json.loads(path.read_text(encoding="utf-8"))
+    node = next(n for n in graph["nodes"] if n["id"] == _TASK)
+    if task_type is None:
+        node.pop("task_type", None)
+    else:
+        node["task_type"] = task_type
+    path.write_text(json.dumps(graph, indent=2), encoding="utf-8")
+
+
+def _rewrite_deliverable_type(dst, deliverable_type):
+    """Set (or, with `None`, remove) `deliverable_type` on the copied record.
+
+    The record stores the human LABEL ("Exposure Draft"), not the code.
+    """
+    path = dst / _OPRES / "workstream.json"
+    record = json.loads(path.read_text(encoding="utf-8"))
+    if deliverable_type is None:
+        record.pop("deliverable_type", None)
+    else:
+        record["deliverable_type"] = deliverable_type
+    path.write_text(json.dumps(record, indent=2), encoding="utf-8")
+
+
+def _make_copilot_client(tmp_path, reply_fn, *, task_type=_UNSET, deliverable_type=_UNSET):
     dst = tmp_path / "workstreams"
     shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
+    if task_type is not _UNSET:
+        _rewrite_task_type(dst, task_type)
+    if deliverable_type is not _UNSET:
+        _rewrite_deliverable_type(dst, deliverable_type)
     return TestClient(create_app(workstreams_dir=dst, copilot_reply_fn=reply_fn))
+
+
+def _capturing_client(tmp_path, **kwargs):
+    """A copilot client whose reply_fn records the kwargs the route passed it."""
+    captured = {}
+
+    def capture(**kw):
+        captured.update(kw)
+        return {"role": "copilot", "text": "ok"}
+
+    return _make_copilot_client(tmp_path, capture, **kwargs), captured
+
+
+def test_POST_copilot_resolves_the_intent_from_the_task_node(tmp_path):
+    """The drafter is never asked: the intent is the kind already recorded on
+    the working draft, and the request body never carries it."""
+    client, captured = _capturing_client(tmp_path, task_type="FAQ")
+    res = client.post(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
+        json={"message": "hi"},
+    )
+    assert res.status_code == 200
+    assert captured["intent"] == "FAQ"
 
 
 def test_POST_copilot_returns_the_injected_reply(tmp_path):
@@ -363,7 +419,7 @@ def test_POST_copilot_returns_the_injected_reply(tmp_path):
     client = _make_copilot_client(tmp_path, lambda **kwargs: stub_reply)
     body = client.post(
         f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
-        json={"intent": "PD", "message": "hi", "history": []},
+        json={"message": "hi", "history": []},
     ).json()
     assert body["reply"] == stub_reply
 
@@ -380,7 +436,6 @@ def test_POST_copilot_passes_message_history_and_references_to_the_reply_fn(tmp_
     client.post(
         f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
         json={
-            "intent": "PD",
             "message": "draft §6.3",
             "history": history,
             "referenced_finding_ids": ["e-opres_v0_3--bcbs_opres_2021~0"],
@@ -408,7 +463,6 @@ def test_POST_copilot_flattens_draft_html_and_forwards_the_selection(tmp_path):
     client.post(
         f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
         json={
-            "intent": "PD",
             "message": "suggestions on this?",
             "draft_html": "<h2>PART F</h2><p>This Part does <strong>not</strong> displace.</p>",
             "draft_selection": "This Part does not displace.",
@@ -422,21 +476,51 @@ def test_POST_copilot_flattens_draft_html_and_forwards_the_selection(tmp_path):
     assert captured["selection_text"] == "This Part does not displace."
 
 
-def test_POST_copilot_400_for_an_intent_outside_the_seven(tmp_path):
-    client = _make_copilot_client(tmp_path, lambda **kwargs: {"role": "copilot", "text": "x"})
+def test_POST_copilot_ignores_an_intent_still_sent_in_the_body(tmp_path):
+    """A stale client must not get a 400 for sending a field the server no longer
+    wants. The node's recorded kind wins; the body's is dropped on the floor."""
+    client, captured = _capturing_client(tmp_path, task_type="DECK")
+    res = client.post(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
+        json={"intent": "BENCHMARK", "message": "hi"},
+    )
+    assert res.status_code == 200
+    assert captured["intent"] == "DECK"
+
+
+def test_POST_copilot_does_not_reject_an_intent_outside_the_vocabulary(tmp_path):
+    """Nothing validates the body's `intent` any more, because nothing reads it."""
+    client, captured = _capturing_client(tmp_path, task_type="ED")
     res = client.post(
         f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
         json={"intent": "Freestyle", "message": "hi"},
     )
-    assert res.status_code == 400
-    assert res.json()["code"] == "INVALID_INTENT"
+    assert res.status_code == 200
+    assert captured["intent"] == "ED"
+
+
+def test_the_deleted_intent_error_code_appears_nowhere_in_the_engine():
+    """The error code is deleted, not merely unreachable — grep the source so a
+    re-introduction anywhere in `engine/` fails here rather than in review.
+
+    The needle is assembled at runtime so this file is not itself an offender,
+    which keeps the sweep honest: it covers every `.py` under `engine/`, tests
+    included, with no exclusion list to rot.
+    """
+    needle = "INVALID_" + "INTENT"
+    offenders = [
+        str(p.relative_to(REPO_ROOT))
+        for p in (REPO_ROOT / "engine").rglob("*.py")
+        if needle in p.read_text(encoding="utf-8")
+    ]
+    assert offenders == []
 
 
 def test_POST_copilot_400_for_an_empty_message(tmp_path):
     client = _make_copilot_client(tmp_path, lambda **kwargs: {"role": "copilot", "text": "x"})
     res = client.post(
         f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
-        json={"intent": "PD", "message": "   "},
+        json={"message": "   "},
     )
     assert res.status_code == 400
     assert res.json()["code"] == "MESSAGE_REQUIRED"
@@ -457,7 +541,7 @@ def test_POST_copilot_404_when_node_is_not_a_task(tmp_path):
     client = _make_copilot_client(tmp_path, lambda **kwargs: {"role": "copilot", "text": "x"})
     res = client.post(
         f"/api/workstreams/{_OPRES}/tasks/{_ANCHOR}/copilot",
-        json={"intent": "PD", "message": "hi"},
+        json={"message": "hi"},
     )
     assert res.status_code == 404
     assert res.json()["code"] == "TASK_NOT_FOUND"
@@ -470,7 +554,7 @@ def test_POST_copilot_502_when_the_live_call_fails(tmp_path):
     client = _make_copilot_client(tmp_path, failing)
     res = client.post(
         f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
-        json={"intent": "PD", "message": "hi"},
+        json={"message": "hi"},
     )
     assert res.status_code == 502
     assert res.json()["code"] == "COPILOT_FAILED"
@@ -494,7 +578,7 @@ def test_POST_copilot_stream_returns_sse_events(tmp_path):
     client = _make_stream_client(tmp_path, stub_stream_fn)
     res = client.post(
         f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot/stream",
-        json={"intent": "PD", "message": "hi", "history": [], "referenced_finding_ids": []},
+        json={"message": "hi", "history": [], "referenced_finding_ids": []},
     )
     assert res.status_code == 200
     assert "text/event-stream" in res.headers["content-type"]
@@ -503,21 +587,11 @@ def test_POST_copilot_stream_returns_sse_events(tmp_path):
     assert "event: done" in body
 
 
-def test_POST_copilot_stream_400_for_invalid_intent(tmp_path):
-    client = _make_stream_client(tmp_path, lambda **kwargs: iter([]))
-    res = client.post(
-        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot/stream",
-        json={"intent": "InvalidIntent", "message": "hi"},
-    )
-    assert res.status_code == 400
-    assert res.json()["code"] == "INVALID_INTENT"
-
-
 def test_POST_copilot_stream_400_for_empty_message(tmp_path):
     client = _make_stream_client(tmp_path, lambda **kwargs: iter([]))
     res = client.post(
         f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot/stream",
-        json={"intent": "PD", "message": ""},
+        json={"message": ""},
     )
     assert res.status_code == 400
     assert res.json()["code"] == "MESSAGE_REQUIRED"
@@ -527,7 +601,7 @@ def test_POST_copilot_stream_404_for_non_task_node(tmp_path):
     client = _make_stream_client(tmp_path, lambda **kwargs: iter([]))
     res = client.post(
         f"/api/workstreams/{_OPRES}/tasks/{_ANCHOR}/copilot/stream",
-        json={"intent": "PD", "message": "hi"},
+        json={"message": "hi"},
     )
     assert res.status_code == 404
     assert res.json()["code"] == "TASK_NOT_FOUND"
