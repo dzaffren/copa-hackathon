@@ -14,8 +14,8 @@ from fastapi.testclient import TestClient
 from engine.api import create_app
 from engine.config import REPO_ROOT
 
-_EDGE = "x-bcm_pd_2022--rrp_pd_v0_1"
-_FINDING = "x-bcm_pd_2022--rrp_pd_v0_1~0"
+_EDGE = "x-open_finance_ed--opres_dp_2025"
+_FINDING = "x-open_finance_ed--opres_dp_2025~0"
 _CROSS = "_cross"
 _MAKER = "fm"  # Farid M.
 _CHECKER = "ps"  # Priya S.
@@ -166,15 +166,15 @@ def test_the_state_persists_to_a_sidecar_not_the_findings_file(tmp_path):
 def test_review_queue_aggregates_cross_linkages_with_status(tmp_path):
     client, _ = _make_client(tmp_path)
     body = client.get("/api/review-queue").json()
-    # Both cross pairs' linkages are present (12 + 22).
-    assert len(body["items"]) == 34
-    # The flagship BCM <-> R&R linkage is attributed correctly.
+    # The surviving cross edge's linkages are present (12).
+    assert len(body["items"]) == 12
+    # The flagship Open Finance ED <-> OpRes DP linkage is attributed correctly.
     flagship = next(it for it in body["items"] if it["edge_id"] == _EDGE)
-    assert flagship["near"]["workstream_name"] == "Business Continuity Management"
-    assert flagship["far"]["workstream_name"] == "Resolution & Recovery Planning"
+    assert flagship["near"]["workstream_name"] == "Open Finance PD · 2026"
+    assert flagship["far"]["workstream_name"] == "Operational Resilience v0.3"
     assert flagship["status"] == "ai_detected"
     # Everything starts ai_detected.
-    assert body["counts_by_status"]["ai_detected"] == 34
+    assert body["counts_by_status"]["ai_detected"] == 12
 
 
 def test_review_queue_reflects_a_transition(tmp_path):
@@ -185,4 +185,4 @@ def test_review_queue_reflects_a_transition(tmp_path):
     assert item["status"] == "maker_review"
     assert item["maker"]["id"] == _MAKER
     assert body["counts_by_status"]["maker_review"] == 1
-    assert body["counts_by_status"]["ai_detected"] == 33
+    assert body["counts_by_status"]["ai_detected"] == 11
