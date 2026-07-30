@@ -3,18 +3,6 @@
   "model": "claude-haiku-4-5",
   "anchors": [
     {
-      "anchor_id": "ed-open-finance-2025 (a)(b)(c)(d)",
-      "text_hash": "e3b0c44298fc1c14",
-      "axis_cap": 5,
-      "axes": [
-        "financial institution",
-        "scenario testing",
-        "operational resilience",
-        "testing frequency",
-        "annual compliance cadence"
-      ]
-    },
-    {
       "anchor_id": "ed-open-finance-2025 1.1",
       "text_hash": "6042cc34d26a7439",
       "axis_cap": 5,
@@ -288,18 +276,6 @@
         "retail customer scope",
         "credit card product exemption",
         "applicability by customer type"
-      ]
-    },
-    {
-      "anchor_id": "ed-open-finance-2025 10",
-      "text_hash": "e3b0c44298fc1c14",
-      "axis_cap": 5,
-      "axes": [
-        "anchor text definition",
-        "hyperlink text specification",
-        "link labeling standards",
-        "accessible link naming",
-        "descriptive link requirements"
       ]
     },
     {

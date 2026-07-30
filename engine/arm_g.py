@@ -38,6 +38,13 @@ Design decisions (see docs/specs/workstream-brain/spec-engine-arm-g-pipeline.md)
   document prefix). NO fuzzy / substring / semantic matching — an id that only
   partially resembles a real anchor demotes to unsupported, preserving the
   verbatim-citation guarantee. Every rewrite is recorded in `citation_rewrites`.
+- **Phrasing enforcement** (`enforce_phrasing`) — the plain-language caps from
+  `docs/specs/plain-language-finding-explanations/spec.md` are requested by the
+  finder prompts AND enforced in code after validation, because a live A/B
+  measured the prompt alone leaving roughly 1-in-3 summaries over cap. A finding
+  is never dropped for phrasing; an over-cap summary is reduced to its first
+  sentence when that fits, otherwise kept and reported. Recorded in
+  `trace.phrasing_actions`.
 """
 
 from __future__ import annotations
@@ -217,8 +224,18 @@ def extract_axes_for_document(
     axes_by_id: dict[str, list[str]] = {}
     hits = misses = 0
 
+    skipped_blank = 0
+
     for anchor in anchors:
         anchor_id = anchor["anchor_id"]
+        # A blank anchor has no topics to extract. Sending empty text asks the
+        # model to analyse nothing, which replies with prose ("I don't see the
+        # anchor text") rather than JSON and burns all three retries — 3 wasted
+        # calls per blank anchor, then a silent drop from retrieval anyway.
+        # Skipping here is the same end state at zero cost.
+        if not (anchor.get("text") or "").strip():
+            skipped_blank += 1
+            continue
         text_hash = _text_hash(anchor["text"])
         cap = _axis_cap(anchor["text"])
         existing = cached_by_id.get(anchor_id)
@@ -252,11 +269,12 @@ def extract_axes_for_document(
     cache["model"] = deployment
     _write_axes_cache(document_id, cache, axes_dir)
     logger.info(
-        "%s: %d anchors, %d cache hits, %d extraction calls",
+        "%s: %d anchors, %d cache hits, %d extraction calls, %d blank skipped",
         document_id,
         len(anchors),
         hits,
         misses,
+        skipped_blank,
     )
     return axes_by_id
 
@@ -338,12 +356,22 @@ def _cosine(a: list[float], b: list[float]) -> float:
 
 
 def _bm25_hits(query: str, corpus_texts: list[str]) -> list[float]:
-    """BM25 scores for ``query`` against each corpus text (unnormalised)."""
+    """BM25 scores for ``query`` against each corpus text (unnormalised).
+
+    ``rank_bm25`` is a declared dependency, and BM25 is the LAST-RESORT retrieval
+    path: returning all-zero scores when it is absent made every candidate fall
+    below the floor, so the pipeline reported "no linkages found" — outwardly
+    identical to a genuine no-linkage result. That silent-empty mode cost a real
+    debugging session, so a missing dependency now fails loudly instead.
+    """
     try:
         from rank_bm25 import BM25Okapi
-    except ImportError:
-        logger.warning("rank_bm25 not installed — BM25 hits will all be zero")
-        return [0.0] * len(corpus_texts)
+    except ImportError as exc:  # pragma: no cover - declared dependency
+        raise RuntimeError(
+            "rank_bm25 is required for BM25 retrieval (declared in "
+            "pyproject.toml) but is not installed. Install it rather than "
+            "letting retrieval silently return zero candidates."
+        ) from exc
 
     tokenised = [re.findall(r"\w+", t.lower()) for t in corpus_texts]
     bm25 = BM25Okapi(tokenised)
@@ -477,12 +505,29 @@ def retrieve(
     embeddings (a recall/quality trade, never a failure).
     """
     if signal == "bm25":
-        return retrieve_bm25_only(axes_a, axes_b)
-    try:
-        return retrieve_cosine_only(axes_a, axes_b)
-    except Exception as exc:  # noqa: BLE001 - any embedding failure → BM25 fallback
-        logger.warning("cosine retrieval unavailable (%s) — falling back to BM25", exc)
-        return retrieve_bm25_only(axes_a, axes_b)
+        candidates = retrieve_bm25_only(axes_a, axes_b)
+    else:
+        try:
+            candidates = retrieve_cosine_only(axes_a, axes_b)
+        except Exception as exc:  # noqa: BLE001 - any embedding failure → BM25
+            logger.warning(
+                "cosine retrieval unavailable (%s) — falling back to BM25", exc
+            )
+            candidates = retrieve_bm25_only(axes_a, axes_b)
+    # Zero candidates is a legitimate outcome (two unrelated documents), but it
+    # is also what a broken retrieval path looks like from the outside, and the
+    # caller reports both as "no linkages found". Log it so the distinction is
+    # recoverable from the logs instead of requiring a bisect.
+    if not candidates:
+        logger.warning(
+            "retrieval returned 0 candidates for %d A-side and %d B-side "
+            "anchors with axes (signal=%s) — if both sides have axes this is "
+            "more likely a retrieval fault than a genuine no-overlap result",
+            len(axes_a),
+            len(axes_b),
+            signal,
+        )
+    return candidates
 
 
 # ---------------------------------------------------------------------------
@@ -939,6 +984,94 @@ def merge_reformat_validate(
 
 
 # ---------------------------------------------------------------------------
+# Phrasing enforcement [no model]. The prompts ASK for a short summary; this is
+# the code layer that makes the cap observable and partly self-correcting —
+# same two-layer philosophy the citation guarantee uses (prompt says it, code
+# enforces it). A live A/B measured the prompt alone at roughly 1-in-3 over cap,
+# so the instruction is necessary but not sufficient.
+#
+# A finding is NEVER dropped for phrasing: losing a real linkage over cosmetics
+# would be a correctness regression. Instead an over-cap summary is reduced
+# deterministically (first sentence only, the model's usual failure mode being
+# an appended second clause) and every action is recorded for the trace.
+# ---------------------------------------------------------------------------
+
+SUMMARY_MAX_WORDS = 20
+SCOPE_NOTE_MAX_WORDS = 30
+
+_SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+")
+
+
+def _word_count(text: str) -> int:
+    return len(text.split())
+
+
+def _reduce_to_first_sentence(text: str, cap: int) -> Optional[str]:
+    """Return the first sentence when that alone lands within ``cap``, else None.
+
+    Deterministic and reversible-in-spirit: no paraphrasing, no truncation
+    mid-sentence. A summary that cannot be rescued this way is left untouched
+    and reported over-cap rather than mangled.
+    """
+    parts = [p for p in _SENTENCE_SPLIT.split(text.strip()) if p]
+    if len(parts) < 2:
+        return None
+    first = parts[0].strip()
+    if first and _word_count(first) <= cap:
+        return first
+    return None
+
+
+def enforce_phrasing(findings: list[dict]) -> tuple[list[dict], list[dict]]:
+    """Apply the summary / scope_note word caps to findings in place-by-copy.
+
+    Returns ``(findings, phrasing_actions)``. Each action records
+    ``{finding_summary, field, words_before, words_after, action}`` where action
+    is ``reduced_to_first_sentence`` or ``over_cap_kept``. Findings are never
+    dropped; ``over_cap_kept`` is the honest signal that the model ignored the
+    instruction and a human may want to reword it.
+    """
+    actions: list[dict] = []
+    out: list[dict] = []
+    for finding in findings:
+        adjusted = dict(finding)
+        for field, cap in (
+            ("summary", SUMMARY_MAX_WORDS),
+            ("scope_note", SCOPE_NOTE_MAX_WORDS),
+        ):
+            text = (adjusted.get(field) or "").strip()
+            if not text:
+                continue
+            before = _word_count(text)
+            if before <= cap:
+                continue
+            reduced = _reduce_to_first_sentence(text, cap)
+            if reduced is not None:
+                adjusted[field] = reduced
+                actions.append(
+                    {
+                        "field": field,
+                        "words_before": before,
+                        "words_after": _word_count(reduced),
+                        "action": "reduced_to_first_sentence",
+                        "text_after": reduced,
+                    }
+                )
+            else:
+                actions.append(
+                    {
+                        "field": field,
+                        "words_before": before,
+                        "words_after": before,
+                        "action": "over_cap_kept",
+                        "text_after": text,
+                    }
+                )
+        out.append(adjusted)
+    return out, actions
+
+
+# ---------------------------------------------------------------------------
 # Orchestration — run all six stages in order and return the result dict.
 # ---------------------------------------------------------------------------
 
@@ -998,6 +1131,22 @@ def run_arm_g(
         same_topic_raw, coverage_raw, anchor_index, doc_a, doc_b
     )
 
+    # Phrasing enforcement (no model) — the code layer behind the prompts' plain
+    # language rules. Runs on the SUPPORTED findings only: `unsupported` entries
+    # are dropped downstream anyway, so rewording them would be wasted work.
+    connections, phrasing_actions = enforce_phrasing(connections)
+    if phrasing_actions:
+        logger.info(
+            "phrasing: %d field(s) over cap (%d reduced, %d kept over cap)",
+            len(phrasing_actions),
+            sum(
+                1
+                for a in phrasing_actions
+                if a["action"] == "reduced_to_first_sentence"
+            ),
+            sum(1 for a in phrasing_actions if a["action"] == "over_cap_kept"),
+        )
+
     coverage_output = [
         {
             **finding,
@@ -1017,11 +1166,13 @@ def run_arm_g(
             "coverage_finder_output": coverage_output,
             "validation": validation,
             "citation_rewrites": rewrites,
+            "phrasing_actions": phrasing_actions,
             "counts": {
                 "supported": len(connections),
                 "unsupported": len(unsupported),
                 "same_topic_finding": len(same_topic_raw),
                 "coverage_finding": len(coverage_raw),
+                "phrasing_over_cap": len(phrasing_actions),
             },
             "wall_clock_seconds": round(time.time() - start, 1),
         },
