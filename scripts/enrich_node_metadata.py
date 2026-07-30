@@ -112,13 +112,26 @@ def _enrich_workstream(workstreams_dir: Path, workstream_id: str) -> int:
         if policy_owner is None and empowerment_framework is None:
             continue  # nothing to write — leave this node un-enriched
 
+        # Merge over what is already on disk, and only for the fields actually
+        # derived. `save_concepts` writes the whole nine-key set, filling any key
+        # its argument omits with `null` — so passing just the two derived fields
+        # silently erased the other seven. That destroyed hand-authored profile
+        # content (of-ed-2025 lost its applicability, issuance date, six keywords
+        # and legal basis) while reporting "enriched", and the values live only in
+        # git. A `None` derived value means "this script could not honestly derive
+        # it", which is not the same as "clear it", so it must not overwrite.
+        existing = concepts.load_concepts(workstreams_dir, workstream_id, node["id"])
+        derived = {
+            "policy_owner": policy_owner,
+            "empowerment_framework": empowerment_framework,
+        }
         concepts.save_concepts(
             workstreams_dir,
             workstream_id,
             node["id"],
             {
-                "policy_owner": policy_owner,
-                "empowerment_framework": empowerment_framework,
+                **(existing or {}),
+                **{k: v for k, v in derived.items() if v is not None},
             },
         )
         enriched += 1
