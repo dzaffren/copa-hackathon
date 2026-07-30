@@ -17,7 +17,7 @@ export type ChatMsgKind =
   | "thinking"
   | "question"
   | "suggestion"
-  | "draft-summary";
+  | "banner";
 
 /** A document/node the drafter referenced with `@` in a message. */
 export interface MentionRef {
@@ -86,12 +86,13 @@ export interface SuggestionMsg {
   used?: boolean;
 }
 
-/** Post-/build confirmation: the sections written into the editor, read-only
- *  (no per-section Insert buttons — /build auto-populates the whole draft). */
-export interface DraftSummaryMsg {
+/** A one-time dismissable notice — used after /write to confirm the full
+ *  document landed in the editor. */
+export interface BannerMsg {
   id: string;
-  kind: "draft-summary";
-  sectionIds: string[];
+  kind: "banner";
+  text: string;
+  dismissed?: boolean;
 }
 
 export type ChatMsg =
@@ -101,4 +102,4 @@ export type ChatMsg =
   | ThinkingMsg
   | QuestionMsg
   | SuggestionMsg
-  | DraftSummaryMsg;
+  | BannerMsg;

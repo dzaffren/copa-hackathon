@@ -1,15 +1,17 @@
 import { useEffect, useReducer, useRef } from "react";
 import { RotateCcw } from "lucide-react";
 import { ChatInput } from "./ChatInput";
-import { MessageRenderer, type MessageHandlers } from "./MessageRenderer";
+import { MessageRenderer, type DeliveredTo, type MessageHandlers } from "./MessageRenderer";
 import { WelcomeScreen } from "./WelcomeScreen";
+import { DRAFT_OUTLINE_SECTIONS } from "./copilotDraftOutline";
 import {
   CLARIFICATION_QUESTIONS,
   DRAFT_SECTIONS,
   NODE_METADATA,
   THINKING_STEPS,
-  WORKSTREAM_CONTEXT,
+  buildDraftOutline,
   buildFullDraft,
+  isCommandUnlocked,
   type SlashCommandId,
 } from "./copilotV2Data";
 import type {
@@ -35,8 +37,12 @@ const METADATA_AVAILABLE = NODE_METADATA.filter((f) => f.value !== null).length;
 
 interface ChatState {
   messages: ChatMsg[];
-  released: boolean;
+  delivered: DeliveredTo | null;
   expandedCommands: Set<string>;
+  resolvedFields: Record<string, string>;
+  /** Commands whose lifecycle has reached its terminal step — gates which
+   *  command runs next (see isCommandUnlocked). */
+  completedSteps: Set<SlashCommandId>;
 }
 
 /** A partial patch merged into an existing message by id. Typed loosely because
@@ -47,8 +53,10 @@ type MsgPatch = Record<string, unknown>;
 type Action =
   | { type: "append"; msg: ChatMsg }
   | { type: "update"; id: string; patch: MsgPatch }
-  | { type: "release" }
+  | { type: "deliver"; recipient: DeliveredTo }
+  | { type: "resolve-fields"; values: Record<string, string> }
   | { type: "toggle-command"; id: string }
+  | { type: "complete-step"; id: SlashCommandId }
   | { type: "reset"; state: ChatState };
 
 function reducer(state: ChatState, action: Action): ChatState {
@@ -62,14 +70,18 @@ function reducer(state: ChatState, action: Action): ChatState {
           m.id === action.id ? ({ ...m, ...action.patch } as ChatMsg) : m,
         ),
       };
-    case "release":
-      return { ...state, released: true };
+    case "deliver":
+      return { ...state, delivered: action.recipient };
+    case "resolve-fields":
+      return { ...state, resolvedFields: { ...state.resolvedFields, ...action.values } };
     case "toggle-command": {
       const next = new Set(state.expandedCommands);
       if (next.has(action.id)) next.delete(action.id);
       else next.add(action.id);
       return { ...state, expandedCommands: next };
     }
+    case "complete-step":
+      return { ...state, completedSteps: new Set(state.completedSteps).add(action.id) };
     case "reset":
       return action.state;
     default:
@@ -80,15 +92,19 @@ function reducer(state: ChatState, action: Action): ChatState {
 function initialState(): ChatState {
   return {
     messages: [],
-    released: false,
+    delivered: null,
     expandedCommands: new Set(),
+    resolvedFields: {},
+    completedSteps: new Set(),
   };
 }
 
 export function CopilotChat({
   onInsertSnippet,
+  onReplaceDraft,
 }: {
   onInsertSnippet: (html: string) => void;
+  onReplaceDraft: (html: string) => void;
 }) {
   const [state, dispatch] = useReducer(reducer, undefined, initialState);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -100,9 +116,11 @@ export function CopilotChat({
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const intervals = useRef<ReturnType<typeof setInterval>[]>([]);
   const brainstormCmdId = useRef<string | null>(null);
-  const releaseCmdId = useRef<string | null>(null);
+  const deliverCmdId = useRef<string | null>(null);
   const insertRef = useRef(onInsertSnippet);
   insertRef.current = onInsertSnippet;
+  const replaceRef = useRef(onReplaceDraft);
+  replaceRef.current = onReplaceDraft;
 
   function later(fn: () => void, ms: number) {
     const t = setTimeout(fn, ms);
@@ -148,8 +166,18 @@ export function CopilotChat({
         kind: "text",
         text: "Here's the task's regulatory profile — task type through legal basis. Fields with no honest source read \"Not available\" rather than a guess.",
       });
-      suggest([{ label: "Run /brainstorm", command: "/brainstorm" }]);
     }, METADATA_REVEAL_MS);
+  }
+
+  function onSubmitMissingFields(values: Record<string, string>) {
+    dispatch({ type: "resolve-fields", values });
+    dispatch({ type: "complete-step", id: "/explore-task" });
+    append({
+      id: nextId(),
+      kind: "text",
+      text: "Thanks — I've folded those into the task's profile.",
+    });
+    suggest([{ label: "Run /brainstorm", command: "/brainstorm" }]);
   }
 
   function runBrainstorm() {
@@ -191,6 +219,7 @@ export function CopilotChat({
         statusLine: "Understanding aligned ✓",
       });
     }
+    dispatch({ type: "complete-step", id: "/brainstorm" });
     append({
       id: nextId(),
       kind: "text",
@@ -200,18 +229,20 @@ export function CopilotChat({
   }
 
   function runDraftOutline() {
+    replaceRef.current(buildDraftOutline());
+    dispatch({ type: "complete-step", id: "/draft" });
     append({
       id: nextId(),
       kind: "command",
       command: "/draft",
       status: "done",
-      statusLine: `Outline ready — ${DRAFT_SECTIONS.length} sections.`,
+      statusLine: `Outline ready — ${DRAFT_OUTLINE_SECTIONS.length} sections.`,
       detailKind: "outline",
     });
     append({
       id: nextId(),
       kind: "text",
-      text: "Here's the outline I'd draft, each section grounded in a confirmed citation.",
+      text: "I've outlined the draft in your editor — replace each guidance block with your own drafting.",
     });
     suggest([{ label: "Run /write", command: "/write" }]);
   }
@@ -223,32 +254,37 @@ export function CopilotChat({
       kind: "command",
       command: "/write",
       status: "active",
-      statusLine: `Populating ${DRAFT_SECTIONS.length} sections…`,
+      statusLine: `Writing ${DRAFT_SECTIONS.length} sections…`,
       detailKind: null,
     });
     later(() => {
-      insertRef.current(buildFullDraft());
+      replaceRef.current(buildFullDraft());
+      dispatch({ type: "complete-step", id: "/write" });
       update(cmdId, {
         status: "done",
-        statusLine: `${DRAFT_SECTIONS.length} sections drafted into your editor.`,
+        statusLine: `${DRAFT_SECTIONS.length} sections written into your editor.`,
       });
       append({
         id: nextId(),
-        kind: "draft-summary",
-        sectionIds: DRAFT_SECTIONS.map((s) => s.id),
+        kind: "banner",
+        text: "This draft has been inserted into the editor. You may edit it directly.",
       });
       append({
         id: nextId(),
         kind: "text",
-        text: "Done — I've drafted the full document straight into your editor, every clause quoted verbatim. Review and edit it inline.",
+        text: "Done — I've written the full document straight into your editor, every clause quoted verbatim. Review and edit it inline.",
       });
       suggest([{ label: "Run /deliver", command: "/deliver" }]);
     }, BUILD_REVEAL_MS);
   }
 
+  function onDismissBanner(id: string) {
+    update(id, { dismissed: true });
+  }
+
   function runDeliver() {
     const cmdId = nextId();
-    releaseCmdId.current = cmdId;
+    deliverCmdId.current = cmdId;
     append({
       id: cmdId,
       kind: "command",
@@ -260,6 +296,10 @@ export function CopilotChat({
   }
 
   function runCommand(id: SlashCommandId) {
+    // Enforced regardless of how the command was invoked — a welcome-screen
+    // step, a suggestion chip, the slash menu, or typing the exact command
+    // — so there's no route around doing the flow in order.
+    if (!isCommandUnlocked(id, state.completedSteps)) return;
     switch (id) {
       case "/explore-task":
         return runExploreTask();
@@ -307,12 +347,13 @@ export function CopilotChat({
     if (command) runCommand(command);
   }
 
-  function onRelease() {
-    dispatch({ type: "release" });
-    if (releaseCmdId.current) {
-      update(releaseCmdId.current, {
+  function onDeliver(recipient: DeliveredTo) {
+    dispatch({ type: "deliver", recipient });
+    dispatch({ type: "complete-step", id: "/deliver" });
+    if (deliverCmdId.current) {
+      update(deliverCmdId.current, {
         status: "done",
-        statusLine: `Sent to ${WORKSTREAM_CONTEXT.owner}.`,
+        statusLine: `Sent to ${recipient.name} (${recipient.email}).`,
       });
     }
   }
@@ -330,7 +371,7 @@ export function CopilotChat({
   function reset() {
     clearAll();
     brainstormCmdId.current = null;
-    releaseCmdId.current = null;
+    deliverCmdId.current = null;
     dispatch({ type: "reset", state: initialState() });
   }
 
@@ -338,10 +379,13 @@ export function CopilotChat({
     onAnswerQuestion,
     onRunCommand: runCommand,
     onUseSuggestion,
-    released: state.released,
-    onRelease,
+    delivered: state.delivered,
+    onDeliver,
     expandedCommands: state.expandedCommands,
     onToggleCommand: (id) => dispatch({ type: "toggle-command", id }),
+    resolvedFields: state.resolvedFields,
+    onSubmitMissingFields,
+    onDismissBanner,
   };
 
   // Keep the newest message in view as the conversation grows. Guarded because

@@ -28,7 +28,8 @@ export interface NodeMetadataField {
 
 export const NODE_METADATA: NodeMetadataField[] = [
   { key: "task_type", label: "Task type", value: "Policy Document (PD)" },
-  { key: "policy_owner", label: "Policy owner", value: "Jarod N." },
+  { key: "drafter", label: "Drafter", value: WORKSTREAM_CONTEXT.owner },
+  { key: "policy_owner", label: "Policy owner", value: "Open Finance Division" },
   {
     key: "applicability",
     label: "Applicability",
@@ -55,11 +56,21 @@ export const NODE_METADATA: NodeMetadataField[] = [
   { key: "ismp_classification", label: "ISMP classification", value: null },
 ];
 
-/** Real reviewers on file for this task, from
- *  data/workstreams/open-finance-pd-2026/workstream.json — genuinely empty in
- *  that fixture today. The owner shown alongside this in the release phase is
- *  WORKSTREAM_CONTEXT.owner, the same real value used throughout this file. */
-export const RELEASE_REVIEWERS: string[] = [];
+export interface MissingField {
+  key: string;
+  label: string;
+  placeholder: string;
+}
+
+/** One text input per NODE_METADATA field with value: null, shown once
+ *  /explore-task has revealed the profile. Keys must match NODE_METADATA
+ *  keys exactly — that's how a submitted value overrides its null field. */
+export const MISSING_FIELDS: MissingField[] = [
+  { key: "empowerment_framework", label: "Empowerment framework", placeholder: "e.g. Financial Services Act 2013, Section 47" },
+  { key: "requirement", label: "Requirement", placeholder: "e.g. Mandatory compliance for all licensed banks" },
+  { key: "effective_date", label: "Effective date", placeholder: "e.g. 2028-01-01" },
+  { key: "ismp_classification", label: "ISMP classification", placeholder: "e.g. Restricted — Internal Use" },
+];
 
 export interface AnchorDoc {
   title: string;
@@ -323,38 +334,7 @@ export const DRAFT_SECTIONS: DraftSection[] = [
   },
 ];
 
-/** Builds the HTML snippet inserted into the editor for one draft section.
- *  Ready/Drafted sections quote their real citation(s) verbatim; the one Gap
- *  section says so explicitly and marks its scaffold as provisional — never
- *  presented as clause-backed. */
-export function buildSectionSnippet(section: DraftSection): string {
-  const quote = (c: ClauseCitation) =>
-    `<blockquote><strong>${c.clauseNumber}:</strong> "${c.text}"</blockquote>`;
-
-  if (section.status === "gap") {
-    return [
-      `<h3>${section.title}</h3>`,
-      `<p><em>No matching source clause found in the connected anchor documents.</em></p>`,
-      ...section.targetCitations.map(quote),
-      `<p>Draft language below is provisional — not grounded in a clause citation; review before adopting.</p>`,
-      `<p>[Insert drafting language here]</p>`,
-    ].join("");
-  }
-
-  return [
-    `<h3>${section.title}</h3>`,
-    `<p>${section.summary}</p>`,
-    ...section.sourceCitations.map(quote),
-    ...section.targetCitations.map(quote),
-  ].join("");
-}
-
-/** The full 2–3 page draft /build auto-populates into the editor: every
- *  section's snippet, concatenated. Reuses buildSectionSnippet (never
- *  re-serialises) so each section keeps its verbatim blockquote citation. */
-export function buildFullDraft(): string {
-  return DRAFT_SECTIONS.map(buildSectionSnippet).join("");
-}
+export { buildFullDraft } from "./copilotFullDocument";
 
 // --- Slash command registry ------------------------------------------------
 // The five commands the Copilot chatbox understands, in flow order. Typing "/"
@@ -412,6 +392,20 @@ export const SLASH_COMMANDS: SlashCommandDef[] = [
 
 export const SLASH_COMMAND_IDS: SlashCommandId[] = SLASH_COMMANDS.map((c) => c.id);
 
+/** A command is unlocked once the one before it in SLASH_COMMAND_IDS's flow
+ *  order has completed — /explore-task, the first step, is always
+ *  unlocked. The single source of truth for the flow's sequential gating,
+ *  shared by CopilotChat (enforcement), WelcomeScreen, and ChatInput (both
+ *  presentational — only showing/allowing what's actually reachable). */
+export function isCommandUnlocked(
+  id: SlashCommandId,
+  completed: Set<SlashCommandId>,
+): boolean {
+  const idx = SLASH_COMMAND_IDS.indexOf(id);
+  if (idx <= 0) return true;
+  return completed.has(SLASH_COMMAND_IDS[idx - 1]);
+}
+
 // --- Mentionable documents/nodes -------------------------------------------
 // Typing "@" in the chat input references one of the workstream's documents.
 // A static demo list (this panel never touches the live graph): the anchor
@@ -432,3 +426,5 @@ export const MENTIONABLE: Mentionable[] = [
   { id: "open-finance-pd-2026", label: "Open Finance PD . 2026 (this task)", kind: "node" },
   { id: "pdpa-2010", label: "PDPA 2010", kind: "node" },
 ];
+
+export { buildDraftOutline } from "./copilotDraftOutline";

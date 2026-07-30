@@ -105,7 +105,7 @@ export function DemoController() {
         type="button"
         aria-label="Expand demo walkthrough panel"
         onClick={() => setMinimized(false)}
-        className="fixed bottom-4 left-1/2 z-50 grid h-11 w-11 -translate-x-1/2 place-items-center rounded-full border border-border bg-card text-primary shadow-md transition hover:bg-accent"
+        className="fixed bottom-4 right-4 z-50 grid h-11 w-11 place-items-center rounded-full border border-border bg-card text-primary shadow-md transition hover:bg-accent"
       >
         <Play className="h-4 w-4" />
       </button>
@@ -120,7 +120,7 @@ export function DemoController() {
     <div
       role="toolbar"
       aria-label="Demo walkthrough"
-      className="pointer-events-none fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2 text-sm shadow-md [&_button]:pointer-events-auto [&_select]:pointer-events-auto"
+      className="pointer-events-none fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2 text-sm shadow-md [&_button]:pointer-events-auto [&_select]:pointer-events-auto"
     >
       <button
         type="button"

@@ -158,7 +158,7 @@ export function ChatInput({
           emptyLabel={menuKind === "slash" ? "No commands" : "No documents"}
         />
       )}
-      <div className="flex items-end gap-1.5 rounded-xl border border-border/60 bg-background/60 px-2.5 py-1.5 focus-within:border-primary/60">
+      <div className="flex items-end gap-1.5 rounded-xl border border-border/60 bg-card px-2.5 py-1.5 shadow-sm focus-within:border-primary/60">
         <textarea
           ref={inputRef}
           aria-label="Message the Copilot"
@@ -166,7 +166,7 @@ export function ChatInput({
           rows={1}
           value={value}
           disabled={disabled}
-          placeholder="Message the Copilot — type / for commands, @ to reference a document"
+          placeholder="Type a message or / for commands..."
           onChange={(e) => {
             setValue(e.target.value);
             resetCaret(e.target);

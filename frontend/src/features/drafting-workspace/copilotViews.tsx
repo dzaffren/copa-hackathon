@@ -1,42 +1,9 @@
-import { labelStyle, labelText } from "@/features/task/semanticLabel";
-import type { SemanticLabel } from "@/lib/types";
-import {
-  ANCHOR_DOCS,
-  NODE_METADATA,
-  WORKSTREAM_CONTEXT,
-  type ClauseCitation,
-  type DraftSection,
-  type SectionStatus,
-} from "./copilotV2Data";
+import type { DraftOutlineSection } from "./copilotDraftOutline";
+import { ANCHOR_DOCS, NODE_METADATA, WORKSTREAM_CONTEXT } from "./copilotV2Data";
 
 // Shared presentational pieces for the Copilot chatbox — extracted from the
 // old CopilotTab so the message renderers can reuse them. All static, all
 // light-theme, royal-blue primary; no live data.
-
-const STATUS_META: Record<SectionStatus, { text: string; className: string }> = {
-  ready: {
-    text: "Ready",
-    className: "bg-emerald-500/15 text-emerald-800 border-emerald-400/30",
-  },
-  drafted: {
-    text: "Drafted",
-    className: "bg-amber-400/15 text-amber-800 border-amber-300/30",
-  },
-  gap: {
-    text: "Gap detected",
-    className: "bg-red-500/15 text-red-800 border-red-400/30",
-  },
-};
-
-/** Left-edge accent bar colour per semantic label — mirrors the taxonomy hues
- *  used elsewhere. Semantic colour only, never the royal-blue brand accent. */
-const LABEL_ACCENT: Record<SemanticLabel, string> = {
-  "aligns-with": "bg-emerald-400",
-  "differs-on": "bg-amber-400",
-  "conflicts-with": "bg-red-400",
-  "silent-on": "bg-sky-400",
-  "goes-beyond": "bg-violet-400",
-};
 
 /** The thinking orb — the one deliberately theatrical moment in the panel.
  *  Built entirely from the royal-blue primary token and the existing keyframes
@@ -150,86 +117,59 @@ export function ContextCard() {
   );
 }
 
-/** The task's regulatory profile, revealed by /pull-node-metadata. A null value
- *  renders as an honest "Not available" — never invented. */
-export function NodeMetadataList() {
+/** The task's regulatory profile, revealed by /explore-task. A null value
+ *  renders as an honest "Not available" unless the drafter has since
+ *  resolved it through the missing-fields form (`overrides`), in which case
+ *  it renders as a confirmed row instead. */
+export function NodeMetadataList({
+  overrides,
+}: {
+  overrides?: Record<string, string>;
+} = {}) {
   return (
     <dl className="space-y-2 text-xs">
-      {NODE_METADATA.map((f) => (
-        <div key={f.key}>
-          <dt className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-            {f.label}
-          </dt>
-          <dd className="mt-0.5 text-foreground">
-            {f.value === null ? (
-              <span className="italic text-muted-foreground">Not available</span>
-            ) : Array.isArray(f.value) ? (
-              f.value.join(", ")
-            ) : (
-              f.value
-            )}
-          </dd>
-        </div>
-      ))}
+      {NODE_METADATA.map((f) => {
+        const resolved = f.value === null ? overrides?.[f.key] : undefined;
+        const value = resolved ?? f.value;
+        return (
+          <div key={f.key}>
+            <dt className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+              {f.label}
+            </dt>
+            <dd className="mt-0.5 text-foreground">
+              {value === null ? (
+                <span className="italic text-muted-foreground">Not available</span>
+              ) : Array.isArray(value) ? (
+                value.join(", ")
+              ) : (
+                value
+              )}
+            </dd>
+          </div>
+        );
+      })}
     </dl>
   );
 }
 
-/** A read-only summary row for one drafted section — used in the post-/build
- *  draft-summary message. No "Insert into Editor" button: /build has already
- *  auto-populated the editor, so this is a receipt, not an action. */
-export function DraftSectionSummary({
-  section,
-  index,
-}: {
-  section: DraftSection;
-  index: number;
-}) {
-  const status = STATUS_META[section.status];
-  const style = labelStyle(section.label);
-  const accent = LABEL_ACCENT[section.label] ?? "bg-slate-400";
-  const citation: ClauseCitation | undefined =
-    section.status === "gap"
-      ? undefined
-      : section.targetCitations[0] ?? section.sourceCitations[0];
-
+/** One card in the /draft outline preview — bold title, one-sentence
+ *  description, 3-4 "what to write" bullets, and an italic guidance note.
+ *  Purely instructional; the editable content this previews is inserted
+ *  separately via buildDraftOutline(). */
+export function DraftInstructionCard({ section }: { section: DraftOutlineSection }) {
   return (
     <article
-      data-testid="draft-section-summary"
-      className={`group relative overflow-hidden rounded-xl border bg-card p-3 pl-4 shadow-sm ${
-        section.status === "gap" ? "border-dashed border-border" : "border-border/60"
-      }`}
-      style={{
-        animation: "fadeSlideUp 0.5s var(--ease-spring) both",
-        animationDelay: `${index * 90}ms`,
-      }}
+      data-testid="draft-instruction-card"
+      className="rounded-lg border border-border/60 bg-card p-3 shadow-sm"
     >
-      <span className={`absolute inset-y-0 left-0 w-1 ${accent}`} aria-hidden />
-      <div className="mb-1 flex items-center justify-between gap-2">
-        <h4 className="text-sm font-semibold text-foreground">{section.title}</h4>
-        <span
-          className={`shrink-0 rounded-full border px-1.5 py-0.5 text-[9px] font-semibold ${status.className}`}
-        >
-          {status.text}
-        </span>
-      </div>
-      <span
-        className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold ${style.pill}`}
-      >
-        {labelText(section.label, section.sentiment)}
-      </span>
-      <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">
-        {section.summary}
-      </p>
-      {citation ? (
-        <p className="mt-1.5 line-clamp-2 font-mono text-[10px] text-muted-foreground">
-          {citation.clauseNumber} — &ldquo;{citation.text}&rdquo;
-        </p>
-      ) : (
-        <p className="mt-1.5 text-[10px] italic text-muted-foreground">
-          No matching clause found.
-        </p>
-      )}
+      <h4 className="text-sm font-semibold text-foreground">{section.title}</h4>
+      <p className="mt-1 text-xs text-muted-foreground">{section.description}</p>
+      <ul className="mt-2 list-disc space-y-1 pl-4 text-xs text-foreground">
+        {section.bullets.map((b) => (
+          <li key={b}>{b}</li>
+        ))}
+      </ul>
+      <p className="mt-2 text-[11px] italic text-muted-foreground">{section.guidanceNote}</p>
     </article>
   );
 }

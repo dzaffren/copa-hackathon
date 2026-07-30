@@ -75,6 +75,17 @@ export function DraftingWorkspacePage() {
     save.mutate(next);
   }
 
+  function replaceDraft(documentHtml: string) {
+    // /draft and /write each generate the whole document, not a snippet to
+    // land beside existing text — running one after the other replaces the
+    // page, it doesn't stack the new pages on top of the old ones.
+    const wrapped = `<div class="copilot-snippet">${documentHtml}</div>`;
+    const next = editorRef.current?.replaceContent(wrapped);
+    if (next == null) return;
+    setHtml(next);
+    save.mutate(next);
+  }
+
   const reviewedCards = reviewed.data?.findings ?? [];
 
   const tabs: { key: TabKey; label: string }[] = [
@@ -176,6 +187,7 @@ export function DraftingWorkspacePage() {
                 workstreamId={workstreamId}
                 nodeId={nodeId}
                 onInsertSnippet={insertSnippet}
+                onReplaceDraft={replaceDraft}
                 reviewedCards={reviewedCards}
                 getDraftContext={() => ({
                   draftHtml: html ?? "",

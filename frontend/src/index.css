@@ -87,6 +87,155 @@
   .glass {
     @apply border border-border bg-card shadow-sm;
   }
+
+  /* /draft's instructional outline blocks, inserted into the editor. A CSS
+     class, not an inline `style=` attribute — engine/drafts.py's server-side
+     sanitizer only allows `class` on div/span/p, never `style`, on any
+     save round-trip. */
+  .draft-guidance-block {
+    background: #EBF5FF;
+    border-left: 3px solid #93C5FD;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+  }
+
+  /* Inline comment highlight — the anchored passage a drafter has attached
+     a comment to, in EditorPane.tsx. Amber, distinct from the guidance
+     block's blue and the copilot-snippet provenance mark's primary blue. */
+  .draft-comment {
+    background: #fef3c7;
+    border-bottom: 2px solid #f59e0b;
+  }
+
+  /* /write's and /draft's full-document template — matched to the visual
+     style of the real BNM Exposure Draft reference file (plain, monochrome,
+     sans-serif government-document typography: black text, thin black
+     rules, no colour blocks), not the earlier navy/serif treatment. Custom
+     classes, not Tailwind utilities (per spec) — and no
+     <table>/<blockquote>/<style> tag or `style=` attribute anywhere in the
+     generated markup, since engine/drafts.py's server-side sanitizer allows
+     none of those on a save round-trip. The "table" is a flex-based div
+     grid; citations are styled divs. */
+  .bnm-doc { font-family: Arial, Helvetica, sans-serif; color: #1a1a1a; }
+  .bnm-page {
+    background: white;
+    /* Fluid up to a page-like cap, rather than a fixed 794px (print-page)
+       width — the editor's own column is narrower than that on common
+       viewport sizes, and a fixed width there would overflow it. */
+    width: 100%;
+    max-width: 680px;
+    min-height: 900px;
+    margin: 0 auto 24px auto;
+    padding: 56px 56px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    position: relative;
+    box-sizing: border-box;
+  }
+  .bnm-cover { padding-top: 96px; }
+  .bnm-cover-logo-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 140px;
+  }
+  .bnm-seal {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+  .bnm-logo {
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    color: #1a1a1a;
+    text-align: right;
+  }
+  .bnm-cover-title-row { text-align: right; margin-bottom: 280px; }
+  .bnm-title { font-size: 28px; font-weight: bold; margin-bottom: 4px; color: #1a1a1a; }
+  .bnm-draft-label { font-size: 18px; font-weight: normal; color: #1a1a1a; }
+  .bnm-meta { font-size: 12px; color: #1a1a1a; line-height: 1.8; }
+  .bnm-cover-footer {
+    position: absolute;
+    bottom: 48px;
+    left: 76px;
+    right: 76px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #1a1a1a;
+  }
+  .bnm-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #1a1a1a;
+    border-bottom: 1px solid #1a1a1a;
+    padding-bottom: 6px;
+    margin-bottom: 32px;
+  }
+  .bnm-footer {
+    position: absolute;
+    bottom: 40px;
+    left: 76px;
+    right: 76px;
+    font-size: 10px;
+    color: #1a1a1a;
+  }
+  /* Inline "N. Title" heading — matches the reference document's convention
+     (e.g. "7 Governance"), not a stacked label-then-title treatment. */
+  .bnm-section-heading { font-size: 14px; font-weight: bold; margin-bottom: 14px; color: #1a1a1a; }
+  .bnm-part-heading {
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    margin: 20px 0 14px 0;
+    color: #1a1a1a;
+  }
+  .bnm-toc-heading {
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 24px;
+    color: #1a1a1a;
+  }
+  .bnm-toc { font-size: 12px; }
+  .bnm-toc-part {
+    font-weight: bold;
+    margin: 14px 0 6px 0;
+    color: #1a1a1a;
+  }
+  .bnm-toc-row {
+    display: flex;
+    gap: 8px;
+    padding: 2px 0;
+    border-bottom: 1px dotted #999;
+    color: #1a1a1a;
+  }
+  .bnm-toc-num { flex-shrink: 0; width: 28px; }
+  .bnm-toc-title { flex: 1; }
+  .bnm-clause { font-size: 12px; line-height: 1.7; margin-bottom: 10px; }
+  .bnm-clause-num { font-weight: bold; }
+  .bnm-blockquote {
+    border-left: 2px solid #999;
+    padding: 6px 14px;
+    margin: 10px 0;
+    background: #f7f7f7;
+    font-size: 11px;
+    font-style: italic;
+    color: #333;
+  }
+  .bnm-table { width: 100%; font-size: 11px; margin: 14px 0; border: 1px solid #1a1a1a; }
+  .bnm-table-header-row {
+    display: flex;
+    background: #e8e8e8;
+    color: #1a1a1a;
+    font-weight: bold;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  .bnm-table-row { display: flex; border-bottom: 1px solid #ccc; }
+  .bnm-table-cell { flex: 1; padding: 6px 8px; border-right: 1px solid #ccc; }
 }
 
 @layer base {

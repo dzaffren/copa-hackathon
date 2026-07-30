@@ -1,16 +1,21 @@
 import { describe, it, expect } from "vitest";
-import { cleanup, screen, within, waitFor } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  screen,
+  within,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderApp } from "@/test/utils";
+import { DRAFT_OUTLINE_SECTIONS } from "./copilotDraftOutline";
 import {
   CLARIFICATION_QUESTIONS,
-  DRAFT_SECTIONS,
   LEADING_OPTIONS,
   MENTIONABLE,
+  MISSING_FIELDS,
   NODE_METADATA,
-  RELEASE_REVIEWERS,
   SLASH_COMMANDS,
-  WORKSTREAM_CONTEXT,
 } from "./copilotV2Data";
 
 const THINKING_WAIT = { timeout: 8000 };
@@ -90,6 +95,26 @@ describe("DraftingWorkspacePage — landing", () => {
       /Auto-saved \d+s ago/,
     );
   });
+
+  it("enables Bold/Italic/Underline once text is selected in the editor", async () => {
+    const user = userEvent.setup();
+    await loadWorkspace();
+
+    const surface = screen.getByTestId("draft-surface");
+    const boldButton = screen.getByRole("button", { name: "B" });
+    expect(boldButton).toBeDisabled();
+
+    // Select the clause text already rendered in the surface.
+    const range = document.createRange();
+    range.selectNodeContents(surface);
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+    await user.pointer([{ target: surface }]); // fires mouseup on the surface
+    fireEvent.mouseUp(surface);
+
+    await waitFor(() => expect(boldButton).not.toBeDisabled());
+  });
 });
 
 describe("DraftingWorkspacePage — blank team tabs", () => {
@@ -163,12 +188,23 @@ describe("DraftingWorkspacePage — Copilot chat", () => {
     await user.click(chip);
   }
 
+  /** Fill and submit the /explore-task missing-fields form — a prerequisite
+   *  for the /brainstorm suggestion chip to appear. */
+  async function fillMissingFields(user: ReturnType<typeof userEvent.setup>) {
+    const form = await screen.findByTestId("missing-fields-form", undefined, THINKING_WAIT);
+    for (const f of MISSING_FIELDS) {
+      await user.type(within(form).getByLabelText(f.label), `Test value for ${f.key}`);
+    }
+    await user.click(within(form).getByRole("button", { name: "Submit" }));
+  }
+
   /** From a fresh chat, run brainstorming and walk every clarification round,
    *  leaving the flow with the "Run /draft" chip visible. */
   async function reachBrainstormDone(
     user: ReturnType<typeof userEvent.setup>,
   ) {
     await user.click(screen.getByRole("button", { name: "Explore Task" }));
+    await fillMissingFields(user);
     await runViaChip(user, "Run /brainstorm");
     await answer(user, LEADING_OPTIONS[0], LEADING_OPTIONS[0]);
     for (const q of CLARIFICATION_QUESTIONS) {
@@ -181,10 +217,10 @@ describe("DraftingWorkspacePage — Copilot chat", () => {
     await reachBrainstormDone(user);
     await runViaChip(user, "Run /draft");
     await runViaChip(user, "Run /write");
-    await screen.findByTestId("draft-summary", undefined, THINKING_WAIT);
+    await screen.findByTestId("write-banner", undefined, THINKING_WAIT);
   }
 
-  it("opens on a welcome screen with four quick actions, no intent question", async () => {
+  it("opens on a welcome screen with a five-step flow, no intent question", async () => {
     const user = userEvent.setup();
     await openCopilot(user);
 
@@ -193,13 +229,12 @@ describe("DraftingWorkspacePage — Copilot chat", () => {
     expect(screen.getByTestId("copilot-welcome")).toBeInTheDocument();
 
     const actions = screen.getAllByTestId("welcome-quick-action");
-    expect(actions).toHaveLength(4);
-    expect(actions.map((a) => a.textContent)).toEqual([
-      "Explore Task",
-      "Brainstorm",
-      "Draft Outline",
-      "Write Document",
-    ]);
+    expect(actions).toHaveLength(5);
+    expect(actions[0]).toHaveTextContent("Explore Task");
+    expect(actions[1]).toHaveTextContent("Brainstorm");
+    expect(actions[2]).toHaveTextContent("Draft Outline");
+    expect(actions[3]).toHaveTextContent("Write Document");
+    expect(actions[4]).toHaveTextContent("Deliver");
     expect(screen.queryByText("What are you drafting?")).not.toBeInTheDocument();
   });
 
@@ -238,6 +273,23 @@ describe("DraftingWorkspacePage — Copilot chat", () => {
     expect(screen.getByTestId("slash-menu")).toHaveTextContent("/brainstorm");
   });
 
+  it("does nothing when a locked command is picked or typed out of order", async () => {
+    const user = userEvent.setup();
+    await openCopilot(user);
+
+    const input = screen.getByTestId("chat-input");
+    await user.click(input);
+    await user.type(input, "/write");
+    await user.keyboard("{Enter}");
+
+    // The command is listed and typeable, but running it before its
+    // prerequisites are met simply does nothing — no command starts, the
+    // welcome screen is still showing, nothing was echoed.
+    expect(screen.getByTestId("copilot-welcome")).toBeInTheDocument();
+    expect(screen.queryByTestId("command-step")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("user-msg")).not.toBeInTheDocument();
+  });
+
   it("opens a mention menu of documents when typing @", async () => {
     const user = userEvent.setup();
     await openCopilot(user);
@@ -266,7 +318,9 @@ describe("DraftingWorkspacePage — Copilot chat", () => {
       THINKING_WAIT,
     );
     for (const field of NODE_METADATA) {
-      expect(within(block).getByText(field.label)).toBeInTheDocument();
+      // getAllByText: the missing-fields form (rendered alongside, before
+      // submission) repeats the same label text for each null field.
+      expect(within(block).getAllByText(field.label).length).toBeGreaterThan(0);
     }
     // task_type is the first field, and honest nulls read "Not available".
     expect(NODE_METADATA[0].key).toBe("task_type");
@@ -274,12 +328,43 @@ describe("DraftingWorkspacePage — Copilot chat", () => {
     expect(within(block).getAllByText("Not available").length).toBeGreaterThan(0);
   });
 
+  it("shows a missing-fields form after /explore-task, and resolves nulls on submit", async () => {
+    const user = userEvent.setup();
+    await openCopilot(user);
+    await user.click(screen.getByRole("button", { name: "Explore Task" }));
+
+    const block = await waitFor(() => {
+      const el = commandBlock("/explore-task");
+      expect(el).toBeTruthy();
+      return el!;
+    }, THINKING_WAIT);
+    // Wait past the metadata-reveal timer before inspecting field content.
+    await waitFor(
+      () => expect(within(block).getByText("Task type")).toBeInTheDocument(),
+      THINKING_WAIT,
+    );
+    const nullFieldLabels = NODE_METADATA.filter((f) => f.value === null).map((f) => f.label);
+    expect(nullFieldLabels.length).toBeGreaterThan(0);
+    for (const label of nullFieldLabels) {
+      expect(within(block).getAllByText("Not available").length).toBeGreaterThan(0);
+    }
+
+    await fillMissingFields(user);
+
+    await waitFor(() => {
+      expect(screen.queryByTestId("missing-fields-form")).not.toBeInTheDocument();
+    });
+    expect(within(block).queryAllByText("Not available")).toHaveLength(0);
+    await screen.findByRole("button", { name: "Run /brainstorm" }, THINKING_WAIT);
+  }, 15000);
+
   it("walks every clarification round (>=5) to an aligned understanding", async () => {
     const user = userEvent.setup();
     await openCopilot(user);
 
     expect(CLARIFICATION_QUESTIONS.length).toBeGreaterThanOrEqual(5);
     await user.click(screen.getByRole("button", { name: "Explore Task" }));
+    await fillMissingFields(user);
     await runViaChip(user, "Run /brainstorm");
     await answer(user, LEADING_OPTIONS[0], LEADING_OPTIONS[0]);
 
@@ -311,14 +396,32 @@ describe("DraftingWorkspacePage — Copilot chat", () => {
     await waitFor(() => expect(commandBlock("/draft")).toBeTruthy());
   }, LONG_FLOW);
 
-  it("auto-populates the full draft into the editor on /write, no insert buttons", async () => {
+  it("renders and inserts the instructional draft outline on /draft", async () => {
+    const user = userEvent.setup();
+    await openCopilot(user);
+    await reachBrainstormDone(user);
+    await runViaChip(user, "Run /draft");
+
+    const cards = await screen.findAllByTestId("draft-instruction-card", undefined, THINKING_WAIT);
+    expect(cards).toHaveLength(DRAFT_OUTLINE_SECTIONS.length);
+    expect(cards[0]).toHaveTextContent("Executive Summary");
+
+    const surface = screen.getByTestId("draft-surface");
+    await waitFor(() => {
+      expect(surface.querySelectorAll(".draft-guidance-block").length).toBe(
+        DRAFT_OUTLINE_SECTIONS.length,
+      );
+    });
+  }, 25000);
+
+  it("writes the full document into the editor on /write, no insert buttons", async () => {
     const user = userEvent.setup();
     await openCopilot(user);
     await reachBuildDone(user);
 
     const surface = screen.getByTestId("draft-surface");
-    const first = DRAFT_SECTIONS[0];
-    const last = DRAFT_SECTIONS[DRAFT_SECTIONS.length - 1];
+    const first = DRAFT_OUTLINE_SECTIONS[0];
+    const last = DRAFT_OUTLINE_SECTIONS[DRAFT_OUTLINE_SECTIONS.length - 1];
     await waitFor(() => {
       expect(surface).toHaveTextContent(first.title);
       expect(surface).toHaveTextContent(last.title);
@@ -329,29 +432,51 @@ describe("DraftingWorkspacePage — Copilot chat", () => {
     expect(
       screen.queryByRole("button", { name: /Insert into Editor/i }),
     ).not.toBeInTheDocument();
+
+    const banner = await screen.findByTestId("write-banner");
+    expect(banner).toHaveTextContent(
+      "This draft has been inserted into the editor. You may edit it directly.",
+    );
+    await user.click(within(banner).getByRole("button", { name: "Dismiss" }));
+    expect(screen.queryByTestId("write-banner")).not.toBeInTheDocument();
   }, LONG_FLOW);
 
-  it("releases the draft to the task's owner, honestly with no reviewers", async () => {
+  it("delivers the draft to a recipient the drafter names themselves", async () => {
     const user = userEvent.setup();
     await openCopilot(user);
     await reachBuildDone(user);
 
     await runViaChip(user, "Run /deliver");
 
-    await screen.findByText(WORKSTREAM_CONTEXT.owner, undefined, THINKING_WAIT);
-    expect(RELEASE_REVIEWERS).toHaveLength(0);
-    expect(
-      screen.getByText("No reviewers on file for this task yet."),
-    ).toBeInTheDocument();
+    const block = await waitFor(() => {
+      const el = commandBlock("/deliver");
+      expect(el).toBeTruthy();
+      return el!;
+    }, THINKING_WAIT);
 
-    await user.click(screen.getByRole("button", { name: "Send for review" }));
+    // No fabricated default recipient — every field starts empty and "Send
+    // for Review" is disabled until the drafter names someone.
+    const nameInput = within(block).getByLabelText("Recipient name") as HTMLInputElement;
+    const emailInput = within(block).getByLabelText("Recipient email") as HTMLInputElement;
+    expect(nameInput.value).toBe("");
+    expect(emailInput.value).toBe("");
+    expect(within(block).getByRole("button", { name: "Send for Review" })).toBeDisabled();
 
-    // The confirmation shows both in the command status line and the panel.
+    await user.type(nameInput, "Jarod N.");
+    await user.type(within(block).getByLabelText("Recipient role"), "Policy Owner, Open Finance Division");
+    await user.type(emailInput, "jarod.ng@bnm.gov.my");
+    await user.click(within(block).getByRole("button", { name: "Send for Review" }));
+
     expect(
-      (await screen.findAllByText(`Sent to ${WORKSTREAM_CONTEXT.owner}.`)).length,
+      (await screen.findAllByText(
+        "Draft submitted to Jarod N. (jarod.ng@bnm.gov.my) for review.",
+      )).length,
     ).toBeGreaterThan(0);
     expect(
-      screen.queryByRole("button", { name: "Send for review" }),
+      (await screen.findAllByText("Sent to Jarod N. (jarod.ng@bnm.gov.my).")).length,
+    ).toBeGreaterThan(0);
+    expect(
+      screen.queryByRole("button", { name: "Send for Review" }),
     ).not.toBeInTheDocument();
   }, LONG_FLOW);
 
