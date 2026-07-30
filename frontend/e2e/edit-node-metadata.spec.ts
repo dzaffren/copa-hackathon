@@ -127,11 +127,6 @@ test.describe("Fill in a document's regulatory profile", () => {
     // A closed dropdown, not free text — these are BNM handling categories.
     await page.getByLabel("ISMP classification").selectOption("SULIT");
 
-    // The honesty note on the one field that holds a verbatim clause quote.
-    await expect(
-      page.getByText("Quote this word-for-word from the document."),
-    ).toBeVisible();
-
     await page.getByRole("button", { name: /^save$/i }).click();
 
     // Read mode returns with the new values — the form is gone.

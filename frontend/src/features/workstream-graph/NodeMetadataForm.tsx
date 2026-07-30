@@ -187,11 +187,6 @@ export function NodeMetadataForm({
                 onChange={(e) => update(field, e.target.value)}
               />
             )}
-            {field === "empowerment_framework" && (
-              <span className="mt-1 block text-[11px] text-muted-foreground">
-                Quote this word-for-word from the document.
-              </span>
-            )}
           </label>
         );
       })}

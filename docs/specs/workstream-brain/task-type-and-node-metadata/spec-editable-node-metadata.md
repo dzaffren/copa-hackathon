@@ -4,7 +4,7 @@
 
 **Epic:** [Task Type & Editable Node Metadata — Overview](spec.md)
 
-Every document in a workstream has a Regulatory profile card — policy owner, applicability, empowerment framework, requirement, issuance date, effective date, keywords, legal basis, and ISMP classification. Today it is read-only, and for most documents it shows a placeholder saying the information is not available. This story lets Aisyah fill it in and correct it herself, on any document, and keeps what she saves.
+Every document in a workstream has a Regulatory profile card — policy owner, applicability, empowerment framework, issuance date, effective date, legal basis, and ISMP classification. Today it is read-only, and for most documents it shows a placeholder saying the information is not available. This story lets Aisyah fill it in and correct it herself, on any document, and keeps what she saves.
 
 ## User Story
 
@@ -14,10 +14,10 @@ As Aisyah R., I want to fill in and correct a document's regulatory profile myse
 
 **Current state:**
 
-- Opening any document shows a collapsed Regulatory profile section. Expanding it lists nine fields: policy owner, applicability, empowerment framework, requirement, issuance date, effective date, keywords, legal basis, and ISMP classification.
-- For a small number of documents the card has content, prepared ahead of time outside the tool. The Operational Resilience working draft, for instance, shows Aisyah as its policy owner, quotes the Financial Services Act provision it is issued under, and lists five keywords.
+- Opening any document shows a collapsed Regulatory profile section. Expanding it lists seven fields: policy owner, applicability, empowerment framework, issuance date, effective date, legal basis, and ISMP classification. (`keywords` and `requirement` were removed on 30 Jul 2026 — the extracted axes in the Concepts section carry a document's topics from the document itself.)
+- For a small number of documents the card has content, prepared ahead of time outside the tool. The Operational Resilience working draft, for instance, shows Aisyah as its policy owner, and quotes the Financial Services Act provision it is issued under.
 - For every other document — the Basel operational resilience principles, the Financial Services Act, industry submissions — the card shows a single line of text explaining that concept extraction is not enabled, and nothing else.
-- ISMP classification is empty on every document, and displays as "Pending — RH publication form" where a profile exists at all, because its source is not available to the tool.
+- ISMP classification is empty on every document, and displays as "Pending — RH publication form" where a profile exists at all, because its source is not available to the tool. Its four values are UMUM, TERHAD, SULIT and RAHSIA.
 - Nothing in the tool can change any of it.
 
 **Problem:**
@@ -35,7 +35,7 @@ As Aisyah R., I want to fill in and correct a document's regulatory profile myse
 
 ## Goals
 
-- Let Aisyah edit the nine profile fields on **any** document in **any** workstream.
+- Let Aisyah edit the seven profile fields on **any** document in **any** workstream.
 - Replace the "not available" placeholder with a profile she can start filling in.
 - Keep what she saves, so it is there when she comes back and available to later work.
 - Preserve the tool's honesty: a field she has not filled in says so, and nothing she types is ever presented as a quotation from the document.
@@ -51,7 +51,7 @@ As Aisyah R., I want to fill in and correct a document's regulatory profile myse
 
 1. **She opens a document.** Inspecting the RMiT policy document, she expands its Regulatory profile. The policy owner is recorded; the effective date is not set.
 2. **She presses Edit.** The card becomes a form, with the current values already in place.
-3. **She fills in what she knows.** She types 28 November 2025 as the effective date and adds "technology risk" to the keywords.
+3. **She fills in what she knows.** She types 28 November 2025 as the effective date and picks TERHAD as the ISMP classification.
 4. **She saves.** The form becomes a card again, showing her new values.
 5. **She comes back later.** The values are still there.
 6. **She works on a document nobody prepared.** Opening the Basel principles, she finds a profile where every field reads "Not set", with the same Edit button. She fills in the two she is confident about and leaves the rest.
@@ -95,9 +95,9 @@ Then every field reads "Not set"
 ### Scenario: Saved values survive leaving and returning
 
 ```gherkin
-Given I have saved "financial stability" as a keyword on the Basel operational resilience principles
+Given I have saved "FSA 2013" as the legal basis on the Basel operational resilience principles
 When I close the document and open it again
-Then its regulatory profile still shows "financial stability" as a keyword
+Then its regulatory profile still shows "FSA 2013" as its legal basis
 ```
 
 ### Scenario: Abandoning an edit changes nothing
@@ -120,14 +120,24 @@ When I press Edit
 Then the profile shows the legal basis as "Not set"
 ```
 
-### Scenario: Recording several keywords at once
+### Scenario: Recording several Acts at once
 
 ```gherkin
 Given I am editing the RMiT policy document's regulatory profile
-When I enter "technology risk, cloud, outsourcing" as its keywords
+When I enter "FSA 2013, IFSA 2013, DFIA 2002" as its legal basis
   And I save
-Then the profile shows three separate keywords
-  And they read "technology risk", "cloud", and "outsourcing"
+Then the profile shows three separate Acts
+  And they read "FSA 2013", "IFSA 2013", and "DFIA 2002"
+```
+
+### Scenario: ISMP classification is chosen from the four, never typed
+
+```gherkin
+Given I am editing a document's regulatory profile
+When I look at the ISMP classification field
+Then I can choose between UMUM, TERHAD, SULIT and RAHSIA
+  And I can leave it unset
+  And I cannot type a classification of my own
 ```
 
 ### Scenario: A working draft's deliverable kind is shown but not editable
@@ -147,7 +157,7 @@ Then I can see "FAQ" recorded as its deliverable kind
 Given I am viewing the Financial Services Act 2013's regulatory profile
 When I expand it
 Then no deliverable kind is shown
-  And the nine remaining fields are listed
+  And the seven remaining fields are listed
   And I can edit them
 ```
 
@@ -159,14 +169,6 @@ Given I am viewing the Operational Resilience working draft's regulatory profile
 When I expand the profile
 Then the ISMP classification reads "Pending — RH publication form"
   And it is distinguishable from a field that simply has not been filled in
-```
-
-### Scenario: The empowerment framework warns that it must be quoted
-
-```gherkin
-Given I am editing a document's regulatory profile
-When I look at the empowerment framework field
-Then I can see that it must be quoted word-for-word from the document
 ```
 
 ### Scenario: A save that cannot be completed loses nothing
@@ -182,13 +184,13 @@ Then I can see that the profile could not be saved
 
 ## Business Rules & Constraints
 
-- **All nine fields are editable on every document**, in every workstream, regardless of how the document is classified.
+- **All seven fields are editable on every document**, in every workstream, regardless of how the document is classified.
 - **A working draft's profile also shows its deliverable kind, read-only.** It is set once when the draft is created and cannot be changed. Published context documents show no deliverable kind at all.
 - **Blank means "not set yet."** It does not mean the field is inapplicable, and there is no way for a drafter to say that it is.
 - **ISMP classification continues to read "Pending — RH publication form"** when nothing has been recorded, because the tool genuinely has no source for it. A drafter may still record one.
 - **Keywords and legal basis hold several values;** the other seven hold one. A drafter enters several by separating them with commas.
 - **What a drafter types is her own account of the document, never a quotation from it.** No profile field is ever presented as a citation, and the tool's rule that every citation is quoted word-for-word with its clause number is untouched.
-- **The empowerment framework field carries an on-screen note** that its content must be quoted word-for-word from the document, because that is the convention the existing prepared profiles follow. The tool does not verify this — a drafter is trusted, and told.
+- **The empowerment framework holds a word-for-word clause quote by convention**, which the tool does not verify. An on-screen note saying so was built and then removed on 30 Jul 2026 as UI noise; the convention stands, unenforced and undocumented in the UI.
 - **Saving is a deliberate action.** The card is read-only until Edit is pressed, so a stray keystroke cannot alter a recorded value, and an abandoned edit changes nothing.
 - **A profile that was prepared ahead of time is edited the same way as one that was not.** There is no distinction in the interface between the two.
 
@@ -205,7 +207,7 @@ Then I can see that the profile could not be saved
 
 - [x] ~~Should the profile always be a form, or read-only until Edit is pressed?~~ — **Resolved:** read-only until Edit. Several fields hold word-for-word quotations from the document, and an always-live form makes it easy to alter one by accident.
 - [x] ~~Should only working drafts be editable, or every document?~~ — **Resolved:** every document. The existing prepared profiles already cover context documents, such as a supervisory letter in the RMiT workstream, so restricting editing to working drafts would leave those uncorrectable.
-- [x] ~~Should the tool check that the empowerment framework really is quoted from the document?~~ — **Resolved:** no, but the field says so on screen. Verifying it would require the document to have been broken into passages first, which would block editing on documents that have not been, for a field the drafter is best placed to get right.
+- [x] ~~Should the tool check that the empowerment framework really is quoted from the document?~~ — **Resolved:** no. Verifying it would require the document to have been broken into passages first, which would block editing on documents that have not been, for a field the drafter is best placed to get right. An on-screen note was tried and removed as noise.
 - [x] ~~Should the placeholder shape be dropped from the node-detail response now that every node is editable?~~ — **Resolved:** no, keep it. Four other consumers read the `{status, message}` union (the cross-workstream intelligence panel, the comparison view, and their tests), and collapsing it would churn all of them for no gain in this story. The panel decides what to render from `status`.
 - [ ] Whether saving a profile should appear in the document's recent activity — **Deferred (non-blocking):** the existing activity trail is written inconsistently by the features that already add to it (`add_node` writes an `event` key, the panel renders a `kind` key), and widening it here would spread that inconsistency. Worth resolving on its own terms rather than as a side effect of this story.
 
@@ -213,20 +215,20 @@ Then I can see that the profile could not be saved
 
 ## Functional Requirements
 
-- **Write path:** a new `PUT /api/workstreams/{workstream_id}/nodes/{node_id}/metadata` persists the nine profile fields through the existing `engine/concepts.py::save_concepts`, which already writes `data/workstreams/{ws}/concepts/{node_id}.json` with the exact `CONCEPT_FIELDS` key set. No new storage module.
-- **Full replacement, not a patch:** the route accepts the complete nine-field object and writes it whole. `save_concepts` already normalises to `{field: fields.get(field) for field in CONCEPT_FIELDS}`, so a field omitted by the client lands as `null`. The form always sends all nine, so this is exact rather than lossy.
+- **Write path:** a new `PUT /api/workstreams/{workstream_id}/nodes/{node_id}/metadata` persists the seven profile fields through the existing `engine/concepts.py::save_concepts`, which already writes `data/workstreams/{ws}/concepts/{node_id}.json` with the exact `CONCEPT_FIELDS` key set. No new storage module.
+- **Full replacement, not a patch:** the route accepts the complete seven-field object and writes it whole. `save_concepts` already normalises to `{field: fields.get(field) for field in CONCEPT_FIELDS}`, so a field omitted by the client lands as `null`. The form always sends all seven, so this is exact rather than lossy.
 - **Atomicity:** one `write_text` call per save, as `save_concepts` does today. A validation failure returns before any write, so a rejected save leaves the side-file untouched.
 - **Idempotency:** naturally idempotent — the same payload written twice yields a byte-identical file and the same `200`.
 - **`task_type` is not writable here.** It lives on the node, is permanent, and the route rejects it (`400 TASK_TYPE_IMMUTABLE`) rather than ignoring it. The node-detail response is where the panel reads it for display.
 - **Absence is not an error.** A node with no side-file yet returns the existing placeholder from `GET`, and the first `PUT` creates the file — `save_concepts` already does `mkdir(parents=True, exist_ok=True)`.
-- **No axis-cache interaction.** The nine-field profile (`concepts/`) and the extracted axis pills (`axes/`) are separate stores that happen to share a screen section name. This route touches only the former; `POST .../extract-concepts` is unaffected.
+- **No axis-cache interaction.** The seven-field profile (`concepts/`) and the extracted axis pills (`axes/`) are separate stores that happen to share a screen section name. This route touches only the former; `POST .../extract-concepts` is unaffected.
 
 ### Validation & Business Rules
 
 - Body must be a JSON object → else `400 INVALID_METADATA "Metadata must be an object."`
 - Unknown keys are rejected → `400 UNKNOWN_METADATA_FIELD` naming the first offender, e.g. `"'policy_owner_name' is not a metadata field."` Silently dropping a typo'd key would lose a drafter's edit without telling them.
 - `task_type` in the body → `400 TASK_TYPE_IMMUTABLE "A deliverable kind is set when the document is created and cannot be changed."`
-- `keywords` and `legal_basis` accept a list of strings, a bare string, or `null`. A bare string is stored as-is (older side-files carry scalars and `asList` in the panel already tolerates both). Any non-string list member → `400 INVALID_METADATA`.
+- `legal_basis` accepts a list of strings, a bare string, or `null`. A bare string is stored as-is (older side-files carry scalars and `asList` in the panel already tolerates both). Any non-string list member → `400 INVALID_METADATA`.
 - The other seven accept a string or `null`. A non-string → `400 INVALID_METADATA` naming the field.
 - Empty string, whitespace-only string, and empty list all normalise to `null` before writing, so "cleared" and "never set" are one state on disk — which is what "blank means not set yet" requires.
 - Per-field max length **2000 characters**; a list may hold at most **50** members, each at most **200** characters. Over either → `413 METADATA_TOO_LARGE` naming the field. The empowerment framework holds a full clause quote, so 2000 is generous rather than tight.
@@ -250,10 +252,8 @@ Then I can see that the profile could not be saved
   "policy_owner": "Aisyah R.",
   "applicability": "Licensed banks and licensed investment banks.",
   "empowerment_framework": "This policy document is issued pursuant to section 143(2) of the Financial Services Act 2013.",
-  "requirement": null,
   "issuance_date": "2025-11-28",
   "effective_date": "2025-11-28",
-  "keywords": ["technology risk", "cloud", "outsourcing"],
   "legal_basis": ["FSA 2013", "IFSA 2013"],
   "ismp_classification": null
 }
@@ -269,11 +269,9 @@ Then I can see that the profile could not be saved
     "policy_owner": "Aisyah R.",
     "applicability": "Licensed banks and licensed investment banks.",
     "empowerment_framework": "This policy document is issued pursuant to section 143(2) of the Financial Services Act 2013.",
-    "requirement": null,
-    "issuance_date": "2025-11-28",
+      "issuance_date": "2025-11-28",
     "effective_date": "2025-11-28",
-    "keywords": ["technology risk", "cloud", "outsourcing"],
-    "legal_basis": ["FSA 2013", "IFSA 2013"],
+      "legal_basis": ["FSA 2013", "IFSA 2013"],
     "ismp_classification": null
   }
 }
@@ -284,7 +282,7 @@ Then I can see that the profile could not be saved
 | Status | Code                     | Condition                                                                 |
 | ------ | ------------------------ | ------------------------------------------------------------------------- |
 | 400    | `INVALID_METADATA`       | Body is not an object, or a field has the wrong type                      |
-| 400    | `UNKNOWN_METADATA_FIELD` | A key outside the nine profile fields                                     |
+| 400    | `UNKNOWN_METADATA_FIELD` | A key outside the seven profile fields                                     |
 | 400    | `TASK_TYPE_IMMUTABLE`    | `task_type` present in the body                                           |
 | 404    | `WORKSTREAM_NOT_FOUND`   | No such workstream                                                        |
 | 404    | `NODE_NOT_FOUND`         | No such node in that workstream                                           |
@@ -294,7 +292,7 @@ Errors carry `field` where one field is at fault, matching `_ws_error`'s existin
 
 ### `GET /api/workstreams/{workstream_id}/nodes/{node_id}` — unchanged
 
-Still returns `metadata` as either `{"status": "available", ...nine fields}` or `{"status": "placeholder", "message": "Concept extraction not enabled in MVP1"}`. The panel keys off `status`; the placeholder message is no longer shown to the drafter, but the shape stays for the four other consumers.
+Still returns `metadata` as either `{"status": "available", ...seven fields}` or `{"status": "placeholder", "message": "Concept extraction not enabled in MVP1"}`. The panel keys off `status`; the placeholder message is no longer shown to the drafter, but the shape stays for the four other consumers.
 
 ## Data Model & Migrations
 
@@ -307,19 +305,17 @@ No database. The store is `data/workstreams/{ws}/concepts/{node_id}.json`, alrea
 | `policy_owner`          | string \| null             | ≤ 2000 chars       | Who owns the document                  |
 | `applicability`         | string \| null             | ≤ 2000 chars       | Who it applies to                      |
 | `empowerment_framework` | string \| null             | ≤ 2000 chars       | Verbatim statutory-basis clause        |
-| `requirement`           | string \| null             | ≤ 2000 chars       | The core obligation                    |
 | `issuance_date`         | string \| null             | ≤ 2000 chars       | Free text — no date parsing (see note) |
 | `effective_date`        | string \| null             | ≤ 2000 chars       | Free text                              |
-| `keywords`              | string[] \| string \| null | ≤ 50 × ≤ 200 chars | Topic keywords, rendered as chips      |
 | `legal_basis`           | string[] \| string \| null | ≤ 50 × ≤ 200 chars | Acts, rendered as chips                |
-| `ismp_classification`   | string \| null             | ≤ 2000 chars       | `null` renders as the pending state    |
+| `ismp_classification`   | string \| null             | One of UMUM / TERHAD / SULIT / RAHSIA | `null` renders as the pending state |
 
 **Dates are stored as free text, not validated or normalised.** The committed fixtures leave them `null`, and the drafter's own phrasing ("28 November 2025", "2025-11-28") is what the field is for. Imposing a format would reject valid input for a display-only value; the panel renders whatever string is stored.
 
 ### Migration Notes
 
 - No backfill. Existing side-files (`opres-v2/concepts/opres-pd-v0-3.json`, `open-finance-ed/concepts/of-ed-2025.json`, `rmit-v2-2025/concepts/{rmit-pd-v2,bnm-supervisory-letter-rmit-2025}.json`) already match the schema and load unchanged.
-- A side-file written before `legal_basis` / `ismp_classification` existed still loads — `load_concepts` returns the raw dict and missing keys read back as `None`. The first save through this route normalises it to all nine keys.
+- A side-file written before `legal_basis` / `ismp_classification` existed still loads — `load_concepts` returns the raw dict and missing keys read back as `None`. The first save through this route normalises it to all seven keys.
 
 ## UI/Frontend Requirements
 
@@ -328,7 +324,7 @@ No database. The store is `data/workstreams/{ws}/concepts/{node_id}.json`, alrea
 **`NodeMetadataForm`** — `frontend/src/features/workstream-graph/NodeMetadataForm.tsx`
 
 - **Type:** New
-- **Purpose:** the edit mode of the Metadata disclosure — nine controlled inputs, Save and Cancel. Extracted rather than inlined because `NodeDetailPanel.tsx` is already ~500 lines carrying the header, five sections, the delete flow, and the footer actions; adding a nine-field form inline would make it the largest file in the feature.
+- **Purpose:** the edit mode of the Metadata disclosure — seven controlled inputs, Save and Cancel. Extracted rather than inlined because `NodeDetailPanel.tsx` is already ~500 lines carrying the header, five sections, the delete flow, and the footer actions; adding a seven-field form inline would make it the largest file in the feature.
 - **Props:**
   ```typescript
   interface NodeMetadataFormProps {
@@ -339,9 +335,8 @@ No database. The store is `data/workstreams/{ws}/concepts/{node_id}.json`, alrea
     onDone: () => void;
   }
   ```
-- **Fields:** seven single-line `<input>`s; `empowerment_framework` and `requirement` as `<textarea rows={3}>` (both hold clause-length text); `keywords` and `legal_basis` as single-line inputs taking comma-separated values, split on `,` and trimmed on submit, joined with `", "` on load.
+- **Fields:** five single-line `<input>`s; `empowerment_framework` as `<textarea rows={3}>` (it holds a clause-length quote); `legal_basis` as a single-line input taking comma-separated values, split on `,` and trimmed on submit, joined with `", "` on load; `ismp_classification` as a `<select>` offering a blank "Not set" option plus UMUM / TERHAD / SULIT / RAHSIA.
 - **Labels:** reuse `CONCEPT_FIELD_ORDER`'s existing label strings so read and edit modes cannot drift. Move that constant into the new file and import it back into the panel, or into a shared `metadata.ts` — either is fine, but it must exist once.
-- **Empowerment-framework hint:** a `<span>` under the field reading "Quote this word-for-word from the document." — the on-screen honesty note the business rules require.
 - **Mutation:** TanStack `useMutation` calling `saveNodeMetadata`; on success invalidate `["node", workstreamId, nodeId]` and call `onDone()`.
 - **Error state:** `role="alert"` paragraph with copy keyed off the error code; the form stays mounted with the drafter's values intact so they can retry.
 
@@ -349,7 +344,7 @@ No database. The store is `data/workstreams/{ws}/concepts/{node_id}.json`, alrea
 
 - **Type:** Modify existing
 - **Purpose:** add `metadataEditing` state; render `NodeMetadataForm` in place of the `<dl>` when editing.
-- **Read mode changes:** when `metadata.status !== "available"`, render the nine labels each reading "Not set" instead of the placeholder message — the "no dead end" requirement. `ismp_classification` keeps its `ISMP_PENDING` treatment in both cases.
+- **Read mode changes:** when `metadata.status !== "available"`, render the seven labels each reading "Not set" instead of the placeholder message — the "no dead end" requirement. `ismp_classification` keeps its `ISMP_PENDING` treatment in both cases.
 - **Edit affordance:** a small "Edit" button in the disclosure header row, beside the chevron. Do not nest it inside the existing disclosure `<button>` — a button inside a button is invalid and breaks keyboard activation. Make the header a flex row containing the disclosure toggle and the Edit button as siblings.
 - **`task_type` line:** for a task node, the first row of the read-mode list, labelled "Task type", showing the human label. Rendered in edit mode too, as static text, never an input.
 
@@ -369,7 +364,7 @@ Add a `putJson` helper alongside the existing `postJson` if none exists, followi
 
 ### User Interactions
 
-- Expand Metadata → nine labelled values, or nine "Not set" rows; an Edit button either way.
+- Expand Metadata → seven labelled values, or six "Not set" rows plus the pending ISMP row; an Edit button either way.
 - Press Edit → the list becomes a form pre-filled with current values; Save and Cancel appear.
 - Press Save → the form disables while saving, then closes back to read mode showing the new values.
 - Press Cancel → the form closes, discarding everything typed; stored values are unchanged.
@@ -378,7 +373,7 @@ Add a `putJson` helper alongside the existing `postJson` if none exists, followi
 ### States
 
 - **Loading:** the panel's existing "Loading node…" spinner covers initial load. While saving, the Save button shows "Saving…" and both buttons disable.
-- **Empty:** nine rows reading "Not set", with `ismp_classification` reading "Pending — RH publication form".
+- **Empty:** six rows reading "Not set", with `ismp_classification` reading "Pending — RH publication form".
 - **Error:** inline `role="alert"` text under the form; nothing is lost.
 
 ## Architecture Notes
@@ -442,7 +437,7 @@ Add a `putJson` helper alongside the existing `postJson` if none exists, followi
 
 ### Negative Constraints
 
-- Do NOT change `CONCEPT_FIELDS`. Nine fields, same names, same order. `task_type` does not join it.
+- Do NOT re-add `keywords` or `requirement` to `CONCEPT_FIELDS`, and do NOT let `task_type` join it. Seven fields, same names, same order.
 - Do NOT modify `scripts/enrich_node_metadata.py`. The offline path keeps working against the same side-file, unchanged.
 - Do NOT remove the `{status, message}` placeholder branch from the node-detail response — `CompareWorkstreamsPage.tsx`, `RegulatoryProfileCard.tsx`, and their tests read that union.
 - Do NOT touch the axis-extraction route, the `axes/` cache, or `engine/arm_g.py`. "Concepts" the pills and "Metadata" the profile are different stores.
@@ -456,8 +451,8 @@ Add a `putJson` helper alongside the existing `postJson` if none exists, followi
 **Test 1: a first save creates the side-file**
 
 - Setup: `open-finance-pd-2026` fixture in `tmp_path`; no `concepts/bis-papers-168.json`
-- Action: `PUT .../nodes/bis-papers-168/metadata` with `{"policy_owner": "Priya S.", "keywords": ["operational resilience"], ...seven nulls}`
-- Expected: `200`; `metadata.status == "available"`; the file now exists with all nine keys, seven of them `null`
+- Action: `PUT .../nodes/bis-papers-168/metadata` with `{"policy_owner": "Priya S.", "legal_basis": ["FSA 2013"], ...five nulls}`
+- Expected: `200`; `metadata.status == "available"`; the file now exists with all seven keys, five of them `null`
 
 **Test 2: a save overwrites an existing profile whole**
 
@@ -469,7 +464,7 @@ Add a `putJson` helper alongside the existing `postJson` if none exists, followi
 
 - Setup: Test 1's state
 - Action: `PUT` then `GET .../nodes/bis-papers-168`
-- Expected: `GET` body `metadata.keywords == ["operational resilience"]`
+- Expected: `GET` body `metadata.legal_basis == ["FSA 2013"]`
 
 **Test 4: an unknown key is refused**
 
@@ -492,26 +487,26 @@ Add a `putJson` helper alongside the existing `postJson` if none exists, followi
 **Test 7: a non-string list member is refused**
 
 - Setup: same
-- Action: `PUT` with `{"keywords": ["cloud", 7]}`
-- Expected: `400 INVALID_METADATA`, field `keywords`
+- Action: `PUT` with `{"legal_basis": ["FSA 2013", 7]}`
+- Expected: `400 INVALID_METADATA`, field `legal_basis`
 
 **Test 8: blank input normalises to null**
 
 - Setup: same
-- Action: `PUT` with `{"policy_owner": "   ", "keywords": []}`
+- Action: `PUT` with `{"policy_owner": "   ", "legal_basis": []}`
 - Expected: `200`; both stored as `null`
 
 **Test 9: an over-long field is refused**
 
 - Setup: same
-- Action: `PUT` with `{"requirement": "x" * 2001}`
-- Expected: `413 METADATA_TOO_LARGE`, field `requirement`; no file written
+- Action: `PUT` with `{"applicability": "x" * 2001}`
+- Expected: `413 METADATA_TOO_LARGE`, field `applicability`; no file written
 
 **Test 10: too many list members refused**
 
 - Setup: same
-- Action: `PUT` with 51 keywords
-- Expected: `413 METADATA_TOO_LARGE`, field `keywords`
+- Action: `PUT` with 51 legal-basis members
+- Expected: `413 METADATA_TOO_LARGE`, field `legal_basis`
 
 **Test 11: unknown workstream and unknown node**
 
@@ -534,8 +529,8 @@ Add a `putJson` helper alongside the existing `postJson` if none exists, followi
 **Test 14: a legacy side-file missing the newer keys is upgraded on save**
 
 - Setup: write a `concepts/{node}.json` holding only the original seven fields
-- Action: `GET` (confirm it loads), then `PUT` the nine-field form payload
-- Expected: `GET` succeeds with `legal_basis`/`ismp_classification` reading `None`; after `PUT` the file holds all nine keys
+- Action: `GET` (confirm it loads), then `PUT` the seven-field form payload
+- Expected: `GET` succeeds with `legal_basis`/`ismp_classification` reading `None`; after `PUT` the file holds all seven keys
 
 ## Acceptance Criteria
 
@@ -568,8 +563,8 @@ Start the engine and the app (unauthenticated), then:
 
 1. Open `/workstreams/open-finance-pd-2026` and click the **BIS Papers 168** node.
 2. Expand **Metadata**. **Expect:** nine rows each reading "Not set", ISMP reading "Pending — RH publication form", and an **Edit** button. No text about MVP1.
-3. Press **Edit**. **Expect:** nine inputs, empty; a note under Empowerment framework saying to quote it word-for-word; Save and Cancel.
-4. Type "Priya S." as policy owner and "operational resilience, third-party risk" as keywords. Press **Save**. **Expect:** read mode returns showing Priya S. and two keyword chips.
+3. Press **Edit**. **Expect:** seven inputs, empty, with ISMP classification as a dropdown; Save and Cancel.
+4. Type "Priya S." as policy owner, "FSA 2013, IFSA 2013" as legal basis, and pick SULIT as the ISMP classification. Press **Save**. **Expect:** read mode returns showing Priya S., two Act chips, and SULIT.
 5. Close the panel, reselect the node, expand Metadata. **Expect:** both values are still there.
 6. Press **Edit**, change policy owner to "Farid M.", press **Cancel**. **Expect:** still Priya S.
 7. Click the workstream's working draft and expand Metadata. **Expect:** a "Task type" row reading "PD — Policy Document"; pressing Edit leaves it as text with no input.
@@ -583,11 +578,11 @@ Start the engine and the app (unauthenticated), then:
 | Saved values survive leaving and returning               | `frontend/e2e/edit-node-metadata.spec.ts` | Task 8            |
 | A document nobody prepared can be filled in from scratch | `frontend/e2e/edit-node-metadata.spec.ts` | Task 8            |
 
-These three need a real round-trip to the filesystem to mean anything — persistence is the claim. The remaining scenarios (cancel, clearing a field, several keywords, the read-only task-type row, the ISMP pending wording, the verbatim hint, and the failed save) are Vitest + MSW in `NodeMetadataForm.test.tsx` and `NodeDetailPanel.test.tsx`; the validation-rejection scenarios are engine Tests 4–10.
+These three need a real round-trip to the filesystem to mean anything — persistence is the claim. The remaining scenarios (cancel, clearing a field, several Acts, the ISMP dropdown's four options, the read-only task-type row, the ISMP pending wording, and the failed save) are Vitest + MSW in `NodeMetadataForm.test.tsx` and `NodeDetailPanel.test.tsx`; the validation-rejection scenarios are engine Tests 4–10.
 
 **Locator strategies:** `getByRole("button", { name: /^edit$/i })` for the edit toggle; `getByLabel(<field label>)` for each input, reusing the `CONCEPT_FIELD_ORDER` labels; `getByRole("button", { name: /^save$/i })` and `/^cancel$/i`; `getByTestId("task-type-chip")` for the read-only kind.
 
-**Match chip text exactly.** `keywords` and `legal_basis` render their values as sibling `<span>` chips inside one `<dd>`, so a non-exact `getByText("open banking")` resolves to the containing `<dd>` — which holds all three keywords and reads as not visible. Scope to the profile list and pass `{ exact: true }`. Found the hard way; the assertion failed while the data was correct on disk.
+**Match chip text exactly.** `legal_basis` renders its values as sibling `<span>` chips inside one `<dd>`, so a non-exact `getByText("FSA 2013")` resolves to the containing `<dd>` — which holds every Act and reads as not visible. Scope to the profile list and pass `{ exact: true }`. Found the hard way; the assertion failed while the data was correct on disk.
 
 **Node selection:** the graph renders to a single `<canvas>`, so there is no per-node DOM element in a real browser — this spec shares the `openNode` canvas-sweep helper described in [spec-shared-task-type.md](spec-shared-task-type.md)'s Verification section.
 

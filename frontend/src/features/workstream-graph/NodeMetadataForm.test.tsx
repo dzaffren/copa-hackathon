@@ -82,23 +82,6 @@ describe("NodeMetadataForm", () => {
     }
   });
 
-  it("tells the drafter the empowerment framework must be quoted verbatim", () => {
-    renderWithProviders(
-      <NodeMetadataForm
-        workstreamId="rmit-v2-2025"
-        nodeId="rmit-pd-v2"
-        initial={null}
-        onDone={() => {}}
-      />,
-    );
-
-    // The tool cannot verify the quote, so it says so on screen rather than
-    // implying a check it does not perform.
-    expect(
-      screen.getByText(/quote this word-for-word from the document/i),
-    ).toBeInTheDocument();
-  });
-
   it("splits a comma-separated line into separate Acts on save", async () => {
     const saved = captureSave();
     renderWithProviders(
