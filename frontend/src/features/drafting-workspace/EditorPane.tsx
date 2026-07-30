@@ -66,8 +66,9 @@ const PURIFY_CONFIG = {
     "div",
     "span",
     "br",
+    "img",
   ],
-  ALLOWED_ATTR: ["class"],
+  ALLOWED_ATTR: ["class", "src", "alt"],
 };
 
 /** Extract the clause number a callout should sit beside, e.g. "5.3" from

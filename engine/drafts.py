@@ -28,14 +28,37 @@ import bleach
 # targets to smuggle javascript: through), no <img> (no onerror), no <style>.
 # `span`/`div` survive because the Copilot snippet wraps in them.
 ALLOWED_TAGS: frozenset[str] = frozenset(
-    {"h1", "h2", "h3", "p", "strong", "em", "u", "ul", "ol", "li", "div", "span", "br"}
+    {
+        "h1",
+        "h2",
+        "h3",
+        "p",
+        "strong",
+        "em",
+        "u",
+        "ul",
+        "ol",
+        "li",
+        "div",
+        "span",
+        "br",
+        "img",
+    }
 )
 
 # `class` only, and only on the wrappers that carry it. This is what lets an
 # inserted Copilot snippet keep its `copilot-snippet` marker — the visual
 # provenance signal that tells a drafter which text they did not write — while
 # still dropping every event handler, since `on*` is simply not on the list.
-ALLOWED_ATTRS: dict[str, list[str]] = {"div": ["class"], "span": ["class"], "p": ["class"]}
+# `img` additionally keeps `src`/`alt` — the BNM cover-page logo is the only
+# image the generated chrome ever inserts, and no `on*` attribute is ever
+# on the list regardless of tag.
+ALLOWED_ATTRS: dict[str, list[str]] = {
+    "div": ["class"],
+    "span": ["class"],
+    "p": ["class"],
+    "img": ["class", "src", "alt"],
+}
 
 # 200 KB after sanitization. A policy document is text; anything past this is
 # either a paste accident or someone probing.
