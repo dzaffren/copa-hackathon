@@ -451,7 +451,7 @@ No database. Fixture files under `data/workstreams/` are the store.
 
 ### Negative Constraints
 
-- Do NOT alter the 8-value `NODE_TYPES` or the 4-value `EDGE_TYPES` vocabularies. `task_type` is a second, orthogonal question.
+- Do NOT alter the 8-value `NODE_TYPES` or the 3-value `EDGE_TYPES` vocabularies (`contributes-to` was retired on 29 Jul 2026 — do not reintroduce it). `task_type` is a second, orthogonal question.
 - Do NOT add `task_type` to `engine/concepts.py::CONCEPT_FIELDS`. The profile side-file stays nine fields; `task_type` lives on the node.
 - Do NOT rewrite `deliverable_type` in any existing `workstream.json`.
 - Do NOT backfill `task_type` into `opres-v2`, `rmit-v2-2025`, `open-finance-ed`, or `_cross`.
@@ -574,3 +574,7 @@ The workstream-creation scenarios and the scenario outline over all eight kinds 
 **Locator strategies:** `getByRole("radiogroup", { name: "Task type" })` and `getByRole("radio", { name: <code> })` for the grid (matching the existing "Breaking-up method" and node-type locators); `getByLabel("Deliverable type")` for the creation dropdown; `getByTestId("task-type-chip")` for the detail chip.
 
 **Fixture hygiene:** the new spec adds a node to `open-finance-pd-2026`, a tracked path. Follow the existing convention in `add-node-chunking.spec.ts` — note in a comment that `git checkout data/workstreams/open-finance-pd-2026` restores it after a local run.
+
+**Locating a node in a real browser — a constraint discovered while building this.** The graph is drawn by `react-force-graph-2d` into a single `<canvas>`, so there is **no per-node DOM element** outside Vitest. The one-button-per-node DOM the component suite relies on comes entirely from the stub at `frontend/src/test/mocks/react-force-graph-2d.tsx`. A Playwright spec must therefore sweep the canvas for any node, then navigate by the detail panel's neighbour chips — the only real DOM handles a node has. Both new specs share an `openNode` helper doing exactly that, and `frontend/e2e/README.md` documents it.
+
+Consequently **five pre-existing E2E specs do not pass** — `add-edge`, `add-node-chunking`, `extract-concepts`, `open-finance-build`, and `workstream-graph` all target either `getByRole("button", { name: <node title> })` or `svg circle`, neither of which exists under the canvas renderer. Verified to fail identically on `staging` with none of this epic's code present, so they are **not** a regression from this work and are deliberately left untouched. Repairing them is its own task, and the better fix is probably to give `GraphCanvas` a real `sr-only` node list — which would restore E2E addressability and canvas keyboard accessibility in one change.

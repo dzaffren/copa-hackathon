@@ -76,7 +76,7 @@ test("build Open Finance PD . 2026 from scratch and analyse a linkage", async ({
   await page.getByLabel("Workstream name").fill("Open Finance PD . 2026");
   await page
     .getByLabel("Short description")
-    .fill("PD consolidating the 2025 Open Finance ED against peer guidance.");
+    .fill("PD serving as a foundational framework to facilitate consent-driven sharing of customer information across the financial sector in a secure, open, accessible, interoperable and timely manner.");
   await page.getByLabel("Deliverable type").selectOption("PD");
   await page.getByLabel("Target publication").fill("Q4 2026");
   await page.getByRole("button", { name: /create workstream/i }).click();

@@ -8,15 +8,13 @@ import { fetchAllCrossLinks, fetchWorkstreams } from "@/lib/api";
 import type { CrossLink, RelationshipClassification } from "@/lib/types";
 import { labelStyle } from "@/lib/labels";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  classStyle,
-  intelMetrics,
-  riskStyle,
-  unreviewedCount,
-} from "./intel";
+import { classStyle, intelMetrics, riskStyle, unreviewedCount } from "./intel";
 import { RelationshipPanel } from "./RelationshipPanel";
 
-const CLASS_FILTERS: { value: RelationshipClassification | "all"; label: string }[] = [
+const CLASS_FILTERS: {
+  value: RelationshipClassification | "all";
+  label: string;
+}[] = [
   { value: "all", label: "All" },
   { value: "conflict", label: "Conflicts" },
   { value: "divergent", label: "Divergent" },
@@ -38,7 +36,9 @@ export function CrossIntelligencePage() {
   });
 
   const [query, setQuery] = useState("");
-  const [classFilter, setClassFilter] = useState<RelationshipClassification | "all">("all");
+  const [classFilter, setClassFilter] = useState<
+    RelationshipClassification | "all"
+  >("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const metrics = useMemo(
@@ -58,7 +58,7 @@ export function CrossIntelligencePage() {
           l.near.title,
           l.far.title,
           ...l.reasons,
-          ...l.shared_attributes.keywords,
+          ...l.shared_attributes.applicability,
         ]
           .filter(Boolean)
           .join(" ")
@@ -81,7 +81,8 @@ export function CrossIntelligencePage() {
               <Radar className="h-3.5 w-3.5" /> Cross-Workstream Intelligence
             </p>
             <h1 className="mt-1 text-lg font-bold">
-              Overlap, duplication &amp; conflict across active policy workstreams
+              Overlap, duplication &amp; conflict across active policy
+              workstreams
             </h1>
             <p className="mt-0.5 max-w-2xl text-sm text-muted-foreground">
               An early-warning system: the moment two teams draft policies that
@@ -99,8 +100,16 @@ export function CrossIntelligencePage() {
 
         {/* Metrics */}
         <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-          <Metric label="Active workstreams" value={metrics.activeWorkstreams} loading={isLoading} />
-          <Metric label="Potential overlaps" value={metrics.potentialOverlaps} loading={isLoading} />
+          <Metric
+            label="Active workstreams"
+            value={metrics.activeWorkstreams}
+            loading={isLoading}
+          />
+          <Metric
+            label="Potential overlaps"
+            value={metrics.potentialOverlaps}
+            loading={isLoading}
+          />
           <Metric
             label="High-risk conflicts"
             value={metrics.highRiskConflicts}
@@ -229,9 +238,13 @@ function Metric({
       {loading ? (
         <Skeleton className="mt-1 h-7 w-10" />
       ) : (
-        <p className={cn("mt-0.5 text-2xl font-bold tabular-nums", toneClass)}>{value}</p>
+        <p className={cn("mt-0.5 text-2xl font-bold tabular-nums", toneClass)}>
+          {value}
+        </p>
       )}
-      {hint && <p className="text-[10px] text-muted-foreground">latest {hint}</p>}
+      {hint && (
+        <p className="text-[10px] text-muted-foreground">latest {hint}</p>
+      )}
     </div>
   );
 }
@@ -271,7 +284,12 @@ function RelationshipCard({
             {link.far.workstream_name ?? link.far.workstream_id}
           </span>
         </span>
-        <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold", risk.pill)}>
+        <span
+          className={cn(
+            "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold",
+            risk.pill,
+          )}
+        >
           {risk.label}
         </span>
       </div>
@@ -283,22 +301,27 @@ function RelationshipCard({
       )}
 
       <div className="mt-2 flex flex-wrap items-center gap-1">
-        <span className={cn("rounded-full px-1.5 py-0.5 text-[10px] font-semibold", cls.pill)}>
+        <span
+          className={cn(
+            "rounded-full px-1.5 py-0.5 text-[10px] font-semibold",
+            cls.pill,
+          )}
+        >
           {cls.label}
         </span>
-        {(Object.entries(link.labels) as [keyof typeof link.labels, number][]).map(
-          ([label, count]) => (
-            <span
-              key={label as string}
-              className={cn(
-                "rounded-full px-1.5 py-0.5 text-[10px] font-semibold",
-                labelStyle(label as never).pill,
-              )}
-            >
-              {count} {label}
-            </span>
-          ),
-        )}
+        {(
+          Object.entries(link.labels) as [keyof typeof link.labels, number][]
+        ).map(([label, count]) => (
+          <span
+            key={label as string}
+            className={cn(
+              "rounded-full px-1.5 py-0.5 text-[10px] font-semibold",
+              labelStyle(label as never).pill,
+            )}
+          >
+            {count} {label}
+          </span>
+        ))}
         {unreviewed > 0 && (
           <span className="ml-auto text-[10px] font-medium text-amber-800">
             {unreviewed} unreviewed
@@ -315,7 +338,9 @@ function EmptyState({ hasLinks }: { hasLinks: boolean }) {
       <div className="max-w-xs">
         <Radar className="mx-auto h-8 w-8 text-muted-foreground/60" />
         <p className="mt-3 text-sm font-medium">
-          {hasLinks ? "No relationships match your filter" : "No overlaps detected"}
+          {hasLinks
+            ? "No relationships match your filter"
+            : "No overlaps detected"}
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
           {hasLinks

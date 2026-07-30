@@ -1,15 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import {
-  ArrowLeftRight,
-  Check,
-  FileText,
-  Scale,
-  Tag,
-  User,
-  X,
-} from "lucide-react";
+import { ArrowLeftRight, Check, FileText, Scale, User, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { fetchCrossLinkDetail } from "@/lib/api";
@@ -142,11 +134,6 @@ export function RelationshipPanel({
             icon={<User className="h-3.5 w-3.5" />}
             label="Applicability"
             values={shared.applicability}
-          />
-          <SharedRow
-            icon={<Tag className="h-3.5 w-3.5" />}
-            label="Shared topics"
-            values={shared.keywords}
           />
           {shared.policy_owner && (
             <SharedRow

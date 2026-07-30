@@ -167,6 +167,25 @@ def test_GET_node_detail_lists_every_neighbour_in_the_workstream(tmp_path):
     assert "opres-pd-v0-0" in neighbour_ids
 
 
+def test_GET_node_detail_returns_null_task_type_for_a_context_document(tmp_path):
+    """`task_type` is a top-level key on every node detail, null where there is
+    none, so the panel can render the chip conditionally without probing for the
+    key's existence. A standard never carries one."""
+    client, _ = _make_client(tmp_path)
+    body = client.get(f"/api/workstreams/{_OPRES}/nodes/bcbs-opres-2021").json()
+    assert body["task_type"] is None
+
+
+def test_GET_node_detail_returns_null_task_type_for_a_legacy_working_draft(tmp_path):
+    """The seeded drafts predate the deliverable vocabulary and are being
+    retired, so they are deliberately NOT backfilled: a task node with no
+    recorded kind reads as null rather than 404ing or guessing "PD"."""
+    client, _ = _make_client(tmp_path)
+    body = client.get(f"/api/workstreams/{_OPRES}/nodes/{_TASK}").json()
+    assert body["node_type"] == "task"
+    assert body["task_type"] is None
+
+
 def test_GET_node_detail_unknown_node_returns_404(tmp_path):
     client, _ = _make_client(tmp_path)
     res = client.get(f"/api/workstreams/{_OPRES}/nodes/ghost")

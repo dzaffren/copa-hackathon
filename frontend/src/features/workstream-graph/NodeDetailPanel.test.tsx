@@ -30,10 +30,8 @@ const ENRICHED_SUPERVISORY_LETTER: NodeDetail = {
     policy_owner: null,
     applicability: "Financial institutions subject to the RMiT policy document",
     empowerment_framework: null,
-    requirement: null,
     issuance_date: null,
     effective_date: null,
-    keywords: ["RMiT", "implementation guidance", "technology risk"],
     legal_basis: ["FSA 2013", "IFSA 2013", "DFIA 2002"],
     ismp_classification: null,
   },
@@ -137,7 +135,44 @@ describe("NodeDetailPanel", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders keyword + legal-basis chips in the Metadata disclosure", async () => {
+  it("shows the deliverable kind as a chip, by label not code", async () => {
+    seedNode({
+      ...ENRICHED_SUPERVISORY_LETTER,
+      id: "opres-industry-briefing",
+      node_type: "task",
+      task_type: "DECK",
+      title: "OpRes Industry Briefing",
+    });
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="opres-v2"
+        nodeId="opres-industry-briefing"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/opres-v2",
+    );
+
+    // The drafter reads "Engagement Deck", never the stored "DECK".
+    expect(await screen.findByTestId("task-type-chip")).toHaveTextContent(
+      "Engagement Deck",
+    );
+  });
+
+  it("shows no deliverable chip for a published context document", async () => {
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="opres-v2"
+        nodeId="bcbs-opres-2021"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/opres-v2",
+    );
+
+    await screen.findByText("international-standard");
+    expect(screen.queryByTestId("task-type-chip")).not.toBeInTheDocument();
+  });
+
+  it("renders legal-basis chips in the Metadata disclosure", async () => {
     seedNode(ENRICHED_SUPERVISORY_LETTER);
     renderWithProviders(
       <NodeDetailPanel
@@ -151,15 +186,172 @@ describe("NodeDetailPanel", () => {
     await screen.findByText("supervisory-letter");
     await userEvent.click(screen.getByRole("button", { name: /metadata/i }));
 
-    // Keywords render as individual chips.
-    expect(
-      await screen.findByText("implementation guidance"),
-    ).toBeInTheDocument();
-    expect(screen.getByText("technology risk")).toBeInTheDocument();
+    // A multi-value field renders as individual chips.
+    expect(await screen.findByText("Legal basis")).toBeInTheDocument();
     // The ISMP row inside the disclosure also shows the pending state.
     expect(
       screen.getAllByText(/Pending — RH publication form/).length,
     ).toBeGreaterThan(0);
+  });
+
+  it("offers a fillable profile, not a dead end, on a node nobody prepared", async () => {
+    // The seeded BCBS node has no side-file, so its metadata arrives as the
+    // placeholder shape the four other consumers still read.
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="opres-v2"
+        nodeId="bcbs-opres-2021"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/opres-v2",
+    );
+
+    await screen.findByText("international-standard");
+    await userEvent.click(screen.getByRole("button", { name: /^metadata$/i }));
+
+    // Every field is named and honestly empty — six "Not set" plus the ISMP
+    // row, which is pending rather than merely unfilled.
+    expect(screen.getAllByText("Not set")).toHaveLength(6);
+    expect(screen.getByText("Policy owner")).toBeInTheDocument();
+    expect(screen.getByText("ISMP classification")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Pending — RH publication form/),
+    ).toBeInTheDocument();
+    // The MVP1 apology must never reach the drafter again.
+    expect(
+      screen.queryByText(/concept extraction not enabled/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it("Edit turns the profile into a form and a save shows the new values", async () => {
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="opres-v2"
+        nodeId="bcbs-opres-2021"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/opres-v2",
+    );
+
+    await screen.findByText("international-standard");
+    await userEvent.click(screen.getByRole("button", { name: /^edit$/i }));
+
+    // Read mode's flat values are replaced by inputs.
+    const owner = screen.getByLabelText("Policy owner");
+    await userEvent.type(owner, "Priya S.");
+    await userEvent.type(
+      screen.getByLabelText("Legal basis"),
+      "FSA 2013, IFSA 2013",
+    );
+    await userEvent.click(screen.getByRole("button", { name: /^save$/i }));
+
+    // Back to read mode, showing what she saved — the panel refetched the node.
+    await waitFor(() =>
+      expect(screen.queryByLabelText("Policy owner")).not.toBeInTheDocument(),
+    );
+    expect(await screen.findByText("Priya S.")).toBeInTheDocument();
+    // The comma-separated line came back as separate chips.
+    expect(screen.getByText("FSA 2013")).toBeInTheDocument();
+    expect(screen.getByText("IFSA 2013")).toBeInTheDocument();
+  });
+
+  it("lists a working draft's deliverable kind on its profile, uneditable", async () => {
+    seedNode({
+      ...ENRICHED_SUPERVISORY_LETTER,
+      id: "rmit-faq-v1",
+      node_type: "task",
+      task_type: "FAQ",
+      title: "RMiT FAQ — v1",
+    });
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="rmit-v2-2025"
+        nodeId="rmit-faq-v1"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/rmit-v2-2025",
+    );
+
+    await screen.findByText("task");
+    await userEvent.click(screen.getByRole("button", { name: /^metadata$/i }));
+
+    // The first row of the profile, reading the drafter-facing label. "FAQ" now
+    // appears twice: the badge-row chip and this profile row.
+    expect(screen.getByText("Task type")).toBeInTheDocument();
+    expect(screen.getAllByText("FAQ")).toHaveLength(2);
+
+    // It stays static text in edit mode — set once at creation, never an input.
+    await userEvent.click(screen.getByRole("button", { name: /^edit$/i }));
+    expect(screen.getByText("Task type")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Task type")).not.toBeInTheDocument();
+    // Every other field is still editable.
+    expect(screen.getByLabelText("Policy owner")).toBeEnabled();
+  });
+
+  it("shows no Task type row on a published context document", async () => {
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="opres-v2"
+        nodeId="bcbs-opres-2021"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/opres-v2",
+    );
+
+    await screen.findByText("international-standard");
+    await userEvent.click(screen.getByRole("button", { name: /^metadata$/i }));
+
+    // A standard is never asked what kind of deliverable it is.
+    expect(screen.queryByText("Task type")).not.toBeInTheDocument();
+    expect(screen.getByText("Policy owner")).toBeInTheDocument();
+  });
+
+  it("abandoning a profile edit changes nothing", async () => {
+    seedNode(ENRICHED_SUPERVISORY_LETTER);
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="rmit-v2-2025"
+        nodeId="bnm-supervisory-letter-rmit-2025"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/rmit-v2-2025",
+    );
+
+    await screen.findByText("supervisory-letter");
+    await userEvent.click(screen.getByRole("button", { name: /^edit$/i }));
+    const applicability = screen.getByLabelText("Applicability");
+    await userEvent.clear(applicability);
+    await userEvent.type(applicability, "Everyone");
+    await userEvent.click(screen.getByRole("button", { name: /^cancel$/i }));
+
+    // Read mode returns with the stored value, not the typed one.
+    expect(screen.queryByLabelText("Applicability")).not.toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Financial institutions subject to the RMiT policy document",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Everyone")).not.toBeInTheDocument();
+  });
+
+  it("keeps the Edit button out of the disclosure toggle", async () => {
+    renderWithProviders(
+      <NodeDetailPanel
+        workstreamId="opres-v2"
+        nodeId="bcbs-opres-2021"
+        onSelectNode={() => {}}
+      />,
+      "/workstreams/opres-v2",
+    );
+
+    await screen.findByText("international-standard");
+    const edit = screen.getByRole("button", { name: /^edit$/i });
+    // A button nested inside a button is invalid HTML and breaks keyboard
+    // activation of both, so the two must be siblings.
+    expect(edit.parentElement?.closest("button")).toBeNull();
+    expect(
+      screen.getByRole("button", { name: /^metadata$/i }).contains(edit),
+    ).toBe(false);
   });
 
   // --- Concepts (extracted axes) -------------------------------------------

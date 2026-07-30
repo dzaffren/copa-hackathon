@@ -249,12 +249,28 @@ def edges_between(
 # which is just owner + reviewers restated, while the form captures an actual
 # policy choice. The three seeded fixtures were converted — losslessly, since
 # each one's list was exactly its owner plus its reviewers.
+#
+# TASK_TYPES is now shared beyond this form: the add-node dialog asks it of every
+# new working draft, and the Copilot reads the recorded answer instead of asking
+# again. It replaces the four-code `DELIVERABLE_TYPES` and the Copilot's own
+# seven-preset `INTENTS` — two lists describing one idea, which had drifted apart
+# far enough that an FAQ could only be recorded as "Other". Deleted outright
+# rather than aliased, because an alias is how they drifted in the first place.
 
-DELIVERABLE_TYPES: dict[str, str] = {
+# The eight deliverable kinds BNM actually publishes, code -> label, in the order
+# the drafter is offered them. The code is what an auto-generated draft title
+# embeds ("OpRes Feedback Form (FEEDBACK)"), which is why the longer kinds carry
+# a short form at all — the full label is unreadable inside a title. Note
+# "OTHERS", not the retired "Other": one spelling everywhere.
+TASK_TYPES: dict[str, str] = {
     "PD": "Policy Document",
-    "ED": "Exposure Draft",
     "DP": "Discussion Paper",
-    "Other": "Other",
+    "ED": "Exposure Draft",
+    "FAQ": "FAQ",
+    "DECK": "Engagement Deck",
+    "FEEDBACK": "Feedback Template for Industry",
+    "BENCHMARK": "Peer Benchmarking",
+    "OTHERS": "Others",
 }
 
 ACCESS_LEVELS: frozenset[str] = frozenset({"team_only", "department_wide"})
@@ -262,6 +278,15 @@ ACCESS_LEVELS: frozenset[str] = frozenset({"team_only", "department_wide"})
 NAME_MIN, NAME_MAX = 3, 120
 DESCRIPTION_MAX = 500
 TARGET_PUBLICATION_MAX = 60
+
+
+def task_type_code_for_label(label: Optional[str]) -> Optional[str]:
+    """The code whose label matches, or None. Derived from TASK_TYPES so the
+    two directions cannot drift."""
+    for code, code_label in TASK_TYPES.items():
+        if code_label == label:
+            return code
+    return None
 
 
 def validate_workstream_create(body: dict[str, Any]) -> Optional[tuple[str, str, str]]:
@@ -300,10 +325,10 @@ def validate_workstream_create(body: dict[str, Any]) -> Optional[tuple[str, str,
             f"Target publication must be {TARGET_PUBLICATION_MAX} characters or fewer.",
             "target_publication",
         )
-    if body.get("deliverable_type") not in DELIVERABLE_TYPES:
+    if body.get("deliverable_type") not in TASK_TYPES:
         return (
             "INVALID_DELIVERABLE_TYPE",
-            f"deliverable_type must be one of {sorted(DELIVERABLE_TYPES)}, "
+            f"deliverable_type must be one of {sorted(TASK_TYPES)}, "
             f"got {body.get('deliverable_type')!r}",
             "deliverable_type",
         )
@@ -368,6 +393,11 @@ def create_workstream(
     focal_node: dict[str, Any] = {
         "id": focal_id,
         "node_type": "task",
+        # The CODE, not the label — the title suffix above and the detail chip
+        # both derive from it, so "(PD)" reads as a suffix rather than "(Policy
+        # Document)". The workstream record stores the label instead; that
+        # asymmetry is deliberate (see the comment block above TASK_TYPES).
+        "task_type": body["deliverable_type"],
         "title": focal_title,
         "description": (body.get("description") or "").strip() or None,
         "source_url": None,
@@ -376,7 +406,7 @@ def create_workstream(
     record: dict[str, Any] = {
         "id": ws_id,
         "name": name,
-        "deliverable_type": DELIVERABLE_TYPES[body["deliverable_type"]],
+        "deliverable_type": TASK_TYPES[body["deliverable_type"]],
         # Anything you create, you own — which is also what makes the sidebar's
         # role badge render.
         "role": "own",
@@ -426,12 +456,18 @@ def make_edge_id(source: str, target: str) -> str:
 def validate_node_create(body: dict[str, Any]) -> Optional[tuple[int, str, str]]:
     """Validate an add-node request body. Returns `None` when valid, else the
     `(status, code, message)` for the first rule broken, checked in this order:
-    node type, then `doc_class` (when supplied), then ≥1 edge, then each edge's
-    type and a present target.
+    node type, then `task_type`, then `doc_class` (when supplied), then ≥1 edge,
+    then each edge's type and a present target. The order mirrors the form, so
+    the response always points at the topmost problem on it.
 
     `doc_class` is optional here because the legacy JSON path adds a node
     without a document to chunk. The route requires it whenever an attachment
     is present — presence of the file is what makes the choice meaningful.
+
+    `task_type` is required of a working draft and refused of everything else.
+    Refused rather than silently dropped: a client sending a deliverable kind
+    for an act of law has misunderstood the contract, and swallowing it hides
+    that until someone wonders why the kind never appears.
     """
     if body.get("node_type") not in NODE_TYPES:
         return (
@@ -439,6 +475,16 @@ def validate_node_create(body: dict[str, Any]) -> Optional[tuple[int, str, str]]
             "INVALID_NODE_TYPE",
             f"node_type must be one of the eight flat types, got "
             f"{body.get('node_type')!r}",
+        )
+    is_task = body.get("node_type") == "task"
+    if is_task and body.get("task_type") not in TASK_TYPES:
+        return (400, "INVALID_TASK_TYPE", "Choose what kind of deliverable this is.")
+    if not is_task and "task_type" in body:
+        return (
+            400,
+            "TASK_TYPE_NOT_ALLOWED",
+            f"Only a working draft carries a deliverable kind; "
+            f"{body['node_type']!r} does not.",
         )
     if "doc_class" in body and body.get("doc_class") not in DOC_CLASSES:
         return (
@@ -494,6 +540,12 @@ def add_node(
     node: dict[str, Any] = {
         "id": node_id,
         "node_type": body["node_type"],
+        # Only a working draft is a deliverable Aisyah is producing, so only a
+        # task node carries a kind — and where there is none the key is absent
+        # rather than null, the fixtures' convention for `issuer` and
+        # `pursuant_to`. Set in the same literal as `node_type` (its structural
+        # twin) so a validation failure can never leave a half-typed node.
+        **({"task_type": body["task_type"]} if body["node_type"] == "task" else {}),
         "title": body.get("title", node_id),
         "description": body.get("description"),
         "source_url": body.get("source_url"),

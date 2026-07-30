@@ -16,7 +16,7 @@ import shutil
 
 from fastapi.testclient import TestClient
 
-from engine import ws_anchors
+from engine import workstreams, ws_anchors
 from engine.api import create_app
 from engine.config import REPO_ROOT
 
@@ -337,6 +337,123 @@ def test_the_ingested_markdown_lands_beside_the_workstreams_anchors(tmp_path):
     assert source.read_text(encoding="utf-8") == SEMI_MD
     # Nothing lands in the flat artifacts dir any more.
     assert not (tmp_path / "artifacts" / f"{node_id}.md").exists()
+
+
+# --- task_type: the deliverable kind of a working draft ---------------------
+# A drafter can add a SECOND working draft to a workstream that already has one
+# (an engagement deck accompanying a policy document), and the one question
+# asked of it that is never asked of a context document is what KIND of
+# deliverable it is. The answer lands on the node in graph.json, not the
+# concepts side-file: like `node_type` it is structural and written once.
+
+_TASK_NODE = {
+    "node_type": "task",
+    "task_type": "DECK",
+    "title": "OpRes Industry Briefing",
+    "description": "Slides for the 14 August industry engagement session.",
+}
+
+
+def test_a_task_node_is_created_with_its_deliverable_kind(tmp_path):
+    client, dst = _client(tmp_path)
+
+    res = _post(client, _payload(**_TASK_NODE))
+
+    assert res.status_code == 201, res.text
+    body = res.json()
+    assert body["task_type"] == "DECK"
+    node = next(n for n in _graph(dst)["nodes"] if n["id"] == body["id"])
+    assert node["task_type"] == "DECK"
+
+
+def test_a_task_node_without_a_deliverable_kind_is_refused(tmp_path):
+    """The add-node form refuses a working draft with no kind the same way it
+    refuses one with no title — and, like every other failure on this route,
+    leaves graph.json untouched."""
+    client, dst = _client(tmp_path)
+    payload = _payload(**_TASK_NODE)
+    del payload["task_type"]
+    before = _graph(dst)
+
+    res = _post(client, payload)
+
+    assert res.status_code == 400
+    body = res.json()
+    assert body["code"] == "INVALID_TASK_TYPE"
+    assert body["field"] == "task_type"
+    assert body["message"] == "Choose what kind of deliverable this is."
+    assert _graph(dst) == before
+
+
+def test_an_out_of_vocabulary_deliverable_kind_is_refused(tmp_path):
+    """The eight kinds are a closed set — a kind outside it is as invalid as
+    none at all, so a typo cannot invent a ninth."""
+    client, dst = _client(tmp_path)
+    before = _graph(dst)
+
+    res = _post(client, _payload(**{**_TASK_NODE, "task_type": "Manifesto"}))
+
+    assert res.status_code == 400
+    assert res.json()["code"] == "INVALID_TASK_TYPE"
+    assert _graph(dst) == before
+
+
+def test_a_context_document_carrying_a_deliverable_kind_is_refused(tmp_path):
+    """A standard is not a deliverable Aisyah is producing. Refused rather than
+    silently dropped: a client sending one has misunderstood the contract, and
+    swallowing it hides that until someone wonders where the kind went."""
+    client, dst = _client(tmp_path)
+    before = _graph(dst)
+
+    res = _post(client, _payload(task_type="PD"))
+
+    assert res.status_code == 400
+    body = res.json()
+    assert body["code"] == "TASK_TYPE_NOT_ALLOWED"
+    assert body["field"] == "task_type"
+    assert _graph(dst) == before
+
+
+def test_a_context_document_without_one_is_still_accepted(tmp_path):
+    """The unchanged majority path. `not in` rather than `is None`: absent means
+    absent on disk, the fixtures' convention for `issuer` and `pursuant_to`, and
+    an explicit null would read as a kind someone failed to fill in."""
+    client, dst = _client(tmp_path)
+
+    res = _post(client, _payload())
+
+    assert res.status_code == 201, res.text
+    assert res.json()["task_type"] is None
+    node = next(n for n in _graph(dst)["nodes"] if n["id"] == res.json()["id"])
+    assert "task_type" not in node
+
+
+def test_an_invalid_node_type_is_reported_before_a_missing_kind():
+    """Order is the contract: `validate_node_create` names the TOPMOST problem
+    on the form, and node type sits above task type on it. A body broken in both
+    places must not send the drafter to the second control first."""
+    problem = workstreams.validate_node_create(
+        {
+            "node_type": "working-draft",  # not one of the eight
+            "title": "OpRes Industry Briefing",
+            "edges": [{"target_node_id": _TASK, "edge_type": "references"}],
+        }
+    )
+
+    assert problem is not None
+    assert problem[1] == "INVALID_NODE_TYPE"
+
+
+def test_node_detail_projects_the_recorded_deliverable_kind(tmp_path):
+    """The round trip the drafter performs: add the deck, then open it. The
+    detail panel renders the chip from this key."""
+    client, _ = _client(tmp_path)
+    node_id = _post(client, _payload(**_TASK_NODE)).json()["id"]
+
+    detail = client.get(f"/api/workstreams/{_OPRES}/nodes/{node_id}").json()
+
+    assert detail["node_type"] == "task"
+    assert detail["task_type"] == "DECK"
 
 
 def test_two_workstreams_can_add_the_same_titled_document(tmp_path):

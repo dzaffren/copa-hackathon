@@ -38,19 +38,6 @@ from engine.clauses import ClauseIndex
 from engine.config import COPILOT_DEPLOYMENT
 from engine.llm import LLMResponseError, call_chat, call_chat_stream, parse_json_response
 
-# The seven intent presets, moved from `copilot_scripts.py` which this module
-# replaces. Cosmetic beyond a light system-prompt framing hint; the dropdown
-# itself is a frontend/product concept, not a script key any more.
-INTENTS: tuple[str, ...] = (
-    "PD",
-    "DP",
-    "ED",
-    "FAQ",
-    "Engagement Deck",
-    "Feedback Template for Industry",
-    "Peer Benchmarking",
-)
-
 # The phrase the Copilot must say instead of inventing a citation, the
 # CLAUDE.md verbatim-citation hard rule, verbatim.
 NO_MATCHING_CLAUSE: str = "No matching clause found"
@@ -240,7 +227,7 @@ def _system_prompt(task_title: str, intent: str, context: str) -> str:
         "sentences instead.\n"
         "- Use Markdown for structure and emphasis: bold for key terms, bullet "
         "lists for enumerations, and short headings where they aid clarity.\n\n"
-        f"INTENT PRESET: the drafter has selected '{intent}'. Treat this as "
+        f"DELIVERABLE KIND: this task is a '{intent}'. Treat this as "
         "light framing for tone and format only (for example 'DP' favours "
         "discussion-paper question framing, 'PD' favours policy-document "
         "prose). It never licenses inventing content.\n\n"
@@ -335,7 +322,8 @@ def copilot_reply(
         node: the task node dict (from the workstream graph); its `title` frames
             the system prompt and its `document_id` (if any) supplies grounding
             clause text.
-        intent: one of `INTENTS`, a light system-prompt framing hint.
+        intent: one of `engine.workstreams.TASK_TYPES`'s codes, a light
+            system-prompt framing hint.
         history: prior turns as `[{"role": "user" | "copilot", "text": ...}]`;
             the server holds no conversation state, so the full history travels
             on every call (the client is the source of truth).

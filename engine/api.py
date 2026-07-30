@@ -50,7 +50,6 @@ from engine.copilot import copilot_reply_stream as _default_copilot_reply_stream
 from engine.config import REPO_ROOT
 from engine import (
     concepts,
-    copilot,
     cross_intel,
     directory,
     drafts,
@@ -318,6 +317,17 @@ def _ws_error(
     return JSONResponse(status_code=status_code, content=content)
 
 
+# Which input on the add-node form each `validate_node_create` failure belongs
+# to, so the dialog can ring the offending control instead of showing a banner.
+# A codes-not-listed-here failure (EDGE_REQUIRED, INVALID_NODE_TYPE) has no
+# single input to blame and gets no `field`.
+_NODE_CREATE_ERROR_FIELDS: dict[str, str] = {
+    "INVALID_DOC_CLASS": "doc_class",
+    "INVALID_TASK_TYPE": "task_type",
+    "TASK_TYPE_NOT_ALLOWED": "task_type",
+}
+
+
 def _ws_axes_dir(workstreams_dir: Path, workstream_id: str) -> Path:
     """Where a workstream's axis cache lives — beside its graph and findings, so
     a workstream prepared ahead of a demo travels with its concepts."""
@@ -437,6 +447,38 @@ def _html_to_text(html: str) -> str:
     return text.strip()
 
 
+def _resolve_intent(node: dict[str, Any], ws_record: Optional[dict[str, Any]]) -> str:
+    """The deliverable kind the Copilot frames its help for, resolved server-side.
+
+    The drafter is never asked: they answered when they created the draft, so the
+    answer is read back off the working draft instead of off the request body.
+
+    Order, first hit wins:
+      1. the task node's `task_type` — the code recorded on the working draft;
+      2. the workstream record's `deliverable_type`, reverse-mapped from label to
+         code (the record stores "Policy Document", not "PD");
+      3. `"PD"`.
+
+    Steps 2 and 3 are NOT dead code, and are not reachable through the app
+    either: every task node created since the task-type epic carries a
+    `task_type`, so only a legacy node predating it can fall through to step 2,
+    and only a legacy workstream record missing `deliverable_type` too can reach
+    step 3. They are cheap insurance against a fixture or a hand-edited graph
+    that predates the epic, and they guarantee `_system_prompt` never
+    interpolates `None`.
+    """
+    node_task_type = node.get("task_type")
+    if node_task_type:
+        return str(node_task_type)
+    if ws_record is not None:
+        from_record = workstreams.task_type_code_for_label(
+            ws_record.get("deliverable_type")
+        )
+        if from_record:
+            return from_record
+    return "PD"
+
+
 def _parse_copilot_request(
     body: dict[str, Any],
 ) -> Union[dict[str, Any], JSONResponse]:
@@ -444,14 +486,12 @@ def _parse_copilot_request(
     routes pass to `engine.copilot`, or a `JSONResponse` error. `draft_html` is
     the drafter's LIVE editor content (possibly unsaved), flattened to text;
     `draft_selection` is their highlighted passage. Both are non-citable context
-    (see `engine.copilot._build_grounding_context`)."""
-    intent = body.get("intent")
-    if intent not in copilot.INTENTS:
-        return _ws_error(
-            400,
-            "INVALID_INTENT",
-            f"intent must be one of {list(copilot.INTENTS)}, got {intent!r}",
-        )
+    (see `engine.copilot._build_grounding_context`).
+
+    `intent` is deliberately NOT read here: the server resolves it from the task
+    node (`_resolve_intent`) and each route passes it on explicitly. A body that
+    still carries an `intent` is ignored rather than rejected — a stale client
+    should not get a 400 for sending a field the server no longer wants."""
     message = body.get("message")
     if not isinstance(message, str) or not message.strip():
         return _ws_error(400, "MESSAGE_REQUIRED", "message must be a non-empty string")
@@ -476,7 +516,6 @@ def _parse_copilot_request(
     )
 
     return {
-        "intent": intent,
         "message": message,
         "history": history,
         "referenced_finding_ids": referenced_finding_ids,
@@ -1137,6 +1176,10 @@ def create_app(
         return {
             "id": node["id"],
             "node_type": node.get("node_type"),
+            # None for a context document, and for a working draft that predates
+            # the deliverable vocabulary — the retired seeded drafts are not
+            # backfilled, so the panel must render the chip conditionally.
+            "task_type": node.get("task_type"),
             "title": node.get("title"),
             "issuer": node.get("issuer"),
             "short_type": node.get("short_type"),
@@ -1312,6 +1355,54 @@ def create_app(
             "recent_activity": activity,
         }
 
+    @app.put("/api/workstreams/{workstream_id}/nodes/{node_id}/metadata")
+    async def put_node_metadata(
+        workstream_id: str, node_id: str, request: Request
+    ) -> Any:
+        """Record the drafter's own account of a document's regulatory identity.
+
+        A FULL REPLACEMENT of the nine-field profile, not a patch: the form
+        always sends all nine, and `save_concepts` writes the whole key set, so a
+        field the client omits lands as `null`. That makes a save exactly what the
+        drafter saw on screen, with no stale value surviving underneath.
+
+        The two 404 guards are the security boundary, not merely a courtesy:
+        `concepts_path` interpolates both ids into a filesystem path, so
+        resolving them against the loaded graph first is what stops a `../` in
+        `node_id` writing outside the workstream. Validation likewise runs before
+        any write, so a rejected save leaves the side-file exactly as it was.
+        """
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        node = next((n for n in ws_graph.get("nodes", []) if n["id"] == node_id), None)
+        if node is None:
+            return _ws_error(
+                404,
+                "NODE_NOT_FOUND",
+                f"Node {node_id} not found in workstream {workstream_id}",
+            )
+
+        try:
+            body = await request.json()
+        except Exception:  # unparseable body — the same class of error as a non-object
+            return _ws_error(400, "INVALID_METADATA", "Metadata must be an object.")
+        problem = concepts.validate_metadata(body)
+        if problem is not None:
+            status, code, message, field = problem
+            return _ws_error(status, code, message, field=field)
+
+        saved = concepts.normalise_metadata(body)
+        concepts.save_concepts(workstreams_dir, workstream_id, node_id, saved)
+        # Re-read rather than project what we sent: `save_concepts` owns the
+        # normalisation to all nine keys, and reading the file back is what makes
+        # the response provably the stored profile — which is what lets the client
+        # drop it straight into its node-detail cache.
+        stored = concepts.load_concepts(workstreams_dir, workstream_id, node_id) or {}
+        return {"node_id": node_id, "metadata": {"status": "available", **stored}}
+
     @app.get("/api/workstreams/{workstream_id}/edges/{edge_id}")
     def get_workstream_edge_detail(workstream_id: str, edge_id: str) -> Any:
         ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
@@ -1383,10 +1474,7 @@ def create_app(
             )
         problem = workstreams.validate_node_create(body)
         if problem is not None:
-            return _ws_error(
-                *problem,
-                field="doc_class" if problem[1] == "INVALID_DOC_CLASS" else None,
-            )
+            return _ws_error(*problem, field=_NODE_CREATE_ERROR_FIELDS.get(problem[1]))
         # An attached document must declare how to break it up — the drafter
         # chooses; the tool never guesses (a wrong guess yields useless passages).
         if upload is not None and "doc_class" not in body:
@@ -1483,6 +1571,9 @@ def create_app(
         content: dict[str, Any] = {
             "id": new_node["id"],
             "node_type": new_node["node_type"],
+            # Echoed so the client can confirm what was stored; None for every
+            # node type but `task`, which is the only kind that carries one.
+            "task_type": new_node.get("task_type"),
             "title": new_node["title"],
             "created_edges": [{**edge, "analysed": False} for edge in created],
         }
@@ -1924,9 +2015,11 @@ def create_app(
             return fields
 
         clause_index = load_clause_index(artifacts_dir)
+        record = workstreams.load_workstream(workstreams_dir, workstream_id)
         try:
             reply = copilot_reply_fn(
                 node=node,
+                intent=_resolve_intent(node, record),
                 clause_index=clause_index,
                 workstreams_dir=workstreams_dir,
                 workstream_id=workstream_id,
@@ -1958,8 +2051,10 @@ def create_app(
             return fields
 
         clause_index = load_clause_index(artifacts_dir)
+        record = workstreams.load_workstream(workstreams_dir, workstream_id)
         sse_generator = copilot_stream_fn(
             node=node,
+            intent=_resolve_intent(node, record),
             clause_index=clause_index,
             workstreams_dir=workstreams_dir,
             workstream_id=workstream_id,

@@ -160,14 +160,19 @@ describe("DraftingWorkspacePage — Related · 1 hop tab", () => {
 });
 
 describe("DraftingWorkspacePage — Copilot tab", () => {
-  it("offers all seven intent presets", async () => {
+  // The drafter recorded the deliverable kind when the task node was created,
+  // and the server reads it off that node — so the Copilot must not ask again.
+  it("never asks what kind of deliverable the drafter is producing", async () => {
     const user = userEvent.setup();
     await loadWorkspace();
     await user.click(screen.getByRole("tab", { name: /Copilot/ }));
 
-    const select = screen.getByLabelText("Intent preset");
-    expect(within(select).getAllByRole("option")).toHaveLength(7);
-    expect(select).toHaveValue("PD");
+    expect(screen.queryByLabelText("Intent preset")).not.toBeInTheDocument();
+    // No control of any kind offers the vocabulary: the panel opens straight
+    // into the conversation.
+    expect(
+      within(screen.getByTestId("copilot-tab")).queryByRole("combobox"),
+    ).not.toBeInTheDocument();
   });
 
   it("shows the quick-start surface and a message box, before any chat", async () => {
