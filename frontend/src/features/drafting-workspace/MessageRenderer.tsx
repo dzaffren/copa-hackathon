@@ -25,15 +25,12 @@ import {
   WORKSTREAM_CONTEXT,
   type SlashCommandId,
 } from "./copilotV2Data";
-import { COPILOT_INTENT_LABELS, COPILOT_INTENTS } from "@/lib/types";
 import type {
   ChatMsg,
   CommandMsg,
   QuestionMsg,
   SuggestionMsg,
 } from "./copilotChatTypes";
-
-const INTENT_OPTIONS = COPILOT_INTENTS.map((i) => COPILOT_INTENT_LABELS[i]);
 
 export interface MessageHandlers {
   onAnswerQuestion: (msg: QuestionMsg, answer: string) => void;
@@ -46,9 +43,6 @@ export interface MessageHandlers {
 }
 
 function questionParts(msg: QuestionMsg): { prompt: string; options: string[] } {
-  if (msg.questionKind === "intent") {
-    return { prompt: "What are you drafting?", options: INTENT_OPTIONS };
-  }
   if (msg.questionKind === "leading") {
     return { prompt: LEADING_QUESTION, options: LEADING_OPTIONS };
   }
@@ -214,11 +208,7 @@ export function MessageRenderer({
           options={options}
           answered={msg.answered}
           onAnswer={(a) => handlers.onAnswerQuestion(msg, a)}
-          freeTextPlaceholder={
-            msg.questionKind === "intent"
-              ? "Or describe what you're drafting…"
-              : "Or type your own answer…"
-          }
+          freeTextPlaceholder="Or type your own answer…"
         />
       );
       if (msg.questionKind === "clarification") {

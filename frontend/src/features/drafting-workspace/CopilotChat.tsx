@@ -2,6 +2,7 @@ import { useEffect, useReducer, useRef } from "react";
 import { RotateCcw } from "lucide-react";
 import { ChatInput } from "./ChatInput";
 import { MessageRenderer, type MessageHandlers } from "./MessageRenderer";
+import { WelcomeScreen } from "./WelcomeScreen";
 import {
   CLARIFICATION_QUESTIONS,
   DRAFT_SECTIONS,
@@ -76,15 +77,9 @@ function reducer(state: ChatState, action: Action): ChatState {
   }
 }
 
-const GREETING =
-  "Hi Aisyah — I'm your drafting Copilot. I can pull the task's regulatory profile, brainstorm the focus, outline, and draft it straight into your editor. What are you drafting?";
-
 function initialState(): ChatState {
   return {
-    messages: [
-      { id: "seed-greeting", kind: "text", text: GREETING },
-      { id: "seed-intent", kind: "question", questionKind: "intent" },
-    ],
+    messages: [],
     released: false,
     expandedCommands: new Set(),
   };
@@ -283,15 +278,6 @@ export function CopilotChat({
 
   function onAnswerQuestion(msg: QuestionMsg, answer: string) {
     update(msg.id, { answered: answer });
-    if (msg.questionKind === "intent") {
-      append({
-        id: nextId(),
-        kind: "text",
-        text: `Great — a ${answer}. Let's start by pulling what we already know about this task.`,
-      });
-      suggest([{ label: "Run /explore-task", command: "/explore-task" }]);
-      return;
-    }
     if (msg.questionKind === "leading") {
       append({
         id: nextId(),
@@ -367,8 +353,6 @@ export function CopilotChat({
     }
   }, [state.messages]);
 
-  const started = state.messages.length > initialState().messages.length;
-
   return (
     <div className="flex h-full flex-col" data-testid="copilot-chat">
       <div
@@ -376,20 +360,28 @@ export function CopilotChat({
         className="flex-1 space-y-3 overflow-y-auto px-1 pb-2"
         aria-label="Copilot conversation"
       >
-        {started && (
-          <button
-            type="button"
-            onClick={reset}
-            className="flex items-center gap-1.5 px-1 text-[11px] font-medium text-muted-foreground hover:text-foreground"
-          >
-            <RotateCcw className="h-3 w-3" />
-            Start over
-          </button>
+        {state.messages.length === 0 ? (
+          <WelcomeScreen onRunCommand={runCommand} />
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={reset}
+              className="flex items-center gap-1.5 px-1 text-[11px] font-medium text-muted-foreground hover:text-foreground"
+            >
+              <RotateCcw className="h-3 w-3" />
+              Start over
+            </button>
+            {state.messages.map((msg) => (
+              <div
+                key={msg.id}
+                style={{ animation: "fadeSlideUp 0.4s var(--ease-out-expo) both" }}
+              >
+                <MessageRenderer msg={msg} handlers={handlers} />
+              </div>
+            ))}
+          </>
         )}
-
-        {state.messages.map((msg) => (
-          <MessageRenderer key={msg.id} msg={msg} handlers={handlers} />
-        ))}
       </div>
 
       <ChatInput onRunCommand={runCommand} onSend={onSend} />

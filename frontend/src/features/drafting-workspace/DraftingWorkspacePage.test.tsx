@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import { cleanup, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderApp } from "@/test/utils";
-import { COPILOT_INTENT_LABELS } from "@/lib/types";
 import {
   CLARIFICATION_QUESTIONS,
   DRAFT_SECTIONS,
@@ -164,18 +163,12 @@ describe("DraftingWorkspacePage — Copilot chat", () => {
     await user.click(chip);
   }
 
-  /** Answer the opening intent question with the PD preset. */
-  async function answerIntent(user: ReturnType<typeof userEvent.setup>) {
-    await answer(user, "What are you drafting?", COPILOT_INTENT_LABELS.PD);
-  }
-
   /** From a fresh chat, run brainstorming and walk every clarification round,
    *  leaving the flow with the "Run /draft" chip visible. */
   async function reachBrainstormDone(
     user: ReturnType<typeof userEvent.setup>,
   ) {
-    await answerIntent(user);
-    await runViaChip(user, "Run /explore-task");
+    await user.click(screen.getByRole("button", { name: "Explore Task" }));
     await runViaChip(user, "Run /brainstorm");
     await answer(user, LEADING_OPTIONS[0], LEADING_OPTIONS[0]);
     for (const q of CLARIFICATION_QUESTIONS) {
@@ -191,18 +184,33 @@ describe("DraftingWorkspacePage — Copilot chat", () => {
     await screen.findByTestId("draft-summary", undefined, THINKING_WAIT);
   }
 
-  it("opens with a chat stream, an input, and asks the intent as vertical options", async () => {
+  it("opens on a welcome screen with four quick actions, no intent question", async () => {
     const user = userEvent.setup();
     await openCopilot(user);
 
     expect(screen.getByTestId("copilot-chat")).toBeInTheDocument();
     expect(screen.getByTestId("chat-input")).toBeInTheDocument();
+    expect(screen.getByTestId("copilot-welcome")).toBeInTheDocument();
 
-    await screen.findByText("What are you drafting?");
-    const options = screen.getByTestId("clarification-options");
-    expect(options.className).toContain("flex-col");
-    // All seven intents are offered as stacked options, not a dropdown.
-    expect(within(options).getAllByRole("button")).toHaveLength(7);
+    const actions = screen.getAllByTestId("welcome-quick-action");
+    expect(actions).toHaveLength(4);
+    expect(actions.map((a) => a.textContent)).toEqual([
+      "Explore Task",
+      "Brainstorm",
+      "Draft Outline",
+      "Write Document",
+    ]);
+    expect(screen.queryByText("What are you drafting?")).not.toBeInTheDocument();
+  });
+
+  it("running a quick action starts the conversation and hides the welcome screen", async () => {
+    const user = userEvent.setup();
+    await openCopilot(user);
+
+    await user.click(screen.getByRole("button", { name: "Explore Task" }));
+
+    expect(screen.queryByTestId("copilot-welcome")).not.toBeInTheDocument();
+    await screen.findByTestId("command-step", undefined, THINKING_WAIT);
   });
 
   it("opens a vertical slash menu listing every command, filterable", async () => {
@@ -245,8 +253,7 @@ describe("DraftingWorkspacePage — Copilot chat", () => {
   it("reveals the task's regulatory profile — incl. task_type — with honest nulls", async () => {
     const user = userEvent.setup();
     await openCopilot(user);
-    await answerIntent(user);
-    await runViaChip(user, "Run /explore-task");
+    await user.click(screen.getByRole("button", { name: "Explore Task" }));
 
     const block = await waitFor(() => {
       const el = commandBlock("/explore-task");
@@ -272,8 +279,7 @@ describe("DraftingWorkspacePage — Copilot chat", () => {
     await openCopilot(user);
 
     expect(CLARIFICATION_QUESTIONS.length).toBeGreaterThanOrEqual(5);
-    await answerIntent(user);
-    await runViaChip(user, "Run /explore-task");
+    await user.click(screen.getByRole("button", { name: "Explore Task" }));
     await runViaChip(user, "Run /brainstorm");
     await answer(user, LEADING_OPTIONS[0], LEADING_OPTIONS[0]);
 
@@ -367,16 +373,14 @@ describe("DraftingWorkspacePage — Copilot chat", () => {
   it("starts over to a fresh conversation", async () => {
     const user = userEvent.setup();
     await openCopilot(user);
-    await answerIntent(user);
+    await user.click(screen.getByRole("button", { name: "Explore Task" }));
+    await screen.findByTestId("command-step", undefined, THINKING_WAIT);
 
     await user.click(screen.getByRole("button", { name: "Start over" }));
 
     await waitFor(() => {
-      // Back to just the greeting + intent question; the ack is gone.
-      expect(screen.getByText("What are you drafting?")).toBeInTheDocument();
-      expect(
-        screen.queryByRole("button", { name: "Run /explore-task" }),
-      ).not.toBeInTheDocument();
+      expect(screen.getByTestId("copilot-welcome")).toBeInTheDocument();
+      expect(screen.queryByTestId("command-step")).not.toBeInTheDocument();
     });
   });
 });
@@ -402,23 +406,15 @@ describe("DraftingWorkspacePage — tab switching", () => {
     await user.click(screen.getByRole("tab", { name: /Copilot/ }));
     await screen.findByTestId("copilot-chat");
 
-    // Answer the intent so there is real conversation state to preserve.
-    const promptEl = await screen.findByText("What are you drafting?");
-    const card = promptEl.closest(
-      '[data-testid="clarification-card"]',
-    ) as HTMLElement;
-    await user.click(
-      within(card).getByRole("button", { name: COPILOT_INTENT_LABELS.PD }),
-    );
-    await screen.findByRole("button", { name: "Run /explore-task" });
+    await user.click(screen.getByRole("button", { name: "Explore Task" }));
+    await screen.findByTestId("command-step", undefined, THINKING_WAIT);
 
     await user.click(screen.getByRole("tab", { name: /Reviewed Findings/ }));
     await user.click(screen.getByRole("tab", { name: /Copilot/ }));
 
-    // The conversation is intact — not reset to a fresh greeting.
-    expect(
-      screen.getByRole("button", { name: "Run /explore-task" }),
-    ).toBeInTheDocument();
+    // The conversation is intact — not reset to the welcome screen.
+    expect(screen.queryByTestId("copilot-welcome")).not.toBeInTheDocument();
+    expect(screen.getByTestId("command-step")).toBeInTheDocument();
   });
 });
 

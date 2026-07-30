@@ -60,7 +60,7 @@ export interface ThinkingMsg {
   done: boolean;
 }
 
-export type QuestionKind = "intent" | "leading" | "clarification";
+export type QuestionKind = "leading" | "clarification";
 
 export interface QuestionMsg {
   id: string;
