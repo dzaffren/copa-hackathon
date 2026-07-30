@@ -71,12 +71,13 @@ ISMP_CLASSIFICATIONS: tuple[str, ...] = ("UMUM", "TERHAD", "SULIT", "RAHSIA")
 # these fields legitimately carries, so this is generous rather than tight.
 MAX_FIELD_CHARS: int = 2000
 
-# A profile lists topics and Acts, not a corpus: 50 chips is far past what a
-# drafter would type, and past it the panel would be unreadable anyway.
+# A profile lists Acts, not a corpus: 50 chips is far past what a drafter would
+# type, and past it the panel would be unreadable anyway. This bounds the number
+# of values, not their length — `legal_basis` members are deliberately uncapped,
+# because a statutory citation can run long ("Financial Services Act 2013,
+# section 143(2), read together with…") and truncating one would corrupt a
+# reference rather than tidy it.
 MAX_LIST_MEMBERS: int = 50
-
-# Each chip is a keyword or an Act's short name — a phrase, never a sentence.
-MAX_LIST_MEMBER_CHARS: int = 200
 
 
 def concepts_path(workstreams_dir: Path, workstream_id: str, node_id: str) -> Path:
@@ -171,9 +172,12 @@ def _validate_field(
     if value is None:
         return None
 
+    # A list field carries statutory citations, which are uncapped in length —
+    # both as a bare string and per member. See MAX_LIST_MEMBERS on why only the
+    # count is bounded.
     if field in LIST_FIELDS:
         if isinstance(value, str):
-            return _too_long(field, value, MAX_FIELD_CHARS)
+            return None
         if not isinstance(value, list):
             return (
                 400,
@@ -195,10 +199,6 @@ def _validate_field(
                 f"{field} holds at most {MAX_LIST_MEMBERS} values.",
                 field,
             )
-        for member in value:
-            problem = _too_long(field, member, MAX_LIST_MEMBER_CHARS)
-            if problem is not None:
-                return problem
         return None
 
     if not isinstance(value, str):

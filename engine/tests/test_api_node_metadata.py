@@ -303,13 +303,46 @@ def test_too_many_list_members_are_refused(tmp_path):
     assert not path.exists()
 
 
-def test_an_over_long_list_member_is_refused(tmp_path):
-    """The other half of the list cap: 50 members, each at most 200 characters."""
+def test_a_long_legal_basis_member_is_accepted(tmp_path):
+    """`legal_basis` bounds the number of values, never their length: a statutory
+    citation can legitimately run long, and truncating one corrupts a reference
+    rather than tidying it."""
+    client, _ = _make_client(tmp_path)
+    citation = (
+        "Financial Services Act 2013, section 143(2), read together with "
+        "the Islamic Financial Services Act 2013, section 155(2) " + "x" * 3000
+    )
+
+    response = client.put(
+        _metadata_url("open-finance-pd-2026", "bis-papers-168"),
+        json={"legal_basis": ["FSA 2013", citation]},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["metadata"]["legal_basis"] == ["FSA 2013", citation]
+
+
+def test_a_long_bare_string_legal_basis_is_accepted(tmp_path):
+    """The scalar form is uncapped too — older side-files carry one."""
     client, _ = _make_client(tmp_path)
 
     response = client.put(
         _metadata_url("open-finance-pd-2026", "bis-papers-168"),
-        json={"legal_basis": ["FSA 2013", "x" * 201]},
+        json={"legal_basis": "y" * 5000},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["metadata"]["legal_basis"] == "y" * 5000
+
+
+def test_the_list_member_count_is_still_capped(tmp_path):
+    """Uncapping length must not uncap the count — 50 chips is already past what
+    a profile can render."""
+    client, _ = _make_client(tmp_path)
+
+    response = client.put(
+        _metadata_url("open-finance-pd-2026", "bis-papers-168"),
+        json={"legal_basis": [f"Act {n}" for n in range(51)]},
     )
 
     assert response.status_code == 413

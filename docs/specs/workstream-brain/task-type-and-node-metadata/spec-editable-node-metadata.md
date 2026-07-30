@@ -231,7 +231,9 @@ Then I can see that the profile could not be saved
 - `legal_basis` accepts a list of strings, a bare string, or `null`. A bare string is stored as-is (older side-files carry scalars and `asList` in the panel already tolerates both). Any non-string list member → `400 INVALID_METADATA`.
 - The other seven accept a string or `null`. A non-string → `400 INVALID_METADATA` naming the field.
 - Empty string, whitespace-only string, and empty list all normalise to `null` before writing, so "cleared" and "never set" are one state on disk — which is what "blank means not set yet" requires.
-- Per-field max length **2000 characters**; a list may hold at most **50** members, each at most **200** characters. Over either → `413 METADATA_TOO_LARGE` naming the field. The empowerment framework holds a full clause quote, so 2000 is generous rather than tight.
+- Per-field max length **2000 characters** for the scalar fields. The empowerment framework holds a full clause quote, so 2000 is generous rather than tight.
+- `legal_basis` bounds the **number** of values (at most **50**), never their length — in either the list or the bare-string form. A statutory citation can legitimately run long ("Financial Services Act 2013, section 143(2), read together with…"), and truncating one corrupts a reference rather than tidying it.
+- Over either bound → `413 METADATA_TOO_LARGE` naming the field.
 - No HTML sanitisation is needed: every value is rendered as text (`{value}` in JSX), never as markup. Unlike the draft route, nothing here reaches `dangerouslySetInnerHTML`.
 
 ## Permissions & Security
@@ -286,7 +288,7 @@ Then I can see that the profile could not be saved
 | 400    | `TASK_TYPE_IMMUTABLE`    | `task_type` present in the body                                           |
 | 404    | `WORKSTREAM_NOT_FOUND`   | No such workstream                                                        |
 | 404    | `NODE_NOT_FOUND`         | No such node in that workstream                                           |
-| 413    | `METADATA_TOO_LARGE`     | A field exceeds 2000 chars, or a list exceeds 50 members / 200 chars each |
+| 413    | `METADATA_TOO_LARGE`     | A scalar field exceeds 2000 chars, or `legal_basis` exceeds 50 members    |
 
 Errors carry `field` where one field is at fault, matching `_ws_error`'s existing optional `field` argument so the form can ring the offending input.
 
@@ -307,7 +309,7 @@ No database. The store is `data/workstreams/{ws}/concepts/{node_id}.json`, alrea
 | `empowerment_framework` | string \| null             | ≤ 2000 chars       | Verbatim statutory-basis clause        |
 | `issuance_date`         | string \| null             | ≤ 2000 chars       | Free text — no date parsing (see note) |
 | `effective_date`        | string \| null             | ≤ 2000 chars       | Free text                              |
-| `legal_basis`           | string[] \| string \| null | ≤ 50 × ≤ 200 chars | Acts, rendered as chips                |
+| `legal_basis`           | string[] \| string \| null | ≤ 50 members, each uncapped | Acts, rendered as chips       |
 | `ismp_classification`   | string \| null             | One of UMUM / TERHAD / SULIT / RAHSIA | `null` renders as the pending state |
 
 **Dates are stored as free text, not validated or normalised.** The committed fixtures leave them `null`, and the drafter's own phrasing ("28 November 2025", "2025-11-28") is what the field is for. Imposing a format would reject valid input for a display-only value; the panel renders whatever string is stored.
@@ -502,11 +504,13 @@ Add a `putJson` helper alongside the existing `postJson` if none exists, followi
 - Action: `PUT` with `{"applicability": "x" * 2001}`
 - Expected: `413 METADATA_TOO_LARGE`, field `applicability`; no file written
 
-**Test 10: too many list members refused**
+**Test 10: too many list members refused, but a long one is not**
 
 - Setup: same
 - Action: `PUT` with 51 legal-basis members
 - Expected: `413 METADATA_TOO_LARGE`, field `legal_basis`
+- Action: `PUT` with a single 3000-character statutory citation, as a list member and again as a bare string
+- Expected: `200` both times — `legal_basis` caps the count, never the length
 
 **Test 11: unknown workstream and unknown node**
 
