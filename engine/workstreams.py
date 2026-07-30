@@ -208,6 +208,35 @@ def neighbour_ids(edges: list[dict[str, Any]], node_id: str) -> list[str]:
     return out
 
 
+def neighbourhood_edges(
+    edges: list[dict[str, Any]], node_id: str
+) -> list[dict[str, Any]]:
+    """Edges where at least one endpoint is `node_id` or a direct neighbour of it.
+
+    The task's own edges plus every edge incident to a first-order neighbour, in
+    graph order. Excludes edges whose BOTH endpoints are second-order — a linkage
+    between two documents that are each two hops from the draft relates neither to
+    the draft nor to anything the drafter declared, so it is noise on the task's
+    surfaces.
+
+    Shared by the Pairwise Findings box and the drafting workspace's Reviewed tab
+    so the two can never disagree about which findings are in scope. It is a
+    superset of both older scopes: the task screen's `source == node_id` scan and
+    `edges_between`'s anchor↔anchor set.
+
+    Direction is deliberately NOT normalised — both endpoints are checked. The two
+    live fixtures use opposite conventions (`opres-v2` points task → anchor,
+    `open-finance-pd-2026` points anchor → ED), and a rule reading only `source`
+    returns almost nothing on the latter.
+    """
+    first_order = {node_id, *neighbour_ids(edges, node_id)}
+    return [
+        e
+        for e in edges
+        if e.get("source") in first_order or e.get("target") in first_order
+    ]
+
+
 def edges_between(
     edges: list[dict[str, Any]], node_ids: set[str], exclude_node: Optional[str] = None
 ) -> list[dict[str, Any]]:
