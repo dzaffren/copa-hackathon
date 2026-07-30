@@ -39,23 +39,32 @@ from typing import Any, Optional
 # CAS's RH publication form, which the repo does not hold) and is therefore
 # `null` everywhere today — the field exists so the UI can render "pending"
 # rather than hide the concept.
+# `keywords` and `requirement` were removed on 30 Jul 2026. `keywords` was a
+# hand-curated topic list that the extracted axes (the `concepts` block, from
+# `engine.arm_g`) now cover from the document itself; `requirement` never earned
+# its row — the obligation a document imposes is the whole draft, not a field.
+# Side-files still carrying either key load fine: `load_concepts` returns the raw
+# dict, and the next save drops them (`save_concepts` writes exactly this tuple).
 CONCEPT_FIELDS: tuple[str, ...] = (
     "policy_owner",
     "applicability",
     "empowerment_framework",
-    "requirement",
     "issuance_date",
     "effective_date",
-    "keywords",
     "legal_basis",
     "ismp_classification",
 )
 
 
-# The two list-valued fields. Both hold several short values (topic keywords,
-# Acts) and both tolerate a bare string, because side-files written before the
-# panel rendered chips carry scalars.
-LIST_FIELDS: frozenset[str] = frozenset({"keywords", "legal_basis"})
+# The one list-valued field. It holds several short values (Acts) and tolerates a
+# bare string, because side-files written before the panel rendered chips carry
+# scalars.
+LIST_FIELDS: frozenset[str] = frozenset({"legal_basis"})
+
+# The four BNM security classifications, in ascending sensitivity. A drafter
+# picks one or leaves it unset — unset renders as pending rather than as a
+# guess, because misclassifying a document has real handling consequences.
+ISMP_CLASSIFICATIONS: tuple[str, ...] = ("UMUM", "TERHAD", "SULIT", "RAHSIA")
 
 # 2000 characters per scalar field. `empowerment_framework` holds a whole
 # statutory-basis clause quoted word-for-word, which is the longest thing any of
@@ -138,6 +147,19 @@ def validate_metadata(body: Any) -> Optional[tuple[int, str, str, Optional[str]]
         problem = _validate_field(key, value)
         if problem is not None:
             return problem
+
+    # A closed vocabulary, checked after the type rules so a non-string reports as
+    # a type error rather than a bad classification. `None` stays legal — unset is
+    # the honest state for a document whose classification nobody has recorded.
+    ismp = body.get("ismp_classification")
+    if ismp is not None and ismp not in ISMP_CLASSIFICATIONS:
+        return (
+            400,
+            "INVALID_ISMP_CLASSIFICATION",
+            f"ismp_classification must be one of {list(ISMP_CLASSIFICATIONS)}, "
+            f"got {ismp!r}",
+            "ismp_classification",
+        )
     return None
 
 

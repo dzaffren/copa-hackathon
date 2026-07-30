@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 
@@ -34,10 +34,8 @@ const EMPTY_PROFILE = {
   policy_owner: null,
   applicability: null,
   empowerment_framework: null,
-  requirement: null,
   issuance_date: null,
   effective_date: null,
-  keywords: null,
   legal_basis: null,
   ismp_classification: null,
 };
@@ -53,11 +51,9 @@ describe("NodeMetadataForm", () => {
           policy_owner: "Aisyah R.",
           applicability: null,
           empowerment_framework: null,
-          requirement: null,
           issuance_date: null,
           effective_date: null,
-          keywords: ["technology risk", "cloud"],
-          legal_basis: null,
+          legal_basis: ["FSA 2013", "IFSA 2013"],
           ismp_classification: null,
         }}
         onDone={() => {}}
@@ -67,20 +63,18 @@ describe("NodeMetadataForm", () => {
     // A recorded value arrives in the field; a list arrives comma-joined so it
     // can be edited as one line.
     expect(screen.getByLabelText("Policy owner")).toHaveValue("Aisyah R.");
-    expect(screen.getByLabelText("Keywords")).toHaveValue(
-      "technology risk, cloud",
+    expect(screen.getByLabelText("Legal basis")).toHaveValue(
+      "FSA 2013, IFSA 2013",
     );
     // An unset field is empty, never the string "null".
     expect(screen.getByLabelText("Effective date")).toHaveValue("");
-    // All nine are editable.
+    // All seven are editable.
     for (const label of [
       "Policy owner",
       "Applicability",
       "Empowerment framework",
-      "Requirement",
       "Issuance date",
       "Effective date",
-      "Keywords",
       "Legal basis",
       "ISMP classification",
     ]) {
@@ -105,7 +99,7 @@ describe("NodeMetadataForm", () => {
     ).toBeInTheDocument();
   });
 
-  it("splits a comma-separated line into separate keywords on save", async () => {
+  it("splits a comma-separated line into separate Acts on save", async () => {
     const saved = captureSave();
     renderWithProviders(
       <NodeMetadataForm
@@ -117,17 +111,17 @@ describe("NodeMetadataForm", () => {
     );
 
     await userEvent.type(
-      screen.getByLabelText("Keywords"),
-      "technology risk, cloud ,, outsourcing",
+      screen.getByLabelText("Legal basis"),
+      "FSA 2013, IFSA 2013 ,, DFIA 2002",
     );
     await userEvent.click(screen.getByRole("button", { name: /^save$/i }));
 
     await waitFor(() => expect(saved.body()).not.toBeNull());
     // Trimmed, and the stray empty member between the two commas is dropped.
-    expect(saved.body()?.keywords).toEqual([
-      "technology risk",
-      "cloud",
-      "outsourcing",
+    expect(saved.body()?.legal_basis).toEqual([
+      "FSA 2013",
+      "IFSA 2013",
+      "DFIA 2002",
     ]);
   });
 
@@ -158,17 +152,15 @@ describe("NodeMetadataForm", () => {
     expect(body?.applicability).toBeNull();
     // An emptied list is null, not [] — "cleared" and "never set" are one state.
     expect(body?.legal_basis).toBeNull();
-    // All nine keys ride along: the server replaces the profile whole.
+    // All seven keys ride along: the server replaces the profile whole.
     expect(Object.keys(body ?? {}).sort()).toEqual([
       "applicability",
       "effective_date",
       "empowerment_framework",
       "ismp_classification",
       "issuance_date",
-      "keywords",
       "legal_basis",
       "policy_owner",
-      "requirement",
     ]);
   });
 
@@ -257,8 +249,8 @@ describe("NodeMetadataForm", () => {
         HttpResponse.json(
           {
             code: "METADATA_TOO_LARGE",
-            message: "requirement exceeds 2000 characters.",
-            field: "requirement",
+            message: "applicability exceeds 2000 characters.",
+            field: "applicability",
           },
           { status: 413 },
         ),
@@ -311,5 +303,66 @@ describe("NodeMetadataForm", () => {
       /could not be saved/i,
     );
     expect(screen.getByLabelText("Policy owner")).toHaveValue("Priya S.");
+  });
+});
+
+describe("NodeMetadataForm — ISMP classification", () => {
+  it("offers the four BNM classifications plus an unset option", async () => {
+    renderWithProviders(
+      <NodeMetadataForm
+        workstreamId="rmit-v2-2025"
+        nodeId="rmit-pd-v2"
+        initial={EMPTY_PROFILE}
+        onDone={() => {}}
+      />,
+    );
+
+    const select = screen.getByLabelText("ISMP classification");
+    expect(select.tagName).toBe("SELECT");
+    // Unset stays available: a document nobody has classified must not be
+    // forced into a guess, since these categories carry real handling rules.
+    expect(
+      within(select)
+        .getAllByRole("option")
+        .map((o) => o.textContent),
+    ).toEqual(["Not set", "UMUM", "TERHAD", "SULIT", "RAHSIA"]);
+  });
+
+  it("saves the chosen classification", async () => {
+    const saved = captureSave();
+    renderWithProviders(
+      <NodeMetadataForm
+        workstreamId="rmit-v2-2025"
+        nodeId="rmit-pd-v2"
+        initial={EMPTY_PROFILE}
+        onDone={() => {}}
+      />,
+    );
+
+    await userEvent.selectOptions(
+      screen.getByLabelText("ISMP classification"),
+      "SULIT",
+    );
+    await userEvent.click(screen.getByRole("button", { name: /^save$/i }));
+
+    await waitFor(() => expect(saved.body()).not.toBeNull());
+    expect(saved.body()?.ismp_classification).toBe("SULIT");
+  });
+
+  it("sends null when left unset", async () => {
+    const saved = captureSave();
+    renderWithProviders(
+      <NodeMetadataForm
+        workstreamId="rmit-v2-2025"
+        nodeId="rmit-pd-v2"
+        initial={EMPTY_PROFILE}
+        onDone={() => {}}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: /^save$/i }));
+
+    await waitFor(() => expect(saved.body()).not.toBeNull());
+    expect(saved.body()?.ismp_classification).toBeNull();
   });
 });

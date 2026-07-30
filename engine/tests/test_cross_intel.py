@@ -10,14 +10,12 @@ from engine import cross_intel
 _BCM = {
     "policy_owner": "Jarod N.",
     "applicability": "Licensed banks, licensed Islamic banks and licensed investment banks",
-    "keywords": ["business continuity", "continuity of critical functions", "recovery time objective"],
     "legal_basis": ["FSA 2013", "IFSA 2013", "DFIA 2002"],
     "ismp_classification": None,
 }
 _RRP = {
     "policy_owner": "Priya S.",
     "applicability": "Licensed banks, licensed Islamic banks and licensed investment banks",
-    "keywords": ["recovery planning", "continuity of critical functions", "recovery options"],
     "legal_basis": ["FSA 2013", "IFSA 2013"],
     "ismp_classification": None,
 }
@@ -28,10 +26,6 @@ _RRP = {
 
 def test_shared_legal_basis_is_the_case_insensitive_intersection():
     assert cross_intel.shared_legal_basis(_BCM, _RRP) == ["FSA 2013", "IFSA 2013"]
-
-
-def test_shared_keywords_finds_the_common_topic():
-    assert cross_intel.shared_keywords(_BCM, _RRP) == ["continuity of critical functions"]
 
 
 def test_shared_applicability_matches_controlled_vocabulary():
@@ -88,7 +82,6 @@ def test_reasons_lead_with_shared_facts_then_label_rollup():
     lines = cross_intel.reasons(shared, labels)
     assert any("apply to licensed banks" in ln for ln in lines)
     assert any("issued under FSA 2013" in ln for ln in lines)
-    assert any("continuity of critical functions" in ln for ln in lines)
     # label rollup lines appear too
     assert any("differ on 4 requirement" in ln for ln in lines)
     assert any("goes beyond" in ln for ln in lines)

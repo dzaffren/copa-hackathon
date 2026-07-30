@@ -272,8 +272,6 @@ function ProfileColumn({
             value={concepts?.ismp_classification}
             pendingNote="pending RH publication form"
           />
-          <ListField label="Key topics" values={asList(concepts?.keywords)} />
-          <Field label="Key requirement" value={concepts?.requirement} />
           <Field label="Empowerment" value={concepts?.empowerment_framework} />
           <Field label="Issued" value={concepts?.issuance_date} />
         </dl>

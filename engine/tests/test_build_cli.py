@@ -178,14 +178,12 @@ def test_enrich_preserves_fields_it_does_not_derive(tmp_path) -> None:
             "policy_owner": "Jarod N.",
             "applicability": "Licensed banks and eligible data providers",
             "issuance_date": "2025-11-18",
-            "keywords": ["open finance", "consent"],
             "legal_basis": ["FSA 2013"],
         },
     )
 
     assert after["applicability"] == "Licensed banks and eligible data providers"
     assert after["issuance_date"] == "2025-11-18"
-    assert after["keywords"] == ["open finance", "consent"]
     assert after["legal_basis"] == ["FSA 2013"]
 
 
@@ -203,7 +201,7 @@ def test_enrich_is_idempotent(tmp_path) -> None:
     profile = {
         "policy_owner": "Aisyah R.",
         "applicability": "Licensed banks",
-        "keywords": ["resilience"],
+        "legal_basis": ["FSA 2013"],
     }
     once = _enrich_fixture(tmp_path, profile)
     twice = _enrich_fixture(tmp_path, once)

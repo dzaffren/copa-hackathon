@@ -8,15 +8,13 @@ import type { ConceptsAvailable, NodeMetadataRequest } from "@/lib/types";
 import {
   asList,
   CONCEPT_FIELD_ORDER,
+  ISMP_CLASSIFICATIONS,
   LIST_FIELDS,
   type ConceptField,
 } from "./metadata";
 
-/** The two fields that hold clause-length text and so get a textarea. */
-const MULTILINE_FIELDS = new Set<ConceptField>([
-  "empowerment_framework",
-  "requirement",
-]);
+/** The one field that holds clause-length text and so gets a textarea. */
+const MULTILINE_FIELDS = new Set<ConceptField>(["empowerment_framework"]);
 
 /** Plain-language copy for the refusals a save can provoke. Most of these should
  *  be unreachable from this form — it sends exactly the nine known keys and never
@@ -24,6 +22,8 @@ const MULTILINE_FIELDS = new Set<ConceptField>([
  *  map, and the server's own message is the fallback. */
 const ERROR_COPY: Record<string, string> = {
   METADATA_TOO_LARGE: "That value is too long — shorten it and try again.",
+  INVALID_ISMP_CLASSIFICATION:
+    "Choose one of the four classifications, or leave it unset.",
   INVALID_METADATA: "That value could not be saved. Check it and try again.",
   UNKNOWN_METADATA_FIELD: "That field is not part of the profile.",
   TASK_TYPE_IMMUTABLE:
@@ -76,17 +76,15 @@ function list(raw: string): string[] | null {
  *
  *  Written out field by field rather than looped: the server replaces the profile
  *  whole, so an omitted key silently clears a value the drafter never touched.
- *  Spelling the nine out means the compiler catches a missing one, which a loop
+ *  Spelling the seven out means the compiler catches a missing one, which a loop
  *  over `CONCEPT_FIELD_ORDER` could only do behind a cast. */
 function toRequest(values: FormState): NodeMetadataRequest {
   return {
     policy_owner: text(values.policy_owner),
     applicability: text(values.applicability),
     empowerment_framework: text(values.empowerment_framework),
-    requirement: text(values.requirement),
     issuance_date: text(values.issuance_date),
     effective_date: text(values.effective_date),
-    keywords: list(values.keywords),
     legal_basis: list(values.legal_basis),
     ismp_classification: text(values.ismp_classification),
   };
@@ -155,7 +153,25 @@ export function NodeMetadataForm({
             <span className="mb-1 block text-xs font-medium text-muted-foreground">
               {label}
             </span>
-            {MULTILINE_FIELDS.has(field) ? (
+            {field === "ismp_classification" ? (
+              // A closed vocabulary, not free text: these are BNM handling
+              // categories with real consequences. The blank option is kept and
+              // listed first so leaving it unset stays available — the panel then
+              // renders the honest "pending" state rather than a guess.
+              <select
+                className={inputClass}
+                aria-label={label}
+                value={values[field]}
+                onChange={(e) => update(field, e.target.value)}
+              >
+                <option value="">Not set</option>
+                {ISMP_CLASSIFICATIONS.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            ) : MULTILINE_FIELDS.has(field) ? (
               <textarea
                 className={inputClass}
                 rows={3}

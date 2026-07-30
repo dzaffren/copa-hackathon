@@ -6,7 +6,7 @@ different workstreams (a `_cross` edge), each side's concept metadata
 Cross-Workstream Intelligence panel needs beyond the raw linkage list:
 
   * ``shared_attributes`` — the concrete facts the two documents have in common
-    (legal basis, applicability, keywords/topics, policy owner). Each is the
+    (legal basis, applicability, policy owner). Each is the
     *shared value itself*, not a boolean, so a caller renders "Both issued under
     FSA 2013, IFSA 2013" rather than a bare tick.
   * ``reasons`` — those shared facts plus a finding-label rollup, rendered as
@@ -82,11 +82,6 @@ def shared_legal_basis(a: dict[str, Any], b: dict[str, Any]) -> list[str]:
     return _intersect_ci(_as_list(a.get("legal_basis")), _as_list(b.get("legal_basis")))
 
 
-def shared_keywords(a: dict[str, Any], b: dict[str, Any]) -> list[str]:
-    """Topics/keywords both documents carry — the strongest topical-overlap signal."""
-    return _intersect_ci(_as_list(a.get("keywords")), _as_list(b.get("keywords")))
-
-
 def shared_applicability(a: dict[str, Any], b: dict[str, Any]) -> list[str]:
     """Regulated-entity scope both documents apply to, as display phrases.
 
@@ -109,7 +104,11 @@ def shared_scalar(a: dict[str, Any], b: dict[str, Any], field: str) -> Optional[
     """A scalar concept field's value when both sides carry the *same* non-null
     value (used for `policy_owner` and `ismp_classification`)."""
     va, vb = a.get(field), b.get(field)
-    if va is not None and vb is not None and str(va).strip().lower() == str(vb).strip().lower():
+    if (
+        va is not None
+        and vb is not None
+        and str(va).strip().lower() == str(vb).strip().lower()
+    ):
         return str(va)
     return None
 
@@ -140,7 +139,6 @@ def shared_attributes(a: dict[str, Any], b: dict[str, Any]) -> dict[str, Any]:
     return {
         "legal_basis": shared_legal_basis(a, b),
         "applicability": shared_applicability(a, b),
-        "keywords": shared_keywords(a, b),
         "policy_owner": shared_scalar(a, b, "policy_owner"),
         "ismp_classification": shared_scalar(a, b, "ismp_classification"),
     }
@@ -158,8 +156,6 @@ def reasons(shared: dict[str, Any], labels: dict[str, int]) -> list[str]:
         lines.append("Both apply to " + _join(shared["applicability"]))
     if shared.get("legal_basis"):
         lines.append("Both issued under " + _join(shared["legal_basis"]))
-    if shared.get("keywords"):
-        lines.append("Both address " + _join(shared["keywords"][:4]))
     if shared.get("policy_owner"):
         lines.append("Both owned by " + shared["policy_owner"])
     if shared.get("ismp_classification"):
@@ -172,7 +168,7 @@ def reasons(shared: dict[str, Any], labels: dict[str, int]) -> list[str]:
 
 
 def _join(items: list[str]) -> str:
-    """"a", "a and b", "a, b and c" — for readable reason lines."""
+    """ "a", "a and b", "a, b and c" — for readable reason lines."""
     if not items:
         return ""
     if len(items) == 1:

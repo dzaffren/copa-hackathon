@@ -886,7 +886,6 @@ const CROSS_LINK: CrossLink = {
   shared_attributes: {
     legal_basis: ["FSA 2013"],
     applicability: ["licensed banks"],
-    keywords: ["operational resilience"],
     policy_owner: null,
     ismp_classification: null,
   },
@@ -1205,10 +1204,8 @@ export const handlers = [
           policy_owner: "Aisyah R.",
           applicability: null,
           empowerment_framework: null,
-          requirement: null,
           issuance_date: null,
           effective_date: null,
-          keywords: ["operational resilience"],
           legal_basis: ["FSA 2013"],
           ismp_classification: null,
         },
@@ -1227,10 +1224,8 @@ export const handlers = [
           policy_owner: "Jarod N.",
           applicability: null,
           empowerment_framework: null,
-          requirement: null,
           issuance_date: "2025-11-18",
           effective_date: null,
-          keywords: ["open finance", "operational resilience"],
           legal_basis: ["FSA 2013"],
           ismp_classification: null,
         },
@@ -1764,7 +1759,7 @@ export const handlers = [
       { status: 201 },
     );
   }),
-  // Mirrors the route's full replacement: whatever the nine-field body carries is
+  // Mirrors the route's full replacement: whatever the seven-field body carries is
   // stored whole and echoed back in the GET's `metadata` shape.
   http.put(
     "*/api/workstreams/:workstreamId/nodes/:nodeId/metadata",

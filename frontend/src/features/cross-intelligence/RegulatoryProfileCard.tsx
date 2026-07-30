@@ -12,7 +12,11 @@ import { asList, conceptsOf } from "./intel";
  *  legal basis, ISMP classification, key topics — read from its primary
  *  document's concept metadata. Surfaced in the graph rail so the intelligence
  *  profile lives beside the drafting canvas, and reusable elsewhere. */
-export function RegulatoryProfileCard({ workstreamId }: { workstreamId: string }) {
+export function RegulatoryProfileCard({
+  workstreamId,
+}: {
+  workstreamId: string;
+}) {
   const { data: graph } = useQuery({
     queryKey: ["workstream", workstreamId, "graph"],
     queryFn: () => fetchGraph(workstreamId),
@@ -50,13 +54,16 @@ export function RegulatoryProfileCard({ workstreamId }: { workstreamId: string }
         <dl className="mt-2 space-y-1.5 text-xs">
           <Row label="Owner" value={concepts?.policy_owner} />
           <Row label="Applicability" value={concepts?.applicability} />
-          <ChipRow label="Legal basis" values={asList(concepts?.legal_basis)} fallback={detail.pursuant_to} />
+          <ChipRow
+            label="Legal basis"
+            values={asList(concepts?.legal_basis)}
+            fallback={detail.pursuant_to}
+          />
           <Row
             label="ISMP"
             value={concepts?.ismp_classification ?? detail.ismp_classification}
             pendingNote="pending RH form"
           />
-          <ChipRow label="Topics" values={asList(concepts?.keywords)} />
         </dl>
       )}
     </section>
@@ -100,7 +107,10 @@ function ChipRow({
           <span className="italic text-muted-foreground">—</span>
         ) : (
           items.map((v) => (
-            <span key={v} className="rounded-full bg-accent/60 px-1.5 py-0.5 font-medium text-foreground/90">
+            <span
+              key={v}
+              className="rounded-full bg-accent/60 px-1.5 py-0.5 font-medium text-foreground/90"
+            >
               {v}
             </span>
           ))

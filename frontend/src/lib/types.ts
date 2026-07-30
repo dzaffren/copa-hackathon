@@ -196,28 +196,25 @@ export interface Placeholder {
   message: string;
 }
 
-/** The seven concept fields, offline-enriched (scripts/enrich_node_metadata.py).
- *  Each is either a verbatim clause quote or a value already on the node
- *  (`owner`) — never invented. A field the enrichment could not derive is
- *  `null`, not omitted, so the panel can render "not available" per field. */
+/** The seven regulatory-profile fields, drafter-editable and also written by the
+ *  offline enrichment (scripts/enrich_node_metadata.py). A field nobody has
+ *  filled in is `null`, not omitted, so the panel renders "Not set" per field.
+ *
+ *  `keywords` and `requirement` were removed on 30 Jul 2026 — the extracted axes
+ *  (the Concepts section) carry a document's topics from the document itself. */
 export interface ConceptsAvailable {
   status: "available";
   policy_owner: string | null;
   applicability: string | null;
   empowerment_framework: string | null;
-  requirement: string | null;
   issuance_date: string | null;
   effective_date: string | null;
-  /** A list of topic keywords once enriched (older side-files may carry a bare
-   *  string or null). */
-  keywords: string[] | string | null;
-  /** Acts the document is issued under, e.g. `["FSA 2013", "IFSA 2013"]` — a
-   *  shared Act is a strong cross-workstream overlap signal. May be absent on
-   *  side-files written before this field existed. */
+  /** Acts the document is issued under, e.g. `["FSA 2013", "IFSA 2013"]`. May be
+   *  absent on side-files written before this field existed. */
   legal_basis?: string[] | null;
-  /** BNM ISMP classification. No offline source exists yet (its authority is
-   *  CAS's RH publication form), so this is `null` today — the field is
-   *  present so the panel can render "pending" rather than hide the concept. */
+  /** BNM security classification — one of UMUM / TERHAD / SULIT / RAHSIA, or
+   *  `null` when nobody has recorded one, which the panel renders as pending
+   *  rather than as a guess. */
   ismp_classification?: string | null;
 }
 
@@ -257,18 +254,17 @@ export interface ExtractConceptsResponse {
   recent_activity: RecentActivity[];
 }
 
-/** The nine editable profile fields. Every key is sent on every save — the
+/** The seven editable profile fields. Every key is sent on every save — the
  *  server does a full replacement, so an omitted field is stored as null. That
  *  is what makes "clear a field" and "never filled it in" the same state. */
 export interface NodeMetadataRequest {
   policy_owner: string | null;
   applicability: string | null;
   empowerment_framework: string | null;
-  requirement: string | null;
   issuance_date: string | null;
   effective_date: string | null;
-  keywords: string[] | null;
   legal_basis: string[] | null;
+  /** One of UMUM / TERHAD / SULIT / RAHSIA, or null for unset. */
   ismp_classification: string | null;
 }
 
@@ -544,7 +540,6 @@ export type RiskLevel = "high" | "medium" | "low";
 export interface SharedAttributes {
   legal_basis: string[];
   applicability: string[];
-  keywords: string[];
   policy_owner: string | null;
   ismp_classification: string | null;
 }

@@ -100,7 +100,7 @@ test.describe("Fill in a document's regulatory profile", () => {
     await expect(page.getByText("Policy owner")).toBeVisible();
     await expect(page.getByText("Applicability")).toBeVisible();
     await expect(page.getByText("Empowerment framework")).toBeVisible();
-    expect(await page.getByText("Not set").count()).toBeGreaterThanOrEqual(8);
+    expect(await page.getByText("Not set").count()).toBeGreaterThanOrEqual(6);
 
     // ISMP is the one field whose emptiness has a documented cause, so it says
     // so instead of reading "Not set" like the rest.
@@ -121,9 +121,11 @@ test.describe("Fill in a document's regulatory profile", () => {
 
     await page.getByLabel("Policy owner").fill("Priya S.");
     await page
-      .getByLabel("Keywords")
-      .fill("open banking, data portability, consent");
+      .getByLabel("Legal basis")
+      .fill("FSA 2013, IFSA 2013, DFIA 2002");
     await page.getByLabel("Effective date").fill("28 November 2025");
+    // A closed dropdown, not free text — these are BNM handling categories.
+    await page.getByLabel("ISMP classification").selectOption("SULIT");
 
     // The honesty note on the one field that holds a verbatim clause quote.
     await expect(
@@ -137,13 +139,10 @@ test.describe("Fill in a document's regulatory profile", () => {
     const profile = page.locator("dl").first();
     await expect(profile.getByText("Priya S.", { exact: true })).toBeVisible();
     // The comma-separated line became three separate chips, not one string.
-    await expect(
-      profile.getByText("open banking", { exact: true }),
-    ).toBeVisible();
-    await expect(
-      profile.getByText("data portability", { exact: true }),
-    ).toBeVisible();
-    await expect(profile.getByText("consent", { exact: true })).toBeVisible();
+    await expect(profile.getByText("FSA 2013", { exact: true })).toBeVisible();
+    await expect(profile.getByText("IFSA 2013", { exact: true })).toBeVisible();
+    await expect(profile.getByText("DFIA 2002", { exact: true })).toBeVisible();
+    await expect(profile.getByText("SULIT", { exact: true })).toBeVisible();
     await expect(
       profile.getByText("28 November 2025", { exact: true }),
     ).toBeVisible();
@@ -156,7 +155,8 @@ test.describe("Fill in a document's regulatory profile", () => {
 
     const reloaded = page.locator("dl").first();
     await expect(reloaded.getByText("Priya S.", { exact: true })).toBeVisible();
-    await expect(reloaded.getByText("consent", { exact: true })).toBeVisible();
+    await expect(reloaded.getByText("DFIA 2002", { exact: true })).toBeVisible();
+    await expect(reloaded.getByText("SULIT", { exact: true })).toBeVisible();
     await expect(
       reloaded.getByText("28 November 2025", { exact: true }),
     ).toBeVisible();

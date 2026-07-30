@@ -30,10 +30,8 @@ const ENRICHED_SUPERVISORY_LETTER: NodeDetail = {
     policy_owner: null,
     applicability: "Financial institutions subject to the RMiT policy document",
     empowerment_framework: null,
-    requirement: null,
     issuance_date: null,
     effective_date: null,
-    keywords: ["RMiT", "implementation guidance", "technology risk"],
     legal_basis: ["FSA 2013", "IFSA 2013", "DFIA 2002"],
     ismp_classification: null,
   },
@@ -174,7 +172,7 @@ describe("NodeDetailPanel", () => {
     expect(screen.queryByTestId("task-type-chip")).not.toBeInTheDocument();
   });
 
-  it("renders keyword + legal-basis chips in the Metadata disclosure", async () => {
+  it("renders legal-basis chips in the Metadata disclosure", async () => {
     seedNode(ENRICHED_SUPERVISORY_LETTER);
     renderWithProviders(
       <NodeDetailPanel
@@ -188,11 +186,8 @@ describe("NodeDetailPanel", () => {
     await screen.findByText("supervisory-letter");
     await userEvent.click(screen.getByRole("button", { name: /metadata/i }));
 
-    // Keywords render as individual chips.
-    expect(
-      await screen.findByText("implementation guidance"),
-    ).toBeInTheDocument();
-    expect(screen.getByText("technology risk")).toBeInTheDocument();
+    // A multi-value field renders as individual chips.
+    expect(await screen.findByText("Legal basis")).toBeInTheDocument();
     // The ISMP row inside the disclosure also shows the pending state.
     expect(
       screen.getAllByText(/Pending — RH publication form/).length,
@@ -214,9 +209,9 @@ describe("NodeDetailPanel", () => {
     await screen.findByText("international-standard");
     await userEvent.click(screen.getByRole("button", { name: /^metadata$/i }));
 
-    // Every field is named and honestly empty — eight "Not set" plus the ISMP
+    // Every field is named and honestly empty — six "Not set" plus the ISMP
     // row, which is pending rather than merely unfilled.
-    expect(screen.getAllByText("Not set")).toHaveLength(8);
+    expect(screen.getAllByText("Not set")).toHaveLength(6);
     expect(screen.getByText("Policy owner")).toBeInTheDocument();
     expect(screen.getByText("ISMP classification")).toBeInTheDocument();
     expect(
@@ -245,8 +240,8 @@ describe("NodeDetailPanel", () => {
     const owner = screen.getByLabelText("Policy owner");
     await userEvent.type(owner, "Priya S.");
     await userEvent.type(
-      screen.getByLabelText("Keywords"),
-      "operational resilience, third-party risk",
+      screen.getByLabelText("Legal basis"),
+      "FSA 2013, IFSA 2013",
     );
     await userEvent.click(screen.getByRole("button", { name: /^save$/i }));
 
@@ -255,8 +250,9 @@ describe("NodeDetailPanel", () => {
       expect(screen.queryByLabelText("Policy owner")).not.toBeInTheDocument(),
     );
     expect(await screen.findByText("Priya S.")).toBeInTheDocument();
-    expect(screen.getByText("operational resilience")).toBeInTheDocument();
-    expect(screen.getByText("third-party risk")).toBeInTheDocument();
+    // The comma-separated line came back as separate chips.
+    expect(screen.getByText("FSA 2013")).toBeInTheDocument();
+    expect(screen.getByText("IFSA 2013")).toBeInTheDocument();
   });
 
   it("lists a working draft's deliverable kind on its profile, uneditable", async () => {
