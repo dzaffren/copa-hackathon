@@ -87,7 +87,6 @@ export interface EdgeStyle {
 export const EDGE_LEGEND: Record<EdgeType, EdgeStyle> = {
   supersedes: { label: "supersedes", stroke: "#f87171", dash: [] },
   references: { label: "references", stroke: "#38bdf8", dash: [] },
-  "contributes-to": { label: "contributes-to", stroke: "#818cf8", dash: [5, 4] },
   "parallel-to": { label: "parallel-to", stroke: "#94a3b8", dash: [7, 4] },
 };
 
@@ -97,8 +96,12 @@ export function nodeStyle(type: NodeType): NodeStyle {
   return NODE_LEGEND[type] ?? FALLBACK_NODE;
 }
 
+/** Style for an edge type. Retired workstream fixtures still carry the removed
+ *  `contributes-to` type on disk, so an unknown type borrows the `references`
+ *  styling (its replacement) but keeps its own on-canvas label rather than
+ *  claiming to be a reference. */
 export function edgeStyle(type: EdgeType): EdgeStyle {
-  return EDGE_LEGEND[type] ?? EDGE_LEGEND["contributes-to"];
+  return EDGE_LEGEND[type] ?? { ...EDGE_LEGEND.references, label: type };
 }
 
 /** Cross-workstream edges (institution map) always render in this bright
@@ -132,6 +135,5 @@ export const NODE_LEGEND_ORDER: NodeType[] = [
 export const EDGE_LEGEND_ORDER: EdgeType[] = [
   "supersedes",
   "references",
-  "contributes-to",
   "parallel-to",
 ];

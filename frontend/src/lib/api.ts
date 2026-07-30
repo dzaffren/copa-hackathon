@@ -3,7 +3,6 @@ import type {
   ChatHistoryTurn,
   Connection,
   CopilotDraftContext,
-  CopilotIntent,
   CopilotResponse,
   CreateEdgeRequest,
   CreateEdgeResponse,
@@ -25,6 +24,8 @@ import type {
   Person,
   ReviewQueueResponse,
   NodeDetail,
+  NodeMetadataRequest,
+  NodeMetadataResponse,
   PatchReviewStateResponse,
   ReviewResponse,
   ReviewState,
@@ -217,6 +218,22 @@ export function extractConcepts(
   );
 }
 
+/** Replace a document's nine-field regulatory profile.
+ *
+ *  A full replacement, not a patch: the server writes whatever it is given
+ *  whole, so `body` must always carry all nine keys. A field the drafter
+ *  cleared is sent as `null` and lands as "not set". */
+export function saveNodeMetadata(
+  workstreamId: string,
+  nodeId: string,
+  body: NodeMetadataRequest,
+): Promise<NodeMetadataResponse> {
+  return putJson<NodeMetadataResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/nodes/${nodeId}/metadata`,
+    body,
+  );
+}
+
 /** Connect two nodes already on the canvas. Runs no analysis. */
 export function createEdge(
   workstreamId: string,
@@ -340,7 +357,6 @@ export function saveDraft(
 export function sendCopilotMessage(
   workstreamId: string,
   nodeId: string,
-  intent: CopilotIntent,
   message: string,
   history: ChatHistoryTurn[],
   referencedFindingIds: string[],
@@ -348,10 +364,12 @@ export function sendCopilotMessage(
 ): Promise<CopilotResponse> {
   // The server holds no conversation state (deliberately not persisted across
   // sessions), so the client sends the full prior history on every call.
+  //
+  // No `intent`: the server reads the deliverable kind off the task node, so
+  // the drafter is never asked what they are drafting.
   return postJson<CopilotResponse>(
     `${API_BASE}/api/workstreams/${workstreamId}/tasks/${nodeId}/copilot`,
     {
-      intent,
       message,
       history,
       referenced_finding_ids: referencedFindingIds,
@@ -367,7 +385,7 @@ function abortError(): DOMException {
 
 /** Stream a Copilot reply via SSE. Yields typed events as they arrive.
  *  Pass an AbortSignal so the caller can cancel the in-flight stream when
- *  the component unmounts, the intent changes, or the user navigates away.
+ *  the component unmounts or the user navigates away.
  *
  *  The signal is deliberately *not* forwarded via `fetch()`'s `RequestInit`.
  *  In a real browser that would be equivalent, but under Vitest's jsdom test
@@ -383,7 +401,6 @@ function abortError(): DOMException {
 export async function* streamCopilotMessage(
   workstreamId: string,
   nodeId: string,
-  intent: CopilotIntent,
   message: string,
   history: ChatHistoryTurn[],
   referencedFindingIds: string[],
@@ -398,7 +415,6 @@ export async function* streamCopilotMessage(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        intent,
         message,
         history,
         referenced_finding_ids: referencedFindingIds,

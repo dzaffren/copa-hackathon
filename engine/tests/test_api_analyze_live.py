@@ -62,7 +62,7 @@ def _ws(tmp_path: Path) -> Path:
                         "id": "e-noref",
                         "source": "opres-pd-v0-3",
                         "target": "bcbs",
-                        "edge_type": "contributes-to",
+                        "edge_type": "references",
                     },
                     {
                         "id": "e-samedoc",

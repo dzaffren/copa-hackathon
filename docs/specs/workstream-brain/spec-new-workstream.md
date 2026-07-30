@@ -2,7 +2,7 @@
 
 **Ticket:** TBD
 
-**Epic:** [Workstream Brain MVP1 — Overview](spec.md)
+**Epic:** [Project SELARAS MVP1 — Overview](spec.md)
 
 A short, three-card form that lets a policymaker spin up a new workstream (one Discussion Paper, Exposure Draft, or Policy Document under active drafting) in under a minute. On submission, the user lands on the new workstream's empty graph, ready to add its first anchor. Reached from the collapsible sidebar's **+ New workstream** action on any screen.
 

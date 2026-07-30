@@ -1,7 +1,7 @@
 [project]
 name = "engine"
 version = "0.1.0"
-description = "Workstream Brain — knowledge-graph engine + FastAPI for BNM cross-workstream policy drafting (COPA Hackathon 2026)"
+description = "Project SELARAS — Semantic Engine for Linkage Analysis across Regulatory Artefacts & Standards: knowledge-graph engine + FastAPI for BNM cross-workstream policy drafting (COPA Hackathon 2026)"
 requires-python = ">=3.12"
 dependencies = [
     "anthropic>=0.116.0",

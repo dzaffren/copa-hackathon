@@ -1,4 +1,4 @@
-// Contract types mirroring the Workstream Brain FastAPI engine.
+// Contract types mirroring the Project SELARAS FastAPI engine.
 // Task Screen: `GET /api/workstreams/{id}/tasks/{nodeId}`, `.../edges/{edgeId}/findings`.
 // Graph Screen: `GET /api/workstreams`, `.../{id}/graph`, `.../nodes/{id}`,
 //   `.../edges/{id}`, `POST .../nodes`, `POST .../edges/{id}/analyze`.
@@ -13,8 +13,7 @@ export type NodeType =
   | "supervisory-letter"
   | "others";
 
-export type EdgeType =
-  "contributes-to" | "parallel-to" | "references" | "supersedes";
+export type EdgeType = "parallel-to" | "references" | "supersedes";
 
 export type WorkstreamRole = "own" | "review" | "delivered";
 
@@ -30,17 +29,23 @@ export interface Person {
 
 // --- Task Screen (unchanged from #36) --------------------------------------
 
+// Every field below the identity pair is nullable because a focal node
+// scaffolded by `create_workstream` carries identity only — no document is
+// attached, so there is no source name, format, status or edit stamp to report.
+// `owner` is filled from the workstream record, but stays nullable: nothing
+// guarantees a record has one, and a non-null type here is what let a live
+// workstream crash the Task Screen.
 export interface Task {
   id: string;
   title: string;
-  source_name: string;
-  format: string;
-  description: string;
-  status: string;
-  owner: Person;
+  source_name: string | null;
+  format: string | null;
+  description: string | null;
+  status: string | null;
+  owner: Person | null;
   reviewers: Person[];
   clause_count: number;
-  last_edited_at: string;
+  last_edited_at: string | null;
 }
 
 export interface Neighbour {
@@ -191,34 +196,34 @@ export interface Placeholder {
   message: string;
 }
 
-/** The seven concept fields, offline-enriched (scripts/enrich_node_metadata.py).
- *  Each is either a verbatim clause quote or a value already on the node
- *  (`owner`) — never invented. A field the enrichment could not derive is
- *  `null`, not omitted, so the panel can render "not available" per field. */
+/** The seven regulatory-profile fields, drafter-editable and also written by the
+ *  offline enrichment (scripts/enrich_node_metadata.py). A field nobody has
+ *  filled in is `null`, not omitted, so the panel renders "Not set" per field.
+ *
+ *  `keywords` and `requirement` were removed on 30 Jul 2026 — the extracted axes
+ *  (the Concepts section) carry a document's topics from the document itself. */
 export interface ConceptsAvailable {
   status: "available";
   policy_owner: string | null;
   applicability: string | null;
   empowerment_framework: string | null;
-  requirement: string | null;
   issuance_date: string | null;
   effective_date: string | null;
-  /** A list of topic keywords once enriched (older side-files may carry a bare
-   *  string or null). */
-  keywords: string[] | string | null;
-  /** Acts the document is issued under, e.g. `["FSA 2013", "IFSA 2013"]` — a
-   *  shared Act is a strong cross-workstream overlap signal. May be absent on
-   *  side-files written before this field existed. */
+  /** Acts the document is issued under, e.g. `["FSA 2013", "IFSA 2013"]`. May be
+   *  absent on side-files written before this field existed. */
   legal_basis?: string[] | null;
-  /** BNM ISMP classification. No offline source exists yet (its authority is
-   *  CAS's RH publication form), so this is `null` today — the field is
-   *  present so the panel can render "pending" rather than hide the concept. */
+  /** BNM security classification — one of UMUM / TERHAD / SULIT / RAHSIA, or
+   *  `null` when nobody has recorded one, which the panel renders as pending
+   *  rather than as a guess. */
   ismp_classification?: string | null;
 }
 
 export interface NodeDetail {
   id: string;
   node_type: NodeType;
+  /** The deliverable kind, set once at creation and thereafter read-only.
+   *  `null` on a context document, and on a legacy draft that carries none. */
+  task_type: TaskTypeCode | null;
   title: string;
   issuer: string | null;
   short_type: string | null;
@@ -247,6 +252,27 @@ export interface ExtractConceptsResponse {
   node_id: string;
   concepts: NodeConcepts;
   recent_activity: RecentActivity[];
+}
+
+/** The seven editable profile fields. Every key is sent on every save — the
+ *  server does a full replacement, so an omitted field is stored as null. That
+ *  is what makes "clear a field" and "never filled it in" the same state. */
+export interface NodeMetadataRequest {
+  policy_owner: string | null;
+  applicability: string | null;
+  empowerment_framework: string | null;
+  issuance_date: string | null;
+  effective_date: string | null;
+  legal_basis: string[] | null;
+  /** One of UMUM / TERHAD / SULIT / RAHSIA, or null for unset. */
+  ismp_classification: string | null;
+}
+
+export interface NodeMetadataResponse {
+  node_id: string;
+  /** The saved profile in the GET's `metadata` shape, so the client can drop it
+   *  straight into its cache. */
+  metadata: ConceptsAvailable;
 }
 
 export interface EdgeEndpoint {
@@ -278,6 +304,9 @@ export type DocClass = "structured-rules" | "semi-structured" | "prose";
 
 export interface CreateNodeRequest {
   node_type: NodeType;
+  /** Required when `node_type` is `task`, refused otherwise — the server sends
+   *  `INVALID_TASK_TYPE` / `TASK_TYPE_NOT_ALLOWED` rather than dropping it. */
+  task_type?: TaskTypeCode;
   title: string;
   description?: string | null;
   source_url?: string | null;
@@ -310,6 +339,7 @@ export interface CreatedEdge {
 export interface CreateNodeResponse {
   id: string;
   node_type: NodeType;
+  task_type?: TaskTypeCode | null;
   title: string;
   created_edges: CreatedEdge[];
   /** Present only when a document was attached and chunked. */
@@ -340,37 +370,11 @@ export interface AnalyzeResponse {
 
 // --- Drafting Workspace ----------------------------------------------------
 
-/** The seven Copilot intent presets. Cosmetic in MVP1 beyond keying the
- *  scripted reply map — they signal the surface area the tool will cover. */
-export type CopilotIntent =
-  | "PD"
-  | "DP"
-  | "ED"
-  | "FAQ"
-  | "Engagement Deck"
-  | "Feedback Template for Industry"
-  | "Peer Benchmarking";
-
-export const COPILOT_INTENTS: CopilotIntent[] = [
-  "PD",
-  "DP",
-  "ED",
-  "FAQ",
-  "Engagement Deck",
-  "Feedback Template for Industry",
-  "Peer Benchmarking",
-];
-
-/** Human labels for the intent dropdown. The wire values stay terse. */
-export const COPILOT_INTENT_LABELS: Record<CopilotIntent, string> = {
-  PD: "PD — Policy Document",
-  DP: "DP — Discussion Paper",
-  ED: "ED — Exposure Draft",
-  FAQ: "FAQ",
-  "Engagement Deck": "Engagement Deck",
-  "Feedback Template for Industry": "Feedback Template for Industry",
-  "Peer Benchmarking": "Peer Benchmarking",
-};
+// The Copilot's intent preset vocabulary lived here as `CopilotIntent` /
+// `COPILOT_INTENTS` / `COPILOT_INTENT_LABELS`. It is gone: the deliverable kind
+// is now `TASK_TYPE_OPTIONS` above, recorded on the task node at creation, and
+// the server reads it off that node. The drafter is never asked what they are
+// drafting, so there is no dropdown and no client-sent `intent`.
 
 export interface LinkageEndpoint {
   id: string;
@@ -461,18 +465,25 @@ export type SSEEvent =
 
 // --- New Workstream --------------------------------------------------------
 
-/** Wire codes for the deliverable dropdown. The server maps these to the human
- *  labels the fixtures store ("PD" → "Policy Document"). */
-export type DeliverableTypeCode = "PD" | "ED" | "DP" | "Other";
+/** Wire codes for the eight deliverable kinds BNM publishes — the one vocabulary
+ *  asked at workstream creation and of every new working draft. Mirrors
+ *  `engine/workstreams.py::TASK_TYPES`, whose order this preserves. */
+export type TaskTypeCode =
+  "PD" | "DP" | "ED" | "FAQ" | "DECK" | "FEEDBACK" | "BENCHMARK" | "OTHERS";
 
-export const DELIVERABLE_TYPE_OPTIONS: {
-  code: DeliverableTypeCode;
-  label: string;
-}[] = [
-  { code: "PD", label: "Policy Document (PD)" },
-  { code: "ED", label: "Exposure Draft (ED)" },
-  { code: "DP", label: "Discussion Paper (DP)" },
-  { code: "Other", label: "Other" },
+/** Drafter-facing labels. These differ from the labels the engine STORES
+ *  ("PD" → "Policy Document"): a picker needs the short form visible, because
+ *  the code is what an auto-generated draft title embeds. The asymmetry is
+ *  deliberate and documented above `TASK_TYPES` in the engine. */
+export const TASK_TYPE_OPTIONS: { code: TaskTypeCode; label: string }[] = [
+  { code: "PD", label: "PD — Policy Document" },
+  { code: "DP", label: "DP — Discussion Paper" },
+  { code: "ED", label: "ED — Exposure Draft" },
+  { code: "FAQ", label: "FAQ" },
+  { code: "DECK", label: "Engagement Deck" },
+  { code: "FEEDBACK", label: "Feedback Template for Industry" },
+  { code: "BENCHMARK", label: "Peer Benchmarking" },
+  { code: "OTHERS", label: "Others" },
 ];
 
 export type AccessLevel = "team_only" | "department_wide";
@@ -485,7 +496,7 @@ export interface Person {
 export interface CreateWorkstreamRequest {
   name: string;
   description?: string;
-  deliverable_type: DeliverableTypeCode;
+  deliverable_type: TaskTypeCode;
   target_publication?: string;
   reviewer_ids: string[];
   access: AccessLevel;
@@ -529,7 +540,6 @@ export type RiskLevel = "high" | "medium" | "low";
 export interface SharedAttributes {
   legal_basis: string[];
   applicability: string[];
-  keywords: string[];
   policy_owner: string | null;
   ismp_classification: string | null;
 }

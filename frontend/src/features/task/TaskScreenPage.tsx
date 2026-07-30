@@ -1,12 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  GitBranch,
-  Link2,
-  Loader2,
-  PencilLine,
-  Sparkles,
-} from "lucide-react";
+import { GitBranch, Link2, Loader2, PencilLine, Sparkles } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -147,9 +141,17 @@ export default function TaskScreenPage() {
                 {STATUS_LABEL[currentStatus]}
               </Badge>
             </div>
+            {/* Built by filter rather than interpolation: a freshly scaffolded
+                focal node has no owner or format, and the byline should shrink
+                rather than render "null" or a stray separator. */}
             <p className="mt-1 text-sm text-muted-foreground">
-              {task.owner.name} · {task.format} · {neighbours.length} neighbour
-              nodes
+              {[
+                task.owner?.name,
+                task.format,
+                `${neighbours.length} neighbour nodes`,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
             </p>
             {currentStatus === "approved" && workflow.approved_by && (
               <p className="mt-0.5 text-xs text-emerald-800">

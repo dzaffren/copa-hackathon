@@ -46,7 +46,13 @@ async function loadWorkspace() {
  *  Reviewed tab is populated by the real path rather than a seeded fixture. */
 async function acceptOnReviewScreen(user: ReturnType<typeof userEvent.setup>) {
   renderApp(`/workstreams/opres-v2/edges/${BCBS_EDGE}/review`);
-  const card = (await screen.findAllByTestId("finding-card"))[0];
+  // By label, not position: the review screen orders cards by attention
+  // (conflicts-with → … → aligns-with), so index 0 is not the aligns-with
+  // finding on OpRes PD 4.4 that the assertions below are about.
+  await screen.findAllByTestId("finding-card");
+  const card = screen
+    .getAllByTestId("finding-card")
+    .find((c) => c.getAttribute("data-label") === "aligns-with")!;
   await user.click(within(card).getByRole("button", { name: "Accept" }));
   await waitFor(() =>
     expect(screen.getByTestId("count-accepted")).toHaveTextContent(
@@ -70,16 +76,17 @@ describe("DraftingWorkspacePage — landing", () => {
     expect(
       screen.getByRole("link", { name: /Workstream graph/i }),
     ).toBeInTheDocument();
-    for (const name of [/Reviewed Findings/, /Recommendations/, /Copilot/]) {
+    for (const name of [/Reviewed/, /Related · 1 hop/, /Copilot/]) {
       expect(screen.getByRole("tab", { name })).toBeInTheDocument();
     }
   });
 
-  it("opens on the Reviewed Findings tab", async () => {
+  it("opens on the Reviewed tab", async () => {
     await loadWorkspace();
-    expect(
-      screen.getByRole("tab", { name: /Reviewed Findings/ }),
-    ).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: /Reviewed/ })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
   });
 
   it("shows the working draft's clause text verbatim in the editor", async () => {
@@ -117,25 +124,54 @@ describe("DraftingWorkspacePage — landing", () => {
   });
 });
 
-describe("DraftingWorkspacePage — blank team tabs", () => {
-  it("shows a placeholder on the Reviewed Findings tab, pending team data", async () => {
+describe("DraftingWorkspacePage — Reviewed tab", () => {
+  it("is empty until something is accepted, and says why", async () => {
     await loadWorkspace();
-    expect(
-      screen.getByTestId("reviewed-findings-empty"),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("count-reviewed")).toHaveTextContent("0");
+    expect(screen.getByText(/No accepted linkages yet/i)).toBeInTheDocument();
   });
 
-  it("shows a placeholder on the Recommendations tab, pending team data", async () => {
+  it("shows a linkage accepted on the review screen, and counts it", async () => {
     const user = userEvent.setup();
+    await acceptOnReviewScreen(user);
+
     await loadWorkspace();
 
-    await user.click(screen.getByRole("tab", { name: /Recommendations/ }));
-
-    expect(screen.getByTestId("recommendations-empty")).toBeInTheDocument();
+    const cards = await screen.findAllByTestId("linkage-ref-card");
+    expect(cards).toHaveLength(1);
+    expect(cards[0]).toHaveAttribute("data-label", "aligns-with");
+    expect(cards[0]).toHaveTextContent("BCBS OpRes 2021");
+    expect(screen.getByTestId("count-reviewed")).toHaveTextContent("1");
   });
-});
 
-describe("DraftingWorkspacePage — editor inline callouts", () => {
+  it("does not show a dismissed finding", async () => {
+    const user = userEvent.setup();
+    renderApp(`/workstreams/opres-v2/edges/${BCBS_EDGE}/review`);
+    const card = (await screen.findAllByTestId("finding-card"))[0];
+    await user.click(within(card).getByRole("button", { name: "Dismiss" }));
+    await waitFor(() =>
+      expect(screen.getByTestId("count-dismissed")).toHaveTextContent(
+        "1 dismissed",
+      ),
+    );
+    cleanup();
+
+    await loadWorkspace();
+
+    expect(screen.queryByTestId("linkage-ref-card")).not.toBeInTheDocument();
+    expect(screen.getByTestId("count-reviewed")).toHaveTextContent("0");
+  });
+
+  it("highlights a clicked card and leaves the others alone", async () => {
+    const user = userEvent.setup();
+    await acceptOnReviewScreen(user);
+    await loadWorkspace();
+
+    const card = (await screen.findAllByTestId("linkage-ref-card"))[0];
+    await user.click(card);
+    expect(card).toHaveAttribute("data-active", "true");
+  });
+
   it("renders an inline callout beside the accepted clause, colour-coded", async () => {
     const user = userEvent.setup();
     await acceptOnReviewScreen(user);
@@ -145,6 +181,21 @@ describe("DraftingWorkspacePage — editor inline callouts", () => {
     expect(callout).toHaveAttribute("data-label", "aligns-with");
     expect(callout).toHaveAttribute("data-clause", "4.4");
     expect(callout.className).toContain("border-emerald-400");
+  });
+});
+
+describe("DraftingWorkspacePage — Related · 1 hop tab", () => {
+  it("explains the tab and reports honestly that nothing is analysed", async () => {
+    const user = userEvent.setup();
+    await loadWorkspace();
+
+    await user.click(screen.getByRole("tab", { name: /Related · 1 hop/ }));
+
+    expect(
+      screen.getByText(/neighbour documents themselves/i),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("related-empty")).toBeInTheDocument();
+    expect(screen.getByTestId("count-related")).toHaveTextContent("0");
   });
 });
 
@@ -517,7 +568,7 @@ describe("DraftingWorkspacePage — tab switching", () => {
     const before = screen.getByTestId("draft-surface");
 
     await user.click(screen.getByRole("tab", { name: /Copilot/ }));
-    await user.click(screen.getByRole("tab", { name: /Reviewed Findings/ }));
+    await user.click(screen.getByRole("tab", { name: /Reviewed/ }));
 
     expect(screen.getByTestId("draft-surface")).toBe(before);
     expect(screen.getByTestId("draft-surface")).toHaveTextContent(
@@ -534,7 +585,7 @@ describe("DraftingWorkspacePage — tab switching", () => {
     await user.click(screen.getByRole("button", { name: "Explore Task" }));
     await screen.findByTestId("command-step", undefined, THINKING_WAIT);
 
-    await user.click(screen.getByRole("tab", { name: /Reviewed Findings/ }));
+    await user.click(screen.getByRole("tab", { name: /Reviewed/ }));
     await user.click(screen.getByRole("tab", { name: /Copilot/ }));
 
     // The conversation is intact — not reset to the welcome screen.

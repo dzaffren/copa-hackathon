@@ -1,10 +1,10 @@
-# Workstream Brain MVP1 — Overview
+# Project SELARAS MVP1 — Overview
 
 **Discovery Brief:** `docs/discovery/workstream-brain-mvp1/brief.md`
 
 ## Summary
 
-Workstream Brain is the second POC delivered for the COPA Hackathon 2026, targeting the "cross-workstream drift is invisible" opportunity retired in the parent discovery brief. Each policy workstream (Discussion Paper, Exposure Draft, Policy Document under active drafting) becomes a knowledge graph of documents connected by structural edges. AI-found linkages between clause pairs surface as findings the drafter reviews and accepts before drafting. This epic covers the drafter-facing MVP1 scope: five drafter/workstream screens plus a widened engine. The management-facing institution map is deferred to a follow-on epic.
+Project SELARAS — **S**emantic **E**ngine for **L**inkage **A**nalysis across **R**egulatory **A**rtefacts & **S**tandards, renamed from "Workstream Brain" on 30 Jul 2026 (the directory slug keeps the old name) — is the second POC delivered for the COPA Hackathon 2026, targeting the "cross-workstream drift is invisible" opportunity retired in the parent discovery brief. Each policy workstream (Discussion Paper, Exposure Draft, Policy Document under active drafting) becomes a knowledge graph of documents connected by structural edges. AI-found linkages between clause pairs surface as findings the drafter reviews and accepts before drafting. This epic covers the drafter-facing MVP1 scope: five drafter/workstream screens plus a widened engine. The management-facing institution map is deferred to a follow-on epic.
 
 ## Background & Context
 

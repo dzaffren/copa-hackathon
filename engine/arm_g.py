@@ -137,7 +137,7 @@ def _load_axes_cache(document_id: str, axes_dir: Optional[Path] = None) -> dict:
 
     `axes_dir` defaults to the module-level `AXES_DIR` so the experiment runner
     and `scripts/run_finder_trace.py` keep their existing location; the
-    Workstream Brain routes pass the per-workstream `axes/` dir instead.
+    Project SELARAS routes pass the per-workstream `axes/` dir instead.
     """
     path = (axes_dir or AXES_DIR) / f"axes-{document_id}.json"
     if path.exists():
@@ -204,7 +204,7 @@ def extract_axes_for_document(
     either forces re-extraction. The refreshed cache is written back to disk.
 
     ``axes_dir`` selects where that cache lives; it defaults to the module-level
-    ``AXES_DIR`` (the experiment location) and the Workstream Brain routes pass
+    ``AXES_DIR`` (the experiment location) and the Project SELARAS routes pass
     the per-workstream ``axes/`` dir so a workstream's cache travels with it.
 
     Returns ``{anchor_id: [axis, ...]}`` for every anchor in the document.
@@ -523,6 +523,14 @@ SAME_TOPIC_FINDER_SYSTEM_PROMPT = (
     "BATCH-UNION MEMBERSHIP: you may relate ANY A-side anchor in this batch to "
     "ANY B-side anchor in this batch — you are not limited to a fixed pairing. "
     "Emit one finding object per genuine relationship you find.\n\n"
+    "SUMMARY PHRASING RULE (strict): write `summary` as ONE plain sentence, at "
+    "most 20 words, in everyday professional English a policy drafter grasps on "
+    "the first read. State plainly what OUR side does and what THEIR side does; "
+    "do not merely restate the label (never write bare phrasing like 'these "
+    "align' or 'these differ'). Use a specialist regulatory term only if it "
+    "appears in the cited clause text; otherwise use a plain equivalent. Do not "
+    "use em dashes. Put any qualifying nuance in `scope_note` (one plain "
+    "sentence, at most 30 words), never stacked into the summary.\n\n"
     "SIDE-GUARD (strict): `source_clauses` MUST contain ONLY anchor IDs from the "
     "A-side list; `target_clauses` MUST contain ONLY anchor IDs from the B-side "
     "list. Never place a B-side id in source_clauses or an A-side id in "
@@ -697,15 +705,19 @@ COVERAGE_FINDER_SYSTEM_PROMPT = (
     "(document B) has no provision for it anywhere in the document.\n"
     "  - silent-on: OUR side (document A) has no provision for a sub-topic; "
     "THEIR side (document B) covers it.\n\n"
-    "COVERAGE-SUMMARY RULE: every finding summary MUST do all three of the "
-    "following:\n"
-    "  1. Name the shared regulatory topic that both documents sit under (e.g. "
-    "'open API security', 'consent management', 'third-party access').\n"
-    "  2. State what the COVERING side specifically requires or addresses on "
-    "that sub-topic.\n"
-    "  3. State precisely what the OTHER side does NOT address — name the "
-    "specific obligation or sub-point that is absent, not just 'does not cover "
-    "this'.\n\n"
+    "COVERAGE-SUMMARY RULE: keep the `summary` short and readable, and put the "
+    "detail in `scope_note`. Do NOT stack multiple points into the summary.\n"
+    "  - `summary`: ONE plain sentence, at most 20 words, in everyday "
+    "professional English a policy drafter grasps on the first read. Name the "
+    "shared regulatory topic and state plainly which side covers it and which "
+    "side is silent (e.g. 'The draft requires a tested exit plan per provider; "
+    "the BCBS principles do not.'). Do not merely restate the label. Do not use "
+    "em dashes.\n"
+    "  - `scope_note`: ONE plain sentence, at most 30 words, naming the specific "
+    "obligation or sub-point the silent side does NOT address — not just 'does "
+    "not cover this'. This is where the precise detail belongs.\n"
+    "  - Use a specialist regulatory term only if it appears in the cited clause "
+    "text; otherwise use a plain equivalent.\n\n"
     "GUARDRAIL: If both sides take a position on this topic — even if different "
     "— that is NOT a coverage finding. Do not emit it. Only emit a finding when "
     "one side genuinely has no provision for the sub-point. A stricter rule on "

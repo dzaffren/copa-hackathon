@@ -1,4 +1,4 @@
-"""Tests for the Workstream Brain — Graph Screen API routes.
+"""Tests for the Project SELARAS — Graph Screen API routes.
 
 Each test copies the real seeded `data/workstreams/` fixtures into a `tmp_path`
 and points `create_app(workstreams_dir=...)` at the copy. GET tests therefore
@@ -167,6 +167,25 @@ def test_GET_node_detail_lists_every_neighbour_in_the_workstream(tmp_path):
     assert "opres-pd-v0-0" in neighbour_ids
 
 
+def test_GET_node_detail_returns_null_task_type_for_a_context_document(tmp_path):
+    """`task_type` is a top-level key on every node detail, null where there is
+    none, so the panel can render the chip conditionally without probing for the
+    key's existence. A standard never carries one."""
+    client, _ = _make_client(tmp_path)
+    body = client.get(f"/api/workstreams/{_OPRES}/nodes/bcbs-opres-2021").json()
+    assert body["task_type"] is None
+
+
+def test_GET_node_detail_returns_null_task_type_for_a_legacy_working_draft(tmp_path):
+    """The seeded drafts predate the deliverable vocabulary and are being
+    retired, so they are deliberately NOT backfilled: a task node with no
+    recorded kind reads as null rather than 404ing or guessing "PD"."""
+    client, _ = _make_client(tmp_path)
+    body = client.get(f"/api/workstreams/{_OPRES}/nodes/{_TASK}").json()
+    assert body["node_type"] == "task"
+    assert body["task_type"] is None
+
+
 def test_GET_node_detail_unknown_node_returns_404(tmp_path):
     client, _ = _make_client(tmp_path)
     res = client.get(f"/api/workstreams/{_OPRES}/nodes/ghost")
@@ -182,6 +201,9 @@ def test_GET_edge_detail_returns_not_analysed_when_findings_file_absent(tmp_path
     body = client.get(f"/api/workstreams/{_OPRES}/edges/{_FSB_EDGE}").json()
     assert body["status"] == "not_analysed"
     assert body["findings"] == []
+    # opres-v2 is a retired fixture that still stores the removed
+    # `contributes-to` type; the read projection passes any stored type through
+    # rather than validating it, so retired graphs keep rendering.
     assert body["edge_type"] == "contributes-to"
     assert body["source"]["id"] == _TASK
     assert body["target"]["id"] == "fsb-3rd-party"
@@ -306,7 +328,7 @@ def test_POST_node_rejects_invalid_node_type_400_INVALID_NODE_TYPE(tmp_path):
         json={
             "node_type": "cluster",
             "title": "X",
-            "edges": [{"target_node_id": _TASK, "edge_type": "contributes-to"}],
+            "edges": [{"target_node_id": _TASK, "edge_type": "references"}],
         },
     )
     assert res.status_code == 400
@@ -335,7 +357,7 @@ def test_POST_node_writes_graph_and_returns_created_edges(tmp_path):
             "node_type": "international-standard",
             "title": "BCBS OpRes 2021 Companion Guide",
             "description": "Companion to the 2021 principles",
-            "edges": [{"target_node_id": _TASK, "edge_type": "contributes-to"}],
+            "edges": [{"target_node_id": _TASK, "edge_type": "references"}],
         },
     )
     assert res.status_code == 201
@@ -366,7 +388,7 @@ def test_POST_node_rejects_edge_to_unknown_target_400_INVALID_EDGE_TARGET(tmp_pa
         json={
             "node_type": "international-standard",
             "title": "X",
-            "edges": [{"target_node_id": "ghost-node", "edge_type": "contributes-to"}],
+            "edges": [{"target_node_id": "ghost-node", "edge_type": "references"}],
         },
     )
     assert res.status_code == 400
@@ -381,7 +403,7 @@ def test_POST_node_unknown_workstream_returns_404_WORKSTREAM_NOT_FOUND(tmp_path)
         json={
             "node_type": "international-standard",
             "title": "X",
-            "edges": [{"target_node_id": _TASK, "edge_type": "contributes-to"}],
+            "edges": [{"target_node_id": _TASK, "edge_type": "references"}],
         },
     )
     assert res.status_code == 404

@@ -76,7 +76,7 @@ test("build Open Finance PD . 2026 from scratch and analyse a linkage", async ({
   await page.getByLabel("Workstream name").fill("Open Finance PD . 2026");
   await page
     .getByLabel("Short description")
-    .fill("PD consolidating the 2025 Open Finance ED against peer guidance.");
+    .fill("PD serving as a foundational framework to facilitate consent-driven sharing of customer information across the financial sector in a secure, open, accessible, interoperable and timely manner.");
   await page.getByLabel("Deliverable type").selectOption("PD");
   await page.getByLabel("Target publication").fill("Q4 2026");
   await page.getByRole("button", { name: /create workstream/i }).click();
@@ -95,7 +95,7 @@ test("build Open Finance PD . 2026 from scratch and analyse a linkage", async ({
     file: "ED_Open_Finance_2025.pdf",
     docClass: "semi-structured",
     connectTo: "Open Finance PD . 2026 (PD)",
-    edgeType: "contributes-to",
+    edgeType: "references",
   });
 
   // --- 3. HKMA + BIS → the ED node -----------------------------------------
@@ -131,7 +131,7 @@ test("build Open Finance PD . 2026 from scratch and analyse a linkage", async ({
 
   // --- 5. Analyse the focal ↔ ED linkage -----------------------------------
   await page
-    .getByRole("button", { name: /^edge contributes-to .*open-finance/i })
+    .getByRole("button", { name: /^edge references .*open-finance/i })
     .first()
     .click();
   const analyze = page.getByRole("button", { name: /analyz/i });

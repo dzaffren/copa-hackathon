@@ -68,6 +68,8 @@ export function labelStyle(label: SemanticLabel): LabelStyle {
   return LABEL_STYLES[label] ?? FALLBACK;
 }
 
+/** Taxonomy declaration order — for legends and label-count grids, where the
+ *  point is "here are the five labels", not "here is what needs attention". */
 export const LABEL_ORDER: SemanticLabel[] = [
   "aligns-with",
   "differs-on",
@@ -75,6 +77,39 @@ export const LABEL_ORDER: SemanticLabel[] = [
   "silent-on",
   "goes-beyond",
 ];
+
+/** Attention order — most→least urgent for the drafter. Every list of finding
+ *  cards in the app renders in this order so a conflict is never buried under
+ *  the alignments that happened to precede it in the findings file. */
+export const LABEL_SEVERITY_ORDER: SemanticLabel[] = [
+  "conflicts-with",
+  "differs-on",
+  "silent-on",
+  "goes-beyond",
+  "aligns-with",
+];
+
+const SEVERITY_RANK: Record<SemanticLabel, number> =
+  LABEL_SEVERITY_ORDER.reduce(
+    (acc, label, i) => ({ ...acc, [label]: i }),
+    {} as Record<SemanticLabel, number>,
+  );
+
+/** Rank of a label in `LABEL_SEVERITY_ORDER`; an unknown label sorts last. */
+export function labelSeverityRank(label: SemanticLabel): number {
+  return SEVERITY_RANK[label] ?? LABEL_SEVERITY_ORDER.length;
+}
+
+/** Copy of `items` in attention order. A view concern only — the engine never
+ *  reorders a findings file. `Array.prototype.sort` is stable, so findings
+ *  sharing a label keep their original (file) order. */
+export function bySeverity<T extends { label: SemanticLabel }>(
+  items: readonly T[],
+): T[] {
+  return [...items].sort(
+    (a, b) => labelSeverityRank(a.label) - labelSeverityRank(b.label),
+  );
+}
 
 /** "tighten" → "↑", "loosen" → "↓". Only meaningful on `differs-on`. */
 export function sentimentArrow(sentiment: Sentiment): string {

@@ -44,10 +44,7 @@ export function Sidebar({
   const [collapsed, setCollapsed] = useState(false);
   const { pathname } = useLocation();
   const intelActive = pathname.startsWith("/intelligence");
-  const {
-    data: workstreams = [],
-    isLoading,
-  } = useQuery({
+  const { data: workstreams = [], isLoading } = useQuery({
     queryKey: ["workstreams"],
     queryFn: fetchWorkstreams,
   });
@@ -67,9 +64,11 @@ export function Sidebar({
               <Brain className="h-4 w-4 text-primary" />
             </span>
             <span className="flex min-w-0 flex-col leading-tight">
-              <span className="truncate text-sm font-bold">Workstream Brain</span>
+              <span className="truncate text-sm font-bold">
+                Project SELARAS
+              </span>
               <span className="truncate text-[10px] text-muted-foreground">
-                Policy drafting intelligence
+                Policy coherence intelligence
               </span>
             </span>
           </Link>

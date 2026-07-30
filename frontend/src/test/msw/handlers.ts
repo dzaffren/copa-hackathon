@@ -1,7 +1,7 @@
 import { http, HttpResponse } from "msw";
 import type {
+  ConceptsAvailable,
   Connection,
-  CopilotIntent,
   CreateWorkstreamRequest,
   CreateWorkstreamResponse,
   CrossLink,
@@ -17,6 +17,7 @@ import type {
   ReviewFinding,
   ReviewState,
   TaskResponse,
+  TaskTypeCode,
   TaskWorkflow,
   WorkstreamGraph,
   WorkstreamSummary,
@@ -53,7 +54,7 @@ const TASK_V0_3: TaskResponse = {
       node_id: "bcbs-opres-2021",
       title: "BCBS OpRes 2021",
       node_type: "international-standard",
-      edge_type: "contributes-to",
+      edge_type: "references",
       edge_id: "e-opres_v0_3--bcbs_opres_2021",
       analysed: true,
       findings_count: 3,
@@ -62,7 +63,7 @@ const TASK_V0_3: TaskResponse = {
       node_id: "fsb-3rd-party",
       title: "FSB 3rd-Party Toolkit",
       node_type: "international-standard",
-      edge_type: "contributes-to",
+      edge_type: "references",
       edge_id: "e-opres_v0_3--fsb_3rd_party",
       analysed: false,
       findings_count: 0,
@@ -71,7 +72,7 @@ const TASK_V0_3: TaskResponse = {
       node_id: "hkma-spm-or2",
       title: "HKMA SPM OR-2",
       node_type: "peer-regulator",
-      edge_type: "contributes-to",
+      edge_type: "references",
       edge_id: "e-opres_v0_3--hkma_spm_or2",
       analysed: true,
       findings_count: 1,
@@ -98,7 +99,7 @@ const TASK_V0_3: TaskResponse = {
       node_id: "abm-position",
       title: "ABM position paper",
       node_type: "industry-input",
-      edge_type: "contributes-to",
+      edge_type: "references",
       edge_id: "e-opres_v0_3--abm_position",
       analysed: false,
       findings_count: 0,
@@ -138,7 +139,7 @@ const TASK_V0_0: TaskResponse = {
       node_id: "bcbs-opres-2021",
       title: "BCBS OpRes 2021",
       node_type: "international-standard",
-      edge_type: "contributes-to",
+      edge_type: "references",
       edge_id: "e-opres_v0_0--bcbs_opres_2021",
       analysed: false,
       findings_count: 0,
@@ -147,7 +148,7 @@ const TASK_V0_0: TaskResponse = {
       node_id: "hkma-spm-or2",
       title: "HKMA SPM OR-2",
       node_type: "peer-regulator",
-      edge_type: "contributes-to",
+      edge_type: "references",
       edge_id: "e-opres_v0_0--hkma_spm_or2",
       analysed: false,
       findings_count: 0,
@@ -157,9 +158,32 @@ const TASK_V0_0: TaskResponse = {
   draft_empty: true,
 };
 
+// A focal node exactly as `create_workstream` scaffolds it: identity only. No
+// document is attached yet, so the engine has no source_name/format/status/
+// last_edited_at to report and answers with nulls. The Task Screen has to open
+// on this — it is the first thing a drafter sees in a new workstream.
+const TASK_SCAFFOLDED: TaskResponse = {
+  task: {
+    id: "opres-pd-fresh",
+    title: "Operational Resilience PD (PD)",
+    source_name: null,
+    format: null,
+    description: "Newly created workstream — no document attached yet.",
+    status: null,
+    owner: { id: "ar", name: "Aisyah R." },
+    reviewers: [],
+    clause_count: 0,
+    last_edited_at: null,
+  },
+  neighbours: [],
+  workflow: DRAFT_WORKFLOW,
+  draft_empty: true,
+};
+
 const TASKS: Record<string, TaskResponse> = {
   "opres-pd-v0-3": TASK_V0_3,
   "opres-pd-v0-0": TASK_V0_0,
+  "opres-pd-fresh": TASK_SCAFFOLDED,
 };
 
 // Mutable per-task workflow overrides, so a PATCH .../workflow round-trips
@@ -363,6 +387,8 @@ interface GraphNodeFull extends GraphNode {
   description: string | null;
   source_url: string | null;
   document_id: string | null;
+  /** Set on a working draft only; `null` on every published context document. */
+  task_type: TaskTypeCode | null;
 }
 
 const GRAPH_NODES: Record<string, GraphNodeFull> = {
@@ -375,6 +401,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     description: "Working draft of the OpRes Policy Document.",
     source_url: null,
     document_id: "opres-v1-2025-draft",
+    task_type: "PD",
   },
   "bcbs-opres-2021": {
     id: "bcbs-opres-2021",
@@ -386,6 +413,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
       "Basel Committee Principles for Operational Resilience (2021).",
     source_url: "https://www.bis.org/bcbs/publ/d509.htm",
     document_id: null,
+    task_type: null,
   },
   "fsb-3rd-party": {
     id: "fsb-3rd-party",
@@ -396,6 +424,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     description: "FSB third-party risk management toolkit (2023).",
     source_url: "https://www.fsb.org",
     document_id: null,
+    task_type: null,
   },
   "hkma-spm-or2": {
     id: "hkma-spm-or2",
@@ -406,6 +435,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     description: "HKMA Supervisory Policy Manual OR-2.",
     source_url: "https://www.hkma.gov.hk",
     document_id: null,
+    task_type: null,
   },
   "rmit-pd-2025": {
     id: "rmit-pd-2025",
@@ -416,6 +446,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     description: "BNM RMiT policy document, reissued 28 Nov 2025.",
     source_url: "https://www.bnm.gov.my",
     document_id: "rmit-v2-2025",
+    task_type: null,
   },
   "fsa-2013-143": {
     id: "fsa-2013-143",
@@ -426,6 +457,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     description: "Financial Services Act 2013, section 143.",
     source_url: "https://www.bnm.gov.my",
     document_id: null,
+    task_type: null,
   },
   "abm-position": {
     id: "abm-position",
@@ -436,6 +468,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     description: "ABM position paper on operational resilience.",
     source_url: null,
     document_id: null,
+    task_type: null,
   },
   "opres-dp-2025": {
     id: "opres-dp-2025",
@@ -447,6 +480,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
       "Operational Resilience Discussion Paper, December 2025 — the consultation the v0.3 PD draft follows.",
     source_url: null,
     document_id: "opres-v1-2025-draft",
+    task_type: null,
   },
 };
 
@@ -455,7 +489,7 @@ const GRAPH_EDGES: GraphEdge[] = [
     id: "e-opres_v0_3--bcbs_opres_2021",
     source: "opres-pd-v0-3",
     target: "bcbs-opres-2021",
-    edge_type: "contributes-to",
+    edge_type: "references",
     analysed: true,
     findings_count: 3,
   },
@@ -463,7 +497,7 @@ const GRAPH_EDGES: GraphEdge[] = [
     id: "e-opres_v0_3--fsb_3rd_party",
     source: "opres-pd-v0-3",
     target: "fsb-3rd-party",
-    edge_type: "contributes-to",
+    edge_type: "references",
     analysed: false,
     findings_count: 0,
   },
@@ -471,7 +505,7 @@ const GRAPH_EDGES: GraphEdge[] = [
     id: "e-opres_v0_3--hkma_spm_or2",
     source: "opres-pd-v0-3",
     target: "hkma-spm-or2",
-    edge_type: "contributes-to",
+    edge_type: "references",
     analysed: true,
     findings_count: 1,
   },
@@ -495,7 +529,7 @@ const GRAPH_EDGES: GraphEdge[] = [
     id: "e-opres_v0_3--abm_position",
     source: "opres-pd-v0-3",
     target: "abm-position",
-    edge_type: "contributes-to",
+    edge_type: "references",
     analysed: false,
     findings_count: 0,
   },
@@ -600,6 +634,19 @@ const TASK_ACTIVITY = [
   },
 ];
 
+/** Profiles saved through the PUT within a single test run, so an edit-then-read
+ *  round-trip behaves like the real side-file store. `resetSavedMetadata()`
+ *  clears it between tests. */
+const savedMetadata = new Map<string, ConceptsAvailable>();
+
+export function resetSavedMetadata() {
+  savedMetadata.clear();
+}
+
+/** A node id a test can PUT to when it needs the save to be refused, so the
+ *  failure path is reachable without overriding the handler. */
+export const METADATA_SAVE_FAILS_NODE_ID = "node-that-cannot-be-saved";
+
 function buildNodeDetail(nodeId: string): NodeDetail | null {
   const node = GRAPH_NODES[nodeId];
   if (!node) return null;
@@ -616,6 +663,7 @@ function buildNodeDetail(nodeId: string): NodeDetail | null {
   return {
     id: node.id,
     node_type: node.node_type,
+    task_type: node.task_type,
     title: node.title,
     issuer: node.issuer,
     short_type: node.short_type,
@@ -630,10 +678,14 @@ function buildNodeDetail(nodeId: string): NodeDetail | null {
     })),
     second_order_neighbours: { status: "placeholder", message: "N/A in demo" },
     recent_activity: node.node_type === "task" ? TASK_ACTIVITY : [],
-    metadata: {
-      status: "placeholder",
-      message: "Concept extraction not enabled in MVP1",
-    },
+    // Un-enriched by default — the placeholder shape the four cross-workstream
+    // consumers still read. Once a test saves a profile, the GET returns it.
+    metadata:
+      savedMetadata.get(nodeId) ??
+      ({
+        status: "placeholder",
+        message: "Concept extraction not enabled in MVP1",
+      } as const),
     concepts: { status: "not_extracted", axes: [] },
   };
 }
@@ -834,7 +886,6 @@ const CROSS_LINK: CrossLink = {
   shared_attributes: {
     legal_basis: ["FSA 2013"],
     applicability: ["licensed banks"],
-    keywords: ["operational resilience"],
     policy_owner: null,
     ismp_classification: null,
   },
@@ -1153,10 +1204,8 @@ export const handlers = [
           policy_owner: "Aisyah R.",
           applicability: null,
           empowerment_framework: null,
-          requirement: null,
           issuance_date: null,
           effective_date: null,
-          keywords: ["operational resilience"],
           legal_basis: ["FSA 2013"],
           ismp_classification: null,
         },
@@ -1175,10 +1224,8 @@ export const handlers = [
           policy_owner: "Jarod N.",
           applicability: null,
           empowerment_framework: null,
-          requirement: null,
           issuance_date: "2025-11-18",
           effective_date: null,
-          keywords: ["open finance", "operational resilience"],
           legal_basis: ["FSA 2013"],
           ismp_classification: null,
         },
@@ -1370,18 +1417,13 @@ export const handlers = [
     "*/api/workstreams/:workstreamId/tasks/:nodeId/copilot",
     async ({ request }) => {
       const body = (await request.json()) as {
-        intent: CopilotIntent;
         message?: string;
         history?: { role: string; text: string }[];
         referenced_finding_ids?: string[];
       };
-      const script = COPILOT_SCRIPT[body.intent];
-      if (!script) {
-        return HttpResponse.json(
-          { code: "INVALID_INTENT", message: `bad intent ${body.intent}` },
-          { status: 400 },
-        );
-      }
+      // No `intent` on the wire: the server resolves the deliverable kind from
+      // the task node itself, so the mock serves the one script unconditionally.
+      const script = COPILOT_SCRIPT.PD;
       if (!body.message || !body.message.trim()) {
         return HttpResponse.json(
           { code: "MESSAGE_REQUIRED", message: "message must be non-empty" },
@@ -1406,17 +1448,10 @@ export const handlers = [
     "*/api/workstreams/:workstreamId/tasks/:nodeId/copilot/stream",
     async ({ request }) => {
       const body = (await request.json()) as {
-        intent: CopilotIntent;
         message?: string;
         history?: { role: string; text: string }[];
       };
-      const script = COPILOT_SCRIPT[body.intent];
-      if (!script) {
-        return HttpResponse.json(
-          { code: "INVALID_INTENT", message: `bad intent ${body.intent}` },
-          { status: 400 },
-        );
-      }
+      const script = COPILOT_SCRIPT.PD;
       if (!body.message?.trim()) {
         return HttpResponse.json(
           { code: "MESSAGE_REQUIRED", message: "message must be non-empty" },
@@ -1671,6 +1706,7 @@ export const handlers = [
     // `attachment` file — the chunking path) or a plain JSON body.
     type NodeBody = {
       node_type: string;
+      task_type?: TaskTypeCode;
       title: string;
       doc_class?: string;
       edges: Array<{ target_node_id: string; edge_type: string }>;
@@ -1695,6 +1731,8 @@ export const handlers = [
       {
         id,
         node_type: body.node_type,
+        // Echoed as the route does — present only when the client sent it.
+        ...(body.task_type === undefined ? {} : { task_type: body.task_type }),
         title: body.title,
         ...(attached
           ? {
@@ -1721,6 +1759,21 @@ export const handlers = [
       { status: 201 },
     );
   }),
+  // Mirrors the route's full replacement: whatever the seven-field body carries is
+  // stored whole and echoed back in the GET's `metadata` shape.
+  http.put(
+    "*/api/workstreams/:workstreamId/nodes/:nodeId/metadata",
+    async ({ request, params }) => {
+      const nodeId = params.nodeId as string;
+      if (nodeId === METADATA_SAVE_FAILS_NODE_ID) {
+        return jsonError(502, "SAVE_FAILED", "The profile could not be saved");
+      }
+      const body = (await request.json()) as Record<string, unknown>;
+      const metadata = { status: "available", ...body } as ConceptsAvailable;
+      savedMetadata.set(nodeId, metadata);
+      return HttpResponse.json({ node_id: nodeId, metadata });
+    },
+  ),
   http.post(
     "*/api/workstreams/:workstreamId/edges/:edgeId/analyze",
     ({ params }) => {

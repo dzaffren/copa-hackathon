@@ -13,7 +13,7 @@ themselves — the last piece needed for a fully build-it-yourself workstream.
 
 ## Motivation
 
-The headline capability of Workstream Brain is surfacing labelled linkages
+The headline capability of Project SELARAS is surfacing labelled linkages
 between two documents, each quoted verbatim. For the COPA Hackathon 2026 demo
 (3 Aug 2026), the team is building the demo workstreams live in the app and
 removing the outdated pre-seeded examples. If analysis keeps reading from the

@@ -2,7 +2,7 @@
 
 **Ticket:** TBD
 
-**Epic:** [Workstream Brain MVP1 — Overview](spec.md)
+**Epic:** [Project SELARAS MVP1 — Overview](spec.md)
 
 The review linkages screen is where a drafter reads every AI-found relationship between two documents in her workstream side-by-side with the underlying clauses. Each finding can be accepted, dismissed, or discussed in a comment thread, and new linkages can be surfaced by prompting the finder again or added by hand from parsed clause lists. This is the surface that turns raw pairwise linkage output into a curated set of findings the drafter can trust downstream.
 

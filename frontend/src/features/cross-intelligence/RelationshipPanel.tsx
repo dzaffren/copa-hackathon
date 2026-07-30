@@ -1,20 +1,12 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import {
-  ArrowLeftRight,
-  Check,
-  FileText,
-  Scale,
-  Tag,
-  User,
-  X,
-} from "lucide-react";
+import { ArrowLeftRight, Check, FileText, Scale, User, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { fetchCrossLinkDetail } from "@/lib/api";
 import { CROSS_STORE, type ReviewFinding } from "@/lib/types";
-import { labelStyle, labelText } from "@/lib/labels";
+import { bySeverity, labelStyle, labelText } from "@/lib/labels";
 import { Skeleton } from "@/components/ui/skeleton";
 import { classStyle, riskStyle } from "./intel";
 
@@ -60,7 +52,10 @@ export function RelationshipPanel({
       : null;
 
   return (
-    <div className="flex h-full min-h-0 flex-col" data-testid="relationship-panel">
+    <div
+      className="flex h-full min-h-0 flex-col"
+      data-testid="relationship-panel"
+    >
       {/* Header */}
       <header className="border-b border-border/60 bg-card/40 p-5">
         <div className="flex items-start justify-between gap-3">
@@ -89,13 +84,19 @@ export function RelationshipPanel({
           )}
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px] font-semibold">
-          <span className={cn("rounded-full px-2 py-0.5", cls.pill)}>{cls.label}</span>
-          <span className={cn("rounded-full px-2 py-0.5", risk.pill)}>{risk.label}</span>
+          <span className={cn("rounded-full px-2 py-0.5", cls.pill)}>
+            {cls.label}
+          </span>
+          <span className={cn("rounded-full px-2 py-0.5", risk.pill)}>
+            {risk.label}
+          </span>
           <span className="rounded-full border border-border/60 px-2 py-0.5 text-muted-foreground">
             {data.findings.length} linkages
           </span>
           {data.detected_at && (
-            <span className="text-muted-foreground">Detected {data.detected_at}</span>
+            <span className="text-muted-foreground">
+              Detected {data.detected_at}
+            </span>
           )}
         </div>
       </header>
@@ -109,7 +110,8 @@ export function RelationshipPanel({
           <ul className="mt-2 space-y-1.5">
             {data.reasons.length === 0 && (
               <li className="text-sm text-muted-foreground">
-                No shared attributes derivable — flagged on clause linkages alone.
+                No shared attributes derivable — flagged on clause linkages
+                alone.
               </li>
             )}
             {data.reasons.map((reason) => (
@@ -123,11 +125,22 @@ export function RelationshipPanel({
 
         {/* Shared attributes */}
         <section className="grid gap-2">
-          <SharedRow icon={<Scale className="h-3.5 w-3.5" />} label="Legal basis" values={shared.legal_basis} />
-          <SharedRow icon={<User className="h-3.5 w-3.5" />} label="Applicability" values={shared.applicability} />
-          <SharedRow icon={<Tag className="h-3.5 w-3.5" />} label="Shared topics" values={shared.keywords} />
+          <SharedRow
+            icon={<Scale className="h-3.5 w-3.5" />}
+            label="Legal basis"
+            values={shared.legal_basis}
+          />
+          <SharedRow
+            icon={<User className="h-3.5 w-3.5" />}
+            label="Applicability"
+            values={shared.applicability}
+          />
           {shared.policy_owner && (
-            <SharedRow icon={<User className="h-3.5 w-3.5" />} label="Policy owner" values={[shared.policy_owner]} />
+            <SharedRow
+              icon={<User className="h-3.5 w-3.5" />}
+              label="Policy owner"
+              values={[shared.policy_owner]}
+            />
           )}
         </section>
 
@@ -137,8 +150,14 @@ export function RelationshipPanel({
             Clause evidence
           </h3>
           <div className="mt-2 space-y-3">
-            {data.findings.map((f) => (
-              <EvidenceCard key={f.id} finding={f} nearTitle={data.near.title} farTitle={data.far.title} />
+            {/* Attention order — as every finding list in the app. */}
+            {bySeverity(data.findings).map((f) => (
+              <EvidenceCard
+                key={f.id}
+                finding={f}
+                nearTitle={data.near.title}
+                farTitle={data.far.title}
+              />
             ))}
           </div>
         </section>
@@ -165,8 +184,8 @@ export function RelationshipPanel({
           </span>
         )}
         <p className="col-span-2 text-center text-[11px] text-muted-foreground">
-          Create review task · Assign owner · Mark reviewed arrive with the Review
-          Queue (Phase 3).
+          Create review task · Assign owner · Mark reviewed arrive with the
+          Review Queue (Phase 3).
         </p>
       </footer>
     </div>
@@ -216,15 +235,29 @@ function EvidenceCard({
 }) {
   const style = labelStyle(finding.label);
   return (
-    <div className={cn("rounded-lg border border-border/60 border-l-2 bg-card/40 p-3", style.accent)}>
+    <div
+      className={cn(
+        "rounded-lg border border-border/60 border-l-2 bg-card/40 p-3",
+        style.accent,
+      )}
+    >
       <div className="flex items-center justify-between gap-2">
-        <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold", style.pill)}>
+        <span
+          className={cn(
+            "rounded-full px-2 py-0.5 text-[10px] font-semibold",
+            style.pill,
+          )}
+        >
           {labelText(finding.label, finding.sentiment)}
         </span>
       </div>
-      <p className="mt-1.5 text-sm font-medium leading-snug">{finding.summary}</p>
+      <p className="mt-1.5 text-sm font-medium leading-snug">
+        {finding.summary}
+      </p>
       {finding.scope_note && (
-        <p className="mt-1 text-xs italic text-muted-foreground">{finding.scope_note}</p>
+        <p className="mt-1 text-xs italic text-muted-foreground">
+          {finding.scope_note}
+        </p>
       )}
       <div className="mt-2 grid gap-2 sm:grid-cols-2">
         <ClauseColumn title={nearTitle} clauses={finding.source_clauses} />
@@ -258,7 +291,9 @@ function ClauseColumn({
               <span
                 className={cn(
                   "mt-0.5 block leading-snug",
-                  c.text === NO_CLAUSE ? "italic text-muted-foreground" : "text-foreground/70",
+                  c.text === NO_CLAUSE
+                    ? "italic text-muted-foreground"
+                    : "text-foreground/70",
                 )}
               >
                 {c.text}

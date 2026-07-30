@@ -3,14 +3,18 @@ import { Link, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchDraft,
+  fetchRelatedLinkages,
   fetchReviewedLinkages,
   fetchTask,
   saveDraft,
 } from "@/lib/api";
+import { bySeverity } from "@/lib/labels";
+import type { LinkageCard } from "@/lib/types";
 import { EditorPane, type EditorPaneHandle } from "./EditorPane";
+import { LinkageRefCard } from "./LinkageRefCard";
 import { CopilotTab } from "./CopilotTab";
 
-type TabKey = "reviewed" | "recommendations" | "copilot";
+type TabKey = "reviewed" | "related" | "copilot";
 
 const SAVE_DEBOUNCE_MS = 2000;
 
@@ -18,6 +22,7 @@ export function DraftingWorkspacePage() {
   const { workstreamId = "", nodeId = "" } = useParams();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<TabKey>("reviewed");
+  const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const editorRef = useRef<EditorPaneHandle>(null);
 
   const task = useQuery({
@@ -31,6 +36,10 @@ export function DraftingWorkspacePage() {
   const reviewed = useQuery({
     queryKey: ["reviewed-linkages", workstreamId, nodeId],
     queryFn: () => fetchReviewedLinkages(workstreamId, nodeId),
+  });
+  const related = useQuery({
+    queryKey: ["related-linkages", workstreamId, nodeId],
+    queryFn: () => fetchRelatedLinkages(workstreamId, nodeId),
   });
 
   // The draft the editor is showing. Seeded from the server once loaded, then
@@ -86,12 +95,15 @@ export function DraftingWorkspacePage() {
     save.mutate(next);
   }
 
-  const reviewedCards = reviewed.data?.findings ?? [];
+  // Both side-panel lists render in attention order (conflicts-with first,
+  // aligns-with last), the same order the review screen and edge detail use.
+  const reviewedCards = bySeverity(reviewed.data?.findings ?? []);
+  const relatedCards = bySeverity(related.data?.findings ?? []);
 
-  const tabs: { key: TabKey; label: string }[] = [
-    { key: "reviewed", label: "Reviewed Findings" },
-    { key: "recommendations", label: "Recommendations" },
-    { key: "copilot", label: "Copilot" },
+  const tabs: { key: TabKey; label: string; count: number | null }[] = [
+    { key: "reviewed", label: "Reviewed", count: reviewedCards.length },
+    { key: "related", label: "Related · 1 hop", count: relatedCards.length },
+    { key: "copilot", label: "Copilot", count: null },
   ];
 
   if (task.isError) {
@@ -147,41 +159,70 @@ export function DraftingWorkspacePage() {
                 ].join(" ")}
               >
                 {t.label}
+                {t.count !== null && (
+                  <span
+                    data-testid={`count-${t.key}`}
+                    className={[
+                      "ml-1.5 rounded-full px-1.5 py-0.5 text-[10px]",
+                      tab === t.key ? "bg-primary-foreground/20" : "bg-accent",
+                    ].join(" ")}
+                  >
+                    {t.count}
+                  </span>
+                )}
               </button>
             ))}
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto">
             {tab === "reviewed" && (
-              <div
-                data-testid="reviewed-findings-empty"
-                aria-label="Reviewed findings"
-                className="flex h-full items-center justify-center p-6"
-              >
-                <p className="max-w-xs rounded-lg border border-dashed border-border/60 p-4 text-center text-sm text-muted-foreground">
-                  Reviewed findings will appear here once your team's review data
-                  is connected.
-                </p>
+              <div className="space-y-2" aria-label="Reviewed linkages">
+                {reviewedCards.length === 0 ? (
+                  <p className="rounded-lg bg-muted/40 p-3 text-sm text-muted-foreground">
+                    No accepted linkages yet. Findings you accept on the review
+                    screen appear here, so the context you built up while
+                    reviewing is next to the draft.
+                  </p>
+                ) : (
+                  reviewedCards.map((c: LinkageCard) => (
+                    <LinkageRefCard
+                      key={c.id}
+                      card={c}
+                      isActive={activeCardId === c.id}
+                      onSelect={() => setActiveCardId(c.id)}
+                    />
+                  ))
+                )}
               </div>
             )}
 
-            {tab === "recommendations" && (
-              <div
-                data-testid="recommendations-empty"
-                aria-label="Recommendations"
-                className="flex h-full items-center justify-center p-6"
-              >
-                <p className="max-w-xs rounded-lg border border-dashed border-border/60 p-4 text-center text-sm text-muted-foreground">
-                  Recommendations will appear here once your team's data is
-                  connected.
+            {tab === "related" && (
+              <div className="space-y-2" aria-label="Related linkages">
+                <p className="rounded-lg bg-muted/40 p-2.5 text-[12px] leading-snug text-muted-foreground">
+                  Linkages between your task's neighbour documents themselves —
+                  useful when your draft is silent on a concept the neighbours
+                  have already settled.
                 </p>
+                {relatedCards.length === 0 ? (
+                  <p
+                    data-testid="related-empty"
+                    className="rounded-lg border border-dashed border-border/60 p-3 text-sm text-muted-foreground"
+                  >
+                    No linkages between neighbour documents have been analysed
+                    yet.
+                  </p>
+                ) : (
+                  relatedCards.map((c: LinkageCard) => (
+                    <LinkageRefCard key={c.id} card={c} showBothEndpoints />
+                  ))
+                )}
               </div>
             )}
 
             {/* Always mounted (like the editor pane) so its command transcript
-                survives a tab switch instead of resetting to /pull-node-metadata
-                every time the drafter checks another tab. Visibility toggles
-                via the hidden class rather than mount/unmount. */}
+                survives a tab switch instead of resetting every time the
+                drafter checks another tab. Visibility toggles via the hidden
+                class rather than mount/unmount. */}
             <div className={tab === "copilot" ? "h-full" : "hidden"}>
               <CopilotTab
                 workstreamId={workstreamId}
