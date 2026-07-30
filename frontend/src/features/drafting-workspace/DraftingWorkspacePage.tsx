@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchDraft,
-  fetchRelatedLinkages,
   fetchReviewedLinkages,
   fetchTask,
   saveDraft,
+  setReviewState,
 } from "@/lib/api";
 import { bySeverity } from "@/lib/labels";
 import type { LinkageCard } from "@/lib/types";
@@ -14,12 +14,18 @@ import { EditorPane, type EditorPaneHandle } from "./EditorPane";
 import { LinkageRefCard } from "./LinkageRefCard";
 import { CopilotTab } from "./CopilotTab";
 
-type TabKey = "reviewed" | "related" | "copilot";
+/** Two tabs. "Related · 1 hop" was retired with the Pairwise Findings epic: the
+ *  box on the task page covers the same peer material more completely and with
+ *  review state attached, where Related showed unjudged findings beside the draft
+ *  as though the drafter had endorsed them. The vacated slot stays EMPTY rather
+ *  than holding a disabled placeholder for the future Recommendations tab. */
+type TabKey = "reviewed" | "copilot";
 
 const SAVE_DEBOUNCE_MS = 2000;
 
 export function DraftingWorkspacePage() {
   const { workstreamId = "", nodeId = "" } = useParams();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<TabKey>("reviewed");
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
@@ -37,9 +43,56 @@ export function DraftingWorkspacePage() {
     queryKey: ["reviewed-linkages", workstreamId, nodeId],
     queryFn: () => fetchReviewedLinkages(workstreamId, nodeId),
   });
-  const related = useQuery({
-    queryKey: ["related-linkages", workstreamId, nodeId],
-    queryFn: () => fetchRelatedLinkages(workstreamId, nodeId),
+
+  const [withdrawErrors, setWithdrawErrors] = useState<Record<string, string>>(
+    {},
+  );
+
+  // Withdrawal is the tab's ONLY state transition (accepted → pending), so a
+  // change of mind mid-draft does not send the drafter back to the task page.
+  // Optimistic: the card leaves the list at once and the badge decrements.
+  const withdraw = useMutation({
+    mutationFn: (card: LinkageCard) =>
+      setReviewState(workstreamId, card.edge_id, card.id, "pending"),
+    onMutate: async (card) => {
+      setWithdrawErrors((prev) => {
+        const { [card.id]: _dropped, ...rest } = prev;
+        return rest;
+      });
+      const key = ["reviewed-linkages", workstreamId, nodeId];
+      await queryClient.cancelQueries({ queryKey: key });
+      const previous = queryClient.getQueryData<{ findings: LinkageCard[] }>(
+        key,
+      );
+      queryClient.setQueryData<{ findings: LinkageCard[] }>(key, (old) =>
+        old
+          ? { ...old, findings: old.findings.filter((f) => f.id !== card.id) }
+          : old,
+      );
+      return { previous };
+    },
+    onError: (_err, card, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(
+          ["reviewed-linkages", workstreamId, nodeId],
+          context.previous,
+        );
+      }
+      setWithdrawErrors((prev) => ({
+        ...prev,
+        [card.id]: "Could not withdraw that decision. Try again.",
+      }));
+    },
+    onSuccess: (_data, card) => {
+      // The box and the comparison screen read the same review state — miss one
+      // and it shows a decision the drafter has already reversed.
+      queryClient.invalidateQueries({
+        queryKey: ["pairwise-findings", workstreamId, nodeId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["review", workstreamId, card.edge_id],
+      });
+    },
   });
 
   // The draft the editor is showing. Seeded from the server once loaded, then
@@ -95,14 +148,13 @@ export function DraftingWorkspacePage() {
     save.mutate(next);
   }
 
-  // Both side-panel lists render in attention order (conflicts-with first,
-  // aligns-with last), the same order the review screen and edge detail use.
+  // Attention order (conflicts-with first, aligns-with last), the same order the
+  // task page, review screen and edge detail use. Every card here is accepted by
+  // construction — the engine filters — so review state is not a sort axis.
   const reviewedCards = bySeverity(reviewed.data?.findings ?? []);
-  const relatedCards = bySeverity(related.data?.findings ?? []);
 
   const tabs: { key: TabKey; label: string; count: number | null }[] = [
     { key: "reviewed", label: "Reviewed", count: reviewedCards.length },
-    { key: "related", label: "Related · 1 hop", count: relatedCards.length },
     { key: "copilot", label: "Copilot", count: null },
   ];
 
@@ -179,9 +231,10 @@ export function DraftingWorkspacePage() {
               <div className="space-y-2" aria-label="Reviewed linkages">
                 {reviewedCards.length === 0 ? (
                   <p className="rounded-lg bg-muted/40 p-3 text-sm text-muted-foreground">
-                    No accepted linkages yet. Findings you accept on the review
-                    screen appear here, so the context you built up while
-                    reviewing is next to the draft.
+                    No findings accepted yet. Accept linkages in the Pairwise
+                    findings box on the task page and they appear here, so the
+                    decisions you made surveying the landscape sit next to the
+                    draft.
                   </p>
                 ) : (
                   reviewedCards.map((c: LinkageCard) => (
@@ -189,31 +242,20 @@ export function DraftingWorkspacePage() {
                       key={c.id}
                       card={c}
                       isActive={activeCardId === c.id}
-                      onSelect={() => setActiveCardId(c.id)}
+                      onSelect={() => {
+                        setActiveCardId(c.id);
+                        // Deep-links to this finding, not the pair's first.
+                        navigate(
+                          `/workstreams/${workstreamId}/edges/${c.edge_id}/review` +
+                            `?finding=${encodeURIComponent(c.id)}`,
+                        );
+                      }}
+                      onWithdraw={() => withdraw.mutate(c)}
+                      isWithdrawing={
+                        withdraw.isPending && withdraw.variables?.id === c.id
+                      }
+                      errorMessage={withdrawErrors[c.id]}
                     />
-                  ))
-                )}
-              </div>
-            )}
-
-            {tab === "related" && (
-              <div className="space-y-2" aria-label="Related linkages">
-                <p className="rounded-lg bg-muted/40 p-2.5 text-[12px] leading-snug text-muted-foreground">
-                  Linkages between your task's neighbour documents themselves —
-                  useful when your draft is silent on a concept the neighbours
-                  have already settled.
-                </p>
-                {relatedCards.length === 0 ? (
-                  <p
-                    data-testid="related-empty"
-                    className="rounded-lg border border-dashed border-border/60 p-3 text-sm text-muted-foreground"
-                  >
-                    No linkages between neighbour documents have been analysed
-                    yet.
-                  </p>
-                ) : (
-                  relatedCards.map((c: LinkageCard) => (
-                    <LinkageRefCard key={c.id} card={c} showBothEndpoints />
                   ))
                 )}
               </div>

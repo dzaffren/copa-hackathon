@@ -1,4 +1,4 @@
-import type { SemanticLabel, Sentiment } from "@/lib/types";
+import type { ReviewState, SemanticLabel, Sentiment } from "@/lib/types";
 
 // One source of truth for the five-label semantic taxonomy:
 //   aligns-with · differs-on · conflicts-with · silent-on · goes-beyond
@@ -108,6 +108,28 @@ export function bySeverity<T extends { label: SemanticLabel }>(
 ): T[] {
   return [...items].sort(
     (a, b) => labelSeverityRank(a.label) - labelSeverityRank(b.label),
+  );
+}
+
+/** Review-state rank within a label group: pending floats, judged sinks.
+ *  Accepted and dismissed share a rank so they sink together and keep their
+ *  server order relative to each other — the drafter's own sequence of
+ *  decisions is the order she expects to see them in. */
+export function reviewStateRank(state: ReviewState): number {
+  return state === "pending" ? 0 : 1;
+}
+
+/** One label group's findings in display order: pending first, then judged,
+ *  each block preserving server order (`Array.prototype.sort` is stable).
+ *
+ *  A view concern only — the engine never reorders a findings file. Distinct
+ *  from `bySeverity`, which orders ACROSS labels: inside a group every finding
+ *  shares a label, so review state is the only axis left to sort on. */
+export function forGroupDisplay<T extends { review_state: ReviewState }>(
+  items: readonly T[],
+): T[] {
+  return [...items].sort(
+    (a, b) => reviewStateRank(a.review_state) - reviewStateRank(b.review_state),
   );
 }
 

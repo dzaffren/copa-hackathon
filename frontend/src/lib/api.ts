@@ -26,6 +26,7 @@ import type {
   NodeDetail,
   NodeMetadataRequest,
   NodeMetadataResponse,
+  PairwiseFindingsResponse,
   PatchReviewStateResponse,
   ReviewResponse,
   ReviewState,
@@ -132,6 +133,18 @@ export function fetchEdgeFindings(
 ): Promise<Connection[]> {
   return getJson<Connection[]>(
     `${API_BASE}/api/workstreams/${workstreamId}/edges/${edgeId}/findings`,
+  );
+}
+
+/** Every finding in the task's neighbourhood, with review state, plus the
+ *  filter's node list and the pairs that have never been analysed. One call
+ *  replaces the old per-neighbour findings fan-out. */
+export function fetchPairwiseFindings(
+  workstreamId: string,
+  nodeId: string,
+): Promise<PairwiseFindingsResponse> {
+  return getJson<PairwiseFindingsResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/tasks/${nodeId}/pairwise-findings`,
   );
 }
 
@@ -279,9 +292,13 @@ export function analyzeEdge(
 export function fetchReview(
   workstreamId: string,
   edgeId: string,
+  findingId?: string,
 ): Promise<ReviewResponse> {
+  // `finding_id` deep-links to one finding (the Pairwise Findings box's Review
+  // action). Encoded because finding ids carry a `~` separator.
+  const query = findingId ? `?finding_id=${encodeURIComponent(findingId)}` : "";
   return getJson<ReviewResponse>(
-    `${API_BASE}/api/workstreams/${workstreamId}/edges/${edgeId}/review`,
+    `${API_BASE}/api/workstreams/${workstreamId}/edges/${edgeId}/review${query}`,
   );
 }
 

@@ -1,4 +1,5 @@
 import { http, HttpResponse } from "msw";
+import { LABEL_ORDER } from "@/lib/labels";
 import type {
   ConceptsAvailable,
   Connection,
@@ -11,11 +12,14 @@ import type {
   GraphNode,
   LinkageCard,
   NodeDetail,
+  PairwiseFinding,
+  PairwiseFindingsResponse,
   Person,
   ReviewClause,
   ReviewCounts,
   ReviewFinding,
   ReviewState,
+  UnanalysedPair,
   TaskResponse,
   TaskTypeCode,
   TaskWorkflow,
@@ -785,6 +789,43 @@ const NODE_TITLES: Record<string, string> = Object.fromEntries(
   Object.entries(GRAPH_NODES).map(([id, n]) => [id, n.title]),
 );
 
+// Edges that `analyze` has flipped to analysed within a test. The engine derives
+// `analysed` from findings-file presence, so a successful analyze makes a
+// previously-unanalysed pair start carrying findings — the mock has to model that
+// or a refetch after Analyze looks like a no-op.
+const analysedEdges = new Set<string>();
+
+export function resetAnalysedEdges() {
+  analysedEdges.clear();
+}
+
+function isAnalysed(edge: GraphEdge): boolean {
+  return edge.analysed || analysedEdges.has(edge.id);
+}
+
+function endpoint(nodeId: string) {
+  return {
+    id: nodeId,
+    title: NODE_TITLES[nodeId] ?? nodeId,
+    node_type: GRAPH_NODES[nodeId]?.node_type ?? null,
+  };
+}
+
+/** Mirrors `engine.workstreams.neighbourhood_edges`: keep an edge when either
+ *  endpoint is the task or a direct neighbour of it. Both endpoints are checked,
+ *  so the mock behaves on an edge pointing INTO a neighbour the way the engine
+ *  does on `open-finance-pd-2026`. */
+function neighbourhoodEdges(nodeId: string): GraphEdge[] {
+  const firstOrder = new Set<string>([nodeId]);
+  for (const edge of GRAPH_EDGES) {
+    if (edge.source === nodeId) firstOrder.add(edge.target);
+    else if (edge.target === nodeId) firstOrder.add(edge.source);
+  }
+  return GRAPH_EDGES.filter(
+    (e) => firstOrder.has(e.source) || firstOrder.has(e.target),
+  );
+}
+
 function linkageCard(finding: ReviewFinding, edge: GraphEdge): LinkageCard {
   return {
     id: finding.id,
@@ -1350,13 +1391,94 @@ export const handlers = [
         );
       }
       const cards: LinkageCard[] = [];
-      for (const edge of GRAPH_EDGES) {
-        if (edge.source !== nodeId && edge.target !== nodeId) continue;
+      for (const edge of neighbourhoodEdges(nodeId)) {
         for (const f of reviewFindings(edge.id)) {
           if (f.review_state === "accepted") cards.push(linkageCard(f, edge));
         }
       }
       return HttpResponse.json({ findings: cards });
+    },
+  ),
+
+  http.get(
+    "*/api/workstreams/:workstreamId/tasks/:nodeId/pairwise-findings",
+    ({ params }) => {
+      const nodeId = params.nodeId as string;
+      if (!TASKS[nodeId]) {
+        return HttpResponse.json(
+          { code: "NOT_A_TASK", message: `${nodeId} is not a task` },
+          { status: 400 },
+        );
+      }
+      const scope = neighbourhoodEdges(nodeId);
+      const findings: PairwiseFinding[] = [];
+      const unanalysed: UnanalysedPair[] = [];
+      const perNode = new Map<string, number>();
+      let analysedPairs = 0;
+
+      for (const edge of scope) {
+        // `analysed` is the mock's stand-in for findings-file presence, which is
+        // what the engine derives it from. NOT FINDINGS membership: FINDINGS also
+        // holds what `analyze` *would* return for an as-yet unanalysed edge (the
+        // fsb-3rd-party demo pair), which has no file on disk until analysed.
+        if (!isAnalysed(edge)) {
+          unanalysed.push({
+            edge_id: edge.id,
+            edge_type: edge.edge_type,
+            left: endpoint(edge.source),
+            right: endpoint(edge.target),
+          });
+          continue;
+        }
+        analysedPairs += 1;
+        const edgeFindings = reviewFindings(edge.id);
+        for (const f of edgeFindings) {
+          findings.push({
+            ...linkageCard(f, edge),
+            review_state: f.review_state,
+          });
+        }
+        for (const end of [edge.source, edge.target]) {
+          perNode.set(end, (perNode.get(end) ?? 0) + edgeFindings.length);
+        }
+      }
+
+      const byLabel = Object.fromEntries(
+        LABEL_ORDER.map((label) => {
+          const of = findings.filter((f) => f.label === label);
+          return [
+            label,
+            {
+              total: of.length,
+              pending: of.filter((f) => f.review_state === "pending").length,
+            },
+          ];
+        }),
+      ) as PairwiseFindingsResponse["counts"]["by_label"];
+
+      const nodeIds: string[] = [];
+      for (const edge of scope) {
+        for (const end of [edge.source, edge.target]) {
+          if (end !== nodeId && !nodeIds.includes(end)) nodeIds.push(end);
+        }
+      }
+
+      return HttpResponse.json<PairwiseFindingsResponse>({
+        findings,
+        nodes: nodeIds.map((id) => ({
+          id,
+          title: NODE_TITLES[id] ?? id,
+          node_type: GRAPH_NODES[id]?.node_type ?? null,
+          findings_count: perNode.get(id) ?? 0,
+        })),
+        unanalysed_pairs: unanalysed,
+        counts: {
+          total: findings.length,
+          by_label: byLabel,
+          analysed_pairs: analysedPairs,
+          total_pairs: scope.length,
+        },
+      });
     },
   ),
 
@@ -1493,11 +1615,12 @@ export const handlers = [
 
   http.get(
     "*/api/workstreams/:workstreamId/edges/:edgeId/review",
-    ({ params }) => {
+    ({ request, params }) => {
       const { workstreamId, edgeId } = params as {
         workstreamId: string;
         edgeId: string;
       };
+      const nominated = new URL(request.url).searchParams.get("finding_id");
       if (workstreamId !== "opres-v2") {
         return jsonError(
           404,
@@ -1521,6 +1644,13 @@ export const handlers = [
         );
       }
       const findings = reviewFindings(edgeId);
+      if (nominated && !findings.some((f) => f.id === nominated)) {
+        return jsonError(
+          404,
+          "FINDING_NOT_FOUND",
+          `Finding ${nominated} not found on ${edgeId}`,
+        );
+      }
       const node = (id: string) => {
         const n = GRAPH_NODES[id];
         return {
@@ -1536,6 +1666,7 @@ export const handlers = [
           source_node: node(edge.source),
           target_node: node(edge.target),
         },
+        active_finding_id: nominated,
         source_clauses: clausePane(findings, "source"),
         target_clauses: clausePane(findings, "target"),
         findings,
@@ -1778,6 +1909,9 @@ export const handlers = [
     "*/api/workstreams/:workstreamId/edges/:edgeId/analyze",
     ({ params }) => {
       const { edgeId } = params as { edgeId: string };
+      // Mirrors the engine's persist-then-report: the pair is analysed from here
+      // on, so a refetch sees its findings and it leaves the coverage strip.
+      analysedEdges.add(edgeId);
       return HttpResponse.json({
         id: edgeId,
         status: "analysed",
