@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { asList, conceptsOf } from "./intel";
 
 /** A compact regulatory profile for a workstream — policy owner, applicability,
- *  legal basis, ISMP classification, key topics — read from its primary
+ *  legal provision, ISMP classification, key topics — read from its primary
  *  document's concept metadata. Surfaced in the graph rail so the intelligence
  *  profile lives beside the drafting canvas, and reusable elsewhere. */
 export function RegulatoryProfileCard({
@@ -53,10 +53,13 @@ export function RegulatoryProfileCard({
       ) : (
         <dl className="mt-2 space-y-1.5 text-xs">
           <Row label="Owner" value={concepts?.policy_owner} />
-          <Row label="Applicability" value={concepts?.applicability} />
           <ChipRow
-            label="Legal basis"
-            values={asList(concepts?.legal_basis)}
+            label="Applicability"
+            values={asList(concepts?.applicability)}
+          />
+          <ChipRow
+            label="Legal provision"
+            values={asList(concepts?.legal_provision)}
             fallback={detail.pursuant_to}
           />
           <Row

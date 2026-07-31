@@ -164,7 +164,7 @@ export function CopilotChat({
       append({
         id: nextId(),
         kind: "text",
-        text: "Here's the task's regulatory profile — task type through legal basis. Fields with no honest source read \"Not available\" rather than a guess.",
+        text: "Here's the task's regulatory profile — task type through ISMP classification. Fields with no honest source read \"Not available\" rather than a guess.",
       });
     }, METADATA_REVEAL_MS);
   }

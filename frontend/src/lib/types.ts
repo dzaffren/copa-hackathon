@@ -211,23 +211,29 @@ export interface Placeholder {
   message: string;
 }
 
-/** The six regulatory-profile fields, drafter-editable and also written by the
+/** The seven regulatory-profile fields, drafter-editable and also written by the
  *  offline enrichment (scripts/enrich_node_metadata.py). A field nobody has
  *  filled in is `null`, not omitted, so the panel renders "Not set" per field.
  *
- *  `keywords` and `requirement` were removed on 30 Jul 2026 — the extracted axes
- *  (the Concepts section) carry a document's topics from the document itself.
- *  `empowerment_framework` was removed on 31 Jul 2026 — `legal_basis` and the
- *  node's `pursuant_to` already carry the statutory basis. */
+ *  `keywords` went on 30 Jul 2026 and `empowerment_framework` on 31 Jul 2026.
+ *  On 1 Aug 2026 `legal_basis` became `legal_provision` and `requirement`
+ *  returned as `policy_requirement`. Retired workstreams were not migrated, so
+ *  their side-files still carry `legal_basis`; the route spreads the raw dict,
+ *  so the legacy key still arrives, it just no longer lands in a row. */
 export interface ConceptsAvailable {
   status: "available";
   policy_owner: string | null;
-  applicability: string | null;
-  issuance_date: string | null;
-  effective_date: string | null;
+  /** Multi-valued, but typed to allow a bare string: the three retired
+   *  workstreams still store this as one sentence. Read it through `asList`. */
+  applicability: string[] | string | null;
   /** Acts the document is issued under, e.g. `["FSA 2013", "IFSA 2013"]`. May be
    *  absent on side-files written before this field existed. */
-  legal_basis?: string[] | null;
+  legal_provision?: string[] | string | null;
+  issuance_date: string | null;
+  effective_date: string | null;
+  /** The obligations this document imposes, one per value. Also the axes the
+   *  Recommendations feature reasons over, which is why it earned a row back. */
+  policy_requirement?: string[] | string | null;
   /** BNM security classification — one of UMUM / TERHAD / SULIT / RAHSIA, or
    *  `null` when nobody has recorded one, which the panel renders as pending
    *  rather than as a guess. */
@@ -252,7 +258,7 @@ export interface NodeDetail {
   first_order_neighbours: NeighbourRef[];
   second_order_neighbours: Placeholder;
   recent_activity: RecentActivity[];
-  /** The six-field regulatory profile. Formerly served as `concepts`; renamed
+  /** The seven-field regulatory profile. Formerly served as `concepts`; renamed
    *  when `concepts` was repurposed for extracted axes. */
   metadata: Placeholder | ConceptsAvailable;
   /** The document's extracted topics, shown as pills. `not_extracted` (with an
@@ -270,15 +276,16 @@ export interface ExtractConceptsResponse {
   recent_activity: RecentActivity[];
 }
 
-/** The six editable profile fields. Every key is sent on every save — the
+/** The seven editable profile fields. Every key is sent on every save — the
  *  server does a full replacement, so an omitted field is stored as null. That
  *  is what makes "clear a field" and "never filled it in" the same state. */
 export interface NodeMetadataRequest {
   policy_owner: string | null;
-  applicability: string | null;
+  applicability: string[] | null;
+  legal_provision: string[] | null;
   issuance_date: string | null;
   effective_date: string | null;
-  legal_basis: string[] | null;
+  policy_requirement: string[] | null;
   /** One of UMUM / TERHAD / SULIT / RAHSIA, or null for unset. */
   ismp_classification: string | null;
 }
@@ -605,7 +612,7 @@ export type RiskLevel = "high" | "medium" | "low";
  *  "FSA 2013, IFSA 2013"), never a bare boolean. A signal is present only when
  *  both sides carry it. */
 export interface SharedAttributes {
-  legal_basis: string[];
+  legal_provision: string[];
   applicability: string[];
   policy_owner: string | null;
   ismp_classification: string | null;

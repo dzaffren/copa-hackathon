@@ -6,7 +6,7 @@ different workstreams (a `_cross` edge), each side's concept metadata
 Cross-Workstream Intelligence panel needs beyond the raw linkage list:
 
   * ``shared_attributes`` — the concrete facts the two documents have in common
-    (legal basis, applicability, policy owner). Each is the
+    (legal provision, applicability, policy owner). Each is the
     *shared value itself*, not a boolean, so a caller renders "Both issued under
     FSA 2013, IFSA 2013" rather than a bare tick.
   * ``reasons`` — those shared facts plus a finding-label rollup, rendered as
@@ -53,7 +53,7 @@ def _as_list(value: Any) -> list[str]:
     """Normalise a concept value to a list of trimmed strings.
 
     A list stays a list; a non-empty scalar becomes a one-item list; ``None`` /
-    empty becomes ``[]``. Lets `legal_basis` (a list) and `applicability` (a
+    empty becomes ``[]``. Lets `legal_provision` (a list) and `applicability` (a
     scalar) be compared with the same helpers.
     """
     if value is None:
@@ -77,9 +77,16 @@ def _intersect_ci(a: list[str], b: list[str]) -> list[str]:
     return out
 
 
-def shared_legal_basis(a: dict[str, Any], b: dict[str, Any]) -> list[str]:
-    """Acts both documents are issued under (e.g. ``["FSA 2013", "IFSA 2013"]``)."""
-    return _intersect_ci(_as_list(a.get("legal_basis")), _as_list(b.get("legal_basis")))
+def shared_legal_provision(a: dict[str, Any], b: dict[str, Any]) -> list[str]:
+    """Acts both documents are issued under (e.g. ``["FSA 2013", "IFSA 2013"]``).
+
+    Reads `legal_provision`, the field's name since 1 Aug 2026. A retired
+    workstream that still stores `legal_basis` simply does not fire this signal,
+    which is the honest outcome — it is unmigrated, not secretly equivalent.
+    """
+    return _intersect_ci(
+        _as_list(a.get("legal_provision")), _as_list(b.get("legal_provision"))
+    )
 
 
 def shared_applicability(a: dict[str, Any], b: dict[str, Any]) -> list[str]:
@@ -137,7 +144,7 @@ _LABEL_REASON = {
 def shared_attributes(a: dict[str, Any], b: dict[str, Any]) -> dict[str, Any]:
     """The structured "what do they share" block for one relationship."""
     return {
-        "legal_basis": shared_legal_basis(a, b),
+        "legal_provision": shared_legal_provision(a, b),
         "applicability": shared_applicability(a, b),
         "policy_owner": shared_scalar(a, b, "policy_owner"),
         "ismp_classification": shared_scalar(a, b, "ismp_classification"),
@@ -154,8 +161,8 @@ def reasons(shared: dict[str, Any], labels: dict[str, int]) -> list[str]:
     lines: list[str] = []
     if shared.get("applicability"):
         lines.append("Both apply to " + _join(shared["applicability"]))
-    if shared.get("legal_basis"):
-        lines.append("Both issued under " + _join(shared["legal_basis"]))
+    if shared.get("legal_provision"):
+        lines.append("Both issued under " + _join(shared["legal_provision"]))
     if shared.get("policy_owner"):
         lines.append("Both owned by " + shared["policy_owner"])
     if shared.get("ismp_classification"):

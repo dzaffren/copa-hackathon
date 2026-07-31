@@ -23,63 +23,70 @@ import json
 from pathlib import Path
 from typing import Any, Optional
 
-# The regulatory-profile concept fields. The first seven are the original set;
-# `legal_basis` and `ismp_classification` were added for Cross-Workstream
-# Intelligence, where a *shared* Act or classification is one of the strongest
-# early signals that two workstreams overlap. Both are additive — a node whose
-# side-file omits them still loads (missing keys read back as `None`).
+# The seven regulatory-profile fields, in the order the panel renders them.
 #
 # Honesty rules (unchanged): every populated value is either a value already
 # carried structurally on the node (`policy_owner`, `issuance_date`), or a
 # structured reference already documented elsewhere in the corpus
-# (`legal_basis` — the same kind of value `pursuant_to` already holds on a
+# (`legal_provision` — the same kind of value `pursuant_to` already holds on a
 # node). A field that cannot be honestly derived is `null`, not guessed.
 # `ismp_classification` in particular has NO offline source (its authority is
 # CAS's RH publication form, which the repo does not hold) and is therefore
 # `null` everywhere today — the field exists so the UI can render "pending"
 # rather than hide the concept.
-# `keywords` and `requirement` were removed on 30 Jul 2026, and
-# `empowerment_framework` on 31 Jul 2026. `keywords` was a hand-curated topic
-# list that the extracted axes (the `concepts` block, from `engine.arm_g`) now
-# cover from the document itself; `requirement` never earned its row — the
-# obligation a document imposes is the whole draft, not a field; and the
-# statutory basis a document is issued under is already `legal_basis` plus the
-# node's own `pursuant_to`, so quoting the empowering clause a second time was a
-# duplicate the drafter had to keep in sync by hand.
-# Side-files still carrying any removed key load fine: `load_concepts` returns
-# the raw dict, and the next save drops them (`save_concepts` writes exactly this
-# tuple).
+#
+# History, so a reader is not surprised by what side-files on disk contain:
+# `keywords` was removed on 30 Jul 2026 (the extracted axes cover a document's
+# topics from the document itself) and `empowerment_framework` on 31 Jul 2026
+# (`legal_provision` plus the node's `pursuant_to` already carry the statutory
+# basis). On 1 Aug 2026 `legal_basis` was renamed `legal_provision`, and
+# `requirement` returned as `policy_requirement` — this time earning its row,
+# because it is the axis list the Recommendations feature reasons over rather
+# than a restatement of the draft.
+#
+# Retired workstreams were deliberately NOT migrated, so `opres-v2`,
+# `rmit-v2-2025` and `open-finance-ed` still hold `legal_basis` on disk. Nothing
+# breaks: `load_concepts` returns the raw dict and the node-detail route spreads
+# it, so the legacy key still reaches the client — it simply no longer lands in
+# a panel row. The next save through the API rewrites the file to exactly this
+# tuple.
 CONCEPT_FIELDS: tuple[str, ...] = (
     "policy_owner",
     "applicability",
+    "legal_provision",
     "issuance_date",
     "effective_date",
-    "legal_basis",
+    "policy_requirement",
     "ismp_classification",
 )
 
 
-# The one list-valued field. It holds several short values (Acts) and tolerates a
-# bare string, because side-files written before the panel rendered chips carry
-# scalars.
-LIST_FIELDS: frozenset[str] = frozenset({"legal_basis"})
+# The list-valued fields: each holds several values, entered as one
+# comma-separated line and rendered as chips. Every one tolerates a bare string
+# too, because side-files written before the field became a list carry
+# scalars — including the three retired workstreams, whose `applicability` is
+# still a sentence.
+LIST_FIELDS: frozenset[str] = frozenset(
+    {"applicability", "legal_provision", "policy_requirement"}
+)
 
 # The four BNM security classifications, in ascending sensitivity. A drafter
 # picks one or leaves it unset — unset renders as pending rather than as a
 # guess, because misclassifying a document has real handling consequences.
 ISMP_CLASSIFICATIONS: tuple[str, ...] = ("UMUM", "TERHAD", "SULIT", "RAHSIA")
 
-# 2000 characters per scalar field. `applicability` is the longest thing any of
-# these fields legitimately carries — a sentence naming the institutions bound —
-# so this is generous rather than tight.
+# 2000 characters per SCALAR field. The remaining scalars are a name, two dates
+# and a classification code, so this is a backstop against a paste accident
+# rather than a limit a drafter can reach. The list fields are bounded by
+# MAX_LIST_MEMBERS instead — see below on why their members are uncapped.
 MAX_FIELD_CHARS: int = 2000
 
-# A profile lists Acts, not a corpus: 50 chips is far past what a drafter would
-# type, and past it the panel would be unreadable anyway. This bounds the number
-# of values, not their length — `legal_basis` members are deliberately uncapped,
-# because a statutory citation can run long ("Financial Services Act 2013,
-# section 143(2), read together with…") and truncating one would corrupt a
-# reference rather than tidy it.
+# A profile lists Acts and obligations, not a corpus: 50 chips is far past what a
+# drafter would type, and past it the panel would be unreadable anyway. This
+# bounds the number of values, not their length — members are deliberately
+# uncapped, because a statutory citation runs long ("Financial Services Act 2013,
+# section 143(2), read together with…") and so does a policy requirement, and
+# truncating either would corrupt it rather than tidy it.
 MAX_LIST_MEMBERS: int = 50
 
 

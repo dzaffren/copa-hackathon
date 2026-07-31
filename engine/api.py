@@ -1239,7 +1239,7 @@ def create_app(
         ]
         node_concepts = concepts.load_concepts(workstreams_dir, workstream_id, node_id)
         # Four ordered blocks: neighbours → recent activity → metadata → concepts.
-        # `metadata` is the nine-field regulatory profile (formerly served under
+        # `metadata` is the seven-field regulatory profile (formerly served under
         # `concepts`); `concepts` now carries the extracted axis pills. The two
         # are distinct: metadata is the document's regulatory identity, concepts
         # are what it talks about.

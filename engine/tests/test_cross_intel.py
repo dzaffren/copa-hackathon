@@ -10,13 +10,13 @@ from engine import cross_intel
 _BCM = {
     "policy_owner": "Jarod N.",
     "applicability": "Licensed banks, licensed Islamic banks and licensed investment banks",
-    "legal_basis": ["FSA 2013", "IFSA 2013", "DFIA 2002"],
+    "legal_provision": ["FSA 2013", "IFSA 2013", "DFIA 2002"],
     "ismp_classification": None,
 }
 _RRP = {
     "policy_owner": "Priya S.",
     "applicability": "Licensed banks, licensed Islamic banks and licensed investment banks",
-    "legal_basis": ["FSA 2013", "IFSA 2013"],
+    "legal_provision": ["FSA 2013", "IFSA 2013"],
     "ismp_classification": None,
 }
 
@@ -24,8 +24,8 @@ _RRP = {
 # --- shared attributes ------------------------------------------------------
 
 
-def test_shared_legal_basis_is_the_case_insensitive_intersection():
-    assert cross_intel.shared_legal_basis(_BCM, _RRP) == ["FSA 2013", "IFSA 2013"]
+def test_shared_legal_provision_is_the_case_insensitive_intersection():
+    assert cross_intel.shared_legal_provision(_BCM, _RRP) == ["FSA 2013", "IFSA 2013"]
 
 
 def test_shared_applicability_matches_controlled_vocabulary():

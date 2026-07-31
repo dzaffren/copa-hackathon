@@ -83,13 +83,13 @@ export const DRAFT_OUTLINE_SECTIONS: DraftOutlineSection[] = [
     description:
       "Anchor the whole Part in its enabling statutory sections, confirmed via /explore-task.",
     bullets: [
-      "Cite the FSA 2013 sections (and IFSA/DFIA equivalents, if this PD binds Islamic or development financial institutions too) once the legal basis is resolved.",
+      "Cite the FSA 2013 sections (and IFSA/DFIA equivalents, if this PD binds Islamic or development financial institutions too) once the legal provision is resolved.",
       "Separate binding requirements ('S') from guidance ('G') issued under a different statutory head — the real document keeps these on two different legal footings.",
       "Do not restate the requirement text here — this section cites authority, Policy Objectives (below) states purpose.",
-      "If the legal basis is still 'Not available' when this is drafted, flag it rather than guessing a section number.",
+      "If the legal provision is still 'Not available' when this is drafted, flag it rather than guessing a section number.",
     ],
     guidanceNote:
-      "Legal basis is the one section where an honest 'to be confirmed' beats a plausible-sounding but wrong statutory citation.",
+      "Legal provision is the one section where an honest 'to be confirmed' beats a plausible-sounding but wrong statutory citation.",
   },
   {
     id: "effective-date",

@@ -86,7 +86,7 @@ export function CrossIntelligencePage() {
             </h1>
             <p className="mt-0.5 max-w-2xl text-sm text-muted-foreground">
               An early-warning system: the moment two teams draft policies that
-              touch the same requirements, entities or legal basis, it surfaces
+              touch the same requirements, entities or legal provision, it surfaces
               here — with the evidence to resolve it before FPWG, not after.
             </p>
           </div>

@@ -28,7 +28,7 @@ const FLAGSHIP: CrossLink = {
   risk_level: "medium",
   detected_at: "2026-07-14",
   shared_attributes: {
-    legal_basis: ["FSA 2013", "IFSA 2013"],
+    legal_provision: ["FSA 2013", "IFSA 2013"],
     applicability: ["licensed banks"],
     keywords: ["continuity of critical functions"],
     policy_owner: null,

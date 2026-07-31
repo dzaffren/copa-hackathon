@@ -172,13 +172,13 @@ export function NodeDetailPanel({
   const isTask = node.node_type === "task";
   const subBadge = [node.issuer, node.short_type].filter(Boolean).join(" · ");
 
-  // Legal basis: prefer the enriched `legal_basis` list, else the structural
-  // `pursuant_to` on the node. ISMP: the enriched value, else the node field;
-  // for a profiled document with no value yet, show the honest pending state
-  // (its source, CAS's RH publication form, is not held offline).
-  const legalBasis =
-    enriched && asList(concepts.legal_basis).length > 0
-      ? asList(concepts.legal_basis)
+  // Legal provision: prefer the enriched `legal_provision` list, else the
+  // structural `pursuant_to` on the node. ISMP: the enriched value, else the
+  // node field; for a profiled document with no value yet, show the honest
+  // pending state (its source, CAS's RH publication form, is not held offline).
+  const legalProvision =
+    enriched && asList(concepts.legal_provision).length > 0
+      ? asList(concepts.legal_provision)
       : node.pursuant_to
         ? [node.pursuant_to]
         : [];
@@ -230,7 +230,7 @@ export function NodeDetailPanel({
         {node.description && (
           <p className="text-sm text-muted-foreground">{node.description}</p>
         )}
-        {(legalBasis.length > 0 || ismpBadge) && (
+        {(legalProvision.length > 0 || ismpBadge) && (
           <div className="flex flex-wrap gap-1.5 pt-1">
             {ismpBadge && (
               <span
@@ -247,10 +247,10 @@ export function NodeDetailPanel({
                 <ShieldCheck className="h-3 w-3" /> ISMP: {ismpBadge}
               </span>
             )}
-            {legalBasis.length > 0 && (
+            {legalProvision.length > 0 && (
               <span className="inline-flex items-center gap-1 rounded-md border border-amber-300/30 bg-amber-400/10 px-2 py-0.5 text-[11px] font-medium text-amber-700">
-                <Scale className="h-3 w-3" /> Legal basis:{" "}
-                {legalBasis.join(", ")}
+                <Scale className="h-3 w-3" /> Legal provision:{" "}
+                {legalProvision.join(", ")}
               </span>
             )}
           </div>

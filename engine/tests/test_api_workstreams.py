@@ -211,7 +211,13 @@ def test_GET_node_detail_concepts_available_when_offline_enriched(tmp_path):
     body = client.get(f"/api/workstreams/{_OPRES}/nodes/{_TASK}").json()
     assert body["metadata"]["status"] == "available"
     assert body["metadata"]["policy_owner"] == "Aisyah R."
+    # `legal_basis`, NOT `legal_provision`: opres-v2 is retired and was
+    # deliberately not migrated when the field was renamed on 1 Aug 2026. The
+    # route spreads the raw side-file, so the legacy key still reaches the
+    # client — it simply no longer lands in a panel row. This pins that
+    # pass-through, which is what keeps an unmigrated fixture readable.
     assert body["metadata"]["legal_basis"] == ["FSA 2013"]
+    assert "legal_provision" not in body["metadata"]
     # A field the enrichment script could not honestly derive stays null.
     assert body["metadata"]["applicability"] is None
     assert body["pursuant_to"] == "FSA 2013 §143"

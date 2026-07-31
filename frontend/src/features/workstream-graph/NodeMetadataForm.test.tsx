@@ -7,6 +7,7 @@ import { renderWithProviders } from "@/test/utils";
 import { server } from "@/test/msw/server";
 import { METADATA_SAVE_FAILS_NODE_ID } from "@/test/msw/handlers";
 import type { NodeMetadataRequest } from "@/lib/types";
+import { CONCEPT_FIELD_ORDER } from "./metadata";
 import { NodeMetadataForm } from "./NodeMetadataForm";
 
 /** Capture the body the form actually PUTs — the comma-splitting and the
@@ -33,9 +34,10 @@ const EMPTY_PROFILE = {
   status: "available" as const,
   policy_owner: null,
   applicability: null,
+  legal_provision: null,
   issuance_date: null,
   effective_date: null,
-  legal_basis: null,
+  policy_requirement: null,
   ismp_classification: null,
 };
 
@@ -51,7 +53,7 @@ describe("NodeMetadataForm", () => {
           applicability: null,
           issuance_date: null,
           effective_date: null,
-          legal_basis: ["FSA 2013", "IFSA 2013"],
+          legal_provision: ["FSA 2013", "IFSA 2013"],
           ismp_classification: null,
         }}
         onDone={() => {}}
@@ -61,22 +63,69 @@ describe("NodeMetadataForm", () => {
     // A recorded value arrives in the field; a list arrives comma-joined so it
     // can be edited as one line.
     expect(screen.getByLabelText("Policy owner")).toHaveValue("Aisyah R.");
-    expect(screen.getByLabelText("Legal basis")).toHaveValue(
+    expect(screen.getByLabelText("Legal provision")).toHaveValue(
       "FSA 2013, IFSA 2013",
     );
     // An unset field is empty, never the string "null".
     expect(screen.getByLabelText("Effective date")).toHaveValue("");
-    // All six are editable.
+    // All seven are editable.
     for (const label of [
       "Policy owner",
       "Applicability",
+      "Legal provision",
       "Issuance date",
       "Effective date",
-      "Legal basis",
+      "Policy requirement",
       "ISMP classification",
     ]) {
       expect(screen.getByLabelText(label)).toBeEnabled();
     }
+  });
+
+  it("renders the seven fields in the canonical order", async () => {
+    renderWithProviders(
+      <NodeMetadataForm
+        workstreamId="rmit-v2-2025"
+        nodeId="rmit-pd-v2"
+        initial={EMPTY_PROFILE}
+        onDone={() => {}}
+      />,
+    );
+
+    // Order is part of the contract: the read panel and this form share
+    // CONCEPT_FIELD_ORDER precisely so a drafter fills in the field she thought
+    // she was reading.
+    expect(CONCEPT_FIELD_ORDER.map(([, label]) => label)).toEqual([
+      "Policy owner",
+      "Applicability",
+      "Legal provision",
+      "Issuance date",
+      "Effective date",
+      "Policy requirement",
+      "ISMP classification",
+    ]);
+  });
+
+  it("tells the drafter that Policy requirement feeds Recommendations", async () => {
+    renderWithProviders(
+      <NodeMetadataForm
+        workstreamId="rmit-v2-2025"
+        nodeId="rmit-pd-v2"
+        initial={EMPTY_PROFILE}
+        onDone={() => {}}
+      />,
+    );
+
+    // Nothing else on the form says what this field is FOR, and it is the only
+    // one whose value leaves the profile and drives another feature.
+    expect(
+      screen.getByText(/dimensions the Recommendations feature is formulated/i),
+    ).toBeInTheDocument();
+    // It is the one field that runs to sentences, so it gets a textarea.
+    expect(screen.getByLabelText("Policy requirement").tagName).toBe(
+      "TEXTAREA",
+    );
+    expect(screen.getByLabelText("Applicability").tagName).toBe("INPUT");
   });
 
   it("splits a comma-separated line into separate Acts on save", async () => {
@@ -91,14 +140,14 @@ describe("NodeMetadataForm", () => {
     );
 
     await userEvent.type(
-      screen.getByLabelText("Legal basis"),
+      screen.getByLabelText("Legal provision"),
       "FSA 2013, IFSA 2013 ,, DFIA 2002",
     );
     await userEvent.click(screen.getByRole("button", { name: /^save$/i }));
 
     await waitFor(() => expect(saved.body()).not.toBeNull());
     // Trimmed, and the stray empty member between the two commas is dropped.
-    expect(saved.body()?.legal_basis).toEqual([
+    expect(saved.body()?.legal_provision).toEqual([
       "FSA 2013",
       "IFSA 2013",
       "DFIA 2002",
@@ -114,14 +163,14 @@ describe("NodeMetadataForm", () => {
         initial={{
           ...EMPTY_PROFILE,
           policy_owner: "Aisyah R.",
-          legal_basis: ["FSA 2013"],
+          legal_provision: ["FSA 2013"],
         }}
         onDone={() => {}}
       />,
     );
 
     await userEvent.clear(screen.getByLabelText("Policy owner"));
-    await userEvent.clear(screen.getByLabelText("Legal basis"));
+    await userEvent.clear(screen.getByLabelText("Legal provision"));
     // Whitespace is not a value either.
     await userEvent.type(screen.getByLabelText("Applicability"), "   ");
     await userEvent.click(screen.getByRole("button", { name: /^save$/i }));
@@ -131,15 +180,16 @@ describe("NodeMetadataForm", () => {
     expect(body?.policy_owner).toBeNull();
     expect(body?.applicability).toBeNull();
     // An emptied list is null, not [] — "cleared" and "never set" are one state.
-    expect(body?.legal_basis).toBeNull();
-    // All six keys ride along: the server replaces the profile whole.
+    expect(body?.legal_provision).toBeNull();
+    // All seven keys ride along: the server replaces the profile whole.
     expect(Object.keys(body ?? {}).sort()).toEqual([
       "applicability",
       "effective_date",
       "ismp_classification",
       "issuance_date",
-      "legal_basis",
+      "legal_provision",
       "policy_owner",
+      "policy_requirement",
     ]);
   });
 

@@ -2,9 +2,9 @@
 
 Product feedback asked for an "ISMP Classification" badge, a "Pursuant to:
 <Act>" badge, and a Concepts disclosure (`policy_owner`, `applicability`,
-`issuance_date`, `effective_date`). The frontend has always rendered all of
-these (`NodeDetailPanel.tsx`); nothing ever populated them, so they were dead
-code.
+`legal_provision`, `issuance_date`, `effective_date`, `policy_requirement`).
+The frontend has always rendered all of these (`NodeDetailPanel.tsx`); nothing
+ever populated them, so they were dead code.
 
 This script is the offline enrichment step, run once against the committed
 fixtures (the same "offline script -> fixture -> API projection" pattern as

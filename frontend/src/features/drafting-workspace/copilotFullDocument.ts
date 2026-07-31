@@ -109,7 +109,7 @@ function legalProvisionBody(o: DraftOutlineSection): string {
     heading(o),
     clause(
       "S 3.1",
-      "The requirements in this Part are issued pursuant to the legal basis confirmed for this task via /explore-task.",
+      "The requirements in this Part are issued pursuant to the legal provision confirmed for this task via /explore-task.",
     ),
     clause(
       "G 3.2",
@@ -179,7 +179,7 @@ function objectivesBody(section: DraftSection, o: DraftOutlineSection): string {
     clause("S 2.2", section.summary),
     clause(
       "S 2.3",
-      "A financial service provider shall read this Part alongside the legal basis and requirement confirmed for this task, and shall not commence open finance activities in advance of the confirmed effective date.",
+      "A financial service provider shall read this Part alongside the legal provision and policy requirement confirmed for this task, and shall not commence open finance activities in advance of the confirmed effective date.",
     ),
     citation(section.sourceCitations[0]),
     citation(section.targetCitations[0]),

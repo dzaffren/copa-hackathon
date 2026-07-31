@@ -13,13 +13,14 @@ export const WORKSTREAM_CONTEXT = {
   owner: "Aisyah R.",
 };
 
-/** The task's regulatory profile. Nine fields are copied verbatim from the
- *  task's direct anchor "ED Open Finance 2025" —
+/** The task's regulatory profile — the same seven fields as
+ *  `CONCEPT_FIELD_ORDER`, in the same order, copied verbatim from the task's
+ *  direct anchor "ED Open Finance 2025" —
  *  data/workstreams/open-finance-ed/concepts/of-ed-2025.json — the document
  *  this PD consolidates. A null value is real absence, not omission. The
- *  leading `task_type` is not a concepts field; it is the task node's own
- *  document class ("PD" short_type → "Policy Document"), an honest projection
- *  of existing graph data, not an invented value. */
+ *  leading `task_type` and `drafter` are NOT concepts fields; they are the task
+ *  node's own document class ("PD" short_type → "Policy Document") and owner,
+ *  honest projections of existing graph data rather than invented values. */
 export interface NodeMetadataField {
   key: string;
   label: string;
@@ -40,22 +41,10 @@ export const NODE_METADATA: NodeMetadataField[] = [
     value:
       "Licensed banks and eligible data providers participating in the open finance ecosystem",
   },
-  { key: "requirement", label: "Requirement", value: null },
+  { key: "legal_provision", label: "Legal provision", value: ["FSA 2013"] },
   { key: "issuance_date", label: "Issuance date", value: "2025-11-18" },
   { key: "effective_date", label: "Effective date", value: null },
-  {
-    key: "keywords",
-    label: "Keywords",
-    value: [
-      "open finance",
-      "data sharing",
-      "third-party providers",
-      "consent",
-      "operational resilience",
-      "accountability",
-    ],
-  },
-  { key: "legal_basis", label: "Legal basis", value: ["FSA 2013"] },
+  { key: "policy_requirement", label: "Policy requirement", value: null },
   { key: "ismp_classification", label: "ISMP classification", value: null },
 ];
 
@@ -70,8 +59,8 @@ export interface MissingField {
  *  keys exactly — that's how a submitted value overrides its null field. */
 export const MISSING_FIELDS: MissingField[] = [
   {
-    key: "requirement",
-    label: "Requirement",
+    key: "policy_requirement",
+    label: "Policy requirement",
     placeholder: "e.g. Mandatory compliance for all licensed banks",
   },
   {

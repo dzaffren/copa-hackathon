@@ -10,7 +10,7 @@ import type { NodeDetail } from "@/lib/types";
 import { NodeDetailPanel } from "./NodeDetailPanel";
 
 /** An offline-enriched supervisory letter: distinct doc type, a multi-Act legal
- *  basis, and an ISMP classification that has no offline source yet. */
+ *  provision, and an ISMP classification that has no offline source yet. */
 const ENRICHED_SUPERVISORY_LETTER: NodeDetail = {
   id: "bnm-supervisory-letter-rmit-2025",
   node_type: "supervisory-letter",
@@ -29,9 +29,10 @@ const ENRICHED_SUPERVISORY_LETTER: NodeDetail = {
     status: "available",
     policy_owner: null,
     applicability: "Financial institutions subject to the RMiT policy document",
+    legal_provision: ["FSA 2013", "IFSA 2013", "DFIA 2002"],
     issuance_date: null,
     effective_date: null,
-    legal_basis: ["FSA 2013", "IFSA 2013", "DFIA 2002"],
+    policy_requirement: null,
     ismp_classification: null,
   },
 };
@@ -111,7 +112,7 @@ describe("NodeDetailPanel", () => {
     expect(screen.queryByRole("button", { name: /open task/i })).toBeNull();
   });
 
-  it("distinguishes a supervisory letter and surfaces its legal basis + ISMP", async () => {
+  it("distinguishes a supervisory letter and surfaces its legal provision + ISMP", async () => {
     seedNode(ENRICHED_SUPERVISORY_LETTER);
     renderWithProviders(
       <NodeDetailPanel
@@ -124,9 +125,9 @@ describe("NodeDetailPanel", () => {
 
     // The document type is visually distinguished by its own badge.
     expect(await screen.findByText("supervisory-letter")).toBeInTheDocument();
-    // Legal basis (multi-Act) is surfaced first-class, not hidden in a disclosure.
+    // Legal provision (multi-Act) is surfaced first-class, not hidden in a disclosure.
     expect(
-      screen.getByText(/Legal basis: FSA 2013, IFSA 2013, DFIA 2002/),
+      screen.getByText(/Legal provision: FSA 2013, IFSA 2013, DFIA 2002/),
     ).toBeInTheDocument();
     // ISMP is supported but honestly pending — no fabricated classification.
     expect(
@@ -171,7 +172,7 @@ describe("NodeDetailPanel", () => {
     expect(screen.queryByTestId("task-type-chip")).not.toBeInTheDocument();
   });
 
-  it("renders legal-basis chips in the Metadata disclosure", async () => {
+  it("renders legal-provision chips in the Metadata disclosure", async () => {
     seedNode(ENRICHED_SUPERVISORY_LETTER);
     renderWithProviders(
       <NodeDetailPanel
@@ -186,7 +187,7 @@ describe("NodeDetailPanel", () => {
     await userEvent.click(screen.getByRole("button", { name: /metadata/i }));
 
     // A multi-value field renders as individual chips.
-    expect(await screen.findByText("Legal basis")).toBeInTheDocument();
+    expect(await screen.findByText("Legal provision")).toBeInTheDocument();
     // The ISMP row inside the disclosure also shows the pending state.
     expect(
       screen.getAllByText(/Pending — RH publication form/).length,
@@ -208,9 +209,9 @@ describe("NodeDetailPanel", () => {
     await screen.findByText("international-standard");
     await userEvent.click(screen.getByRole("button", { name: /^metadata$/i }));
 
-    // Every field is named and honestly empty — five "Not set" plus the ISMP
+    // Every field is named and honestly empty — six "Not set" plus the ISMP
     // row, which is pending rather than merely unfilled.
-    expect(screen.getAllByText("Not set")).toHaveLength(5);
+    expect(screen.getAllByText("Not set")).toHaveLength(6);
     expect(screen.getByText("Policy owner")).toBeInTheDocument();
     expect(screen.getByText("ISMP classification")).toBeInTheDocument();
     expect(
@@ -239,7 +240,7 @@ describe("NodeDetailPanel", () => {
     const owner = screen.getByLabelText("Policy owner");
     await userEvent.type(owner, "Priya S.");
     await userEvent.type(
-      screen.getByLabelText("Legal basis"),
+      screen.getByLabelText("Legal provision"),
       "FSA 2013, IFSA 2013",
     );
     await userEvent.click(screen.getByRole("button", { name: /^save$/i }));

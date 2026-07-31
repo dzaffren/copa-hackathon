@@ -1,13 +1,13 @@
-"""Node-detail regulatory metadata: legal basis, ISMP classification, the
+"""Node-detail regulatory metadata: legal provision, ISMP classification, the
 supervisory-letter document type, and the drafter's own edits to the profile.
 
-Phase 2 surfaces `legal_basis` and `ismp_classification` (added to the concept
+Phase 2 surfaces `legal_provision` and `ismp_classification` (added to the concept
 sidecar) through the node-detail route, and confirms the supervisory-letter node
 type is first-class end to end.
 
 The write side (`PUT .../nodes/{node_id}/metadata`) lets the drafter record what
 she knows about any document in any workstream. It is a full replacement of the
-six-field profile, not a patch, and every rejection happens before any
+seven-field profile, not a patch, and every rejection happens before any
 filesystem write.
 """
 
@@ -39,19 +39,31 @@ def test_supervisory_letter_is_a_first_class_node_type_with_a_profile(tmp_path):
         "/api/workstreams/rmit-v2-2025/nodes/bnm-supervisory-letter-rmit-2025"
     ).json()
     assert body["node_type"] == "supervisory-letter"
-    # The six-field regulatory profile now lands under `metadata`; `concepts`
+    # The seven-field regulatory profile now lands under `metadata`; `concepts`
     # carries extracted axes.
     concepts = body["metadata"]
     assert concepts["status"] == "available"
     assert concepts["applicability"].startswith("Financial institutions")
-    # An honest profile: no invented legal basis or classification for a letter.
+    # An honest profile: no invented statutory basis or classification for a
+    # letter. `legal_basis` is the pre-1-Aug-2026 name — rmit-v2-2025 is retired
+    # and deliberately unmigrated, and the route spreads the raw side-file.
     assert concepts["legal_basis"] is None
     assert concepts["ismp_classification"] is None
 
 
-def test_new_concept_fields_are_present_for_every_enriched_document(tmp_path):
-    """legal_basis + ismp_classification round-trip through save/load for the
-    documents enriched in Phase 1/2, so the intelligence layer can rely on them."""
+def test_a_retired_fixtures_profile_is_served_unmigrated(tmp_path):
+    """The statutory-basis field and ismp_classification still round-trip for the
+    documents enriched in Phase 1/2 — under the key each side-file actually
+    holds.
+
+    `open-finance-ed` and `opres-v2` are retired and were deliberately NOT
+    migrated when `legal_basis` became `legal_provision` on 1 Aug 2026, so they
+    still carry the old key. The route spreads the raw dict rather than
+    projecting `CONCEPT_FIELDS`, which is exactly what keeps them readable — and
+    also why the cross-intelligence overlap signal, which reads
+    `legal_provision`, simply does not fire for them. That is the honest
+    outcome: unmigrated, not silently equivalent.
+    """
     client, _ = _make_client(tmp_path)
     for ws, node in [
         ("open-finance-ed", "of-ed-2025"),
@@ -60,6 +72,7 @@ def test_new_concept_fields_are_present_for_every_enriched_document(tmp_path):
         concepts = client.get(f"/api/workstreams/{ws}/nodes/{node}").json()["metadata"]
         assert concepts["status"] == "available"
         assert "legal_basis" in concepts
+        assert "legal_provision" not in concepts
         assert "ismp_classification" in concepts
 
 
@@ -80,7 +93,7 @@ def test_a_first_save_creates_the_side_file(tmp_path):
             "applicability": None,
             "issuance_date": None,
             "effective_date": None,
-            "legal_basis": ["FSA 2013"],
+            "legal_provision": ["FSA 2013"],
             "ismp_classification": None,
         },
     )
@@ -90,18 +103,18 @@ def test_a_first_save_creates_the_side_file(tmp_path):
     assert body["node_id"] == "bis-papers-168"
     assert body["metadata"]["status"] == "available"
     assert body["metadata"]["policy_owner"] == "Priya S."
-    assert body["metadata"]["legal_basis"] == ["FSA 2013"]
+    assert body["metadata"]["legal_provision"] == ["FSA 2013"]
 
     saved = json.loads(path.read_text(encoding="utf-8"))
     assert list(saved) == list(CONCEPT_FIELDS)
-    # policy_owner and legal_basis were sent; the other four stay unset.
-    assert sum(1 for value in saved.values() if value is None) == 4
+    # policy_owner and legal_provision were sent; the other five stay unset.
+    assert sum(1 for value in saved.values() if value is None) == 5
 
 
 def test_a_save_overwrites_an_existing_profile_whole(tmp_path):
     """Test 2: a save is a full replacement, not a patch.
 
-    Deliberate: the form always sends all six fields, so a field absent from the
+    Deliberate: the form always sends all seven fields, so a field absent from the
     body is one the drafter cleared — leaving the stored value in place would show
     her something she had just deleted.
 
@@ -117,9 +130,10 @@ def test_a_save_overwrites_an_existing_profile_whole(tmp_path):
         json={
             "policy_owner": "Aisyah R.",
             "applicability": "Licensed banks.",
+            "legal_provision": ["FSA 2013"],
             "issuance_date": "28 November 2025",
             "effective_date": "28 November 2025",
-            "legal_basis": ["FSA 2013"],
+            "policy_requirement": "Report material incidents within 24 hours.",
             "ismp_classification": "TERHAD",
         },
     )
@@ -148,7 +162,7 @@ def test_saved_values_round_trip_through_the_node_detail_route(tmp_path):
     client, _ = _make_client(tmp_path)
     client.put(
         _metadata_url("open-finance-pd-2026", "bis-papers-168"),
-        json={"policy_owner": "Priya S.", "legal_basis": ["FSA 2013"]},
+        json={"policy_owner": "Priya S.", "legal_provision": ["FSA 2013"]},
     )
 
     body = client.get(
@@ -156,7 +170,7 @@ def test_saved_values_round_trip_through_the_node_detail_route(tmp_path):
     ).json()
 
     assert body["metadata"]["status"] == "available"
-    assert body["metadata"]["legal_basis"] == ["FSA 2013"]
+    assert body["metadata"]["legal_provision"] == ["FSA 2013"]
     assert body["metadata"]["policy_owner"] == "Priya S."
 
 
@@ -221,12 +235,12 @@ def test_a_non_string_list_member_is_refused(tmp_path):
 
     response = client.put(
         _metadata_url("open-finance-pd-2026", "bis-papers-168"),
-        json={"legal_basis": ["FSA 2013", 7]},
+        json={"legal_provision": ["FSA 2013", 7]},
     )
 
     assert response.status_code == 400
     assert response.json()["code"] == "INVALID_METADATA"
-    assert response.json()["field"] == "legal_basis"
+    assert response.json()["field"] == "legal_provision"
 
 
 def test_blank_input_normalises_to_null(tmp_path):
@@ -240,49 +254,74 @@ def test_blank_input_normalises_to_null(tmp_path):
 
     response = client.put(
         _metadata_url("open-finance-pd-2026", "bis-papers-168"),
-        json={"policy_owner": "   ", "legal_basis": [], "applicability": ""},
+        json={"policy_owner": "   ", "legal_provision": [], "applicability": ""},
     )
 
     assert response.status_code == 200
     metadata = response.json()["metadata"]
     assert metadata["policy_owner"] is None
-    assert metadata["legal_basis"] is None
+    assert metadata["legal_provision"] is None
     assert metadata["applicability"] is None
 
     path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
     saved = json.loads(path.read_text(encoding="utf-8"))
     assert saved["policy_owner"] is None
-    assert saved["legal_basis"] is None
+    assert saved["legal_provision"] is None
 
 
 def test_an_over_long_field_is_refused(tmp_path):
-    """Test 9: 2000 characters per scalar field, and past it nothing is written."""
+    """Test 9: 2000 characters per SCALAR field, and past it nothing is written.
+
+    Asserted on `policy_owner` rather than `applicability`: applicability became
+    a list field on 1 Aug 2026, and list fields are bounded by member count
+    (MAX_LIST_MEMBERS), never by length — see `test_a_long_list_member_is_kept`.
+    """
     client, workstreams_dir = _make_client(tmp_path)
     path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
 
     response = client.put(
         _metadata_url("open-finance-pd-2026", "bis-papers-168"),
-        json={"applicability": "x" * 2001},
+        json={"policy_owner": "x" * 2001},
     )
 
     assert response.status_code == 413
     assert response.json()["code"] == "METADATA_TOO_LARGE"
-    assert response.json()["field"] == "applicability"
+    assert response.json()["field"] == "policy_owner"
     assert not path.exists()
 
 
 def test_a_field_at_the_limit_is_accepted(tmp_path):
-    """The cap is inclusive — 2000 characters is a valid clause quote, and only
-    2001 is too many. Pins which side of the boundary rejects."""
+    """The cap is inclusive — 2000 characters is valid and only 2001 is too many.
+    Pins which side of the boundary rejects."""
     client, _ = _make_client(tmp_path)
 
     response = client.put(
         _metadata_url("open-finance-pd-2026", "bis-papers-168"),
-        json={"applicability": "x" * 2000},
+        json={"policy_owner": "x" * 2000},
     )
 
     assert response.status_code == 200
-    assert response.json()["metadata"]["applicability"] == "x" * 2000
+    assert response.json()["metadata"]["policy_owner"] == "x" * 2000
+
+
+def test_a_long_list_member_is_kept(tmp_path):
+    """A list field bounds how MANY values it holds, never how long one is.
+
+    A policy requirement runs to a sentence or two and a statutory citation can
+    run past that; truncating either would corrupt it rather than tidy it.
+    """
+    client, _ = _make_client(tmp_path)
+    requirement = "A financial institution shall " + "y" * 3000
+
+    response = client.put(
+        _metadata_url("open-finance-pd-2026", "bis-papers-168"),
+        json={"policy_requirement": [requirement], "applicability": ["z" * 3000]},
+    )
+
+    assert response.status_code == 200
+    metadata = response.json()["metadata"]
+    assert metadata["policy_requirement"] == [requirement]
+    assert metadata["applicability"] == ["z" * 3000]
 
 
 def test_too_many_list_members_are_refused(tmp_path):
@@ -292,17 +331,17 @@ def test_too_many_list_members_are_refused(tmp_path):
 
     response = client.put(
         _metadata_url("open-finance-pd-2026", "bis-papers-168"),
-        json={"legal_basis": [f"Act {n}" for n in range(51)]},
+        json={"legal_provision": [f"Act {n}" for n in range(51)]},
     )
 
     assert response.status_code == 413
     assert response.json()["code"] == "METADATA_TOO_LARGE"
-    assert response.json()["field"] == "legal_basis"
+    assert response.json()["field"] == "legal_provision"
     assert not path.exists()
 
 
-def test_a_long_legal_basis_member_is_accepted(tmp_path):
-    """`legal_basis` bounds the number of values, never their length: a statutory
+def test_a_long_legal_provision_member_is_accepted(tmp_path):
+    """`legal_provision` bounds the number of values, never their length: a statutory
     citation can legitimately run long, and truncating one corrupts a reference
     rather than tidying it."""
     client, _ = _make_client(tmp_path)
@@ -313,24 +352,24 @@ def test_a_long_legal_basis_member_is_accepted(tmp_path):
 
     response = client.put(
         _metadata_url("open-finance-pd-2026", "bis-papers-168"),
-        json={"legal_basis": ["FSA 2013", citation]},
+        json={"legal_provision": ["FSA 2013", citation]},
     )
 
     assert response.status_code == 200
-    assert response.json()["metadata"]["legal_basis"] == ["FSA 2013", citation]
+    assert response.json()["metadata"]["legal_provision"] == ["FSA 2013", citation]
 
 
-def test_a_long_bare_string_legal_basis_is_accepted(tmp_path):
+def test_a_long_bare_string_legal_provision_is_accepted(tmp_path):
     """The scalar form is uncapped too — older side-files carry one."""
     client, _ = _make_client(tmp_path)
 
     response = client.put(
         _metadata_url("open-finance-pd-2026", "bis-papers-168"),
-        json={"legal_basis": "y" * 5000},
+        json={"legal_provision": "y" * 5000},
     )
 
     assert response.status_code == 200
-    assert response.json()["metadata"]["legal_basis"] == "y" * 5000
+    assert response.json()["metadata"]["legal_provision"] == "y" * 5000
 
 
 def test_the_list_member_count_is_still_capped(tmp_path):
@@ -340,12 +379,12 @@ def test_the_list_member_count_is_still_capped(tmp_path):
 
     response = client.put(
         _metadata_url("open-finance-pd-2026", "bis-papers-168"),
-        json={"legal_basis": [f"Act {n}" for n in range(51)]},
+        json={"legal_provision": [f"Act {n}" for n in range(51)]},
     )
 
     assert response.status_code == 413
     assert response.json()["code"] == "METADATA_TOO_LARGE"
-    assert response.json()["field"] == "legal_basis"
+    assert response.json()["field"] == "legal_provision"
 
 
 def test_unknown_workstream_and_unknown_node_are_404_before_any_write(tmp_path):
@@ -425,7 +464,7 @@ def test_repeated_identical_saves_are_idempotent(tmp_path):
     path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
     payload = {
         "policy_owner": "Priya S.",
-        "legal_basis": ["FSA 2013"],
+        "legal_provision": ["FSA 2013"],
     }
 
     first = client.put(
@@ -466,7 +505,7 @@ def test_a_legacy_side_file_missing_the_newer_keys_is_upgraded_on_save(tmp_path)
     ).json()["metadata"]
     assert before["status"] == "available"
     assert before["policy_owner"] == "Aisyah R."
-    assert before.get("legal_basis") is None
+    assert before.get("legal_provision") is None
     assert before.get("ismp_classification") is None
 
     response = client.put(
@@ -476,7 +515,7 @@ def test_a_legacy_side_file_missing_the_newer_keys_is_upgraded_on_save(tmp_path)
             "applicability": "Licensed banks.",
             "issuance_date": None,
             "effective_date": None,
-                "legal_basis": ["FSA 2013"],
+                "legal_provision": ["FSA 2013"],
             "ismp_classification": None,
         },
     )
@@ -484,7 +523,7 @@ def test_a_legacy_side_file_missing_the_newer_keys_is_upgraded_on_save(tmp_path)
     assert response.status_code == 200
     upgraded = json.loads(path.read_text(encoding="utf-8"))
     assert list(upgraded) == list(CONCEPT_FIELDS)
-    assert upgraded["legal_basis"] == ["FSA 2013"]
+    assert upgraded["legal_provision"] == ["FSA 2013"]
     assert upgraded["ismp_classification"] is None
 
 
@@ -503,18 +542,18 @@ def test_a_body_that_is_not_an_object_is_refused(tmp_path):
 
 
 def test_a_bare_string_list_field_is_stored_as_is(tmp_path):
-    """`legal_basis` tolerates a scalar, because older side-files
+    """`legal_provision` tolerates a scalar, because older side-files
     carry one and the panel's `asList` already renders either shape. Nothing
     splits it on commas — that is the form's job, not the route's."""
     client, _ = _make_client(tmp_path)
 
     response = client.put(
         _metadata_url("open-finance-pd-2026", "bis-papers-168"),
-        json={"legal_basis": "FSA 2013, IFSA 2013"},
+        json={"legal_provision": "FSA 2013, IFSA 2013"},
     )
 
     assert response.status_code == 200
-    assert response.json()["metadata"]["legal_basis"] == "FSA 2013, IFSA 2013"
+    assert response.json()["metadata"]["legal_provision"] == "FSA 2013, IFSA 2013"
 
 
 # --- ISMP classification is a closed vocabulary -----------------------------
@@ -565,12 +604,24 @@ def test_an_unset_ismp_classification_stays_legal(tmp_path):
     assert response.json()["metadata"]["ismp_classification"] is None
 
 
-def test_the_removed_fields_are_now_unknown(tmp_path):
-    """`keywords` and `requirement` left the profile on 30 Jul 2026. A client
-    still sending either is told, rather than having the value silently dropped."""
+def test_the_removed_and_renamed_fields_are_now_unknown(tmp_path):
+    """A client sending a retired or pre-rename key is told, rather than having
+    the value silently dropped.
+
+    `keywords` left on 30 Jul 2026 and `empowerment_framework` on 31 Jul 2026.
+    `requirement` and `legal_basis` are the pre-1-Aug-2026 spellings of
+    `policy_requirement` and `legal_provision` — a save under the old name has to
+    fail loudly, because accepting it would write a key the panel never reads and
+    the drafter would see her edit vanish.
+    """
     client, _ = _make_client(tmp_path)
 
-    for field in ("keywords", "requirement"):
+    for field in (
+        "keywords",
+        "requirement",
+        "empowerment_framework",
+        "legal_basis",
+    ):
         response = client.put(
             _metadata_url("open-finance-pd-2026", "bis-papers-168"),
             json={field: "anything"},

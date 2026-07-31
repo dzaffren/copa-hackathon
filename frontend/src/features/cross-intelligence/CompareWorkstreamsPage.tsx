@@ -261,10 +261,13 @@ function ProfileColumn({
       ) : (
         <dl className="mt-3 space-y-2 text-sm">
           <Field label="Policy owner" value={concepts?.policy_owner} />
-          <Field label="Applicability" value={concepts?.applicability} />
           <ListField
-            label="Legal basis"
-            values={asList(concepts?.legal_basis)}
+            label="Applicability"
+            values={asList(concepts?.applicability)}
+          />
+          <ListField
+            label="Legal provision"
+            values={asList(concepts?.legal_provision)}
             fallback={detail.pursuant_to}
           />
           <Field

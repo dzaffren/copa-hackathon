@@ -127,8 +127,8 @@ export function RelationshipPanel({
         <section className="grid gap-2">
           <SharedRow
             icon={<Scale className="h-3.5 w-3.5" />}
-            label="Legal basis"
-            values={shared.legal_basis}
+            label="Legal provision"
+            values={shared.legal_provision}
           />
           <SharedRow
             icon={<User className="h-3.5 w-3.5" />}
