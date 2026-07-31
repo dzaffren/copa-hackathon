@@ -29,7 +29,6 @@ const ENRICHED_SUPERVISORY_LETTER: NodeDetail = {
     status: "available",
     policy_owner: null,
     applicability: "Financial institutions subject to the RMiT policy document",
-    empowerment_framework: null,
     issuance_date: null,
     effective_date: null,
     legal_basis: ["FSA 2013", "IFSA 2013", "DFIA 2002"],
@@ -209,9 +208,9 @@ describe("NodeDetailPanel", () => {
     await screen.findByText("international-standard");
     await userEvent.click(screen.getByRole("button", { name: /^metadata$/i }));
 
-    // Every field is named and honestly empty — six "Not set" plus the ISMP
+    // Every field is named and honestly empty — five "Not set" plus the ISMP
     // row, which is pending rather than merely unfilled.
-    expect(screen.getAllByText("Not set")).toHaveLength(6);
+    expect(screen.getAllByText("Not set")).toHaveLength(5);
     expect(screen.getByText("Policy owner")).toBeInTheDocument();
     expect(screen.getByText("ISMP classification")).toBeInTheDocument();
     expect(

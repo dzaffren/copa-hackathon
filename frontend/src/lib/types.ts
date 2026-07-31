@@ -201,17 +201,18 @@ export interface Placeholder {
   message: string;
 }
 
-/** The seven regulatory-profile fields, drafter-editable and also written by the
+/** The six regulatory-profile fields, drafter-editable and also written by the
  *  offline enrichment (scripts/enrich_node_metadata.py). A field nobody has
  *  filled in is `null`, not omitted, so the panel renders "Not set" per field.
  *
  *  `keywords` and `requirement` were removed on 30 Jul 2026 — the extracted axes
- *  (the Concepts section) carry a document's topics from the document itself. */
+ *  (the Concepts section) carry a document's topics from the document itself.
+ *  `empowerment_framework` was removed on 31 Jul 2026 — `legal_basis` and the
+ *  node's `pursuant_to` already carry the statutory basis. */
 export interface ConceptsAvailable {
   status: "available";
   policy_owner: string | null;
   applicability: string | null;
-  empowerment_framework: string | null;
   issuance_date: string | null;
   effective_date: string | null;
   /** Acts the document is issued under, e.g. `["FSA 2013", "IFSA 2013"]`. May be
@@ -241,7 +242,7 @@ export interface NodeDetail {
   first_order_neighbours: NeighbourRef[];
   second_order_neighbours: Placeholder;
   recent_activity: RecentActivity[];
-  /** The nine-field regulatory profile. Formerly served as `concepts`; renamed
+  /** The six-field regulatory profile. Formerly served as `concepts`; renamed
    *  when `concepts` was repurposed for extracted axes. */
   metadata: Placeholder | ConceptsAvailable;
   /** The document's extracted topics, shown as pills. `not_extracted` (with an
@@ -259,13 +260,12 @@ export interface ExtractConceptsResponse {
   recent_activity: RecentActivity[];
 }
 
-/** The seven editable profile fields. Every key is sent on every save — the
+/** The six editable profile fields. Every key is sent on every save — the
  *  server does a full replacement, so an omitted field is stored as null. That
  *  is what makes "clear a field" and "never filled it in" the same state. */
 export interface NodeMetadataRequest {
   policy_owner: string | null;
   applicability: string | null;
-  empowerment_framework: string | null;
   issuance_date: string | null;
   effective_date: string | null;
   legal_basis: string[] | null;

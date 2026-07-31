@@ -29,14 +29,17 @@ export interface NodeMetadataField {
 export const NODE_METADATA: NodeMetadataField[] = [
   { key: "task_type", label: "Task type", value: "Policy Document (PD)" },
   { key: "drafter", label: "Drafter", value: WORKSTREAM_CONTEXT.owner },
-  { key: "policy_owner", label: "Policy owner", value: "Open Finance Division" },
+  {
+    key: "policy_owner",
+    label: "Policy owner",
+    value: "Open Finance Division",
+  },
   {
     key: "applicability",
     label: "Applicability",
     value:
       "Licensed banks and eligible data providers participating in the open finance ecosystem",
   },
-  { key: "empowerment_framework", label: "Empowerment framework", value: null },
   { key: "requirement", label: "Requirement", value: null },
   { key: "issuance_date", label: "Issuance date", value: "2025-11-18" },
   { key: "effective_date", label: "Effective date", value: null },
@@ -66,10 +69,21 @@ export interface MissingField {
  *  /explore-task has revealed the profile. Keys must match NODE_METADATA
  *  keys exactly — that's how a submitted value overrides its null field. */
 export const MISSING_FIELDS: MissingField[] = [
-  { key: "empowerment_framework", label: "Empowerment framework", placeholder: "e.g. Financial Services Act 2013, Section 47" },
-  { key: "requirement", label: "Requirement", placeholder: "e.g. Mandatory compliance for all licensed banks" },
-  { key: "effective_date", label: "Effective date", placeholder: "e.g. 2028-01-01" },
-  { key: "ismp_classification", label: "ISMP classification", placeholder: "e.g. Restricted — Internal Use" },
+  {
+    key: "requirement",
+    label: "Requirement",
+    placeholder: "e.g. Mandatory compliance for all licensed banks",
+  },
+  {
+    key: "effective_date",
+    label: "Effective date",
+    placeholder: "e.g. 2028-01-01",
+  },
+  {
+    key: "ismp_classification",
+    label: "ISMP classification",
+    placeholder: "e.g. Restricted — Internal Use",
+  },
 ];
 
 export interface AnchorDoc {
@@ -94,19 +108,44 @@ export const LEADING_OPTIONS = [
 ];
 
 export interface ThinkingStep {
-  icon: "search" | "map" | "scale" | "globe" | "link" | "eye" | "chart" | "check";
+  icon:
+    "search" | "map" | "scale" | "globe" | "link" | "eye" | "chart" | "check";
   text: string;
 }
 
 export const THINKING_STEPS: ThinkingStep[] = [
-  { icon: "search", text: "Scanning anchor documents — ED Open Finance 2025, HKMA Open API Framework, BIS Papers 168, RMiT 2025..." },
-  { icon: "map", text: "Mapping the PD's defined terms against ED Open Finance 2025's scope of prescribed information..." },
-  { icon: "scale", text: "Cross-referencing HKMA Open API Framework's TSP governance clauses (9.3, 29–31)..." },
-  { icon: "globe", text: "Benchmarking BIS Papers 168 on open banking & cross-border data portability..." },
-  { icon: "link", text: "Checking API security control alignment — HKMA's phased categories vs BNM's uniform controls (clause 12)..." },
-  { icon: "chart", text: "Comparing implementation timelines — HKMA's voluntary phased rollout vs BNM's mandated 2028 dates..." },
-  { icon: "eye", text: "Identifying silent gaps — no HKMA equivalent found for consent dashboards or breach-response plans..." },
-  { icon: "check", text: "Synthesising a draft structure grounded in confirmed clause citations..." },
+  {
+    icon: "search",
+    text: "Scanning anchor documents — ED Open Finance 2025, HKMA Open API Framework, BIS Papers 168, RMiT 2025...",
+  },
+  {
+    icon: "map",
+    text: "Mapping the PD's defined terms against ED Open Finance 2025's scope of prescribed information...",
+  },
+  {
+    icon: "scale",
+    text: "Cross-referencing HKMA Open API Framework's TSP governance clauses (9.3, 29–31)...",
+  },
+  {
+    icon: "globe",
+    text: "Benchmarking BIS Papers 168 on open banking & cross-border data portability...",
+  },
+  {
+    icon: "link",
+    text: "Checking API security control alignment — HKMA's phased categories vs BNM's uniform controls (clause 12)...",
+  },
+  {
+    icon: "chart",
+    text: "Comparing implementation timelines — HKMA's voluntary phased rollout vs BNM's mandated 2028 dates...",
+  },
+  {
+    icon: "eye",
+    text: "Identifying silent gaps — no HKMA equivalent found for consent dashboards or breach-response plans...",
+  },
+  {
+    icon: "check",
+    text: "Synthesising a draft structure grounded in confirmed clause citations...",
+  },
 ];
 
 export interface ClarificationQuestion {
@@ -119,20 +158,28 @@ export const CLARIFICATION_QUESTIONS: ClarificationQuestion[] = [
   {
     id: "q1",
     prompt:
-      "ED Open Finance 2025 §14 phases mandated-FSP obligations to \"both individual and SME customers\" from 1 Jan 2028. Is this PD's scope individual customers, SME customers, or both?",
+      'ED Open Finance 2025 §14 phases mandated-FSP obligations to "both individual and SME customers" from 1 Jan 2028. Is this PD\'s scope individual customers, SME customers, or both?',
     options: ["Individual customers", "SME customers", "Both"],
   },
   {
     id: "q2",
     prompt:
       "For TSP/TPP assessment, should this PD follow HKMA's bilateral-with-common-baseline model (banks may rely on another bank's assessment), or BNM's direct FSP-obligation model in §12.2?",
-    options: ["HKMA's shared baseline", "BNM's direct FSP obligation", "Hybrid of both"],
+    options: [
+      "HKMA's shared baseline",
+      "BNM's direct FSP obligation",
+      "Hybrid of both",
+    ],
   },
   {
     id: "q3",
     prompt:
       "ED Open Finance 2025 §10.4 requires a real-time consent dashboard — a requirement the HKMA framework has no equivalent for. Should the PD keep this requirement as drafted?",
-    options: ["Keep as drafted", "Soften to a periodic status update", "Needs more research"],
+    options: [
+      "Keep as drafted",
+      "Soften to a periodic status update",
+      "Needs more research",
+    ],
   },
   {
     id: "q4",
@@ -218,13 +265,13 @@ export const DRAFT_SECTIONS: DraftSection[] = [
     sourceCitations: [
       {
         clauseNumber: "hkma-open-api-framework 11.1",
-        text: "Product and service information - \"Read-only\" information offered by banks on details of their products and services;",
+        text: 'Product and service information - "Read-only" information offered by banks on details of their products and services;',
       },
     ],
     targetCitations: [
       {
         clauseNumber: "ed-open-finance-2025 11(a)-(g)",
-        text: "\"scope of prescribed information\" refers to the scope of personal financial information relating to a customer that a data provider is obligated to share with a data consumer subject to the customer's consent as specified in Appendix 1; \"open finance\" refers to a framework that enables permissioned sharing of customer information between a data provider and a data consumer in a secure, open, accessible, interoperable, and timely manner;",
+        text: '"scope of prescribed information" refers to the scope of personal financial information relating to a customer that a data provider is obligated to share with a data consumer subject to the customer\'s consent as specified in Appendix 1; "open finance" refers to a framework that enables permissioned sharing of customer information between a data provider and a data consumer in a secure, open, accessible, interoperable, and timely manner;',
       },
     ],
   },
@@ -343,11 +390,7 @@ export { buildFullDraft } from "./copilotFullDocument";
 // once it completes — that suggestion is what reveals the next command.
 
 export type SlashCommandId =
-  | "/explore-task"
-  | "/brainstorm"
-  | "/draft"
-  | "/write"
-  | "/deliver";
+  "/explore-task" | "/brainstorm" | "/draft" | "/write" | "/deliver";
 
 export interface SlashCommandDef {
   id: SlashCommandId;
@@ -362,13 +405,15 @@ export const SLASH_COMMANDS: SlashCommandDef[] = [
     id: "/explore-task",
     label: "/explore-task",
     description: "Reveal the task's regulatory profile",
-    intro: "Pulling the task's regulatory profile from its connected anchor document…",
+    intro:
+      "Pulling the task's regulatory profile from its connected anchor document…",
   },
   {
     id: "/brainstorm",
     label: "/brainstorm",
     description: "Pull context, then align on focus through Q&A",
-    intro: "Let's align on the draft. Pulling context from the anchor documents first…",
+    intro:
+      "Let's align on the draft. Pulling context from the anchor documents first…",
   },
   {
     id: "/draft",
@@ -390,7 +435,9 @@ export const SLASH_COMMANDS: SlashCommandDef[] = [
   },
 ];
 
-export const SLASH_COMMAND_IDS: SlashCommandId[] = SLASH_COMMANDS.map((c) => c.id);
+export const SLASH_COMMAND_IDS: SlashCommandId[] = SLASH_COMMANDS.map(
+  (c) => c.id,
+);
 
 /** A command is unlocked once the one before it in SLASH_COMMAND_IDS's flow
  *  order has completed — /explore-task, the first step, is always
@@ -423,7 +470,11 @@ export const MENTIONABLE: Mentionable[] = [
     label: a.title,
     kind: "doc" as const,
   })),
-  { id: "open-finance-pd-2026", label: "Open Finance PD . 2026 (this task)", kind: "node" },
+  {
+    id: "open-finance-pd-2026",
+    label: "Open Finance PD . 2026 (this task)",
+    kind: "node",
+  },
   { id: "pdpa-2010", label: "PDPA 2010", kind: "node" },
 ];
 

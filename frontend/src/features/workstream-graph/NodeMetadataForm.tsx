@@ -13,11 +13,8 @@ import {
   type ConceptField,
 } from "./metadata";
 
-/** The one field that holds clause-length text and so gets a textarea. */
-const MULTILINE_FIELDS = new Set<ConceptField>(["empowerment_framework"]);
-
 /** Plain-language copy for the refusals a save can provoke. Most of these should
- *  be unreachable from this form — it sends exactly the nine known keys and never
+ *  be unreachable from this form — it sends exactly the six known keys and never
  *  `task_type` — but a refusal the drafter cannot read is worse than a verbose
  *  map, and the server's own message is the fallback. */
 const ERROR_COPY: Record<string, string> = {
@@ -76,13 +73,12 @@ function list(raw: string): string[] | null {
  *
  *  Written out field by field rather than looped: the server replaces the profile
  *  whole, so an omitted key silently clears a value the drafter never touched.
- *  Spelling the seven out means the compiler catches a missing one, which a loop
+ *  Spelling the six out means the compiler catches a missing one, which a loop
  *  over `CONCEPT_FIELD_ORDER` could only do behind a cast. */
 function toRequest(values: FormState): NodeMetadataRequest {
   return {
     policy_owner: text(values.policy_owner),
     applicability: text(values.applicability),
-    empowerment_framework: text(values.empowerment_framework),
     issuance_date: text(values.issuance_date),
     effective_date: text(values.effective_date),
     legal_basis: list(values.legal_basis),
@@ -99,13 +95,13 @@ interface NodeMetadataFormProps {
 }
 
 /**
- * Edit mode for the Metadata disclosure: nine controlled inputs, Save and
+ * Edit mode for the Metadata disclosure: six controlled inputs, Save and
  * Cancel. A plain controlled form, consistent with `AddNodeDialog` and
  * `AddEdgeDialog` — no form library.
  *
  * Its own file rather than inlined because `NodeDetailPanel.tsx` is already
  * ~500 lines carrying the header, five sections, the delete flow, and the footer
- * actions; a nine-field form inline would make it the largest file in the
+ * actions; a six-field form inline would make it the largest file in the
  * feature.
  */
 export function NodeMetadataForm({
@@ -143,7 +139,7 @@ export function NodeMetadataForm({
     <div className="mt-2 space-y-3">
       {CONCEPT_FIELD_ORDER.map(([field, label]) => {
         // The server names the field at fault, so the offending input is ringed
-        // rather than leaving the drafter to guess which of nine it means.
+        // rather than leaving the drafter to guess which of six it means.
         const inputClass = cn(
           fieldClass,
           errorField === field && "border-red-400 ring-1 ring-red-400",
@@ -171,14 +167,6 @@ export function NodeMetadataForm({
                   </option>
                 ))}
               </select>
-            ) : MULTILINE_FIELDS.has(field) ? (
-              <textarea
-                className={inputClass}
-                rows={3}
-                aria-label={label}
-                value={values[field]}
-                onChange={(e) => update(field, e.target.value)}
-              />
             ) : (
               <input
                 className={inputClass}

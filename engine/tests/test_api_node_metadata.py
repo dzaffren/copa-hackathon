@@ -7,7 +7,7 @@ type is first-class end to end.
 
 The write side (`PUT .../nodes/{node_id}/metadata`) lets the drafter record what
 she knows about any document in any workstream. It is a full replacement of the
-nine-field profile, not a patch, and every rejection happens before any
+six-field profile, not a patch, and every rejection happens before any
 filesystem write.
 """
 
@@ -39,7 +39,7 @@ def test_supervisory_letter_is_a_first_class_node_type_with_a_profile(tmp_path):
         "/api/workstreams/rmit-v2-2025/nodes/bnm-supervisory-letter-rmit-2025"
     ).json()
     assert body["node_type"] == "supervisory-letter"
-    # The seven-field regulatory profile now lands under `metadata`; `concepts`
+    # The six-field regulatory profile now lands under `metadata`; `concepts`
     # carries extracted axes.
     concepts = body["metadata"]
     assert concepts["status"] == "available"
@@ -78,7 +78,6 @@ def test_a_first_save_creates_the_side_file(tmp_path):
         json={
             "policy_owner": "Priya S.",
             "applicability": None,
-            "empowerment_framework": None,
             "issuance_date": None,
             "effective_date": None,
             "legal_basis": ["FSA 2013"],
@@ -95,14 +94,14 @@ def test_a_first_save_creates_the_side_file(tmp_path):
 
     saved = json.loads(path.read_text(encoding="utf-8"))
     assert list(saved) == list(CONCEPT_FIELDS)
-    # policy_owner and legal_basis were sent; the other five stay unset.
-    assert sum(1 for value in saved.values() if value is None) == 5
+    # policy_owner and legal_basis were sent; the other four stay unset.
+    assert sum(1 for value in saved.values() if value is None) == 4
 
 
 def test_a_save_overwrites_an_existing_profile_whole(tmp_path):
     """Test 2: a save is a full replacement, not a patch.
 
-    Deliberate: the form always sends all nine fields, so a field absent from the
+    Deliberate: the form always sends all six fields, so a field absent from the
     body is one the drafter cleared — leaving the stored value in place would show
     her something she had just deleted.
 
@@ -118,7 +117,6 @@ def test_a_save_overwrites_an_existing_profile_whole(tmp_path):
         json={
             "policy_owner": "Aisyah R.",
             "applicability": "Licensed banks.",
-            "empowerment_framework": "Issued pursuant to section 143(2) of the FSA 2013.",
             "issuance_date": "28 November 2025",
             "effective_date": "28 November 2025",
             "legal_basis": ["FSA 2013"],
@@ -446,7 +444,7 @@ def test_repeated_identical_saves_are_idempotent(tmp_path):
 
 def test_a_legacy_side_file_missing_the_newer_keys_is_upgraded_on_save(tmp_path):
     """Test 14: a side-file written before the last two fields existed still loads,
-    and the first save through this route brings it up to all nine keys.
+    and the first save through this route brings it up to the full key set.
 
     No backfill migration: `load_concepts` returns the raw dict, so the missing
     keys read back as `None` and the panel renders them "Not set" — which is
@@ -458,7 +456,6 @@ def test_a_legacy_side_file_missing_the_newer_keys_is_upgraded_on_save(tmp_path)
     legacy = {
         "policy_owner": "Aisyah R.",
         "applicability": "Licensed banks.",
-        "empowerment_framework": None,
         "issuance_date": None,
         "effective_date": None,
     }
@@ -477,7 +474,6 @@ def test_a_legacy_side_file_missing_the_newer_keys_is_upgraded_on_save(tmp_path)
         json={
             "policy_owner": "Aisyah R.",
             "applicability": "Licensed banks.",
-            "empowerment_framework": None,
             "issuance_date": None,
             "effective_date": None,
                 "legal_basis": ["FSA 2013"],

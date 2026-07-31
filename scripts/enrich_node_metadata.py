@@ -2,9 +2,9 @@
 
 Product feedback asked for an "ISMP Classification" badge, a "Pursuant to:
 <Act>" badge, and a Concepts disclosure (`policy_owner`, `applicability`,
-`empowerment_framework`, `requirement`, `issuance_date`, `effective_date`,
-`keywords`). The frontend has always rendered all of these
-(`NodeDetailPanel.tsx`); nothing ever populated them, so they were dead code.
+`issuance_date`, `effective_date`). The frontend has always rendered all of
+these (`NodeDetailPanel.tsx`); nothing ever populated them, so they were dead
+code.
 
 This script is the offline enrichment step, run once against the committed
 fixtures (the same "offline script -> fixture -> API projection" pattern as
@@ -12,8 +12,8 @@ fixtures (the same "offline script -> fixture -> API projection" pattern as
 per-request cost. Every field it writes is either:
 
   - a value already carried structurally on the node (`owner` -> policy_owner), or
-  - a verbatim quote from a clause the node's own document contains, resolved
-    through an existing, *supported* finding — never invented.
+  - the title of an act the node's own document cites, resolved through an
+    existing, *supported* finding (`pursuant_to`) — never invented.
 
 A field this script cannot honestly derive is left absent/`null`, not
 guessed. `ismp_classification` is the clearest example: no taxonomy for it
@@ -51,19 +51,17 @@ def _save_graph(workstream_dir: Path, graph: dict[str, Any]) -> None:
     )
 
 
-def _pursuant_to_and_empowerment(
+def _pursuant_to(
     workstreams_dir: Path,
     workstream_id: str,
     node: dict[str, Any],
     edges: list[dict[str, Any]],
     nodes_by_id: dict[str, dict[str, Any]],
-) -> tuple[Optional[str], Optional[str]]:
+) -> Optional[str]:
     """A node's statutory basis, derived from its own `references` edge to an
     `act-law` node backed by a supported finding — never from anywhere else.
 
-    Returns (pursuant_to, empowerment_framework): the cited act's title, and
-    the node's own document quoted verbatim stating that basis. Either or both
-    are `None` when no such edge/finding exists.
+    Returns the cited act's title, or `None` when no such edge/finding exists.
     """
     for edge in edges:
         if edge.get("source") != node["id"] or edge.get("edge_type") != "references":
@@ -78,11 +76,13 @@ def _pursuant_to_and_empowerment(
         for finding in edge_findings:
             if not finding.get("supported"):
                 continue
-            source_clauses = finding.get("source_clauses") or []
-            if not source_clauses:
+            # Still gated on a quoted source clause: the act's title is only
+            # honest here if the finding that cites it is anchored in the node's
+            # own document, not merely labelled `references`.
+            if not (finding.get("source_clauses") or []):
                 continue
-            return target.get("title"), source_clauses[0].get("text")
-    return None, None
+            return target.get("title")
+    return None
 
 
 def _enrich_workstream(workstreams_dir: Path, workstream_id: str) -> int:
@@ -101,7 +101,7 @@ def _enrich_workstream(workstreams_dir: Path, workstream_id: str) -> int:
         owner = node.get("owner") or {}
         policy_owner = owner.get("name")
 
-        pursuant_to, empowerment_framework = _pursuant_to_and_empowerment(
+        pursuant_to = _pursuant_to(
             workstreams_dir, workstream_id, node, edges, nodes_by_id
         )
 
@@ -109,22 +109,19 @@ def _enrich_workstream(workstreams_dir: Path, workstream_id: str) -> int:
             node["pursuant_to"] = pursuant_to
             graph_changed = True
 
-        if policy_owner is None and empowerment_framework is None:
+        if policy_owner is None:
             continue  # nothing to write — leave this node un-enriched
 
         # Merge over what is already on disk, and only for the fields actually
-        # derived. `save_concepts` writes the whole nine-key set, filling any key
-        # its argument omits with `null` — so passing just the two derived fields
-        # silently erased the other seven. That destroyed hand-authored profile
+        # derived. `save_concepts` writes the whole `CONCEPT_FIELDS` set, filling
+        # any key its argument omits with `null` — so passing just the derived
+        # fields silently erased the rest. That destroyed hand-authored profile
         # content (of-ed-2025 lost its applicability, issuance date, six keywords
         # and legal basis) while reporting "enriched", and the values live only in
         # git. A `None` derived value means "this script could not honestly derive
         # it", which is not the same as "clear it", so it must not overwrite.
         existing = concepts.load_concepts(workstreams_dir, workstream_id, node["id"])
-        derived = {
-            "policy_owner": policy_owner,
-            "empowerment_framework": empowerment_framework,
-        }
+        derived = {"policy_owner": policy_owner}
         concepts.save_concepts(
             workstreams_dir,
             workstream_id,

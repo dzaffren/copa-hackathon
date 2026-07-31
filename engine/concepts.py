@@ -13,10 +13,10 @@ that is not an error. `load_concepts` returns `None` in that case, and the
 caller falls back to the placeholder exactly like an unanalysed edge falls
 back to "not analysed" rather than erroring (`findings.FindingsNotAnalysedError`).
 
-Every field here is either a verbatim quote from a clause the node's own
-document contains, or a value already carried structurally on the node
-(`owner`) — never invented. A field the enrichment script could not honestly
-derive is `null`, not guessed.
+Every field here is either a value already carried structurally on the node
+(`owner`) or a structured reference already documented in the corpus — never
+invented. A field the enrichment script could not honestly derive is `null`,
+not guessed.
 """
 
 import json
@@ -29,8 +29,7 @@ from typing import Any, Optional
 # early signals that two workstreams overlap. Both are additive — a node whose
 # side-file omits them still loads (missing keys read back as `None`).
 #
-# Honesty rules (unchanged): every populated value is either a verbatim clause
-# quote from the node's own document (`empowerment_framework`), a value already
+# Honesty rules (unchanged): every populated value is either a value already
 # carried structurally on the node (`policy_owner`, `issuance_date`), or a
 # structured reference already documented elsewhere in the corpus
 # (`legal_basis` — the same kind of value `pursuant_to` already holds on a
@@ -39,16 +38,20 @@ from typing import Any, Optional
 # CAS's RH publication form, which the repo does not hold) and is therefore
 # `null` everywhere today — the field exists so the UI can render "pending"
 # rather than hide the concept.
-# `keywords` and `requirement` were removed on 30 Jul 2026. `keywords` was a
-# hand-curated topic list that the extracted axes (the `concepts` block, from
-# `engine.arm_g`) now cover from the document itself; `requirement` never earned
-# its row — the obligation a document imposes is the whole draft, not a field.
-# Side-files still carrying either key load fine: `load_concepts` returns the raw
-# dict, and the next save drops them (`save_concepts` writes exactly this tuple).
+# `keywords` and `requirement` were removed on 30 Jul 2026, and
+# `empowerment_framework` on 31 Jul 2026. `keywords` was a hand-curated topic
+# list that the extracted axes (the `concepts` block, from `engine.arm_g`) now
+# cover from the document itself; `requirement` never earned its row — the
+# obligation a document imposes is the whole draft, not a field; and the
+# statutory basis a document is issued under is already `legal_basis` plus the
+# node's own `pursuant_to`, so quoting the empowering clause a second time was a
+# duplicate the drafter had to keep in sync by hand.
+# Side-files still carrying any removed key load fine: `load_concepts` returns
+# the raw dict, and the next save drops them (`save_concepts` writes exactly this
+# tuple).
 CONCEPT_FIELDS: tuple[str, ...] = (
     "policy_owner",
     "applicability",
-    "empowerment_framework",
     "issuance_date",
     "effective_date",
     "legal_basis",
@@ -66,9 +69,9 @@ LIST_FIELDS: frozenset[str] = frozenset({"legal_basis"})
 # guess, because misclassifying a document has real handling consequences.
 ISMP_CLASSIFICATIONS: tuple[str, ...] = ("UMUM", "TERHAD", "SULIT", "RAHSIA")
 
-# 2000 characters per scalar field. `empowerment_framework` holds a whole
-# statutory-basis clause quoted word-for-word, which is the longest thing any of
-# these fields legitimately carries, so this is generous rather than tight.
+# 2000 characters per scalar field. `applicability` is the longest thing any of
+# these fields legitimately carries — a sentence naming the institutions bound —
+# so this is generous rather than tight.
 MAX_FIELD_CHARS: int = 2000
 
 # A profile lists Acts, not a corpus: 50 chips is far past what a drafter would
@@ -229,7 +232,7 @@ def normalise_metadata(body: dict[str, Any]) -> dict[str, Any]:
     visit, exactly as if she had never touched it.
 
     Missing keys are left missing: `save_concepts` already normalises to the full
-    nine-key set, and adding them here would duplicate that.
+    `CONCEPT_FIELDS` set, and adding them here would duplicate that.
     """
     cleaned: dict[str, Any] = {}
     for key, value in body.items():

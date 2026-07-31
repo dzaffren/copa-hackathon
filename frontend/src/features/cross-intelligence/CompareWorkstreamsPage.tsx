@@ -272,7 +272,6 @@ function ProfileColumn({
             value={concepts?.ismp_classification}
             pendingNote="pending RH publication form"
           />
-          <Field label="Empowerment" value={concepts?.empowerment_framework} />
           <Field label="Issued" value={concepts?.issuance_date} />
         </dl>
       )}

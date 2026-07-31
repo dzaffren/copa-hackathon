@@ -1,6 +1,6 @@
 import type { ConceptsAvailable } from "@/lib/types";
 
-/** One of the seven regulatory-profile fields. */
+/** One of the six regulatory-profile fields. */
 export type ConceptField = keyof Omit<ConceptsAvailable, "status">;
 
 /** Display order + labels for the regulatory-profile fields.
@@ -8,14 +8,15 @@ export type ConceptField = keyof Omit<ConceptsAvailable, "status">;
  *  `keywords` and `requirement` were removed on 30 Jul 2026: the extracted axes
  *  (the Concepts section) now carry a document's topics, derived from the
  *  document itself rather than typed by hand, and the obligation a document
- *  imposes is the whole draft rather than one field.
+ *  imposes is the whole draft rather than one field. `empowerment_framework`
+ *  followed on 31 Jul 2026: `legal_basis` and the node's own `pursuant_to`
+ *  already carry the statutory basis a document is issued under.
  *
  *  Shared by the panel's read mode and `NodeMetadataForm`'s edit mode so the two
  *  cannot drift: a drafter must fill in the field she thought she was reading. */
 export const CONCEPT_FIELD_ORDER: [ConceptField, string][] = [
   ["policy_owner", "Policy owner"],
   ["applicability", "Applicability"],
-  ["empowerment_framework", "Empowerment framework"],
   ["issuance_date", "Issuance date"],
   ["effective_date", "Effective date"],
   ["legal_basis", "Legal basis"],

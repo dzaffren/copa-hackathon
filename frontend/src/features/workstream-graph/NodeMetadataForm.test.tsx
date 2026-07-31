@@ -33,7 +33,6 @@ const EMPTY_PROFILE = {
   status: "available" as const,
   policy_owner: null,
   applicability: null,
-  empowerment_framework: null,
   issuance_date: null,
   effective_date: null,
   legal_basis: null,
@@ -50,7 +49,6 @@ describe("NodeMetadataForm", () => {
           status: "available",
           policy_owner: "Aisyah R.",
           applicability: null,
-          empowerment_framework: null,
           issuance_date: null,
           effective_date: null,
           legal_basis: ["FSA 2013", "IFSA 2013"],
@@ -68,11 +66,10 @@ describe("NodeMetadataForm", () => {
     );
     // An unset field is empty, never the string "null".
     expect(screen.getByLabelText("Effective date")).toHaveValue("");
-    // All seven are editable.
+    // All six are editable.
     for (const label of [
       "Policy owner",
       "Applicability",
-      "Empowerment framework",
       "Issuance date",
       "Effective date",
       "Legal basis",
@@ -135,11 +132,10 @@ describe("NodeMetadataForm", () => {
     expect(body?.applicability).toBeNull();
     // An emptied list is null, not [] — "cleared" and "never set" are one state.
     expect(body?.legal_basis).toBeNull();
-    // All seven keys ride along: the server replaces the profile whole.
+    // All six keys ride along: the server replaces the profile whole.
     expect(Object.keys(body ?? {}).sort()).toEqual([
       "applicability",
       "effective_date",
-      "empowerment_framework",
       "ismp_classification",
       "issuance_date",
       "legal_basis",

@@ -1,5 +1,12 @@
 import { WORKSTREAM_CONTEXT } from "./copilotV2Data";
-import { coverPage, pageChrome, sectionHeading, partHeading, tocPage, type TocEntry } from "./copilotDocumentChrome";
+import {
+  coverPage,
+  pageChrome,
+  sectionHeading,
+  partHeading,
+  tocPage,
+  type TocEntry,
+} from "./copilotDocumentChrome";
 
 export interface DraftOutlineSection {
   id: string;
@@ -44,7 +51,8 @@ export const DRAFT_OUTLINE_SECTIONS: DraftOutlineSection[] = [
     number: "1",
     partStart: { letter: "A", title: "Overview" },
     title: "Introduction",
-    description: "Set the scene: why open finance, and why a formal Policy Document now.",
+    description:
+      "Set the scene: why open finance, and why a formal Policy Document now.",
     bullets: [
       "Frame the shift toward digital, consent-driven information sharing as the reason a dedicated open finance framework is needed.",
       "Name the customer and industry benefits this PD is trying to secure, without repeating the Executive Summary verbatim.",
@@ -72,12 +80,13 @@ export const DRAFT_OUTLINE_SECTIONS: DraftOutlineSection[] = [
     id: "legal-provision",
     number: "3",
     title: "Legal Provision",
-    description: "Anchor the whole Part in its enabling statutory sections, confirmed via /explore-task.",
+    description:
+      "Anchor the whole Part in its enabling statutory sections, confirmed via /explore-task.",
     bullets: [
-      "Cite the FSA 2013 sections (and IFSA/DFIA equivalents, if this PD binds Islamic or development financial institutions too) once the empowerment framework field is resolved.",
+      "Cite the FSA 2013 sections (and IFSA/DFIA equivalents, if this PD binds Islamic or development financial institutions too) once the legal basis is resolved.",
       "Separate binding requirements ('S') from guidance ('G') issued under a different statutory head — the real document keeps these on two different legal footings.",
       "Do not restate the requirement text here — this section cites authority, Policy Objectives (below) states purpose.",
-      "If the empowerment framework is still 'Not available' when this is drafted, flag it rather than guessing a section number.",
+      "If the legal basis is still 'Not available' when this is drafted, flag it rather than guessing a section number.",
     ],
     guidanceNote:
       "Legal basis is the one section where an honest 'to be confirmed' beats a plausible-sounding but wrong statutory citation.",
@@ -86,7 +95,8 @@ export const DRAFT_OUTLINE_SECTIONS: DraftOutlineSection[] = [
     id: "effective-date",
     number: "4",
     title: "Effective Date",
-    description: "State when this Part itself takes effect, distinct from the phased transition dates in Appendix 2.",
+    description:
+      "State when this Part itself takes effect, distinct from the phased transition dates in Appendix 2.",
     bullets: [
       "Confirm the effective date via /explore-task's regulatory profile rather than inventing one.",
       "Make clear this date governs the Part's coming-into-force, while Appendix 2 governs when each cohort's obligations commence.",
@@ -115,7 +125,8 @@ export const DRAFT_OUTLINE_SECTIONS: DraftOutlineSection[] = [
     number: "6",
     partStart: { letter: "B", title: "Policy Requirements" },
     title: "Governance",
-    description: "Set board and senior-management oversight expectations for open finance participation.",
+    description:
+      "Set board and senior-management oversight expectations for open finance participation.",
     bullets: [
       "State that the board and senior management must exercise effective oversight of the FSP's open finance arrangements.",
       "Separate board-level responsibilities (risk strategy, appetite) from senior-management responsibilities (day-to-day implementation and controls).",
@@ -133,7 +144,7 @@ export const DRAFT_OUTLINE_SECTIONS: DraftOutlineSection[] = [
       "Define \"scope of prescribed information\" precisely — this is the one area where BNM's definition is broader than HKMA's.",
     bullets: [
       "Reproduce ED Open Finance 2025 §11(a)-(g)'s defined-terms list rather than paraphrasing it.",
-      "Note explicitly where this differs from HKMA §11.1's narrower \"read-only product and service information\" scope.",
+      'Note explicitly where this differs from HKMA §11.1\'s narrower "read-only product and service information" scope.',
       "Decide, per the drafter's earlier answer, whether scope covers individual customers, SME customers, or both.",
       "Avoid silently narrowing scope to match HKMA — the difference is intentional, not a drafting gap.",
     ],
@@ -189,7 +200,8 @@ export const DRAFT_OUTLINE_SECTIONS: DraftOutlineSection[] = [
     id: "consent",
     number: "11",
     title: "Consent Management — Obtaining Consent",
-    description: "Require explicit, separate consent before any third-party disclosure — an area both anchors already agree on.",
+    description:
+      "Require explicit, separate consent before any third-party disclosure — an area both anchors already agree on.",
     bullets: [
       "Anchor on ED Open Finance 2025 §6's separate-and-distinct consent requirement for third-party disclosure.",
       "Cite HKMA §34.3.2(i) as the aligned comparator on explicit customer-facing consent language.",
@@ -203,7 +215,8 @@ export const DRAFT_OUTLINE_SECTIONS: DraftOutlineSection[] = [
     id: "consent-monitoring",
     number: "12",
     title: "Consent Management — Monitoring, Renewal and Revocation",
-    description: "Cover the consent lifecycle after it's granted: the dashboard, expiry, renewal, and revocation.",
+    description:
+      "Cover the consent lifecycle after it's granted: the dashboard, expiry, renewal, and revocation.",
     bullets: [
       "State the real-time consent dashboard requirement from ED Open Finance 2025 §10.4 in full, per the drafter's decision to keep, soften, or research it further.",
       "Set validity periods for one-time vs recurring data access, and what happens on expiry (cease access, or require renewal).",
@@ -217,7 +230,8 @@ export const DRAFT_OUTLINE_SECTIONS: DraftOutlineSection[] = [
     id: "data-privacy-security",
     number: "13",
     title: "Customer Protection — Data Privacy and Security",
-    description: "Set data governance, confidentiality, and technical-safeguard expectations for customer information.",
+    description:
+      "Set data governance, confidentiality, and technical-safeguard expectations for customer information.",
     bullets: [
       "Require data governance and privacy policies limiting access to a need-to-know basis and prohibiting use beyond consented purpose.",
       "Set retention limits and secure-disposal requirements once information is no longer needed for its consented purpose.",
@@ -231,7 +245,8 @@ export const DRAFT_OUTLINE_SECTIONS: DraftOutlineSection[] = [
     id: "third-party-arrangements",
     number: "14",
     title: "Customer Protection — Third-Party Arrangements",
-    description: "Extend the same protections to any third-party service provider handling customer information.",
+    description:
+      "Extend the same protections to any third-party service provider handling customer information.",
     bullets: [
       "Require the FSP to ensure any third-party service provider handling customer information meets the same privacy, confidentiality, and security requirements.",
       "Require customer information not be shared with a third party without the customer's explicit consent, cross-referencing Consent Management above.",
@@ -260,7 +275,8 @@ export const DRAFT_OUTLINE_SECTIONS: DraftOutlineSection[] = [
     id: "complaints-handling",
     number: "16",
     title: "Complaints Handling and Redress",
-    description: "Set clear accountability and a fair, timely complaints process for open finance disputes.",
+    description:
+      "Set clear accountability and a fair, timely complaints process for open finance disputes.",
     bullets: [
       "Require clear delineation of responsibility between FSPs when a dispute or complaint involves more than one party.",
       "Require complaints handling policies compliant with the FSP's existing complaints-handling policy document.",
@@ -274,7 +290,8 @@ export const DRAFT_OUTLINE_SECTIONS: DraftOutlineSection[] = [
     id: "tech-risk",
     number: "17",
     title: "Management of Technology Risk",
-    description: "Cross-reference the FSP's existing technology risk framework rather than duplicating it.",
+    description:
+      "Cross-reference the FSP's existing technology risk framework rather than duplicating it.",
     bullets: [
       "Require existing technology-risk-management and payment-technology requirements to extend to open finance activities.",
       "Require operational resilience measures — availability, integrity, confidentiality of exchanged data — sized to open finance's specific risk profile.",
@@ -289,7 +306,8 @@ export const DRAFT_OUTLINE_SECTIONS: DraftOutlineSection[] = [
     number: "Appendix 1",
     partStart: { letter: "C", title: "Appendices" },
     title: "Definition of Mandated FSP and Scope of Prescribed Information",
-    description: "The threshold test for who is a 'mandated FSP', and exactly what information they must share.",
+    description:
+      "The threshold test for who is a 'mandated FSP', and exactly what information they must share.",
     bullets: [
       "Set the customer-count (or active-user, for e-money) threshold that makes an FSP 'mandated', per category of institution.",
       "Confirm whether the threshold is measured at entity level, banking-group level, or both.",
@@ -303,7 +321,8 @@ export const DRAFT_OUTLINE_SECTIONS: DraftOutlineSection[] = [
     id: "appendix-timeline",
     number: "Appendix 2",
     title: "Transition Timeline",
-    description: "The full phase-by-phase commencement schedule, rendered as a table.",
+    description:
+      "The full phase-by-phase commencement schedule, rendered as a table.",
     bullets: [
       "Render the commencement date per FSP category as a table, not prose — this is the one section that should be almost entirely tabular.",
       "State which categories of customer information are mandated for sharing at each phase.",
@@ -315,7 +334,11 @@ export const DRAFT_OUTLINE_SECTIONS: DraftOutlineSection[] = [
   },
 ];
 
-const PART_TITLES: Record<string, string> = { A: "Overview", B: "Policy Requirements", C: "Appendices" };
+const PART_TITLES: Record<string, string> = {
+  A: "Overview",
+  B: "Policy Requirements",
+  C: "Appendices",
+};
 
 /** The TOC entries for this document — this PD's own section list, in the
  *  same dotted-leader / part-divider visual convention as the reference,
@@ -325,7 +348,11 @@ export function buildTocEntries(): TocEntry[] {
   for (const s of DRAFT_OUTLINE_SECTIONS) {
     if (s.id === "executive-summary") continue;
     if (s.partStart) {
-      entries.push({ number: s.partStart.letter, title: PART_TITLES[s.partStart.letter], isPart: true });
+      entries.push({
+        number: s.partStart.letter,
+        title: PART_TITLES[s.partStart.letter],
+        isPart: true,
+      });
     }
     entries.push({ number: s.number, title: s.title });
   }
@@ -338,12 +365,16 @@ export function buildTocEntries(): TocEntry[] {
  *  `.draft-guidance-block` light-blue tint so it still reads as guidance to
  *  replace, not finished prose. */
 function guidanceBody(section: DraftOutlineSection): string {
-  const bullets = section.bullets.map((b) => `<li class="bnm-clause">${b}</li>`).join("");
+  const bullets = section.bullets
+    .map((b) => `<li class="bnm-clause">${b}</li>`)
+    .join("");
   const heading =
     section.id === "executive-summary"
       ? `<div class="bnm-section-heading">${section.title}</div>`
       : sectionHeading(section.number, section.title);
-  const part = section.partStart ? partHeading(section.partStart.letter, section.partStart.title) : "";
+  const part = section.partStart
+    ? partHeading(section.partStart.letter, section.partStart.title)
+    : "";
   return [
     part,
     heading,
@@ -366,7 +397,11 @@ function guidanceBody(section: DraftOutlineSection): string {
  *  (DOMPurify) and server (bleach, engine/drafts.py) sanitizers. */
 export function buildDraftOutline(): string {
   const totalPages = 2 + DRAFT_OUTLINE_SECTIONS.length; // cover + TOC + sections
-  const cover = coverPage(WORKSTREAM_CONTEXT.owner, WORKSTREAM_CONTEXT.name, "Instructional Outline — Draft");
+  const cover = coverPage(
+    WORKSTREAM_CONTEXT.owner,
+    WORKSTREAM_CONTEXT.name,
+    "Instructional Outline — Draft",
+  );
   const toc = tocPage(buildTocEntries(), 2, totalPages);
   const pages = DRAFT_OUTLINE_SECTIONS.map((section, i) =>
     pageChrome(i + 3, totalPages, guidanceBody(section)),

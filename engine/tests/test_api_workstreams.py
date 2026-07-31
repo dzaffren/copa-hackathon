@@ -146,10 +146,7 @@ def test_GET_node_detail_concepts_available_when_offline_enriched(tmp_path):
     body = client.get(f"/api/workstreams/{_OPRES}/nodes/{_TASK}").json()
     assert body["metadata"]["status"] == "available"
     assert body["metadata"]["policy_owner"] == "Aisyah R."
-    assert body["metadata"]["empowerment_framework"] == (
-        "This policy document is issued pursuant to section 143(2) of the "
-        "Financial Services Act 2013."
-    )
+    assert body["metadata"]["legal_basis"] == ["FSA 2013"]
     # A field the enrichment script could not honestly derive stays null.
     assert body["metadata"]["applicability"] is None
     assert body["pursuant_to"] == "FSA 2013 §143"

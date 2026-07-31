@@ -99,8 +99,7 @@ test.describe("Fill in a document's regulatory profile", () => {
     // Every field is offered, and each reads as unfilled rather than absent.
     await expect(page.getByText("Policy owner")).toBeVisible();
     await expect(page.getByText("Applicability")).toBeVisible();
-    await expect(page.getByText("Empowerment framework")).toBeVisible();
-    expect(await page.getByText("Not set").count()).toBeGreaterThanOrEqual(6);
+    expect(await page.getByText("Not set").count()).toBeGreaterThanOrEqual(5);
 
     // ISMP is the one field whose emptiness has a documented cause, so it says
     // so instead of reading "Not set" like the rest.
@@ -120,9 +119,7 @@ test.describe("Fill in a document's regulatory profile", () => {
     await page.getByRole("button", { name: /^edit$/i }).click();
 
     await page.getByLabel("Policy owner").fill("Priya S.");
-    await page
-      .getByLabel("Legal basis")
-      .fill("FSA 2013, IFSA 2013, DFIA 2002");
+    await page.getByLabel("Legal basis").fill("FSA 2013, IFSA 2013, DFIA 2002");
     await page.getByLabel("Effective date").fill("28 November 2025");
     // A closed dropdown, not free text — these are BNM handling categories.
     await page.getByLabel("ISMP classification").selectOption("SULIT");
@@ -150,7 +147,9 @@ test.describe("Fill in a document's regulatory profile", () => {
 
     const reloaded = page.locator("dl").first();
     await expect(reloaded.getByText("Priya S.", { exact: true })).toBeVisible();
-    await expect(reloaded.getByText("DFIA 2002", { exact: true })).toBeVisible();
+    await expect(
+      reloaded.getByText("DFIA 2002", { exact: true }),
+    ).toBeVisible();
     await expect(reloaded.getByText("SULIT", { exact: true })).toBeVisible();
     await expect(
       reloaded.getByText("28 November 2025", { exact: true }),
