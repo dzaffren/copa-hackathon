@@ -39,6 +39,7 @@ from engine.anchors import AnchorIndex, segment
 from engine.arm_g import extract_axes_for_document as _default_extract_axes
 from engine.arm_g import run_arm_g as _run_arm_g
 from engine.clauses import load_clause_index
+from engine.connections import CONNECTION_LABELS
 from engine.connections import find_connections as _default_find_connections
 from engine.ingest import (
     UnreadableDocumentError,
@@ -1760,7 +1761,18 @@ def create_app(
         return pane
 
     @app.get("/api/workstreams/{workstream_id}/edges/{edge_id}/review")
-    def get_edge_review(workstream_id: str, edge_id: str) -> Any:
+    def get_edge_review(
+        workstream_id: str, edge_id: str, finding_id: Optional[str] = None
+    ) -> Any:
+        """The pairwise clause reader.
+
+        `finding_id` is the Pairwise Findings box's deep link: the box shows one
+        card per finding, so Review must open on the finding the drafter clicked
+        rather than the pair's first. It is validated and echoed as
+        `active_finding_id` — an unknown id 404s rather than silently falling back,
+        which would hide a stale link. Absent, `active_finding_id` is None and the
+        screen keeps its own first-selectable default.
+        """
         ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
         if ws_graph is None:
             return _ws_error(
@@ -1784,6 +1796,14 @@ def create_app(
                 "EDGE_NOT_ANALYSED",
                 f"Edge {edge_id} has not been analysed yet",
             )
+        if finding_id is not None and not any(
+            f["id"] == finding_id for f in edge_findings
+        ):
+            return _ws_error(
+                404,
+                "FINDING_NOT_FOUND",
+                f"Finding {finding_id} not found on {edge_id}",
+            )
         return {
             "edge": {
                 "id": edge_id,
@@ -1791,6 +1811,7 @@ def create_app(
                 "source_node": _review_node(ws_graph, edge["source"]),
                 "target_node": _review_node(ws_graph, edge["target"]),
             },
+            "active_finding_id": finding_id,
             "source_clauses": _clause_pane(edge_findings, "source"),
             "target_clauses": _clause_pane(edge_findings, "target"),
             "findings": edge_findings,
@@ -1861,6 +1882,11 @@ def create_app(
         into the reader, and the drafter clicks through to the review screen for
         the full quotation. Nothing here is a citation, so nothing here can
         misquote.
+
+        `review_state` travels because the Pairwise Findings box renders every
+        finding whatever its state (judged cards mute and sink rather than
+        vanishing). It is redundant on the Reviewed tab, whose cards are accepted
+        by construction, and harmless there.
         """
         source_clauses = finding.get("source_clauses") or []
         target_clauses = finding.get("target_clauses") or []
@@ -1869,6 +1895,7 @@ def create_app(
             "label": finding.get("label"),
             "sentiment": finding.get("sentiment"),
             "summary": finding.get("summary"),
+            "review_state": finding.get("review_state"),
             "edge_id": edge["id"],
             "left": _review_node(ws_graph, edge["source"]),
             "right": _review_node(ws_graph, edge["target"]),
@@ -1880,13 +1907,137 @@ def create_app(
             ),
         }
 
+    @app.get("/api/workstreams/{workstream_id}/tasks/{node_id}/pairwise-findings")
+    def get_pairwise_findings(workstream_id: str, node_id: str) -> Any:
+        """Every finding in the task's neighbourhood, whatever its review state.
+
+        Backs the task screen's Pairwise Findings box. The scope is
+        `workstreams.neighbourhood_edges` — the task's own edges plus every edge
+        incident to a first-order neighbour — which is what makes the box work on
+        `open-finance-pd-2026`, where the task node has ONE edge, that pair has no
+        findings, and all 130 findings hang off edges between its neighbour and
+        other documents.
+
+        Nothing is filtered or reordered here: grouping by label, sinking judged
+        cards and filtering by node are all view concerns, so the browser gets the
+        full set in graph order and needs no refetch to reorder after a review
+        write. Unanalysed pairs are reported separately rather than as empty
+        groups — an edge with no findings file has never been run, which is a
+        different condition from an analysed edge with zero findings.
+        """
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        nodes_by_id = {n["id"]: n for n in ws_graph.get("nodes", [])}
+        # Distinguished from `_task_node`, which collapses both into NOT_A_TASK:
+        # this box is linked from the graph canvas, so "you clicked a node that
+        # isn't there" and "you clicked a document, not a task" are different
+        # mistakes and get different codes.
+        if node_id not in nodes_by_id:
+            return _ws_error(
+                404,
+                "NODE_NOT_FOUND",
+                f"Node {node_id} not found in workstream {workstream_id}",
+            )
+        if nodes_by_id[node_id].get("node_type") != "task":
+            return _ws_error(
+                400,
+                "NOT_A_TASK",
+                f"Node {node_id} is of type "
+                f"{nodes_by_id[node_id].get('node_type')}, not task",
+            )
+
+        scope = workstreams.neighbourhood_edges(ws_graph.get("edges", []), node_id)
+
+        cards: list[dict[str, Any]] = []
+        unanalysed: list[dict[str, Any]] = []
+        # Findings per node, for the filter chips. Both endpoints of an analysed
+        # edge accumulate its findings, so the shared hub node (the ED, here)
+        # carries the sum of every pair it sits on.
+        per_node: dict[str, int] = {}
+        analysed_pairs = 0
+
+        for edge in scope:
+            try:
+                edge_findings = findings.load(
+                    workstreams_dir, workstream_id, edge["id"]
+                )
+            except findings.FindingsNotAnalysedError:
+                unanalysed.append(
+                    {
+                        "edge_id": edge["id"],
+                        "edge_type": edge.get("edge_type"),
+                        "left": _review_node(ws_graph, edge["source"]),
+                        "right": _review_node(ws_graph, edge["target"]),
+                    }
+                )
+                continue
+            analysed_pairs += 1
+            cards.extend(_linkage_card(f, edge, ws_graph) for f in edge_findings)
+            for endpoint in (edge["source"], edge["target"]):
+                per_node[endpoint] = per_node.get(endpoint, 0) + len(edge_findings)
+
+        # All five labels always, including the zeroes — the frontend renders a
+        # group per label and must never have to synthesise a missing one.
+        by_label = {
+            label: {
+                "total": sum(1 for c in cards if c["label"] == label),
+                "pending": sum(
+                    1
+                    for c in cards
+                    if c["label"] == label and c["review_state"] == "pending"
+                ),
+            }
+            for label in CONNECTION_LABELS
+        }
+
+        # Every neighbourhood node except the viewed task. A second task node in
+        # the neighbourhood (`opres-v2` has one) is a legitimate document here and
+        # gets a chip like any other.
+        filter_nodes = [
+            {
+                "id": nid,
+                "title": nodes_by_id[nid].get("title"),
+                "node_type": nodes_by_id[nid].get("node_type"),
+                "findings_count": per_node.get(nid, 0),
+            }
+            for nid in dict.fromkeys(
+                nid
+                for edge in scope
+                for nid in (edge["source"], edge["target"])
+                if nid != node_id and nid in nodes_by_id
+            )
+        ]
+
+        return {
+            "findings": cards,
+            "nodes": filter_nodes,
+            "unanalysed_pairs": unanalysed,
+            "counts": {
+                "total": len(cards),
+                "by_label": by_label,
+                "analysed_pairs": analysed_pairs,
+                "total_pairs": len(scope),
+            },
+        }
+
     @app.get("/api/workstreams/{workstream_id}/tasks/{node_id}/reviewed-linkages")
     def get_reviewed_linkages(workstream_id: str, node_id: str) -> Any:
-        """Accepted findings across every edge incident to the task.
+        """Accepted findings across the task's whole neighbourhood.
 
         Filtered server-side, per the spec's negative constraint: the Reviewed
         tab must not receive dismissed findings and filter them away in the
         browser.
+
+        Scope is `workstreams.neighbourhood_edges` — the SAME rule the Pairwise
+        Findings box uses, deliberately shared so the two surfaces cannot disagree
+        about what is in scope. It used to be "edges incident to the task node",
+        which meant a finding accepted between two of the task's anchors was
+        recorded and then invisible here: on `open-finance-pd-2026` the task's only
+        edge has no findings at all, so that was every acceptance a drafter could
+        possibly make.
         """
         ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
         if ws_graph is None:
@@ -1898,9 +2049,7 @@ def create_app(
             return node
 
         cards: list[dict[str, Any]] = []
-        for edge in ws_graph.get("edges", []):
-            if node_id not in (edge.get("source"), edge.get("target")):
-                continue
+        for edge in workstreams.neighbourhood_edges(ws_graph.get("edges", []), node_id):
             try:
                 edge_findings = findings.load(
                     workstreams_dir, workstream_id, edge["id"]
@@ -1917,6 +2066,14 @@ def create_app(
     @app.get("/api/workstreams/{workstream_id}/tasks/{node_id}/related-linkages")
     def get_related_linkages(workstream_id: str, node_id: str, hops: int = 1) -> Any:
         """Findings on edges between the task's neighbours themselves.
+
+        DEPRECATED — no frontend surface calls this as of the Pairwise Findings
+        epic. The drafting workspace's "Related · 1 hop" tab was its only consumer
+        and has been retired: the Pairwise Findings box covers the same peer
+        material more completely (and with review state attached), while this route
+        showed unjudged findings beside the draft as though endorsed. Retained
+        deliberately as a rollback seam — its `hops` validation is a documented
+        contract and its tests still run.
 
         Peer context: what the anchors already say about each other, useful when
         the draft is silent on a concept the neighbours have settled. Bounded at

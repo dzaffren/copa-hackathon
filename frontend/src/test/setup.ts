@@ -6,6 +6,7 @@ import { server } from "./msw/server";
 // react-force-graph-2d is swapped for an accessible DOM stub via a test-time
 // alias in vite.config.ts (jsdom has no real canvas). See src/test/mocks.
 import {
+  resetAnalysedEdges,
   resetCreatedWorkstreams,
   resetDraft,
   resetLinkageReview,
@@ -43,6 +44,7 @@ afterEach(() => {
   // PATCH/PUT round-trips persist within a test; clear both so tests stay
   // independent.
   resetReviewState();
+  resetAnalysedEdges();
   resetDraft();
   resetCreatedWorkstreams();
   resetTaskWorkflow();

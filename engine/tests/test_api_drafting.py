@@ -52,7 +52,9 @@ def _accept_first_bcbs_finding(client) -> str:
 def test_GET_reviewed_linkages_is_empty_before_anything_is_accepted(tmp_path):
     """Fixture integrity: nothing ships pre-accepted."""
     client, _ = _make_client(tmp_path)
-    body = client.get(f"/api/workstreams/{_OPRES}/tasks/{_TASK}/reviewed-linkages").json()
+    body = client.get(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/reviewed-linkages"
+    ).json()
     assert body["findings"] == []
 
 
@@ -60,7 +62,9 @@ def test_GET_reviewed_linkages_returns_only_accepted_findings(tmp_path):
     client, _ = _make_client(tmp_path)
     accepted_id = _accept_first_bcbs_finding(client)
 
-    body = client.get(f"/api/workstreams/{_OPRES}/tasks/{_TASK}/reviewed-linkages").json()
+    body = client.get(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/reviewed-linkages"
+    ).json()
 
     assert [f["id"] for f in body["findings"]] == [accepted_id]
     card = body["findings"][0]
@@ -78,7 +82,9 @@ def test_GET_reviewed_linkages_excludes_dismissed(tmp_path):
         json={"review_state": "dismissed"},
     )
 
-    body = client.get(f"/api/workstreams/{_OPRES}/tasks/{_TASK}/reviewed-linkages").json()
+    body = client.get(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/reviewed-linkages"
+    ).json()
 
     states = [f["id"] for f in body["findings"]]
     assert f"{_BCBS_EDGE}~1" not in states
@@ -95,7 +101,9 @@ def test_GET_reviewed_linkages_aggregates_across_edges(tmp_path):
         json={"review_state": "accepted"},
     )
 
-    body = client.get(f"/api/workstreams/{_OPRES}/tasks/{_TASK}/reviewed-linkages").json()
+    body = client.get(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/reviewed-linkages"
+    ).json()
 
     assert {f["edge_id"] for f in body["findings"]} == {_BCBS_EDGE, hkma_edge}
     differs = next(f for f in body["findings"] if f["edge_id"] == hkma_edge)
@@ -103,11 +111,15 @@ def test_GET_reviewed_linkages_aggregates_across_edges(tmp_path):
     assert differs["sentiment"] == "tighten"
 
 
-def test_GET_reviewed_linkages_cards_carry_clause_numbers_but_never_clause_text(tmp_path):
+def test_GET_reviewed_linkages_cards_carry_clause_numbers_but_never_clause_text(
+    tmp_path,
+):
     """The cards are references, not citations — so they cannot misquote."""
     client, _ = _make_client(tmp_path)
     _accept_first_bcbs_finding(client)
-    body = client.get(f"/api/workstreams/{_OPRES}/tasks/{_TASK}/reviewed-linkages").json()
+    body = client.get(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/reviewed-linkages"
+    ).json()
     card = body["findings"][0]
     assert "source_clauses" not in card
     assert "text" not in json.dumps(card)
@@ -127,6 +139,156 @@ def test_GET_reviewed_linkages_404_when_workstream_unknown(tmp_path):
     assert res.json()["code"] == "WORKSTREAM_NOT_FOUND"
 
 
+# --- GET reviewed-linkages: the neighbourhood widening ----------------------
+# On `open-finance-pd-2026` the task's ONLY edge has no findings file, so every
+# acceptance a drafter can possibly make lives on a second-order edge. Before the
+# widening this route returned [] there no matter what she accepted — a finding
+# accepted and then lost, which is the defect these tests pin shut.
+
+_OF = "open-finance-pd-2026"
+_OF_TASK = "open-finance-pd-2026-pd"
+_OF_RMIT_EDGE = "e-rmit_2025--ed_open_finance_2025"
+_OF_HKMA_EDGE = "e-hkma_open_api_framework--ed_open_finance_2025"
+_OF_BIS_EDGE = "e-bis_papers_168--ed_open_finance_2025"
+
+
+def _of_finding_ids(client, edge_id) -> list[str]:
+    """Real ids off the review route.
+
+    The `open-finance-*` fixtures ship explicit opaque ids while `opres-v2` ships
+    none and gets `{edge_id}~{i}` derived on read, so ids cannot be constructed —
+    only read back.
+    """
+    body = client.get(f"/api/workstreams/{_OF}/edges/{edge_id}/review").json()
+    return [f["id"] for f in body["findings"]]
+
+
+def _of_accept(client, edge_id, count, state="accepted") -> list[str]:
+    ids = _of_finding_ids(client, edge_id)[:count]
+    for finding_id in ids:
+        res = client.patch(
+            f"/api/workstreams/{_OF}/edges/{edge_id}/findings/{finding_id}",
+            json={"review_state": state},
+        )
+        assert res.status_code == 200, res.text
+    return ids
+
+
+def _of_reviewed(client):
+    return client.get(
+        f"/api/workstreams/{_OF}/tasks/{_OF_TASK}/reviewed-linkages"
+    ).json()["findings"]
+
+
+def test_GET_reviewed_linkages_surfaces_a_second_order_acceptance(tmp_path):
+    """THE regression guard. Fails against the pre-widening implementation, which
+    returns [] because the RMiT edge does not touch the task node."""
+    client, _ = _make_client(tmp_path)
+    accepted = _of_accept(client, _OF_RMIT_EDGE, 1)[0]
+
+    cards = _of_reviewed(client)
+    assert len(cards) == 1
+    assert cards[0]["id"] == accepted
+    assert cards[0]["edge_id"] == _OF_RMIT_EDGE
+    assert cards[0]["left"]["id"] == "rmit-2025"
+    assert cards[0]["right"]["id"] == "ed-open-finance-2025"
+
+
+def test_GET_reviewed_linkages_aggregates_across_pairs(tmp_path):
+    client, _ = _make_client(tmp_path)
+    _of_accept(client, _OF_RMIT_EDGE, 6)
+    _of_accept(client, _OF_HKMA_EDGE, 5)
+    _of_accept(client, _OF_BIS_EDGE, 7)
+
+    cards = _of_reviewed(client)
+    assert len(cards) == 18
+    per_edge: dict[str, int] = {}
+    for card in cards:
+        per_edge[card["edge_id"]] = per_edge.get(card["edge_id"], 0) + 1
+    assert per_edge == {_OF_RMIT_EDGE: 6, _OF_HKMA_EDGE: 5, _OF_BIS_EDGE: 7}
+
+
+def test_GET_reviewed_linkages_excludes_pending_and_dismissed(tmp_path):
+    client, _ = _make_client(tmp_path)
+    accepted = _of_accept(client, _OF_RMIT_EDGE, 4)
+    dismissed = _of_accept(client, _OF_HKMA_EDGE, 3, state="dismissed")
+
+    ids = {c["id"] for c in _of_reviewed(client)}
+    assert ids == set(accepted)
+    assert not (ids & set(dismissed))
+
+
+def test_GET_reviewed_linkages_drops_a_withdrawn_acceptance(tmp_path):
+    client, _ = _make_client(tmp_path)
+    ids = _of_accept(client, _OF_HKMA_EDGE, 2)
+    res = client.patch(
+        f"/api/workstreams/{_OF}/edges/{_OF_HKMA_EDGE}/findings/{ids[0]}",
+        json={"review_state": "pending"},
+    )
+    assert res.status_code == 200
+
+    remaining = _of_reviewed(client)
+    assert [c["id"] for c in remaining] == [ids[1]]
+
+
+def test_GET_reviewed_linkages_excludes_second_order_to_second_order(tmp_path):
+    """An acceptance on an edge between two documents that are each two hops out
+    must not reach the tab. Written into the tmp copy only."""
+    client, ws_dir = _make_client(tmp_path)
+    graph_path = ws_dir / _OF / "graph.json"
+    graph = json.loads(graph_path.read_text(encoding="utf-8"))
+    graph["edges"].append(
+        {
+            "id": "e-hkma--bis",
+            "source": "hkma-open-api-framework",
+            "target": "bis-papers-168",
+            "edge_type": "references",
+        }
+    )
+    graph_path.write_text(json.dumps(graph), encoding="utf-8")
+    (ws_dir / _OF / "findings" / "e-hkma--bis.json").write_text(
+        json.dumps(
+            [
+                {
+                    "summary": "Out-of-scope linkage that must not reach the tab.",
+                    "label": "differs-on",
+                    "sentiment": "tighten",
+                    "review_state": "accepted",
+                    "source_clauses": [{"clause_number": "HKMA 1.1", "text": "x"}],
+                    "target_clauses": [{"clause_number": "BIS 1.1", "text": "y"}],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+    in_scope = _of_accept(client, _OF_RMIT_EDGE, 2)
+
+    cards = _of_reviewed(client)
+    assert {c["id"] for c in cards} == set(in_scope)
+    assert "e-hkma--bis" not in {c["edge_id"] for c in cards}
+
+
+def test_GET_reviewed_linkages_ignores_draft_content(tmp_path):
+    client, _ = _make_client(tmp_path)
+    _of_accept(client, _OF_RMIT_EDGE, 3)
+    before = _of_reviewed(client)
+
+    res = client.put(
+        f"/api/workstreams/{_OF}/tasks/{_OF_TASK}/draft",
+        json={"content_html": "<p>1.1 Scope of this policy document.</p>"},
+    )
+    assert res.status_code == 200
+
+    assert _of_reviewed(client) == before
+
+
+def test_GET_reviewed_linkages_404_when_node_is_not_a_task_on_open_finance(tmp_path):
+    client, _ = _make_client(tmp_path)
+    res = client.get(f"/api/workstreams/{_OF}/tasks/rmit-2025/reviewed-linkages")
+    assert res.status_code == 404
+    assert res.json()["code"] == "TASK_NOT_FOUND"
+
+
 # --- GET related-linkages --------------------------------------------------
 
 
@@ -137,7 +299,9 @@ def test_GET_related_linkages_is_empty_on_the_seeded_fixture(tmp_path):
     text for documents this repo has no source for.
     """
     client, _ = _make_client(tmp_path)
-    body = client.get(f"/api/workstreams/{_OPRES}/tasks/{_TASK}/related-linkages").json()
+    body = client.get(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/related-linkages"
+    ).json()
     assert body["findings"] == []
 
 
@@ -178,7 +342,9 @@ def test_GET_related_linkages_returns_neighbour_pair_findings_and_excludes_task_
         encoding="utf-8",
     )
 
-    body = client.get(f"/api/workstreams/{_OPRES}/tasks/{_TASK}/related-linkages").json()
+    body = client.get(
+        f"/api/workstreams/{_OPRES}/tasks/{_TASK}/related-linkages"
+    ).json()
 
     assert len(body["findings"]) == 1
     card = body["findings"][0]
@@ -186,7 +352,9 @@ def test_GET_related_linkages_returns_neighbour_pair_findings_and_excludes_task_
     assert card["left"]["id"] == "hkma-spm-or2"
     assert card["right"]["id"] == _ANCHOR
     # The task's own analysed edges must not leak into the peer feed.
-    assert all(_TASK not in (c["left"]["id"], c["right"]["id"]) for c in body["findings"])
+    assert all(
+        _TASK not in (c["left"]["id"], c["right"]["id"]) for c in body["findings"]
+    )
 
 
 def test_GET_related_linkages_hops_2_is_rejected(tmp_path):
@@ -254,7 +422,7 @@ def test_PUT_draft_strips_inline_event_handlers(tmp_path):
     client, _ = _make_client(tmp_path)
     body = client.put(
         f"/api/workstreams/{_OPRES}/tasks/{_TASK}/draft",
-        json={"content_html": "<p onclick=\"steal()\">Text</p>"},
+        json={"content_html": '<p onclick="steal()">Text</p>'},
     ).json()
     assert "onclick" not in body["content_html"]
     assert "Text" in body["content_html"]
@@ -275,7 +443,7 @@ def test_PUT_draft_keeps_the_copilot_snippet_class(tmp_path):
     client, _ = _make_client(tmp_path)
     body = client.put(
         f"/api/workstreams/{_OPRES}/tasks/{_TASK}/draft",
-        json={"content_html": "<div class=\"copilot-snippet\"><p>Generated</p></div>"},
+        json={"content_html": '<div class="copilot-snippet"><p>Generated</p></div>'},
     ).json()
     assert 'class="copilot-snippet"' in body["content_html"]
 
@@ -553,7 +721,9 @@ def test_the_deleted_intent_error_code_appears_nowhere_in_the_engine():
 
 
 def test_POST_copilot_400_for_an_empty_message(tmp_path):
-    client = _make_copilot_client(tmp_path, lambda **kwargs: {"role": "copilot", "text": "x"})
+    client = _make_copilot_client(
+        tmp_path, lambda **kwargs: {"role": "copilot", "text": "x"}
+    )
     res = client.post(
         f"/api/workstreams/{_OPRES}/tasks/{_TASK}/copilot",
         json={"message": "   "},
@@ -586,7 +756,9 @@ def test_POST_copilot_404_when_node_is_not_a_task(workstream_id, node_id, tmp_pa
     """Dropping `intent` widened no door: an anchor node is still refused, and
     still with `TASK_NOT_FOUND` — `_task_node` uses one code for both "not a
     task" and "no such node"."""
-    client = _make_copilot_client(tmp_path, lambda **kwargs: {"role": "copilot", "text": "x"})
+    client = _make_copilot_client(
+        tmp_path, lambda **kwargs: {"role": "copilot", "text": "x"}
+    )
     res = client.post(
         f"/api/workstreams/{workstream_id}/tasks/{node_id}/copilot",
         json={"message": "hi"},
@@ -612,6 +784,7 @@ def test_POST_copilot_502_when_the_live_call_fails(tmp_path):
 # The streaming variant of the copilot route. `copilot_stream_fn` is injected
 # so tests stub the generator with no network or credentials.
 
+
 def _make_stream_client(tmp_path, stream_fn, **kwargs):
     dst = _copy_workstreams(tmp_path, **kwargs)
     return TestClient(create_app(workstreams_dir=dst, copilot_stream_fn=stream_fn))
@@ -620,7 +793,7 @@ def _make_stream_client(tmp_path, stream_fn, **kwargs):
 def test_POST_copilot_stream_returns_sse_events(tmp_path):
     def stub_stream_fn(**kwargs):
         yield 'event: token\ndata: {"t": "Hello"}\n\n'
-        yield 'event: done\ndata: {}\n\n'
+        yield "event: done\ndata: {}\n\n"
 
     client = _make_stream_client(tmp_path, stub_stream_fn)
     res = client.post(

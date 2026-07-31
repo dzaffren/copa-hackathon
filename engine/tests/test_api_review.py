@@ -26,8 +26,8 @@ def _make_client(tmp_path) -> tuple[TestClient, "object"]:
     return TestClient(create_app(workstreams_dir=dst)), dst
 
 
-def _review(client, edge=_BCBS_EDGE):
-    return client.get(f"/api/workstreams/{_OPRES}/edges/{edge}/review")
+def _review(client, edge=_BCBS_EDGE, query=""):
+    return client.get(f"/api/workstreams/{_OPRES}/edges/{edge}/review{query}")
 
 
 # --- GET /review -----------------------------------------------------------
@@ -72,7 +72,9 @@ def test_GET_review_findings_default_to_pending_and_carry_derived_ids(tmp_path):
     client, _ = _make_client(tmp_path)
     body = _review(client).json()
     assert [f["review_state"] for f in body["findings"]] == ["pending"] * 3
-    assert [f["id"] for f in body["findings"]] == [f"{_BCBS_EDGE}~{i}" for i in range(3)]
+    assert [f["id"] for f in body["findings"]] == [
+        f"{_BCBS_EDGE}~{i}" for i in range(3)
+    ]
 
 
 def test_GET_review_400_EDGE_NOT_ANALYSED_when_no_findings_file(tmp_path):
@@ -94,6 +96,59 @@ def test_GET_review_404_WORKSTREAM_NOT_FOUND_on_unknown_workstream(tmp_path):
     res = client.get(f"/api/workstreams/nope/edges/{_BCBS_EDGE}/review")
     assert res.status_code == 404
     assert res.json()["code"] == "WORKSTREAM_NOT_FOUND"
+
+
+# --- GET review?finding_id= (deep link from the Pairwise Findings box) ------
+
+
+def test_GET_review_echoes_a_nominated_finding_id(tmp_path):
+    """The box's Review action names a finding, so the screen opens on THAT one
+    rather than the pair's first."""
+    client, _ = _make_client(tmp_path)
+    third = _review(client).json()["findings"][2]["id"]
+
+    body = _review(client, query=f"?finding_id={third}").json()
+    assert body["active_finding_id"] == third
+
+
+def test_GET_review_active_finding_id_is_null_without_the_param(tmp_path):
+    """Regression guard: the screen keeps its own first-selectable default when
+    no finding is nominated."""
+    client, _ = _make_client(tmp_path)
+    assert _review(client).json()["active_finding_id"] is None
+
+
+def test_GET_review_is_otherwise_unchanged_by_the_param(tmp_path):
+    """Only the echo differs — clause panes already carry every clause cited by
+    any finding on the edge, so nothing else may move."""
+    client, _ = _make_client(tmp_path)
+    plain = _review(client).json()
+    first = plain["findings"][0]["id"]
+    nominated = _review(client, query=f"?finding_id={first}").json()
+
+    assert nominated["findings"] == plain["findings"]
+    assert nominated["source_clauses"] == plain["source_clauses"]
+    assert nominated["target_clauses"] == plain["target_clauses"]
+    assert nominated["counts"] == plain["counts"]
+    assert nominated["edge"] == plain["edge"]
+
+
+def test_GET_review_404_FINDING_NOT_FOUND_on_a_finding_from_another_edge(tmp_path):
+    """A stale or hand-edited link must fail loudly rather than silently falling
+    back to the first finding."""
+    client, _ = _make_client(tmp_path)
+    res = _review(client, query="?finding_id=e-opres_v0_3--bcbs_opres_2021~9999")
+    assert res.status_code == 404
+    assert res.json()["code"] == "FINDING_NOT_FOUND"
+
+
+def test_GET_review_finding_id_is_validated_before_the_not_analysed_check(tmp_path):
+    """An unanalysed edge still reports EDGE_NOT_ANALYSED, not FINDING_NOT_FOUND
+    — the pair's state is the more useful complaint."""
+    client, _ = _make_client(tmp_path)
+    res = _review(client, edge=_FSB_EDGE, query="?finding_id=whatever")
+    assert res.status_code == 400
+    assert res.json()["code"] == "EDGE_NOT_ANALYSED"
 
 
 # --- PATCH review_state ----------------------------------------------------

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { fetchReview, setReviewState, HttpError } from "@/lib/api";
@@ -23,12 +23,17 @@ function forDisplay(findings: ReviewFinding[]): ReviewFinding[] {
 
 export function ReviewLinkagesPage() {
   const { workstreamId = "", edgeId = "" } = useParams();
+  const [searchParams] = useSearchParams();
+  // The Pairwise Findings box shows one card per finding, so its Review action
+  // names the finding to open on. Sent to the engine too, which validates it —
+  // an unknown id fails loudly rather than silently showing the wrong finding.
+  const nominatedId = searchParams.get("finding");
   const queryClient = useQueryClient();
   const queryKey = ["review", workstreamId, edgeId];
 
   const { data, isLoading, error } = useQuery<ReviewResponse>({
     queryKey,
-    queryFn: () => fetchReview(workstreamId, edgeId),
+    queryFn: () => fetchReview(workstreamId, edgeId, nominatedId ?? undefined),
   });
 
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -44,10 +49,19 @@ export function ReviewLinkagesPage() {
   // The first selectable card is active on load, and stays active across a
   // refetch. Falls back when the active card was just dismissed (dismissed
   // cards are not selectable, so leaving it active would strand the panes).
+  //
+  // A nominated finding wins over the default, but NOT over the drafter's own
+  // click — once she has selected something here, the URL no longer overrides
+  // her. It is also allowed to be dismissed: arriving from a deep link at a
+  // dismissed finding should show it, not silently jump elsewhere.
   const active = useMemo(() => {
     const selectable = ordered.filter((f) => f.review_state !== "dismissed");
+    if (activeId === null && data?.active_finding_id) {
+      const nominated = ordered.find((f) => f.id === data.active_finding_id);
+      if (nominated) return nominated;
+    }
     return selectable.find((f) => f.id === activeId) ?? selectable[0] ?? null;
-  }, [ordered, activeId]);
+  }, [ordered, activeId, data?.active_finding_id]);
 
   if (isLoading) {
     return <p className="p-6 text-sm text-muted-foreground">Loading review…</p>;

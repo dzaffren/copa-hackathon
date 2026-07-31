@@ -5,11 +5,16 @@ import { GitBranch, Link2, Loader2, PencilLine, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { fetchTask, setTaskWorkflow, HttpError } from "@/lib/api";
+import {
+  fetchPairwiseFindings,
+  fetchTask,
+  setTaskWorkflow,
+  HttpError,
+} from "@/lib/api";
 import type { TaskWorkflowStatus } from "@/lib/types";
 import { SourceCard } from "./SourceCard";
 import { NeighboursCard } from "./NeighboursCard";
-import { PairwiseComparisonCard } from "./PairwiseComparisonCard";
+import { PairwiseFindingsCard } from "./PairwiseFindingsCard";
 import { AssignDialog } from "./AssignDialog";
 import { ApproveDialog } from "./ApproveDialog";
 
@@ -41,7 +46,7 @@ function MetricTile({
   label,
 }: {
   icon: React.ReactNode;
-  value: number;
+  value: number | string;
   label: string;
 }) {
   return (
@@ -65,6 +70,15 @@ export default function TaskScreenPage() {
   const query = useQuery({
     queryKey,
     queryFn: () => fetchTask(workstreamId, nodeId),
+  });
+
+  // The metric tiles describe the NEIGHBOURHOOD (what the box can show findings
+  // for), which is wider than `task.neighbours` (documents joined directly to
+  // the task). Shares the box's query key, so this is the same cached response
+  // the box renders, not a second request.
+  const pairwise = useQuery({
+    queryKey: ["pairwise-findings", workstreamId, nodeId],
+    queryFn: () => fetchPairwiseFindings(workstreamId, nodeId),
   });
 
   const workflowMutation = useMutation({
@@ -107,13 +121,10 @@ export default function TaskScreenPage() {
     );
   }
 
-  const { task, workflow, neighbours, draft_empty } = query.data;
+  const { task, workflow, neighbours } = query.data;
   const currentStatus = workflow.status;
-  const analysedCount = neighbours.filter((n) => n.analysed).length;
-  const findingsTotal = neighbours.reduce(
-    (sum, n) => sum + (n.findings_count ?? 0),
-    0,
-  );
+  const counts = pairwise.data?.counts;
+  const documentCount = pairwise.data?.nodes.length ?? 0;
 
   return (
     <div className="h-full overflow-y-auto bg-background">
@@ -195,20 +206,25 @@ export default function TaskScreenPage() {
           </div>
         </div>
 
+        {/* "Documents", not "Neighbours": the neighbourhood is wider than the
+            first-order neighbour list, so this number legitimately exceeds the
+            NeighboursCard row count and must not claim to be the same thing. */}
         <div className="mt-4 grid grid-cols-3 gap-3 sm:max-w-xl">
           <MetricTile
             icon={<GitBranch className="h-4 w-4" />}
-            value={neighbours.length}
-            label="Neighbours"
+            value={documentCount}
+            label="Documents"
           />
           <MetricTile
             icon={<Sparkles className="h-4 w-4" />}
-            value={analysedCount}
+            value={
+              counts ? `${counts.analysed_pairs} of ${counts.total_pairs}` : 0
+            }
             label="Analysed"
           />
           <MetricTile
             icon={<Link2 className="h-4 w-4" />}
-            value={findingsTotal}
+            value={counts?.total ?? 0}
             label="Findings"
           />
         </div>
@@ -220,12 +236,7 @@ export default function TaskScreenPage() {
           <NeighboursCard neighbours={neighbours} />
         </section>
         <section className="col-span-12 lg:col-span-8">
-          <PairwiseComparisonCard
-            workstreamId={workstreamId}
-            nodeId={nodeId}
-            neighbours={neighbours}
-            draftEmpty={draft_empty}
-          />
+          <PairwiseFindingsCard workstreamId={workstreamId} nodeId={nodeId} />
         </section>
       </div>
     </div>

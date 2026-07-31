@@ -74,7 +74,7 @@ matching clause found" — never invent one. Preserve this in any spec or POC ed
 - `frontend/` — **the SELARAS app** (Vite + React 18 + Tailwind + shadcn/ui).
   The only frontend. This is where UI work lands.
 - `data/corpus/` — the parsed BNM policy PDFs; `data/workstreams/` — workstream
-  fixtures (`opres-v2`, `outsourcing-v2`, `rmit-v2-2025`), which the API reads;
+  fixtures, which the API reads (see the retired-fixtures rule below);
   `data/references/` — **public** external standards (Basel, MAS TRM, PDPA);
   `data/artifacts/` — built clause index + recorded linkage traces (see the
   narrowing blocker below).
@@ -102,6 +102,37 @@ matching clause found" — never invent one. Preserve this in any spec or POC ed
 
 **Confidential:** `docs/references/` — **git-ignored**, internal, local only.
 Note this is _not_ `data/references/`, which is public and tracked.
+
+## Retired workstream fixtures (hard rule)
+
+`data/workstreams/` holds four fixtures. Three are **retired** and carry
+`"hidden": true` in their `workstream.json`:
+
+| Fixture                | State                                  |
+| ---------------------- | -------------------------------------- |
+| `open-finance-pd-2026` | **live** — the current demo workstream |
+| `opres-v2`             | retired, hidden                        |
+| `rmit-v2-2025`         | retired, hidden                        |
+| `open-finance-ed`      | retired, hidden                        |
+
+**A retired fixture's data oddities are not bugs. Do not fix them.** They stay on
+disk because the engine suite reads several of them by id, and `hidden: true`
+keeps them out of the drafter's sidebar. Only `list_workstreams` honours the flag
+— every direct-id route still serves a hidden workstream, so existing links and
+tests keep working (`engine/workstreams.py`'s `list_workstreams` docstring is the
+source of truth).
+
+Concretely, leave these alone: the retired `contributes-to` edge type still stored
+in `opres-v2` / `rmit-v2-2025`; `opres-v2`'s second task node (`opres-pd-v0-0`)
+and its edges; seeded drafts that predate the deliverable-kind vocabulary and so
+carry no `task_type`; the absence of anchor↔anchor edges in `opres-v2`; and the
+duplicated `name` between `open-finance-ed` and `open-finance-pd-2026`. Each is
+recorded history, and "correcting" one silently changes what a test asserts.
+
+Build and demo against **`open-finance-pd-2026`**. Use a retired fixture only as
+a regression check that existing behaviour still holds — never as the shape a new
+feature is designed around. `data/corpus/` and `data/artifacts/` are not covered
+by this rule.
 
 ## Conventions
 
@@ -181,11 +212,16 @@ workstream_id)`, per-node files under `data/workstreams/<ws>/anchors/`), falling
   green). Verify with `.venv/Scripts/python.exe -m pytest engine/tests`; don't disable
   all hooks (kills secret-scan) or install ruff to appease it. See
   `docs/learnings/blocker-forge-verify-hook-false-fail-pyenv-ruff.md`.
-- **Workstream-brain uses the opres-v2 base, not the specs' shapes** — the
-  workstream-brain specs are greenfield-stale; build screens to the `opres-v2`
+- **Workstream-brain uses the fixture base, not the specs' shapes** — the
+  workstream-brain specs are greenfield-stale; build screens to the committed
   fixtures + `engine/workstreams.py` (`node_type`/`edge_type`, `analysed` derived
-  from a findings file, task node is always the edge source). See
-  `docs/learnings/convention-workstream-brain-opres-v2-conventions.md`.
+  from a findings file). See
+  `docs/learnings/convention-workstream-brain-opres-v2-conventions.md` — but note
+  two of its claims are now `opres-v2`-only, not general: **the task node is _not_
+  always the edge source** (`open-finance-pd-2026` points its edges _into_ the ED
+  node, so read both endpoints and never normalise direction), and `opres-v2` is a
+  retired fixture, so design against `open-finance-pd-2026` per the retired-fixtures
+  rule above.
 - **Run forge builds in the main tree, not a worktree** — `.venv` and
   `frontend/node_modules` exist only in the main working tree, so builds that need
   `pytest`/`vitest` must run there rather than in isolated feature-builder

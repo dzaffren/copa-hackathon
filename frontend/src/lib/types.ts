@@ -129,6 +129,11 @@ export interface ReviewResponse {
     source_node: ReviewEdgeNode;
     target_node: ReviewEdgeNode;
   };
+  /** The finding named by the caller's `finding_id`, echoed back so the screen
+   *  can open on the card the drafter clicked in the Pairwise Findings box.
+   *  `null` when no finding was nominated — the screen then falls back to its
+   *  own first-selectable default. */
+  active_finding_id: string | null;
   source_clauses: ReviewClause[];
   target_clauses: ReviewClause[];
   findings: ReviewFinding[];
@@ -398,6 +403,58 @@ export interface LinkageCard {
 
 export interface LinkagesResponse {
   findings: LinkageCard[];
+}
+
+// --- Pairwise Findings -----------------------------------------------------
+// `GET .../tasks/{nodeId}/pairwise-findings`. Every finding in the task's
+// neighbourhood — the task's own edges plus every edge incident to a first-order
+// neighbour — whatever its review state. Grouping, sinking judged cards and
+// filtering by node are all view concerns, so the server sends the full set in
+// graph order and the browser never refetches to reorder.
+
+/** A `LinkageCard` plus the review state the box needs to mute and sink a
+ *  judged card. Clause NUMBERS only, as with every card shape. */
+export interface PairwiseFinding extends LinkageCard {
+  review_state: ReviewState;
+}
+
+/** One chip in the node filter. Every neighbourhood document except the viewed
+ *  task — including a second task node, where the fixture has one. A document
+ *  whose pair is unanalysed still gets a chip, at zero. */
+export interface PairwiseFilterNode {
+  id: string;
+  title: string | null;
+  node_type: NodeType | null;
+  findings_count: number;
+}
+
+/** A pair with no findings file: never analysed, as distinct from analysed with
+ *  zero findings. Drives the coverage strip. */
+export interface UnanalysedPair {
+  edge_id: string;
+  edge_type: EdgeType | null;
+  left: LinkageEndpoint;
+  right: LinkageEndpoint;
+}
+
+/** Per-label totals. `total` never moves as findings are judged; `pending`
+ *  falls. All five labels are always present, including zeroes, so the UI never
+ *  synthesises a missing group. */
+export interface LabelCount {
+  total: number;
+  pending: number;
+}
+
+export interface PairwiseFindingsResponse {
+  findings: PairwiseFinding[];
+  nodes: PairwiseFilterNode[];
+  unanalysed_pairs: UnanalysedPair[];
+  counts: {
+    total: number;
+    by_label: Record<SemanticLabel, LabelCount>;
+    analysed_pairs: number;
+    total_pairs: number;
+  };
 }
 
 export interface DraftResponse {
