@@ -67,6 +67,12 @@ from engine.config import (
 )
 from engine.connections import _validate_candidates
 from engine.llm import LLMResponseError, call_chat, parse_json_response
+from engine.prompt_style import (
+    EVIDENCE_DISCIPLINE_RULE,
+    GOVERNING_THOUGHT_RULE,
+    HOUSE_CONSTRAINTS,
+    NO_INTERNAL_LABELS_RULE,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -567,15 +573,23 @@ SAME_TOPIC_FINDER_SYSTEM_PROMPT = (
     "  - conflicts-with: the two cannot both be followed (incompatible).\n\n"
     "BATCH-UNION MEMBERSHIP: you may relate ANY A-side anchor in this batch to "
     "ANY B-side anchor in this batch — you are not limited to a fixed pairing. "
-    "Emit one finding object per genuine relationship you find.\n\n"
+    "Emit one finding object per genuine relationship you find. Because any "
+    "pairing is permitted, apply the MECE constraint below within the batch: "
+    "never emit two findings that describe the same underlying relationship, and "
+    "never skip a genuine one.\n\n"
+    f"{GOVERNING_THOUGHT_RULE} The `summary` IS the governing thought: the single "
+    "claim this finding makes.\n\n"
     "SUMMARY PHRASING RULE (strict): write `summary` as ONE plain sentence, at "
     "most 20 words, in everyday professional English a policy drafter grasps on "
     "the first read. State plainly what OUR side does and what THEIR side does; "
     "do not merely restate the label (never write bare phrasing like 'these "
     "align' or 'these differ'). Use a specialist regulatory term only if it "
-    "appears in the cited clause text; otherwise use a plain equivalent. Do not "
-    "use em dashes. Put any qualifying nuance in `scope_note` (one plain "
-    "sentence, at most 30 words), never stacked into the summary.\n\n"
+    "appears in the cited clause text; otherwise use a plain equivalent. Put any "
+    "qualifying nuance in `scope_note` (one plain sentence, at most 30 words), "
+    "never stacked into the summary.\n\n"
+    f"{EVIDENCE_DISCIPLINE_RULE}\n\n"
+    f"{NO_INTERNAL_LABELS_RULE}\n\n"
+    f"{HOUSE_CONSTRAINTS}\n\n"
     "SIDE-GUARD (strict): `source_clauses` MUST contain ONLY anchor IDs from the "
     "A-side list; `target_clauses` MUST contain ONLY anchor IDs from the B-side "
     "list. Never place a B-side id in source_clauses or an A-side id in "
@@ -750,19 +764,26 @@ COVERAGE_FINDER_SYSTEM_PROMPT = (
     "(document B) has no provision for it anywhere in the document.\n"
     "  - silent-on: OUR side (document A) has no provision for a sub-topic; "
     "THEIR side (document B) covers it.\n\n"
+    f"{GOVERNING_THOUGHT_RULE} The `summary` IS the governing thought: the single "
+    "claim this finding makes.\n\n"
     "COVERAGE-SUMMARY RULE: keep the `summary` short and readable, and put the "
     "detail in `scope_note`. Do NOT stack multiple points into the summary.\n"
     "  - `summary`: ONE plain sentence, at most 20 words, in everyday "
     "professional English a policy drafter grasps on the first read. Name the "
     "shared regulatory topic and state plainly which side covers it and which "
     "side is silent (e.g. 'The draft requires a tested exit plan per provider; "
-    "the BCBS principles do not.'). Do not merely restate the label. Do not use "
-    "em dashes.\n"
+    "the BCBS principles do not.'). Do not merely restate the label.\n"
     "  - `scope_note`: ONE plain sentence, at most 30 words, naming the specific "
     "obligation or sub-point the silent side does NOT address — not just 'does "
     "not cover this'. This is where the precise detail belongs.\n"
     "  - Use a specialist regulatory term only if it appears in the cited clause "
     "text; otherwise use a plain equivalent.\n\n"
+    "MECE ACROSS THE DOCUMENT: emit one finding per distinct sub-topic. Never "
+    "emit two findings for the same gap in different words, and never leave a "
+    "genuine gap out.\n\n"
+    f"{EVIDENCE_DISCIPLINE_RULE}\n\n"
+    f"{NO_INTERNAL_LABELS_RULE}\n\n"
+    f"{HOUSE_CONSTRAINTS}\n\n"
     "GUARDRAIL: If both sides take a position on this topic — even if different "
     "— that is NOT a coverage finding. Do not emit it. Only emit a finding when "
     "one side genuinely has no provision for the sub-point. A stricter rule on "

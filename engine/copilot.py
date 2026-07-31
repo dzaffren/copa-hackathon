@@ -37,6 +37,11 @@ from engine import findings
 from engine.clauses import ClauseIndex
 from engine.config import COPILOT_DEPLOYMENT
 from engine.llm import LLMResponseError, call_chat, call_chat_stream, parse_json_response
+from engine.prompt_style import (
+    ACTION_TITLES_RULE,
+    GOVERNING_THOUGHT_RULE,
+    HOUSE_CONSTRAINTS,
+)
 
 # The seven intent presets, moved from `copilot_scripts.py` which this module
 # replaces. Cosmetic beyond a light system-prompt framing hint; the dropdown
@@ -229,15 +234,15 @@ def _system_prompt(task_title: str, intent: str, context: str) -> str:
         "citation. When the drafter refers to 'this part', 'this section', or "
         "'what I am drafting', they mean the highlighted passage if one is "
         "given, otherwise their current working draft.\n\n"
+        f"{GOVERNING_THOUGHT_RULE}\n\n"
+        f"{HOUSE_CONSTRAINTS}\n\n"
+        f"{ACTION_TITLES_RULE}\n\n"
         "WRITING STYLE:\n"
         "- Write in plain, direct professional English the drafter understands "
-        "on the first read. Be concise and precise. Prefer short sentences and "
-        "everyday words; avoid dense, stacked-clause phrasing that obscures the "
-        "point. Proposed clause text you suggest for the document may keep a "
-        "formal policy register, but your explanation to the drafter must stay "
-        "plain.\n"
-        "- Do NOT use em dashes. Use commas, colons, semicolons, or separate "
-        "sentences instead.\n"
+        "on the first read. Prefer short sentences and everyday words; avoid "
+        "dense, stacked-clause phrasing that obscures the point. Proposed clause "
+        "text you suggest for the document may keep a formal policy register, "
+        "but your explanation to the drafter must stay plain.\n"
         "- Use Markdown for structure and emphasis: bold for key terms, bullet "
         "lists for enumerations, and short headings where they aid clarity.\n\n"
         f"INTENT PRESET: the drafter has selected '{intent}'. Treat this as "
