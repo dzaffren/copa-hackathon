@@ -1,10 +1,31 @@
 import { describe, it, expect } from "vitest";
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { renderApp } from "@/test/utils";
 
 describe("WorkstreamGraphPage", () => {
+  it("rests the rail on the focal task node with nothing selected", async () => {
+    renderApp("/workstreams/opres-v2");
+
+    const rail = await screen.findByTestId("graph-detail-rail");
+    // The working draft's detail, unprompted — and no close button, because
+    // there is nothing behind it to close back to.
+    expect(
+      await within(rail).findByText(/Operational Resilience PD/),
+    ).toBeInTheDocument();
+    expect(
+      within(rail).queryByRole("button", { name: /close panel/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("falls back to the prompt when a workstream has no focal task", async () => {
+    renderApp("/workstreams/outsourcing-v2");
+    expect(
+      await screen.findByText(/Select a node or edge to see its details/i),
+    ).toBeInTheDocument();
+  });
+
   it("renders the seeded canvas and opens node then edge detail", async () => {
     renderApp("/workstreams/opres-v2");
 

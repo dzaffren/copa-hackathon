@@ -9,8 +9,6 @@ import { fetchGraph, fetchWorkstreams } from "@/lib/api";
 import { GraphCanvas } from "./GraphCanvas";
 import { NodeDetailPanel } from "./NodeDetailPanel";
 import { EdgeDetailPanel } from "./EdgeDetailPanel";
-import { CrossWorkstreamPanel } from "./CrossWorkstreamPanel";
-import { RegulatoryProfileCard } from "@/features/cross-intelligence/RegulatoryProfileCard";
 import { AddNodeDialog } from "./AddNodeDialog";
 import {
   EDGE_LEGEND,
@@ -85,6 +83,10 @@ export default function WorkstreamGraphPage() {
   const name =
     workstreams?.find((w) => w.id === workstreamId)?.name ?? workstreamId;
 
+  // The working draft, and the rail's resting subject. Read from the graph so
+  // it survives a node delete: the graph refetches, and the rail follows.
+  const focalTaskId = graphQuery.data?.primary_task_id ?? null;
+
   return (
     <>
       <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-background">
@@ -146,7 +148,10 @@ export default function WorkstreamGraphPage() {
             {!graphQuery.isPending && !graphQuery.isError && <LegendCard />}
           </main>
 
-          <div className="w-80 shrink-0 overflow-hidden border-l border-border/60 bg-card">
+          <div
+            data-testid="graph-detail-rail"
+            className="w-80 shrink-0 overflow-hidden border-l border-border/60 bg-card"
+          >
             {selection.kind === "node" ? (
               <NodeDetailPanel
                 workstreamId={workstreamId}
@@ -161,14 +166,23 @@ export default function WorkstreamGraphPage() {
                 edgeId={selection.id}
                 onClose={() => setSelection({ kind: "none" })}
               />
+            ) : focalTaskId ? (
+              // Nothing selected: the rail rests on the focal task node. The
+              // working draft is what the drafter came to this screen for, so
+              // it should not take a click to read. No `onClose` — this is the
+              // resting state, not a panel laid over one.
+              <NodeDetailPanel
+                key={focalTaskId}
+                workstreamId={workstreamId}
+                nodeId={focalTaskId}
+                nodes={graphQuery.data?.nodes ?? []}
+                onSelectNode={(id) => setSelection({ kind: "node", id })}
+              />
             ) : (
-              // Nothing selected: the rail leads with cross-workstream drift.
-              // It is the one thing on this screen a drafter cannot find by
-              // reading their own workstream, so it should not need hunting for.
-              <div className="flex h-full flex-col gap-3 overflow-y-auto p-3">
-                <CrossWorkstreamPanel workstreamId={workstreamId} />
-                <RegulatoryProfileCard workstreamId={workstreamId} />
-                <p className="px-3 text-center text-sm text-muted-foreground">
+              // No focal task node (a graph still loading, or one without a
+              // working draft) — the rail says what to do instead.
+              <div className="flex h-full items-center justify-center p-6">
+                <p className="text-center text-sm text-muted-foreground">
                   Select a node or edge to see its details.
                 </p>
               </div>
