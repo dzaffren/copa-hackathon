@@ -548,7 +548,7 @@
   {
     "summary": "RMiT can require an independent external review, while the draft relies on the FSP's own regular monitoring of controls.",
     "label": "differs-on",
-    "sentiment": "tighten",
+    "sentiment": "loosen",
     "source_clauses": [
       {
         "clause_number": "Rmit 2025 1.4(a)",
@@ -820,7 +820,7 @@
   },
   {
     "summary": "Only the draft addresses inclusive, accessible interface design for customers; RMiT is silent on this.",
-    "label": "silent-on",
+    "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [],
     "target_clauses": [
@@ -836,7 +836,7 @@
   },
   {
     "summary": "Only the draft creates a mandated customer information-sharing arrangement between firms; RMiT has no such concept.",
-    "label": "silent-on",
+    "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [],
     "target_clauses": [
@@ -856,7 +856,7 @@
   },
   {
     "summary": "RMiT requires a full cryptography and key management policy; the draft has no equivalent requirement.",
-    "label": "goes-beyond",
+    "label": "silent-on",
     "sentiment": null,
     "source_clauses": [
       {
@@ -885,7 +885,7 @@
   },
   {
     "summary": "RMiT requires a patch and end-of-life management framework; the draft has no such provision.",
-    "label": "goes-beyond",
+    "label": "silent-on",
     "sentiment": null,
     "source_clauses": [
       {
@@ -905,7 +905,7 @@
   },
   {
     "summary": "RMiT requires a full cyber incident response plan with drills and backup communications; the draft only requires breach handling.",
-    "label": "goes-beyond",
+    "label": "silent-on",
     "sentiment": null,
     "source_clauses": [
       {
@@ -934,7 +934,7 @@
   },
   {
     "summary": "RMiT requires red team simulation attacks and allows crowdsourced testing; the draft has no such requirement.",
-    "label": "goes-beyond",
+    "label": "silent-on",
     "sentiment": null,
     "source_clauses": [
       {
@@ -954,7 +954,7 @@
   },
   {
     "summary": "RMiT requires data centre resilience and periodic external assessments; the draft has no such provision.",
-    "label": "goes-beyond",
+    "label": "silent-on",
     "sentiment": null,
     "source_clauses": [
       {
@@ -978,7 +978,7 @@
   },
   {
     "summary": "RMiT requires reviewing loss provisions and cyber insurance adequacy; the draft has no such provision.",
-    "label": "goes-beyond",
+    "label": "silent-on",
     "sentiment": null,
     "source_clauses": [
       {
@@ -1002,7 +1002,7 @@
   },
   {
     "summary": "RMiT requires a dedicated technology audit function with an annual plan; the draft has no such provision.",
-    "label": "goes-beyond",
+    "label": "silent-on",
     "sentiment": null,
     "source_clauses": [
       {
@@ -1026,7 +1026,7 @@
   },
   {
     "summary": "RMiT requires network resilience safeguards, a design blueprint, and periodic assessments; the draft has no such provision.",
-    "label": "goes-beyond",
+    "label": "silent-on",
     "sentiment": null,
     "source_clauses": [
       {
@@ -1050,7 +1050,7 @@
   },
   {
     "summary": "RMiT requires a designated CISO; the draft assigns oversight to the board and senior management but requires no CISO.",
-    "label": "goes-beyond",
+    "label": "silent-on",
     "sentiment": null,
     "source_clauses": [
       {
@@ -1075,7 +1075,7 @@
   },
   {
     "summary": "Only the draft sets phased start dates for mandated open finance obligations; RMiT has no such rollout.",
-    "label": "silent-on",
+    "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [],
     "target_clauses": [

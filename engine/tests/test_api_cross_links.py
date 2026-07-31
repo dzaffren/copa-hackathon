@@ -64,7 +64,7 @@ def test_link_carries_a_label_tally(tmp_path):
     """So a caller can render "12 linkages · 4 differ" without fetching each."""
     client, _ = _make_client(tmp_path)
     labels = _links(client, _OPRES)[0]["labels"]
-    assert labels == {"aligns-with": 6, "differs-on": 4, "goes-beyond": 2}
+    assert labels == {"aligns-with": 6, "differs-on": 4, "silent-on": 2}
     assert sum(labels.values()) == 12
 
 
@@ -228,7 +228,11 @@ def test_findings_use_only_the_five_label_taxonomy(tmp_path):
 def test_the_accountability_gap_survived_the_projection(tmp_path):
     """The brief's demo-hero linkage: Open Finance mandates board oversight but
     no single accountable person, where the OpRes DP has Responsibility Mapping.
-    Pinned because it is the moment the demo turns on."""
+    Pinned because it is the moment the demo turns on.
+
+    The label is `silent-on`: the drafter's side (Open Finance, the task node and
+    so document A) is the one WITHOUT the provision, and the peer covers it.
+    """
     _, dst = _make_client(tmp_path)
     findings = json.loads(
         (dst / "_cross" / "findings" / f"{_CROSS_EDGE}.json").read_text(
@@ -236,7 +240,7 @@ def test_the_accountability_gap_survived_the_projection(tmp_path):
         )
     )
     gap = next(
-        f for f in findings if f["label"] == "goes-beyond" and "7.1" in json.dumps(f)
+        f for f in findings if f["label"] == "silent-on" and "7.1" in json.dumps(f)
     )
     assert "Open Finance 7.1" in [c["clause_number"] for c in gap["source_clauses"]]
     assert "Operational Resilience 6.3" in [

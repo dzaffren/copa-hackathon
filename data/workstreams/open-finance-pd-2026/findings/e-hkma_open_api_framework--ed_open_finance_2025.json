@@ -170,7 +170,7 @@
   {
     "summary": "The HKMA framework takes a voluntary, phased approach; the draft mandates FSP obligations with fixed commencement dates.",
     "label": "differs-on",
-    "sentiment": "loosen",
+    "sentiment": "tighten",
     "source_clauses": [
       {
         "clause_number": "hkma-open-api-framework 8.2",
@@ -195,7 +195,7 @@
   {
     "summary": "The HKMA framework lets banks advance their own rollout timeline; the draft sets a firm mandatory commencement date.",
     "label": "differs-on",
-    "sentiment": "loosen",
+    "sentiment": "tighten",
     "source_clauses": [
       {
         "clause_number": "hkma-open-api-framework 19",
@@ -505,7 +505,7 @@
   {
     "summary": "The HKMA framework has no fixed mandatory timeline for Open API rollout; the draft mandates specific commencement dates.",
     "label": "differs-on",
-    "sentiment": "loosen",
+    "sentiment": "tighten",
     "source_clauses": [
       {
         "clause_number": "hkma-open-api-framework 8.2",
@@ -723,7 +723,7 @@
   {
     "summary": "Both set security requirements, but HKMA varies protections by API category while the draft applies cyber and API controls uniformly.",
     "label": "differs-on",
-    "sentiment": "tighten",
+    "sentiment": "neutral",
     "source_clauses": [
       {
         "clause_number": "hkma-open-api-framework 12",
@@ -806,7 +806,7 @@
   },
   {
     "summary": "The draft requires a real-time consent dashboard; the HKMA framework has no such requirement.",
-    "label": "silent-on",
+    "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [],
     "target_clauses": [
@@ -822,7 +822,7 @@
   },
   {
     "summary": "The draft bans bundled consent, pre-ticked boxes and coercion, and requires easy revocation; the HKMA framework does not.",
-    "label": "silent-on",
+    "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [],
     "target_clauses": [
@@ -842,7 +842,7 @@
   },
   {
     "summary": "The draft requires board and senior management oversight of open finance; the HKMA framework has no such requirement.",
-    "label": "silent-on",
+    "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [],
     "target_clauses": [
@@ -862,7 +862,7 @@
   },
   {
     "summary": "The draft requires a customer-information breach handling and response plan; the HKMA framework does not.",
-    "label": "silent-on",
+    "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [],
     "target_clauses": [
@@ -878,7 +878,7 @@
   },
   {
     "summary": "The draft encourages inclusive, accessible interface design for underserved customers; the HKMA framework does not.",
-    "label": "silent-on",
+    "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [],
     "target_clauses": [
@@ -894,7 +894,7 @@
   },
   {
     "summary": "The HKMA framework sets a customer-liability standard for unauthorised transactions; the draft does not.",
-    "label": "goes-beyond",
+    "label": "silent-on",
     "sentiment": null,
     "source_clauses": [
       {
@@ -919,7 +919,7 @@
   },
   {
     "summary": "The HKMA framework requires publishing a partnering-TSP list and monitoring for impersonation scams; the draft does not.",
-    "label": "goes-beyond",
+    "label": "silent-on",
     "sentiment": null,
     "source_clauses": [
       {
@@ -939,7 +939,7 @@
   },
   {
     "summary": "The HKMA framework provides central facilitation infrastructure and a standing development body; the draft does not.",
-    "label": "goes-beyond",
+    "label": "silent-on",
     "sentiment": null,
     "source_clauses": [
       {
@@ -963,7 +963,7 @@
   },
   {
     "summary": "The HKMA framework requires banks to provide test environments and sample data; the draft does not.",
-    "label": "goes-beyond",
+    "label": "silent-on",
     "sentiment": null,
     "source_clauses": [
       {
@@ -984,7 +984,7 @@
   },
   {
     "summary": "The HKMA framework requires banks to submit implementation road maps, which it publishes; the draft does not.",
-    "label": "goes-beyond",
+    "label": "silent-on",
     "sentiment": null,
     "source_clauses": [
       {

@@ -614,7 +614,7 @@
   },
   {
     "summary": "The draft requires a breach handling and response plan; the BIS paper is silent on incident response.",
-    "label": "silent-on",
+    "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [],
     "target_clauses": [
@@ -630,7 +630,7 @@
   },
   {
     "summary": "The draft requires board-level oversight of open finance; the BIS paper covers only ecosystem governance.",
-    "label": "silent-on",
+    "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [],
     "target_clauses": [
@@ -650,7 +650,7 @@
   },
   {
     "summary": "The draft sets detailed rules for valid consent, banning bundled or coerced consent; the BIS paper is silent.",
-    "label": "silent-on",
+    "label": "goes-beyond",
     "sentiment": null,
     "source_clauses": [],
     "target_clauses": [

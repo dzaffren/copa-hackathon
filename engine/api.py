@@ -1729,8 +1729,20 @@ def create_app(
         by_id = {n["id"]: n for n in ws_graph.get("nodes", [])}
         src_doc = by_id.get(edge["source"], {}).get("document_id")
         tgt_doc = by_id.get(edge["target"], {}).get("document_id")
-        # The source (task) node is doc_a ("ours") so silent-on / goes-beyond
-        # read in the drafter's direction (task node is always the edge source).
+        # Which endpoint is "ours" is decided by position relative to the drafting
+        # task, NOT by edge direction — the live fixtures point opposite ways, so
+        # assuming the task is the source made silent-on / goes-beyond and
+        # tighten / loosen read backwards on `open-finance-pd-2026`. See
+        # `workstreams.analysis_direction`.
+        ws_meta = workstreams.load_workstream(workstreams_dir, workstream_id)
+        task_id = workstreams.primary_task_id(ws_meta, ws_graph)
+        ours_node, _theirs_node = workstreams.analysis_direction(
+            ws_graph, edge, task_id
+        )
+        # Findings are PERSISTED in edge orientation (source_clauses belong to
+        # `edge["source"]`), which is what the review panes read. So when "ours"
+        # is the target we analyse target→source and flip the result back.
+        ours_is_target = ours_node == edge["target"]
         if not src_doc:
             return _ws_error(
                 409,
@@ -1765,7 +1777,10 @@ def create_app(
             analyze_fn = injected_run_arm_g_fn or _make_default_run_arm_g(
                 artifacts_dir, workstreams_dir, workstream_id
             )
-            result = analyze_fn(src_doc, tgt_doc)
+            doc_a, doc_b = (
+                (tgt_doc, src_doc) if ours_is_target else (src_doc, tgt_doc)
+            )
+            result = analyze_fn(doc_a, doc_b)
         except Exception as exc:  # live model / creds / network failure
             return _ws_error(
                 502,
@@ -1775,6 +1790,8 @@ def create_app(
         # Map to findings via the SAME connections->findings path the legacy
         # finder used; the mapper reads only `connections`/`unsupported`, so the
         # extra `trace` key is ignored (trace is not persisted here).
+        if ours_is_target:
+            result = workstreams.flip_connection_sides(result)
         findings = workstreams.connections_to_findings(result)
         # Only persist a non-empty result. Writing an empty findings file would
         # one-way-flip the edge to "analysed" (analysed is derived from file

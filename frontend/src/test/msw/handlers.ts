@@ -959,7 +959,7 @@ const CROSS_LINK: CrossLink = {
     workstream_name: "Open Finance ED · 2025",
   },
   findings_count: 12,
-  labels: { "aligns-with": 6, "differs-on": 4, "goes-beyond": 2 },
+  labels: { "aligns-with": 6, "differs-on": 4, "silent-on": 2 },
   counts: { total: 12, accepted: 0, dismissed: 0 },
   classification: "divergent",
   risk_level: "medium",
@@ -1013,8 +1013,8 @@ const QUEUE_SEED = [
     workstream_id: "_cross",
     edge_id: "x-open_finance_ed--opres_dp_2025",
     finding_id: "x-open_finance_ed--opres_dp_2025~0",
-    summary: "Open finance board oversight goes beyond the DP",
-    label: "goes-beyond" as const,
+    summary: "The DP names one accountable person; open finance does not",
+    label: "silent-on" as const,
     sentiment: null,
     near: {
       node_id: "of-ed-2025",
@@ -1185,8 +1185,8 @@ export const handlers = [
     const findings = [
       {
         summary:
-          "Open finance's requirement for board and senior management oversight goes beyond the discussion paper's responsibility mapping",
-        label: "goes-beyond" as const,
+          "The discussion paper names one accountable person for resilience; open finance relies on general board oversight",
+        label: "silent-on" as const,
         sentiment: null,
         scope_note:
           "Open finance does not mandate a single ultimately-accountable person for operational resilience outcomes.",
