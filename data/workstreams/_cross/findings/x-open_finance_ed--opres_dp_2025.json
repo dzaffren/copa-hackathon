@@ -32,7 +32,7 @@
   },
   {
     "summary": "The discussion paper's third-party risk concerns go further than open finance's, adding concentration and systemic risk beyond data-handling oversight.",
-    "label": "goes-beyond",
+    "label": "silent-on",
     "sentiment": null,
     "scope_note": "Open finance's third-party rules focus on data privacy, confidentiality and security, while the discussion paper also covers substitutability, concentration and systemic risk that open finance does not address.",
     "supported": true,
@@ -94,7 +94,7 @@
   },
   {
     "summary": "The discussion paper goes beyond open finance by naming one person ultimately accountable for resilience, not just general board oversight.",
-    "label": "goes-beyond",
+    "label": "silent-on",
     "sentiment": null,
     "scope_note": "Open finance relies on general board and senior management oversight; it does not require a single ultimately accountable person as OpRes 6.3 Responsibility Mapping does.",
     "supported": true,

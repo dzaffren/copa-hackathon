@@ -33,7 +33,7 @@ describe("CrossWorkstreamPanel", () => {
     );
     expect(within(panel).getByText("6 aligns-with")).toBeInTheDocument();
     expect(within(panel).getByText("4 differs-on")).toBeInTheDocument();
-    expect(within(panel).getByText("2 goes-beyond")).toBeInTheDocument();
+    expect(within(panel).getByText("2 silent-on")).toBeInTheDocument();
   });
 
   it("routes into the ordinary review screen — no second reader", async () => {

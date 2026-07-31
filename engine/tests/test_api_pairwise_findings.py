@@ -93,8 +93,8 @@ def test_label_counts_match_the_fixture(tmp_path):
     assert body["counts"]["by_label"] == {
         "conflicts-with": {"total": 0, "pending": 0},
         "differs-on": {"total": 30, "pending": 30},
-        "silent-on": {"total": 11, "pending": 11},
-        "goes-beyond": {"total": 14, "pending": 14},
+        "silent-on": {"total": 14, "pending": 14},
+        "goes-beyond": {"total": 11, "pending": 11},
         "aligns-with": {"total": 75, "pending": 75},
     }
 
