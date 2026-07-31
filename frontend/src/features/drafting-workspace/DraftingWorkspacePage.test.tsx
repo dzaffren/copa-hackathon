@@ -74,9 +74,13 @@ describe("DraftingWorkspacePage — landing", () => {
     expect(
       screen.getByRole("heading", { name: "Operational Resilience PD — v0.3" }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: /Workstream graph/i }),
-    ).toBeInTheDocument();
+    // Back to the task the draft belongs to — where Open draft came from —
+    // rather than all the way out to the graph.
+    const back = screen.getByRole("link", { name: /← Task/ });
+    expect(back).toHaveAttribute(
+      "href",
+      "/workstreams/opres-v2/tasks/opres-pd-v0-3",
+    );
     for (const name of [/Reviewed/, /Copilot/]) {
       expect(screen.getByRole("tab", { name })).toBeInTheDocument();
     }

@@ -180,10 +180,10 @@ export function DraftingWorkspacePage() {
       <header className="flex items-center justify-between border-b border-border/60 bg-card px-4 py-2.5">
         <div>
           <Link
-            to={`/workstreams/${workstreamId}`}
+            to={`/workstreams/${workstreamId}/tasks/${nodeId}`}
             className="text-xs font-semibold text-muted-foreground hover:text-foreground"
           >
-            ← Workstream graph
+            ← Task
           </Link>
           <h1 className="mt-0.5 text-lg font-bold">
             {task.data?.task.title ?? "Working draft"}
