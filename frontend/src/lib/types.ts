@@ -58,6 +58,15 @@ export interface Neighbour {
   findings_count: number;
 }
 
+/** A document two hops from the task: joined to one of its neighbours, not to
+ *  the task itself. `edge_*` describe that further-out edge, so `via_*` names
+ *  the neighbour it arrives through — without it the row would read as an edge
+ *  the task has. */
+export interface SecondOrderNeighbour extends Neighbour {
+  via_node_id: string;
+  via_title: string;
+}
+
 export type TaskWorkflowStatus = "draft" | "pending_review" | "approved";
 
 /** The persisted Maker-Checker state for a task (`engine/tasks.py`) — the
@@ -73,6 +82,7 @@ export interface TaskResponse {
   task: Task;
   workflow: TaskWorkflow;
   neighbours: Neighbour[];
+  second_order_neighbours: SecondOrderNeighbour[];
   draft_empty: boolean;
 }
 

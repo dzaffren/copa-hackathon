@@ -125,6 +125,71 @@ def test_GET_node_detail_returns_first_order_neighbours_for_task_node(tmp_path):
     assert len(body["recent_activity"]) >= 1
 
 
+def test_GET_task_reports_second_order_neighbours_with_the_hop_they_arrive_through(
+    tmp_path,
+):
+    """The task screen's Neighbour nodes box shows two tiers. The second tier is
+    a document joined to a NEIGHBOUR, not to the task, so each row has to name
+    the neighbour it arrives through — otherwise it reads as an edge the task
+    has, which would overstate what the drafter declared."""
+    client, _ = _make_client(tmp_path)
+    body = client.get(f"/api/workstreams/{_OPRES}/tasks/{_TASK}").json()
+
+    first = {n["node_id"] for n in body["neighbours"]}
+    second = body["second_order_neighbours"]
+    assert len(first) == 7
+
+    # The IAIS paper cites the OpRes DP, which the task references. Two hops.
+    iais = next(
+        n
+        for n in second
+        if n["node_id"].startswith("iais-draft-application-paper")
+    )
+    assert iais["via_node_id"] == "opres-dp-2025"
+    assert iais["via_title"] == "OpRes DP (Dec 2025)"
+    assert iais["edge_id"].endswith("--opres_dp_2025")
+
+    # The two tiers are disjoint, and neither contains the task itself.
+    second_ids = {n["node_id"] for n in second}
+    assert second_ids & first == set()
+    assert _TASK not in second_ids
+    # A first-order row never claims a `via` — it is a real edge on the task.
+    assert all("via_node_id" not in n for n in body["neighbours"])
+
+
+def test_GET_task_reads_both_endpoints_so_edges_pointing_INTO_the_hop_count(
+    tmp_path,
+):
+    """`open-finance-pd-2026` points its edges INTO the ED node, so a scan that
+    only reads `source` would report the four peer/standard documents as
+    unreachable. They are two hops from the draft, via the ED."""
+    client, _ = _make_client(tmp_path)
+    body = client.get(
+        "/api/workstreams/open-finance-pd-2026/tasks/open-finance-pd-2026-pd"
+    ).json()
+
+    assert [n["node_id"] for n in body["neighbours"]] == ["ed-open-finance-2025"]
+    second = body["second_order_neighbours"]
+    assert {n["node_id"] for n in second} == {
+        "hkma-open-api-framework",
+        "bis-papers-168",
+        "rmit-2025",
+        "abs-mas-api-playbook",
+    }
+    assert all(n["via_node_id"] == "ed-open-finance-2025" for n in second)
+
+
+def test_GET_task_has_no_second_order_neighbours_when_the_graph_is_a_star(
+    tmp_path,
+):
+    """rmit-v2-2025's anchors touch nothing but the task, so the second tier is
+    empty rather than absent — the box renders no 2-hop section at all."""
+    client, _ = _make_client(tmp_path)
+    body = client.get("/api/workstreams/rmit-v2-2025/tasks/rmit-pd-v2").json()
+    assert len(body["neighbours"]) == 3
+    assert body["second_order_neighbours"] == []
+
+
 def test_GET_node_detail_concepts_placeholder_when_not_enriched(tmp_path):
     """A node the offline enrichment script has not touched still gets the
     MVP1 placeholder — never an error, never a guess."""

@@ -121,7 +121,7 @@ export default function TaskScreenPage() {
     );
   }
 
-  const { task, workflow, neighbours } = query.data;
+  const { task, workflow, neighbours, second_order_neighbours } = query.data;
   const currentStatus = workflow.status;
   const counts = pairwise.data?.counts;
   const documentCount = pairwise.data?.nodes.length ?? 0;
@@ -233,7 +233,10 @@ export default function TaskScreenPage() {
       <div className="grid grid-cols-12 gap-4 p-6">
         <section className="col-span-12 space-y-4 lg:col-span-4">
           <SourceCard task={task} />
-          <NeighboursCard neighbours={neighbours} />
+          <NeighboursCard
+            neighbours={neighbours}
+            secondOrder={second_order_neighbours}
+          />
         </section>
         <section className="col-span-12 lg:col-span-8">
           <PairwiseFindingsCard workstreamId={workstreamId} nodeId={nodeId} />

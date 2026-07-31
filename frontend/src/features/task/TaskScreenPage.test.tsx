@@ -67,8 +67,39 @@ describe("TaskScreenPage — landing", () => {
     expect(within(source).getByText("Aisyah R.")).toBeInTheDocument();
     expect(within(source).getByText("in progress")).toBeInTheDocument();
 
-    // The neighbour list is unchanged by this epic — still first-order only.
+    // The direct tier: one row per edge the task itself carries.
     expect(screen.getAllByTestId("neighbour-row")).toHaveLength(7);
+  });
+
+  it("lists 2-hop neighbours as their own tier, each naming the hop it arrives through", async () => {
+    await loadTaskScreen();
+    const box = screen.getByTestId("neighbours-card");
+
+    const twoHop = within(box).getAllByTestId("neighbour-row-2hop");
+    expect(twoHop).toHaveLength(2);
+    expect(within(box).getByText("2 hops away")).toBeInTheDocument();
+    expect(
+      within(box).getByText(/IAIS Draft Application Paper/),
+    ).toBeInTheDocument();
+
+    // A 2-hop row sits on an edge the TASK does not have, so it must say which
+    // neighbour it came through rather than implying a direct edge.
+    expect(within(twoHop[0]).getByText("via BCBS OpRes 2021")).toBeVisible();
+
+    // The two tiers stay separate: the header count and the page byline both
+    // still describe direct neighbours only.
+    expect(within(box).getByText(/7 · from node creation/)).toBeInTheDocument();
+    expect(
+      screen.getByText("Aisyah R. · .docx · 7 neighbour nodes"),
+    ).toBeInTheDocument();
+  });
+
+  it("renders no 2-hop section when nothing sits two hops out", async () => {
+    renderApp("/workstreams/opres-v2/tasks/opres-pd-fresh");
+    const box = await screen.findByTestId("neighbours-card");
+
+    expect(within(box).queryByTestId("neighbour-row-2hop")).toBeNull();
+    expect(within(box).queryByText("2 hops away")).toBeNull();
   });
 
   it("titles and describes the box in the semantic-linkage vocabulary", async () => {

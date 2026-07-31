@@ -90,6 +90,18 @@ def _cross_side(edge: dict[str, Any], workstream_id: str) -> Optional[tuple[str,
     return None
 
 
+def _other_endpoint(edge: dict[str, Any], node_id: str) -> Optional[str]:
+    """The node at the far end of `edge` from `node_id`, or None when the edge
+    does not touch it. Direction is deliberately not normalised — see
+    `workstreams.neighbourhood_edges` on why reading only `source` under-reports.
+    """
+    if edge.get("source") == node_id:
+        return edge.get("target")
+    if edge.get("target") == node_id:
+        return edge.get("source")
+    return None
+
+
 def _workstream_name(
     workstreams_dir: Path, workstream_id: Optional[str]
 ) -> Optional[str]:
@@ -660,6 +672,40 @@ def create_app(
     def _edge_findings_path(workstream_id: str, edge_id: str) -> Path:
         return workstreams_dir / workstream_id / "findings" / f"{edge_id}.json"
 
+    def _neighbour_entry(
+        workstream_id: str,
+        nodes_by_id: dict[str, Any],
+        edge: dict[str, Any],
+        other_id: str,
+        via_id: Optional[str] = None,
+    ) -> dict[str, Any]:
+        """One neighbour row: the document at `other_id`, joined by `edge`.
+
+        `via_id` is set only for a second-order neighbour, and names the
+        first-order document the edge actually touches — without it the row
+        would claim an edge the task does not have.
+        """
+        other = nodes_by_id.get(other_id, {})
+        findings_path = _edge_findings_path(workstream_id, edge["id"])
+        analysed = findings_path.exists()
+        entry: dict[str, Any] = {
+            "node_id": other_id,
+            "title": other.get("title", other_id),
+            "node_type": other.get("node_type"),
+            "edge_type": edge.get("edge_type"),
+            "edge_id": edge["id"],
+            "analysed": analysed,
+            "findings_count": (
+                len(json.loads(findings_path.read_text(encoding="utf-8")))
+                if analysed
+                else 0
+            ),
+        }
+        if via_id is not None:
+            entry["via_node_id"] = via_id
+            entry["via_title"] = nodes_by_id.get(via_id, {}).get("title", via_id)
+        return entry
+
     @app.get("/api/workstreams/{workstream_id}/tasks/{node_id}")
     def get_workstream_task(workstream_id: str, node_id: str) -> Any:
         try:
@@ -686,30 +732,52 @@ def create_app(
                     f"Node {node_id} is of type {node.get('node_type')}, " "not task",
                 )
 
-            # Neighbours = edges out of this task node, in graph.json order.
+            # First order = the documents joined to this task, in graph.json
+            # order. BOTH endpoints are read, never just `source`: the two live
+            # fixtures use opposite conventions (`opres-v2` points task →
+            # anchor, `open-finance-pd-2026` points anchor → ED), and a rule
+            # reading only `source` returns almost nothing on the latter.
+            all_edges = ws_graph.get("edges", [])
+            first_order_ids: list[str] = []
             neighbours = []
-            for edge in ws_graph.get("edges", []):
-                if edge.get("source") != node_id:
+            for edge in all_edges:
+                other = _other_endpoint(edge, node_id)
+                if other is None or other in first_order_ids:
                     continue
-                target = nodes_by_id.get(edge["target"], {})
-                findings_path = _edge_findings_path(workstream_id, edge["id"])
-                analysed = findings_path.exists()
-                findings_count = (
-                    len(json.loads(findings_path.read_text(encoding="utf-8")))
-                    if analysed
-                    else 0
-                )
+                first_order_ids.append(other)
                 neighbours.append(
-                    {
-                        "node_id": edge["target"],
-                        "title": target.get("title", edge["target"]),
-                        "node_type": target.get("node_type"),
-                        "edge_type": edge.get("edge_type"),
-                        "edge_id": edge["id"],
-                        "analysed": analysed,
-                        "findings_count": findings_count,
-                    }
+                    _neighbour_entry(workstream_id, nodes_by_id, edge, other)
                 )
+
+            # Second order = a document joined to a first-order neighbour but not
+            # to the task itself: the context the drafter's declared context is
+            # itself grounded in. Reported as its own list rather than folded
+            # into `neighbours`, because it is NOT an edge the task has — the row
+            # names the neighbour it arrives through instead.
+            #
+            # An edge with both endpoints two hops out is skipped: it relates
+            # neither to the draft nor to anything the drafter declared, the same
+            # boundary `workstreams.neighbourhood_edges` draws.
+            first_order = set(first_order_ids)
+            second_order_ids: set[str] = set()
+            second_order = []
+            for edge in all_edges:
+                for near, far in (
+                    (edge.get("source"), edge.get("target")),
+                    (edge.get("target"), edge.get("source")),
+                ):
+                    if near not in first_order:
+                        continue
+                    if far is None or far == node_id or far in first_order:
+                        continue
+                    if far in second_order_ids:
+                        continue
+                    second_order_ids.add(far)
+                    second_order.append(
+                        _neighbour_entry(
+                            workstream_id, nodes_by_id, edge, far, via_id=near
+                        )
+                    )
 
             # A focal node scaffolded by `create_workstream` carries only its
             # identity (id/type/title/description/source_url) — owner and
@@ -742,6 +810,7 @@ def create_app(
                 "task": task,
                 "workflow": workflow,
                 "neighbours": neighbours,
+                "second_order_neighbours": second_order,
                 "draft_empty": draft_empty,
             }
         except Exception:  # noqa: BLE001 — contract: any load error → 500

@@ -118,6 +118,32 @@ const TASK_V0_3: TaskResponse = {
       findings_count: 0,
     },
   ],
+  // Two hops out: joined to a neighbour, not to the task. Mirrors the opres-v2
+  // fixture, where v0-0 shares BCBS with v0-3 and the IAIS paper cites the DP.
+  second_order_neighbours: [
+    {
+      node_id: "opres-pd-v0-0",
+      title: "Operational Resilience PD — v0.0",
+      node_type: "task",
+      edge_type: "references",
+      edge_id: "e-opres_v0_0--bcbs_opres_2021",
+      analysed: false,
+      findings_count: 0,
+      via_node_id: "bcbs-opres-2021",
+      via_title: "BCBS OpRes 2021",
+    },
+    {
+      node_id: "iais-opres-toolkit",
+      title: "IAIS Draft Application Paper on operational resilience",
+      node_type: "international-standard",
+      edge_type: "references",
+      edge_id: "e-iais_opres_toolkit--opres_dp_2025",
+      analysed: false,
+      findings_count: 0,
+      via_node_id: "opres-dp-2025",
+      via_title: "OpRes DP (Dec 2025)",
+    },
+  ],
   workflow: DRAFT_WORKFLOW,
   draft_empty: false,
 };
@@ -158,6 +184,19 @@ const TASK_V0_0: TaskResponse = {
       findings_count: 0,
     },
   ],
+  second_order_neighbours: [
+    {
+      node_id: "opres-pd-v0-3",
+      title: "Operational Resilience PD — v0.3",
+      node_type: "task",
+      edge_type: "references",
+      edge_id: "e-opres_v0_3--bcbs_opres_2021",
+      analysed: true,
+      findings_count: 3,
+      via_node_id: "bcbs-opres-2021",
+      via_title: "BCBS OpRes 2021",
+    },
+  ],
   workflow: DRAFT_WORKFLOW,
   draft_empty: true,
 };
@@ -180,6 +219,7 @@ const TASK_SCAFFOLDED: TaskResponse = {
     last_edited_at: null,
   },
   neighbours: [],
+  second_order_neighbours: [],
   workflow: DRAFT_WORKFLOW,
   draft_empty: true,
 };
