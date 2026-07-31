@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { render, screen, within, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  within,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderApp } from "@/test/utils";
 import { PairwiseFindingCard } from "./PairwiseFindingCard";
@@ -429,6 +435,43 @@ describe("TaskScreenPage — node filter", () => {
 });
 
 describe("TaskScreenPage — coverage strip", () => {
+  it("folds to its count line while the findings are scrolled, and reopens at the top", async () => {
+    await loadTaskScreen();
+    const strip = screen.getByTestId("coverage-strip");
+    const scroller = screen.getByTestId("findings-scroll");
+
+    expect(strip).toHaveAttribute("data-collapsed", "false");
+    expect(within(strip).getAllByTestId("coverage-pair")[0]).toBeVisible();
+
+    fireEvent.scroll(scroller, { target: { scrollTop: 240 } });
+    expect(strip).toHaveAttribute("data-collapsed", "true");
+    expect(within(strip).getAllByTestId("coverage-pair")[0]).not.toBeVisible();
+    // The count survives the fold — the gap is still declared, just not listed.
+    expect(
+      within(strip).getByText(/Not yet analysed · 3 pairs/),
+    ).toBeInTheDocument();
+    // Hidden, never unmounted: a row owns its own in-flight analyze, and
+    // dropping it mid-request would take the progress bar with it.
+    expect(within(strip).getAllByTestId("coverage-pair")).toHaveLength(3);
+
+    fireEvent.scroll(scroller, { target: { scrollTop: 0 } });
+    expect(strip).toHaveAttribute("data-collapsed", "false");
+    expect(within(strip).getAllByTestId("coverage-pair")[0]).toBeVisible();
+  });
+
+  it("keeps the strip open on a scroll too small to be a read", async () => {
+    // Collapsing makes the viewport taller, which can pull `scrollTop` back
+    // down; one threshold would flap, so expanding and collapsing use different
+    // ones and a nudge inside the gap changes nothing.
+    await loadTaskScreen();
+    const strip = screen.getByTestId("coverage-strip");
+
+    fireEvent.scroll(screen.getByTestId("findings-scroll"), {
+      target: { scrollTop: 12 },
+    });
+    expect(strip).toHaveAttribute("data-collapsed", "false");
+  });
+
   it("lists the pairs that have never been analysed", async () => {
     await loadTaskScreen();
     const strip = screen.getByTestId("coverage-strip");

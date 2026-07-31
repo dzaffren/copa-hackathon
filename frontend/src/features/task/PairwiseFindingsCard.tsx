@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type UIEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
@@ -25,6 +25,13 @@ const DESCRIPTION =
   "Semantic linkages (differs-on, conflicts-with, silent-on, aligns-with, " +
   "goes-beyond) between nodes";
 
+// Two thresholds, not one. Collapsing the coverage strip makes the findings
+// viewport taller, which can pull `scrollTop` back under a single threshold and
+// re-expand — which grows the strip, shrinks the viewport, and flaps. The gap
+// between these two is what breaks that loop.
+const COLLAPSE_AT = 24;
+const EXPAND_AT = 4;
+
 /** The task screen's Pairwise Findings box.
  *
  *  Draws on the task's whole neighbourhood, so it is populated from the moment
@@ -40,6 +47,7 @@ export function PairwiseFindingsCard({ workstreamId, nodeId }: Props) {
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [stripCollapsed, setStripCollapsed] = useState(false);
 
   const query = useQuery({
     queryKey,
@@ -130,6 +138,13 @@ export function PairwiseFindingsCard({ workstreamId, nodeId }: Props) {
     });
   }
 
+  function handleFindingsScroll(event: UIEvent<HTMLDivElement>) {
+    const top = event.currentTarget.scrollTop;
+    setStripCollapsed((wasCollapsed) =>
+      wasCollapsed ? top > EXPAND_AT : top > COLLAPSE_AT,
+    );
+  }
+
   function handleReview(finding: PairwiseFinding) {
     navigate(
       `/workstreams/${workstreamId}/edges/${finding.edge_id}/review` +
@@ -138,8 +153,19 @@ export function PairwiseFindingsCard({ workstreamId, nodeId }: Props) {
   }
 
   return (
-    <Card data-testid="pairwise-card" className="glass overflow-hidden">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 px-4 py-3">
+    // Capped and internally scrolled so the header, the node filter and the
+    // coverage strip stay put while a 130-card triage pass runs — on the demo
+    // workstream the ungoverned list ran several screens past the fold, taking
+    // the whole page with it.
+    //
+    // 18rem of headroom, not less: the page header runs ~13rem and the floating
+    // screen-nav overlays the last ~4rem of the viewport, so a taller cap tucks
+    // the final finding underneath it.
+    <Card
+      data-testid="pairwise-card"
+      className="glass flex max-h-[calc(100vh-18rem)] min-h-[24rem] flex-col overflow-hidden"
+    >
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border/60 px-4 py-3">
         <div>
           <h2 className="text-sm font-semibold">Pairwise findings</h2>
           <p className="mt-0.5 text-[11px] text-muted-foreground">
@@ -177,6 +203,7 @@ export function PairwiseFindingsCard({ workstreamId, nodeId }: Props) {
             workstreamId={workstreamId}
             pairs={data.unanalysed_pairs}
             onAnalysed={() => queryClient.invalidateQueries({ queryKey })}
+            collapsed={stripCollapsed}
           />
 
           {data.nodes.length === 0 ? (
@@ -189,7 +216,11 @@ export function PairwiseFindingsCard({ workstreamId, nodeId }: Props) {
               No linkages have been surfaced yet.
             </p>
           ) : (
-            <div className="space-y-5 p-4">
+            <div
+              data-testid="findings-scroll"
+              onScroll={handleFindingsScroll}
+              className="flex-1 space-y-5 overflow-y-auto p-4"
+            >
               {LABEL_SEVERITY_ORDER.map((label) => (
                 <FindingGroup
                   key={label}

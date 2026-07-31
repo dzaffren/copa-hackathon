@@ -9,6 +9,9 @@ interface Props {
   workstreamId: string;
   pairs: UnanalysedPair[];
   onAnalysed: () => void;
+  /** Fold to the count line alone. Driven by the findings list's scroll
+   *  position — the gaps matter when you arrive, not while you are reading. */
+  collapsed?: boolean;
 }
 
 /** Coverage gaps, above the label groups.
@@ -17,20 +20,38 @@ interface Props {
  *  and would vanish silently — so the pairs that have never been analysed get
  *  their own row, each with its own Analyze action. Renders nothing once every
  *  pair is analysed, so a fully-seeded demo workstream pays no visual cost.
+ *
+ *  Collapsing HIDES the rows rather than unmounting them: a row owns the state
+ *  of its own in-flight analyze, and dropping it mid-request would take the
+ *  progress bar with it and leave the drafter unsure whether the run survived.
  */
-export function CoverageStrip({ workstreamId, pairs, onAnalysed }: Props) {
+export function CoverageStrip({
+  workstreamId,
+  pairs,
+  onAnalysed,
+  collapsed = false,
+}: Props) {
   if (pairs.length === 0) return null;
 
   return (
     <div
       data-testid="coverage-strip"
-      className="border-b border-border/60 bg-muted/20 px-4 py-3"
+      data-collapsed={collapsed}
+      className="shrink-0 border-b border-border/60 bg-muted/20 px-4 py-3"
     >
       <p className="text-[11px] font-semibold text-muted-foreground">
         Not yet analysed · {pairs.length}{" "}
         {pairs.length === 1 ? "pair" : "pairs"}
+        {collapsed && (
+          <span className="ml-1 font-normal opacity-70">
+            · scroll up to expand
+          </span>
+        )}
       </p>
-      <div className="mt-2 space-y-2">
+      {/* The `hidden` ATTRIBUTE, not a utility class: it hides the rows from
+          assistive tech and the accessibility tree too, which a display class
+          alone would not. */}
+      <div hidden={collapsed} className="mt-2 space-y-2">
         {pairs.map((pair) => (
           <CoveragePairRow
             key={pair.edge_id}
