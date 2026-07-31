@@ -9,7 +9,9 @@ demo-visible finding:
 
 - ``summary`` is one short line, at most 20 words;
 - ``scope_note``, when present, is at most 30 words;
-- neither field uses an em dash (house style, mirrors the finder prompts).
+- neither field uses an em dash (house style, mirrors the finder prompts);
+- neither field names a side by letter (``Document A`` / ``B-side``), which are
+  internal prompt mechanics the drafter cannot interpret.
 
 Scope is exactly what the app surfaces: the non-hidden workstreams
 (``engine.workstreams.list_workstreams`` honours the ``hidden`` flag) plus the
@@ -20,6 +22,7 @@ Pure file assertions — no network, no engine run.
 """
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -31,6 +34,13 @@ WORKSTREAMS_DIR = REPO_ROOT / "data" / "workstreams"
 
 SUMMARY_MAX_WORDS = 20
 SCOPE_NOTE_MAX_WORDS = 30
+
+# The finder prompts must name the sides by letter so the side-guard is
+# unambiguous ("document A is 'we/ours'"), but the drafter never sees which
+# document is which, so the letter is meaningless in rendered text. Enforced in
+# the prompts by `prompt_style.NO_INTERNAL_LABELS_RULE`; this is the output-side
+# half of that guard.
+_INTERNAL_SIDE_LABEL = re.compile(r"\b(?:document [AB]\b|[AB]-side\b)", re.IGNORECASE)
 
 
 def _word_count(text: str) -> int:
@@ -102,3 +112,21 @@ def test_scope_note_is_short(source: str, finding: dict) -> None:
         f"{source}: finding {finding.get('id')} scope_note uses an em dash: "
         f"{scope_note!r}"
     )
+
+
+@pytest.mark.parametrize(
+    "source, finding",
+    _FINDINGS,
+    ids=[f"{name}#{i}" for i, (name, _) in enumerate(_FINDINGS)],
+)
+def test_neither_field_names_a_side_by_letter(source: str, finding: dict) -> None:
+    """Regression guard, 31 Jul 2026: a live A/B of the finder prompts produced
+    "Document B does not address..." in 10 of 15 scope_notes. The drafter has no
+    way to know which document is B, so the letter is unreadable to them."""
+    for field in ("summary", "scope_note"):
+        text = finding.get(field) or ""
+        leak = _INTERNAL_SIDE_LABEL.search(text)
+        assert leak is None, (
+            f"{source}: finding {finding.get('id')} {field} names a side by "
+            f"letter ({leak.group(0)!r}) instead of the document: {text!r}"
+        )
