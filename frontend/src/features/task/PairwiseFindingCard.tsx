@@ -1,4 +1,4 @@
-import { Check, Loader2, Undo2, X } from "lucide-react";
+import { Check, Eye, Loader2, Undo2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -102,25 +102,27 @@ export function PairwiseFindingCard({
             variant="outline"
             onClick={() => onSetState("pending")}
             disabled={isPending}
-            className="justify-start"
+            className="justify-center"
           >
             {isPending ? <Loader2 className="animate-spin" /> : <Undo2 />} Undo
           </Button>
         ) : (
           <>
+            {/* The only action that opens the quoted clauses, so it is the one
+                the drafter should reach for first — a dark slate against the
+                card's pale label tint, where an outline button disappeared. */}
             <Button
               size="sm"
-              variant="outline"
               onClick={onReview}
-              className="justify-start"
+              className="justify-center bg-[#3F4350] text-white hover:bg-[#4B5060] [&_svg]:text-white"
             >
-              Review
+              <Eye /> Review
             </Button>
             <Button
               size="sm"
               onClick={() => onSetState("accepted")}
               disabled={isPending}
-              className="justify-start bg-primary text-primary-foreground hover:bg-primary/90"
+              className="justify-center bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {isPending ? <Loader2 className="animate-spin" /> : <Check />}{" "}
               Accept
@@ -130,7 +132,7 @@ export function PairwiseFindingCard({
               variant="outline"
               onClick={() => onSetState("dismissed")}
               disabled={isPending}
-              className="justify-start"
+              className="justify-center"
             >
               <X /> Dismiss
             </Button>

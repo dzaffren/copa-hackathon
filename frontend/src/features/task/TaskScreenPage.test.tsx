@@ -223,6 +223,20 @@ describe("TaskScreenPage — finding cards", () => {
     expect(within(card).queryByRole("button", { name: /Undo/ })).toBeNull();
   });
 
+  it("gives all three actions an icon and centres their contents", async () => {
+    await loadTaskScreen();
+    const card = cardsIn("conflicts-with")[0];
+
+    // Review used to be the one bare label in the column; it now carries an eye
+    // like Accept's tick and Dismiss's cross.
+    for (const name of [/Review/, /Accept/, /Dismiss/]) {
+      const button = within(card).getByRole("button", { name });
+      expect(button.querySelector("svg")).not.toBeNull();
+      expect(button.className).toContain("justify-center");
+      expect(button.className).not.toContain("justify-start");
+    }
+  });
+
   it("shows the sentiment arrow only on differs-on", async () => {
     await loadTaskScreen();
 
