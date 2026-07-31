@@ -1,0 +1,31 @@
+{
+  "policy_owner": "BNM - FDI",
+  "applicability": [
+    "Licensed banks",
+    "Licensed investment banks",
+    "Licensed Islamic banks",
+    "Licensed insurers",
+    "Licensed takaful operators",
+    "Prescribed development financial institutions",
+    "Eligible e-money issuers"
+  ],
+  "legal_provision": [
+    "sections 47 and 123 of the Financial Services Act 2013 (FSA)",
+    "sections 57 and 135 of the Islamic Financial Services Act 2013 (IFSA)",
+    "sections 41 and 42C of the Development Financial Institutions Act 2002 (DFIA)",
+    "section 266 of the FSA",
+    "section 277 of the IFSA",
+    "section 126 of the DFIA"
+  ],
+  "issuance_date": "30-11-2026",
+  "effective_date": "01-01-2027",
+  "policy_requirement": [
+    "Governance",
+    "Participation and scope of information sharing",
+    "Transition arrangements",
+    "Consent management",
+    "Customer protection",
+    "Management of technology risk"
+  ],
+  "ismp_classification": "TERHAD"
+}
