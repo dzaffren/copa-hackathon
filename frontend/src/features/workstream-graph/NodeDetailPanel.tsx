@@ -8,8 +8,6 @@ import {
   Link2,
   Trash2,
   Loader2,
-  Scale,
-  ShieldCheck,
   Sparkles,
   X,
 } from "lucide-react";
@@ -172,20 +170,10 @@ export function NodeDetailPanel({
   const isTask = node.node_type === "task";
   const subBadge = [node.issuer, node.short_type].filter(Boolean).join(" · ");
 
-  // Legal provision: prefer the enriched `legal_provision` list, else the
-  // structural `pursuant_to` on the node. ISMP: the enriched value, else the
-  // node field; for a profiled document with no value yet, show the honest
-  // pending state (its source, CAS's RH publication form, is not held offline).
-  const legalProvision =
-    enriched && asList(concepts.legal_provision).length > 0
-      ? asList(concepts.legal_provision)
-      : node.pursuant_to
-        ? [node.pursuant_to]
-        : [];
-  const ismpValue =
-    (enriched ? concepts.ismp_classification : null) ??
-    node.ismp_classification;
-  const ismpBadge = ismpValue ?? (enriched ? ISMP_PENDING : null);
+  // Legal provision and ISMP classification used to repeat as badges under the
+  // title. Both are rows in the Metadata disclosure below, so the badges were a
+  // second copy of the same values — and the one a drafter could not edit where
+  // she read it. The disclosure is now the only place either appears.
 
   // The chip reads the drafter-facing label, never the stored code — "DECK" is
   // a title suffix, not something to show as a badge. Absent for a context
@@ -229,31 +217,6 @@ export function NodeDetailPanel({
         <h2 className="text-lg font-bold leading-tight">{node.title}</h2>
         {node.description && (
           <p className="text-sm text-muted-foreground">{node.description}</p>
-        )}
-        {(legalProvision.length > 0 || ismpBadge) && (
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            {ismpBadge && (
-              <span
-                className={cn(
-                  "inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium",
-                  ismpValue
-                    ? "border-primary/30 bg-primary/10 text-primary"
-                    : "border-slate-400/30 bg-slate-500/10 text-muted-foreground",
-                )}
-                title={
-                  ismpValue ? undefined : "ISMP classification not yet sourced"
-                }
-              >
-                <ShieldCheck className="h-3 w-3" /> ISMP: {ismpBadge}
-              </span>
-            )}
-            {legalProvision.length > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-md border border-amber-300/30 bg-amber-400/10 px-2 py-0.5 text-[11px] font-medium text-amber-700">
-                <Scale className="h-3 w-3" /> Legal provision:{" "}
-                {legalProvision.join(", ")}
-              </span>
-            )}
-          </div>
         )}
       </div>
 

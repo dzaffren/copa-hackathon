@@ -112,7 +112,7 @@ describe("NodeDetailPanel", () => {
     expect(screen.queryByRole("button", { name: /open task/i })).toBeNull();
   });
 
-  it("distinguishes a supervisory letter and surfaces its legal provision + ISMP", async () => {
+  it("distinguishes a supervisory letter, and keeps its profile in one place", async () => {
     seedNode(ENRICHED_SUPERVISORY_LETTER);
     renderWithProviders(
       <NodeDetailPanel
@@ -125,14 +125,13 @@ describe("NodeDetailPanel", () => {
 
     // The document type is visually distinguished by its own badge.
     expect(await screen.findByText("supervisory-letter")).toBeInTheDocument();
-    // Legal provision (multi-Act) is surfaced first-class, not hidden in a disclosure.
-    expect(
-      screen.getByText(/Legal provision: FSA 2013, IFSA 2013, DFIA 2002/),
-    ).toBeInTheDocument();
-    // ISMP is supported but honestly pending — no fabricated classification.
-    expect(
-      screen.getByText(/ISMP: Pending — RH publication form/),
-    ).toBeInTheDocument();
+
+    // Legal provision and ISMP no longer repeat as badges under the title —
+    // they are rows in the Metadata disclosure, which is also where they can be
+    // edited. Two copies meant the drafter could read a value where she could
+    // not change it.
+    expect(screen.queryByText(/Legal provision: FSA 2013/)).toBeNull();
+    expect(screen.queryByText(/ISMP: Pending/)).toBeNull();
   });
 
   it("shows the deliverable kind as a chip, by label not code", async () => {
