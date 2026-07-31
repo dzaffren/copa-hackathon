@@ -74,6 +74,14 @@
   0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
   45%      { box-shadow: 0 0 14px 1px rgba(16, 185, 129, 0.55); }
 }
+/* The intro page's "Enter Demo" button: a diagonal light sweep that crosses
+   the button quickly, then sits parked off-screen for the rest of a 5s
+   cycle — reads as a periodic premium shine, not a constant shimmer loop. */
+@keyframes buttonShine {
+  0%   { transform: translateX(-150%) skewX(-20deg); }
+  10%  { transform: translateX(150%) skewX(-20deg); }
+  100% { transform: translateX(150%) skewX(-20deg); }
+}
 
 :root {
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);

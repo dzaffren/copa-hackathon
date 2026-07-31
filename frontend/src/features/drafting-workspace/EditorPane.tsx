@@ -6,9 +6,21 @@ import {
   useState,
 } from "react";
 import DOMPurify from "dompurify";
-import { MessageSquare, Trash2 } from "lucide-react";
+import { MessageSquare, Send, Trash2, X } from "lucide-react";
 import type { LinkageCard } from "@/lib/types";
 import { labelStyle } from "@/features/task/semanticLabel";
+import { WORKSTREAM_CONTEXT } from "./copilotV2Data";
+
+/** "Aisyah R." → "AR" for the comment popover's avatar. */
+function initials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
 
 interface DraftComment {
   id: string;
@@ -17,6 +29,11 @@ interface DraftComment {
    *  always be wrapped in one marker span). */
   quote: string;
   text: string;
+  /** Position (px, relative to the paper) of the small marker icon that
+   *  sits right after the highlighted passage — on the page itself, not a
+   *  side margin. */
+  top: number;
+  left: number;
 }
 
 interface EditorPaneProps {
@@ -96,11 +113,23 @@ export const EditorPane = forwardRef<EditorPaneHandle, EditorPaneProps>(
   const editorRef = useRef<HTMLDivElement>(null);
   const [secondsAgo, setSecondsAgo] = useState(0);
   const [hasSelection, setHasSelection] = useState(false);
+  const [activeFormats, setActiveFormats] = useState({
+    bold: false,
+    italic: false,
+    underline: false,
+  });
   const [comments, setComments] = useState<DraftComment[]>([]);
   const [commentFormOpen, setCommentFormOpen] = useState(false);
   const [commentDraft, setCommentDraft] = useState("");
+  // Position (px, relative to the paper) — scroll-invariant, since the paper
+  // and the anchored passage move together when the pane scrolls, only their
+  // difference is stored.
+  const [commentAnchor, setCommentAnchor] = useState<{ top: number; left: number } | null>(null);
+  const [expandedCommentId, setExpandedCommentId] = useState<string | null>(null);
   const pendingRangeRef = useRef<Range | null>(null);
   const commentIdRef = useRef(0);
+  const commentPopoverRef = useRef<HTMLDivElement>(null);
+  const paperRef = useRef<HTMLDivElement>(null);
 
   // The last cursor/selection position the drafter left inside the editor —
   // captured on blur (before focus moves to, say, the Copilot panel's "Insert
@@ -128,18 +157,42 @@ export const EditorPane = forwardRef<EditorPaneHandle, EditorPaneProps>(
     setHasSelection(el.contains(range.commonAncestorContainer));
   }
 
+  /** The toolbar reflects the format at the caret — e.g. Bold stays
+   *  highlighted while typing after a click, the same feedback Word gives —
+   *  not just whether a selection happens to already be bold. jsdom (the
+   *  component test environment) doesn't implement queryCommandState at
+   *  all, unlike every real browser, hence the feature check. */
+  function updateActiveFormats() {
+    if (typeof document.queryCommandState !== "function") return;
+    setActiveFormats({
+      bold: document.queryCommandState("bold"),
+      italic: document.queryCommandState("italic"),
+      underline: document.queryCommandState("underline"),
+    });
+  }
+
   function handleSelectionChange() {
     saveCursor();
     updateSelectionState();
+    updateActiveFormats();
   }
 
-  /** Open the comment form for the drafter's current selection — captured
-   *  now since focus is about to move to the form's own textarea, which
-   *  would otherwise collapse the browser selection. */
+  /** Open the comment compose card on the page itself, just below the
+   *  drafter's current selection — not in a side margin. Captured now since
+   *  focus is about to move to the card's own textarea, which would
+   *  otherwise collapse the browser selection. */
   function openCommentForm() {
     const range = savedRangeRef.current;
-    if (!range) return;
+    const paper = paperRef.current;
+    if (!range || !paper) return;
     pendingRangeRef.current = range.cloneRange();
+    const rect = range.getBoundingClientRect();
+    const paperRect = paper.getBoundingClientRect();
+    setExpandedCommentId(null);
+    setCommentAnchor({
+      top: rect.bottom - paperRect.top + 6,
+      left: Math.min(Math.max(rect.left - paperRect.left, 0), paperRect.width - 272),
+    });
     setCommentDraft("");
     setCommentFormOpen(true);
   }
@@ -147,37 +200,76 @@ export const EditorPane = forwardRef<EditorPaneHandle, EditorPaneProps>(
   function cancelCommentForm() {
     setCommentFormOpen(false);
     setCommentDraft("");
+    setCommentAnchor(null);
     pendingRangeRef.current = null;
   }
 
   /** Wrap the anchored selection in a highlighted `.draft-comment-{id}`
-   *  marker (a selection confined to one text run) and record the comment.
-   *  A selection that crosses element boundaries can't always be wrapped in
-   *  a single span — the comment is still recorded against its quoted text,
-   *  just without a visual highlight in that edge case. */
+   *  marker (a selection confined to one text run) and record the comment,
+   *  anchoring its marker icon just after the marker — right on the page,
+   *  beside the passage it's about. A selection that crosses element
+   *  boundaries can't always be wrapped in a single span — the comment is
+   *  still recorded against its quoted text, just without a visual
+   *  highlight or precise icon position in that edge case. */
   function submitComment() {
     const range = pendingRangeRef.current;
     const el = editorRef.current;
+    const paper = paperRef.current;
     const text = commentDraft.trim();
-    if (!range || !el || !text) return;
+    if (!range || !el || !paper || !text) return;
 
     const quote = range.toString().trim();
     const id = `c${++commentIdRef.current}`;
+    let top = commentAnchor?.top ?? 0;
+    let left = commentAnchor?.left ?? 0;
     try {
       const mark = document.createElement("span");
       mark.className = `draft-comment draft-comment-${id}`;
       range.surroundContents(mark);
+      const markRect = mark.getBoundingClientRect();
+      const paperRect = paper.getBoundingClientRect();
+      top = markRect.top - paperRect.top;
+      left = markRect.right - paperRect.left + 4;
     } catch {
       // Selection spans multiple elements — comment recorded without a
       // visual anchor rather than losing it.
     }
 
-    setComments((prev) => [...prev, { id, quote, text }]);
+    setComments((prev) => [...prev, { id, quote, text, top, left }]);
     setCommentFormOpen(false);
     setCommentDraft("");
+    setCommentAnchor(null);
     pendingRangeRef.current = null;
     onChange(el.innerHTML);
   }
+
+  // Click anywhere outside the open card (or Escape) dismisses it — the
+  // same behaviour as Word/Google Docs' comment bubble. A click on a marker
+  // icon itself is left alone here; its own onClick decides whether that's
+  // an open, a close, or a switch to a different comment.
+  useEffect(() => {
+    if (!commentFormOpen && !expandedCommentId) return;
+    function onPointerDown(e: MouseEvent) {
+      const target = e.target as HTMLElement;
+      if (commentPopoverRef.current?.contains(target)) return;
+      if (target.closest("[data-comment-marker]")) return;
+      cancelCommentForm();
+      setExpandedCommentId(null);
+    }
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        cancelCommentForm();
+        setExpandedCommentId(null);
+      }
+    }
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [commentFormOpen, expandedCommentId]);
 
   function removeComment(id: string) {
     const el = editorRef.current;
@@ -190,16 +282,23 @@ export const EditorPane = forwardRef<EditorPaneHandle, EditorPaneProps>(
       }
     }
     setComments((prev) => prev.filter((c) => c.id !== id));
+    setExpandedCommentId((prev) => (prev === id ? null : prev));
     if (el) onChange(el.innerHTML);
   }
 
   /** Bold/Italic/Underline via document.execCommand — deprecated but still
    *  universally supported, and the spec explicitly calls for it (H and •
    *  stay disabled, out of scope). No richer rich-text editor is warranted
-   *  for three toggle buttons. */
+   *  for three toggle buttons. Works on a collapsed selection too — a real
+   *  browser then applies the format to whatever's typed next, the same
+   *  sticky-formatting behaviour Word gives when you click Bold with
+   *  nothing selected. jsdom doesn't implement execCommand at all, hence
+   *  the feature check. */
   function applyFormat(command: "bold" | "italic" | "underline") {
     editorRef.current?.focus();
-    document.execCommand(command);
+    if (typeof document.execCommand === "function") {
+      document.execCommand(command);
+    }
     handleSelectionChange();
     const el = editorRef.current;
     if (el) onChange(el.innerHTML);
@@ -313,15 +412,21 @@ export const EditorPane = forwardRef<EditorPaneHandle, EditorPaneProps>(
         <div className="flex gap-0.5" aria-label="Formatting">
           {(["B", "I", "U"] as const).map((b) => {
             const command = b === "B" ? "bold" : b === "I" ? "italic" : "underline";
+            const isActive = activeFormats[command];
             return (
               <button
                 key={b}
                 type="button"
-                disabled={!hasSelection}
-                title={hasSelection ? `Toggle ${command}` : "Select text in the editor to format it"}
+                title={`Toggle ${command}`}
+                aria-pressed={isActive}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => applyFormat(command)}
-                className="h-6 w-6 rounded text-xs font-semibold text-muted-foreground enabled:text-foreground enabled:hover:bg-accent"
+                className={[
+                  "h-6 w-6 rounded text-xs font-semibold transition",
+                  isActive
+                    ? "bg-primary text-primary-foreground"
+                    : "text-foreground hover:bg-accent",
+                ].join(" ")}
               >
                 {b}
               </button>
@@ -363,54 +468,17 @@ export const EditorPane = forwardRef<EditorPaneHandle, EditorPaneProps>(
         </span>
       </div>
 
-      {commentFormOpen && (
-        <div
-          data-testid="comment-form"
-          className="border-b border-border/60 bg-card px-3 py-2"
-        >
-          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Comment on: <span className="italic normal-case text-foreground">&ldquo;{pendingRangeRef.current?.toString().trim().slice(0, 80)}&rdquo;</span>
-          </p>
-          <div className="flex items-start gap-1.5">
-            <textarea
-              aria-label="Comment text"
-              autoFocus
-              rows={2}
-              value={commentDraft}
-              onChange={(e) => setCommentDraft(e.target.value)}
-              placeholder="Add a comment…"
-              className="min-w-0 flex-1 resize-none rounded-md border border-border/60 bg-background/60 px-2 py-1 text-xs outline-none focus:border-primary/60"
-            />
-            <div className="flex shrink-0 flex-col gap-1">
-              <button
-                type="button"
-                disabled={!commentDraft.trim()}
-                onClick={submitComment}
-                className="rounded-md bg-primary px-2.5 py-1 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
-              >
-                Comment
-              </button>
-              <button
-                type="button"
-                onClick={cancelCommentForm}
-                className="rounded-md px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-accent"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* A white "paper" document surface, floated on a soft neutral canvas so
-          the serif draft reads like a real page rather than blending into the
-          surrounding chrome. */}
+      {/* The paper. Comments live on the page itself: a small marker icon
+          sits right after the highlighted passage, and clicking it expands
+          the full card in place — not a permanent side margin, and not a
+          flat list appended after a many-page document. */}
       <div className="flex-1 overflow-auto bg-muted p-4">
         <div
+          ref={paperRef}
           className={
             isBnmDoc
-              ? "w-full"
-              : "mx-auto max-w-2xl rounded-sm bg-white p-8 text-slate-900 shadow-xl shadow-black/30"
+              ? "relative mx-auto w-full"
+              : "relative mx-auto max-w-2xl rounded-sm bg-white p-8 text-slate-900 shadow-xl shadow-black/30"
           }
         >
           <div
@@ -461,24 +529,113 @@ export const EditorPane = forwardRef<EditorPaneHandle, EditorPaneProps>(
             </div>
           )}
 
-          {comments.length > 0 && (
-            <div className="mt-6 border-t border-dashed border-slate-200 pt-3">
-              <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Comments
+          {/* Compose card — appears on the page just under the selection. */}
+          {commentFormOpen && commentAnchor && (
+            <div
+              ref={commentPopoverRef}
+              data-testid="comment-form"
+              style={{ position: "absolute", top: commentAnchor.top, left: commentAnchor.left }}
+              className="z-50 w-64 rounded-lg border border-primary/30 bg-card p-3 shadow-xl"
+            >
+              <div className="mb-2 flex items-center gap-2">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
+                  {initials(WORKSTREAM_CONTEXT.owner)}
+                </span>
+                <span className="text-xs font-semibold text-foreground">
+                  {WORKSTREAM_CONTEXT.owner}
+                </span>
+              </div>
+              <textarea
+                aria-label="Comment text"
+                autoFocus
+                rows={3}
+                value={commentDraft}
+                onChange={(e) => setCommentDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    submitComment();
+                  }
+                }}
+                placeholder="@mention or comment"
+                className="w-full resize-none rounded-md border border-border/60 bg-background/60 px-2 py-1.5 text-xs outline-none focus:border-primary/60"
+              />
+              <p className="mt-1 text-[10px] text-muted-foreground">
+                Tip: Press Ctrl+Enter to post.
               </p>
-              <div className="space-y-1.5">
-                {comments.map((c) => (
-                  <div
-                    key={c.id}
-                    data-testid="draft-comment-item"
-                    className="flex items-start justify-between gap-2 border-l-4 border-amber-400 bg-amber-50/60 pl-2 pr-1.5 py-1"
-                  >
-                    <div className="min-w-0">
-                      <p className="line-clamp-1 font-mono text-[10px] text-muted-foreground">
-                        &ldquo;{c.quote}&rdquo;
-                      </p>
-                      <p className="text-[12px] leading-snug text-slate-900">{c.text}</p>
-                    </div>
+              <div className="mt-2 flex justify-end gap-1">
+                <button
+                  type="button"
+                  aria-label="Cancel comment"
+                  onClick={cancelCommentForm}
+                  className="rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Post comment"
+                  disabled={!commentDraft.trim()}
+                  onClick={submitComment}
+                  className="rounded-md bg-primary p-1.5 text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
+                >
+                  <Send className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Marker icons — one per posted comment, sitting right after its
+              highlighted passage. Click to expand. */}
+          {comments.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              data-comment-marker
+              aria-label={
+                expandedCommentId === c.id ? "Collapse comment" : "Expand comment"
+              }
+              onClick={() => {
+                cancelCommentForm();
+                setExpandedCommentId((prev) => (prev === c.id ? null : c.id));
+              }}
+              style={{ position: "absolute", top: c.top, left: c.left }}
+              className={[
+                "z-40 flex h-5 w-5 items-center justify-center rounded-full shadow transition",
+                expandedCommentId === c.id
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-amber-400 text-amber-950 hover:bg-amber-300",
+              ].join(" ")}
+            >
+              <MessageSquare className="h-3 w-3" />
+            </button>
+          ))}
+
+          {comments.map((c) => {
+            if (expandedCommentId !== c.id) return null;
+            // Flip to the icon's left when there isn't 256px (the card's
+            // width) of room to its right — e.g. a passage near the page's
+            // right edge — rather than let the card run off the page.
+            const paperWidth = paperRef.current?.clientWidth ?? 0;
+            const left =
+              c.left + 24 + 256 > paperWidth
+                ? Math.max(c.left - 256 - 8, 0)
+                : c.left + 24;
+            return (
+                <div
+                  key={`${c.id}-card`}
+                  ref={commentPopoverRef}
+                  data-testid="draft-comment-item"
+                  style={{ position: "absolute", top: c.top, left }}
+                  className="z-50 w-64 rounded-lg border border-border/60 bg-card p-2.5 shadow-xl"
+                >
+                  <div className="mb-1 flex items-center gap-1.5">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
+                      {initials(WORKSTREAM_CONTEXT.owner)}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-foreground">
+                      {WORKSTREAM_CONTEXT.owner}
+                    </span>
                     <button
                       type="button"
                       aria-label="Remove comment"
@@ -488,10 +645,13 @@ export const EditorPane = forwardRef<EditorPaneHandle, EditorPaneProps>(
                       <Trash2 className="h-3 w-3" />
                     </button>
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
+                  <p className="line-clamp-1 font-mono text-[10px] text-muted-foreground">
+                    &ldquo;{c.quote}&rdquo;
+                  </p>
+                  <p className="text-[12px] leading-snug text-foreground">{c.text}</p>
+                </div>
+            );
+          })}
         </div>
       </div>
     </section>

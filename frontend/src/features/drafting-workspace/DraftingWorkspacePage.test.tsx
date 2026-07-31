@@ -116,24 +116,20 @@ describe("DraftingWorkspacePage — landing", () => {
     );
   });
 
-  it("enables Bold/Italic/Underline once text is selected in the editor", async () => {
+  it("lets Bold/Italic/Underline be clicked with no selection, not just once text is selected", async () => {
     const user = userEvent.setup();
     await loadWorkspace();
 
-    const surface = screen.getByTestId("draft-surface");
+    // Word-style sticky formatting — clicking Bold with the caret merely
+    // collapsed (nothing selected) is not a no-op requiring selected text
+    // first. execCommand/queryCommandState are real-browser APIs jsdom
+    // doesn't implement, so the actual toggle-then-type behaviour is
+    // covered by manual verification, not this unit test; what's checked
+    // here is that the buttons are enabled and clickable either way.
     const boldButton = screen.getByRole("button", { name: "B" });
-    expect(boldButton).toBeDisabled();
-
-    // Select the clause text already rendered in the surface.
-    const range = document.createRange();
-    range.selectNodeContents(surface);
-    const selection = window.getSelection();
-    selection?.removeAllRanges();
-    selection?.addRange(range);
-    await user.pointer([{ target: surface }]); // fires mouseup on the surface
-    fireEvent.mouseUp(surface);
-
-    await waitFor(() => expect(boldButton).not.toBeDisabled());
+    expect(boldButton).not.toBeDisabled();
+    await user.click(boldButton);
+    expect(boldButton).not.toBeDisabled();
   });
 });
 

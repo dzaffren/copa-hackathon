@@ -173,16 +173,14 @@ export function IntroPage() {
       {/* Layer 3 — foreground content */}
       <div className="absolute left-6 top-6 z-10 sm:left-8 sm:top-8">
         <div
-          className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-to-br from-primary/30 to-primary/10 ring-1 ring-primary/40 motion-reduce:animate-none"
+          className="grid h-9 w-9 place-items-center rounded-lg bg-white/80 shadow-sm ring-1 ring-primary/20 motion-reduce:animate-none"
           style={{
             animation: reduceMotion
               ? undefined
               : "fadeSlideDown 0.4s var(--ease-out-expo) both",
           }}
         >
-          <span className="font-['Fraunces'] text-xs font-semibold tracking-widest text-primary">
-            BNM
-          </span>
+          <img src="/bnm-logo.png" alt="Bank Negara Malaysia" className="h-6 w-6 object-contain" />
         </div>
       </div>
 
@@ -263,14 +261,24 @@ export function IntroPage() {
         <button
           type="button"
           onClick={() => navigate("/")}
-          className="mt-10 flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-violet-600 px-8 py-3 font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-transform duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-105 hover:shadow-primary/40 active:scale-95 motion-reduce:opacity-100"
+          className="group relative mt-10 flex items-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-[#050f2c] via-[#0f2a63] to-[#050f2c] px-8 py-3 font-semibold text-white shadow-lg shadow-blue-950/40 transition-transform duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-105 hover:shadow-blue-900/50 active:scale-95 motion-reduce:opacity-100"
           style={{
             animation: reduceMotion
               ? undefined
               : "fadeSlideUp 0.5s 1s var(--ease-out-expo) both",
           }}
         >
-          Enter Demo <ArrowRight className="h-4 w-4" />
+          {/* The periodic shine — a diagonal streak that sweeps across every
+              5s, parked off-screen the rest of the time. */}
+          {!reduceMotion && (
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+              style={{ animation: "buttonShine 5s ease-in-out infinite" }}
+            />
+          )}
+          <span className="relative">Enter Demo</span>
+          <ArrowRight className="relative h-4 w-4" />
         </button>
       </div>
     </div>
