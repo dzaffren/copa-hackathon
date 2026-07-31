@@ -237,6 +237,46 @@ def neighbourhood_edges(
     ]
 
 
+def analysis_direction(
+    graph: dict[str, Any], edge: dict[str, Any], task_id: Optional[str]
+) -> tuple[str, str]:
+    """Orient one edge for analysis: `(ours_node_id, theirs_node_id)`.
+
+    The finder's DIRECTION CONVENTION is fixed — document A is "we/ours" — so
+    `silent-on` ("ours has no provision") and `goes-beyond` ("ours covers it,
+    theirs does not"), plus `differs-on`'s tighten/loosen sentiment, are only
+    correct if A really is the drafter's side. Edge direction cannot decide that:
+    the live fixtures use OPPOSITE conventions (`opres-v2` points task → anchor,
+    `open-finance-pd-2026` points anchor → ED), which is the same trap
+    `neighbourhood_edges` documents.
+
+    So "ours" is resolved by position relative to the drafting task, not by
+    `source`:
+
+    1. An endpoint that IS the task node — the draft is unambiguously ours.
+    2. Otherwise the endpoint that is a NEIGHBOUR of the task while the other is
+       not. On `open-finance-pd-2026` every anchor points into the ED node, which
+       the PD consolidates, so the ED is the side the drafter owns.
+    3. Failing both (an edge unrelated to the task), the stored direction stands.
+
+    Returns node ids; the caller maps them to `document_id`s.
+    """
+    source, target = edge["source"], edge["target"]
+    if task_id is not None:
+        if source == task_id:
+            return source, target
+        if target == task_id:
+            return target, source
+        neighbours = set(neighbour_ids(graph.get("edges", []), task_id))
+        source_near = source in neighbours
+        target_near = target in neighbours
+        if target_near and not source_near:
+            return target, source
+        if source_near and not target_near:
+            return source, target
+    return source, target
+
+
 def edges_between(
     edges: list[dict[str, Any]], node_ids: set[str], exclude_node: Optional[str] = None
 ) -> list[dict[str, Any]]:
@@ -696,6 +736,34 @@ def remove_edge(graph: dict[str, Any], edge_id: str) -> bool:
     before = len(graph.get("edges", []))
     graph["edges"] = [e for e in graph.get("edges", []) if e["id"] != edge_id]
     return len(graph.get("edges", [])) < before
+
+
+def flip_connection_sides(result: dict[str, Any]) -> dict[str, Any]:
+    """Swap `source_clauses` / `target_clauses` on every connection in a result.
+
+    Used when the drafter's side ("ours", document A to the finder) is the edge
+    TARGET: the finder is called ours-first so its labels come out right, then the
+    cited clauses are swapped back so the persisted finding stays in edge
+    orientation — `source_clauses` always belongs to `edge["source"]`, which is
+    what the review panes and `_linkage_card` assume.
+
+    Labels are deliberately NOT touched. `silent-on` / `goes-beyond` and
+    tighten / loosen describe ours-vs-theirs, which the flip does not change;
+    rewriting them here would undo the very fix this function exists to support.
+    """
+    flipped = dict(result)
+    for key in ("connections", "unsupported"):
+        entries = result.get(key)
+        if not entries:
+            continue
+        out = []
+        for conn in entries:
+            swapped = dict(conn)
+            swapped["source_clauses"] = conn.get("target_clauses") or []
+            swapped["target_clauses"] = conn.get("source_clauses") or []
+            out.append(swapped)
+        flipped[key] = out
+    return flipped
 
 
 def connections_to_findings(result: dict[str, Any]) -> list[dict[str, Any]]:
