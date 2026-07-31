@@ -12,6 +12,7 @@ import type {
   ReviewState,
   SemanticLabel,
 } from "@/lib/types";
+import { LabelLegend } from "@/components/LabelLegend";
 import { CoverageStrip } from "./CoverageStrip";
 import { FindingGroup } from "./FindingGroup";
 import { NodeFilterChips } from "./NodeFilterChips";
@@ -170,7 +171,10 @@ export function PairwiseFindingsCard({ workstreamId, nodeId }: Props) {
     >
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border/60 px-4 py-3">
         <div>
-          <h2 className="text-sm font-semibold">Pairwise findings</h2>
+          <div className="flex items-center gap-1.5">
+            <h2 className="text-sm font-semibold">Pairwise findings</h2>
+            <LabelLegend />
+          </div>
           <p className="mt-0.5 text-[11px] text-muted-foreground">
             {DESCRIPTION}
           </p>

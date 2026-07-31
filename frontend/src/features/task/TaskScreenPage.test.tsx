@@ -8,6 +8,7 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderApp } from "@/test/utils";
+import { LABEL_ORDER, LABEL_STYLES } from "@/lib/labels";
 import { PairwiseFindingCard } from "./PairwiseFindingCard";
 import type { PairwiseFinding } from "@/lib/types";
 
@@ -123,6 +124,50 @@ describe("TaskScreenPage — landing", () => {
     // The retired framing is gone.
     expect(within(box).queryByText(/draft vs neighbours/i)).toBeNull();
     expect(within(box).queryByText(/Finder→critic/i)).toBeNull();
+  });
+
+  it("explains all five semantic labels on hovering the heading's info icon", async () => {
+    const user = userEvent.setup();
+    await loadTaskScreen();
+
+    // Nothing until asked — the legend is a reference, not a banner.
+    expect(screen.queryByTestId("label-legend")).toBeNull();
+
+    await user.hover(screen.getByTestId("label-legend-trigger"));
+
+    const legend = await screen.findByTestId("label-legend");
+    for (const label of LABEL_ORDER) {
+      expect(within(legend).getByText(label)).toBeInTheDocument();
+      expect(
+        within(legend).getByText(LABEL_STYLES[label].description),
+      ).toBeInTheDocument();
+    }
+    // silent-on and goes-beyond are meaningless without knowing which side is
+    // which, so the direction convention rides along.
+    expect(
+      within(legend).getByText(/is this task's draft/),
+    ).toBeInTheDocument();
+
+    await user.unhover(screen.getByTestId("label-legend-trigger"));
+    await waitFor(() =>
+      expect(screen.queryByTestId("label-legend")).toBeNull(),
+    );
+  });
+
+  it("opens the legend on keyboard focus too, and closes it on Escape", async () => {
+    const user = userEvent.setup();
+    await loadTaskScreen();
+    const trigger = screen.getByTestId("label-legend-trigger");
+
+    trigger.focus();
+    const legend = await screen.findByTestId("label-legend");
+    // Announced to a screen reader as the trigger's description, not orphaned.
+    expect(trigger).toHaveAttribute("aria-describedby", legend.id);
+
+    await user.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(screen.queryByTestId("label-legend")).toBeNull(),
+    );
   });
 
   it("reports the neighbourhood in the metric tiles, not the neighbour list", async () => {

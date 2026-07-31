@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { deleteEdge, fetchEdgeDetail } from "@/lib/api";
 import { useAnalyzeEdge } from "@/lib/hooks/useAnalyzeEdge";
 import { bySeverity, labelStyle, labelText } from "@/lib/labels";
+import { LabelLegend } from "@/components/LabelLegend";
 
 interface EdgeDetailPanelProps {
   workstreamId: string;
@@ -178,44 +179,54 @@ export function EdgeDetailPanel({
             )}
           </div>
         ) : (
-          // Attention order, not file order: a conflict must not sit below the
-          // alignments that happened to precede it in the findings file.
-          bySeverity(edge.findings).map((f, i) => {
-            const style = labelStyle(f.label);
-            return (
-              <div
-                key={i}
-                className={cn(
-                  "rounded-lg border border-l-2 border-border/60 bg-card/50 p-3",
-                  style.accent,
-                )}
-              >
-                <div className="mb-1 flex items-center justify-between gap-2">
-                  <span
-                    className={cn(
-                      "rounded-full px-2 py-0.5 text-xs font-semibold",
-                      style.pill,
-                    )}
-                  >
-                    {labelText(f.label, f.sentiment)}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 text-primary hover:text-primary/80"
-                    onClick={() =>
-                      navigate(
-                        `/workstreams/${workstreamId}/edges/${edgeId}/review`,
-                      )
-                    }
-                  >
-                    Review
-                  </Button>
+          <>
+            {/* Same heading and legend as the task screen's box: these are the
+                same five-label findings, and a drafter who learned the taxonomy
+                on one screen should not have to relearn it on the other. */}
+            <div className="flex items-center gap-1.5">
+              <h3 className="text-sm font-semibold">Pairwise findings</h3>
+              <LabelLegend />
+            </div>
+            {/* Attention order, not file order: a conflict must not sit below
+                the alignments that happened to precede it in the findings
+                file. */}
+            {bySeverity(edge.findings).map((f, i) => {
+              const style = labelStyle(f.label);
+              return (
+                <div
+                  key={i}
+                  className={cn(
+                    "rounded-lg border border-l-2 border-border/60 bg-card/50 p-3",
+                    style.accent,
+                  )}
+                >
+                  <div className="mb-1 flex items-center justify-between gap-2">
+                    <span
+                      className={cn(
+                        "rounded-full px-2 py-0.5 text-xs font-semibold",
+                        style.pill,
+                      )}
+                    >
+                      {labelText(f.label, f.sentiment)}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-primary hover:text-primary/80"
+                      onClick={() =>
+                        navigate(
+                          `/workstreams/${workstreamId}/edges/${edgeId}/review`,
+                        )
+                      }
+                    >
+                      Review
+                    </Button>
+                  </div>
+                  <p className="text-sm">{f.summary}</p>
                 </div>
-                <p className="text-sm">{f.summary}</p>
-              </div>
-            );
-          })
+              );
+            })}
+          </>
         )}
       </div>
 

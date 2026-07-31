@@ -1,11 +1,12 @@
 import { describe, it, expect, vi } from "vitest";
-import { screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 
 import { server } from "@/test/msw/server";
 
 import { renderWithProviders } from "@/test/utils";
+import { LABEL_ORDER } from "@/lib/labels";
 import { EdgeDetailPanel } from "./EdgeDetailPanel";
 
 describe("EdgeDetailPanel", () => {
@@ -23,6 +24,11 @@ describe("EdgeDetailPanel", () => {
     // No finding cards → no Review buttons.
     expect(screen.queryByRole("button", { name: /^review$/i })).toBeNull();
     expect(screen.getByText(/not analysed/i)).toBeInTheDocument();
+    // No cards to explain, so no heading and no legend either.
+    expect(
+      screen.queryByRole("heading", { name: "Pairwise findings" }),
+    ).toBeNull();
+    expect(screen.queryByTestId("label-legend-trigger")).toBeNull();
   });
 
   it("analysed edge shows finding cards and no Analyze button", async () => {
@@ -39,6 +45,30 @@ describe("EdgeDetailPanel", () => {
       screen.queryByRole("button", { name: /analyze linkages/i }),
     ).toBeNull();
     expect(screen.getByText(/3 linkage\(s\)/i)).toBeInTheDocument();
+    // Headed like the task screen's box, so the taxonomy is explained wherever
+    // these cards appear rather than only on one screen.
+    expect(
+      screen.getByRole("heading", { name: "Pairwise findings" }),
+    ).toBeInTheDocument();
+  });
+
+  it("explains the labels from the edge panel's own legend", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(
+      <EdgeDetailPanel
+        workstreamId="opres-v2"
+        edgeId="e-opres_v0_3--bcbs_opres_2021"
+      />,
+      "/workstreams/opres-v2",
+    );
+    await screen.findAllByRole("button", { name: /^review$/i });
+
+    await user.hover(screen.getByTestId("label-legend-trigger"));
+
+    const legend = await screen.findByTestId("label-legend");
+    for (const label of LABEL_ORDER) {
+      expect(within(legend).getByText(label)).toBeInTheDocument();
+    }
   });
 
   it("disables Analyze when the edge is not analysable", async () => {
