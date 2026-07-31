@@ -158,12 +158,15 @@ export function PairwiseFindingsCard({ workstreamId, nodeId }: Props) {
     // workstream the ungoverned list ran several screens past the fold, taking
     // the whole page with it.
     //
-    // 18rem of headroom, not less: the page header runs ~13rem and the floating
-    // screen-nav overlays the last ~4rem of the viewport, so a taller cap tucks
-    // the final finding underneath it.
+    // 12rem of headroom is a deliberate trade, not the largest gap that fits:
+    // the page header runs ~13rem and the DemoController overlays the last ~4rem
+    // of the viewport, so ~17rem is the most that clears both. At 12rem the last
+    // finding sits behind the controller until the page is scrolled a little —
+    // accepted, because the controller is a dismissible demo aid and the taller
+    // box is worth more than the overlap costs.
     <Card
       data-testid="pairwise-card"
-      className="glass flex max-h-[calc(100vh-18rem)] min-h-[24rem] flex-col overflow-hidden"
+      className="glass flex max-h-[calc(100vh-12rem)] min-h-[24rem] flex-col overflow-hidden"
     >
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border/60 px-4 py-3">
         <div>
