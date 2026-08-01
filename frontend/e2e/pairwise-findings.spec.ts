@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import { execFileSync } from "node:child_process";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 /**
@@ -15,7 +15,8 @@ import path from "node:path";
  *
  * WRITES TO TRACKED PATHS: accepting and dismissing persist review state into
  * data/workstreams/open-finance-pd-2026/findings/. Run
- * `git checkout data/workstreams/open-finance-pd-2026` afterwards.
+ * `afterEach` restores those files byte-for-byte from a snapshot, so no manual
+ * cleanup is needed and nothing outside `findings/` is ever touched.
  */
 
 const TASK_URL =
@@ -42,15 +43,38 @@ async function openTask(page: Page) {
   await expect(group(page, "differs-on")).toBeVisible();
 }
 
-// Accepting and dismissing write review state into the tracked fixture, so
-// without a reset the specs only pass in one order on a clean tree. The note in
-// the file header still applies for a run that is interrupted.
+// Accepting and dismissing write review state into the tracked findings files,
+// so without a reset the specs only pass in one order on a clean tree.
+//
+// This used to run `git checkout -- data/workstreams/<ws>`, which was safe only
+// while the fixture held no uncommitted work. It does now — the demo carries the
+// drafter's accepted findings, `source_pdf` fields on the graph, and a directory
+// rename — and that command silently destroyed all of it during development of
+// the Recommendations feature.
+//
+// Snapshot-and-restore instead: only the findings files this spec can write are
+// captured, and they are put back byte-for-byte. It cannot reach anything else in
+// the workstream, committed or not.
+const FINDINGS_DIR = path.resolve(
+  process.cwd(),
+  "..",
+  "data/workstreams/open-finance-pd-2026/findings",
+);
+
+let snapshot: Map<string, Buffer>;
+
 test.beforeEach(() => {
-  execFileSync(
-    "git",
-    ["checkout", "--", "data/workstreams/open-finance-pd-2026"],
-    { cwd: path.resolve(process.cwd(), "..") },
+  snapshot = new Map(
+    readdirSync(FINDINGS_DIR)
+      .filter((name) => name.endsWith(".json"))
+      .map((name) => [name, readFileSync(path.join(FINDINGS_DIR, name))]),
   );
+});
+
+test.afterEach(() => {
+  for (const [name, bytes] of snapshot) {
+    writeFileSync(path.join(FINDINGS_DIR, name), bytes);
+  }
 });
 
 test.describe("Pairwise Findings box", () => {
@@ -141,7 +165,12 @@ test.describe("Pairwise Findings box", () => {
     await openTask(page);
 
     const differs = group(page, "differs-on");
-    const first = differs.getByTestId("finding-card").first();
+    const pendingBefore = Number(
+      await differs.getByTestId("group-pending").innerText(),
+    );
+    const first = differs
+      .locator('[data-testid="finding-card"][data-review-state="pending"]')
+      .first();
     const findingId = await first.getAttribute("data-finding-id");
 
     await first.getByRole("button", { name: /Accept/ }).click();
@@ -149,31 +178,59 @@ test.describe("Pairwise Findings box", () => {
     const accepted = differs.locator(`[data-finding-id="${findingId}"]`);
     await expect(accepted).toHaveAttribute("data-review-state", "accepted");
 
-    // Still in differs-on, now last, and the group total has not moved.
+    // Still in differs-on, now last, and the group total has not moved. Pending
+    // is asserted as a DELTA: the demo fixture ships with real acceptances, so
+    // "30 minus one" only held while a destructive reset emptied it first.
     await expect(differs.getByTestId("group-total")).toHaveText("30");
-    await expect(differs.getByTestId("group-pending")).toHaveText("29");
-    const ids = await differs
+    await expect(differs.getByTestId("group-pending")).toHaveText(
+      String(pendingBefore - 1),
+    );
+    // The property is that it SANK below every still-pending card — not that it
+    // is strictly last. The fixture already holds accepted findings in this
+    // group, so a newly accepted one joins them rather than going to the end.
+    const states = await differs
       .getByTestId("finding-card")
-      .evaluateAll((els) => els.map((e) => e.getAttribute("data-finding-id")));
-    expect(ids).toHaveLength(30);
-    expect(ids[ids.length - 1]).toBe(findingId);
+      .evaluateAll((els) =>
+        els.map((e) => ({
+          id: e.getAttribute("data-finding-id"),
+          state: e.getAttribute("data-review-state"),
+        })),
+      );
+    expect(states).toHaveLength(30);
+    const movedTo = states.findIndex((c) => c.id === findingId);
+    const lastPending = states.reduce(
+      (acc, c, i) => (c.state === "pending" ? i : acc),
+      -1,
+    );
+    expect(movedTo).toBeGreaterThan(lastPending);
   });
 
   test("undo returns a judged finding to pending", async ({ page }) => {
     await openTask(page);
 
     const aligns = group(page, "aligns-with");
-    const first = aligns.getByTestId("finding-card").first();
+    // Deltas, not absolutes: the demo fixture ships with real acceptances, so a
+    // hard-coded "74 then 75" only held while a destructive reset emptied it.
+    const pendingBefore = Number(
+      await aligns.getByTestId("group-pending").innerText(),
+    );
+    const first = aligns
+      .locator('[data-testid="finding-card"][data-review-state="pending"]')
+      .first();
     const findingId = await first.getAttribute("data-finding-id");
 
     await first.getByRole("button", { name: /Dismiss/ }).click();
     const card = aligns.locator(`[data-finding-id="${findingId}"]`);
     await expect(card).toHaveAttribute("data-review-state", "dismissed");
-    await expect(aligns.getByTestId("group-pending")).toHaveText("74");
+    await expect(aligns.getByTestId("group-pending")).toHaveText(
+      String(pendingBefore - 1),
+    );
 
     await card.getByRole("button", { name: /Undo/ }).click();
     await expect(card).toHaveAttribute("data-review-state", "pending");
-    await expect(aligns.getByTestId("group-pending")).toHaveText("75");
+    await expect(aligns.getByTestId("group-pending")).toHaveText(
+      String(pendingBefore),
+    );
   });
 
   test("Review opens the comparison on the finding that was clicked", async ({
