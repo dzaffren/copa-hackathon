@@ -187,7 +187,12 @@ def _build_grounding_context(
     return "\n\n".join(sections), grounded
 
 
-def _system_prompt(task_title: str, intent: str, context: str) -> str:
+def _system_prompt(
+    task_title: str,
+    intent: str,
+    context: str,
+    playbook_section: str = "",
+) -> str:
     """The citation-grounding system prompt: mirrors `engine.connections`'s
     "prompt says don't invent" layer, backed by `_validate_reply`'s
     deterministic enforcement, never trusted alone. Also sets the writing
@@ -248,6 +253,21 @@ def _system_prompt(task_title: str, intent: str, context: str) -> str:
         "nothing. Omit snippet_html if you are not proposing draft text. If you "
         "have neither, do not output the " + sentinel + " line at all. Never "
         "put anything after the JSON object."
+        # The drafter's own standing instruction for THIS stage, appended LAST and
+        # deliberately AFTER the grounding and citation rules above. A playbook
+        # instruction shapes how the Copilot writes; it cannot loosen what it may
+        # cite, because that guarantee is enforced by `_validate_reply` in code
+        # rather than by this prompt. An empty section adds nothing at all, so a
+        # workstream with no playbook produces a byte-identical prompt to the one
+        # it produced before playbooks existed.
+        + (
+            "\n\nTHE DRAFTER'S PLAYBOOK FOR THIS STAGE — her own standing "
+            "instructions, in her words. Follow them unless they would conflict "
+            "with the grounding and citation rules above, which always win:\n"
+            + playbook_section.strip()
+            if playbook_section.strip()
+            else ""
+        )
     )
 
 
@@ -315,6 +335,7 @@ def copilot_reply(
     draft_text: Optional[str] = None,
     selection_text: Optional[str] = None,
     turn_fn: Optional[CopilotTurnFn] = None,
+    playbook_section: str = "",
 ) -> dict[str, Any]:
     """Ground, call, split, and validate one live Copilot turn (non-streaming).
 
@@ -355,7 +376,9 @@ def copilot_reply(
         node, clause_index, workstreams_dir, workstream_id,
         referenced_finding_ids, draft_text, selection_text,
     )
-    system = _system_prompt(node.get("title") or "this task", intent, context)
+    system = _system_prompt(
+        node.get("title") or "this task", intent, context, playbook_section
+    )
     messages = _build_messages(history, message)
 
     raw = turn(system, messages)
@@ -376,6 +399,7 @@ def copilot_reply_stream(
     draft_text: Optional[str] = None,
     selection_text: Optional[str] = None,
     stream_fn: Optional[CopilotStreamFn] = None,
+    playbook_section: str = "",
 ) -> Generator[str, None, None]:
     """Stream a Copilot turn as SSE frames.
 
@@ -400,7 +424,9 @@ def copilot_reply_stream(
         node, clause_index, workstreams_dir, workstream_id,
         referenced_finding_ids, draft_text, selection_text,
     )
-    system = _system_prompt(node.get("title") or "this task", intent, context)
+    system = _system_prompt(
+        node.get("title") or "this task", intent, context, playbook_section
+    )
     messages_list = _build_messages(history, message)
 
     accumulated = ""
