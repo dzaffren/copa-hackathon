@@ -17,11 +17,15 @@ import type {
   DraftResponse,
   EdgeDetail,
   ExtractConceptsResponse,
+  GuardrailsResponse,
   LinkageReviewResponse,
   LinkageTransitionRequest,
   LinkageTransitionResponse,
   LinkagesResponse,
   Person,
+  Playbook,
+  Recommendation,
+  RecommendationsResponse,
   ReviewQueueResponse,
   NodeDetail,
   NodeMetadataRequest,
@@ -145,6 +149,122 @@ export function fetchPairwiseFindings(
 ): Promise<PairwiseFindingsResponse> {
   return getJson<PairwiseFindingsResponse>(
     `${API_BASE}/api/workstreams/${workstreamId}/tasks/${nodeId}/pairwise-findings`,
+  );
+}
+
+// --- Recommendations -------------------------------------------------------
+
+/** The task's recommendations, plus the accepted findings none of them drew on.
+ *
+ *  Never 404s on "not generated yet" — an untouched task returns an empty list
+ *  with `generated_at: null`, so the card's three empty states are data rather
+ *  than error handling. */
+export function fetchRecommendations(
+  workstreamId: string,
+  nodeId: string,
+): Promise<RecommendationsResponse> {
+  return getJson<RecommendationsResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/tasks/${nodeId}/recommendations`,
+  );
+}
+
+/** Generate a fresh set. Bookmarked recommendations survive; the rest are
+ *  replaced. Rejects with `NO_POLICY_REQUIREMENTS` (409) when the draft records
+ *  none, or `NO_ACCEPTED_FINDINGS` (409) when nothing has been accepted — both
+ *  before any model call. */
+export function generateRecommendations(
+  workstreamId: string,
+  nodeId: string,
+): Promise<RecommendationsResponse> {
+  return postJson<RecommendationsResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/tasks/${nodeId}/recommendations/generate`,
+  );
+}
+
+/** Mark or unmark a recommendation as one the drafter is taking forward.
+ *
+ *  Bookmarked recommendations survive regeneration byte-for-byte, which is what
+ *  makes regenerating safe. No model call — a single-field write. */
+export function setRecommendationBookmark(
+  workstreamId: string,
+  nodeId: string,
+  recId: string,
+  bookmarked: boolean,
+): Promise<Recommendation> {
+  return patchJson<Recommendation>(
+    `${API_BASE}/api/workstreams/${workstreamId}/tasks/${nodeId}/recommendations/${recId}`,
+    { bookmarked },
+  );
+}
+
+/** Record why a recommendation misses. Appends to the card and makes no model
+ *  call — the comment stays ON THE CARD. Making a correction permanent is the
+ *  drafter's own edit to the guardrails. */
+export function addRecommendationComment(
+  workstreamId: string,
+  nodeId: string,
+  recId: string,
+  comment: string,
+): Promise<Recommendation> {
+  return patchJson<Recommendation>(
+    `${API_BASE}/api/workstreams/${workstreamId}/tasks/${nodeId}/recommendations/${recId}`,
+    { comment },
+  );
+}
+
+/** Rewrite ONE recommendation from its comments. Keeps its id, bookmark and
+ *  dimensions; appends the superseded text to `revisions`. Touches no other
+ *  card, and is refused if the rewrite resolves no citations. */
+export function rewriteRecommendation(
+  workstreamId: string,
+  nodeId: string,
+  recId: string,
+): Promise<Recommendation> {
+  return postJson<Recommendation>(
+    `${API_BASE}/api/workstreams/${workstreamId}/tasks/${nodeId}/recommendations/${recId}/rewrite`,
+  );
+}
+
+/** The drafter's per-stage Copilot instructions. Returns four empty sections for
+ *  a workstream that has never saved one — there are no shipped defaults. */
+export function fetchPlaybook(workstreamId: string): Promise<Playbook> {
+  return getJson<Playbook>(
+    `${API_BASE}/api/workstreams/${workstreamId}/playbook`,
+  );
+}
+
+/** Replace the playbook. A FULL REPLACEMENT of the four sections: the form always
+ *  sends all four, so an omitted one lands empty. */
+export function savePlaybook(
+  workstreamId: string,
+  sections: Pick<Playbook, "brainstorm" | "draft" | "write" | "deliver">,
+): Promise<Playbook> {
+  return putJson<Playbook>(
+    `${API_BASE}/api/workstreams/${workstreamId}/playbook`,
+    sections,
+  );
+}
+
+/** The workstream's guardrails — the rules the recommendations engine follows.
+ *  Serves the five shipped defaults when nothing has been saved, so the box is
+ *  never empty on first open. */
+export function fetchGuardrails(
+  workstreamId: string,
+): Promise<GuardrailsResponse> {
+  return getJson<GuardrailsResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/guardrails`,
+  );
+}
+
+/** Replace the workstream's guardrails. An empty body is accepted deliberately —
+ *  clearing the box is a real decision and the defaults do not creep back. */
+export function saveGuardrails(
+  workstreamId: string,
+  body: string,
+): Promise<GuardrailsResponse> {
+  return putJson<GuardrailsResponse>(
+    `${API_BASE}/api/workstreams/${workstreamId}/guardrails`,
+    { body },
   );
 }
 
@@ -300,6 +420,13 @@ export function fetchReview(
   return getJson<ReviewResponse>(
     `${API_BASE}/api/workstreams/${workstreamId}/edges/${edgeId}/review${query}`,
   );
+}
+
+/** The route serving a document's published PDF. Opened in a new tab rather than
+ *  fetched, so this returns the URL instead of the bytes. Only meaningful for a
+ *  node whose `has_source_pdf` is true. */
+export function sourcePdfUrl(workstreamId: string, nodeId: string): string {
+  return `${API_BASE}/api/workstreams/${workstreamId}/nodes/${nodeId}/source-pdf`;
 }
 
 export function setReviewState(

@@ -124,6 +124,9 @@ export interface ReviewEdgeNode {
   id: string;
   title: string | null;
   node_type: NodeType | null;
+  /** Whether this document has a published PDF the pane can link out to. False
+   *  for a working draft, and for any node whose workstream ships none. */
+  has_source_pdf: boolean;
 }
 
 export interface ReviewCounts {
@@ -219,8 +222,13 @@ export interface Placeholder {
  *  On 1 Aug 2026 `legal_basis` became `legal_provision` and `requirement`
  *  returned as `policy_requirement`. Retired workstreams were not migrated, so
  *  their side-files still carry `legal_basis`; the route spreads the raw dict,
- *  so the legacy key still arrives, it just no longer lands in a row. */
-export interface ConceptsAvailable {
+ *  so the legacy key still arrives, it just no longer lands in a row.
+ *
+ *  Named `NodeMetadata`, not `ConceptsAvailable` (renamed 1 Aug 2026): the API
+ *  serves this shape as `metadata`, and `concepts` on the wire means a
+ *  document's **extracted axes** — see `NodeConcepts`. The old name pointed the
+ *  reader at the wrong one of the two. */
+export interface NodeMetadata {
   status: "available";
   policy_owner: string | null;
   /** Multi-valued, but typed to allow a bare string: the three retired
@@ -260,7 +268,7 @@ export interface NodeDetail {
   recent_activity: RecentActivity[];
   /** The seven-field regulatory profile. Formerly served as `concepts`; renamed
    *  when `concepts` was repurposed for extracted axes. */
-  metadata: Placeholder | ConceptsAvailable;
+  metadata: Placeholder | NodeMetadata;
   /** The document's extracted topics, shown as pills. `not_extracted` (with an
    *  empty list) is the expected state until the drafter extracts them. */
   concepts: NodeConcepts;
@@ -294,7 +302,7 @@ export interface NodeMetadataResponse {
   node_id: string;
   /** The saved profile in the GET's `metadata` shape, so the client can drop it
    *  straight into its cache. */
-  metadata: ConceptsAvailable;
+  metadata: NodeMetadata;
 }
 
 export interface EdgeEndpoint {
@@ -474,6 +482,143 @@ export interface PairwiseFindingsResponse {
   };
 }
 
+// --- Recommendations -------------------------------------------------------
+
+/** One accepted finding a recommendation rests on.
+ *
+ *  Carries the clause TEXT, not just the number — unlike `PairwiseFinding`,
+ *  which is a reference the drafter clicks through from. A recommendation has to
+ *  be readable and checkable in place, so the quotation travels with it. The
+ *  engine copies this text off the finding record, so it can never diverge from
+ *  the evidence it cites. */
+export interface RecommendationEvidence {
+  finding_id: string;
+  edge_id: string;
+  label: SemanticLabel | null;
+  sentiment: Sentiment;
+  summary: string | null;
+  left: { id: string; title: string | null };
+  right: { id: string; title: string | null };
+  source_clause_number: string | null;
+  source_clause_text: string | null;
+  target_clause_number: string | null;
+  target_clause_text: string | null;
+}
+
+export interface RecommendationComment {
+  author: { id: string; name: string };
+  at: string;
+  text: string;
+}
+
+/** A superseded version, appended on each rewrite. `evidence` is deliberately
+ *  not snapshotted — it is a projection of accepted findings that still exist
+ *  and are still quotable. */
+export interface RecommendationRevision {
+  at: string;
+  title: string;
+  rationale: string;
+  action: string;
+  confidence_note: string;
+}
+
+/** Mirrors the columns a BNM reviewer actually worked with — Recommendation,
+ *  Rationale, Action for BNM, Referenced rows — minus Type and Relevance score,
+ *  which were both dropped deliberately (an expert disputed one type outright,
+ *  and a single-pass generator has no independent judgement to score with).
+ *
+ *  `id` is opaque, never index-derived: a regeneration reorders the list, so an
+ *  index-based id would silently re-point a bookmark at a different card. */
+export interface Recommendation {
+  id: string;
+  title: string;
+  rationale: string;
+  action: string;
+  /** Which of the draft's policy requirements this touches. Free-form count —
+   *  one recommendation may span several, one dimension may attract none. */
+  dimensions: string[];
+  /** Never empty: the engine drops any recommendation whose citations do not
+   *  resolve to a real accepted finding. */
+  evidence: RecommendationEvidence[];
+  /** What the tool could not verify from the documents available. */
+  confidence_note: string;
+  bookmarked: boolean;
+  comments: RecommendationComment[];
+  revisions: RecommendationRevision[];
+}
+
+/** An accepted finding no recommendation drew on. Derived server-side on every
+ *  read, never stored, so it cannot drift from current review state. */
+export interface UnreflectedFinding {
+  finding_id: string;
+  edge_id: string;
+  label: SemanticLabel | null;
+  sentiment: Sentiment;
+  summary: string | null;
+  left: { id: string; title: string | null };
+  right: { id: string; title: string | null };
+  source_clause_number: string | null;
+  source_clause_text: string | null;
+  target_clause_number: string | null;
+  target_clause_text: string | null;
+}
+
+export interface RecommendationsResponse {
+  /** `null` before the first generation — which is how "never generated" is told
+   *  apart from "generated, and empty". */
+  generated_at: string | null;
+  /** The task's parsed policy requirements. Populated even when nothing has been
+   *  generated, because the card needs it to choose its empty state. */
+  dimensions: string[];
+  accepted_count: number;
+  recommendations: Recommendation[];
+  not_yet_reflected: UnreflectedFinding[];
+  counts: {
+    total: number;
+    bookmarked: number;
+    cited_findings: number;
+    not_yet_reflected: number;
+  };
+  /** Present on a generate response: how many the evidence floor removed. */
+  dropped_unsupported?: number;
+}
+
+/** The drafter's per-stage instructions for the Copilot.
+ *
+ *  Four sections, one per editable stage. `/explore-task` has NO field: it is
+ *  locked because its job is to report what a document's regulatory profile
+ *  records, and an editable override would let the tool state an identity the
+ *  document does not have.
+ *
+ *  Every section starts empty — unlike the guardrails there are no shipped
+ *  defaults, because the Copilot's current behaviour is the baseline. */
+export interface Playbook {
+  brainstorm: string;
+  draft: string;
+  write: string;
+  deliver: string;
+  updated_at: string | null;
+  /** True when nothing has been saved for this workstream. Not the same as every
+   *  section being blank — clearing them all is a legitimate save. */
+  is_default: boolean;
+}
+
+/** The four editable section keys, for iterating the form. */
+export type PlaybookSectionKey = "brainstorm" | "draft" | "write" | "deliver";
+
+/** Just the instruction text, without the persistence metadata — what a consumer
+ *  needs to act on the playbook rather than edit it. */
+export type PlaybookSections = Pick<Playbook, PlaybookSectionKey>;
+
+export interface GuardrailsResponse {
+  body: string;
+  updated_at: string | null;
+  /** True when no guardrails have been saved and the five shipped defaults are
+   *  being served. Not the same as comparing the text — a drafter may save the
+   *  defaults verbatim. */
+  is_default: boolean;
+}
+
 export interface DraftResponse {
   node_id: string;
   content_html: string;
@@ -651,7 +796,11 @@ export interface CrossProfile {
   description: string | null;
   workstream_id: string | null;
   workstream_name: string | null;
-  concepts: Placeholder | ConceptsAvailable;
+  /** Holds the regulatory PROFILE, despite the key name — this is the
+   *  cross-links wire shape and renaming the key would break the API surface.
+   *  The `NodeMetadata` type makes the mismatch visible rather than hiding it;
+   *  `concepts` elsewhere means extracted axes (`NodeConcepts`). */
+  concepts: Placeholder | NodeMetadata;
 }
 
 /** The full "why do these overlap, and what's the evidence" payload behind the

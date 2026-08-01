@@ -56,23 +56,21 @@ async function loadTaskScreen(url = TASK_URL) {
 }
 
 describe("TaskScreenPage — landing", () => {
-  it("renders the header, source card and neighbour list", async () => {
+  it("renders the header, recommendations card and neighbour list", async () => {
     await loadTaskScreen();
 
     expect(
       screen.getByRole("link", { name: /Workstream graph/i }),
     ).toBeInTheDocument();
+
+    // The Source card was deleted on 1 Aug 2026. Everything it uniquely showed
+    // that the drafter acts on now reads from the header byline, so that is what
+    // is asserted here — the card's absence must not quietly cost information.
     expect(
       screen.getByText("Aisyah R. · .docx · 7 neighbour nodes"),
     ).toBeInTheDocument();
-
-    const source = screen.getByTestId("source-card");
-    expect(
-      within(source).getByText("OpRes PD v0.3 working draft"),
-    ).toBeInTheDocument();
-    expect(within(source).getByText(/42 clauses/)).toBeInTheDocument();
-    expect(within(source).getByText("Aisyah R.")).toBeInTheDocument();
-    expect(within(source).getByText("in progress")).toBeInTheDocument();
+    expect(screen.queryByTestId("source-card")).not.toBeInTheDocument();
+    expect(screen.getByTestId("recommendations-card")).toBeInTheDocument();
 
     // The direct tier: one row per edge the task itself carries.
     expect(screen.getAllByTestId("neighbour-row")).toHaveLength(7);
@@ -687,7 +685,11 @@ describe("TaskScreenPage — navigation", () => {
 
     await user.click(screen.getByRole("link", { name: /Open draft/i }));
     expect(await screen.findByTestId("draft-surface")).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /Reviewed/ })).toBeInTheDocument();
+    // The workspace opens on Recommendations — Reviewed was replaced by Playbook
+    // on 1 Aug 2026.
+    expect(
+      screen.getByRole("tab", { name: /Recommendations/ }),
+    ).toBeInTheDocument();
   });
 });
 
@@ -715,18 +717,24 @@ describe("TaskScreenPage — a freshly scaffolded focal task", () => {
         name: "Operational Resilience PD (PD)",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByTestId("source-card")).toBeInTheDocument();
+    expect(screen.getByTestId("recommendations-card")).toBeInTheDocument();
   });
 
-  it("names the owner and says no document is attached, never 'null'", async () => {
+  it("never renders 'null' or the epoch for a node with no document", async () => {
+    // Original intent, kept: this screen used to throw on `task.owner.name` for
+    // a freshly scaffolded node, and with no error boundary that blanked the
+    // whole app — Open task looked like a dead button. The Source card is gone,
+    // so the assertion moved to the header, which is where those fields render
+    // now.
     renderApp(FRESH_URL);
-    const source = await screen.findByTestId("source-card");
-    expect(within(source).getByText("Aisyah R.")).toBeInTheDocument();
-    expect(
-      within(source).getByText("No document attached"),
-    ).toBeInTheDocument();
-    expect(source).not.toHaveTextContent(/null/i);
-    expect(source).not.toHaveTextContent(/1970/);
+    const heading = await screen.findByRole("heading", {
+      name: "Operational Resilience PD (PD)",
+    });
+    const header = heading.closest("header");
+    expect(header).not.toBeNull();
+    expect(header).toHaveTextContent("Aisyah R.");
+    expect(header).not.toHaveTextContent(/null/i);
+    expect(header).not.toHaveTextContent(/1970/);
   });
 
   it("presents a task with no neighbours as a starting state, not an error", async () => {
