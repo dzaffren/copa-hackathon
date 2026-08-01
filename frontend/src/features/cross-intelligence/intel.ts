@@ -1,5 +1,5 @@
 import type {
-  ConceptsAvailable,
+  NodeMetadata,
   CrossLink,
   Placeholder,
   RelationshipClassification,
@@ -111,9 +111,9 @@ export function asList(value: string[] | string | null | undefined): string[] {
 /** The regulatory-profile concept block, or null when a node has not been
  *  enriched (so the caller can render a "pending" state instead of guessing). */
 export function conceptsOf(
-  c: Placeholder | ConceptsAvailable | undefined,
-): ConceptsAvailable | null {
+  c: Placeholder | NodeMetadata | undefined,
+): NodeMetadata | null {
   // Placeholder.status is a wide `string`, so the union does not auto-narrow;
   // the "available" check is the discriminant and the cast is safe.
-  return c && c.status === "available" ? (c as ConceptsAvailable) : null;
+  return c && c.status === "available" ? (c as NodeMetadata) : null;
 }

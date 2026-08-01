@@ -135,8 +135,8 @@ def test_merge_leaves_graph_json_alone(tmp_path) -> None:
 
 
 # --- enrich_node_metadata must not erase what it did not derive -------------
-# The script writes through `concepts.save_concepts`, which fills every one of
-# the nine CONCEPT_FIELDS — so passing only the two fields it derives blanked
+# The script writes through `node_metadata.save_metadata`, which fills every one of
+# the seven METADATA_FIELDS — so passing only the two fields it derives blanked
 # the other seven. That destroyed hand-authored profile content (of-ed-2025 lost
 # its applicability, issuance date, six keywords and legal basis) while printing
 # "enriched", and those values exist only in git. The script has no CLI and is
@@ -146,7 +146,15 @@ def test_merge_leaves_graph_json_alone(tmp_path) -> None:
 
 def _enrich_fixture(tmp_path: Path, profile: dict) -> dict:
     """Run the script's per-workstream pass over a one-node workstream that
-    already has `profile` on disk, and return the profile afterwards."""
+    already has `profile` on disk, and return the profile afterwards.
+
+    Note the asymmetry, which is the rename working as designed: the starting
+    profile is seeded in the LEGACY `concepts/` directory (where every existing
+    fixture's profile lives), and the result is read back from `metadata/`,
+    because `node_metadata.save_metadata` always writes there. The script reads
+    through the fallback and writes forward, so one enrichment pass migrates a
+    node. Reading back from `concepts/` here would return the untouched input.
+    """
     ws = tmp_path / "ws-1"
     _write(
         ws / "graph.json",
@@ -167,7 +175,7 @@ def _enrich_fixture(tmp_path: Path, profile: dict) -> dict:
 
     _import_script("enrich_node_metadata")._enrich_workstream(tmp_path, "ws-1")
 
-    return json.loads((ws / "concepts" / "n1.json").read_text(encoding="utf-8"))
+    return json.loads((ws / "metadata" / "n1.json").read_text(encoding="utf-8"))
 
 
 def test_enrich_preserves_fields_it_does_not_derive(tmp_path) -> None:

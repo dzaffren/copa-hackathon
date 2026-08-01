@@ -1,0 +1,365 @@
+{
+  "generated_at": "2026-08-01T13:09:48.034423Z",
+  "dimensions_used": [
+    "Governance",
+    "Participation and scope of information sharing",
+    "Transition arrangements",
+    "Consent management",
+    "Customer protection",
+    "Management of technology risk"
+  ],
+  "recommendations": [
+    {
+      "id": "4b43aee16897",
+      "title": "Retain the data-protection compliance anchor for data sharing",
+      "rationale": "- ED S 1.3 requires sharing in \"full compliance with the Personal Data Protection Act 2010 and other relevant data privacy and protection requirements\".\n- HKMA clause 34.3.2(i) requires parties to \"comply with the applicable laws and guidance on the protection of personal data\".\n- The draft's anchor matches the peer baseline and grounds the third-party obligations in S 11.8.",
+      "action": "Keep S 1.3 as the governing data-protection requirement and retain the S 11.8 obligation that third-party service providers comply with data privacy, confidentiality and security rules.",
+      "dimensions": [
+        "Customer protection",
+        "Participation and scope of information sharing"
+      ],
+      "evidence": [
+        {
+          "finding_id": "4e88fb130c39",
+          "edge_id": "e-hkma_open_api_framework--ed_open_finance_2025",
+          "label": "aligns-with",
+          "sentiment": null,
+          "summary": "Both require compliance with personal data protection laws when sharing customer data with third parties.",
+          "left": {
+            "id": "hkma-open-api-framework",
+            "title": "HKMA Open API Framework"
+          },
+          "right": {
+            "id": "ed-open-finance-2025",
+            "title": "ED Open Finance 2025"
+          },
+          "source_clause_number": "hkma-open-api-framework 34.3.2(i)",
+          "source_clause_text": "explicit to their customers that the collection\nof personal data is neither carried out by banks\nnor directly related to bank business, and (iii)\ncomply with the applicable laws and guidance\non the protection of personal data; and",
+          "target_clause_number": "ed-open-finance-2025 1.3",
+          "target_clause_text": "This Policy Document sets out the regulatory framework for open finance which\nseeks to ensure that it is implemented in an efficient, resilient and secure\nfashion. In addition to ensuring that the sharing of data is conducted in full\ncompliance with the Personal Data Protection Act 2010 and other relevant data\nprivacy and protection requirements, the Policy Document seeks to promote\nresponsible data sharing that strikes an appropriate balance between financial\ninnovation and prudent management of risks."
+        },
+        {
+          "finding_id": "89d0e2fa62b7",
+          "edge_id": "e-hkma_open_api_framework--ed_open_finance_2025",
+          "label": "aligns-with",
+          "sentiment": null,
+          "summary": "Both treat customer data protection and compliance with data privacy laws as core to data sharing.",
+          "left": {
+            "id": "hkma-open-api-framework",
+            "title": "HKMA Open API Framework"
+          },
+          "right": {
+            "id": "ed-open-finance-2025",
+            "title": "ED Open Finance 2025"
+          },
+          "source_clause_number": "hkma-open-api-framework 7#2",
+          "source_clause_text": "to customers succinct and easy-to-understand summary on the use and purpose of collecting the\npersonal data and key highlights of the terms and conditions of the services offered.), customer data\nprotection (including, among others, appropriate control and safeguards in relation to the collection,\nuse, holding and erasure of customer data for complying with the applicable laws and guidance on the\nprotection of personal data, the consent model for storing or sharing customer data), commitment not to\nstore customers' e-banking credentials, responsible conduct, protection of customers against fraud,\ncomplaint handling mechanism with accessible channels for interacting with customers to deal with\ntheir enquiries and complaints, redress measures, clear liability and settlement arrangement between\nthe bank and the partnering TSP for compensating customers' loss arising from unauthorised\ntransactions, and purchase of liability insurance by the TSP (where appropriate, such as when high-risk\ntransactions are involved).\n\nthrough his/her account attributable to the services offered by\nTSP using banks' Open API unless he/she acts fraudulently or\nwith gross negligence. In these cases, banks and TSP should\nprovide refund to customers according to the liability and\nsettlement arrangement defined in their contractual terms.",
+          "target_clause_number": "ed-open-finance-2025 1.3",
+          "target_clause_text": "This Policy Document sets out the regulatory framework for open finance which\nseeks to ensure that it is implemented in an efficient, resilient and secure\nfashion. In addition to ensuring that the sharing of data is conducted in full\ncompliance with the Personal Data Protection Act 2010 and other relevant data\nprivacy and protection requirements, the Policy Document seeks to promote\nresponsible data sharing that strikes an appropriate balance between financial\ninnovation and prudent management of risks."
+        },
+        {
+          "finding_id": "c7186e52e4d5",
+          "edge_id": "e-hkma_open_api_framework--ed_open_finance_2025",
+          "label": "differs-on",
+          "sentiment": "neutral",
+          "summary": "Both set third-party obligations: HKMA has TSPs notify banks of in-scope products; the draft requires TSP data compliance.",
+          "left": {
+            "id": "hkma-open-api-framework",
+            "title": "HKMA Open API Framework"
+          },
+          "right": {
+            "id": "ed-open-finance-2025",
+            "title": "ED Open Finance 2025"
+          },
+          "source_clause_number": "hkma-open-api-framework 34.3.1",
+          "source_clause_text": "TSPs should notify banks of their\nproducts/services which fall within the scope\nof and are bound by the terms and conditions;",
+          "target_clause_number": "ed-open-finance-2025 11.8",
+          "target_clause_text": "An FSP that is a data consumer shall ensure that any third-party service provider\ninvolved in handling customer information, whether related to an open finance\narrangement (including that associated with outsourcing or cloud computing\narrangements), complies with relevant requirements relating to data privacy,\nconfidentiality and security, as set out in the Policy Document on Management\nof Customer Information and Permitted Disclosures, the Policy Document on\nRisk Management and Information Technology, and the Policy Document on\nOutsourcing.\n\nS 11.9 An FSP shall ensure that customer information is not shared with any third-party\nservice provider without the customer's explicit consent, in line with the\nrequirements stipulated in paragraph 10.1 of this Policy Document.\n\nS 11.10 For the purposes of paragraph 11.8, an FSP shall ensure the obligation to\nsafeguard customer information is adequately reflected in the service level\nagreement with the third-party service provider, in line with paragraph 12.4 of the\nPolicy Document on Management of Customer Information and Permitted\nDisclosures."
+        }
+      ],
+      "confidence_note": "Nothing unverified.",
+      "bookmarked": true,
+      "comments": [],
+      "revisions": []
+    },
+    {
+      "id": "bc0810703218",
+      "title": "Retain the real-time consent dashboard requirement",
+      "rationale": "- ED S 10.4 requires the consent dashboard to reflect \"the real-time status of consent and is updated immediately upon any renewal, revocation or expiration\".\n- The HKMA framework sets no equivalent dashboard requirement.\n- This enhancement exceeds the peer baseline and should be kept.",
+      "action": "Retain S 10.4 as drafted, requiring the consent dashboard to show real-time status updated immediately on renewal, revocation or expiration.",
+      "dimensions": [
+        "Consent management"
+      ],
+      "evidence": [
+        {
+          "finding_id": "e8dd23689842",
+          "edge_id": "e-hkma_open_api_framework--ed_open_finance_2025",
+          "label": "goes-beyond",
+          "sentiment": null,
+          "summary": "The draft requires a real-time consent dashboard; the HKMA framework has no such requirement.",
+          "left": {
+            "id": "hkma-open-api-framework",
+            "title": "HKMA Open API Framework"
+          },
+          "right": {
+            "id": "ed-open-finance-2025",
+            "title": "ED Open Finance 2025"
+          },
+          "source_clause_number": null,
+          "source_clause_text": null,
+          "target_clause_number": "ed-open-finance-2025 11",
+          "target_clause_text": "\"explicit and deliberate\" consent by a customer as there is no way to definitively establish that the\ncustomer consented to the pre-ticked box and the applicable statement/term.\n\nS 10.4 An FSP shall ensure that the consent dashboard reflects the real-time status of\nconsent and is updated immediately upon any renewal, revocation or expiration\nof consent."
+        }
+      ],
+      "confidence_note": "Cannot verify which department owns the consent dashboard technical specification.",
+      "bookmarked": true,
+      "comments": [],
+      "revisions": []
+    },
+    {
+      "id": "12f68553e2a8",
+      "title": "Add a customer-liability standard for unauthorised transactions",
+      "rationale": "- HKMA clause 50 provides a customer \"should not be responsible for any direct loss\" from unauthorised transactions absent fraud or gross negligence.\n- ED S 11.12 covers assistance, complaints handling and redress but sets no liability standard.\n- Without an explicit standard, customers lack certainty on loss allocation.",
+      "action": "Add a provision fixing customer liability for unauthorised transactions, aligned with the redress mechanisms already in S 11.12.",
+      "dimensions": [
+        "Customer protection"
+      ],
+      "evidence": [
+        {
+          "finding_id": "f57ab00c1b2f",
+          "edge_id": "e-hkma_open_api_framework--ed_open_finance_2025",
+          "label": "silent-on",
+          "sentiment": null,
+          "summary": "The HKMA framework sets a customer-liability standard for unauthorised transactions; the draft does not.",
+          "left": {
+            "id": "hkma-open-api-framework",
+            "title": "HKMA Open API Framework"
+          },
+          "right": {
+            "id": "ed-open-finance-2025",
+            "title": "ED Open Finance 2025"
+          },
+          "source_clause_number": "hkma-open-api-framework 50",
+          "source_clause_text": "In line with the relevant clause in the Code of Banking Practice, a\ncustomer should not be responsible for any direct loss suffered by\nhim/her as a result of unauthorised transactions conducted",
+          "target_clause_number": "ed-open-finance-2025 11.12(a)(b)(a)(b)(c)",
+          "target_clause_text": "assistance, complaints handling and redress mechanisms."
+        }
+      ],
+      "confidence_note": "Cannot verify whether an existing consumer-protection instrument already sets this liability standard.",
+      "bookmarked": false,
+      "comments": [],
+      "revisions": []
+    },
+    {
+      "id": "7da98d978f7a",
+      "title": "Retain the firm mandatory commencement dates for FSP obligations",
+      "rationale": "- ED S 9.1 ties obligations to \"the timeline specified in Appendix 2\" and S 9.2 fixes a 1 January 2028 date.\n- HKMA clause 19 leaves timing to banks, treating dates as \"the latest expected dates\".\n- The draft's firm dates give clearer, enforceable transition arrangements.",
+      "action": "Keep the concrete commencement dates in S 9.1 and S 9.2 and Appendix 2 rather than adopting the HKMA advisory-timeline approach.",
+      "dimensions": [
+        "Transition arrangements"
+      ],
+      "evidence": [
+        {
+          "finding_id": "48ecad951c6b",
+          "edge_id": "e-hkma_open_api_framework--ed_open_finance_2025",
+          "label": "differs-on",
+          "sentiment": "tighten",
+          "summary": "The HKMA framework lets banks advance their own rollout timeline; the draft sets a firm mandatory commencement date.",
+          "left": {
+            "id": "hkma-open-api-framework",
+            "title": "HKMA Open API Framework"
+          },
+          "right": {
+            "id": "ed-open-finance-2025",
+            "title": "ED Open Finance 2025"
+          },
+          "source_clause_number": "hkma-open-api-framework 19",
+          "source_clause_text": "It should be noted that the suggested timeline above represents\nthe latest expected dates for banks to make available the Open\nAPIs indicated. Individual banks are welcome to advance their\nown programme, either for completion of individual phases or for\nintroducing Open APIs for those categories that have not yet been\nset out in the timeframe. For example, a bank may choose to\nmake available Open APIs for conducting transactions on their\nproducts and services during Phase I at the same time as they\nlaunch their Product and service information Open APIs.\nHowever these banks should ensure that commensurate level of\nprotections3 and suitable TSP governance arrangements are in\nplace with appropriate contracts to clearly define the\nresponsibility, liability, control and customer protections.\n\nOpen API functions",
+          "target_clause_number": "ed-open-finance-2025 9",
+          "target_clause_text": "S 9.1\nThe obligations of a mandated FSP as specified under paragraph 8.4 shall\ncommence in accordance with the timeline specified in Appendix 2.\n\nS 9.2\nA mandated FSP shall commence its obligation under paragraph 8.6 to provide\ndocument submission and single account view interfaces by 1 January 2028 or\n\nthe date on which the FSP's obligations under paragraph 8.4 commence,\nwhichever is later."
+        },
+        {
+          "finding_id": "1314b524cc69",
+          "edge_id": "e-hkma_open_api_framework--ed_open_finance_2025",
+          "label": "differs-on",
+          "sentiment": "neutral",
+          "summary": "Both cover implementation timelines, but HKMA leaves timing to be set per function while the draft prescribes concrete commencement dates.",
+          "left": {
+            "id": "hkma-open-api-framework",
+            "title": "HKMA Open API Framework"
+          },
+          "right": {
+            "id": "ed-open-finance-2025",
+            "title": "ED Open Finance 2025"
+          },
+          "source_clause_number": "hkma-open-api-framework 9.1",
+          "source_clause_text": "Open API functions and deployment timeframe;",
+          "target_clause_number": "ed-open-finance-2025 9",
+          "target_clause_text": "S 9.1\nThe obligations of a mandated FSP as specified under paragraph 8.4 shall\ncommence in accordance with the timeline specified in Appendix 2.\n\nS 9.2\nA mandated FSP shall commence its obligation under paragraph 8.6 to provide\ndocument submission and single account view interfaces by 1 January 2028 or\n\nthe date on which the FSP's obligations under paragraph 8.4 commence,\nwhichever is later."
+        }
+      ],
+      "confidence_note": "Nothing unverified.",
+      "bookmarked": false,
+      "comments": [],
+      "revisions": []
+    },
+    {
+      "id": "d88f04353ccf",
+      "title": "Add test environments and sample data to support participants",
+      "rationale": "- HKMA clause 52.4 requires banks to \"provide examples and testing environment with data (including artificial customer data if necessary)\".\n- ED S 12.5 requires FSPs to meet platform technology requirements but sets no test-environment obligation.\n- Without test facilities, data consumers face higher integration risk.",
+      "action": "Add a requirement that platform participants provide test environments and sample data, or confirm this sits with the platform operator under S 12.5.",
+      "dimensions": [
+        "Management of technology risk",
+        "Participation and scope of information sharing"
+      ],
+      "evidence": [
+        {
+          "finding_id": "256e582cdec7",
+          "edge_id": "e-hkma_open_api_framework--ed_open_finance_2025",
+          "label": "silent-on",
+          "sentiment": null,
+          "summary": "The HKMA framework requires banks to provide test environments and sample data; the draft does not.",
+          "left": {
+            "id": "hkma-open-api-framework",
+            "title": "HKMA Open API Framework"
+          },
+          "right": {
+            "id": "ed-open-finance-2025",
+            "title": "ED Open Finance 2025"
+          },
+          "source_clause_number": "hkma-open-api-framework 52.4",
+          "source_clause_text": "Furthermore, banks should provide examples and testing\nenvironment with data (including artificial customer data\nif necessary) to assist TSPs in using their Open APIs.",
+          "target_clause_number": "ed-open-finance-2025 12.5",
+          "target_clause_text": "An FSP participating in an open finance arrangement shall also comply with\ntechnology and operational requirements of the open finance platform for which\nthe FSP is a member. This may include, but is not limited to, requirements in\nrelation to the user journey, API specifications, uptime requirements, operational\nprocedures and requirements for independent review relating to the operational\nresilience of its technology functions."
+        }
+      ],
+      "confidence_note": "Cannot verify whether the platform operator's own specifications already mandate test environments.",
+      "bookmarked": false,
+      "comments": [],
+      "revisions": []
+    },
+    {
+      "id": "5dd5643c7262",
+      "title": "Retain uniform cyber and API security controls across activities",
+      "rationale": "- ED S 12.3 requires \"robust API security controls\" and cyber measures across all open finance activities.\n- HKMA clause 12 varies protections progressively by the four API categories.\n- Uniform controls avoid gaps that a category-tiered approach can leave.",
+      "action": "Keep S 12.2 and S 12.3 applying cyber and API security controls uniformly rather than tiering protections by data category.",
+      "dimensions": [
+        "Management of technology risk"
+      ],
+      "evidence": [
+        {
+          "finding_id": "af5afcf67c55",
+          "edge_id": "e-hkma_open_api_framework--ed_open_finance_2025",
+          "label": "differs-on",
+          "sentiment": "neutral",
+          "summary": "Both set security requirements, but HKMA varies protections by API category while the draft applies cyber and API controls uniformly.",
+          "left": {
+            "id": "hkma-open-api-framework",
+            "title": "HKMA Open API Framework"
+          },
+          "right": {
+            "id": "ed-open-finance-2025",
+            "title": "ED Open Finance 2025"
+          },
+          "source_clause_number": "hkma-open-api-framework 12",
+          "source_clause_text": "It was further agreed that the types of protection required for each\nof the four categories of Open API implementation should be in a\nprogressive manner as follows:\n\n<table>\n<tr>\n<th>Categories of Open API</th>\n<th>Protections required</th>\n</tr>\n<tr>\n<td>Product and service information</td>\n<td>· Authentication of bank sites · Integrity of data · Authentication of TSPs</td>\n</tr>\n<tr>\n<td>Subscription and new applications for product/service</td>\n<td>· Authentication of bank sites · Integrity and confidentiality of data · Authentication of TSPs</td>\n</tr>\n<tr>\n<td>Account information</td>\n<td>· Authentication of bank sites · Integrity and confidentiality of data</td>\n</tr>\n<tr>\n<td>Transactions</td>\n<td>· Authentication of TSPs · Authorisation of customers</td>\n</tr>\n</table>\n\nA phased approach",
+          "target_clause_number": "ed-open-finance-2025 12.2",
+          "target_clause_text": "An FSP shall ensure that its technology operations management practices are\nappropriately extended to support its open finance activities. This includes, but\nis not limited to, controls for ensuring effective and safe implementation of IT\nsystems, robust third-party service provider management, and operational\nresilience measures to ensure the availability, integrity and confidentiality of data\nexchanged through open finance arrangements.\n\nS 12.3 An FSP shall ensure that its cyber risk management capabilities and\ncybersecurity controls are also appropriately extended to govern, identify,\nprevent, detect, respond and address cyber risks associated with open finance\nactivities. This includes for the FSP to implement robust API security controls,\nstrengthening digital fraud detection and management, as well as take steps to\nsecure technology networks and internal systems from potential external risks\narising from the FSP's participation in an open finance arrangement.\n\nS"
+        },
+        {
+          "finding_id": "fb51977fb576",
+          "edge_id": "e-hkma_open_api_framework--ed_open_finance_2025",
+          "label": "differs-on",
+          "sentiment": "neutral",
+          "summary": "Both protect customer data, but HKMA frames it as regulatory compliance and the draft as technology and cyber controls.",
+          "left": {
+            "id": "hkma-open-api-framework",
+            "title": "HKMA Open API Framework"
+          },
+          "right": {
+            "id": "ed-open-finance-2025",
+            "title": "ED Open Finance 2025"
+          },
+          "source_clause_number": "hkma-open-api-framework 3#2",
+          "source_clause_text": "the applicable requirements related to consumer protection (including applicable consumer protection\nprovisions set out in the Code of Banking Practice) and the applicable regulatory requirements related\nto customer data protection.\n\nAPIs for better interoperability. However, a number of\ninternational banks operating in Hong Kong have already\nimplemented their group standard for implementing Open APIs at\nglobal or regional levels, and have demonstrated elsewhere that\nrequiring banks to adhere to a prescribed set of standardised Open\nAPI functions is challenging.",
+          "target_clause_number": "ed-open-finance-2025 12.2",
+          "target_clause_text": "An FSP shall ensure that its technology operations management practices are\nappropriately extended to support its open finance activities. This includes, but\nis not limited to, controls for ensuring effective and safe implementation of IT\nsystems, robust third-party service provider management, and operational\nresilience measures to ensure the availability, integrity and confidentiality of data\nexchanged through open finance arrangements.\n\nS 12.3 An FSP shall ensure that its cyber risk management capabilities and\ncybersecurity controls are also appropriately extended to govern, identify,\nprevent, detect, respond and address cyber risks associated with open finance\nactivities. This includes for the FSP to implement robust API security controls,\nstrengthening digital fraud detection and management, as well as take steps to\nsecure technology networks and internal systems from potential external risks\narising from the FSP's participation in an open finance arrangement.\n\nS"
+        }
+      ],
+      "confidence_note": "Nothing unverified.",
+      "bookmarked": false,
+      "comments": [],
+      "revisions": []
+    },
+    {
+      "id": "7b2d0f50a4c0",
+      "title": "Retain independent third-party management over shared assessments",
+      "rationale": "- ED S 12.2 requires \"robust third-party service provider management\" as part of technology operations.\n- HKMA clause 31.3.1 lets a bank rely on a TSP \"successfully assessed by another bank\".\n- The draft's independent standard reduces reliance on assessments the FSP did not perform.",
+      "action": "Keep S 12.2 requiring each FSP to manage third-party risk directly, without a provision permitting reliance on another participant's assessment.",
+      "dimensions": [
+        "Management of technology risk",
+        "Governance"
+      ],
+      "evidence": [
+        {
+          "finding_id": "a9193fe14fb4",
+          "edge_id": "e-hkma_open_api_framework--ed_open_finance_2025",
+          "label": "differs-on",
+          "sentiment": "neutral",
+          "summary": "Both address third-party assessment, but HKMA lets a bank rely on another's assessment while the draft requires robust independent management.",
+          "left": {
+            "id": "hkma-open-api-framework",
+            "title": "HKMA Open API Framework"
+          },
+          "right": {
+            "id": "ed-open-finance-2025",
+            "title": "ED Open Finance 2025"
+          },
+          "source_clause_number": "hkma-open-api-framework 31.3.1",
+          "source_clause_text": "Banks conduct their own assessments of TSPs.\nA bank may also, subject to its own risk\nevaluation, consider a TSP that has been\nsuccessfully assessed by another bank;",
+          "target_clause_number": "ed-open-finance-2025 12.2",
+          "target_clause_text": "An FSP shall ensure that its technology operations management practices are\nappropriately extended to support its open finance activities. This includes, but\nis not limited to, controls for ensuring effective and safe implementation of IT\nsystems, robust third-party service provider management, and operational\nresilience measures to ensure the availability, integrity and confidentiality of data\nexchanged through open finance arrangements.\n\nS 12.3 An FSP shall ensure that its cyber risk management capabilities and\ncybersecurity controls are also appropriately extended to govern, identify,\nprevent, detect, respond and address cyber risks associated with open finance\nactivities. This includes for the FSP to implement robust API security controls,\nstrengthening digital fraud detection and management, as well as take steps to\nsecure technology networks and internal systems from potential external risks\narising from the FSP's participation in an open finance arrangement.\n\nS"
+        }
+      ],
+      "confidence_note": "Nothing unverified.",
+      "bookmarked": false,
+      "comments": [],
+      "revisions": []
+    },
+    {
+      "id": "57fe888e9d55",
+      "title": "Retain the inclusive interface design encouragement",
+      "rationale": "- ED S 8.1 conditions participation on meeting Policy Document and platform requirements.\n- The draft encourages accessible interface design for underserved customers; the HKMA framework does not.\n- This customer-protection feature exceeds the peer baseline and should be kept.",
+      "action": "Retain the encouragement for inclusive, accessible interface design serving underserved customers within the participation requirements.",
+      "dimensions": [
+        "Customer protection",
+        "Participation and scope of information sharing"
+      ],
+      "evidence": [
+        {
+          "finding_id": "bce1c057e0ad",
+          "edge_id": "e-hkma_open_api_framework--ed_open_finance_2025",
+          "label": "goes-beyond",
+          "sentiment": null,
+          "summary": "The draft encourages inclusive, accessible interface design for underserved customers; the HKMA framework does not.",
+          "left": {
+            "id": "hkma-open-api-framework",
+            "title": "HKMA Open API Framework"
+          },
+          "right": {
+            "id": "ed-open-finance-2025",
+            "title": "ED Open Finance 2025"
+          },
+          "source_clause_number": null,
+          "source_clause_text": null,
+          "target_clause_number": "ed-open-finance-2025 8",
+          "target_clause_text": "S 8.1\nAn FSP may participate2 as a data provider or a data consumer on an open\nfinance platform, subject to meeting relevant requirements in this Policy\nDocument and that specified by the platform operator."
+        }
+      ],
+      "confidence_note": "Cannot verify whether the inclusive-design provision is mandatory or advisory in the current draft.",
+      "bookmarked": false,
+      "comments": [],
+      "revisions": []
+    }
+  ]
+}

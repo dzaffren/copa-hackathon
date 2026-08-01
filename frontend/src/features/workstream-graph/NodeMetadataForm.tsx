@@ -4,20 +4,20 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { HttpError, saveNodeMetadata } from "@/lib/api";
-import type { ConceptsAvailable, NodeMetadataRequest } from "@/lib/types";
+import type { NodeMetadata, NodeMetadataRequest } from "@/lib/types";
 import {
   asList,
   CONCEPT_FIELD_ORDER,
   FIELD_NOTES,
   ISMP_CLASSIFICATIONS,
   LIST_FIELDS,
-  type ConceptField,
+  type NodeMetadataField,
 } from "./metadata";
 
 /** The one field that runs to sentences rather than a phrase, so it gets a
  *  textarea: a drafter listing the obligations Recommendations will reason over
  *  is writing prose, not filling in a label. */
-const MULTILINE_FIELDS = new Set<ConceptField>(["policy_requirement"]);
+const MULTILINE_FIELDS = new Set<NodeMetadataField>(["policy_requirement"]);
 
 /** Plain-language copy for the refusals a save can provoke. Most of these should
  *  be unreachable from this form — it sends exactly the seven known keys and
@@ -40,11 +40,11 @@ const fieldClass =
 
 /** Every field's editing value is a string — a list field holds its members
  *  comma-separated on one line, which is how a drafter enters several. */
-type FormState = Record<ConceptField, string>;
+type FormState = Record<NodeMetadataField, string>;
 
 /** Seed the form from the stored profile: a list joins into one editable line, a
  *  missing or null value becomes an empty input (never the text "null"). */
-function toFormState(initial: ConceptsAvailable | null): FormState {
+function toFormState(initial: NodeMetadata | null): FormState {
   const state = {} as FormState;
   for (const [field] of CONCEPT_FIELD_ORDER) {
     const value = initial?.[field] ?? null;
@@ -97,7 +97,7 @@ interface NodeMetadataFormProps {
   workstreamId: string;
   nodeId: string;
   /** Current values, or null when the node has no profile yet. */
-  initial: ConceptsAvailable | null;
+  initial: NodeMetadata | null;
   onDone: () => void;
 }
 
@@ -120,7 +120,7 @@ export function NodeMetadataForm({
   const queryClient = useQueryClient();
   const [values, setValues] = useState<FormState>(() => toFormState(initial));
 
-  const update = (field: ConceptField, value: string) =>
+  const update = (field: NodeMetadataField, value: string) =>
     setValues((v) => ({ ...v, [field]: value }));
 
   // The form is NOT reset or unmounted on failure — a drafter who typed a date

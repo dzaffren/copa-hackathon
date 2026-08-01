@@ -1,4 +1,7 @@
 import { useEffect, useRef } from "react";
+import { ExternalLink } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import type { ReviewClause } from "@/lib/types";
 
 interface ClausePaneProps {
@@ -11,6 +14,10 @@ interface ClausePaneProps {
   side: "source" | "target";
   /** When true and there are highlighted clauses, render only those cited. */
   filterToHighlighted?: boolean;
+  /** The engine route serving this document's published PDF. When set, the
+   *  header offers a button opening it in a new tab, so the drafter can check a
+   *  card's verbatim text against the source. Absent for a working draft. */
+  sourcePdfUrl?: string | null;
 }
 
 /** A vertical reader of clause cards for one side of a pair.
@@ -27,6 +34,7 @@ export function ClausePane({
   highlighted,
   side,
   filterToHighlighted = false,
+  sourcePdfUrl = null,
 }: ClausePaneProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const firstHighlighted = highlighted[0];
@@ -51,10 +59,24 @@ export function ClausePane({
       className="glass flex min-h-0 flex-col rounded-xl"
       aria-label={`${side} clauses`}
     >
-      <header className="border-b border-border/60 px-4 py-3">
-        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-        {subtitle ? (
-          <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
+      <header className="flex items-start justify-between gap-2 border-b border-border/60 px-4 py-3">
+        <div className="min-w-0">
+          <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+          {subtitle ? (
+            <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
+          ) : null}
+        </div>
+        {sourcePdfUrl ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="-mr-1 -mt-0.5 shrink-0 text-xs text-muted-foreground hover:text-foreground"
+            onClick={() =>
+              window.open(sourcePdfUrl, "_blank", "noopener,noreferrer")
+            }
+          >
+            <ExternalLink /> Source PDF
+          </Button>
         ) : null}
       </header>
 

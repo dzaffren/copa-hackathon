@@ -1,15 +1,32 @@
-"""Per-node concept metadata (the Node Detail panel's Concepts disclosure).
+"""Per-node regulatory profile — the seven-field metadata the panel calls Metadata.
 
-The node-detail route has always rendered a "Concepts" section with a fixed
-placeholder — `{"status": "placeholder", "message": "Concept extraction not
-enabled in MVP1"}` — because nothing populated it. This module is the read
-side of the fix: a per-node side-file, written offline by
-`scripts/enrich_node_metadata.py`, mirroring the `findings/{edge_id}.json`
-convention (`engine/findings.py`) so `graph.json` diffs stay small and
-reviewable.
+    data/workstreams/{workstream_id}/metadata/{node_id}.json     (canonical)
+    data/workstreams/{workstream_id}/concepts/{node_id}.json     (legacy, read-only)
+
+**Two directories, and the older name is a trap.** This store was called
+`concepts/` before the word was repurposed. When axis extraction landed,
+`concepts` became the name for a document's **extracted axes** — served from
+`axes/` and surfaced as the node-detail response's `concepts` block (see
+`engine.api._node_concepts_block`). Those axes are the real concepts. Meanwhile
+the API and the interface have always called *this* seven-field profile
+`metadata`: the write route is `PUT .../nodes/{id}/metadata` and the response key
+is `metadata`. So the directory named `concepts/` was the one thing in the system
+that was not concepts, and a reader who opened it looking for axes read the wrong
+file. Renamed on 1 Aug 2026 to close that.
+
+`load_metadata` reads `metadata/` first and falls back to `concepts/`.
+**The fallback is permanent, not transitional — do not remove it.** Exactly three
+workstreams depend on it: the retired fixtures `opres-v2`, `rmit-v2-2025` and
+`open-finance-ed`, whose contents are recorded history rather than a defect to
+correct (see the retired-fixtures rule in `CLAUDE.md`) and which the engine suite
+reads by id. The live demo workstream `open-finance-pd-2026` was migrated
+outright — that rule only ever covered retired fixtures — so it reads
+canonically and is not a fallback consumer. `save_metadata` always writes
+`metadata/`, so a retired fixture saved through the app moves forward one node at
+a time, and `metadata/` wins from then on.
 
 Absence is the common, expected case — most nodes have not been enriched, and
-that is not an error. `load_concepts` returns `None` in that case, and the
+that is not an error. `load_metadata` returns `None` in that case, and the
 caller falls back to the placeholder exactly like an unanalysed edge falls
 back to "not analysed" rather than erroring (`findings.FindingsNotAnalysedError`).
 
@@ -46,11 +63,11 @@ from typing import Any, Optional
 #
 # Retired workstreams were deliberately NOT migrated, so `opres-v2`,
 # `rmit-v2-2025` and `open-finance-ed` still hold `legal_basis` on disk. Nothing
-# breaks: `load_concepts` returns the raw dict and the node-detail route spreads
+# breaks: `load_metadata` returns the raw dict and the node-detail route spreads
 # it, so the legacy key still reaches the client — it simply no longer lands in
 # a panel row. The next save through the API rewrites the file to exactly this
 # tuple.
-CONCEPT_FIELDS: tuple[str, ...] = (
+METADATA_FIELDS: tuple[str, ...] = (
     "policy_owner",
     "applicability",
     "legal_provision",
@@ -90,32 +107,67 @@ MAX_FIELD_CHARS: int = 2000
 MAX_LIST_MEMBERS: int = 50
 
 
-def concepts_path(workstreams_dir: Path, workstream_id: str, node_id: str) -> Path:
+def metadata_path(workstreams_dir: Path, workstream_id: str, node_id: str) -> Path:
+    """The canonical location of a node's profile. Every write goes here."""
+    return workstreams_dir / workstream_id / "metadata" / f"{node_id}.json"
+
+
+def legacy_metadata_path(
+    workstreams_dir: Path, workstream_id: str, node_id: str
+) -> Path:
+    """The pre-1-Aug-2026 location, read-only.
+
+    **This is permanent. Do not delete it, and do not migrate the files it
+    points at.** The three retired fixtures (`opres-v2`, `rmit-v2-2025`,
+    `open-finance-ed`) hold their profiles here and are never to be rewritten — a
+    retired fixture's contents are recorded history, and the engine suite reads
+    several of them by id, so "tidying" this away silently changes what those
+    tests assert.
+
+    The live demo workstream `open-finance-pd-2026` is NOT a consumer: it was
+    migrated to `metadata/` outright, because the no-migration rule only ever
+    covered retired fixtures. So this path serves retired fixtures alone.
+
+    Nothing writes here. `save_metadata` always targets `metadata_path`, so a
+    node saved through the app moves forward permanently.
+    """
     return workstreams_dir / workstream_id / "concepts" / f"{node_id}.json"
 
 
-def load_concepts(
+def load_metadata(
     workstreams_dir: Path, workstream_id: str, node_id: str
 ) -> Optional[dict[str, Any]]:
-    """The enriched concept fields for a node, or `None` when not yet enriched."""
-    path = concepts_path(workstreams_dir, workstream_id, node_id)
-    if not path.exists():
-        return None
-    return json.loads(path.read_text(encoding="utf-8"))
+    """A node's regulatory profile, or `None` when it has none.
+
+    Reads `metadata/` first, then falls back to the legacy `concepts/` path (see
+    `legacy_metadata_path` for why that fallback is permanent). When both exist
+    `metadata/` wins, because it is the only one anything writes — so the newer
+    value is always the one served.
+    """
+    for path in (
+        metadata_path(workstreams_dir, workstream_id, node_id),
+        legacy_metadata_path(workstreams_dir, workstream_id, node_id),
+    ):
+        if path.exists():
+            return json.loads(path.read_text(encoding="utf-8"))
+    return None
 
 
-def save_concepts(
+def save_metadata(
     workstreams_dir: Path,
     workstream_id: str,
     node_id: str,
     fields: dict[str, Any],
 ) -> None:
-    """Persist a node's concept fields. UTF-8 always (clause text carries
-    Unicode — §, en-dashes — that the Windows platform default cannot write).
+    """Persist a node's profile to `metadata/`, never to the legacy path.
+
+    UTF-8 always (clause text carries Unicode — §, en-dashes — that the Windows
+    platform default cannot write). A legacy `concepts/` file for the same node
+    is left exactly as it is; `load_metadata` will simply stop reaching it.
     """
-    path = concepts_path(workstreams_dir, workstream_id, node_id)
+    path = metadata_path(workstreams_dir, workstream_id, node_id)
     path.parent.mkdir(parents=True, exist_ok=True)
-    payload = {field: fields.get(field) for field in CONCEPT_FIELDS}
+    payload = {field: fields.get(field) for field in METADATA_FIELDS}
     path.write_text(
         json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
@@ -148,7 +200,7 @@ def validate_metadata(body: Any) -> Optional[tuple[int, str, str, Optional[str]]
         )
 
     for key, value in body.items():
-        if key not in CONCEPT_FIELDS:
+        if key not in METADATA_FIELDS:
             return (
                 400,
                 "UNKNOWN_METADATA_FIELD",
@@ -238,8 +290,8 @@ def normalise_metadata(body: dict[str, Any]) -> dict[str, Any]:
     as `None` — a drafter who clears a field sees it read "Not set" on her next
     visit, exactly as if she had never touched it.
 
-    Missing keys are left missing: `save_concepts` already normalises to the full
-    `CONCEPT_FIELDS` set, and adding them here would duplicate that.
+    Missing keys are left missing: `save_metadata` already normalises to the full
+    `METADATA_FIELDS` set, and adding them here would duplicate that.
     """
     cleaned: dict[str, Any] = {}
     for key, value in body.items():

@@ -17,9 +17,13 @@ import shutil
 import pytest
 from fastapi.testclient import TestClient
 
-from engine import concepts
+from engine import node_metadata
 from engine.api import create_app
-from engine.concepts import CONCEPT_FIELDS, concepts_path
+from engine.node_metadata import (
+    METADATA_FIELDS,
+    legacy_metadata_path,
+    metadata_path,
+)
 from engine.config import REPO_ROOT
 
 
@@ -59,7 +63,7 @@ def test_a_retired_fixtures_profile_is_served_unmigrated(tmp_path):
     `open-finance-ed` and `opres-v2` are retired and were deliberately NOT
     migrated when `legal_basis` became `legal_provision` on 1 Aug 2026, so they
     still carry the old key. The route spreads the raw dict rather than
-    projecting `CONCEPT_FIELDS`, which is exactly what keeps them readable — and
+    projecting `METADATA_FIELDS`, which is exactly what keeps them readable — and
     also why the cross-intelligence overlap signal, which reads
     `legal_provision`, simply does not fire for them. That is the honest
     outcome: unmigrated, not silently equivalent.
@@ -83,7 +87,7 @@ def test_a_first_save_creates_the_side_file(tmp_path):
     with an empty profile and fills in the two fields she is confident about.
     """
     client, workstreams_dir = _make_client(tmp_path)
-    path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
+    path = metadata_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
     assert not path.exists()
 
     response = client.put(
@@ -106,7 +110,7 @@ def test_a_first_save_creates_the_side_file(tmp_path):
     assert body["metadata"]["legal_provision"] == ["FSA 2013"]
 
     saved = json.loads(path.read_text(encoding="utf-8"))
-    assert list(saved) == list(CONCEPT_FIELDS)
+    assert list(saved) == list(METADATA_FIELDS)
     # policy_owner and legal_provision were sent; the other five stay unset.
     assert sum(1 for value in saved.values() if value is None) == 5
 
@@ -122,8 +126,11 @@ def test_a_save_overwrites_an_existing_profile_whole(tmp_path):
     it out first; a replacement is only observable against a populated profile.
     """
     client, workstreams_dir = _make_client(tmp_path)
-    path = concepts_path(workstreams_dir, "rmit-v2-2025", "rmit-pd-v2")
-    assert json.loads(path.read_text(encoding="utf-8"))["policy_owner"] == "Aisyah R."
+    # Read the seeded value through the LEGACY path: `rmit-v2-2025` is a retired
+    # fixture, so its profile still lives in `concepts/` and is never migrated.
+    # The save below lands in `metadata/`, which is the rename's whole point.
+    seeded = legacy_metadata_path(workstreams_dir, "rmit-v2-2025", "rmit-pd-v2")
+    assert json.loads(seeded.read_text(encoding="utf-8"))["policy_owner"] == "Aisyah R."
 
     populated = client.put(
         _metadata_url("rmit-v2-2025", "rmit-pd-v2"),
@@ -148,9 +155,9 @@ def test_a_save_overwrites_an_existing_profile_whole(tmp_path):
     assert response.status_code == 200
     metadata = response.json()["metadata"]
     assert metadata["policy_owner"] == "Farid M."
-    assert [metadata[field] for field in CONCEPT_FIELDS if field != "policy_owner"] == [
+    assert [metadata[field] for field in METADATA_FIELDS if field != "policy_owner"] == [
         None
-    ] * (len(CONCEPT_FIELDS) - 1)
+    ] * (len(METADATA_FIELDS) - 1)
 
 
 def test_saved_values_round_trip_through_the_node_detail_route(tmp_path):
@@ -181,7 +188,7 @@ def test_an_unknown_key_is_refused_and_nothing_is_written(tmp_path):
     save, see the field empty, and have no way to know why.
     """
     client, workstreams_dir = _make_client(tmp_path)
-    path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
+    path = metadata_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
 
     response = client.put(
         _metadata_url("open-finance-pd-2026", "bis-papers-168"),
@@ -202,7 +209,7 @@ def test_task_type_in_the_body_is_refused_as_immutable(tmp_path):
     route's to write.
     """
     client, workstreams_dir = _make_client(tmp_path)
-    path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
+    path = metadata_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
 
     response = client.put(
         _metadata_url("open-finance-pd-2026", "bis-papers-168"),
@@ -263,7 +270,7 @@ def test_blank_input_normalises_to_null(tmp_path):
     assert metadata["legal_provision"] is None
     assert metadata["applicability"] is None
 
-    path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
+    path = metadata_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
     saved = json.loads(path.read_text(encoding="utf-8"))
     assert saved["policy_owner"] is None
     assert saved["legal_provision"] is None
@@ -277,7 +284,7 @@ def test_an_over_long_field_is_refused(tmp_path):
     (MAX_LIST_MEMBERS), never by length — see `test_a_long_list_member_is_kept`.
     """
     client, workstreams_dir = _make_client(tmp_path)
-    path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
+    path = metadata_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
 
     response = client.put(
         _metadata_url("open-finance-pd-2026", "bis-papers-168"),
@@ -327,7 +334,7 @@ def test_a_long_list_member_is_kept(tmp_path):
 def test_too_many_list_members_are_refused(tmp_path):
     """Test 10: at most 50 chips."""
     client, workstreams_dir = _make_client(tmp_path)
-    path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
+    path = metadata_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
 
     response = client.put(
         _metadata_url("open-finance-pd-2026", "bis-papers-168"),
@@ -411,7 +418,7 @@ def test_unknown_workstream_and_unknown_node_are_404_before_any_write(tmp_path):
 def test_a_traversal_shaped_node_id_writes_nothing_anywhere(tmp_path):
     """Test 12: a traversal-shaped node id never reaches the filesystem.
 
-    `concepts_path` interpolates `node_id` straight into a path, so
+    `metadata_path` interpolates `node_id` straight into a path, so
     `../../escape` would write outside the workstream if it ever got as far as
     the write. Two layers stop it, and this pins both — asserting only the status
     code would not catch a write that happened before the refusal, so what is
@@ -461,7 +468,7 @@ def test_a_traversal_id_that_reaches_the_handler_is_node_not_found(tmp_path):
 def test_repeated_identical_saves_are_idempotent(tmp_path):
     """Test 13: the same payload twice yields a byte-identical file and the same 200."""
     client, workstreams_dir = _make_client(tmp_path)
-    path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
+    path = metadata_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
     payload = {
         "policy_owner": "Priya S.",
         "legal_provision": ["FSA 2013"],
@@ -485,13 +492,16 @@ def test_a_legacy_side_file_missing_the_newer_keys_is_upgraded_on_save(tmp_path)
     """Test 14: a side-file written before the last two fields existed still loads,
     and the first save through this route brings it up to the full key set.
 
-    No backfill migration: `load_concepts` returns the raw dict, so the missing
+    No backfill migration: `load_metadata` returns the raw dict, so the missing
     keys read back as `None` and the panel renders them "Not set" — which is
     honest, because nobody ever recorded them.
     """
     client, workstreams_dir = _make_client(tmp_path)
-    path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
+    path = metadata_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
     path.parent.mkdir(parents=True, exist_ok=True)
+    # Seeded in `metadata/` deliberately: this test is about a profile missing the
+    # newer *keys*, not about the directory rename. The legacy-directory read path
+    # is covered separately by the `legacy_metadata_path` tests below.
     legacy = {
         "policy_owner": "Aisyah R.",
         "applicability": "Licensed banks.",
@@ -522,7 +532,7 @@ def test_a_legacy_side_file_missing_the_newer_keys_is_upgraded_on_save(tmp_path)
 
     assert response.status_code == 200
     upgraded = json.loads(path.read_text(encoding="utf-8"))
-    assert list(upgraded) == list(CONCEPT_FIELDS)
+    assert list(upgraded) == list(METADATA_FIELDS)
     assert upgraded["legal_provision"] == ["FSA 2013"]
     assert upgraded["ismp_classification"] is None
 
@@ -561,7 +571,7 @@ def test_a_bare_string_list_field_is_stored_as_is(tmp_path):
 # handling categories with real consequences, not a label to invent.
 
 
-@pytest.mark.parametrize("value", concepts.ISMP_CLASSIFICATIONS)
+@pytest.mark.parametrize("value", node_metadata.ISMP_CLASSIFICATIONS)
 def test_each_ismp_classification_is_accepted(value: str, tmp_path):
     client, _ = _make_client(tmp_path)
 
@@ -577,7 +587,7 @@ def test_each_ismp_classification_is_accepted(value: str, tmp_path):
 def test_an_ismp_classification_outside_the_four_is_refused(tmp_path):
     """The old free-text values ("Prudential") are exactly what this refuses."""
     client, workstreams_dir = _make_client(tmp_path)
-    path = concepts_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
+    path = metadata_path(workstreams_dir, "open-finance-pd-2026", "bis-papers-168")
 
     response = client.put(
         _metadata_url("open-finance-pd-2026", "bis-papers-168"),
@@ -629,3 +639,167 @@ def test_the_removed_and_renamed_fields_are_now_unknown(tmp_path):
         assert response.status_code == 400
         assert response.json()["code"] == "UNKNOWN_METADATA_FIELD"
         assert response.json()["field"] == field
+
+
+# ---------------------------------------------------------------------------
+# The `concepts/` -> `metadata/` store rename (1 Aug 2026).
+#
+# Writes always land in `metadata/`; reads fall back to the legacy `concepts/`
+# path. The fallback is permanent: three retired fixtures keep their profiles
+# there forever, and so does the live demo workstream until its first save.
+# ---------------------------------------------------------------------------
+
+
+def test_a_first_save_lands_in_metadata_not_concepts(tmp_path):
+    """Rename Test 1: a node with no profile saves into `metadata/`.
+
+    Targets `ed-open-finance-2025` — a context document with no profile of its
+    own. NOT the working draft `open-finance-pd-2026-pd`, which was seeded on
+    1 Aug 2026 and already has a `concepts/` file, so "no `concepts/` created"
+    could not be asserted against it.
+    """
+    client, workstreams_dir = _make_client(tmp_path)
+    canonical = metadata_path(
+        workstreams_dir, "open-finance-pd-2026", "ed-open-finance-2025"
+    )
+    legacy = legacy_metadata_path(
+        workstreams_dir, "open-finance-pd-2026", "ed-open-finance-2025"
+    )
+    assert not canonical.exists()
+    assert not legacy.exists()
+
+    response = client.put(
+        _metadata_url("open-finance-pd-2026", "ed-open-finance-2025"),
+        json={"policy_owner": "Priya S.", "legal_provision": ["FSA 2013"]},
+    )
+
+    assert response.status_code == 200
+    assert canonical.exists()
+    assert not legacy.exists(), "a save must never create the legacy directory"
+    assert json.loads(canonical.read_text(encoding="utf-8"))["policy_owner"] == "Priya S."
+
+
+def test_a_legacy_concepts_profile_is_still_readable(tmp_path):
+    """Rename Test 2: a retired fixture's `concepts/` profile still serves.
+
+    `opres-v2` is retired and deliberately unmigrated, so this is the fallback
+    doing the only job it exists for. Nothing on disk may change as a result of
+    a read.
+    """
+    client, workstreams_dir = _make_client(tmp_path)
+    legacy = legacy_metadata_path(workstreams_dir, "opres-v2", "opres-pd-v0-3")
+    assert legacy.exists()
+    assert not metadata_path(workstreams_dir, "opres-v2", "opres-pd-v0-3").exists()
+    before = legacy.read_bytes()
+
+    body = client.get("/api/workstreams/opres-v2/nodes/opres-pd-v0-3").json()
+
+    assert body["metadata"]["status"] == "available"
+    assert body["metadata"]["policy_owner"] is not None
+    assert legacy.read_bytes() == before, "a read must not rewrite the legacy file"
+    assert not metadata_path(workstreams_dir, "opres-v2", "opres-pd-v0-3").exists()
+
+
+def test_the_demo_profile_is_stored_canonically_with_its_six_dimensions(tmp_path):
+    """The live demo workstream is fully migrated — it does NOT use the fallback.
+
+    `open-finance-pd-2026` is the live demo workstream, not a retired fixture, so
+    the no-migration rule never covered it: its directory was renamed to
+    `metadata/` outright on 1 Aug 2026. Only the three retired fixtures are left
+    on the legacy path.
+
+    The six policy requirements are asserted here in order because they are the
+    dimensions Recommendations is formulated on — the demo's whole entry
+    condition. If this list drifts, generation reasons over the wrong axes.
+    """
+    _, workstreams_dir = _make_client(tmp_path)
+    assert metadata_path(
+        workstreams_dir, "open-finance-pd-2026", "open-finance-pd-2026-pd"
+    ).exists()
+    assert not legacy_metadata_path(
+        workstreams_dir, "open-finance-pd-2026", "open-finance-pd-2026-pd"
+    ).exists(), "the live demo workstream must not be left on the legacy path"
+
+    profile = node_metadata.load_metadata(
+        workstreams_dir, "open-finance-pd-2026", "open-finance-pd-2026-pd"
+    )
+
+    assert profile is not None
+    assert profile["policy_requirement"] == [
+        "Governance",
+        "Participation and scope of information sharing",
+        "Transition arrangements",
+        "Consent management",
+        "Customer protection",
+        "Management of technology risk",
+    ]
+
+
+def test_metadata_wins_over_concepts_when_both_exist(tmp_path):
+    """Rename Test 3: precedence goes to the directory that is written to.
+
+    Only `metadata/` is ever written, so when both hold a profile the newer
+    value is by definition the one there — serving the legacy file would show
+    the drafter a value she had already replaced.
+    """
+    _, workstreams_dir = _make_client(tmp_path)
+    legacy = legacy_metadata_path(workstreams_dir, "opres-v2", "opres-pd-v0-3")
+    assert json.loads(legacy.read_text(encoding="utf-8"))["policy_owner"] != "Priya S."
+
+    canonical = metadata_path(workstreams_dir, "opres-v2", "opres-pd-v0-3")
+    canonical.parent.mkdir(parents=True, exist_ok=True)
+    canonical.write_text(
+        json.dumps({"policy_owner": "Priya S."}, indent=2), encoding="utf-8"
+    )
+
+    profile = node_metadata.load_metadata(
+        workstreams_dir, "opres-v2", "opres-pd-v0-3"
+    )
+
+    assert profile is not None
+    assert profile["policy_owner"] == "Priya S."
+
+
+def test_saving_a_legacy_node_moves_it_forward_and_leaves_the_old_file(tmp_path):
+    """Rename Test 4: one save migrates one node, and never edits the legacy file.
+
+    This is what makes the rename need no bulk migration — and what makes the
+    legacy file safe to leave on disk in a retired fixture.
+    """
+    client, workstreams_dir = _make_client(tmp_path)
+    legacy = legacy_metadata_path(workstreams_dir, "opres-v2", "opres-pd-v0-3")
+    before = legacy.read_bytes()
+
+    response = client.put(
+        _metadata_url("opres-v2", "opres-pd-v0-3"),
+        json={"policy_owner": "Farid M."},
+    )
+
+    assert response.status_code == 200
+    canonical = metadata_path(workstreams_dir, "opres-v2", "opres-pd-v0-3")
+    assert canonical.exists()
+    assert json.loads(canonical.read_text(encoding="utf-8"))["policy_owner"] == "Farid M."
+    assert legacy.read_bytes() == before, "the legacy file must be left untouched"
+
+    served = client.get("/api/workstreams/opres-v2/nodes/opres-pd-v0-3").json()
+    assert served["metadata"]["policy_owner"] == "Farid M."
+
+
+def test_extracted_axes_are_untouched_by_the_rename(tmp_path):
+    """The `concepts` RESPONSE key still means extracted axes, read from `axes/`.
+
+    The whole point of the rename is that `concepts` was already taken by the
+    axes. If this ever fails, the boundary has been crossed.
+    """
+    client, _ = _make_client(tmp_path)
+
+    body = client.get(
+        "/api/workstreams/open-finance-pd-2026/nodes/ed-open-finance-2025"
+    ).json()
+
+    assert "concepts" in body
+    assert body["concepts"]["status"] in {"extracted", "not_extracted"}
+    assert "axes" in body["concepts"]
+    # And the two blocks stay distinct: the profile is `metadata`, not `concepts`.
+    assert "metadata" in body
+    assert "axes" not in body["metadata"]

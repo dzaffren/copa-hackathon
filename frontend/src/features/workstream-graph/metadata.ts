@@ -1,7 +1,7 @@
-import type { ConceptsAvailable } from "@/lib/types";
+import type { NodeMetadata } from "@/lib/types";
 
 /** One of the seven regulatory-profile fields. */
-export type ConceptField = keyof Omit<ConceptsAvailable, "status">;
+export type NodeMetadataField = keyof Omit<NodeMetadata, "status">;
 
 /** Display order + labels for the regulatory-profile fields.
  *
@@ -13,7 +13,7 @@ export type ConceptField = keyof Omit<ConceptsAvailable, "status">;
  *
  *  Shared by the panel's read mode and `NodeMetadataForm`'s edit mode so the two
  *  cannot drift: a drafter must fill in the field she thought she was reading. */
-export const CONCEPT_FIELD_ORDER: [ConceptField, string][] = [
+export const CONCEPT_FIELD_ORDER: [NodeMetadataField, string][] = [
   ["policy_owner", "Policy owner"],
   ["applicability", "Applicability"],
   ["legal_provision", "Legal provision"],
@@ -29,7 +29,7 @@ export const CONCEPT_FIELD_ORDER: [ConceptField, string][] = [
  *  `asList` tolerates a bare string on every one of them, which matters: the
  *  three retired workstreams still store `applicability` as a single sentence,
  *  and they render as one chip rather than breaking. */
-export const LIST_FIELDS = new Set<ConceptField>([
+export const LIST_FIELDS = new Set<NodeMetadataField>([
   "applicability",
   "legal_provision",
   "policy_requirement",
@@ -39,7 +39,7 @@ export const LIST_FIELDS = new Set<ConceptField>([
  *  carries one: what a drafter types there is not just a profile row, it is the
  *  input Recommendations is formulated from, and nothing else on the form says
  *  so. */
-export const FIELD_NOTES: Partial<Record<ConceptField, string>> = {
+export const FIELD_NOTES: Partial<Record<NodeMetadataField, string>> = {
   policy_requirement:
     "These become the dimensions the Recommendations feature is formulated on.",
 };

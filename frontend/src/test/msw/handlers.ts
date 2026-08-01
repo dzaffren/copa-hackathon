@@ -1,8 +1,13 @@
 import { http, HttpResponse } from "msw";
 import { LABEL_ORDER } from "@/lib/labels";
 import type {
-  ConceptsAvailable,
+  NodeMetadata,
   Connection,
+  Playbook,
+  Recommendation,
+  RecommendationEvidence,
+  RecommendationsResponse,
+  UnreflectedFinding,
   CreateWorkstreamRequest,
   CreateWorkstreamResponse,
   CrossLink,
@@ -433,6 +438,11 @@ interface GraphNodeFull extends GraphNode {
   document_id: string | null;
   /** Set on a working draft only; `null` on every published context document. */
   task_type: TaskTypeCode | null;
+  /** Mirrors the engine's derived flag: true when the node stores a `source_pdf`
+   *  the corpus can serve. False on the working draft, which has no published
+   *  PDF. Set here on the published documents so the Review panes' Source PDF
+   *  button has something to exercise. */
+  has_source_pdf: boolean;
 }
 
 const GRAPH_NODES: Record<string, GraphNodeFull> = {
@@ -446,6 +456,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     source_url: null,
     document_id: "opres-v1-2025-draft",
     task_type: "PD",
+    has_source_pdf: false,
   },
   "bcbs-opres-2021": {
     id: "bcbs-opres-2021",
@@ -458,6 +469,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     source_url: "https://www.bis.org/bcbs/publ/d509.htm",
     document_id: null,
     task_type: null,
+    has_source_pdf: true,
   },
   "fsb-3rd-party": {
     id: "fsb-3rd-party",
@@ -469,6 +481,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     source_url: "https://www.fsb.org",
     document_id: null,
     task_type: null,
+    has_source_pdf: true,
   },
   "hkma-spm-or2": {
     id: "hkma-spm-or2",
@@ -480,6 +493,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     source_url: "https://www.hkma.gov.hk",
     document_id: null,
     task_type: null,
+    has_source_pdf: true,
   },
   "rmit-pd-2025": {
     id: "rmit-pd-2025",
@@ -491,6 +505,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     source_url: "https://www.bnm.gov.my",
     document_id: "rmit-v2-2025",
     task_type: null,
+    has_source_pdf: true,
   },
   "fsa-2013-143": {
     id: "fsa-2013-143",
@@ -502,6 +517,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     source_url: "https://www.bnm.gov.my",
     document_id: null,
     task_type: null,
+    has_source_pdf: true,
   },
   "abm-position": {
     id: "abm-position",
@@ -513,6 +529,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     source_url: null,
     document_id: null,
     task_type: null,
+    has_source_pdf: true,
   },
   "opres-dp-2025": {
     id: "opres-dp-2025",
@@ -525,6 +542,7 @@ const GRAPH_NODES: Record<string, GraphNodeFull> = {
     source_url: null,
     document_id: "opres-v1-2025-draft",
     task_type: null,
+    has_source_pdf: true,
   },
 };
 
@@ -681,7 +699,7 @@ const TASK_ACTIVITY = [
 /** Profiles saved through the PUT within a single test run, so an edit-then-read
  *  round-trip behaves like the real side-file store. `resetSavedMetadata()`
  *  clears it between tests. */
-const savedMetadata = new Map<string, ConceptsAvailable>();
+const savedMetadata = new Map<string, NodeMetadata>();
 
 export function resetSavedMetadata() {
   savedMetadata.clear();
@@ -1075,6 +1093,168 @@ function recordFor(findingId: string) {
   return linkageReviews[findingId] ?? defaultRecord();
 }
 
+// --- Recommendations fixture state ------------------------------------------
+// Mutable so a test can drive the card through its states: the three empty
+// states, a generated set, a failed generate, and a guardrails save failure.
+
+export const DEFAULT_GUARDRAILS_TEXT = [
+  "1. House convention — cross-references stay general.",
+  "   Never recommend that a policy document cite another policy document by",
+  "   specific provision number.",
+  "",
+  "2. Scope boundary — stay inside what the draft covers.",
+  "",
+  "3. Terminology false-friend — check the term means the same thing.",
+  "",
+  "4. Alignment from silence — mutual vagueness is not agreement.",
+  "",
+  "5. Evidence floor — quote the clause or do not make the claim.",
+].join("\n");
+
+export const REC_DIMENSIONS = [
+  "Governance",
+  "Participation and scope of information sharing",
+  "Transition arrangements",
+  "Consent management",
+  "Customer protection",
+  "Management of technology risk",
+];
+
+function recEvidence(findingId: string): RecommendationEvidence {
+  return {
+    finding_id: findingId,
+    edge_id: "e-hkma_open_api_framework--ed_open_finance_2025",
+    label: "silent-on",
+    sentiment: null,
+    summary: "HKMA requires publication; the ED is silent on it.",
+    left: { id: "hkma-open-api-framework", title: "HKMA Open API Framework" },
+    right: { id: "ed-open-finance-2025", title: "ED Open Finance 2025" },
+    source_clause_number: "4.2",
+    source_clause_text:
+      "An AI should publish on its website a list of all TSPs it partners with.",
+    target_clause_number: "10.4",
+    target_clause_text:
+      "A data provider shall establish oversight arrangements for each data consumer.",
+  };
+}
+
+export function makeRecommendation(
+  overrides: Partial<Recommendation> = {},
+): Recommendation {
+  return {
+    id: "4f9f91c02ef5",
+    title: "Publish and maintain a list of authorised data consumers",
+    rationale:
+      "HKMA requires banks to publish partnering providers. The ED requires oversight but is silent on publication.",
+    action:
+      "Add a requirement for data providers to publish an up-to-date list of authorised data consumers.",
+    dimensions: ["Governance"],
+    evidence: [recEvidence("f-accepted-1")],
+    confidence_note:
+      "Assumes no separate industry register already performs this function.",
+    bookmarked: false,
+    comments: [],
+    revisions: [],
+    ...overrides,
+  };
+}
+
+type PlaybookSections = Pick<
+  Playbook,
+  "brainstorm" | "draft" | "write" | "deliver"
+>;
+
+interface RecState {
+  byNode: Record<string, Recommendation[]>;
+  nextBatch: Recommendation[];
+  unreflected: UnreflectedFinding[];
+  acceptedCount: number;
+  dimensions: string[];
+  generatedAt: string | null;
+  guardrails: string | null;
+  gate: "NO_POLICY_REQUIREMENTS" | "NO_ACCEPTED_FINDINGS" | null;
+  failGenerate: boolean;
+  failGuardrailsSave: boolean;
+  failBookmark: boolean;
+  failComment: boolean;
+  failRewrite: boolean;
+  rewrittenTitle: string | null;
+  playbook: PlaybookSections | null;
+  failPlaybookSave: boolean;
+}
+
+const recState: RecState = {
+  byNode: {},
+  nextBatch: [],
+  unreflected: [],
+  acceptedCount: 30,
+  dimensions: REC_DIMENSIONS,
+  generatedAt: null,
+  guardrails: null,
+  gate: null,
+  failGenerate: false,
+  failGuardrailsSave: false,
+  failBookmark: false,
+  failComment: false,
+  failRewrite: false,
+  rewrittenTitle: null,
+  playbook: null,
+  failPlaybookSave: false,
+};
+
+/** Reset to "generated nothing yet, six dimensions, 30 accepted findings".
+ *
+ *  `nextBatch` serves two purposes, because tests need both: it is what a
+ *  `generate` call returns, AND — when `generatedAt` is set — it is pre-seeded
+ *  into the store so a test can render an ALREADY-generated set without pressing
+ *  Generate first. The drafting workspace only reads, so without that seeding its
+ *  tab would always see an empty store. */
+export function resetRecommendations(overrides: Partial<RecState> = {}) {
+  recState.byNode = {};
+  recState.nextBatch = [];
+  recState.unreflected = [];
+  recState.acceptedCount = 30;
+  recState.dimensions = REC_DIMENSIONS;
+  recState.generatedAt = null;
+  recState.guardrails = null;
+  recState.gate = null;
+  recState.failGenerate = false;
+  recState.failGuardrailsSave = false;
+  recState.failBookmark = false;
+  recState.failComment = false;
+  recState.failRewrite = false;
+  recState.rewrittenTitle = null;
+  recState.playbook = null;
+  recState.failPlaybookSave = false;
+  Object.assign(recState, overrides);
+
+  // An `generatedAt` in the overrides means "pretend this was already
+  // generated" — so the batch belongs in the store, not just queued for a future
+  // generate call.
+  if (recState.generatedAt !== null && recState.nextBatch.length > 0) {
+    for (const nodeId of Object.keys(TASKS)) {
+      recState.byNode[nodeId] = recState.nextBatch.map((r) => ({ ...r }));
+    }
+  }
+}
+
+function recommendationsFor(nodeId: string): RecommendationsResponse {
+  const cards = recState.byNode[nodeId] ?? [];
+  return {
+    generated_at: cards.length ? recState.generatedAt : null,
+    dimensions: recState.dimensions,
+    accepted_count: recState.acceptedCount,
+    recommendations: cards,
+    not_yet_reflected: recState.unreflected,
+    counts: {
+      total: cards.length,
+      bookmarked: cards.filter((r) => r.bookmarked).length,
+      cited_findings: recState.acceptedCount - recState.unreflected.length,
+      not_yet_reflected: recState.unreflected.length,
+    },
+  };
+}
+
 export const handlers = [
   // Review Queue: cross-workstream linkages with their maker-checker status.
   http.get("*/api/review-queue", () => {
@@ -1238,11 +1418,13 @@ export const handlers = [
           id: "of-ed-2025",
           title: "Open Finance ED — 18 Nov 2025",
           node_type: "task",
+          has_source_pdf: false,
         },
         target_node: {
           id: "opres-dp-2025",
           title: "OpRes DP (Dec 2025)",
           node_type: "internal-published",
+          has_source_pdf: true,
         },
       },
       source_clauses: findings.flatMap((f) => f.source_clauses),
@@ -1697,6 +1879,7 @@ export const handlers = [
           id,
           title: n?.title ?? null,
           node_type: n?.node_type ?? null,
+          has_source_pdf: n?.has_source_pdf ?? false,
         };
       };
       return HttpResponse.json({
@@ -1940,7 +2123,7 @@ export const handlers = [
         return jsonError(502, "SAVE_FAILED", "The profile could not be saved");
       }
       const body = (await request.json()) as Record<string, unknown>;
-      const metadata = { status: "available", ...body } as ConceptsAvailable;
+      const metadata = { status: "available", ...body } as NodeMetadata;
       savedMetadata.set(nodeId, metadata);
       return HttpResponse.json({ node_id: nodeId, metadata });
     },
@@ -1957,6 +2140,243 @@ export const handlers = [
         status: "analysed",
         findings: ANALYZE_FSB,
         findings_count: ANALYZE_FSB.length,
+      });
+    },
+  ),
+
+  // --- Recommendations ------------------------------------------------------
+  // In-memory per-node store so a component test can generate, read back, and
+  // regenerate without a real engine. Reset via `resetRecommendations()` in a
+  // test's beforeEach.
+
+  http.get(
+    "*/api/workstreams/:workstreamId/tasks/:nodeId/recommendations",
+    ({ params }) => {
+      const nodeId = params.nodeId as string;
+      if (!TASKS[nodeId]) {
+        return HttpResponse.json(
+          { code: "NOT_A_TASK", message: `${nodeId} is not a task` },
+          { status: 400 },
+        );
+      }
+      return HttpResponse.json(recommendationsFor(nodeId));
+    },
+  ),
+
+  http.post(
+    "*/api/workstreams/:workstreamId/tasks/:nodeId/recommendations/generate",
+    ({ params }) => {
+      const nodeId = params.nodeId as string;
+      if (!TASKS[nodeId]) {
+        return HttpResponse.json(
+          { code: "NOT_A_TASK", message: `${nodeId} is not a task` },
+          { status: 400 },
+        );
+      }
+      if (recState.gate) {
+        const gate = recState.gate;
+        return HttpResponse.json(
+          {
+            code: gate,
+            message:
+              gate === "NO_POLICY_REQUIREMENTS"
+                ? "Recommendations are formulated on the draft's policy requirements, and none are recorded."
+                : "No findings have been accepted yet. Accept findings in the Pairwise findings box first.",
+          },
+          { status: 409 },
+        );
+      }
+      if (recState.failGenerate) {
+        return HttpResponse.json(
+          { code: "RECOMMENDATIONS_FAILED", message: "Could not generate." },
+          { status: 502 },
+        );
+      }
+      // Bookmarked survive; the rest are replaced — the engine's rule.
+      const pinned = (recState.byNode[nodeId] ?? []).filter(
+        (r) => r.bookmarked,
+      );
+      recState.byNode[nodeId] = [...pinned, ...recState.nextBatch];
+      recState.generatedAt = "2026-08-02T09:14:22Z";
+      return HttpResponse.json(recommendationsFor(nodeId), { status: 201 });
+    },
+  ),
+
+  http.patch(
+    "*/api/workstreams/:workstreamId/tasks/:nodeId/recommendations/:recId",
+    async ({ params, request }) => {
+      const nodeId = params.nodeId as string;
+      const recId = params.recId as string;
+      const body = (await request.json()) as {
+        bookmarked?: unknown;
+        comment?: unknown;
+      };
+      const hasBookmark = typeof body.bookmarked === "boolean";
+      const hasComment = typeof body.comment === "string";
+      if (!hasBookmark && !hasComment) {
+        return HttpResponse.json(
+          { code: "INVALID_PATCH", message: "bookmarked must be a boolean." },
+          { status: 400 },
+        );
+      }
+      if (hasComment && !(body.comment as string).trim()) {
+        return HttpResponse.json(
+          { code: "EMPTY_COMMENT", message: "A comment cannot be empty." },
+          { status: 400 },
+        );
+      }
+      if (recState.failComment && hasComment) {
+        return HttpResponse.json(
+          { code: "INTERNAL_ERROR", message: "Could not save." },
+          { status: 500 },
+        );
+      }
+      if (recState.failBookmark && hasBookmark) {
+        return HttpResponse.json(
+          { code: "INTERNAL_ERROR", message: "Could not save." },
+          { status: 500 },
+        );
+      }
+      const cards = recState.byNode[nodeId] ?? [];
+      const card = cards.find((r) => r.id === recId);
+      if (!card) {
+        return HttpResponse.json(
+          { code: "RECOMMENDATION_NOT_FOUND", message: `No ${recId}.` },
+          { status: 404 },
+        );
+      }
+      if (hasBookmark) card.bookmarked = body.bookmarked as boolean;
+      if (hasComment) {
+        card.comments = [
+          ...card.comments,
+          {
+            author: { id: "aisyah-r", name: "Aisyah R." },
+            // Distinct per comment, as the engine's `_now()` produces. A shared
+            // timestamp made two comments collide on the render key.
+            at: `2026-08-02T11:12:${String(40 + card.comments.length).padStart(2, "0")}Z`,
+            text: (body.comment as string).trim(),
+          },
+        ];
+      }
+      return HttpResponse.json(card);
+    },
+  ),
+
+  http.post(
+    "*/api/workstreams/:workstreamId/tasks/:nodeId/recommendations/:recId/rewrite",
+    ({ params }) => {
+      const cards = recState.byNode[params.nodeId as string] ?? [];
+      const card = cards.find((r) => r.id === params.recId);
+      if (!card) {
+        return HttpResponse.json(
+          { code: "RECOMMENDATION_NOT_FOUND", message: "No such card." },
+          { status: 404 },
+        );
+      }
+      if (recState.failRewrite) {
+        return HttpResponse.json(
+          {
+            code: "REWRITE_FAILED",
+            message:
+              "The rewrite could not be completed. The recommendation is unchanged.",
+          },
+          { status: 502 },
+        );
+      }
+      // Mirrors the engine: identity carries, the superseded text is appended.
+      card.revisions = [
+        ...card.revisions,
+        {
+          at: "2026-08-02T11:15:02Z",
+          title: card.title,
+          rationale: card.rationale,
+          action: card.action,
+          confidence_note: card.confidence_note,
+        },
+      ];
+      card.title = recState.rewrittenTitle ?? `${card.title} (rewritten)`;
+      return HttpResponse.json(card);
+    },
+  ),
+
+  http.get("*/api/workstreams/:workstreamId/playbook", () =>
+    HttpResponse.json(
+      recState.playbook === null
+        ? {
+            brainstorm: "",
+            draft: "",
+            write: "",
+            deliver: "",
+            updated_at: null,
+            is_default: true,
+          }
+        : {
+            ...recState.playbook,
+            updated_at: "2026-08-02T10:22:14Z",
+            is_default: false,
+          },
+    ),
+  ),
+
+  http.put(
+    "*/api/workstreams/:workstreamId/playbook",
+    async ({ request }) => {
+      const body = (await request.json()) as Record<string, unknown>;
+      if (recState.failPlaybookSave) {
+        return HttpResponse.json(
+          { code: "INTERNAL_ERROR", message: "Could not save." },
+          { status: 500 },
+        );
+      }
+      // A FULL REPLACEMENT of the four sections, as the engine does — an omitted
+      // section lands empty rather than keeping its stored value.
+      recState.playbook = {
+        brainstorm: String(body.brainstorm ?? ""),
+        draft: String(body.draft ?? ""),
+        write: String(body.write ?? ""),
+        deliver: String(body.deliver ?? ""),
+      };
+      return HttpResponse.json({
+        ...recState.playbook,
+        updated_at: "2026-08-02T11:40:03Z",
+        is_default: false,
+      });
+    },
+  ),
+
+  http.get("*/api/workstreams/:workstreamId/guardrails", () =>
+    HttpResponse.json(
+      recState.guardrails === null
+        ? { body: DEFAULT_GUARDRAILS_TEXT, updated_at: null, is_default: true }
+        : {
+            body: recState.guardrails,
+            updated_at: "2026-08-02T09:02:11Z",
+            is_default: false,
+          },
+    ),
+  ),
+
+  http.put(
+    "*/api/workstreams/:workstreamId/guardrails",
+    async ({ request }) => {
+      const body = (await request.json()) as { body?: unknown };
+      if (typeof body.body !== "string") {
+        return HttpResponse.json(
+          { code: "INVALID_GUARDRAILS", message: "body must be a string." },
+          { status: 400 },
+        );
+      }
+      if (recState.failGuardrailsSave) {
+        return HttpResponse.json(
+          { code: "INTERNAL_ERROR", message: "Could not save." },
+          { status: 500 },
+        );
+      }
+      recState.guardrails = body.body;
+      return HttpResponse.json({
+        body: body.body,
+        updated_at: "2026-08-02T11:40:03Z",
+        is_default: false,
       });
     },
   ),

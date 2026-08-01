@@ -829,6 +829,15 @@ REASONING_DEPLOYMENT = os.environ.get(
     "AZURE_FOUNDRY_REASONING_DEPLOYMENT", "claude-sonnet-5"
 )
 
+# The Recommendations engine (see engine/recommendations.py). Synthesising policy
+# positions from accepted findings is the most demanding reasoning the product
+# does — it has to hold a whole neighbourhood's evidence at once and respect the
+# workstream's guardrails — so it defaults to the large tier that the
+# finder/critic loop uses, not the mid tier.
+RECOMMENDATIONS_DEPLOYMENT = os.environ.get(
+    "AZURE_FOUNDRY_RECOMMENDATIONS_DEPLOYMENT", "claude-opus-4-8"
+)
+
 # Stage-2 cosine retrieval embeddings (Arm G) — Azure OpenAI, sharing the same
 # AZURE_FOUNDRY_API_KEY as the chat deployments. Claude chat runs on the
 # `/anthropic` Messages API; embeddings run through the Azure OpenAI client,

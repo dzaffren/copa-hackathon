@@ -12,7 +12,7 @@ import {
   HttpError,
 } from "@/lib/api";
 import type { TaskWorkflowStatus } from "@/lib/types";
-import { SourceCard } from "./SourceCard";
+import { RecommendationsCard } from "./RecommendationsCard";
 import { NeighboursCard } from "./NeighboursCard";
 import { PairwiseFindingsCard } from "./PairwiseFindingsCard";
 import { AssignDialog } from "./AssignDialog";
@@ -230,16 +230,31 @@ export default function TaskScreenPage() {
         </div>
       </header>
 
-      <div className="grid grid-cols-12 gap-4 p-6">
-        <section className="col-span-12 space-y-4 lg:col-span-4">
-          <SourceCard task={task} />
+      {/* Two boxes on top, one full-width box beneath.
+          Recommendations moved to the bottom row and spans the full width on
+          1 Aug 2026: a recommendation quotes its clauses inline and carries a
+          rationale, an action and a comment thread, so it reads badly in a
+          third-width column. The two boxes above it are the inputs — the
+          neighbourhood it draws on, and the findings the drafter accepts — which
+          is also the order she works in. */}
+      <div className="grid grid-cols-12 items-stretch gap-4 p-6">
+        {/* `items-stretch` on the grid plus `h-full` here is what makes the two
+            top boxes share a height: a grid item defaults to stretching, but the
+            CARD inside it does not inherit that unless the section passes it on.
+            Both cards cap at the same viewport expression and scroll
+            internally, so the taller content decides the row and neither leaves
+            a ragged edge. */}
+        <section className="col-span-12 lg:col-span-4 [&>*]:h-full">
           <NeighboursCard
             neighbours={neighbours}
             secondOrder={second_order_neighbours}
           />
         </section>
-        <section className="col-span-12 lg:col-span-8">
+        <section className="col-span-12 lg:col-span-8 [&>*]:h-full">
           <PairwiseFindingsCard workstreamId={workstreamId} nodeId={nodeId} />
+        </section>
+        <section className="col-span-12">
+          <RecommendationsCard workstreamId={workstreamId} nodeId={nodeId} />
         </section>
       </div>
     </div>

@@ -167,7 +167,7 @@ export function PairwiseFindingsCard({ workstreamId, nodeId }: Props) {
     // box is worth more than the overlap costs.
     <Card
       data-testid="pairwise-card"
-      className="glass flex max-h-[calc(100vh-12rem)] min-h-[24rem] flex-col overflow-hidden"
+      className="glass flex max-h-[calc(100vh-12rem)] flex-col overflow-hidden"
     >
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border/60 px-4 py-3">
         <div>

@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import { deleteNode, extractConcepts, fetchNodeDetail } from "@/lib/api";
 import {
   TASK_TYPE_OPTIONS,
-  type ConceptsAvailable,
+  type NodeMetadata,
   type GraphNode,
 } from "@/lib/types";
 import { AddEdgeDialog } from "./AddEdgeDialog";
@@ -32,8 +32,8 @@ import {
 import { NodeMetadataForm } from "./NodeMetadataForm";
 
 function conceptsAvailable(
-  concepts: ConceptsAvailable | { status: string; message: string },
-): concepts is ConceptsAvailable {
+  concepts: NodeMetadata | { status: string; message: string },
+): concepts is NodeMetadata {
   return concepts.status === "available";
 }
 

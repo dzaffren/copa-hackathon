@@ -14,6 +14,7 @@
       "title": "ED Open Finance 2025",
       "description": "BNM Open Finance Exposure Draft, 2025.",
       "source_url": null,
+      "source_pdf": "open-finance/ED_Open_Finance_2025.pdf",
       "document_id": "ed-open-finance-2025",
       "doc_class": "semi-structured",
       "recent_activity": [
@@ -40,6 +41,7 @@
       "title": "HKMA Open API Framework",
       "description": "HKMA Open API Framework for the Banking Sector, 18 Jul 2018.",
       "source_url": null,
+      "source_pdf": "open-finance/hkma-20180718e5a2.pdf",
       "document_id": "hkma-open-api-framework",
       "doc_class": "semi-structured",
       "recent_activity": [
@@ -61,6 +63,7 @@
       "title": "BIS Papers 168",
       "description": "BIS Papers No 168 — open banking and data portability.",
       "source_url": null,
+      "source_pdf": "open-finance/bispap168.pdf",
       "document_id": "bis-papers-168",
       "doc_class": "prose",
       "recent_activity": [
@@ -82,6 +85,7 @@
       "title": "RMiT 2025",
       "description": "BNM Risk Management in Technology PD, Nov 2025.",
       "source_url": null,
+      "source_pdf": "open-finance/pd-rmit-nov25.pdf",
       "document_id": "rmit-2025",
       "doc_class": "structured-rules",
       "recent_activity": [
@@ -108,6 +112,7 @@
       "title": "ABS-MAS API Playbook",
       "description": "This Playbook will serve as a comprehensive guide in\nidentifying and developing the APIs in your organisation. The requisite data and information standards supporting these APIs are also defined. This Playbook has also been developed as a reference guide for industry adoption in the wider ASEAN region who are embarking on similar API programs.",
       "source_url": null,
+      "source_pdf": "open-finance/mas-ABSMASAPIPlaybook.pdf",
       "document_id": "abs-mas-api-playbook",
       "doc_class": "prose",
       "recent_activity": [
