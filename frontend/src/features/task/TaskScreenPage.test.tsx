@@ -143,7 +143,7 @@ describe("TaskScreenPage — landing", () => {
     // silent-on and goes-beyond are meaningless without knowing which side is
     // which, so the direction convention rides along.
     expect(
-      within(legend).getByText(/is this task's draft/),
+      within(legend).getByText(/refers to the LHS document/),
     ).toBeInTheDocument();
 
     await user.unhover(screen.getByTestId("label-legend-trigger"));

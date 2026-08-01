@@ -8,10 +8,12 @@ import type { ReviewState, SemanticLabel, Sentiment } from "@/lib/types";
 export interface LabelStyle {
   /** Human label text. */
   label: string;
-  /** What the label means, for the legend. Kept word-for-word in step with
-   *  `_TAXONOMY_PROMPT_BLOCK` in `engine/connections.py` — that block is what
-   *  the finder and critic are actually told, so a legend that drifts from it
-   *  would be describing a taxonomy the engine does not apply. */
+  /** What the label means, for the legend. Written for the drafter, so it does
+   *  NOT track `_TAXONOMY_PROMPT_BLOCK` in `engine/connections.py` word for
+   *  word — that block is model instruction and reads like it. The two must
+   *  still agree in MEANING: the block is what the finder and critic are
+   *  actually told, so a legend that contradicts it would be describing a
+   *  taxonomy the engine does not apply. */
   description: string;
   /** Pill: translucent bg + coloured text + hairline border, reads on white. */
   pill: string;
@@ -27,7 +29,7 @@ export const LABEL_STYLES: Record<SemanticLabel, LabelStyle> = {
   "aligns-with": {
     label: "aligns-with",
     description:
-      "Same axis, and the two clauses agree — or ours adopts theirs without narrowing or widening it.",
+      "Both documents take the same position on this concept, no reconciliation required.",
     pill: "bg-emerald-500/15 text-emerald-700 border border-emerald-400/30",
     accent: "border-l-emerald-400",
     dot: "bg-emerald-400",
@@ -36,7 +38,7 @@ export const LABEL_STYLES: Record<SemanticLabel, LabelStyle> = {
   "differs-on": {
     label: "differs-on",
     description:
-      "Same axis, different position. Carries a sentiment: ↑ tighten (ours is stricter), ↓ loosen (ours is more permissive), or neither.",
+      "Both address this concept but set different requirements, ↑/↓/- this document is tighter/looser/neutral.",
     pill: "bg-amber-400/15 text-amber-700 border border-amber-300/30",
     accent: "border-l-amber-400",
     dot: "bg-amber-400",
@@ -45,7 +47,7 @@ export const LABEL_STYLES: Record<SemanticLabel, LabelStyle> = {
   "conflicts-with": {
     label: "conflicts-with",
     description:
-      "The two cannot both be followed. An institution complying with one would breach the other.",
+      "The two requirements are incompatible, i.e. an institution complying with one contradicts the other.",
     pill: "bg-red-500/15 text-red-700 border border-red-400/30",
     accent: "border-l-red-400",
     dot: "bg-red-400",
@@ -54,7 +56,7 @@ export const LABEL_STYLES: Record<SemanticLabel, LabelStyle> = {
   "silent-on": {
     label: "silent-on",
     description:
-      "A coverage gap on our side: their document addresses this, ours does not.",
+      "Concept omitted from this document but not the other document.",
     pill: "bg-sky-500/15 text-sky-700 border border-sky-400/30",
     accent: "border-l-sky-400",
     dot: "bg-sky-400",
@@ -63,7 +65,7 @@ export const LABEL_STYLES: Record<SemanticLabel, LabelStyle> = {
   "goes-beyond": {
     label: "goes-beyond",
     description:
-      "A coverage gap on their side: our document addresses this, theirs does not.",
+      "Concept addressed only in this document but not the other document.",
     pill: "bg-violet-500/15 text-violet-700 border border-violet-400/30",
     accent: "border-l-violet-400",
     dot: "bg-violet-400",

@@ -7,9 +7,9 @@ import { LABEL_ORDER, LABEL_STYLES } from "@/lib/labels";
 /** Hover legend for the five semantic labels, beside the box's heading.
  *
  *  The copy lives in `@/lib/labels` next to the palette, so the legend and the
- *  pills it explains cannot drift apart — and that copy tracks
- *  `_TAXONOMY_PROMPT_BLOCK` in `engine/connections.py`, which is what the finder
- *  and critic are actually told.
+ *  pills it explains cannot drift apart. It is drafter-facing prose rather than
+ *  a transcription of `_TAXONOMY_PROMPT_BLOCK` in `engine/connections.py`, but
+ *  must not contradict it — see `LabelStyle.description`.
  *
  *  Declaration order, not attention order: the point here is "here are the five
  *  labels", not "here is what needs attention" — the card list below already
@@ -101,10 +101,15 @@ export function LabelLegend() {
           </dl>
           {/* The direction convention is the one thing a reader cannot infer
               from the labels alone, and silent-on / goes-beyond are meaningless
-              without it. */}
+              without it. Stated as LHS/RHS because that is what the drafter can
+              actually see: every finding card heads itself `left ↔ right`, and
+              `left` is the edge SOURCE (see `_review_node` in engine/api.py).
+              Note the source is not necessarily the task's own draft —
+              open-finance-pd-2026 points its edges INTO the ED node, so the
+              draft sits on the right there. */}
           <p className="mt-2 border-t border-border/60 pt-2 text-[11px] leading-relaxed text-muted-foreground">
-            &quot;Ours&quot; is this task&apos;s draft; &quot;theirs&quot; is
-            the document it is compared against.
+            Given LHS ↔ RHS: &quot;the other document&quot; refers to the LHS
+            document; &quot;this document&quot; refers to the RHS document.
           </p>
         </div>
       )}
