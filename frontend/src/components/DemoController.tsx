@@ -4,33 +4,59 @@ import { ChevronLeft, ChevronRight, Minimize2, Play } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-// The 6-step demo path, in presentation order. Paths must match the routes
+// The 5-step demo path, in presentation order. Paths must match the routes
 // registered in App.tsx exactly, since this navigates by literal pathname.
+//
+// Runs on open-finance-pd-2026, the live demo workstream — every id below is
+// read off its committed fixture (`graph.json` + `findings/`), so the walkthrough
+// never lands on an unanalysed pair.
 interface DemoStep {
   label: string;
   path: string;
+  /** Marks a step that shares its `path` with another. Steps 1 and 2 are the
+   *  same screen — the graph, then the analyse action on a selected edge — and
+   *  two identical targets would strand the presenter: `activeIndex` is derived
+   *  from the URL, so "Next" onto a path already matched would leave the index
+   *  where it was and stop advancing. The param disambiguates the two without
+   *  the page having to read it (the graph screen keys off `useParams` only). */
+  query?: string;
 }
 
+const WS = "open-finance-pd-2026";
+const TASK = "open-finance-pd-2026-pd";
+// The HKMA ↔ ED pair: analysed, and the richest of the three findings files.
+const EDGE = "e-hkma_open_api_framework--ed_open_finance_2025";
+
 const DEMO_STEPS: DemoStep[] = [
-  { label: "Dashboard", path: "/" },
-  { label: "Workstream Graph", path: "/workstreams/opres-v2" },
+  { label: "Workstream Graph", path: `/workstreams/${WS}` },
   {
-    label: "Review Linkages",
-    path: "/workstreams/opres-v2/edges/e-opres_v0_3--bcbs_opres_2021/review",
+    label: "Analyze Linkage",
+    path: `/workstreams/${WS}`,
+    query: "demo=analyze",
   },
-  { label: "Task Screen", path: "/workstreams/opres-v2/tasks/opres-pd-v0-3" },
+  { label: "Task Workspace", path: `/workstreams/${WS}/tasks/${TASK}` },
   {
-    label: "Drafting Workspace",
-    path: "/workstreams/opres-v2/tasks/opres-pd-v0-3/draft",
+    label: "Review Linkage",
+    path: `/workstreams/${WS}/edges/${EDGE}/review`,
   },
-  { label: "Institution Map", path: "/institution-map" },
+  {
+    label: "Draft Workspace",
+    path: `/workstreams/${WS}/tasks/${TASK}/draft`,
+  },
 ];
+
+/** A step's full navigation target, query string included. */
+function stepHref(step: DemoStep): string {
+  return step.query ? `${step.path}?${step.query}` : step.path;
+}
 
 const STORAGE_KEY = "wsb-demo-controller-minimized";
 
 /**
- * Floating presenter control for stepping through the 6-screen demo path.
+ * Floating presenter control for stepping through the 5-step demo path.
  * Purely a navigation aid — it holds no product state, just pushes routes.
+ * Steps 1 and 2 are deliberately the same screen: the graph, then the analyse
+ * action taken on it.
  *
  * The active step is derived from the URL (not local state) so it stays in
  * sync when the presenter clicks through the app manually instead of using
@@ -52,26 +78,38 @@ export function DemoController() {
   // The active step matches the longest path prefix, so a sub-route (e.g. a
   // different edge's review screen) still highlights the closest demo step
   // rather than showing no selection at all.
+  //
+  // A step carrying a `query` only matches when that query is present, and it
+  // wins over the bare-path step on the same URL — otherwise steps 1 and 2
+  // (same screen) would both resolve to 1 and the presenter could never leave
+  // it. The task and draft steps are prefix-compared in declaration order, so
+  // `/tasks/x/draft` must be checked against the longer path first; sorting by
+  // path length handles that regardless of the order above.
   const activeIndex = useMemo(() => {
     let best = -1;
-    let bestLen = -1;
+    let bestScore = -1;
     DEMO_STEPS.forEach((step, i) => {
       const isRoot = step.path === "/";
-      const matches = isRoot
+      const pathMatches = isRoot
         ? location.pathname === "/"
         : location.pathname === step.path ||
           location.pathname.startsWith(`${step.path}/`);
-      if (matches && step.path.length > bestLen) {
+      if (!pathMatches) return;
+      if (step.query && !location.search.includes(step.query)) return;
+      // A query-qualified match is strictly more specific than a bare path of
+      // the same length, so it outranks it.
+      const score = step.path.length * 2 + (step.query ? 1 : 0);
+      if (score > bestScore) {
         best = i;
-        bestLen = step.path.length;
+        bestScore = score;
       }
     });
     return best;
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
   function goTo(index: number) {
     const clamped = Math.max(0, Math.min(DEMO_STEPS.length - 1, index));
-    navigate(DEMO_STEPS[clamped].path);
+    navigate(stepHref(DEMO_STEPS[clamped]));
   }
 
   function goPrev() {
@@ -136,7 +174,7 @@ export function DemoController() {
         {DEMO_STEPS.map((step, i) => {
           const active = i === activeIndex;
           return (
-            <li key={step.path}>
+            <li key={stepHref(step)}>
               <button
                 type="button"
                 title={step.label}
