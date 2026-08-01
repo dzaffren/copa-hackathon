@@ -2,7 +2,7 @@
 
 Pure functions over the fixture store. Given two documents that live in
 different workstreams (a `_cross` edge), each side's concept metadata
-(`engine.concepts`), and the edge's findings, this derives the three things the
+(`engine.node_metadata`), and the edge's findings, this derives the three things the
 Cross-Workstream Intelligence panel needs beyond the raw linkage list:
 
   * ``shared_attributes`` — the concrete facts the two documents have in common

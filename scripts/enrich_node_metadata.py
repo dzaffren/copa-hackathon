@@ -31,7 +31,7 @@ import json
 from pathlib import Path
 from typing import Any, Optional
 
-from engine import concepts, findings
+from engine import findings, node_metadata
 from engine.config import REPO_ROOT
 
 WORKSTREAMS_DIR = REPO_ROOT / "data" / "workstreams"
@@ -113,16 +113,16 @@ def _enrich_workstream(workstreams_dir: Path, workstream_id: str) -> int:
             continue  # nothing to write — leave this node un-enriched
 
         # Merge over what is already on disk, and only for the fields actually
-        # derived. `save_concepts` writes the whole `CONCEPT_FIELDS` set, filling
+        # derived. `save_metadata` writes the whole `METADATA_FIELDS` set, filling
         # any key its argument omits with `null` — so passing just the derived
         # fields silently erased the rest. That destroyed hand-authored profile
         # content (of-ed-2025 lost its applicability, issuance date, six keywords
         # and legal basis) while reporting "enriched", and the values live only in
         # git. A `None` derived value means "this script could not honestly derive
         # it", which is not the same as "clear it", so it must not overwrite.
-        existing = concepts.load_concepts(workstreams_dir, workstream_id, node["id"])
+        existing = node_metadata.load_metadata(workstreams_dir, workstream_id, node["id"])
         derived = {"policy_owner": policy_owner}
-        concepts.save_concepts(
+        node_metadata.save_metadata(
             workstreams_dir,
             workstream_id,
             node["id"],
