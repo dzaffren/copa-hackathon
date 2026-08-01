@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { beforeEach, describe, it, expect } from "vitest";
 import {
   cleanup,
   fireEvent,
@@ -8,6 +8,10 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderApp } from "@/test/utils";
+import {
+  makeRecommendation,
+  resetRecommendations,
+} from "@/test/msw/handlers";
 import { DRAFT_OUTLINE_SECTIONS } from "./copilotDraftOutline";
 import {
   CLARIFICATION_QUESTIONS,
@@ -68,7 +72,7 @@ async function acceptOnReviewScreen(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe("DraftingWorkspacePage — landing", () => {
-  it("renders the draft surface, two tabs, and the breadcrumb", async () => {
+  it("renders the draft surface, three tabs, and the breadcrumb", async () => {
     await loadWorkspace();
 
     expect(
@@ -81,29 +85,36 @@ describe("DraftingWorkspacePage — landing", () => {
       "href",
       "/workstreams/opres-v2/tasks/opres-pd-v0-3",
     );
-    for (const name of [/Reviewed/, /Copilot/]) {
+    for (const name of [/Recommendations/, /Playbook/, /Copilot/]) {
       expect(screen.getByRole("tab", { name })).toBeInTheDocument();
     }
+    // Order is the point — Recommendations, Playbook, Copilot.
+    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual([
+      expect.stringContaining("Recommendations"),
+      expect.stringContaining("Playbook"),
+      expect.stringContaining("Copilot"),
+    ]);
   });
 
-  it("no longer offers the Related · 1 hop tab, and leaves no placeholder", async () => {
+  it("offers neither the retired Related nor the retired Reviewed tab", async () => {
     await loadWorkspace();
 
-    expect(screen.getAllByRole("tab")).toHaveLength(2);
+    expect(screen.getAllByRole("tab")).toHaveLength(3);
     expect(screen.queryByRole("tab", { name: /Related/ })).toBeNull();
+    // Reviewed went on 1 Aug 2026: it duplicated the task screen, and accepted
+    // findings now reach the draft as quoted evidence on a recommendation.
+    expect(screen.queryByRole("tab", { name: /Reviewed/ })).toBeNull();
     expect(screen.queryByTestId("related-empty")).toBeNull();
-    // No disabled stand-in for the future Recommendations tab either.
     expect(
       screen.getAllByRole("tab").filter((t) => t.hasAttribute("disabled")),
     ).toHaveLength(0);
   });
 
-  it("opens on the Reviewed tab", async () => {
+  it("opens on the Recommendations tab", async () => {
     await loadWorkspace();
-    expect(screen.getByRole("tab", { name: /Reviewed/ })).toHaveAttribute(
-      "aria-selected",
-      "true",
-    );
+    expect(
+      screen.getByRole("tab", { name: /Recommendations/ }),
+    ).toHaveAttribute("aria-selected", "true");
   });
 
   it("shows the working draft's clause text verbatim in the editor", async () => {
@@ -137,163 +148,214 @@ describe("DraftingWorkspacePage — landing", () => {
   });
 });
 
-describe("DraftingWorkspacePage — Reviewed tab", () => {
-  it("is empty until something is accepted, and points at the box", async () => {
-    await loadWorkspace();
-    expect(screen.getByTestId("count-reviewed")).toHaveTextContent("0");
-    expect(screen.getByText(/No findings accepted yet/i)).toBeInTheDocument();
-    // Names where acceptance now happens, not just "the review screen".
-    expect(
-      screen.getByText(/Pairwise findings box on the task page/i),
-    ).toBeInTheDocument();
-  });
+describe("DraftingWorkspacePage — Recommendations tab", () => {
+  beforeEach(() => resetRecommendations());
 
-  it("shows a linkage accepted on the review screen, and counts it", async () => {
-    const user = userEvent.setup();
-    await acceptOnReviewScreen(user);
-
+  it("points at the task page when nothing has been generated", async () => {
     await loadWorkspace();
 
-    const cards = await screen.findAllByTestId("linkage-ref-card");
-    expect(cards).toHaveLength(1);
-    expect(cards[0]).toHaveAttribute("data-label", "aligns-with");
-    expect(cards[0]).toHaveTextContent("BCBS OpRes 2021");
-    expect(screen.getByTestId("count-reviewed")).toHaveTextContent("1");
-  });
-
-  it("does not show a dismissed finding", async () => {
-    const user = userEvent.setup();
-    renderApp(`/workstreams/opres-v2/edges/${BCBS_EDGE}/review`);
-    const card = (await screen.findAllByTestId("finding-card"))[0];
-    await user.click(within(card).getByRole("button", { name: "Dismiss" }));
-    await waitFor(() =>
-      expect(screen.getByTestId("count-dismissed")).toHaveTextContent(
-        "1 dismissed",
-      ),
+    expect(await screen.findByTestId("tab-not-generated")).toHaveTextContent(
+      /Generate them in the Recommendations card on the task page/i,
     );
-    cleanup();
-
-    await loadWorkspace();
-
-    expect(screen.queryByTestId("linkage-ref-card")).not.toBeInTheDocument();
-    expect(screen.getByTestId("count-reviewed")).toHaveTextContent("0");
   });
 
-  it("opens the comparison on the clicked finding", async () => {
-    const user = userEvent.setup();
-    await acceptOnReviewScreen(user);
+  it("asks for a bookmark when recommendations exist but none is marked", async () => {
+    resetRecommendations({
+      nextBatch: [makeRecommendation()],
+      generatedAt: "2026-08-02T09:14:22Z",
+    });
+    await loadWorkspace();
+    // A generated-but-unbookmarked set is a different state from no set at all,
+    // and needs a different instruction — pick, not generate.
+    await userEvent.click(screen.getByRole("tab", { name: /Recommendations/ }));
+
+    expect(await screen.findByTestId("tab-none-bookmarked")).toHaveTextContent(
+      /Bookmark a recommendation on the task page/i,
+    );
+  });
+
+  it("shows only the bookmarked recommendations, and counts them", async () => {
+    resetRecommendations({
+      nextBatch: [
+        makeRecommendation({ id: "kept", title: "Taken forward", bookmarked: true }),
+        makeRecommendation({ id: "passed", title: "Passed over" }),
+      ],
+      generatedAt: "2026-08-02T09:14:22Z",
+    });
     await loadWorkspace();
 
-    const card = (await screen.findAllByTestId("linkage-ref-card"))[0];
-    await user.click(within(card).getByText(/Dependency mapping/));
+    const cards = await screen.findAllByTestId("draft-recommendation");
+    expect(cards).toHaveLength(1);
+    expect(cards[0]).toHaveAttribute("data-rec-id", "kept");
+    expect(screen.queryByText("Passed over")).not.toBeInTheDocument();
+    // The badge counts what she is carrying forward, not the whole set.
+    expect(screen.getByTestId("count-recommendations")).toHaveTextContent("1");
+  });
 
-    // Lands on the comparison for that pair, with the clicked finding selected
-    // rather than the pair's first.
+  it("quotes the clause a bookmarked recommendation rests on", async () => {
+    resetRecommendations({
+      nextBatch: [makeRecommendation({ bookmarked: true })],
+      generatedAt: "2026-08-02T09:14:22Z",
+    });
+    await loadWorkspace();
+    const card = await screen.findByTestId("draft-recommendation");
+
+    await userEvent.click(within(card).getByTestId("tab-citations-toggle"));
+
+    expect(within(card).getByTestId("tab-citations")).toHaveTextContent(
+      /An AI should publish on its website a list of all TSPs/,
+    );
+    expect(within(card).getByTestId("tab-citations")).toHaveTextContent("4.2");
+  });
+
+  it("offers no way to write to the draft", async () => {
+    // The story's defining constraint: everything that reaches the page arrives
+    // through the Copilot conversation, where it is reviewed.
+    resetRecommendations({
+      nextBatch: [makeRecommendation({ bookmarked: true })],
+      generatedAt: "2026-08-02T09:14:22Z",
+    });
+    await loadWorkspace();
+    const card = await screen.findByTestId("draft-recommendation");
+
     expect(
-      await screen.findByRole("heading", {
-        name: /Operational Resilience PD — v0.3 ↔ BCBS OpRes 2021/,
-      }),
-    ).toBeInTheDocument();
-    const active = screen
-      .getAllByTestId("finding-card")
-      .find((c) => c.getAttribute("data-active") === "true");
-    expect(active).toHaveTextContent(/Dependency mapping/);
+      within(card).queryByRole("button", { name: /draft this|insert|add to draft/i }),
+    ).not.toBeInTheDocument();
   });
 
-  it("renders an inline callout beside the accepted clause, colour-coded", async () => {
-    const user = userEvent.setup();
-    await acceptOnReviewScreen(user);
+  it("unbookmarks from beside the draft", async () => {
+    resetRecommendations({
+      nextBatch: [makeRecommendation({ id: "kept", bookmarked: true })],
+      generatedAt: "2026-08-02T09:14:22Z",
+    });
+    await loadWorkspace();
+    const card = await screen.findByTestId("draft-recommendation");
+
+    await userEvent.click(within(card).getByTestId("unbookmark"));
+
+    await waitFor(() =>
+      expect(screen.getByTestId("tab-none-bookmarked")).toBeInTheDocument(),
+    );
+  });
+
+  it("reports the accepted findings no recommendation drew on", async () => {
+    resetRecommendations({
+      nextBatch: [makeRecommendation({ bookmarked: true })],
+      generatedAt: "2026-08-02T09:14:22Z",
+      acceptedCount: 30,
+      unreflected: [
+        {
+          finding_id: "f-uncited-1",
+          edge_id: "e-bis_papers_168--ed_open_finance_2025",
+          label: "differs-on",
+          sentiment: "tighten",
+          summary: "A fixed rollout date where BIS observes flexibility.",
+          left: { id: "bis-papers-168", title: "BIS Papers 168" },
+          right: { id: "ed-open-finance-2025", title: "ED Open Finance 2025" },
+          source_clause_number: "3.1",
+          source_clause_text: "Jurisdictions may adopt a facilitative approach.",
+          target_clause_number: "14.2",
+          target_clause_text: "Phase one obligations take effect 1 January 2027.",
+        },
+      ],
+    });
     await loadWorkspace();
 
-    const callout = await screen.findByTestId("inline-callout");
-    expect(callout).toHaveAttribute("data-label", "aligns-with");
-    expect(callout).toHaveAttribute("data-clause", "4.4");
-    expect(callout.className).toContain("border-emerald-400");
+    const note = await screen.findByTestId("tab-not-yet-reflected");
+    // Measured against every generated recommendation, so the figure means the
+    // same thing here as on the task screen.
+    expect(note).toHaveAttribute("data-count", "1");
+    expect(note).toHaveTextContent(/1 of 30 accepted findings/);
   });
 });
 
-describe("DraftingWorkspacePage — the neighbourhood widening", () => {
-  /** Accept a finding on an edge that does NOT touch the task node. Before the
-   *  widening this acceptance was recorded and then invisible in the workspace —
-   *  the defect the epic exists to fix. `opres-v2` has no anchor↔anchor edges, so
-   *  the second task node's edge is the available second-order case. */
-  async function acceptOnASecondOrderEdge(
-    user: ReturnType<typeof userEvent.setup>,
-  ) {
-    renderApp(`/workstreams/opres-v2/edges/${HKMA_EDGE}/review`);
-    const card = (await screen.findAllByTestId("finding-card"))[0];
-    await user.click(within(card).getByRole("button", { name: "Accept" }));
-    await waitFor(() =>
-      expect(screen.getByTestId("count-accepted")).toHaveTextContent(
-        "1 accepted",
-      ),
-    );
-    cleanup();
-  }
+describe("DraftingWorkspacePage — Playbook tab", () => {
+  beforeEach(() => resetRecommendations());
 
-  it("lists an acceptance made on a pair the draft is not part of", async () => {
-    const user = userEvent.setup();
-    await acceptOnASecondOrderEdge(user);
+  it("offers one section per Copilot stage, in flow order", async () => {
     await loadWorkspace();
+    await userEvent.click(screen.getByRole("tab", { name: /Playbook/ }));
 
-    const cards = await screen.findAllByTestId("linkage-ref-card");
-    expect(cards).toHaveLength(1);
-    expect(cards[0]).toHaveAttribute("data-edge-id", HKMA_EDGE);
-    expect(screen.getByTestId("count-reviewed")).toHaveTextContent("1");
+    const sections = await screen.findAllByTestId("playbook-section");
+    expect(sections.map((s) => s.getAttribute("data-stage"))).toEqual([
+      "/explore-task",
+      "/brainstorm",
+      "/draft",
+      "/write",
+      "/deliver",
+    ]);
   });
 
-  it("names both documents on every card", async () => {
-    const user = userEvent.setup();
-    await acceptOnASecondOrderEdge(user);
+  it("locks the explore-task stage with no editable control at all", async () => {
     await loadWorkspace();
+    await userEvent.click(screen.getByRole("tab", { name: /Playbook/ }));
+    await screen.findAllByTestId("playbook-section");
 
-    const card = (await screen.findAllByTestId("linkage-ref-card"))[0];
-    // Cards now arrive from across the neighbourhood, so a single title would
-    // leave the drafter unable to tell one pair's finding from another's.
-    expect(card).toHaveTextContent("Operational Resilience PD — v0.3");
-    expect(card).toHaveTextContent("HKMA SPM OR-2");
-  });
-});
+    const locked = screen
+      .getAllByTestId("playbook-section")
+      .find((s) => s.getAttribute("data-stage") === "/explore-task")!;
 
-describe("DraftingWorkspacePage — withdrawing an acceptance", () => {
-  it("removes the card, decrements the badge, and returns it to the box", async () => {
-    const user = userEvent.setup();
-    await acceptOnReviewScreen(user);
-    await loadWorkspace();
-
-    const card = (await screen.findAllByTestId("linkage-ref-card"))[0];
-    expect(screen.getByTestId("count-reviewed")).toHaveTextContent("1");
-
-    await user.click(within(card).getByRole("button", { name: /Withdraw/ }));
-
-    await waitFor(() =>
-      expect(screen.queryByTestId("linkage-ref-card")).not.toBeInTheDocument(),
-    );
-    expect(screen.getByTestId("count-reviewed")).toHaveTextContent("0");
-
-    // Back to pending on the task page — one decision, everywhere.
-    cleanup();
-    renderApp("/workstreams/opres-v2/tasks/opres-pd-v0-3");
-    await screen.findAllByTestId("finding-group");
-    const onTaskPage = screen
-      .getAllByTestId("finding-card")
-      .find((c) => c.dataset.edgeId === BCBS_EDGE);
-    expect(onTaskPage).toHaveAttribute("data-review-state", "pending");
-  });
-
-  it("offers no accept or dismiss control — withdrawal only", async () => {
-    const user = userEvent.setup();
-    await acceptOnReviewScreen(user);
-    await loadWorkspace();
-
-    const panel = screen.getByLabelText("Reviewed linkages");
+    // Not a DISABLED textarea — none at all. A disabled field still reads as
+    // something that might one day be filled in.
+    expect(within(locked).queryByRole("textbox")).not.toBeInTheDocument();
+    expect(within(locked).getByTestId("explore-task-locked")).toBeInTheDocument();
     expect(
-      within(panel).getByRole("button", { name: /Withdraw/ }),
+      within(locked).getByRole("link", { name: /regulatory profile/i }),
     ).toBeInTheDocument();
-    expect(within(panel).queryByRole("button", { name: /^Accept/ })).toBeNull();
-    expect(
-      within(panel).queryByRole("button", { name: /^Dismiss/ }),
-    ).toBeNull();
+  });
+
+  it("only enables Save once a section is edited", async () => {
+    await loadWorkspace();
+    await userEvent.click(screen.getByRole("tab", { name: /Playbook/ }));
+    await screen.findAllByTestId("playbook-section");
+
+    expect(screen.getByTestId("playbook-save")).toBeDisabled();
+
+    const write = screen
+      .getAllByTestId("playbook-input")
+      .find((el) => el.getAttribute("data-section") === "write")!;
+    await userEvent.type(write, "Obligations read must.");
+
+    expect(screen.getByTestId("playbook-save")).toBeEnabled();
+  });
+
+  it("saves what the drafter typed and keeps it", async () => {
+    await loadWorkspace();
+    await userEvent.click(screen.getByRole("tab", { name: /Playbook/ }));
+    await screen.findAllByTestId("playbook-section");
+    const write = screen
+      .getAllByTestId("playbook-input")
+      .find((el) => el.getAttribute("data-section") === "write")!;
+
+    await userEvent.type(write, "Guidance reads should.");
+    await userEvent.click(screen.getByTestId("playbook-save"));
+
+    await waitFor(() =>
+      expect(screen.getByTestId("playbook-save")).toBeDisabled(),
+    );
+    expect(write).toHaveValue("Guidance reads should.");
+  });
+
+  it("shows the template picker on /draft and says it does nothing", async () => {
+    await loadWorkspace();
+    await userEvent.click(screen.getByRole("tab", { name: /Playbook/ }));
+    await screen.findAllByTestId("playbook-section");
+
+    const draftSection = screen
+      .getAllByTestId("playbook-section")
+      .find((s) => s.getAttribute("data-stage") === "/draft")!;
+    expect(within(draftSection).getByTestId("playbook-upload")).toBeInTheDocument();
+
+    // Deliberately inert — selecting a file must not upload or store anything.
+    const input = within(draftSection).getByTestId("playbook-upload-input");
+    await userEvent.upload(
+      input as HTMLInputElement,
+      new File(["x"], "house-template.docx"),
+    );
+
+    expect(within(draftSection).getByTestId("playbook-upload-note")).toHaveTextContent(
+      /not wired up in this build/i,
+    );
   });
 });
 
@@ -721,7 +783,7 @@ describe("DraftingWorkspacePage — tab switching", () => {
     const before = screen.getByTestId("draft-surface");
 
     await user.click(screen.getByRole("tab", { name: /Copilot/ }));
-    await user.click(screen.getByRole("tab", { name: /Reviewed/ }));
+    await user.click(screen.getByRole("tab", { name: /Recommendations/ }));
 
     expect(screen.getByTestId("draft-surface")).toBe(before);
     expect(screen.getByTestId("draft-surface")).toHaveTextContent(
@@ -738,7 +800,7 @@ describe("DraftingWorkspacePage — tab switching", () => {
     await user.click(screen.getByRole("button", { name: "Explore Task" }));
     await screen.findByTestId("command-step", undefined, THINKING_WAIT);
 
-    await user.click(screen.getByRole("tab", { name: /Reviewed/ }));
+    await user.click(screen.getByRole("tab", { name: /Playbook/ }));
     await user.click(screen.getByRole("tab", { name: /Copilot/ }));
 
     // The conversation is intact — not reset to the welcome screen.
@@ -752,5 +814,79 @@ describe("DraftingWorkspacePage — wrong node type", () => {
     renderApp("/workstreams/opres-v2/tasks/bcbs-opres-2021/draft");
     expect(await screen.findByText(/is not a task/i)).toBeInTheDocument();
     expect(screen.queryByTestId("draft-surface")).not.toBeInTheDocument();
+  });
+});
+
+describe("DraftingWorkspacePage — a configured stage names its section", () => {
+  beforeEach(() => resetRecommendations());
+
+  /** Walk the gated flow far enough to unlock /brainstorm: run /explore-task and
+   *  submit the missing-fields form it raises. */
+  async function reachBrainstorm(user: ReturnType<typeof userEvent.setup>) {
+    await user.click(screen.getByRole("tab", { name: /Copilot/ }));
+    await screen.findByTestId("copilot-chat");
+    await user.click(screen.getByRole("button", { name: "Explore Task" }));
+
+    const form = await screen.findByTestId(
+      "missing-fields-form",
+      undefined,
+      THINKING_WAIT,
+    );
+    for (const field of MISSING_FIELDS) {
+      await user.type(
+        within(form).getByLabelText(field.label),
+        `Test value for ${field.key}`,
+      );
+    }
+    await user.click(within(form).getByRole("button", { name: "Submit" }));
+
+    const chip = await screen.findByRole(
+      "button",
+      { name: "Run /brainstorm" },
+      THINKING_WAIT,
+    );
+    await user.click(chip);
+  }
+
+  it("names the /brainstorm section when it runs, and only that section", async () => {
+    // The five stages are a scripted demo, so a configured stage cannot literally
+    // obey the instruction — it names it, which is the honest observable
+    // behaviour here. The live path is the engine's system-prompt injection,
+    // covered by engine/tests/test_api_playbook.py.
+    resetRecommendations({
+      playbook: {
+        brainstorm: "Should consent expiry differ for business customers?",
+        draft: "DRAFT_ONLY_MARKER",
+        write: "",
+        deliver: "",
+      },
+    });
+    const user = userEvent.setup();
+    await loadWorkspace();
+
+    await reachBrainstorm(user);
+
+    expect(
+      await screen.findByText(
+        /Following your Playbook for \/brainstorm/i,
+        undefined,
+        THINKING_WAIT,
+      ),
+    ).toHaveTextContent(/consent expiry differ for business customers/);
+    // /draft's section must not leak into /brainstorm.
+    expect(screen.queryByText(/DRAFT_ONLY_MARKER/)).not.toBeInTheDocument();
+  });
+
+  it("says nothing when the section is empty", async () => {
+    const user = userEvent.setup();
+    await loadWorkspace();
+
+    await reachBrainstorm(user);
+
+    // An unconfigured stage behaves exactly as it did before playbooks existed —
+    // no acknowledgement, no warning.
+    expect(
+      screen.queryByText(/Following your Playbook/i),
+    ).not.toBeInTheDocument();
   });
 });

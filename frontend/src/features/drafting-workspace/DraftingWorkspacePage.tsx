@@ -1,34 +1,39 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchDraft,
+  fetchPlaybook,
+  fetchRecommendations,
   fetchReviewedLinkages,
   fetchTask,
   saveDraft,
-  setReviewState,
 } from "@/lib/api";
 import { bySeverity } from "@/lib/labels";
-import type { LinkageCard } from "@/lib/types";
 import { EditorPane, type EditorPaneHandle } from "./EditorPane";
-import { LinkageRefCard } from "./LinkageRefCard";
 import { CopilotTab } from "./CopilotTab";
+import { PlaybookTab } from "./PlaybookTab";
+import { RecommendationsTab } from "./RecommendationsTab";
 
-/** Two tabs. "Related · 1 hop" was retired with the Pairwise Findings epic: the
- *  box on the task page covers the same peer material more completely and with
- *  review state attached, where Related showed unjudged findings beside the draft
- *  as though the drafter had endorsed them. The vacated slot stays EMPTY rather
- *  than holding a disabled placeholder for the future Recommendations tab. */
-type TabKey = "reviewed" | "copilot";
+/** Three tabs: Recommendations, Playbook, Copilot — in that order.
+ *
+ *  "Related · 1 hop" went with the Pairwise Findings epic. **Reviewed went on
+ *  1 Aug 2026**, replaced by Playbook: it duplicated the task screen, and every
+ *  accepted finding that matters to drafting is now either cited by a
+ *  recommendation (quoted in full) or named in that card's not-yet-reflected
+ *  section.
+ *
+ *  The engine's reviewed-linkages route is NOT retired with the tab — it still
+ *  serves this page's `reviewed` query, and server-side it is the recommendation
+ *  engine's evidence input. */
+type TabKey = "recommendations" | "playbook" | "copilot";
 
 const SAVE_DEBOUNCE_MS = 2000;
 
 export function DraftingWorkspacePage() {
   const { workstreamId = "", nodeId = "" } = useParams();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [tab, setTab] = useState<TabKey>("reviewed");
-  const [activeCardId, setActiveCardId] = useState<string | null>(null);
+  const [tab, setTab] = useState<TabKey>("recommendations");
   const editorRef = useRef<EditorPaneHandle>(null);
 
   const task = useQuery({
@@ -43,56 +48,17 @@ export function DraftingWorkspacePage() {
     queryKey: ["reviewed-linkages", workstreamId, nodeId],
     queryFn: () => fetchReviewedLinkages(workstreamId, nodeId),
   });
-
-  const [withdrawErrors, setWithdrawErrors] = useState<Record<string, string>>(
-    {},
-  );
-
-  // Withdrawal is the tab's ONLY state transition (accepted → pending), so a
-  // change of mind mid-draft does not send the drafter back to the task page.
-  // Optimistic: the card leaves the list at once and the badge decrements.
-  const withdraw = useMutation({
-    mutationFn: (card: LinkageCard) =>
-      setReviewState(workstreamId, card.edge_id, card.id, "pending"),
-    onMutate: async (card) => {
-      setWithdrawErrors((prev) => {
-        const { [card.id]: _dropped, ...rest } = prev;
-        return rest;
-      });
-      const key = ["reviewed-linkages", workstreamId, nodeId];
-      await queryClient.cancelQueries({ queryKey: key });
-      const previous = queryClient.getQueryData<{ findings: LinkageCard[] }>(
-        key,
-      );
-      queryClient.setQueryData<{ findings: LinkageCard[] }>(key, (old) =>
-        old
-          ? { ...old, findings: old.findings.filter((f) => f.id !== card.id) }
-          : old,
-      );
-      return { previous };
-    },
-    onError: (_err, card, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(
-          ["reviewed-linkages", workstreamId, nodeId],
-          context.previous,
-        );
-      }
-      setWithdrawErrors((prev) => ({
-        ...prev,
-        [card.id]: "Could not withdraw that decision. Try again.",
-      }));
-    },
-    onSuccess: (_data, card) => {
-      // The box and the comparison screen read the same review state — miss one
-      // and it shows a decision the drafter has already reversed.
-      queryClient.invalidateQueries({
-        queryKey: ["pairwise-findings", workstreamId, nodeId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["review", workstreamId, card.edge_id],
-      });
-    },
+  // Shared with the task screen's Recommendations card — same key, so the tab
+  // badge and the card can never disagree about what is bookmarked.
+  const recommendations = useQuery({
+    queryKey: ["recommendations", workstreamId, nodeId],
+    queryFn: () => fetchRecommendations(workstreamId, nodeId),
+  });
+  // Shared with the Playbook tab's own query key, so editing a section there is
+  // reflected in what the scripted Copilot stages announce.
+  const playbookQuery = useQuery({
+    queryKey: ["playbook", workstreamId],
+    queryFn: () => fetchPlaybook(workstreamId),
   });
 
   // The draft the editor is showing. Seeded from the server once loaded, then
@@ -153,8 +119,13 @@ export function DraftingWorkspacePage() {
   // construction — the engine filters — so review state is not a sort axis.
   const reviewedCards = bySeverity(reviewed.data?.findings ?? []);
 
+  // The count is the BOOKMARKED set — what she is taking forward — read from the
+  // same query the task screen writes to, so the badge cannot disagree with it.
+  const bookmarkedCount = recommendations.data?.counts.bookmarked ?? 0;
+
   const tabs: { key: TabKey; label: string; count: number | null }[] = [
-    { key: "reviewed", label: "Reviewed", count: reviewedCards.length },
+    { key: "recommendations", label: "Recommendations", count: bookmarkedCount },
+    { key: "playbook", label: "Playbook", count: null },
     { key: "copilot", label: "Copilot", count: null },
   ];
 
@@ -227,38 +198,15 @@ export function DraftingWorkspacePage() {
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto">
-            {tab === "reviewed" && (
-              <div className="space-y-2" aria-label="Reviewed linkages">
-                {reviewedCards.length === 0 ? (
-                  <p className="rounded-lg bg-muted/40 p-3 text-sm text-muted-foreground">
-                    No findings accepted yet. Accept linkages in the Pairwise
-                    findings box on the task page and they appear here, so the
-                    decisions you made surveying the landscape sit next to the
-                    draft.
-                  </p>
-                ) : (
-                  reviewedCards.map((c: LinkageCard) => (
-                    <LinkageRefCard
-                      key={c.id}
-                      card={c}
-                      isActive={activeCardId === c.id}
-                      onSelect={() => {
-                        setActiveCardId(c.id);
-                        // Deep-links to this finding, not the pair's first.
-                        navigate(
-                          `/workstreams/${workstreamId}/edges/${c.edge_id}/review` +
-                            `?finding=${encodeURIComponent(c.id)}`,
-                        );
-                      }}
-                      onWithdraw={() => withdraw.mutate(c)}
-                      isWithdrawing={
-                        withdraw.isPending && withdraw.variables?.id === c.id
-                      }
-                      errorMessage={withdrawErrors[c.id]}
-                    />
-                  ))
-                )}
-              </div>
+            {tab === "recommendations" && (
+              <RecommendationsTab
+                workstreamId={workstreamId}
+                nodeId={nodeId}
+              />
+            )}
+
+            {tab === "playbook" && (
+              <PlaybookTab workstreamId={workstreamId} nodeId={nodeId} />
             )}
 
             {/* Always mounted (like the editor pane) so its command transcript
@@ -272,6 +220,7 @@ export function DraftingWorkspacePage() {
                 onInsertSnippet={insertSnippet}
                 onReplaceDraft={replaceDraft}
                 reviewedCards={reviewedCards}
+                playbook={playbookQuery.data}
                 getDraftContext={() => ({
                   draftHtml: html ?? "",
                   selectionText: editorRef.current?.getSelectionText() ?? "",

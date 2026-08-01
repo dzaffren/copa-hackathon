@@ -14,6 +14,7 @@ import {
   isCommandUnlocked,
   type SlashCommandId,
 } from "./copilotV2Data";
+import type { PlaybookSections } from "@/lib/types";
 import type {
   ChatMsg,
   MentionRef,
@@ -102,9 +103,14 @@ function initialState(): ChatState {
 export function CopilotChat({
   onInsertSnippet,
   onReplaceDraft,
+  playbook,
 }: {
   onInsertSnippet: (html: string) => void;
   onReplaceDraft: (html: string) => void;
+  /** The drafter's per-stage instructions. Each scripted stage names its own
+   *  section before producing its canned output, so what she configured is
+   *  visibly in effect. `null` while the playbook is still loading. */
+  playbook?: PlaybookSections | null;
 }) {
   const [state, dispatch] = useReducer(reducer, undefined, initialState);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -121,6 +127,26 @@ export function CopilotChat({
   insertRef.current = onInsertSnippet;
   const replaceRef = useRef(onReplaceDraft);
   replaceRef.current = onReplaceDraft;
+  const playbookRef = useRef(playbook);
+  playbookRef.current = playbook;
+
+  /** Announce the section governing the stage about to run.
+   *
+   *  The five stages are a scripted demo (no live model — see this file's
+   *  docstring), so a configured stage cannot literally obey the instruction. It
+   *  CAN name it, which is the honest observable behaviour: the drafter sees that
+   *  what she wrote is in effect for this stage and no other. The live path is the
+   *  engine's system-prompt injection, covered by test_api_playbook.py.
+   */
+  function announcePlaybook(section: keyof PlaybookSections) {
+    const text = playbookRef.current?.[section]?.trim();
+    if (!text) return;
+    append({
+      id: nextId(),
+      kind: "text",
+      text: `Following your Playbook for /${section}: ${text}`,
+    });
+  }
 
   function later(fn: () => void, ms: number) {
     const t = setTimeout(fn, ms);
@@ -181,6 +207,7 @@ export function CopilotChat({
   }
 
   function runBrainstorm() {
+    announcePlaybook("brainstorm");
     const cmdId = nextId();
     brainstormCmdId.current = cmdId;
     append({
@@ -229,6 +256,7 @@ export function CopilotChat({
   }
 
   function runDraftOutline() {
+    announcePlaybook("draft");
     replaceRef.current(buildDraftOutline());
     dispatch({ type: "complete-step", id: "/draft" });
     append({
@@ -248,6 +276,7 @@ export function CopilotChat({
   }
 
   function runWrite() {
+    announcePlaybook("write");
     const cmdId = nextId();
     append({
       id: cmdId,
@@ -283,6 +312,7 @@ export function CopilotChat({
   }
 
   function runDeliver() {
+    announcePlaybook("deliver");
     const cmdId = nextId();
     deliverCmdId.current = cmdId;
     append({
