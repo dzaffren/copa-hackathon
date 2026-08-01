@@ -48,3 +48,7 @@ data/obsidian_vault/
 # not scripts/experiments/ which holds the tracked runner scripts.
 /experiments/
 archive
+
+# /build orchestrator state (never commit)
+.build-state.json
+BLOCKED.md
