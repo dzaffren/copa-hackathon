@@ -23,10 +23,43 @@ _TASK = "opres-pd-v0-3"
 _ANCHOR = "bcbs-opres-2021"  # a real node, but not a task
 _BCBS_EDGE = "e-opres_v0_3--bcbs_opres_2021"
 
+def _scrub_demo_state(workstreams_dir) -> None:
+    """Reset the copied fixture to a pristine review state.
+
+    The demo workstream is BUILD-AND-PERSIST (see CLAUDE.md): its committed
+    findings carry real `review_state` values and it ships a generated
+    `recommendations/` set, so the demo needs no model call on the day. That is
+    deliberate data, not test scaffolding — but it means a test asserting "an
+    untouched fixture" is really asserting "whatever the demo happens to hold
+    today", which breaks the moment a drafter accepts one more finding.
+
+    So every test here starts from an explicitly pristine copy and creates the
+    acceptances it needs. Scrubbing the tmp copy only; the tracked fixture is
+    never touched.
+    """
+    for path in (workstreams_dir).rglob("findings/*.json"):
+        findings_list = json.loads(path.read_text(encoding="utf-8"))
+        changed = False
+        for finding in findings_list:
+            if finding.pop("review_state", None) is not None:
+                changed = True
+        if changed:
+            path.write_text(
+                json.dumps(findings_list, indent=2, ensure_ascii=False),
+                encoding="utf-8",
+            )
+    for path in (workstreams_dir).rglob("recommendations/*.json"):
+        path.unlink()
+    # Guardrails too: a saved set replaces the shipped defaults, so a leftover
+    # would silently change what the generation prompt contains.
+    for path in (workstreams_dir).glob("*/guardrails.json"):
+        path.unlink()
+
 
 def _make_client(tmp_path):
     dst = tmp_path / "workstreams"
     shutil.copytree(REPO_ROOT / "data" / "workstreams", dst)
+    _scrub_demo_state(dst)
     return TestClient(create_app(workstreams_dir=dst)), dst
 
 

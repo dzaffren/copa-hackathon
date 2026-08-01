@@ -33,7 +33,7 @@ from pathlib import Path
 from typing import Any, Optional, Union
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
 from engine.anchors import AnchorIndex, segment
 from engine.arm_g import extract_axes_for_document as _default_extract_axes
@@ -41,6 +41,9 @@ from engine.arm_g import run_arm_g as _run_arm_g
 from engine.clauses import load_clause_index
 from engine.connections import CONNECTION_LABELS
 from engine.connections import find_connections as _default_find_connections
+from engine.recommendations import (
+    generate_recommendations as _default_generate_recommendations,
+)
 from engine.ingest import (
     UnreadableDocumentError,
     ingest_document,
@@ -50,12 +53,15 @@ from engine.copilot import copilot_reply as _default_copilot_reply
 from engine.copilot import copilot_reply_stream as _default_copilot_reply_stream
 from engine.config import REPO_ROOT
 from engine import (
-    concepts,
     cross_intel,
     directory,
     drafts,
     findings,
+    guardrails,
     linkage_review,
+    node_metadata,
+    playbook,
+    recommendations,
     tasks,
     workstreams,
     ws_anchors,
@@ -196,12 +202,12 @@ def _cross_intel_block(
     side's concept metadata (absent → empty, so a signal simply does not fire).
     """
     near_concepts = (
-        concepts.load_concepts(workstreams_dir, near_workstream_id, near_node_id)
+        node_metadata.load_metadata(workstreams_dir, near_workstream_id, near_node_id)
         if near_workstream_id
         else None
     ) or {}
     far_concepts = (
-        concepts.load_concepts(workstreams_dir, far_workstream_id, far_node_id)
+        node_metadata.load_metadata(workstreams_dir, far_workstream_id, far_node_id)
         if far_workstream_id
         else None
     ) or {}
@@ -223,7 +229,7 @@ def _cross_profile(
     profile (concept metadata), for the intelligence panel and comparison view.
     """
     node_concepts = (
-        concepts.load_concepts(workstreams_dir, workstream_id, node["id"])
+        node_metadata.load_metadata(workstreams_dir, workstream_id, node["id"])
         if workstream_id
         else None
     )
@@ -589,12 +595,14 @@ def _make_default_run_arm_g(
 def create_app(
     workstreams_dir: Union[str, Path] = WORKSTREAMS_DIR,
     artifacts_dir: Union[str, Path] = REPO_ROOT / "data" / "artifacts",
+    corpus_dir: Union[str, Path] = REPO_ROOT / "data" / "corpus",
     find_connections_fn: Any = _default_find_connections,
     run_arm_g_fn: Any = None,
     copilot_reply_fn: Any = _default_copilot_reply,
     copilot_stream_fn: Any = _default_copilot_reply_stream,
     converter: Any = None,
     extract_axes_fn: Any = _default_extract_axes,
+    generate_recommendations_fn: Any = _default_generate_recommendations,
 ) -> FastAPI:
     """Construct the Project SELARAS read API against injected dependencies.
 
@@ -606,6 +614,9 @@ def create_app(
         artifacts_dir: where the clause index (`engine.clauses.load_clause_index`)
             and the anchor index (`anchor-index.json`) are read from for live
             analysis. Defaults to `data/artifacts`.
+        corpus_dir: the root the `source-pdf` route resolves a node's
+            `source_pdf` against, and the only directory it will serve from — a
+            path escaping it is refused. Defaults to `data/corpus`.
         find_connections_fn: the LEGACY single-pass finder — `(doc_a_id,
             doc_b_id, clause_index) -> {"connections": [...], "unsupported":
             [...]}`. Retained as the rollback seam; the analyze route now calls
@@ -636,6 +647,15 @@ def create_app(
             `.convert(path) -> result`. Injectable so tests stub ingest with no
             network or Azure credentials; `None` lets `engine.ingest` build its
             default (Document Intelligence when configured, else MarkItDown).
+        generate_recommendations_fn: the single-pass model call behind the
+            `recommendations/generate` and `.../rewrite` routes —
+            `(*, dimensions, evidence, guardrails_body, pinned_titles,
+            draft_title) -> raw_text`. Returns the model's RAW text so a stub is
+            as thin as possible: parsing, the evidence floor, and persistence all
+            run for real above it. Injectable so tests inject a stub; no live
+            model call happens in CI. Defaults to
+            `engine.recommendations.generate_recommendations`. ONE seam serves
+            both generation and rewriting, so a test that stubs it covers both.
 
     Returns:
         A configured `FastAPI` app. No network, credentials, or build artifacts
@@ -656,6 +676,7 @@ def create_app(
 
     workstreams_dir = Path(workstreams_dir)
     artifacts_dir = Path(artifacts_dir)
+    corpus_dir = Path(corpus_dir)
     # An explicitly injected seam wins; otherwise the analyze route builds a
     # WORKSTREAM-BOUND adapter per call (it needs the workstream_id to find that
     # workstream's anchors and axis cache). `find_connections_fn` stays wired
@@ -1162,6 +1183,95 @@ def create_app(
             return _ws_error(400, exc.code, exc.message)
         return {"finding_id": finding_id, "review": record}
 
+    @app.get("/api/workstreams/{workstream_id}/playbook")
+    def get_playbook(workstream_id: str) -> Any:
+        """The drafter's per-stage instructions for the Copilot.
+
+        Returns four empty sections for a workstream that has never saved one,
+        **without creating a file** — so reading a retired fixture leaves it
+        byte-identical on disk. There is no `explore_task` key: that stage is
+        locked because its whole job is to report what the document's profile
+        records.
+        """
+        if workstreams.load_graph(workstreams_dir, workstream_id) is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        return playbook.load(workstreams_dir, workstream_id)
+
+    @app.put("/api/workstreams/{workstream_id}/playbook")
+    async def put_playbook(workstream_id: str, request: Request) -> Any:
+        """Replace the workstream's playbook with what the drafter wrote.
+
+        A FULL REPLACEMENT of the four editable sections: the form always sends
+        all four, so an omitted one lands empty. The 404 guard runs before any
+        write because `playbook_path` interpolates `workstream_id` into a
+        filesystem path.
+        """
+        if workstreams.load_graph(workstreams_dir, workstream_id) is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        try:
+            body = await request.json()
+        except Exception:  # unparseable — same class as a wrong shape
+            return _ws_error(
+                400, "INVALID_PLAYBOOK", "A playbook must be an object.", field=None
+            )
+        try:
+            return playbook.save(workstreams_dir, workstream_id, body)
+        except playbook.PlaybookValidationError as exc:
+            return _ws_error(exc.status, exc.code, exc.message, field=exc.field)
+
+    @app.get("/api/workstreams/{workstream_id}/guardrails")
+    def get_guardrails(workstream_id: str) -> Any:
+        """The rules the recommendations engine follows for this workstream.
+
+        Serves `engine.guardrails.DEFAULT_GUARDRAILS` when the workstream has
+        never saved any, **without creating a file** — so the box is populated on
+        day one and reading a retired fixture leaves it byte-identical on disk.
+        `is_default` distinguishes shipped content from a drafter's save, which
+        comparing the text could not: she may legitimately save the defaults
+        verbatim.
+        """
+        if workstreams.load_graph(workstreams_dir, workstream_id) is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        return guardrails.load(workstreams_dir, workstream_id)
+
+    @app.put("/api/workstreams/{workstream_id}/guardrails")
+    async def put_guardrails(workstream_id: str, request: Request) -> Any:
+        """Replace this workstream's guardrails with what the drafter wrote.
+
+        The 404 guard runs before any write, and for the same reason it does on
+        the metadata route: `guardrails_path` interpolates `workstream_id` into a
+        filesystem path, so resolving it against a loaded workstream first is
+        what stops a `../` escaping `data/workstreams/`.
+
+        An empty body is accepted deliberately — clearing the box is a real
+        decision, and silently reinstating the defaults would overrule it. The
+        interface says what an empty set of guardrails implies instead.
+        """
+        if workstreams.load_graph(workstreams_dir, workstream_id) is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        try:
+            body = await request.json()
+        except Exception:  # unparseable — same class of error as a wrong shape
+            return _ws_error(400, "INVALID_GUARDRAILS", "body must be a string.")
+        if not isinstance(body, dict) or not isinstance(body.get("body"), str):
+            return _ws_error(400, "INVALID_GUARDRAILS", "body must be a string.")
+        try:
+            return guardrails.save(workstreams_dir, workstream_id, body["body"])
+        except guardrails.GuardrailsTooLargeError:
+            return _ws_error(
+                413,
+                "GUARDRAILS_TOO_LARGE",
+                f"Guardrails hold at most {guardrails.MAX_GUARDRAILS_CHARS} characters.",
+            )
+
     @app.get("/api/workstreams/{workstream_id}/graph")
     def get_workstream_graph(workstream_id: str) -> Any:
         ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
@@ -1237,7 +1347,7 @@ def create_app(
             for nid in workstreams.neighbour_ids(edge_scope, node_id)
             if nid in all_by_id
         ]
-        node_concepts = concepts.load_concepts(workstreams_dir, workstream_id, node_id)
+        node_concepts = node_metadata.load_metadata(workstreams_dir, workstream_id, node_id)
         # Four ordered blocks: neighbours → recent activity → metadata → concepts.
         # `metadata` is the seven-field regulatory profile (formerly served under
         # `concepts`); `concepts` now carries the extracted axis pills. The two
@@ -1276,6 +1386,59 @@ def create_app(
                 "message": "N/A in demo",
             },
         }
+
+    def _source_pdf_path(node: dict[str, Any]) -> Optional[Path]:
+        """The node's published PDF on disk, or None if it has none to serve.
+
+        `source_pdf` is stored relative to `corpus_dir` and resolved against it.
+        Anything that escapes that root is treated as absent: the field is
+        fixture data today, but this route must not become a general file-read
+        primitive over the repo. The caller reports a missing file and an escape
+        identically, so the response never confirms what lies outside the corpus.
+        """
+        relative = node.get("source_pdf")
+        if not relative:
+            return None
+        root = corpus_dir.resolve()
+        candidate = (root / relative).resolve()
+        if not candidate.is_relative_to(root) or not candidate.is_file():
+            return None
+        return candidate
+
+    @app.get("/api/workstreams/{workstream_id}/nodes/{node_id}/source-pdf")
+    def get_node_source_pdf(workstream_id: str, node_id: str) -> Any:
+        """The document's published PDF, for checking a pane's clause text
+        against the source it was quoted from.
+
+        Served inline so the browser's own viewer renders it in a new tab rather
+        than downloading it. A working draft has no published PDF and so carries
+        no `source_pdf` — that is a 404, not an error state to render.
+        """
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        node = next((n for n in ws_graph.get("nodes", []) if n["id"] == node_id), None)
+        if node is None:
+            return _ws_error(
+                404,
+                "NODE_NOT_FOUND",
+                f"Node {node_id} not found in workstream {workstream_id}",
+            )
+        path = _source_pdf_path(node)
+        if path is None:
+            return _ws_error(
+                404,
+                "SOURCE_PDF_NOT_FOUND",
+                f"No source PDF is available for node {node_id}",
+            )
+        return FileResponse(
+            path,
+            media_type="application/pdf",
+            content_disposition_type="inline",
+            filename=path.name,
+        )
 
     @app.delete("/api/workstreams/{workstream_id}/nodes/{node_id}")
     def delete_workstream_node(workstream_id: str, node_id: str) -> Any:
@@ -1431,16 +1594,21 @@ def create_app(
     ) -> Any:
         """Record the drafter's own account of a document's regulatory identity.
 
-        A FULL REPLACEMENT of the nine-field profile, not a patch: the form
-        always sends all nine, and `save_concepts` writes the whole key set, so a
+        A FULL REPLACEMENT of the seven-field profile, not a patch: the form
+        always sends all seven, and `save_metadata` writes the whole key set, so a
         field the client omits lands as `null`. That makes a save exactly what the
         drafter saw on screen, with no stale value surviving underneath.
 
         The two 404 guards are the security boundary, not merely a courtesy:
-        `concepts_path` interpolates both ids into a filesystem path, so
+        `metadata_path` interpolates both ids into a filesystem path, so
         resolving them against the loaded graph first is what stops a `../` in
         `node_id` writing outside the workstream. Validation likewise runs before
         any write, so a rejected save leaves the side-file exactly as it was.
+
+        A save always lands in `metadata/`, even for a node whose profile is
+        currently read from the legacy `concepts/` path — see
+        `engine.node_metadata.legacy_metadata_path`. That is how a node moves
+        forward permanently, one save at a time, without a bulk migration.
         """
         ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
         if ws_graph is None:
@@ -1459,18 +1627,20 @@ def create_app(
             body = await request.json()
         except Exception:  # unparseable body — the same class of error as a non-object
             return _ws_error(400, "INVALID_METADATA", "Metadata must be an object.")
-        problem = concepts.validate_metadata(body)
+        problem = node_metadata.validate_metadata(body)
         if problem is not None:
             status, code, message, field = problem
             return _ws_error(status, code, message, field=field)
 
-        saved = concepts.normalise_metadata(body)
-        concepts.save_concepts(workstreams_dir, workstream_id, node_id, saved)
-        # Re-read rather than project what we sent: `save_concepts` owns the
-        # normalisation to all nine keys, and reading the file back is what makes
+        saved = node_metadata.normalise_metadata(body)
+        node_metadata.save_metadata(workstreams_dir, workstream_id, node_id, saved)
+        # Re-read rather than project what we sent: `save_metadata` owns the
+        # normalisation to all seven keys, and reading the file back is what makes
         # the response provably the stored profile — which is what lets the client
         # drop it straight into its node-detail cache.
-        stored = concepts.load_concepts(workstreams_dir, workstream_id, node_id) or {}
+        stored = (
+            node_metadata.load_metadata(workstreams_dir, workstream_id, node_id) or {}
+        )
         return {"node_id": node_id, "metadata": {"status": "available", **stored}}
 
     @app.get("/api/workstreams/{workstream_id}/edges/{edge_id}")
@@ -1890,12 +2060,25 @@ def create_app(
                 "FINDING_NOT_FOUND",
                 f"Finding {finding_id} not found on {edge_id}",
             )
+        # `has_source_pdf` tells each pane whether to offer its Source PDF
+        # button, saving the screen a probe per side. Added here rather than in
+        # `_review_node` because none of that helper's three other callers needs
+        # it — the Pairwise Findings and linkage-card paths render no such button.
+        def _pane_node(node_id: str) -> dict[str, Any]:
+            node = next(
+                (n for n in ws_graph.get("nodes", []) if n["id"] == node_id), {}
+            )
+            return {
+                **_review_node(ws_graph, node_id),
+                "has_source_pdf": _source_pdf_path(node) is not None,
+            }
+
         return {
             "edge": {
                 "id": edge_id,
                 "edge_type": edge.get("edge_type"),
-                "source_node": _review_node(ws_graph, edge["source"]),
-                "target_node": _review_node(ws_graph, edge["target"]),
+                "source_node": _pane_node(edge["source"]),
+                "target_node": _pane_node(edge["target"]),
             },
             "active_finding_id": finding_id,
             "source_clauses": _clause_pane(edge_findings, "source"),
@@ -1992,6 +2175,279 @@ def create_app(
                 target_clauses[0].get("clause_number") if target_clauses else None
             ),
         }
+
+    def _task_for_recommendations(
+        workstream_id: str, node_id: str
+    ) -> Union[tuple[dict[str, Any], dict[str, Any]], JSONResponse]:
+        """`(ws_graph, node)` for a recommendations route, or the error response.
+
+        Draws the same three-way distinction the Pairwise Findings box does —
+        workstream missing, node missing, node is not a task — because these
+        routes are reached from the same screen and "you clicked a node that
+        isn't there" and "you clicked a document, not a task" are different
+        mistakes that deserve different codes.
+        """
+        ws_graph = workstreams.load_graph(workstreams_dir, workstream_id)
+        if ws_graph is None:
+            return _ws_error(
+                404, "WORKSTREAM_NOT_FOUND", f"Workstream {workstream_id} not found"
+            )
+        node = next(
+            (n for n in ws_graph.get("nodes", []) if n["id"] == node_id), None
+        )
+        if node is None:
+            return _ws_error(
+                404,
+                "NODE_NOT_FOUND",
+                f"Node {node_id} not found in workstream {workstream_id}",
+            )
+        if node.get("node_type") != "task":
+            return _ws_error(
+                400,
+                "NOT_A_TASK",
+                f"Node {node_id} is of type {node.get('node_type')}, not task",
+            )
+        return ws_graph, node
+
+    @app.get("/api/workstreams/{workstream_id}/tasks/{node_id}/recommendations")
+    def get_recommendations(workstream_id: str, node_id: str) -> Any:
+        """The task's recommendations, plus what no recommendation drew on.
+
+        Never 404s on "not generated yet": an absent file returns an empty list
+        with `generated_at: null`, so the card's empty states are data rather than
+        error handling. `dimensions` is populated regardless, because the card
+        needs it to choose between "no policy requirements" and "nothing accepted
+        yet".
+
+        `not_yet_reflected` is DERIVED here, never stored — see
+        `recommendations.coverage` for why a persisted figure would drift.
+        """
+        resolved = _task_for_recommendations(workstream_id, node_id)
+        if isinstance(resolved, JSONResponse):
+            return resolved
+        ws_graph, _node = resolved
+
+        record = recommendations.load(workstreams_dir, workstream_id, node_id)
+        dimensions = recommendations.dimensions_for_task(
+            workstreams_dir, workstream_id, node_id
+        )
+        evidence = recommendations.collect_evidence(
+            workstreams_dir, workstream_id, node_id, ws_graph
+        )
+        unreflected = recommendations.coverage(record, evidence)
+        cards = record.get("recommendations", [])
+        return {
+            "generated_at": record.get("generated_at"),
+            "dimensions": dimensions,
+            "accepted_count": len(evidence),
+            "recommendations": cards,
+            "not_yet_reflected": unreflected,
+            "counts": {
+                "total": len(cards),
+                "bookmarked": sum(1 for c in cards if c.get("bookmarked")),
+                "cited_findings": len(evidence) - len(unreflected),
+                "not_yet_reflected": len(unreflected),
+            },
+        }
+
+    @app.post(
+        "/api/workstreams/{workstream_id}/tasks/{node_id}/recommendations/generate",
+        status_code=201,
+    )
+    def post_generate_recommendations(workstream_id: str, node_id: str) -> Any:
+        """Generate a fresh set from the task's accepted findings.
+
+        Both 409 gates fire before the model seam is called — a gate that spends
+        a model call to discover it is closed is not a gate. A failed or
+        malformed model response leaves the previous set byte-identical, because
+        nothing is written until parsing and the evidence floor have both passed.
+        """
+        resolved = _task_for_recommendations(workstream_id, node_id)
+        if isinstance(resolved, JSONResponse):
+            return resolved
+        ws_graph, node = resolved
+
+        try:
+            result = recommendations.generate(
+                workstreams_dir,
+                workstream_id,
+                node_id,
+                ws_graph,
+                generate_fn=generate_recommendations_fn,
+                draft_title=node.get("title"),
+            )
+        except recommendations.RecommendationsError as exc:
+            # The two gates are 409 (the workstream is not in a state where this
+            # can run); a model or parse failure is 502 (the request was fine,
+            # the upstream was not).
+            status = (
+                409
+                if exc.code in {"NO_POLICY_REQUIREMENTS", "NO_ACCEPTED_FINDINGS"}
+                else 502
+            )
+            return _ws_error(status, exc.code, exc.message)
+        except Exception as exc:  # live model / creds / network failure
+            return _ws_error(
+                502,
+                "RECOMMENDATIONS_FAILED",
+                f"Could not generate recommendations: {exc}",
+            )
+
+        evidence = recommendations.collect_evidence(
+            workstreams_dir, workstream_id, node_id, ws_graph
+        )
+        unreflected = recommendations.coverage(result, evidence)
+        cards = result.get("recommendations", [])
+        return {
+            "generated_at": result.get("generated_at"),
+            "dimensions": result.get("dimensions_used", []),
+            "accepted_count": len(evidence),
+            "recommendations": cards,
+            "not_yet_reflected": unreflected,
+            "dropped_unsupported": result.get("dropped_unsupported", 0),
+            "counts": {
+                "total": len(cards),
+                "bookmarked": sum(1 for c in cards if c.get("bookmarked")),
+                "cited_findings": len(evidence) - len(unreflected),
+                "not_yet_reflected": len(unreflected),
+            },
+        }
+
+    @app.patch(
+        "/api/workstreams/{workstream_id}/tasks/{node_id}/recommendations/{rec_id}"
+    )
+    async def patch_recommendation(
+        workstream_id: str, node_id: str, rec_id: str, request: Request
+    ) -> Any:
+        """Update one recommendation. Currently `bookmarked` only.
+
+        A bookmark is the drafter taking a recommendation forward, and the reason
+        regeneration is safe: bookmarked entries survive it byte-for-byte. No
+        model call — this is a single-field filesystem write.
+
+        Idempotent: setting the same value twice is a success both times. There is
+        no "already bookmarked" error, because her intent is the same either way.
+        """
+        resolved = _task_for_recommendations(workstream_id, node_id)
+        if isinstance(resolved, JSONResponse):
+            return resolved
+
+        try:
+            body = await request.json()
+        except Exception:  # unparseable — same class as a wrong shape
+            body = None
+        if not isinstance(body, dict) or (
+            "bookmarked" not in body and "comment" not in body
+        ):
+            return _ws_error(
+                400, "INVALID_PATCH", "bookmarked must be a boolean."
+            )
+
+        updated: Optional[dict[str, Any]] = None
+        try:
+            if "bookmarked" in body:
+                bookmarked = body["bookmarked"]
+                # `isinstance(True, int)` is True in Python, so bool must be
+                # checked before any numeric coercion would silently accept 1/0.
+                if not isinstance(bookmarked, bool):
+                    return _ws_error(
+                        400, "INVALID_PATCH", "bookmarked must be a boolean."
+                    )
+                updated = recommendations.set_bookmarked(
+                    workstreams_dir, workstream_id, node_id, rec_id, bookmarked
+                )
+
+            if "comment" in body:
+                comment = body["comment"]
+                if not isinstance(comment, str):
+                    return _ws_error(
+                        400, "INVALID_PATCH", "comment must be a string."
+                    )
+                # The author is resolved server-side from the directory, never
+                # taken from the body — a client must not be able to claim a name.
+                # `directory.owner()` is the same resolver workstream creation
+                # uses, so a comment is attributed exactly as a draft is owned.
+                updated = recommendations.add_comment(
+                    workstreams_dir,
+                    workstream_id,
+                    node_id,
+                    rec_id,
+                    comment,
+                    directory.owner(),
+                )
+        except FileNotFoundError:
+            return _ws_error(
+                404,
+                "RECOMMENDATIONS_NOT_GENERATED",
+                "No recommendations have been generated for this task.",
+            )
+        except recommendations.RecommendationNotFoundError:
+            return _ws_error(
+                404,
+                "RECOMMENDATION_NOT_FOUND",
+                f"No recommendation {rec_id} on this task.",
+            )
+        except recommendations.EmptyCommentError:
+            return _ws_error(400, "EMPTY_COMMENT", "A comment cannot be empty.")
+        except recommendations.CommentTooLargeError:
+            return _ws_error(
+                413,
+                "COMMENT_TOO_LARGE",
+                f"A comment holds at most {recommendations.MAX_COMMENT_CHARS} "
+                "characters.",
+            )
+        return updated
+
+    @app.post(
+        "/api/workstreams/{workstream_id}/tasks/{node_id}"
+        "/recommendations/{rec_id}/rewrite"
+    )
+    def post_rewrite_recommendation(
+        workstream_id: str, node_id: str, rec_id: str
+    ) -> Any:
+        """Rewrite ONE recommendation from the drafter's comments on it.
+
+        Keeps its id, bookmark, dimensions and comments, and appends the
+        superseded text to `revisions` so the change is auditable. The evidence
+        floor applies: a rewrite that resolves no citations is refused and the
+        original kept — a rewrite may never launder a card past the citation rule.
+
+        Touches no other recommendation in the set.
+        """
+        resolved = _task_for_recommendations(workstream_id, node_id)
+        if isinstance(resolved, JSONResponse):
+            return resolved
+        ws_graph, _node = resolved
+
+        try:
+            return recommendations.rewrite_one(
+                workstreams_dir,
+                workstream_id,
+                node_id,
+                rec_id,
+                ws_graph,
+                generate_fn=generate_recommendations_fn,
+            )
+        except FileNotFoundError:
+            return _ws_error(
+                404,
+                "RECOMMENDATIONS_NOT_GENERATED",
+                "No recommendations have been generated for this task.",
+            )
+        except recommendations.RecommendationNotFoundError:
+            return _ws_error(
+                404,
+                "RECOMMENDATION_NOT_FOUND",
+                f"No recommendation {rec_id} on this task.",
+            )
+        except recommendations.RecommendationsError as exc:
+            return _ws_error(502, exc.code, exc.message)
+        except Exception as exc:  # live model / creds / network failure
+            return _ws_error(
+                502,
+                "REWRITE_FAILED",
+                f"The rewrite could not be completed: {exc}",
+            )
 
     @app.get("/api/workstreams/{workstream_id}/tasks/{node_id}/pairwise-findings")
     def get_pairwise_findings(workstream_id: str, node_id: str) -> Any:
@@ -2266,6 +2722,9 @@ def create_app(
                 clause_index=clause_index,
                 workstreams_dir=workstreams_dir,
                 workstream_id=workstream_id,
+                playbook_section=playbook.section_for_stage(
+                    workstreams_dir, workstream_id, body.get("stage")
+                ),
                 **fields,
             )
         except Exception as exc:  # live model / creds / network failure
@@ -2301,6 +2760,9 @@ def create_app(
             clause_index=clause_index,
             workstreams_dir=workstreams_dir,
             workstream_id=workstream_id,
+            playbook_section=playbook.section_for_stage(
+                workstreams_dir, workstream_id, body.get("stage")
+            ),
             **fields,
         )
         return StreamingResponse(sse_generator, media_type="text/event-stream")

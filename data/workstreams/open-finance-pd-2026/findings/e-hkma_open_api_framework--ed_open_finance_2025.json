@@ -60,7 +60,7 @@
     "scope_note": null,
     "supported": true,
     "id": "4e88fb130c39",
-    "review_state": "pending"
+    "review_state": "accepted"
   },
   {
     "summary": "Both treat customer data protection and compliance with data privacy laws as core to data sharing.",
@@ -81,7 +81,7 @@
     "scope_note": null,
     "supported": true,
     "id": "89d0e2fa62b7",
-    "review_state": "pending"
+    "review_state": "accepted"
   },
   {
     "summary": "Both set API requirements: the HKMA framework specifies core-banking Open API functions; the draft requires meeting platform API specifications.",
@@ -102,7 +102,7 @@
     "scope_note": null,
     "supported": true,
     "id": "d3dbf0eadd46",
-    "review_state": "pending"
+    "review_state": "accepted"
   },
   {
     "summary": "Both cover the infrastructure and procedures enabling data sharing: HKMA facilitation measures and the draft's platform requirements.",
@@ -123,7 +123,7 @@
     "scope_note": null,
     "supported": true,
     "id": "f0daf4cf8bdf",
-    "review_state": "pending"
+    "review_state": "accepted"
   },
   {
     "summary": "Both draw on existing international and industry practices for their API and technology requirements.",
@@ -144,7 +144,7 @@
     "scope_note": null,
     "supported": true,
     "id": "34f5ae920494",
-    "review_state": "pending"
+    "review_state": "accepted"
   },
   {
     "summary": "Both documents highlight the benefits of API-driven data sharing frameworks for customers and the financial industry.",
@@ -189,8 +189,7 @@
     ],
     "scope_note": null,
     "supported": true,
-    "id": "5ad471400b8f",
-    "review_state": "pending"
+    "id": "5ad471400b8f"
   },
   {
     "summary": "The HKMA framework lets banks advance their own rollout timeline; the draft sets a firm mandatory commencement date.",
@@ -215,7 +214,7 @@
     "scope_note": null,
     "supported": true,
     "id": "48ecad951c6b",
-    "review_state": "pending"
+    "review_state": "accepted"
   },
   {
     "summary": "Both address governance and technology operations management for third-party participation in data sharing.",
@@ -450,7 +449,7 @@
     "scope_note": null,
     "supported": true,
     "id": "fb51977fb576",
-    "review_state": "pending"
+    "review_state": "accepted"
   },
   {
     "summary": "Both require governing and managing third-party providers, including due diligence and risk-based oversight.",
@@ -500,7 +499,7 @@
     "scope_note": null,
     "supported": true,
     "id": "a9193fe14fb4",
-    "review_state": "pending"
+    "review_state": "accepted"
   },
   {
     "summary": "The HKMA framework has no fixed mandatory timeline for Open API rollout; the draft mandates specific commencement dates.",
@@ -718,7 +717,7 @@
     "scope_note": null,
     "supported": true,
     "id": "c7186e52e4d5",
-    "review_state": "pending"
+    "review_state": "accepted"
   },
   {
     "summary": "Both set security requirements, but HKMA varies protections by API category while the draft applies cyber and API controls uniformly.",
@@ -739,7 +738,7 @@
     "scope_note": null,
     "supported": true,
     "id": "af5afcf67c55",
-    "review_state": "pending"
+    "review_state": "accepted"
   },
   {
     "summary": "Both rely on existing standards and practices for technology implementation.",
@@ -781,7 +780,7 @@
     "scope_note": null,
     "supported": true,
     "id": "1314b524cc69",
-    "review_state": "pending"
+    "review_state": "accepted"
   },
   {
     "summary": "Both mention third-party providers, but HKMA requires banks to adopt formal TSP governance while the draft only defines them.",
@@ -818,7 +817,7 @@
     "scope_note": "The dashboard must reflect consent status in real time and update on any renewal, revocation or expiration.",
     "supported": true,
     "id": "e8dd23689842",
-    "review_state": "pending"
+    "review_state": "accepted"
   },
   {
     "summary": "The draft bans bundled consent, pre-ticked boxes and coercion, and requires easy revocation; the HKMA framework does not.",
@@ -890,7 +889,7 @@
     "scope_note": "The draft addresses accessibility and inclusivity of customer interfaces; the HKMA framework is silent on this.",
     "supported": true,
     "id": "bce1c057e0ad",
-    "review_state": "pending"
+    "review_state": "accepted"
   },
   {
     "summary": "The HKMA framework sets a customer-liability standard for unauthorised transactions; the draft does not.",
@@ -915,7 +914,7 @@
     "scope_note": "The draft covers complaints handling and redress but sets no customer liability or refund arrangement for unauthorised transactions.",
     "supported": true,
     "id": "f57ab00c1b2f",
-    "review_state": "pending"
+    "review_state": "accepted"
   },
   {
     "summary": "The HKMA framework requires publishing a partnering-TSP list and monitoring for impersonation scams; the draft does not.",
@@ -980,7 +979,7 @@
     "scope_note": "Banks must provide examples and a testing environment, including artificial customer data, to help third parties use their APIs.",
     "supported": true,
     "id": "256e582cdec7",
-    "review_state": "pending"
+    "review_state": "accepted"
   },
   {
     "summary": "The HKMA framework requires banks to submit implementation road maps, which it publishes; the draft does not.",
