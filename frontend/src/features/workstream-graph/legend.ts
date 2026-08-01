@@ -56,10 +56,12 @@ export const NODE_LEGEND: Record<NodeType, NodeStyle> = {
   },
   "industry-input": {
     label: "industry-input",
-    fill: "#2dd4bf", // teal
-    stroke: "#5eead4",
-    text: "#052e2b",
-    badge: "bg-teal-500/15 text-teal-700 border-teal-400/30",
+    // Sky, not teal: teal sat one hue-step from internal-published's emerald at
+    // the same lightness, so the two fills were hard to tell apart on canvas.
+    fill: "#38bdf8", // sky
+    stroke: "#7dd3fc",
+    text: "#062338",
+    badge: "bg-sky-500/15 text-sky-700 border-sky-400/30",
   },
   "supervisory-letter": {
     label: "supervisory-letter",

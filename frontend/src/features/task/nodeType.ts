@@ -14,8 +14,9 @@ export interface NodeTypeStyle {
 // Colour-codes the eight workstream node types for the light theme (BNM / GEMA
 // enterprise palette). Mirrors the node palette in
 // @/features/workstream-graph/legend.ts (task=royal blue, international-
-// standard=gold, peer-regulator=rose, act-law=red, industry/internal=
-// teal/emerald, supervisory-letter=violet, others=slate). Fills stay subtle
+// standard=gold, peer-regulator=rose, act-law=red, industry-input=sky,
+// internal-published=emerald, supervisory-letter=violet, others=slate). Fills
+// stay subtle
 // (/10–/15) so they never overpower the white page; borders sit at /30 for
 // crisp definition; text uses deep -800/-900 shades for AA contrast on white.
 export const NODE_TYPE_STYLES: Record<NodeType, NodeTypeStyle> = {
@@ -50,10 +51,10 @@ export const NODE_TYPE_STYLES: Record<NodeType, NodeTypeStyle> = {
     pill: "bg-red-500/15 text-red-900",
   },
   "industry-input": {
-    dot: "bg-teal-500",
-    row: "bg-teal-500/10 border-teal-600/30 text-teal-900",
-    chip: "border-teal-600/30 text-teal-800",
-    pill: "bg-teal-500/15 text-teal-900",
+    dot: "bg-sky-500",
+    row: "bg-sky-500/10 border-sky-600/30 text-sky-900",
+    chip: "border-sky-600/30 text-sky-800",
+    pill: "bg-sky-500/15 text-sky-900",
   },
   "supervisory-letter": {
     dot: "bg-violet-500",
