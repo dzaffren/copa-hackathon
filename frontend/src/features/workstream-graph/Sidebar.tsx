@@ -13,6 +13,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import { fetchWorkstreams } from "@/lib/api";
+import { SHOW_CROSS_INTEL } from "@/lib/features";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { WorkstreamRole } from "@/lib/types";
 
@@ -34,7 +35,8 @@ const ROLE_LABEL: Record<WorkstreamRole, string> = {
  * The shared left rail, persistent across every screen. Lists the drafter's
  * workstreams with role status dots, a "+ New workstream" action and an
  * "Institution map" link, and collapses to an icon-only rail. The active
- * workstream is highlighted with a left accent bar.
+ * workstream is highlighted with a left accent bar. The Cross-Workstream Intel
+ * entry above the list is flag-gated on `SHOW_CROSS_INTEL`.
  */
 export function Sidebar({
   activeWorkstreamId,
@@ -89,23 +91,25 @@ export function Sidebar({
 
       {/* Workstream list */}
       <nav className="flex-1 overflow-y-auto p-2">
-        {/* Cross-Workstream Intelligence — the primary product surface, kept
-            above the workstream list so the early-warning view is one click
-            from anywhere. */}
-        <Link
-          to="/intelligence"
-          title="Cross-Workstream Intelligence"
-          aria-current={intelActive ? "page" : undefined}
-          className={cn(
-            "group relative mb-2 flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-semibold transition-colors",
-            intelActive
-              ? "bg-primary/15 text-primary ring-1 ring-primary/30"
-              : "text-foreground/80 hover:bg-accent/40 hover:text-foreground",
-          )}
-        >
-          <Radar className="h-4 w-4 shrink-0 text-primary" />
-          {!collapsed && <span>Cross-Workstream Intel</span>}
-        </Link>
+        {/* Cross-Workstream Intelligence — kept above the workstream list so the
+            early-warning view is one click from anywhere. Gated on
+            SHOW_CROSS_INTEL; the route stays mounted either way. */}
+        {SHOW_CROSS_INTEL && (
+          <Link
+            to="/intelligence"
+            title="Cross-Workstream Intelligence"
+            aria-current={intelActive ? "page" : undefined}
+            className={cn(
+              "group relative mb-2 flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-semibold transition-colors",
+              intelActive
+                ? "bg-primary/15 text-primary ring-1 ring-primary/30"
+                : "text-foreground/80 hover:bg-accent/40 hover:text-foreground",
+            )}
+          >
+            <Radar className="h-4 w-4 shrink-0 text-primary" />
+            {!collapsed && <span>Cross-Workstream Intel</span>}
+          </Link>
+        )}
 
         <p
           className={cn(
