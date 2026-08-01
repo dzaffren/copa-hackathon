@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderApp } from "@/test/utils";
@@ -233,5 +233,47 @@ describe("ReviewLinkagesPage — accept / dismiss / reopen", () => {
     const active = cards().filter((c) => c.getAttribute("data-active"));
     expect(active).toHaveLength(1);
     expect(active[0]).toHaveAttribute("data-review-state", "pending");
+  });
+});
+
+describe("ReviewLinkagesPage — Source PDF button", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  /** The pane header's button, or null when the pane offers none. */
+  function pdfButton(side: "source" | "target"): HTMLElement | null {
+    const pane = screen.getByLabelText(`${side} clauses`);
+    return within(pane).queryByRole("button", { name: /Source PDF/ });
+  }
+
+  it("offers the button on a pane whose document has a published PDF", async () => {
+    await loadReview();
+    // The mock gives every published document a PDF; the working draft has none,
+    // which is the left pane on this edge.
+    expect(pdfButton("target")).toBeInTheDocument();
+  });
+
+  it("omits the button on a working draft, which has no published PDF", async () => {
+    await loadReview();
+    expect(pdfButton("source")).not.toBeInTheDocument();
+  });
+
+  it("opens that pane's own document in a new tab", async () => {
+    const open = vi.spyOn(window, "open").mockReturnValue(null);
+    const user = userEvent.setup();
+    await loadReview();
+
+    await user.click(pdfButton("target")!);
+
+    // The right pane's node, not the left's — a button wired to the wrong side
+    // would show the drafter the document she is not checking.
+    expect(open).toHaveBeenCalledWith(
+      expect.stringContaining(
+        "/api/workstreams/opres-v2/nodes/bcbs-opres-2021/source-pdf",
+      ),
+      "_blank",
+      "noopener,noreferrer",
+    );
   });
 });

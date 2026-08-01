@@ -2,7 +2,12 @@ import { useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { fetchReview, setReviewState, HttpError } from "@/lib/api";
+import {
+  fetchReview,
+  setReviewState,
+  sourcePdfUrl,
+  HttpError,
+} from "@/lib/api";
 import { labelSeverityRank } from "@/lib/labels";
 import type { ReviewFinding, ReviewResponse, ReviewState } from "@/lib/types";
 import { ClausePane } from "./ClausePane";
@@ -147,6 +152,11 @@ export function ReviewLinkagesPage() {
           clauses={data.source_clauses}
           highlighted={sourceLit}
           filterToHighlighted={true}
+          sourcePdfUrl={
+            edge.source_node.has_source_pdf
+              ? sourcePdfUrl(workstreamId, edge.source_node.id)
+              : null
+          }
         />
         <ClausePane
           side="target"
@@ -155,6 +165,11 @@ export function ReviewLinkagesPage() {
           clauses={data.target_clauses}
           highlighted={targetLit}
           filterToHighlighted={true}
+          sourcePdfUrl={
+            edge.target_node.has_source_pdf
+              ? sourcePdfUrl(workstreamId, edge.target_node.id)
+              : null
+          }
         />
 
         <aside
