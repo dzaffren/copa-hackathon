@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import {
   ChevronDown,
   ChevronRight,
-  Map,
-  SearchCode,
-  FileEdit,
+  Building2,
+  AlertTriangle,
+  TrendingUp,
   type LucideIcon,
 } from "lucide-react";
 
@@ -173,7 +173,7 @@ function SlidePanel({ index, activeSlide, reduceMotion, children }: SlidePanelPr
 interface FeatureCardProps {
   icon: LucideIcon;
   title: string;
-  description: string;
+  description: ReactNode;
   delayMs: number;
   active: boolean;
   reduceMotion: boolean;
@@ -192,7 +192,7 @@ function FeatureCard({
 }: FeatureCardProps) {
   return (
     <div
-      className="w-full max-w-xs overflow-hidden rounded-xl motion-reduce:opacity-100"
+      className="flex h-full w-full max-w-xs flex-col overflow-hidden rounded-xl motion-reduce:opacity-100"
       style={{
         backgroundColor: "hsl(var(--card))",
         border: "1px solid hsl(var(--border))",
@@ -203,41 +203,61 @@ function FeatureCard({
             : `fadeSlideUp 0.5s ${delayMs}ms var(--ease-out-expo) both`,
       }}
     >
-      <div className="h-[3px] w-full" style={{ backgroundColor: "hsl(var(--primary))" }} />
-      <div className="p-6">
-        <Icon className="h-6 w-6" style={{ color: "hsl(var(--primary))" }} />
+      <div className="h-[3px] w-full flex-shrink-0" style={{ backgroundColor: "hsl(var(--primary))" }} />
+      <div className="flex flex-1 flex-col p-6">
+        <Icon className="h-6 w-6 flex-shrink-0" style={{ color: "hsl(var(--primary))" }} />
         <h3
-          className="mt-4 text-lg font-bold"
+          className="mt-4 flex-shrink-0 text-lg font-bold"
           style={{ color: "hsl(var(--foreground))", fontFamily: FONT_FAMILY }}
         >
           {title}
         </h3>
-        <p
-          className="mt-2 text-sm leading-relaxed"
+        <div
+          className="mt-2 flex-1 text-sm leading-relaxed"
           style={{ color: "hsl(var(--muted-foreground))", fontFamily: FONT_FAMILY }}
         >
           {description}
-        </p>
+        </div>
       </div>
     </div>
   );
 }
 
-const FEATURES: { icon: LucideIcon; title: string; description: string }[] = [
+const SIP_CARDS: { icon: LucideIcon; title: string; description: ReactNode }[] = [
   {
-    icon: Map,
-    title: "Regulatory Mapping",
-    description: "Analyse how policies relate across jurisdictions and documents.",
+    icon: Building2,
+    title: "Situation",
+    description: (
+      <p>
+        BNM&rsquo;s credibility as a regulator rests on being internally
+        consistent with its own body of policy and externally aligned with
+        international standards.
+      </p>
+    ),
   },
   {
-    icon: SearchCode,
-    title: "Gap Intelligence",
-    description: "Surface where drafts diverge, conflict, or are silent.",
+    icon: AlertTriangle,
+    title: "Problem Statements",
+    description: (
+      <ul className="list-disc space-y-1.5 pl-4 text-left">
+        <li>Manual assessment of overlapping areas of concern with other departments</li>
+        <li>Manual benchmarking of BCBS and other jurisdictions&rsquo; policies</li>
+        <li>Drafters spend disproportionate time on routine tasks over higher-value work</li>
+        <li>Institutional expertise takes years to build and stays with individual drafters</li>
+      </ul>
+    ),
   },
   {
-    icon: FileEdit,
-    title: "Assisted Drafting",
-    description: "Generate structured policy drafts grounded in real citations.",
+    icon: TrendingUp,
+    title: "Impact",
+    description: (
+      <ul className="list-disc space-y-1.5 pl-4 text-left">
+        <li>Automatic detection of overlaps with other departments</li>
+        <li>Optimised opportunity-gap analysis against established practices</li>
+        <li>Drafters&rsquo; time reallocated to higher-value review and scoping</li>
+        <li>Institutional expertise decoupled from individuals, embedded into the system</li>
+      </ul>
+    ),
   },
 ];
 
@@ -280,8 +300,11 @@ export function IntroPage() {
 
       <SlidePanel index={0} activeSlide={activeSlide} reduceMotion={reduceMotion}>
         <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
+          <Overline delayMs={0} reduceMotion={reduceMotion}>
+            COPA Hackathon 2026 &middot; Must-Win 10
+          </Overline>
           <h1
-            className="font-bold tracking-tight text-transparent motion-reduce:opacity-100"
+            className="mt-6 font-bold tracking-tight text-transparent motion-reduce:opacity-100"
             style={{
               fontSize: "clamp(48px, 6vw, 80px)",
               letterSpacing: "-0.025em",
@@ -314,6 +337,17 @@ export function IntroPage() {
             <span className="text-primary">A</span>rtefacts &amp;{" "}
             <span className="text-primary">S</span>tandards
           </p>
+          <p
+            className="mt-4 text-sm font-medium motion-reduce:opacity-100"
+            style={{
+              color: "hsl(var(--muted-foreground))",
+              animation: reduceMotion
+                ? undefined
+                : "fadeSlideUp 0.5s 250ms var(--ease-out-expo) both",
+            }}
+          >
+            by Team Copang
+          </p>
         </div>
 
         {!reduceMotion && (
@@ -342,7 +376,7 @@ export function IntroPage() {
       <SlidePanel index={1} activeSlide={activeSlide} reduceMotion={reduceMotion}>
         <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
           <Overline delayMs={0} reduceMotion={reduceMotion}>
-            CAPABILITIES
+            WHY THIS MATTERS
           </Overline>
           <h2
             className="mt-6 font-bold tracking-tight text-transparent motion-reduce:opacity-100"
@@ -358,19 +392,27 @@ export function IntroPage() {
                 : "fadeSlideUp 0.5s 100ms var(--ease-out-expo) both",
             }}
           >
-            One system. Three levers.
+            Situation &rarr; Problem &rarr; Impact
           </h2>
           <div className="mt-12 flex w-full flex-col items-center gap-6 sm:flex-row sm:items-stretch sm:justify-center">
-            {FEATURES.map((feature, i) => (
-              <FeatureCard
-                key={feature.title}
-                icon={feature.icon}
-                title={feature.title}
-                description={feature.description}
-                delayMs={i * 100}
-                active={activeSlide === 1}
-                reduceMotion={reduceMotion}
-              />
+            {SIP_CARDS.map((card, i) => (
+              <div key={card.title} className="flex items-stretch gap-4">
+                <FeatureCard
+                  icon={card.icon}
+                  title={card.title}
+                  description={card.description}
+                  delayMs={i * 100}
+                  active={activeSlide === 1}
+                  reduceMotion={reduceMotion}
+                />
+                {i < SIP_CARDS.length - 1 && (
+                  <ChevronRight
+                    aria-hidden
+                    className="hidden h-6 w-6 flex-shrink-0 self-center sm:block"
+                    style={{ color: "hsl(var(--muted-foreground))" }}
+                  />
+                )}
+              </div>
             ))}
           </div>
         </div>
@@ -448,7 +490,7 @@ export function IntroPage() {
                 : "fadeSlideUp 0.5s 400ms var(--ease-out-expo) both",
             }}
           >
-            Open Finance Division · Bank Negara Malaysia · 2026
+            Bank Negara Malaysia · 2026
           </p>
         </div>
       </SlidePanel>
