@@ -1404,6 +1404,7 @@ p.deck strong{color:var(--ink-2);font-weight:700}
             <div class="ph done">
               <div class="pt">AI drafting copilot</div>
               <p class="pd">5-step workflow (<span class="mono">/explore</span> &rarr; <span class="mono">/brainstorm</span> &rarr; <span class="mono">/draft</span> &rarr; <span class="mono">/write</span> &rarr; <span class="mono">/deliver</span>) writes citation-grounded recommendations straight into the draft.</p>
+              <div style="margin-top:10px"><span class="pill pill-amber pill-sm">Demo runs on pre-filled data &mdash; live backend built (<span class="mono">engine/copilot.py</span>), UI orchestration wiring pending</span></div>
             </div>
           </div>
 
@@ -1839,7 +1840,7 @@ p.deck strong{color:var(--ink-2);font-weight:700}
         <div class="s10-notes">
           <div class="s10-note"><p><b>Deterministic pipeline stages.</b> Stages 2, 4 and 6 are deterministic code &mdash; retrieval, suppression, merge / citation-validation &mdash; with <b>no model cost</b>.</p></div>
           <div class="s10-note"><p><b>Corpus generation.</b> The entire committed demo corpus &mdash; 9 recorded document pairs plus one-time extraction across 9 documents &mdash; costs <b>under $3 total</b>, which is why the demo strategy is build-and-persist, not live-on-stage.</p></div>
-          <div class="s10-note"><p><b>Copilot Q&amp;A.</b> A turn (Sonnet, ~4,000 in / 500 out) runs about <b>$0.02</b>: cheap enough that interactive use during judging is a non-issue.</p></div>
+          <div class="s10-note"><p><b>Copilot Q&amp;A.</b> A turn (Sonnet, ~4,000 in / 500 out) runs about <b>$0.02</b> on the live backend already built &mdash; cheap enough for interactive use once the UI is wired to it. <b>Today's demo runs the copilot on pre-filled data</b>, so this cost is not incurred on stage.</p></div>
           <div class="s10-note"><p><b>MVP cost today.</b> Effectively negligible &mdash; low single-digit dollars in model spend for the whole committed fixture set, plus whatever the FastAPI + Vite hosting costs during the hackathon window.</p></div>
         </div>
       </div>
