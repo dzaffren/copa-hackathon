@@ -394,27 +394,59 @@ p.deck strong{color:var(--ink-2);font-weight:700}
    (1fr for content, auto for the strip) so the grid can never grow taller
    than .body — otherwise the tallest column's content pushes the slide past
    the 1080px stage. */
-.reuse{display:grid;grid-template-columns:1.02fr 1.28fr;grid-template-rows:minmax(0,1fr) auto;gap:20px 24px;flex:1 1 auto;min-height:0}
-.opp{display:flex;flex-direction:column;gap:10px;min-height:0}
-.opp-c{padding:13px 16px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);flex:1 1 0;min-height:0;display:flex;flex-direction:column;justify-content:center}
-.opp-c .ot{font-size:15.5px;font-weight:700;color:var(--ink);letter-spacing:-.008em;line-height:1.28}
-.opp-c .od{margin-top:6px;font-size:13.2px;line-height:1.45;color:var(--muted)}
-.opp-c .on{margin-top:8px}
-.dept{display:flex;flex-direction:column;gap:10px;min-height:0}
-.dept-r{
-  display:grid;grid-template-columns:88px 1fr;gap:16px;align-items:center;
-  padding:11px 15px;border-radius:13px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);
-  flex:1 1 0;min-height:0;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+.reuse{display:grid;grid-template-columns:1.62fr 1fr;grid-template-rows:minmax(0,1fr) auto;gap:20px 26px;flex:1 1 auto;min-height:0}
+.reuse-col{display:flex;flex-direction:column;min-height:0}
+
+/* Left: one engine band, three arrows, then the six departments as a 3×2 card
+   wall. The wall is the headline — a panel should count six blue badges before
+   reading a single word, and the band above says what they all plug into. */
+.engine-band{
+  flex:none;display:flex;align-items:baseline;justify-content:center;gap:16px;
+  padding:15px 24px;border-radius:14px;
+  background:linear-gradient(120deg,var(--blue-tint),#fff 76%);border:1px solid #d3e1fa;
 }
-.dept-r:hover{transform:translateX(3px);box-shadow:var(--sh-2);border-color:#cfdcf2}
-.dept-code{
-  display:grid;place-items:center;height:38px;border-radius:10px;
+.engine-band .eb-t{font-size:17px;font-weight:700;letter-spacing:-.01em;color:var(--blue-ink)}
+.engine-band .eb-d{font-size:13.4px;line-height:1.4;color:var(--muted)}
+.fanout{flex:none;height:52px;display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding:12px 0 6px}
+.fanout i{display:block;width:2px;height:100%;margin:0 auto;position:relative;background:linear-gradient(180deg,#dbe6f8,#c0d4f7)}
+.fanout i::after{
+  content:"";position:absolute;left:50%;bottom:-1px;transform:translateX(-50%);
+  border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #c0d4f7;
+}
+.dgrid{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,minmax(0,1fr));gap:16px;flex:1 1 auto;min-height:0}
+.dcard{
+  padding:18px 22px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);
+  display:flex;flex-direction:column;justify-content:center;gap:14px;min-height:0;
+  transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+}
+.dcard:hover{transform:translateY(-2px);box-shadow:var(--sh-2);border-color:#cfdcf2}
+.dcard .dhead{display:flex;align-items:center;gap:11px}
+.dcard .dcode{
+  padding:6px 14px;border-radius:9px;
   background:linear-gradient(140deg,var(--blue),var(--blue-deep));color:#fff;
-  font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:.06em;box-shadow:var(--sh-blue);
+  font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:.08em;box-shadow:var(--sh-blue);
 }
-.dept-ws{display:flex;flex-direction:column;gap:4px}
-.dept-ws span{font-size:13.2px;line-height:1.38;color:var(--ink-2);display:flex;gap:8px}
-.dept-ws span::before{content:"";width:4px;height:4px;border-radius:50%;background:var(--blue);flex:none;margin-top:6px}
+/* Only Open Finance is actually built — everything else on this slide is a
+   candidate, and the slide must not imply otherwise. */
+.dcard.is-live{border-color:#a7e8bf;background:linear-gradient(140deg,#f4fdf7,#fff 62%)}
+.dcard .dflag{
+  padding:4px 10px;border-radius:999px;font-size:11.5px;font-weight:700;letter-spacing:.03em;
+  background:var(--green-tint);color:var(--green-ink);border:1px solid #a7e8bf;
+}
+.dcard .dprime{font-size:18.5px;font-weight:700;line-height:1.3;color:var(--ink);letter-spacing:-.012em}
+.dcard .dmore{font-size:13.2px;line-height:1.4;color:var(--muted);display:flex;gap:8px}
+.dcard .dmore::before{content:"";width:4px;height:4px;border-radius:50%;background:#c3d2e8;flex:none;margin-top:6px}
+
+/* Right: five one-line use cases, each tagged with the node type that carries it. */
+.ucl{display:flex;flex-direction:column;gap:10px;flex:1 1 auto;min-height:0}
+.uc{
+  display:grid;grid-template-columns:24px 1fr;gap:13px;align-items:center;
+  padding:11px 15px;border-radius:12px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);
+  flex:1 1 0;min-height:0;
+}
+.uc .un{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;background:var(--blue-tint);border:1px solid #c7d9fb;color:var(--blue-ink);font-family:var(--mono);font-size:11.5px;font-weight:700}
+.uc .ut{font-size:13.6px;line-height:1.32;font-weight:700;color:var(--ink-2)}
+.uc .utag{display:block;margin-top:4px;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:var(--muted-2)}
 .reuse-foot{
   grid-column:1/-1;display:flex;align-items:center;gap:24px;padding:13px 20px;border-radius:13px;
   background:linear-gradient(120deg,var(--blue-tint),#fff 70%);border:1px solid #d3e1fa;
@@ -1334,103 +1366,105 @@ p.deck strong{color:var(--ink-2);font-weight:700}
       <span class="slide-no">08 / 12</span>
     </div>
     <div class="head rise">
-      <h1 class="title">One engine, <span class="accent">six departments</span></h1>
+      <h1 class="title">Built for one workstream. <span class="accent">It fits the rest of BNM.</span></h1>
       <p class="deck">
-        The same node types that model an Open Finance workstream model a monetary policy statement.
-        Onboarding a department is a <strong>document ingestion task</strong>, not a build.
+        We built and demoed Open Finance. Nothing in the engine is specific to it &mdash; pointing it at another
+        department is <strong>uploading that department's documents</strong>, not writing new code.
+        Below are the workstreams it could take on next.
       </p>
     </div>
 
     <div class="body rise">
       <div class="reuse">
 
-        <div class="opp">
-          <div class="seclabel"><span class="t">Opportunities</span><span class="l"></span></div>
-          <div class="opp-c">
-            <div class="ot">International Regulatory Convergence</div>
-            <p class="od">Automated benchmarking of BNM's policies against BIS, MAS, and HKMA standards.</p>
-            <div class="on"><span class="pill pill-blue pill-sm mono">node_type: international-standards</span></div>
+        <div class="reuse-col">
+          <div class="seclabel"><span class="t">Candidate departments &amp; their documents</span><span class="l"></span></div>
+          <div class="engine-band">
+            <span class="eb-t">The same Selaras engine</span>
+            <span class="eb-d">8 node types &middot; 5 finding labels &middot; one finder loop &mdash; unchanged for any department</span>
           </div>
-          <div class="opp-c">
-            <div class="ot">Cross-Departmental Overlap</div>
-            <p class="od">Surfacing overlapping or conflicting requirements across departments prior to publication.</p>
-            <div class="on"><span class="pill pill-blue pill-sm mono">node_type: internal-published</span></div>
-          </div>
-          <div class="opp-c">
-            <div class="ot">Alignment to Act / Law</div>
-            <p class="od">Verify that playbooks and blueprints comply with governing legislation.</p>
-            <div class="on"><span class="pill pill-blue pill-sm mono">node_type: act-law</span></div>
-          </div>
-          <div class="opp-c">
-            <div class="ot">Supervisory Coherence</div>
-            <p class="od">Checks new policy drafts against past supervisory letters issued on the RH platform, to ensure consistent guidance to financial institutions.</p>
-            <div class="on"><span class="pill pill-blue pill-sm mono">node_type: supervisory-letter</span></div>
-          </div>
-          <div class="opp-c">
-            <div class="ot">MPComm Coherence</div>
-            <p class="od">Benchmarks new drafts against past statements to maintain consistent messaging around OPR decisions (hike, maintain, cut).</p>
-            <div class="on"><span class="pill pill-ghost pill-sm">Monetary policy communication</span></div>
+          <div class="fanout"><i></i><i></i></div>
+          <div class="dgrid">
+            <div class="dcard is-live">
+              <span class="dhead"><span class="dcode">FDI</span><span class="dflag">Built &amp; demoed</span></span>
+              <span class="dprime">Open Finance PD</span>
+              <span class="dmore">1 document</span>
+            </div>
+            <div class="dcard">
+              <span class="dhead"><span class="dcode">FS</span></span>
+              <span class="dprime">Crisis Playbook</span>
+              <span class="dmore">+2: CLS, FSBP 2027&ndash;30</span>
+            </div>
+            <div class="dcard">
+              <span class="dhead"><span class="dcode">PFP</span></span>
+              <span class="dprime">Operational Resilience Roadmap</span>
+              <span class="dmore">1 document</span>
+            </div>
+            <div class="dcard">
+              <span class="dhead"><span class="dcode">PPD</span></span>
+              <span class="dprime">DP on stablecoins &amp; CBDC</span>
+              <span class="dmore">+1: tokenised deposit letter</span>
+            </div>
+            <div class="dcard">
+              <span class="dhead"><span class="dcode">JP4</span></span>
+              <span class="dprime">Capital Adequacy Framework PD</span>
+              <span class="dmore">+2: IRB credit risk, IRRBB</span>
+            </div>
+            <div class="dcard">
+              <span class="dhead"><span class="dcode">JDM</span></span>
+              <span class="dprime">Monetary Policy Statement</span>
+              <span class="dmore">+1: Economic &amp; Monetary Review</span>
+            </div>
           </div>
         </div>
 
-        <div class="dept">
-          <div class="seclabel"><span class="t">Department &rarr; workstream / BAU</span><span class="l"></span></div>
-          <div class="dept-r">
-            <span class="dept-code">FDI</span>
-            <div class="dept-ws"><span>Open Finance PD</span></div>
-          </div>
-          <div class="dept-r">
-            <span class="dept-code">FS</span>
-            <div class="dept-ws">
-              <span>Banking System Financial Crisis Management Framework (Crisis Playbook)</span>
-              <span>Conforming Loans Standards (CLS)</span>
-              <span>Financial sector blueprint (FSBP) for 2027&ndash;2030</span>
+        <div class="reuse-col">
+          <div class="seclabel"><span class="t">What it could be used for</span><span class="l"></span></div>
+          <div class="ucl">
+            <div class="uc">
+              <span class="un">1</span>
+              <span class="ut">Benchmark BNM policy against BIS, MAS and HKMA
+                <span class="utag mono">international-standard</span></span>
             </div>
-          </div>
-          <div class="dept-r">
-            <span class="dept-code">PFP</span>
-            <div class="dept-ws"><span>Operational Resilience Roadmap</span></div>
-          </div>
-          <div class="dept-r">
-            <span class="dept-code">PPD</span>
-            <div class="dept-ws">
-              <span>DP on stablecoins and CBDC</span>
-              <span>CEO letter on tokenised deposit</span>
+            <div class="uc">
+              <span class="un">2</span>
+              <span class="ut">Catch clashes with another department before publishing
+                <span class="utag mono">internal-published</span></span>
             </div>
-          </div>
-          <div class="dept-r">
-            <span class="dept-code">JP4</span>
-            <div class="dept-ws">
-              <span>Capital Adequacy Framework (Internal Ratings-Based Approach for Credit Risk) PD</span>
-              <span>Capital Adequacy Framework</span>
-              <span>Interest Rate Risk in the Banking Book PD</span>
+            <div class="uc">
+              <span class="un">3</span>
+              <span class="ut">Check a draft against the law that governs it
+                <span class="utag mono">act-law</span></span>
             </div>
-          </div>
-          <div class="dept-r">
-            <span class="dept-code">JDM</span>
-            <div class="dept-ws">
-              <span>Economic Monetary Review (EMR)</span>
-              <span>Monetary Policy Statement (MPS)</span>
+            <div class="uc">
+              <span class="un">4</span>
+              <span class="ut">Stay consistent with past supervisory letters
+                <span class="utag mono">supervisory-letter</span></span>
+            </div>
+            <div class="uc">
+              <span class="un">5</span>
+              <span class="ut">Keep OPR messaging consistent across statements
+                <span class="utag mono">internal-published</span></span>
             </div>
           </div>
         </div>
 
         <div class="reuse-foot">
-          <div class="metric"><span class="mv">6</span><span class="mk">departments with named workstreams already identified</span></div>
+          <div class="metric"><span class="mv">6</span><span class="mk">candidate departments identified</span></div>
           <span class="metric-div"></span>
-          <div class="metric"><span class="mv">12</span><span class="mk">live workstreams / BAU documents in scope</span></div>
+          <div class="metric"><span class="mv">12</span><span class="mk">real documents they would bring</span></div>
           <span class="metric-div"></span>
-          <div class="metric"><span class="mv">200&ndash;240</span><span class="mk">policy staff in the addressable user base</span></div>
+          <div class="metric"><span class="mv">200&ndash;240</span><span class="mk">policy staff it could reach</span></div>
           <span class="metric-div"></span>
-          <div class="metric"><span class="mv">0</span><span class="mk">new application logic required per department</span></div>
+          <div class="metric"><span class="mv">0</span><span class="mk">lines of new code to add one</span></div>
         </div>
 
       </div>
     </div>
 
     <div class="foot">
-      <span class="fl">Scope is <b>multi-workstream, not a single cluster</b> &mdash; the management-facing institution map is a follow-on epic</span>
-      <div class="fr"><span class="pill pill-blue pill-sm">8 node types cover every artefact above</span></div>
+      <span class="fl">Only Open Finance is built today &mdash; the rest are <b>candidates</b>, and the same <b>8 node types</b> already describe every document above</span>
+      <div class="fr"><span class="pill pill-ghost pill-sm">Institution-wide map is a follow-on epic</span></div>
     </div>
   </section>
 
