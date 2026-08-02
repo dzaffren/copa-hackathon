@@ -161,9 +161,10 @@ export function PairwiseFindingsCard({ workstreamId, nodeId }: Props) {
     //
     // 12rem of headroom is a deliberate trade, not the largest gap that fits:
     // the page header runs ~13rem and the DemoController overlays the last ~4rem
-    // of the viewport, so ~17rem is the most that clears both. At 12rem the last
-    // finding sits behind the controller until the page is scrolled a little —
-    // accepted, because the controller is a dismissible demo aid and the taller
+    // of the viewport in its default bottom-right position, so ~17rem is the
+    // most that clears both. At 12rem the last finding sits behind the
+    // controller until the page is scrolled a little — accepted, because the
+    // controller is a dismissible (and now draggable) demo aid, and the taller
     // box is worth more than the overlap costs.
     <Card
       data-testid="pairwise-card"

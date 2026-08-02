@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import {
@@ -106,6 +106,11 @@ export function NodeDetailPanel({
   // cascades (linkages, findings, passages, concepts) and cannot be undone, so
   // a single click must never be enough.
   const [confirmDelete, setConfirmDelete] = useState(false);
+  // Collapsed by default so a long description can't push the scrollable
+  // sections below off a short screen; resets whenever the selected node changes.
+  const [descExpanded, setDescExpanded] = useState(false);
+  const [descOverflows, setDescOverflows] = useState(false);
+  const descRef = useRef<HTMLParagraphElement>(null);
   const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: ["node", workstreamId, nodeId],
@@ -132,6 +137,21 @@ export function NodeDetailPanel({
       onClose?.();
     },
   });
+  const description = query.data?.description ?? null;
+  // Re-measure whenever the description changes or the panel is resized —
+  // a description that fits at one viewport width can overflow at another.
+  useLayoutEffect(() => {
+    setDescExpanded(false);
+    const el = descRef.current;
+    if (!el) {
+      setDescOverflows(false);
+      return;
+    }
+    const measure = () => setDescOverflows(el.scrollHeight > el.clientHeight);
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [description]);
 
   if (query.isPending) {
     return (
@@ -216,7 +236,26 @@ export function NodeDetailPanel({
         </div>
         <h2 className="text-lg font-bold leading-tight">{node.title}</h2>
         {node.description && (
-          <p className="text-sm text-muted-foreground">{node.description}</p>
+          <div>
+            <p
+              ref={descRef}
+              className={cn(
+                "text-sm text-muted-foreground",
+                !descExpanded && "line-clamp-2",
+              )}
+            >
+              {node.description}
+            </p>
+            {(descOverflows || descExpanded) && (
+              <button
+                type="button"
+                onClick={() => setDescExpanded((v) => !v)}
+                className="mt-0.5 text-xs font-medium text-primary hover:underline"
+              >
+                {descExpanded ? "Show less" : "Show more"}
+              </button>
+            )}
+          </div>
         )}
       </div>
 

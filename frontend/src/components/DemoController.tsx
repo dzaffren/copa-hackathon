@@ -1,6 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Minimize2, Play } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  GripVertical,
+  Minimize2,
+  Play,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -51,6 +57,39 @@ function stepHref(step: DemoStep): string {
 }
 
 const STORAGE_KEY = "wsb-demo-controller-minimized";
+const POSITION_KEY = "wsb-demo-controller-position";
+
+interface Position {
+  left: number;
+  top: number;
+}
+
+/** Keeps the dragged bar fully on-screen — a position saved from a wider
+ *  viewport must not strand it off the edge after a resize. The minimized
+ *  pill always returns to its fixed corner, so it never needs this. */
+function clampToViewport(pos: Position, rect: DOMRect): Position {
+  const maxLeft = Math.max(0, window.innerWidth - rect.width);
+  const maxTop = Math.max(0, window.innerHeight - rect.height);
+  return {
+    left: Math.min(Math.max(pos.left, 0), maxLeft),
+    top: Math.min(Math.max(pos.top, 0), maxTop),
+  };
+}
+
+function readStoredPosition(): Position | null {
+  if (typeof window === "undefined") return null;
+  const raw = window.localStorage.getItem(POSITION_KEY);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (typeof parsed?.left === "number" && typeof parsed?.top === "number") {
+      return parsed;
+    }
+  } catch {
+    // malformed value — fall back to the default corner
+  }
+  return null;
+}
 
 /**
  * Floating presenter control for stepping through the 5-step demo path.
@@ -74,6 +113,73 @@ export function DemoController() {
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, minimized ? "1" : "0");
   }, [minimized]);
+
+  // `null` means "use the default bottom-right corner" (the CSS fallback
+  // below) — only a drag ever produces a concrete position, so a presenter
+  // who never drags the bar sees the exact old behaviour.
+  const [position, setPosition] = useState<Position | null>(() =>
+    readStoredPosition(),
+  );
+  const barRef = useRef<HTMLDivElement>(null);
+  const dragState = useRef<{
+    pointerId: number;
+    offsetX: number;
+    offsetY: number;
+  } | null>(null);
+
+  // Re-clamp a saved position on resize — a bar dragged near an edge on a
+  // wide window must not end up stranded off-screen on a narrower one.
+  useEffect(() => {
+    function onResize() {
+      const el = barRef.current;
+      if (!el) return;
+      setPosition((prev) => {
+        if (!prev) return prev;
+        const next = clampToViewport(prev, el.getBoundingClientRect());
+        window.localStorage.setItem(POSITION_KEY, JSON.stringify(next));
+        return next;
+      });
+    }
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  function onDragPointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    // Only the handle initiates a drag — every other control in the bar
+    // (step chips, prev/next, minimize) must keep its own click behaviour.
+    if (e.button !== 0) return;
+    const el = barRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    dragState.current = {
+      pointerId: e.pointerId,
+      offsetX: e.clientX - rect.left,
+      offsetY: e.clientY - rect.top,
+    };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }
+
+  function onDragPointerMove(e: React.PointerEvent<HTMLDivElement>) {
+    const drag = dragState.current;
+    const el = barRef.current;
+    if (!drag || drag.pointerId !== e.pointerId || !el) return;
+    const next = clampToViewport(
+      { left: e.clientX - drag.offsetX, top: e.clientY - drag.offsetY },
+      el.getBoundingClientRect(),
+    );
+    setPosition(next);
+  }
+
+  function endDrag(e: React.PointerEvent<HTMLDivElement>) {
+    if (dragState.current?.pointerId !== e.pointerId) return;
+    dragState.current = null;
+    setPosition((prev) => {
+      if (prev) {
+        window.localStorage.setItem(POSITION_KEY, JSON.stringify(prev));
+      }
+      return prev;
+    });
+  }
 
   // The active step matches the longest path prefix, so a sub-route (e.g. a
   // different edge's review screen) still highlights the closest demo step
@@ -150,16 +256,38 @@ export function DemoController() {
     );
   }
 
+  // Dragged position overrides the default bottom-right corner. `right`/
+  // `bottom` are dropped once a `left`/`top` is set so the two positioning
+  // schemes never fight each other.
+  const positionStyle: React.CSSProperties = position
+    ? { left: position.left, top: position.top, right: "auto", bottom: "auto" }
+    : {};
+
   return (
     // `pointer-events-none` on the bar with `pointer-events-auto` on its
     // controls: as a bottom-centred fixed element it otherwise swallows clicks
     // meant for whatever sits beneath it (it was intercepting the new-workstream
     // form's submit button). Only the toolbar's own buttons are clickable now.
     <div
+      ref={barRef}
       role="toolbar"
       aria-label="Demo walkthrough"
+      style={positionStyle}
       className="pointer-events-none fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2 text-sm shadow-md [&_button]:pointer-events-auto [&_select]:pointer-events-auto"
     >
+      <div
+        role="button"
+        tabIndex={-1}
+        aria-label="Drag to move demo walkthrough panel"
+        onPointerDown={onDragPointerDown}
+        onPointerMove={onDragPointerMove}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+        className="pointer-events-auto grid h-8 w-4 shrink-0 cursor-grab place-items-center text-muted-foreground/60 touch-none active:cursor-grabbing"
+      >
+        <GripVertical className="h-4 w-4" />
+      </div>
+
       <button
         type="button"
         aria-label="Previous step"
