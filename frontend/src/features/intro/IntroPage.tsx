@@ -298,7 +298,7 @@ export function IntroPage() {
             Project SELARAS
           </h1>
           <p
-            className="mx-auto mt-6 max-w-md text-lg leading-relaxed motion-reduce:opacity-100"
+            className="mx-auto mt-6 max-w-xl text-lg leading-relaxed motion-reduce:opacity-100"
             style={{
               color: "hsl(var(--muted-foreground))",
               animation: reduceMotion
@@ -306,8 +306,13 @@ export function IntroPage() {
                 : "fadeSlideUp 0.5s 200ms var(--ease-out-expo) both",
             }}
           >
-            From regulatory mapping to coherent drafts — in one connected
-            workspace.
+            <span className="text-primary">S</span>emantic{" "}
+            <span className="text-primary">E</span>ngine for{" "}
+            <span className="text-primary">L</span>inkage{" "}
+            <span className="text-primary">A</span>nalysis across{" "}
+            <span className="text-primary">R</span>egulatory{" "}
+            <span className="text-primary">A</span>rtefacts &amp;{" "}
+            <span className="text-primary">S</span>tandards
           </p>
         </div>
 
