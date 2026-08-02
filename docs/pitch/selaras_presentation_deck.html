@@ -514,7 +514,7 @@ p.deck strong{color:var(--ink-2);font-weight:700}
    (1fr for content, auto for the strip) so the grid can never grow taller
    than .body — otherwise the tallest column's content pushes the slide past
    the 1080px stage. */
-.reuse{display:grid;grid-template-columns:1.62fr 1fr;grid-template-rows:minmax(0,1fr) auto;gap:20px 26px;flex:1 1 auto;min-height:0}
+.reuse{display:grid;grid-template-columns:1.62fr 1fr;gap:26px;flex:1 1 auto;min-height:0}
 .reuse-col{display:flex;flex-direction:column;min-height:0}
 
 /* Left: the headline stat, then the six departments as a 2×3 card wall. The
@@ -541,8 +541,8 @@ p.deck strong{color:var(--ink-2);font-weight:700}
 .mwhero .mw span{font-size:15px;color:#e6eefc;line-height:1.3}
 .dgrid{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,minmax(0,1fr));gap:16px;flex:1 1 auto;min-height:0}
 .dcard{
-  padding:18px 22px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);
-  display:flex;flex-direction:column;justify-content:center;gap:14px;min-height:0;
+  padding:15px 19px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);
+  display:flex;flex-direction:column;justify-content:center;gap:11px;min-height:0;
   transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
 }
 .dcard:hover{transform:translateY(-2px);box-shadow:var(--sh-2);border-color:#cfdcf2}
@@ -559,9 +559,11 @@ p.deck strong{color:var(--ink-2);font-weight:700}
   padding:4px 10px;border-radius:999px;font-size:14.5px;font-weight:700;letter-spacing:.03em;
   background:var(--green-tint);color:var(--green-ink);border:1px solid #a7e8bf;
 }
-.dcard .dprime{font-size:20.5px;font-weight:700;line-height:1.3;color:var(--ink);letter-spacing:-.012em}
-.dcard .dmore{font-size:16.5px;line-height:1.4;color:var(--muted);display:flex;gap:8px}
-.dcard .dmore::before{content:"";width:4px;height:4px;border-radius:50%;background:#c3d2e8;flex:none;margin-top:6px}
+/* Every document named in full — no "+2", nothing hidden behind a count. */
+.dcard .dlist{display:flex;flex-direction:column;gap:6px}
+.dcard .dlist span{position:relative;display:block;padding-left:16px;font-size:16.5px;line-height:1.34;color:var(--ink-2)}
+.dcard .dlist span::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:var(--blue)}
+.dcard .dlist span i{font-style:normal;color:var(--muted)}
 
 /* Right: five one-line use cases, each tagged with the node type that carries it. */
 .ucl{display:flex;flex-direction:column;gap:10px;flex:1 1 auto;min-height:0}
@@ -1422,7 +1424,7 @@ p.deck strong{color:var(--ink-2);font-weight:700}
       <span class="slide-no">08 / 13</span>
     </div>
     <div class="head rise">
-      <h1 class="title">Built for one workstream. <span class="accent">80% applicable to three more.</span></h1>
+      <h1 class="title">Built for one workstream. <span class="accent">80% applicable to three more BNM must-wins.</span></h1>
       <p class="deck">
         We built and demoed Open Finance. Nothing in the engine is specific to it &mdash; pointing it at another
         department is <strong>uploading that department's documents</strong>, not writing new code.
@@ -1433,11 +1435,11 @@ p.deck strong{color:var(--ink-2);font-weight:700}
       <div class="reuse">
 
         <div class="reuse-col">
-          <div class="seclabel"><span class="t">Where it could go next</span><span class="l"></span></div>
+          <div class="seclabel"><span class="t">The departments and the exact documents they would bring</span><span class="l"></span></div>
           <div class="mwhero">
             <span class="mh-n">80%</span>
             <div class="mh-r">
-              <p class="mh-l">average applicability across <b>three Blueprint 2026 must-wins</b> &mdash; the same engine, no new application logic</p>
+              <p class="mh-l">average applicability across these <b>three Blueprint 2026 must-wins</b> &mdash; same engine, no new application logic</p>
               <div class="mh-mw">
                 <span class="mw"><i>MW2</i><span>Crisis resilience</span></span>
                 <span class="mw"><i>MW5</i><span>Future-proof digital finance infrastructure</span></span>
@@ -1448,33 +1450,45 @@ p.deck strong{color:var(--ink-2);font-weight:700}
           <div class="dgrid">
             <div class="dcard is-live">
               <span class="dhead"><span class="dcode">FDI</span><span class="dflag">Built &amp; demoed</span></span>
-              <span class="dprime">Open Finance PD</span>
-              <span class="dmore">1 document</span>
+              <div class="dlist">
+                <span>Open Finance Policy Document</span>
+              </div>
             </div>
             <div class="dcard">
               <span class="dhead"><span class="dcode">FS</span></span>
-              <span class="dprime">Crisis Playbook</span>
-              <span class="dmore">+2: CLS, FSBP 2027&ndash;30</span>
+              <div class="dlist">
+                <span>Banking System Financial Crisis Management Framework <i>(Crisis Playbook)</i></span>
+                <span>Conforming Loans Standards <i>(CLS)</i></span>
+                <span>Financial Sector Blueprint <i>(FSBP) 2027&ndash;2030</i></span>
+              </div>
             </div>
             <div class="dcard">
               <span class="dhead"><span class="dcode">PFP</span></span>
-              <span class="dprime">Operational Resilience Roadmap</span>
-              <span class="dmore">1 document</span>
+              <div class="dlist">
+                <span>Operational Resilience Roadmap</span>
+              </div>
             </div>
             <div class="dcard">
               <span class="dhead"><span class="dcode">PPD</span></span>
-              <span class="dprime">DP on stablecoins &amp; CBDC</span>
-              <span class="dmore">+1: tokenised deposit letter</span>
+              <div class="dlist">
+                <span>Discussion Paper on stablecoins and CBDC</span>
+                <span>CEO letter on tokenised deposits</span>
+              </div>
             </div>
             <div class="dcard">
               <span class="dhead"><span class="dcode">JP4</span></span>
-              <span class="dprime">Capital Adequacy Framework PD</span>
-              <span class="dmore">+2: IRB credit risk, IRRBB</span>
+              <div class="dlist">
+                <span>Capital Adequacy Framework</span>
+                <span>Capital Adequacy Framework PD <i>(Internal Ratings-Based Approach for Credit Risk)</i></span>
+                <span>Interest Rate Risk in the Banking Book PD</span>
+              </div>
             </div>
             <div class="dcard">
               <span class="dhead"><span class="dcode">JDM</span></span>
-              <span class="dprime">Monetary Policy Statement</span>
-              <span class="dmore">+1: Economic &amp; Monetary Review</span>
+              <div class="dlist">
+                <span>Monetary Policy Statement <i>(MPS)</i></span>
+                <span>Economic and Monetary Review <i>(EMR)</i></span>
+              </div>
             </div>
           </div>
         </div>
@@ -1508,16 +1522,6 @@ p.deck strong{color:var(--ink-2);font-weight:700}
                 <span class="utag mono">internal-published</span></span>
             </div>
           </div>
-        </div>
-
-        <div class="reuse-foot">
-          <div class="metric"><span class="mv">6</span><span class="mk">candidate departments identified</span></div>
-          <span class="metric-div"></span>
-          <div class="metric"><span class="mv">12</span><span class="mk">real documents they would bring</span></div>
-          <span class="metric-div"></span>
-          <div class="metric"><span class="mv">200&ndash;240</span><span class="mk">policy staff it could reach</span></div>
-          <span class="metric-div"></span>
-          <div class="metric"><span class="mv">0</span><span class="mk">lines of new code to add one</span></div>
         </div>
 
       </div>
