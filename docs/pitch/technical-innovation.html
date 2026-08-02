@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project SELARAS — Backend Technical Innovation</title>
+<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+  window.__mermaid = mermaid;
+</script>
+<style>
+  :root {
+    --bg: #fbfbfa; --panel: #ffffff; --text: #1c1c1a; --muted: #6b6b66;
+    --line: #e4e4df; --accent: #2540b8; --accent-soft: #eef1fd;
+    --code-bg: #f4f4f1; --warn: #b45309; --bad: #b91c1c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16161a; --panel: #1d1d22; --text: #e8e8e4; --muted: #9a9a94;
+      --line: #2f2f36; --accent: #8ea2ff; --accent-soft: #22263a;
+      --code-bg: #232329; --warn: #f0b046; --bad: #f08a8a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.65 ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .layout { display: flex; align-items: flex-start; max-width: 1240px; margin: 0 auto; }
+  nav {
+    position: sticky; top: 0; flex: 0 0 268px; height: 100vh; overflow-y: auto;
+    padding: 2.2rem 1.1rem 3rem 1.4rem; border-right: 1px solid var(--line);
+    font-size: 0.855rem;
+  }
+  nav .navtitle {
+    font-size: 0.7rem; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 0.9rem; font-weight: 600;
+  }
+  nav a {
+    display: block; padding: 0.3rem 0.6rem; margin: 0.1rem 0; color: var(--muted);
+    text-decoration: none; border-radius: 5px; border-left: 2px solid transparent;
+    line-height: 1.35;
+  }
+  nav a:hover { color: var(--text); background: var(--accent-soft); }
+  nav a.h3 { padding-left: 1.4rem; font-size: 0.81rem; }
+  nav a.active {
+    color: var(--accent); background: var(--accent-soft);
+    border-left-color: var(--accent); font-weight: 600;
+  }
+  main { flex: 1 1 auto; min-width: 0; padding: 2.2rem 2.6rem 6rem; max-width: 76ch; }
+  main h1 { font-size: 1.95rem; line-height: 1.2; margin: 0 0 0.4rem; letter-spacing: -0.015em; }
+  main h2 {
+    font-size: 1.32rem; margin: 2.9rem 0 0.9rem; padding-top: 1.4rem;
+    border-top: 1px solid var(--line); letter-spacing: -0.01em;
+  }
+  main h3 { font-size: 1.05rem; margin: 2rem 0 0.6rem; }
+  main h4 { font-size: 0.95rem; margin: 1.4rem 0 0.4rem; color: var(--muted); }
+  main p, main li { color: var(--text); }
+  main a { color: var(--accent); }
+  strong { font-weight: 650; }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 2.6rem 0; }
+  code {
+    background: var(--code-bg); padding: 0.12em 0.36em; border-radius: 4px;
+    font-size: 0.87em; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px;
+    padding: 0.95rem 1.1rem; overflow-x: auto;
+  }
+  pre code { background: none; padding: 0; font-size: 0.84em; }
+  blockquote {
+    margin: 1.2rem 0; padding: 0.1rem 1.1rem; border-left: 3px solid var(--accent);
+    color: var(--muted);
+  }
+  .tablewrap { overflow-x: auto; margin: 1.2rem 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+  th, td { border: 1px solid var(--line); padding: 0.55rem 0.75rem; text-align: left; vertical-align: top; }
+  th { background: var(--accent-soft); font-weight: 620; }
+  tbody tr:nth-child(even) { background: color-mix(in srgb, var(--panel) 60%, var(--bg)); }
+  .mermaid {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 1.1rem; margin: 1.4rem 0; overflow-x: auto; text-align: center;
+  }
+  main > ul, main > ol { padding-left: 1.3rem; }
+  li { margin: 0.28rem 0; }
+  @media (max-width: 900px) {
+    .layout { flex-direction: column; }
+    nav { position: static; height: auto; width: 100%; flex: none; border-right: 0; border-bottom: 1px solid var(--line); }
+    main { padding: 1.6rem 1.2rem 4rem; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav><div class="navtitle">Contents</div><div id="toc"></div></nav>
+  <main id="content"></main>
+</div>
+<script type="text/plain" id="src"># Project SELARAS — Backend Technical Innovation
+
+> Three engines, one guarantee. Every claim SELARAS makes is traceable to a
+> verbatim clause, enforced in **code** rather than requested in a prompt.
+
+---
+
+## The Cross-Cutting Innovation: Structural Citation Integrity
+
+Before the three engines, the property that makes them credible in a regulatory
+setting. Most RAG systems ask the model politely not to hallucinate. SELARAS
+makes hallucination **structurally impossible to publish**, at three independent
+layers:
+
+| Layer              | Mechanism                                                                                                          | Where                                    |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------- |
+| **Extraction**     | Every passage is verified to be a literal substring of the source markdown — no paraphrase, no LLM-quoted text     | `anchors.verify_substring`               |
+| **Finding**        | Every cited anchor id is resolved against the index; any unresolved citation demotes the finding to `unsupported`  | `finder_pipeline` Stage 6                |
+| **Recommendation** | Every citation is resolved against accepted findings; clause text is copied from disk, never from the model's echo | `recommendations.enforce_evidence_floor` |
+
+```mermaid
+graph LR
+    M["LLM output"] --> V{"Code-level<br/>validator"}
+    V -->|"citation resolves"| P["Published<br/>with verbatim text<br/>copied from disk"]
+    V -->|"citation fails"| D["Dropped /<br/>marked unsupported"]
+
+    style P fill:#dcfce7,stroke:#16a34a
+    style D fill:#fee2e2,stroke:#dc2626
+    style V fill:#dbeafe,stroke:#2563eb
+```
+
+**Why it matters:** a model that invents a clause number gets its output
+_dropped_, not published. This is the difference between a demo and a tool a
+regulator can defend in front of an audit committee.
+
+---
+
+## 1. Extraction → Finder Pipeline
+
+**The problem:** comparing two 80-page policy documents clause-by-clause is
+O(n×m). Naive pairwise comparison of ~400 passages per document is 160,000 model
+calls — impossible on cost and latency. Sending both whole documents in one call
+loses the clause-level precision that citation demands.
+
+**The innovation:** a six-stage pipeline that splits the problem into two
+complementary passes — _targeted_ same-topic comparison and _global_ coverage
+detection — with three model tiers matched to the reasoning difficulty of each
+stage.
+
+```mermaid
+graph TD
+    subgraph Ingest["Ingestion — deterministic"]
+        PDF["PDF / DOCX"] --> DI["Azure Document Intelligence<br/>(reading-order recovery)"]
+        DI --> MD["Markdown"]
+        MD --> SEG["Doc-class segmenter<br/>structured-rules | semi-structured | prose"]
+        SEG --> ANC["Anchors<br/>verbatim substring-verified"]
+    end
+
+    subgraph Pipeline["Finder Pipeline — 6 stages"]
+        ANC --> S1["<b>Stage 1 · Axis extraction</b><br/>per-anchor topic labels<br/><i>Haiku · small tier</i><br/>disk-cached on text hash"]
+        S1 --> S2["<b>Stage 2 · Same-topic retrieval</b><br/>cosine embeddings<br/>BM25 fallback<br/><i>no model</i>"]
+        S2 --> S3["<b>Stage 3 · Batched finder</b><br/>batch-union membership, size 8<br/>3 agreement labels only<br/><i>Sonnet · mid tier</i>"]
+        S3 --> S4["<b>Stage 4 · Suppression build</b><br/>topics already resolved<br/><i>no model</i>"]
+        S4 --> S5["<b>Stage 5 · Whole-doc coverage</b><br/>ONE call, silent-on / goes-beyond<br/><i>Opus · large tier</i>"]
+        S5 --> S6["<b>Stage 6 · Merge + validate</b><br/>citation reformat, evidence check<br/><i>no model</i>"]
+    end
+
+    S6 --> OUT["Findings<br/>5-label taxonomy + verbatim citations"]
+
+    style S2 fill:#f1f5f9,stroke:#64748b
+    style S4 fill:#f1f5f9,stroke:#64748b
+    style S6 fill:#dbeafe,stroke:#2563eb
+    style OUT fill:#dcfce7,stroke:#16a34a
+```
+
+### What is genuinely novel
+
+- **Two-pass design solves a recall problem single-pass RAG cannot.** Retrieval
+  finds clauses that _are_ about the same topic. But the highest-value regulatory
+  finding is the **absence** of a clause — "HKMA governs this, we are silent."
+  A retrieval-only system can never surface that, because there is nothing on our
+  side to retrieve. Stage 5 reads whole documents specifically to catch
+  `silent-on` / `goes-beyond`, with Stage 4 suppressing topics Stage 3 already
+  resolved so the expensive pass isn't re-litigating settled ground.
+- **Three model tiers, matched to task difficulty.** Topic-phrase extraction is
+  not reasoning — it runs on the small tier. Per-pair semantic judgment runs
+  mid-tier. Only whole-document coverage inference — the hardest call, requiring
+  the model to hold both documents at once — reaches the large tier. Cost scales
+  with difficulty, not uniformly.
+- **No critic loop.** The earlier finder→critic architecture was retired after
+  ablation experiments showed the finder-only design matched it. Half the model
+  calls, same output quality — a result, not an assumption.
+- **Deterministic citation repair.** When a model returns `RMiT 2.2(b):` with
+  trailing punctuation, Stage 6 recovers it (strip punctuation, restore document
+  prefix) and logs the rewrite. But **no fuzzy or semantic matching** — an id that
+  only partially resembles a real anchor is demoted to `unsupported`. Repair
+  never becomes guessing.
+- **Doc-class-aware segmentation.** BNM policy documents, BIS papers, and MAS
+  playbooks are structured completely differently. Three registered segmenter
+  strategies handle each; the drafter chooses, the tool never guesses (a wrong
+  guess yields unusable passages).
+
+---
+
+## 2. Recommendations Engine
+
+**The problem:** triage leaves the drafter holding thirty accepted comparisons —
+"our clause 8.4 is silent where HKMA's 4.2 is not" — and no answer to _what the
+policy document should actually say_. This is the step most policy-AI tools stop
+short of.
+
+```mermaid
+graph TD
+    ACC["Accepted findings<br/>(neighbourhood scope)"] --> EV["collect_evidence<br/>verbatim clause text<br/>copied off finding records"]
+    DIM["Drafter's own<br/><i>policy_requirement</i> field"] --> PROMPT
+    GR["Workstream guardrails<br/>(drafter-authored constraints)"] --> PROMPT
+    EV --> PROMPT["Single model pass<br/><i>Opus · large tier</i>"]
+
+    PROMPT --> PARSE["parse_response"]
+    PARSE --> FLOOR{"<b>enforce_evidence_floor</b><br/>every citation resolved<br/>against accepted set?"}
+
+    FLOOR -->|"≥1 resolves"| KEEP["Persisted<br/>citations replaced wholesale<br/>with our own records"]
+    FLOOR -->|"none resolve"| DROP["Dropped<br/>counted in dropped_unsupported"]
+
+    KEEP --> COV["coverage()<br/>derived on every read"]
+    COV --> NYR["'Not yet reflected'<br/>accepted findings no<br/>recommendation covers"]
+
+    style FLOOR fill:#dbeafe,stroke:#2563eb
+    style KEEP fill:#dcfce7,stroke:#16a34a
+    style DROP fill:#fee2e2,stroke:#dc2626
+```
+
+### What is genuinely novel
+
+- **The evidence floor is enforced after generation, not requested during it.**
+  Every citation is resolved against the accepted-findings set. A recommendation
+  whose citations _all_ fail to resolve is dropped **before anything is
+  persisted**. Surviving citations are then replaced wholesale by records built
+  from the findings themselves — so clause number and clause text are ours,
+  copied from disk, never the model's paraphrase.
+- **Dimensions come from the drafter, never the tool.** The generation axes are
+  read from the working draft's own `policy_requirement` field, which the drafter
+  maintains. No requirements recorded → generation refuses and says why. A
+  recommendation is always framed in vocabulary the drafter authored, and
+  therefore trusts.
+- **Guardrails are constraints inside one pass, not a second scoring stage.**
+  Deliberately unlike the finder pipeline. This is also why **no relevance score
+  reaches the interface**: there is no independent judgement to report, and a
+  self-assigned score would invite trust it has not earned.
+- **Coverage is derived on every read, never stored.** `not_yet_reflected` — the
+  accepted findings no recommendation has drawn on — is recomputed per request,
+  because a persisted figure would silently drift as findings are accepted after
+  generation.
+- **Rewrite preserves the audit chain.** Rewriting one recommendation from the
+  drafter's comments keeps its id, bookmark, dimensions and comments, and appends
+  the superseded text to `revisions`. The evidence floor applies to the rewrite
+  too — a rewrite may never launder a card past the citation rule.
+
+---
+
+## 3. Drafting Copilot — Current State and the Agentic Target
+
+**Honest current state.** Two of three layers already exist and are tested:
+
+| Layer                                                          | Status                                                                                                                     |
+| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **Live model backend** (`engine/copilot.py`)                   | ✅ Built — real `call_chat`, streaming SSE, prompt + code citation guardrail (`_validate_reply`), playbook-stage injection |
+| **API surface + typed client**                                 | ✅ Built — `POST .../copilot`, `POST .../copilot/stream`, `sendCopilotMessage` / `streamCopilotMessage`                    |
+| **Slash-command orchestration** (`/explore-task` → `/deliver`) | ⚠️ Scripted in the UI, grounded in verbatim fixture clauses — **not yet wired to the live backend**                        |
+
+The gap is **not** "build a copilot." It is: connect the built backend to the UI,
+and add the agentic orchestration layer the five commands imply.
+
+### Target architecture: five commands as five agent skills
+
+```mermaid
+graph TD
+    subgraph Client["Drafting Workspace"]
+        CMD["Slash command<br/>/explore-task · /brainstorm<br/>/draft · /write · /deliver"]
+        ED["Editor<br/>(live draft + selection)"]
+    end
+
+    CMD --> ORCH["<b>Agent orchestrator</b><br/>stage state machine<br/>+ playbook instructions"]
+    ED -->|"non-citable context"| ORCH
+
+    subgraph Skills["Skill layer — one per command"]
+        SK1["<b>explore-task</b><br/>read node metadata<br/>report profile gaps<br/><i>tool: graph read</i>"]
+        SK2["<b>brainstorm</b><br/>pull accepted findings<br/>+ recommendations<br/>clarify via Q&A"]
+        SK3["<b>draft</b><br/>propose section outline<br/>map findings → sections"]
+        SK4["<b>write</b><br/>generate prose per section<br/>cite accepted evidence"]
+        SK5["<b>deliver</b><br/>completeness check<br/>→ maker-checker submit"]
+    end
+
+    ORCH --> SK1 --> SK2 --> SK3 --> SK4 --> SK5
+
+    subgraph Tools["Shared tool surface (all exist today)"]
+        T1["Anchor / clause index"]
+        T2["Accepted findings"]
+        T3["Recommendations + guardrails"]
+        T4["Node metadata + playbook"]
+    end
+
+    SK1 -.-> T4
+    SK2 -.-> T2
+    SK2 -.-> T3
+    SK3 -.-> T3
+    SK4 -.-> T1
+    SK4 -.-> T2
+    SK5 -.-> T4
+
+    SK4 --> GUARD{"<b>_validate_reply</b><br/>drop unsupplied citations<br/>re-quote from grounded set"}
+    GUARD --> OUT["Draft prose<br/>inserted at cursor<br/>or full-document replace"]
+
+    style GUARD fill:#dbeafe,stroke:#2563eb
+    style OUT fill:#dcfce7,stroke:#16a34a
+    style ORCH fill:#fef9c3,stroke:#ca8a04
+```
+
+### What the real implementation requires
+
+- **A stage state machine, not five independent prompts.** `/write` is only
+  meaningful after `/draft` has produced an outline; `/deliver` only after prose
+  exists. The orchestrator must gate commands on prior-stage output and carry
+  accumulated state (chosen focus, approved outline, drafted sections) forward.
+- **Tool-calling over the existing read surface.** Every tool the skills need is
+  already an API route — graph reads, accepted findings, recommendations,
+  guardrails, node metadata, playbook sections. The skills become tool-callers
+  over routes that exist and are tested, rather than new infrastructure.
+- **Per-stage prompt injection is already built.** `playbook.section_for_stage`
+  already resolves the drafter's own instructions for the active stage and injects
+  them into the system prompt. The playbook UI writes them; the backend reads
+  them. Only the command→stage dispatch is missing.
+- **The citation guardrail already covers the hardest case.** `/write` produces
+  the output most likely to hallucinate a clause. `_validate_reply` already drops
+  any citation not present in the grounding context and re-quotes text from the
+  grounded set — so the riskiest skill is the one already protected.
+- **Streaming is already solved.** The `<<<META>>>` sentinel splits Markdown prose
+  from trailing JSON metadata, so prose streams as tokens while citations and
+  draft snippets are parsed after the stream exhausts. No re-engineering needed
+  for a token-streaming agent UI.
+
+---
+
+## Why these three, in one line each
+
+| Engine                     | The hard problem it solves                                              | Why it's defensible                                                              |
+| -------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| **Finder pipeline**        | Finding what a document _doesn't_ say — invisible to retrieval-only RAG | Two-pass + 3 model tiers, validated by ablation, not assumed                     |
+| **Recommendations engine** | Turning triage output into drafted policy language                      | Evidence floor drops uncited output before persistence                           |
+| **Drafting copilot**       | Multi-stage authoring where each step depends on the last               | Live backend + guardrail built; orchestration is composition, not new capability |
+
+</script>
+<script>
+(function () {
+  var md = document.getElementById("src").textContent;
+
+  // Pull mermaid fences out before marked touches them.
+  var blocks = [];
+  md = md.replace(/```mermaid\n([\s\S]*?)```/g, function (_, body) {
+    blocks.push(body);
+    return "\n@@MERMAID" + (blocks.length - 1) + "@@\n";
+  });
+
+  marked.setOptions({ gfm: true, breaks: false });
+  var html = marked.parse(md);
+
+  html = html.replace(/<p>@@MERMAID(\d+)@@<\/p>/g, function (_, i) {
+    return '<pre class="mermaid">' + blocks[+i]
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</pre>";
+  });
+
+  var content = document.getElementById("content");
+  content.innerHTML = html;
+
+  content.querySelectorAll("table").forEach(function (t) {
+    var w = document.createElement("div");
+    w.className = "tablewrap";
+    t.parentNode.insertBefore(w, t);
+    w.appendChild(t);
+  });
+
+  var toc = document.getElementById("toc");
+  var heads = [].slice.call(content.querySelectorAll("h2, h3"));
+  heads.forEach(function (h, i) {
+    h.id = h.id || "s" + i + "-" + h.textContent.toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
+    var a = document.createElement("a");
+    a.href = "#" + h.id;
+    a.textContent = h.textContent;
+    a.className = h.tagName.toLowerCase();
+    toc.appendChild(a);
+  });
+
+  var links = [].slice.call(toc.querySelectorAll("a"));
+  var seen = new Map();
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { seen.set(e.target.id, e.isIntersecting ? e.intersectionRatio : 0); });
+    var best = null, bestTop = Infinity;
+    heads.forEach(function (h) {
+      var top = h.getBoundingClientRect().top;
+      if (top <= 140 && Math.abs(top) < bestTop) { bestTop = Math.abs(top); best = h.id; }
+    });
+    if (!best && heads.length) best = heads[0].id;
+    links.forEach(function (a) { a.classList.toggle("active", a.hash === "#" + best); });
+  }, { rootMargin: "-100px 0px -70% 0px", threshold: [0, 1] });
+  heads.forEach(function (h) { obs.observe(h); });
+
+  function boot() {
+    if (!window.__mermaid) return setTimeout(boot, 60);
+    var dark = matchMedia("(prefers-color-scheme: dark)").matches;
+    window.__mermaid.initialize({
+      startOnLoad: false,
+      theme: dark ? "dark" : "neutral",
+      themeVariables: { fontFamily: "ui-sans-serif, system-ui, sans-serif", fontSize: "14px" }
+    });
+    window.__mermaid.run({ querySelector: ".mermaid" });
+  }
+  boot();
+})();
+</script>
+</body>
+</html>

@@ -287,6 +287,8 @@ p.deck strong{color:var(--ink-2);font-weight:700}
 .ingest{display:flex;align-items:center;padding:12px 16px;border-radius:13px;background:#fbfcfe;border:1px dashed #cdd9ea}
 .ing-node{flex:0 0 auto;padding:6px 12px;border-radius:9px;background:#fff;border:1px solid var(--line);font-size:15.5px;font-weight:500;color:var(--ink-2);box-shadow:var(--sh-1)}
 .ing-node b{font-weight:700;color:var(--ink)}
+.ing-node.ing-out{background:var(--green-tint);border-color:#a7e8bf;color:var(--green-ink)}
+.ing-node.ing-out b{color:var(--green-ink)}
 .ing-arrow{flex:0 0 auto;padding:0 11px;color:#b8c6dc;display:grid;place-items:center}
 
 .novel{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
@@ -325,9 +327,9 @@ p.deck strong{color:var(--ink-2);font-weight:700}
   content:"";position:absolute;left:50%;bottom:-1px;transform:translateX(-50%);
   border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #c5d5f0;
 }
-.conn.short{height:22px}
+.conn.short{height:18px}
 .conn.short .rail{display:none}
-.conn.short .dn{top:0;height:20px}
+.conn.short .dn{top:0;height:16px}
 
 /* The validator gate — the deck's signature motif, reused here. */
 .gatebar{
@@ -356,6 +358,11 @@ p.deck strong{color:var(--ink-2);font-weight:700}
 }
 .onepass .mt{font-size:18.5px;font-weight:700;color:var(--ink);line-height:1.24}
 .onepass .ms{margin-top:5px;font-size:16px;line-height:1.42;color:var(--muted)}
+/* The tail of the graph: coverage is recomputed on every read, never stored. */
+.derive{padding:13px 17px;border-radius:12px;background:#fbfcfe;border:1px dashed #cdd9ea;display:flex;align-items:baseline;gap:14px}
+.derive .dvt{flex:none;font-size:17px;font-weight:700;color:var(--ink)}
+.derive .dvd{font-size:16px;line-height:1.44;color:var(--muted)}
+.derive .dvd b{color:var(--ink-2);font-weight:700}
 
 /* Copilot (slide 4) */
 .cop{display:grid;grid-template-columns:1.42fr 1fr;gap:26px;flex:1 1 auto;min-height:0}
@@ -365,13 +372,31 @@ p.deck strong{color:var(--ink-2);font-weight:700}
 }
 .orch .ot{font-size:18.5px;font-weight:700;color:var(--ink);line-height:1.24}
 .orch .od{margin-top:5px;font-size:16px;line-height:1.42;color:var(--muted)}
+/* What the orchestrator is fed: the command you type, plus the live editor —
+   whose text is context only and is never quotable. */
+.cin{display:grid;grid-template-columns:1fr 1.35fr;gap:12px;flex:none}
+.cin-b{padding:11px 15px;border-radius:12px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);display:flex;align-items:baseline;gap:11px}
+.cin-b .cit{font-size:16.5px;font-weight:700;color:var(--ink);white-space:nowrap}
+.cin-b .cid{font-size:15.5px;line-height:1.35;color:var(--muted)}
+.cin-b.ctx{border-style:dashed;background:#fbfcfe}
+.cin-b.ctx .cid i{font-style:normal;color:var(--amber);font-weight:700}
+
 .chain{display:flex;align-items:stretch;flex:none}
 .cmd{flex:1 1 0;min-width:0;padding:13px 13px;border-radius:12px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);display:flex;flex-direction:column}
 .cmd .cn{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--blue-deep)}
 .cmd .cd{margin-top:6px;font-size:16px;line-height:1.44;color:var(--muted);flex:1 1 auto}
-.tools{display:flex;align-items:center;gap:10px;padding:11px 17px;border-radius:13px;background:#fbfcfe;border:1px dashed #cdd9ea;flex-wrap:nowrap}
-.tools .tl{font-size:16.5px;font-weight:700;color:var(--ink-2);margin-right:4px}
-.tool{padding:6px 12px;border-radius:8px;background:#fff;border:1px solid var(--line);font-family:var(--mono);font-size:15.5px;color:var(--ink-2)}
+/* The dotted tool edges from the source graph, drawn inside the skill that
+   calls them — one skill, its own tools, rather than one shared band. */
+.cmd .cto{margin-top:10px;padding-top:9px;border-top:1px dashed #d9e2ee;display:flex;flex-wrap:wrap;gap:5px}
+.cmd .cto span{padding:3px 8px;border-radius:6px;background:#f4f7fc;border:1px solid #e1e9f4;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.cmd.hot{background:linear-gradient(150deg,#f4f8ff,#fff 70%);border-color:#c3d7fa}
+
+.cout{
+  display:flex;align-items:baseline;gap:14px;padding:11px 18px;border-radius:12px;
+  background:var(--green-tint);border:1px solid #8fdcac;
+}
+.cout .cot{flex:none;font-size:17.5px;font-weight:700;color:var(--green-ink);line-height:1.3}
+.cout .cod{font-size:16px;line-height:1.35;color:#166534}
 .status3{display:flex;flex-direction:column;gap:10px;flex:none}
 .stat{padding:13px 16px;border-radius:13px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);border-left:3px solid var(--green)}
 .stat.todo{border-left-color:var(--amber);background:linear-gradient(120deg,#fffdf2,#fff 70%)}
@@ -808,6 +833,21 @@ p.deck strong{color:var(--ink-2);font-weight:700}
     <div class="body rise">
       <div class="arch">
 
+        <div style="flex:none;display:flex;flex-direction:column">
+          <div class="seclabel"><span class="t">Before any AI runs &mdash; getting the clauses out, exactly as written</span><span class="l"></span><span class="pill pill-slate pill-sm">No AI &middot; deterministic</span></div>
+          <div class="ingest">
+            <span class="ing-node"><b>PDF / DOCX</b></span>
+            <span class="ing-arrow">&rarr;</span>
+            <span class="ing-node">Azure Document Intelligence <b>recovers reading order</b></span>
+            <span class="ing-arrow">&rarr;</span>
+            <span class="ing-node">Markdown</span>
+            <span class="ing-arrow">&rarr;</span>
+            <span class="ing-node">Segmenter the drafter picks &mdash; <b>rules / semi-structured / prose</b></span>
+            <span class="ing-arrow">&rarr;</span>
+            <span class="ing-node ing-out">Clauses, each <b>checked to be literally in the source</b></span>
+          </div>
+        </div>
+
         <div style="flex:1.7 1 auto;display:flex;flex-direction:column;min-height:0">
           <div class="seclabel"><span class="t">The run &mdash; six steps, nine AI calls</span><span class="l"></span><span class="pill pill-ghost pill-sm">Out: one of five plain verdicts, each quoting a real clause</span></div>
           <div class="pipe" style="flex:1 1 auto;min-height:0">
@@ -912,15 +952,15 @@ p.deck strong{color:var(--ink-2);font-weight:700}
           <div class="drow c3">
             <div class="dnode">
               <div class="dt">Findings the drafter accepted</div>
-              <p class="dd">Clause text is copied <b>from the finding</b>, never re-asked from the AI.</p>
+              <p class="dd">Clause text is copied <b>from the finding</b>, never re-asked.</p>
             </div>
             <div class="dnode">
               <div class="dt">Their own requirements</div>
-              <p class="dd">What the draft must cover, in their words. These become the headings.</p>
+              <p class="dd">In their words. These become the headings.</p>
             </div>
             <div class="dnode">
               <div class="dt">The house rules</div>
-              <p class="dd"><b>Five ship by default</b>, each written from a real BNM review.</p>
+              <p class="dd"><b>Five ship by default</b>, from a real BNM review.</p>
             </div>
           </div>
 
@@ -948,7 +988,7 @@ p.deck strong{color:var(--ink-2);font-weight:700}
             </span>
             <div>
               <div class="gt">The check</div>
-              <p class="gq">Does every quote point at a finding the drafter accepted? Run <b>after</b> the AI answers &mdash; not asked for in advance.</p>
+              <p class="gq">Does every quote point at a finding the drafter accepted? Run <b>after</b> the AI answers, not asked for in advance.</p>
             </div>
             <span class="gw">enforce_evidence_floor</span>
           </div>
@@ -963,12 +1003,19 @@ p.deck strong{color:var(--ink-2);font-weight:700}
           <div class="drow c2">
             <div class="fork ok">
               <div class="cond">At least one holds &rarr; kept</div>
-              <div class="out">Its quotes are swapped for <b>our own records</b> &mdash; clause number and text come from the document, not from what the AI typed.</div>
+              <div class="out">Its quotes are swapped for <b>our own records</b> &mdash; clause number and text come from the document, not the AI.</div>
             </div>
             <div class="fork no">
               <div class="cond">None hold &rarr; dropped</div>
               <div class="out">Thrown away <b>before anything is saved</b>, and counted so the drafter sees it happened.</div>
             </div>
+          </div>
+
+          <div class="conn short"><span class="dn" style="left:25%"></span></div>
+
+          <div class="derive">
+            <span class="dvt">Not yet reflected</span>
+            <p class="dvd">Which accepted findings no recommendation has drawn on yet &mdash; worked out <b>fresh on every read</b>, never saved, because a stored figure would go stale.</p>
           </div>
         </div>
 
@@ -1020,10 +1067,28 @@ p.deck strong{color:var(--ink-2);font-weight:700}
         <div class="diag">
           <div class="seclabel"><span class="t">How the copilot is put together</span><span class="l"></span></div>
 
+          <div class="cin">
+            <div class="cin-b">
+              <span class="cit">What you type</span>
+              <span class="cid">one of five commands</span>
+            </div>
+            <div class="cin-b ctx">
+              <span class="cit">The editor</span>
+              <span class="cid">your live draft and whatever you have selected &mdash; <i>context only, never quotable</i></span>
+            </div>
+          </div>
+
+          <div class="conn">
+            <span class="rail" style="left:20%;right:33%"></span>
+            <span class="up" style="left:20%"></span>
+            <span class="up" style="left:67%"></span>
+            <span class="dn" style="left:50%"></span>
+          </div>
+
           <div class="orch">
             <div>
               <div class="ot">The orchestrator &mdash; it knows which stage you are in</div>
-              <p class="od">Each command is only allowed once the one before it has produced something, and the drafter's own playbook instructions for that stage go into every prompt.</p>
+              <p class="od">A command only runs after the one before it, and the drafter's playbook for that stage goes into every prompt.</p>
             </div>
             <span class="pill pill-amber">Stage state machine</span>
           </div>
@@ -1042,40 +1107,35 @@ p.deck strong{color:var(--ink-2);font-weight:700}
             <div class="cmd">
               <div class="cn">/explore-task</div>
               <p class="cd">Read what this document is, report what's missing from its profile.</p>
+              <div class="cto"><span>document profile</span><span>playbook</span></div>
             </div>
             <div class="pipe-arrow">&rarr;</div>
             <div class="cmd">
               <div class="cn">/brainstorm</div>
               <p class="cd">Pull the accepted findings and recommendations, ask what to focus on.</p>
+              <div class="cto"><span>accepted findings</span><span>recommendations</span></div>
             </div>
             <div class="pipe-arrow">&rarr;</div>
             <div class="cmd">
               <div class="cn">/draft</div>
               <p class="cd">Propose the section outline, map each finding to a section.</p>
+              <div class="cto"><span>recommendations</span><span>house rules</span></div>
             </div>
             <div class="pipe-arrow">&rarr;</div>
-            <div class="cmd">
+            <div class="cmd hot">
               <div class="cn">/write</div>
               <p class="cd">Write the prose for a section, quoting accepted evidence.</p>
+              <div class="cto"><span>clause index</span><span>accepted findings</span></div>
             </div>
             <div class="pipe-arrow">&rarr;</div>
             <div class="cmd">
               <div class="cn">/deliver</div>
               <p class="cd">Completeness check, then send for maker&ndash;checker sign-off.</p>
+              <div class="cto"><span>document profile</span><span>playbook</span></div>
             </div>
           </div>
 
-          <div class="conn short"><span class="dn" style="left:50%"></span></div>
-
-          <div class="tools">
-            <span class="tl">Every tool they need already exists</span>
-            <span class="tool">clause index</span>
-            <span class="tool">accepted findings</span>
-            <span class="tool">recommendations</span>
-            <span class="tool">playbook</span>
-          </div>
-
-          <div class="conn short"><span class="dn" style="left:50%"></span></div>
+          <div class="conn short"><span class="dn" style="left:70.5%"></span></div>
 
           <div class="gatebar">
             <span class="gi">
@@ -1083,9 +1143,16 @@ p.deck strong{color:var(--ink-2);font-weight:700}
             </span>
             <div>
               <div class="gt">The same gate, on the riskiest step</div>
-              <p class="gq"><b>/write</b> is the one most likely to invent a clause. Any quote it wasn't given is dropped and re-quoted from the real text before a word reaches the page.</p>
+              <p class="gq">Every tool above is a route that already exists. <b>/write</b> is the one most likely to invent a clause &mdash; any quote it wasn't given is dropped and re-quoted from the real text.</p>
             </div>
             <span class="gw">_validate_reply &middot; built</span>
+          </div>
+
+          <div class="conn short"><span class="dn" style="left:50%"></span></div>
+
+          <div class="cout">
+            <span class="cot">Prose lands in the draft</span>
+            <span class="cod">at the cursor, or replacing the whole document &mdash; the drafter's choice</span>
           </div>
         </div>
 
