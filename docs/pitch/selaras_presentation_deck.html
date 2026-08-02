@@ -296,43 +296,90 @@ p.deck strong{color:var(--ink-2);font-weight:700}
 .nov .nd{margin-top:7px;font-size:16.5px;line-height:1.5;color:var(--muted)}
 .nov .nd b{color:var(--ink-2);font-weight:700}
 
-/* Recommendations engine (slide 3) */
-.rec{display:grid;grid-template-columns:1fr 1fr;gap:22px;flex:1 1 auto;min-height:0}
-.recflow{display:flex;flex-direction:column;gap:11px}
-.inputs{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
-.inp{padding:12px 13px;border-radius:12px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1)}
-.inp .it{font-size:17px;font-weight:700;color:var(--ink);line-height:1.28}
-.sub{margin-top:5px;font-size:15px;line-height:1.42;color:var(--muted)}
-.merge{padding:14px 18px;border-radius:12px;background:linear-gradient(120deg,#f6f1ff,#ffffff);border:1px solid #ddcffb;box-shadow:var(--sh-1);display:flex;align-items:center;justify-content:space-between;gap:14px}
-.merge .mt{font-size:17.5px;font-weight:700;color:var(--ink)}
-.floor{padding:16px 18px;border-radius:12px;background:var(--blue-tint-2);border:2px solid var(--blue);box-shadow:0 6px 20px -8px rgba(37,99,235,.4)}
-.floor .ft{font-size:18.5px;font-weight:700;color:var(--blue-ink);display:flex;align-items:center;gap:9px}
-.floor .fq{margin-top:6px;font-family:var(--mono);font-size:15px;line-height:1.5;color:#1c3f8f}
-.outs{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-.fork{border-radius:12px;padding:12px 14px;border:1px solid}
+/* ─── Diagram primitives shared by slides 3 and 4 ───────────────────────── */
+/* Slides 3 and 4 are drawn as diagrams, not card walls: real boxes joined by
+   real connectors, so the shape of the engine is readable before any of the
+   text is. Connectors are pure CSS — a stem, a rail and drop lines — because
+   the deck must stay one self-contained file with no diagram library. */
+.diag{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+.dnode{
+  padding:14px 17px;border-radius:13px;background:#fff;
+  border:1px solid var(--line);box-shadow:var(--sh-1);
+}
+.dnode .dt{font-size:17.5px;font-weight:700;line-height:1.26;color:var(--ink)}
+.dnode .dd{margin-top:6px;font-size:16px;line-height:1.44;color:var(--muted)}
+.dnode .dd b{color:var(--ink-2);font-weight:700}
+.dnode .dw{margin-top:8px;display:inline-block;font-family:var(--mono);font-size:14.5px;color:var(--blue-ink);background:var(--blue-tint);border:1px solid #d5e3fb;border-radius:6px;padding:3px 8px}
+.drow{display:grid;gap:12px}
+.drow.c3{grid-template-columns:repeat(3,1fr)}
+.drow.c2{grid-template-columns:1fr 1fr}
+
+/* Connector: N stems rising to a rail, one arrow leaving it (converge), or one
+   stem to a rail and N arrows leaving it (diverge). Same markup either way —
+   the .down modifier just flips which end carries the arrowhead. */
+.conn{position:relative;flex:none;height:30px}
+.conn .rail{position:absolute;left:0;right:0;top:16px;height:2px;background:#c5d5f0}
+.conn .up{position:absolute;top:0;width:2px;height:16px;background:#c5d5f0;transform:translateX(-50%)}
+.conn .dn{position:absolute;top:16px;width:2px;height:16px;background:#c5d5f0;transform:translateX(-50%)}
+.conn .dn::after{
+  content:"";position:absolute;left:50%;bottom:-1px;transform:translateX(-50%);
+  border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #c5d5f0;
+}
+.conn.short{height:22px}
+.conn.short .rail{display:none}
+.conn.short .dn{top:0;height:20px}
+
+/* The validator gate — the deck's signature motif, reused here. */
+.gatebar{
+  display:flex;align-items:center;gap:16px;padding:15px 20px;border-radius:13px;
+  background:var(--blue-tint-2);border:2px solid var(--blue);box-shadow:0 6px 20px -8px rgba(37,99,235,.4);
+}
+.gatebar .gi{flex:none;color:var(--blue-deep);display:grid;place-items:center}
+.gatebar .gt{font-size:19px;font-weight:700;color:var(--blue-ink);line-height:1.24}
+.gatebar .gq{margin-top:5px;font-size:16px;line-height:1.42;color:#1c3f8f}
+.gatebar .gq b{font-weight:700}
+.gatebar .gw{margin-left:auto;flex:none;font-family:var(--mono);font-size:14.5px;color:#1c3f8f;opacity:.75;white-space:nowrap}
+
+.fork{border-radius:12px;padding:13px 16px;border:1px solid}
 .fork.ok{background:var(--green-tint);border-color:#8fdcac}
 .fork.no{background:var(--red-tint);border-color:#f4aeae}
-.fork .cond{font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.fork .cond{font-family:var(--mono);font-size:14.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
 .fork.ok .cond{color:var(--green-ink)} .fork.no .cond{color:#b91c1c}
-.fork .out{margin-top:3px;font-size:16.5px;line-height:1.4;color:var(--ink-2);font-weight:500}
-.derive{padding:12px 15px;border-radius:12px;background:#fbfcfe;border:1px dashed #cdd9ea;font-size:16px;line-height:1.5;color:var(--muted)}
-.derive b{color:var(--ink);font-weight:700}
+.fork .out{margin-top:4px;font-size:16.5px;line-height:1.4;color:var(--ink-2);font-weight:500}
+
+/* Recommendations engine (slide 3) */
+.rec{display:grid;grid-template-columns:1.34fr 1fr;gap:26px;flex:1 1 auto;min-height:0}
+.onepass{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:15px 20px;border-radius:13px;
+  background:linear-gradient(120deg,#f6f1ff,#fff 72%);border:1px solid #ddcffb;box-shadow:var(--sh-1);
+}
+.onepass .mt{font-size:18.5px;font-weight:700;color:var(--ink);line-height:1.24}
+.onepass .ms{margin-top:5px;font-size:16px;line-height:1.42;color:var(--muted)}
 
 /* Copilot (slide 4) */
-.cop{display:flex;flex-direction:column;gap:18px;flex:1 1 auto;min-height:0}
-.status3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.stat{padding:14px 16px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);display:flex;flex-direction:column;gap:8px;align-items:flex-start}
-.stat.built{border-top:3px solid var(--green)} .stat.todo{border-top:3px solid var(--amber)}
-.stat .sl{font-size:17px;font-weight:700;color:var(--ink);line-height:1.28}
-.stat .ss{font-size:16px;line-height:1.5;color:var(--muted)}
-.chain{display:flex;align-items:stretch}
-.cmd{flex:1 1 0;min-width:0;padding:12px 13px 13px;border-radius:12px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);display:flex;flex-direction:column}
-.cmd .cn{font-family:var(--mono);font-size:16.5px;font-weight:700;color:var(--blue-deep)}
-.cmd .cd{margin-top:6px;font-size:15.5px;line-height:1.45;color:var(--muted);flex:1 1 auto}
-.cmd .ct{margin-top:8px}
-.cmd.guard{background:var(--blue-tint);border-color:#c3d7fa}
-.tools{display:flex;align-items:center;gap:11px;padding:12px 16px;border-radius:13px;background:#fbfcfe;border:1px dashed #cdd9ea;flex-wrap:wrap}
-.tool{padding:5px 11px;border-radius:8px;background:#fff;border:1px solid var(--line);font-family:var(--mono);font-size:14.5px;color:var(--ink-2)}
+.cop{display:grid;grid-template-columns:1.42fr 1fr;gap:26px;flex:1 1 auto;min-height:0}
+.orch{
+  display:flex;align-items:center;gap:16px;padding:13px 20px;border-radius:13px;
+  background:linear-gradient(120deg,#fefbe8,#fff 74%);border:1px solid #eddc8a;box-shadow:var(--sh-1);
+}
+.orch .ot{font-size:18.5px;font-weight:700;color:var(--ink);line-height:1.24}
+.orch .od{margin-top:5px;font-size:16px;line-height:1.42;color:var(--muted)}
+.chain{display:flex;align-items:stretch;flex:none}
+.cmd{flex:1 1 0;min-width:0;padding:13px 13px;border-radius:12px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);display:flex;flex-direction:column}
+.cmd .cn{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--blue-deep)}
+.cmd .cd{margin-top:6px;font-size:16px;line-height:1.44;color:var(--muted);flex:1 1 auto}
+.tools{display:flex;align-items:center;gap:10px;padding:11px 17px;border-radius:13px;background:#fbfcfe;border:1px dashed #cdd9ea;flex-wrap:nowrap}
+.tools .tl{font-size:16.5px;font-weight:700;color:var(--ink-2);margin-right:4px}
+.tool{padding:6px 12px;border-radius:8px;background:#fff;border:1px solid var(--line);font-family:var(--mono);font-size:15.5px;color:var(--ink-2)}
+.status3{display:flex;flex-direction:column;gap:10px;flex:none}
+.stat{padding:13px 16px;border-radius:13px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);border-left:3px solid var(--green)}
+.stat.todo{border-left-color:var(--amber);background:linear-gradient(120deg,#fffdf2,#fff 70%)}
+.stat .sh{display:flex;align-items:center;gap:10px}
+.stat .sl{font-size:17px;font-weight:700;color:var(--ink);line-height:1.26}
+.stat .ss{margin-top:6px;font-size:16px;line-height:1.46;color:var(--muted)}
+.stat .ss b{color:var(--ink-2);font-weight:700}
+.cop .nov{padding:11px 16px}
 
 /* ═══ S5 — feasibility × scalability ═════════════════════════════════════ */
 /* Redesigned as an explicit 2×2 quadrant grid — Functional/Non-functional ×
@@ -419,22 +466,28 @@ p.deck strong{color:var(--ink-2);font-weight:700}
 .reuse{display:grid;grid-template-columns:1.62fr 1fr;grid-template-rows:minmax(0,1fr) auto;gap:20px 26px;flex:1 1 auto;min-height:0}
 .reuse-col{display:flex;flex-direction:column;min-height:0}
 
-/* Left: one engine band, three arrows, then the six departments as a 3×2 card
-   wall. The wall is the headline — a panel should count six blue badges before
-   reading a single word, and the band above says what they all plug into. */
-.engine-band{
-  flex:none;display:flex;align-items:baseline;justify-content:center;gap:16px;
-  padding:15px 24px;border-radius:14px;
-  background:linear-gradient(120deg,var(--blue-tint),#fff 76%);border:1px solid #d3e1fa;
+/* Left: the headline stat, then the six departments as a 2×3 card wall. The
+   stat leads — average applicability across three Blueprint 2026 must-wins —
+   and gets the deck's darkest treatment so it reads first. */
+.mwhero{
+  flex:none;display:flex;align-items:center;gap:26px;padding:18px 24px;border-radius:16px;
+  background:linear-gradient(140deg,#0f172a,#1e3a8a 82%);color:#fff;box-shadow:var(--sh-3);
+  margin-bottom:16px;
 }
-.engine-band .eb-t{font-size:20px;font-weight:700;letter-spacing:-.01em;color:var(--blue-ink)}
-.engine-band .eb-d{font-size:17px;line-height:1.4;color:var(--muted)}
-.fanout{flex:none;height:52px;display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding:12px 0 6px}
-.fanout i{display:block;width:2px;height:100%;margin:0 auto;position:relative;background:linear-gradient(180deg,#dbe6f8,#c0d4f7)}
-.fanout i::after{
-  content:"";position:absolute;left:50%;bottom:-1px;transform:translateX(-50%);
-  border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #c0d4f7;
+.mwhero .mh-n{
+  flex:none;font-size:66px;font-weight:700;letter-spacing:-.04em;line-height:.86;
+  background:linear-gradient(120deg,#fff,#bfdbfe);-webkit-background-clip:text;background-clip:text;color:transparent;
 }
+.mwhero .mh-r{flex:1 1 auto;min-width:0}
+.mwhero .mh-l{margin:0;font-size:17.5px;line-height:1.36;color:#c7d7f5}
+.mwhero .mh-l b{color:#fff;font-weight:700}
+.mwhero .mh-mw{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
+.mwhero .mw{
+  display:inline-flex;align-items:baseline;gap:8px;padding:5px 13px;border-radius:999px;
+  background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.24);
+}
+.mwhero .mw i{font-family:var(--mono);font-style:normal;font-size:13.5px;font-weight:700;color:#93c5fd;letter-spacing:.05em}
+.mwhero .mw span{font-size:15px;color:#e6eefc;line-height:1.3}
 .dgrid{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,minmax(0,1fr));gap:16px;flex:1 1 auto;min-height:0}
 .dcard{
   padding:18px 22px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);
@@ -473,9 +526,9 @@ p.deck strong{color:var(--ink-2);font-weight:700}
   grid-column:1/-1;display:flex;align-items:center;gap:24px;padding:13px 20px;border-radius:13px;
   background:linear-gradient(120deg,var(--blue-tint),#fff 70%);border:1px solid #d3e1fa;
 }
-.metric{display:flex;align-items:baseline;gap:8px}
+.metric{flex:1 1 0;display:flex;align-items:baseline;gap:9px}
 .metric .mv{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--blue-deep);letter-spacing:-.02em}
-.metric .mk{font-size:15.5px;line-height:1.35;color:var(--muted);max-width:158px}
+.metric .mk{font-size:15.5px;line-height:1.35;color:var(--muted)}
 .metric-div{width:1px;align-self:stretch;background:#d3e1fa}
 
 /* ═══ S9 — user feedback ═════════════════════════════════════════════════ */
@@ -853,55 +906,70 @@ p.deck strong{color:var(--ink-2);font-weight:700}
     <div class="body rise">
       <div class="rec">
 
-        <div class="recflow">
-          <div class="seclabel"><span class="t">What goes in, and what has to survive the check</span><span class="l"></span></div>
+        <div class="diag">
+          <div class="seclabel"><span class="t">How a recommendation is made &mdash; and what it has to survive</span><span class="l"></span></div>
 
-          <div class="inputs">
-            <div class="inp">
-              <div class="it">Only what the drafter accepted</div>
-              <p class="sub">Findings the drafter agreed with. The clause text is taken from the finding itself &mdash; never re-asked from the AI.</p>
+          <div class="drow c3">
+            <div class="dnode">
+              <div class="dt">Findings the drafter accepted</div>
+              <p class="dd">Clause text is copied <b>from the finding</b>, never re-asked from the AI.</p>
             </div>
-            <div class="inp">
-              <div class="it">Their own list of requirements</div>
-              <p class="sub">What the draft must cover, in their words. It sets the headings. Nothing listed, or nothing accepted &rarr; <b>we stop before spending anything</b>.</p>
+            <div class="dnode">
+              <div class="dt">Their own requirements</div>
+              <p class="dd">What the draft must cover, in their words. These become the headings.</p>
             </div>
-            <div class="inp">
-              <div class="it">The house rules</div>
-              <p class="sub">Plain-language rules, one set per workstream. <b>Five ship by default</b>, each written from a real BNM review of nine AI-drafted recommendations.</p>
+            <div class="dnode">
+              <div class="dt">The house rules</div>
+              <p class="dd"><b>Five ship by default</b>, each written from a real BNM review.</p>
             </div>
           </div>
 
-          <div class="arrow" style="padding:2px 0"><svg width="18" height="16" viewBox="0 0 18 16"><path d="M9 0v11M4 8l5 6 5-6" stroke="currentColor" stroke-width="1.8" fill="none"/></svg></div>
+          <div class="conn">
+            <span class="rail" style="left:16.6%;right:16.6%"></span>
+            <span class="up" style="left:16.6%"></span>
+            <span class="up" style="left:50%"></span>
+            <span class="up" style="left:83.4%"></span>
+            <span class="dn" style="left:50%"></span>
+          </div>
 
-          <div class="merge">
+          <div class="onepass">
             <div>
-              <div class="mt">One pass, and the house rules are inside it</div>
-              <p class="sub">No second stage that scores the first. Nothing here reaches the drafter unchecked.</p>
+              <div class="mt">One model pass &mdash; the house rules go in with it</div>
+              <p class="ms">No second stage that scores the first. Nothing reaches the drafter unchecked.</p>
             </div>
             <span class="pill pill-violet">Large model</span>
           </div>
 
-          <div class="arrow" style="padding:2px 0"><svg width="18" height="16" viewBox="0 0 18 16"><path d="M9 0v11M4 8l5 6 5-6" stroke="currentColor" stroke-width="1.8" fill="none"/></svg></div>
+          <div class="conn short"><span class="dn" style="left:50%"></span></div>
 
-          <div class="floor">
-            <div class="ft">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5l6 2.6v4.6c0 3.5-2.5 6.4-6 7.3-3.5-.9-6-3.8-6-7.3V4.1l6-2.6z" stroke="currentColor" stroke-width="1.6"/><path d="M6.2 9.1l2 2 3.6-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-              Then the check
+          <div class="gatebar">
+            <span class="gi">
+              <svg width="30" height="30" viewBox="0 0 18 18" fill="none"><path d="M9 1.5l6 2.6v4.6c0 3.5-2.5 6.4-6 7.3-3.5-.9-6-3.8-6-7.3V4.1l6-2.6z" stroke="currentColor" stroke-width="1.6"/><path d="M6.2 9.1l2 2 3.6-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </span>
+            <div>
+              <div class="gt">The check</div>
+              <p class="gq">Does every quote point at a finding the drafter accepted? Run <b>after</b> the AI answers &mdash; not asked for in advance.</p>
             </div>
-            <p class="fq">Does every quote point at a finding the drafter accepted?<br />Run <b>after</b> the AI answers &mdash; not asked for in advance.</p>
+            <span class="gw">enforce_evidence_floor</span>
           </div>
 
-          <div class="outs">
-            <div class="fork ok" style="padding:13px 15px">
+          <div class="conn">
+            <span class="rail" style="left:25%;right:25%"></span>
+            <span class="up" style="left:50%"></span>
+            <span class="dn" style="left:25%"></span>
+            <span class="dn" style="left:75%"></span>
+          </div>
+
+          <div class="drow c2">
+            <div class="fork ok">
               <div class="cond">At least one holds &rarr; kept</div>
-              <div class="out">Its quotes are swapped for <b>our own records</b>. The clause number and text come from the document, not from what the AI typed.</div>
+              <div class="out">Its quotes are swapped for <b>our own records</b> &mdash; clause number and text come from the document, not from what the AI typed.</div>
             </div>
-            <div class="fork no" style="padding:13px 15px">
+            <div class="fork no">
               <div class="cond">None hold &rarr; dropped</div>
-              <div class="out">Thrown away <b>before anything is saved</b>, and counted so the drafter sees it happened. A failed run leaves the previous set untouched.</div>
+              <div class="out">Thrown away <b>before anything is saved</b>, and counted so the drafter sees it happened.</div>
             </div>
           </div>
-
         </div>
 
         <div style="display:flex;flex-direction:column;min-height:0">
@@ -909,7 +977,7 @@ p.deck strong{color:var(--ink-2);font-weight:700}
           <div class="novel" style="grid-template-columns:1fr;flex:1 1 auto;min-height:0">
             <div class="nov g">
               <div class="nt">The quoting rule is built in, not asked for</div>
-              <p class="nd">We don't ask the AI to cite honestly and hope it does. Every quote is checked against the accepted findings afterwards, and if none hold, that recommendation is <b>deleted before it is ever saved</b>.</p>
+              <p class="nd">We don't ask the AI to cite honestly and hope it does. Every quote is checked afterwards, and if none hold the recommendation is <b>deleted before it is ever saved</b>.</p>
             </div>
             <div class="nov">
               <div class="nt">The headings are theirs, not ours</div>
@@ -917,7 +985,7 @@ p.deck strong{color:var(--ink-2);font-weight:700}
             </div>
             <div class="nov a">
               <div class="nt">The house rules leave one head and go on the record</div>
-              <p class="nd">That is problem 4. Judgement built over years &mdash; how BNM cross-references, what scope a draft may claim &mdash; becomes something every future draft reads. <b>Only the drafter writes it</b>: the tool never turns its own output into a rule it then follows.</p>
+              <p class="nd">Judgement built over years &mdash; how BNM cross-references, what scope a draft may claim &mdash; becomes something every future draft reads. <b>Only the drafter writes it.</b></p>
             </div>
           </div>
         </div>
@@ -941,108 +1009,112 @@ p.deck strong{color:var(--ink-2);font-weight:700}
     <div class="head rise">
       <h1 class="title">Drafting <span class="accent">copilot</span></h1>
       <p class="deck">
-        Honest current state: two of three layers already exist and are tested. The gap is <strong>not</strong>
-        "build a copilot" &mdash; it is connecting the built backend to the UI and adding the agentic orchestration
-        the five commands imply. <strong>Orchestration is composition, not new capability.</strong>
+        Two of the three layers are already built and tested. What is left is <strong>joining the five commands
+        to a backend that already exists</strong> &mdash; composition, not new capability.
       </p>
     </div>
 
     <div class="body rise">
-      <div class="cop scroll">
+      <div class="cop">
 
-        <div>
-          <div class="seclabel"><span class="t">Current state &mdash; what is already built</span><span class="l"></span></div>
-          <div class="status3">
-            <div class="stat built">
-              <span class="pill pill-green pill-sm"><span class="dot"></span>Built</span>
-              <div class="sl">Live model backend</div>
-              <p class="ss">Real <span class="mono">call_chat</span>, streaming SSE, prompt <i>and</i> code citation guardrail (<span class="mono">_validate_reply</span>), playbook-stage injection.</p>
-              <span class="lw">engine/copilot.py</span>
+        <div class="diag">
+          <div class="seclabel"><span class="t">How the copilot is put together</span><span class="l"></span></div>
+
+          <div class="orch">
+            <div>
+              <div class="ot">The orchestrator &mdash; it knows which stage you are in</div>
+              <p class="od">Each command is only allowed once the one before it has produced something, and the drafter's own playbook instructions for that stage go into every prompt.</p>
             </div>
-            <div class="stat built">
-              <span class="pill pill-green pill-sm"><span class="dot"></span>Built</span>
-              <div class="sl">API surface + typed client</div>
-              <p class="ss"><span class="mono">POST .../copilot</span> and <span class="mono">POST .../copilot/stream</span>; <span class="mono">sendCopilotMessage</span> / <span class="mono">streamCopilotMessage</span>.</p>
-            </div>
-            <div class="stat todo">
-              <span class="pill pill-amber pill-sm"><span class="dot"></span>The remaining gap</span>
-              <div class="sl">Slash-command orchestration</div>
-              <p class="ss"><span class="mono">/explore-task</span> &rarr; <span class="mono">/deliver</span> is scripted in the UI and grounded in verbatim fixture clauses &mdash; <b>not yet wired to the live backend.</b></p>
-            </div>
+            <span class="pill pill-amber">Stage state machine</span>
           </div>
-        </div>
 
-        <div>
-          <div class="seclabel"><span class="t">Target architecture &mdash; five commands as five agent skills</span><span class="l"></span><span class="pill pill-amber pill-sm">Agent orchestrator: stage state machine + playbook instructions</span></div>
+          <div class="conn">
+            <span class="rail" style="left:10%;right:10%"></span>
+            <span class="up" style="left:50%"></span>
+            <span class="dn" style="left:10%"></span>
+            <span class="dn" style="left:30%"></span>
+            <span class="dn" style="left:50%"></span>
+            <span class="dn" style="left:70%"></span>
+            <span class="dn" style="left:90%"></span>
+          </div>
+
           <div class="chain">
             <div class="cmd">
               <div class="cn">/explore-task</div>
-              <p class="cd">Read node metadata, report profile gaps.</p>
-              <div class="ct"><span class="pill pill-slate pill-sm">tool: graph read</span></div>
+              <p class="cd">Read what this document is, report what's missing from its profile.</p>
             </div>
             <div class="pipe-arrow">&rarr;</div>
             <div class="cmd">
               <div class="cn">/brainstorm</div>
-              <p class="cd">Pull accepted findings + recommendations, clarify via Q&amp;A.</p>
-              <div class="ct"><span class="pill pill-slate pill-sm">findings, recs</span></div>
+              <p class="cd">Pull the accepted findings and recommendations, ask what to focus on.</p>
             </div>
             <div class="pipe-arrow">&rarr;</div>
             <div class="cmd">
               <div class="cn">/draft</div>
-              <p class="cd">Propose a section outline, map findings &rarr; sections.</p>
-              <div class="ct"><span class="pill pill-slate pill-sm">recs + guardrails</span></div>
+              <p class="cd">Propose the section outline, map each finding to a section.</p>
             </div>
             <div class="pipe-arrow">&rarr;</div>
             <div class="cmd">
               <div class="cn">/write</div>
-              <p class="cd">Generate prose per section, cite accepted evidence.</p>
-              <div class="ct"><span class="pill pill-slate pill-sm">clause index, findings</span></div>
-            </div>
-            <div class="pipe-arrow">&rarr;</div>
-            <div class="cmd guard">
-              <div class="cn">_validate_reply</div>
-              <p class="cd">Drop unsupplied citations, re-quote from the grounded set.</p>
-              <div class="ct"><span class="pill pill-blue pill-sm">the gate</span></div>
+              <p class="cd">Write the prose for a section, quoting accepted evidence.</p>
             </div>
             <div class="pipe-arrow">&rarr;</div>
             <div class="cmd">
               <div class="cn">/deliver</div>
-              <p class="cd">Completeness check &rarr; maker-checker submit.</p>
-              <div class="ct"><span class="pill pill-green pill-sm">draft inserted at cursor</span></div>
+              <p class="cd">Completeness check, then send for maker&ndash;checker sign-off.</p>
             </div>
           </div>
-        </div>
 
-        <div>
-          <div class="seclabel"><span class="t">Shared tool surface &mdash; all of it exists today</span><span class="l"></span></div>
+          <div class="conn short"><span class="dn" style="left:50%"></span></div>
+
           <div class="tools">
-            <span class="tool">Anchor / clause index</span>
-            <span class="tool">Accepted findings</span>
-            <span class="tool">Recommendations + guardrails</span>
-            <span class="tool">Node metadata + playbook</span>
-            <span style="flex:1 1 auto"></span>
-            <span class="pill pill-ghost pill-sm">The skills become tool-callers over routes that exist and are tested</span>
+            <span class="tl">Every tool they need already exists</span>
+            <span class="tool">clause index</span>
+            <span class="tool">accepted findings</span>
+            <span class="tool">recommendations</span>
+            <span class="tool">playbook</span>
+          </div>
+
+          <div class="conn short"><span class="dn" style="left:50%"></span></div>
+
+          <div class="gatebar">
+            <span class="gi">
+              <svg width="30" height="30" viewBox="0 0 18 18" fill="none"><path d="M9 1.5l6 2.6v4.6c0 3.5-2.5 6.4-6 7.3-3.5-.9-6-3.8-6-7.3V4.1l6-2.6z" stroke="currentColor" stroke-width="1.6"/><path d="M6.2 9.1l2 2 3.6-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </span>
+            <div>
+              <div class="gt">The same gate, on the riskiest step</div>
+              <p class="gq"><b>/write</b> is the one most likely to invent a clause. Any quote it wasn't given is dropped and re-quoted from the real text before a word reaches the page.</p>
+            </div>
+            <span class="gw">_validate_reply &middot; built</span>
           </div>
         </div>
 
-        <div style="flex:1 1 auto;min-height:0;display:flex;flex-direction:column">
-          <div class="seclabel"><span class="t">What the real implementation requires</span><span class="l"></span></div>
-          <div class="novel" style="flex:none">
-            <div class="nov a">
-              <div class="nt">A stage state machine, not five independent prompts</div>
-              <p class="nd"><span class="mono">/write</span> is only meaningful after <span class="mono">/draft</span> has produced an outline; <span class="mono">/deliver</span> only after prose exists. The orchestrator gates commands on prior-stage output and carries accumulated state &mdash; chosen focus, approved outline, drafted sections &mdash; forward.</p>
+        <div style="display:flex;flex-direction:column;min-height:0">
+          <div class="seclabel"><span class="t">Where we actually are</span><span class="l"></span></div>
+          <div class="status3">
+            <div class="stat">
+              <div class="sh"><span class="pill pill-green pill-sm"><span class="dot"></span>Built</span><span class="sl">The model backend</span></div>
+              <p class="ss">Real model calls, live streaming, and the citation gate above &mdash; all written and tested. <span class="mono">engine/copilot.py</span></p>
             </div>
+            <div class="stat">
+              <div class="sh"><span class="pill pill-green pill-sm"><span class="dot"></span>Built</span><span class="sl">The routes the app talks to</span></div>
+              <p class="ss">The endpoints and the typed client the workspace calls are in place and covered by tests.</p>
+            </div>
+            <div class="stat todo">
+              <div class="sh"><span class="pill pill-amber pill-sm"><span class="dot"></span>The gap</span><span class="sl">Wiring the five commands up</span></div>
+              <p class="ss">The five commands are scripted in the interface against real clauses. <b>What's left is joining them to the backend that already exists.</b></p>
+            </div>
+          </div>
+
+          <div class="seclabel" style="margin-top:14px"><span class="t">Why the gap is small</span><span class="l"></span></div>
+          <div class="novel" style="grid-template-columns:1fr;gap:11px;flex:1 1 auto;min-height:0">
             <div class="nov g">
-              <div class="nt">Per-stage prompt injection is already built</div>
-              <p class="nd"><span class="mono">playbook.section_for_stage</span> already resolves the drafter's own instructions for the active stage and injects them into the system prompt. The playbook UI writes them; the backend reads them. <b>Only the command&rarr;stage dispatch is missing.</b></p>
-            </div>
-            <div class="nov">
-              <div class="nt">The citation guardrail already covers the hardest case</div>
-              <p class="nd"><span class="mono">/write</span> produces the output most likely to hallucinate a clause. <span class="mono">_validate_reply</span> already drops any citation absent from the grounding context and re-quotes text from the grounded set &mdash; <b>so the riskiest skill is the one already protected.</b></p>
+              <div class="nt">The drafter's playbook already reaches the prompt</div>
+              <p class="nd">The playbook screen writes their instructions and the backend already reads the right section per stage. <b>Only the command&rarr;stage dispatch is missing.</b></p>
             </div>
             <div class="nov v">
               <div class="nt">Streaming is already solved</div>
-              <p class="nd">The <span class="mono">&lt;&lt;&lt;META&gt;&gt;&gt;</span> sentinel splits Markdown prose from trailing JSON metadata, so prose streams as tokens while citations and draft snippets parse after the stream exhausts. <b>No re-engineering needed for a token-streaming agent UI.</b></p>
+              <p class="nd">Prose streams word by word; quotes and draft snippets parse after it finishes. <b>Nothing to re-engineer.</b></p>
             </div>
           </div>
         </div>
@@ -1375,11 +1447,10 @@ p.deck strong{color:var(--ink-2);font-weight:700}
       <span class="slide-no">08 / 13</span>
     </div>
     <div class="head rise">
-      <h1 class="title">Built for one workstream. <span class="accent">It fits the rest of BNM.</span></h1>
+      <h1 class="title">Built for one workstream. <span class="accent">80% applicable to three more.</span></h1>
       <p class="deck">
         We built and demoed Open Finance. Nothing in the engine is specific to it &mdash; pointing it at another
         department is <strong>uploading that department's documents</strong>, not writing new code.
-        Below are the workstreams it could take on next.
       </p>
     </div>
 
@@ -1387,12 +1458,18 @@ p.deck strong{color:var(--ink-2);font-weight:700}
       <div class="reuse">
 
         <div class="reuse-col">
-          <div class="seclabel"><span class="t">Candidate departments &amp; their documents</span><span class="l"></span></div>
-          <div class="engine-band">
-            <span class="eb-t">The same Selaras engine</span>
-            <span class="eb-d">8 node types &middot; 5 finding labels &middot; one finder loop &mdash; unchanged for any department</span>
+          <div class="seclabel"><span class="t">Where it could go next</span><span class="l"></span></div>
+          <div class="mwhero">
+            <span class="mh-n">80%</span>
+            <div class="mh-r">
+              <p class="mh-l">average applicability across <b>three Blueprint 2026 must-wins</b> &mdash; the same engine, no new application logic</p>
+              <div class="mh-mw">
+                <span class="mw"><i>MW2</i><span>Crisis resilience</span></span>
+                <span class="mw"><i>MW5</i><span>Future-proof digital finance infrastructure</span></span>
+                <span class="mw"><i>MW6</i><span>Financial sector strategy</span></span>
+              </div>
+            </div>
           </div>
-          <div class="fanout"><i></i><i></i></div>
           <div class="dgrid">
             <div class="dcard is-live">
               <span class="dhead"><span class="dcode">FDI</span><span class="dflag">Built &amp; demoed</span></span>
@@ -1472,7 +1549,7 @@ p.deck strong{color:var(--ink-2);font-weight:700}
     </div>
 
     <div class="foot">
-      <span class="fl">Only Open Finance is built today &mdash; the rest are <b>candidates</b>, and the same <b>8 node types</b> already describe every document above</span>
+      <span class="fl">Only Open Finance is built today &mdash; the rest are <b>candidates</b>. The same <b>8 node types</b> already describe every document above</span>
       <div class="fr"><span class="pill pill-ghost pill-sm">Institution-wide map is a follow-on epic</span></div>
     </div>
   </section>
