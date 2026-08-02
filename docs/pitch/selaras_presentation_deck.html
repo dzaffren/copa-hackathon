@@ -260,7 +260,7 @@ p.deck strong{color:var(--ink-2);font-weight:700}
 .s1-mid{display:grid;place-items:center;color:#b8c6dc;font-size:24.5px}
 
 /* ═══ S2/3/4 — architecture ══════════════════════════════════════════════ */
-.arch{display:flex;flex-direction:column;gap:20px;flex:1 1 auto;min-height:0}
+.arch{display:grid;grid-template-columns:1.28fr 1fr;gap:26px;flex:1 1 auto;min-height:0}
 .layer3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .layer{padding:15px 17px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);border-top:3px solid var(--blue)}
 .layer .lh{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -268,28 +268,48 @@ p.deck strong{color:var(--ink-2);font-weight:700}
 .layer .lm{margin-top:7px;font-size:17px;line-height:1.48;color:var(--muted)}
 .lw{margin-top:9px;font-family:var(--mono);font-size:14.5px;color:var(--blue-ink);background:var(--blue-tint);border:1px solid #d5e3fb;border-radius:6px;padding:4px 8px;display:inline-block}
 
+/* Slide 2 runs the source graph top-to-bottom in the left column: the
+   deterministic ingestion group, then the six-stage pipeline group, then the
+   output — the two mermaid subgraphs kept as two visible groups. */
+.grp{border:1px dashed #cdd9ea;border-radius:14px;background:#fbfcfe;padding:11px 13px 13px;flex:none}
+.grp.solid{border-style:solid;border-color:var(--line);background:#fff;flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.grp-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:9px}
+.grp-h .gh-t{font-family:var(--mono);font-size:13.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--muted-2)}
+
+.stack{display:flex;flex-direction:column;gap:7px;flex:1 1 auto;min-height:0}
+.stg{
+  display:grid;grid-template-columns:74px 1fr auto;align-items:center;gap:14px;
+  padding:9px 13px;border-radius:11px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);
+  flex:1 1 0;min-height:0;
+}
+.stg.det{background:#f6f8fb;border-color:#dde5ef;box-shadow:none}
+.stg.val{background:var(--blue-tint);border-color:#c3d7fa}
+.stg .sn{font-family:var(--mono);font-size:13.5px;font-weight:700;letter-spacing:.09em;color:var(--muted-2)}
+.stg .st{font-size:18px;font-weight:700;line-height:1.2;color:var(--ink)}
+.stg .sw{display:block;margin-top:3px;font-family:var(--mono);font-size:13.5px;line-height:1.3;color:var(--muted)}
+.stg .tier{justify-self:end}
+
 .pipe{display:flex;align-items:stretch}
 .stage-c{
   flex:1 1 0;min-width:0;padding:16px 16px 16px;border-radius:13px;background:#fff;
   border:1px solid var(--line);box-shadow:var(--sh-1);display:flex;flex-direction:column;
-  transition:transform .2s ease,box-shadow .2s ease;
 }
-.stage-c:hover{transform:translateY(-3px);box-shadow:var(--sh-2)}
 .stage-c.det{background:#f6f8fb;border-color:#dde5ef}
 .stage-c.val{background:var(--blue-tint);border-color:#c3d7fa}
 .stage-c .sn{font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:.12em;color:var(--muted-2)}
 .stage-c .st{margin-top:6px;font-size:19px;font-weight:700;line-height:1.25;color:var(--ink)}
 .stage-c .sd{margin-top:8px;font-size:17px;line-height:1.5;color:var(--muted);flex:1 1 auto}
-.stage-c .tier{margin-top:12px}
 .stage-c .tier{margin-top:9px}
 .pipe-arrow{flex:none;width:26px;display:grid;place-items:center;color:#c3d2e8}
 
-.ingest{display:flex;align-items:center;padding:12px 16px;border-radius:13px;background:#fbfcfe;border:1px dashed #cdd9ea}
+.ingest{display:flex;align-items:center;flex-wrap:wrap;row-gap:8px;padding:11px 14px;border-radius:13px;background:#fff;border:1px solid var(--line)}
 .ing-node{flex:0 0 auto;padding:6px 12px;border-radius:9px;background:#fff;border:1px solid var(--line);font-size:15.5px;font-weight:500;color:var(--ink-2);box-shadow:var(--sh-1)}
 .ing-node b{font-weight:700;color:var(--ink)}
+.ing-note{margin:9px 2px 0;font-size:15.5px;line-height:1.42;color:var(--muted)}
+.ing-note b{color:var(--ink-2);font-weight:700}
 .ing-node.ing-out{background:var(--green-tint);border-color:#a7e8bf;color:var(--green-ink)}
 .ing-node.ing-out b{color:var(--green-ink)}
-.ing-arrow{flex:0 0 auto;padding:0 11px;color:#b8c6dc;display:grid;place-items:center}
+.ing-arrow{flex:0 0 auto;padding:0 9px;color:#b8c6dc;display:grid;place-items:center}
 
 .novel{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .nov{display:flex;flex-direction:column;justify-content:center;padding:15px 17px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);border-left:3px solid var(--blue)}
@@ -833,78 +853,91 @@ p.deck strong{color:var(--ink-2);font-weight:700}
     <div class="body rise">
       <div class="arch">
 
-        <div style="flex:none;display:flex;flex-direction:column">
-          <div class="seclabel"><span class="t">Before any AI runs &mdash; getting the clauses out, exactly as written</span><span class="l"></span><span class="pill pill-slate pill-sm">No AI &middot; deterministic</span></div>
-          <div class="ingest">
-            <span class="ing-node"><b>PDF / DOCX</b></span>
-            <span class="ing-arrow">&rarr;</span>
-            <span class="ing-node">Azure Document Intelligence <b>recovers reading order</b></span>
-            <span class="ing-arrow">&rarr;</span>
-            <span class="ing-node">Markdown</span>
-            <span class="ing-arrow">&rarr;</span>
-            <span class="ing-node">Segmenter the drafter picks &mdash; <b>rules / semi-structured / prose</b></span>
-            <span class="ing-arrow">&rarr;</span>
-            <span class="ing-node ing-out">Clauses, each <b>checked to be literally in the source</b></span>
+        <div class="diag">
+          <div class="seclabel"><span class="t">The engine, end to end</span><span class="l"></span><span class="pill pill-ghost pill-sm">9 AI calls per pair of documents</span></div>
+
+          <div class="grp">
+            <div class="grp-h">
+              <span class="gh-t">Getting the clauses out</span>
+              <span class="pill pill-slate pill-sm">No AI &middot; same result every time</span>
+            </div>
+            <div class="ingest">
+              <span class="ing-node"><b>PDF / DOCX</b></span>
+              <span class="ing-arrow">&rarr;</span>
+              <span class="ing-node">Document Intelligence</span>
+              <span class="ing-arrow">&rarr;</span>
+              <span class="ing-node">Markdown</span>
+              <span class="ing-arrow">&rarr;</span>
+              <span class="ing-node">Segmenter</span>
+              <span class="ing-arrow">&rarr;</span>
+              <span class="ing-node ing-out">Clauses, <b>verbatim-checked</b></span>
+            </div>
+            <p class="ing-note">Document Intelligence recovers reading order on multi-column pages. <b>The drafter picks the segmenter</b> &mdash; rules, semi-structured or prose &mdash; the tool never guesses.</p>
+          </div>
+
+          <div class="conn short"><span class="dn" style="left:50%"></span></div>
+
+          <div class="grp solid">
+            <div class="grp-h">
+              <span class="gh-t">The finder pipeline &mdash; six stages</span>
+              <span class="pill pill-ghost pill-sm">Two passes: same-topic, then whole-document</span>
+            </div>
+            <div class="stack">
+              <div class="stg">
+                <span class="sn">Stage 1</span>
+                <span><span class="st">Tag every clause</span><span class="sw">axis extraction &middot; cached on the text, so a re-run is free</span></span>
+                <span class="tier"><span class="pill pill-green pill-sm">Small model</span></span>
+              </div>
+              <div class="stg det">
+                <span class="sn">Stage 2</span>
+                <span><span class="st">Pair up same topics</span><span class="sw">embeddings, keyword fallback &middot; top 2 per clause, capped at 60 pairs</span></span>
+                <span class="tier"><span class="pill pill-slate pill-sm">No AI &middot; 0 calls</span></span>
+              </div>
+              <div class="stg">
+                <span class="sn">Stage 3</span>
+                <span><span class="st">Judge each pair</span><span class="sw">batches of 8 &middot; only the three agreement verdicts</span></span>
+                <span class="tier"><span class="pill pill-amber pill-sm">Mid model &middot; 8 calls</span></span>
+              </div>
+              <div class="stg det">
+                <span class="sn">Stage 4</span>
+                <span><span class="st">Note what's settled</span><span class="sw">topics stage 3 resolved, so the expensive read skips them</span></span>
+                <span class="tier"><span class="pill pill-slate pill-sm">No AI &middot; 0 calls</span></span>
+              </div>
+              <div class="stg">
+                <span class="sn">Stage 5</span>
+                <span><span class="st">Read both, whole</span><span class="sw">one call &middot; the only way to catch silent-on and goes-beyond</span></span>
+                <span class="tier"><span class="pill pill-violet pill-sm">Large model &middot; 1 call</span></span>
+              </div>
+              <div class="stg val">
+                <span class="sn">Stage 6</span>
+                <span><span class="st">Check every quote</span><span class="sw">merge + validate &middot; a clause number that doesn't exist is dropped</span></span>
+                <span class="tier"><span class="pill pill-blue pill-sm">No AI &middot; the gate</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="conn short"><span class="dn" style="left:50%"></span></div>
+
+          <div class="cout">
+            <span class="cot">Findings</span>
+            <span class="cod">one of five plain verdicts, each quoting a real clause</span>
           </div>
         </div>
 
-        <div style="flex:1.7 1 auto;display:flex;flex-direction:column;min-height:0">
-          <div class="seclabel"><span class="t">The run &mdash; six steps, nine AI calls</span><span class="l"></span><span class="pill pill-ghost pill-sm">Out: one of five plain verdicts, each quoting a real clause</span></div>
-          <div class="pipe" style="flex:1 1 auto;min-height:0">
-            <div class="stage-c">
-              <div class="sn">Step 1</div>
-              <div class="st">Tag every clause</div>
-              <p class="sd">What is this clause about? Done once per document, then remembered &mdash; a re-run costs nothing.</p>
-              <div class="tier"><span class="pill pill-green pill-sm">Small model</span></div>
-            </div>
-            <div class="pipe-arrow">&rarr;</div>
-            <div class="stage-c det">
-              <div class="sn">Step 2</div>
-              <div class="st">Pair up same topics</div>
-              <p class="sd">Match clauses about the same thing. Top 2 per clause, capped at 60 pairs.</p>
-              <div class="tier"><span class="pill pill-slate pill-sm">No AI &middot; 0 calls</span></div>
-            </div>
-            <div class="pipe-arrow">&rarr;</div>
-            <div class="stage-c">
-              <div class="sn">Step 3</div>
-              <div class="st">Judge each pair</div>
-              <p class="sd">Do they agree, differ, or conflict? Eight pairs per call.</p>
-              <div class="tier"><span class="pill pill-amber pill-sm">Mid model &middot; 8 calls</span></div>
-            </div>
-            <div class="pipe-arrow">&rarr;</div>
-            <div class="stage-c det">
-              <div class="sn">Step 4</div>
-              <div class="st">Note what's settled</div>
-              <p class="sd">List the topics step 3 answered, so the expensive read doesn't redo them.</p>
-              <div class="tier"><span class="pill pill-slate pill-sm">No AI &middot; 0 calls</span></div>
-            </div>
-            <div class="pipe-arrow">&rarr;</div>
-            <div class="stage-c">
-              <div class="sn">Step 5</div>
-              <div class="st">Read both, whole</div>
-              <p class="sd">What does their document cover that ours doesn't &mdash; and the other way round?</p>
-              <div class="tier"><span class="pill pill-violet pill-sm">Large model &middot; 1 call</span></div>
-            </div>
-            <div class="pipe-arrow">&rarr;</div>
-            <div class="stage-c val">
-              <div class="sn">Step 6</div>
-              <div class="st">Check every quote</div>
-              <p class="sd">Any clause number that doesn't exist is dropped, not published.</p>
-              <div class="tier"><span class="pill pill-blue pill-sm">No AI &middot; the gate</span></div>
-            </div>
-          </div>
-        </div>
-
-        <div style="flex:1 1 auto;display:flex;flex-direction:column;min-height:0">
+        <div style="display:flex;flex-direction:column;min-height:0">
           <div class="seclabel"><span class="t">Why this holds up</span><span class="l"></span></div>
-          <div class="novel" style="grid-template-columns:repeat(3,1fr);flex:1 1 auto;min-height:0">
+          <div class="novel" style="grid-template-columns:1fr;gap:12px;flex:1 1 auto;min-height:0">
             <div class="nov">
               <div class="nt">Searching alone can never find a gap</div>
-              <p class="nd">Search finds clauses that <b>exist</b>. The finding a drafter most needs is the one that doesn't &mdash; "HKMA regulates this; we say nothing." There is nothing on our side to search for, so step 5 reads both documents whole. That is problem 2 answered.</p>
+              <p class="nd">Search finds clauses that <b>exist</b>. The finding a drafter most needs is the one that doesn't &mdash; "HKMA regulates this; we say nothing." There is nothing on our side to search for, so stage 5 reads both documents whole.</p>
             </div>
             <div class="nov a">
               <div class="nt">Cheap work runs on a cheap model</div>
-              <p class="nd">Tagging what a clause is about isn't hard thinking &mdash; small model, and remembered. Judging a pair is &mdash; mid model. Only reading both documents at once, the hard part, uses the large model, and it runs <b>exactly once</b>.</p>
+              <p class="nd">Tagging what a clause is about isn't hard thinking &mdash; small model, and remembered. Judging a pair is &mdash; mid model. Only reading both documents at once uses the large model, and it runs <b>exactly once</b>.</p>
+            </div>
+            <div class="nov g">
+              <div class="nt">There is no second AI checking the first</div>
+              <p class="nd">An earlier design had one model review another's work. We tested both and the simpler one matched it &mdash; so we dropped it. <b>Half the calls, same answers</b>, measured rather than assumed.</p>
             </div>
             <div class="nov v">
               <div class="nt">We fix typos, we never guess</div>
@@ -952,7 +985,7 @@ p.deck strong{color:var(--ink-2);font-weight:700}
           <div class="drow c3">
             <div class="dnode">
               <div class="dt">Findings the drafter accepted</div>
-              <p class="dd">Clause text is copied <b>from the finding</b>, never re-asked.</p>
+              <p class="dd">Clause text is copied <b>from the finding</b>, never re-asked. <span class="mono" style="font-size:14px;color:var(--muted-2)">collect_evidence</span></p>
             </div>
             <div class="dnode">
               <div class="dt">Their own requirements</div>
@@ -975,7 +1008,7 @@ p.deck strong{color:var(--ink-2);font-weight:700}
           <div class="onepass">
             <div>
               <div class="mt">One model pass &mdash; the house rules go in with it</div>
-              <p class="ms">No second stage that scores the first. Nothing reaches the drafter unchecked.</p>
+              <p class="ms">No second stage that scores the first. What comes back is read into our own records. <span class="mono" style="font-size:14px;color:var(--muted-2)">parse_response</span></p>
             </div>
             <span class="pill pill-violet">Large model</span>
           </div>
