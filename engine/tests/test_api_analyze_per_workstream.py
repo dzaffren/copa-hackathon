@@ -1,14 +1,14 @@
 """Analysis reads the workstream's OWN passages, not a shared pre-built store.
 
-Before this, the default `run_arm_g_fn` loaded one global
+Before this, the default `run_finder_pipeline_fn` loaded one global
 `data/artifacts/anchor-index.json`, so a document a drafter added and chunked
 inside the app was invisible to analysis. These tests pin the repointed
 behaviour: with per-workstream anchors present and NO artifacts file at all, an
 edge is still analysable, and the axis cache used is the workstream's own (so a
 cache warmed by "Extract concepts" is reused rather than re-derived).
 
-`engine.arm_g.run_arm_g` itself is stubbed — the pipeline's internals are
-covered in `test_arm_g.py`; what matters here is which index and axes dir the
+`engine.finder_pipeline.run_finder_pipeline` itself is stubbed — the pipeline's internals are
+covered in `test_finder_pipeline.py`; what matters here is which index and axes dir the
 route hands it.
 """
 
@@ -98,7 +98,7 @@ def _ws(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def spy_run_arm_g(monkeypatch):
+def spy_run_finder_pipeline(monkeypatch):
     """Capture what the default adapter hands the pipeline."""
     seen: dict = {}
 
@@ -109,11 +109,11 @@ def spy_run_arm_g(monkeypatch):
         seen["axes_dir"] = kwargs.get("axes_dir")
         return {"connections": [CONN], "unsupported": [], "trace": {}}
 
-    monkeypatch.setattr(api_module, "_run_arm_g", fake)
+    monkeypatch.setattr(api_module, "_run_finder_pipeline", fake)
     return seen
 
 
-def test_analysis_uses_the_workstreams_own_anchors(tmp_path, spy_run_arm_g):
+def test_analysis_uses_the_workstreams_own_anchors(tmp_path, spy_run_finder_pipeline):
     """No artifacts dir exists at all — the index comes from the workstream."""
     root = _ws(tmp_path)
     client = TestClient(
@@ -125,13 +125,13 @@ def test_analysis_uses_the_workstreams_own_anchors(tmp_path, spy_run_arm_g):
     assert res.status_code == 200, res.text
     assert res.json()["status"] == "analysed"
     # Both chunked documents' anchors were unioned into the index.
-    assert spy_run_arm_g["anchor_ids"] == ["BCBS 1.1", "OpRes 1.1"]
-    assert spy_run_arm_g["doc_a"] == "opres-pd-v0-3"
-    assert spy_run_arm_g["doc_b"] == "bcbs-opres-2021"
+    assert spy_run_finder_pipeline["anchor_ids"] == ["BCBS 1.1", "OpRes 1.1"]
+    assert spy_run_finder_pipeline["doc_a"] == "opres-pd-v0-3"
+    assert spy_run_finder_pipeline["doc_b"] == "bcbs-opres-2021"
 
 
 def test_analysis_points_stage_one_at_the_workstream_axes_cache(
-    tmp_path, spy_run_arm_g
+    tmp_path, spy_run_finder_pipeline
 ):
     """So a cache warmed by "Extract concepts" is reused, not re-derived."""
     root = _ws(tmp_path)
@@ -139,10 +139,10 @@ def test_analysis_points_stage_one_at_the_workstream_axes_cache(
 
     client.post("/api/workstreams/opres-v2/edges/e-live/analyze")
 
-    assert spy_run_arm_g["axes_dir"] == root / "opres-v2" / "axes"
+    assert spy_run_finder_pipeline["axes_dir"] == root / "opres-v2" / "axes"
 
 
-def test_findings_persist_for_the_workstream(tmp_path, spy_run_arm_g):
+def test_findings_persist_for_the_workstream(tmp_path, spy_run_finder_pipeline):
     root = _ws(tmp_path)
     client = TestClient(create_app(workstreams_dir=root))
 
@@ -168,7 +168,7 @@ def test_an_unchunked_endpoint_yields_no_anchors_but_still_refuses_cleanly(
     def boom(anchor_index, doc_a, doc_b, **kwargs):
         raise RuntimeError("no anchors for one side")
 
-    monkeypatch.setattr(api_module, "_run_arm_g", boom)
+    monkeypatch.setattr(api_module, "_run_finder_pipeline", boom)
     client = TestClient(create_app(workstreams_dir=root))
 
     res = client.post("/api/workstreams/opres-v2/edges/e-live/analyze")
@@ -181,7 +181,7 @@ def test_an_unchunked_endpoint_yields_no_anchors_but_still_refuses_cleanly(
 def test_no_linkages_found_leaves_the_edge_re_analysable(tmp_path, monkeypatch):
     monkeypatch.setattr(
         api_module,
-        "_run_arm_g",
+        "_run_finder_pipeline",
         lambda index, a, b, **kw: {
             "connections": [],
             "unsupported": [],
@@ -211,7 +211,7 @@ def test_an_injected_seam_still_overrides_the_default(tmp_path):
         calls.append((a, b))
         return {"connections": [CONN], "unsupported": [], "trace": {}}
 
-    client = TestClient(create_app(workstreams_dir=root, run_arm_g_fn=fake_fn))
+    client = TestClient(create_app(workstreams_dir=root, run_finder_pipeline_fn=fake_fn))
 
     res = client.post("/api/workstreams/opres-v2/edges/e-live/analyze")
 

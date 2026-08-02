@@ -31,7 +31,7 @@ the finding record, never re-derived, so a recommendation cannot cite text its
 own evidence does not contain.
 
 Generation is a SINGLE model pass, deliberately unlike the finder→critic loop in
-`engine.arm_g`. The guardrails are constraints inside that one call, not a second
+`engine.finder_pipeline`. The guardrails are constraints inside that one call, not a second
 scoring stage — which is also why no relevance score reaches the interface: there
 is no independent judgement to report, and a self-assigned score would invite
 trust it has not earned.

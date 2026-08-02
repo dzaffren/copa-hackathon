@@ -818,7 +818,7 @@ COPILOT_DEPLOYMENT = os.environ.get(
     "AZURE_FOUNDRY_COPILOT_DEPLOYMENT", "claude-sonnet-5"
 )
 
-# Arm G pipeline model tiers (see docs/specs/workstream-brain/spec-engine-arm-g-model-config.md).
+# Finder pipeline model tiers (see docs/specs/workstream-brain/spec-engine-arm-g-model-config.md).
 # EXTRACTION_DEPLOYMENT: small/fast model for Stage 1 axis extraction (pure topic-phrase
 #   extraction, no reasoning). REASONING_DEPLOYMENT: mid-tier model for Stage 3 batched
 #   same-topic per-pair judgment. Stage 5 whole-doc coverage reuses FINDER_CRITIC_DEPLOYMENT (large).
@@ -838,7 +838,7 @@ RECOMMENDATIONS_DEPLOYMENT = os.environ.get(
     "AZURE_FOUNDRY_RECOMMENDATIONS_DEPLOYMENT", "claude-opus-4-8"
 )
 
-# Stage-2 cosine retrieval embeddings (Arm G) — Azure OpenAI, sharing the same
+# Stage-2 cosine retrieval embeddings (finder pipeline) — Azure OpenAI, sharing the same
 # AZURE_FOUNDRY_API_KEY as the chat deployments. Claude chat runs on the
 # `/anthropic` Messages API; embeddings run through the Azure OpenAI client,
 # whose `azure_endpoint` is the resource root (no `/anthropic` suffix), so the

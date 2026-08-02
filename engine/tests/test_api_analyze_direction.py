@@ -10,7 +10,7 @@ Edge direction cannot decide that. The two live fixtures point OPPOSITE ways:
 INTO the ED node its PD consolidates. The route used to pass `edge["source"]` as
 A, which silently inverted all three of those labels on the demo workstream.
 
-`test_api_arm_g.py` already covers the task-as-source shape; this file covers the
+`test_api_finder_pipeline.py` already covers the task-as-source shape; this file covers the
 anchor-as-source shape and the flip-back of the persisted clause sides.
 """
 
@@ -91,7 +91,7 @@ def _ws(tmp_path: Path) -> Path:
 
 
 def _client(tmp_path, fn):
-    return TestClient(create_app(workstreams_dir=_ws(tmp_path), run_arm_g_fn=fn))
+    return TestClient(create_app(workstreams_dir=_ws(tmp_path), run_finder_pipeline_fn=fn))
 
 
 def test_the_drafters_document_is_document_a_even_when_it_is_the_edge_target():

@@ -3,7 +3,7 @@
 Extraction is synchronous and the only side effects — the axis cache and the
 "axes extracted" activity entry — must land ONLY after a fully successful run.
 The extractor is injected (`extract_axes_fn`) so no live model is reached; the
-real `arm_g.extract_axes_for_document` is exercised in `test_arm_g.py`.
+real `finder_pipeline.extract_axes_for_document` is exercised in `test_finder_pipeline.py`.
 """
 
 import json
@@ -42,7 +42,7 @@ def _anchor(anchor_id: str, document_id: str, text: str):
 
 
 def _fake_extractor(axes_by_anchor: dict[str, list[str]], calls: list):
-    """Stand in for arm_g.extract_axes_for_document: writes the same cache shape
+    """Stand in for finder_pipeline.extract_axes_for_document: writes the same cache shape
     it would, so the route's read-back path is exercised for real."""
 
     def fn(anchor_index, document_id, axes_dir=None, **kwargs):

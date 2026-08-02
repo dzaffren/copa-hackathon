@@ -1,5 +1,5 @@
 """Tests for engine.config — CURATED_SEED_EDGES shape invariant and the
-Arm G three-tier model deployment vars.
+Finder pipeline three-tier model deployment vars.
 
 Covers Task 3's requirement that every curated seed edge carries a
 non-empty reason and at least one clause anchor on each side (the shape
@@ -7,7 +7,7 @@ non-empty reason and at least one clause anchor on each side (the shape
 time; this test only checks the static shape config.py ships, not that the
 clause numbers resolve in the real corpus).
 
-The Arm G tests reload `engine.config` under a monkeypatched environment,
+The finder pipeline tests reload `engine.config` under a monkeypatched environment,
 because the deployment names are read from `os.environ` at import time. A
 fixture restores the real environment and reloads once more at teardown so
 these reloads never leak into other tests.

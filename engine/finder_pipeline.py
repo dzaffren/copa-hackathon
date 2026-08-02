@@ -1,4 +1,4 @@
-"""Arm G composite coverage-aware finding pipeline (production engine module).
+"""Composite coverage-aware finder pipeline (production engine module).
 
 Ported and adapted from the experiment-validated runner
 (`scripts/experiments/retrieval_ablation.py`, arm G). Six stages, three model
@@ -11,15 +11,18 @@ tiers, no critic anywhere:
     Stage 5  WHOLE-DOC COVERAGE FINDER  [FINDER_CRITIC_DEPLOYMENT — large]
     Stage 6  MERGE + REFORMAT + VALIDATE[no model]
 
-`run_arm_g(anchor_index, doc_a, doc_b, signal="cosine")` runs all six and
-returns a result dict Story 3 (route wiring) consumes. This module composes
+`run_finder_pipeline(anchor_index, doc_a, doc_b, signal="cosine")` runs all six
+and returns a result dict Story 3 (route wiring) consumes. This module composes
 existing engine pieces — `AnchorIndex` (`engine.anchors`), the citation
 validator `_validate_candidates` and taxonomy enforcement (`engine.connections`,
 reused UNCHANGED), and `call_chat` (`engine.llm`) — and ports the coverage
-prompt + retrieval helpers from the experiment runner. The existing
-`find_connections` path is untouched; Arm G is a new, parallel entry point.
+prompt + retrieval helpers from the experiment runner (there, this design is
+"arm G"). The existing `find_connections` path is untouched; this pipeline is a
+new, parallel entry point.
 
-Design decisions (see docs/specs/workstream-brain/spec-engine-arm-g-pipeline.md):
+Design decisions (see docs/specs/workstream-brain/spec-engine-arm-g-pipeline.md
+— the spec predates this module's rename from `arm_g`, so its filename still
+says arm-g):
 
 - **No critic** at any stage — the finder-only design was validated in the
   experiment.
@@ -943,14 +946,14 @@ def merge_reformat_validate(
 # ---------------------------------------------------------------------------
 
 
-def run_arm_g(
+def run_finder_pipeline(
     anchor_index: AnchorIndex,
     doc_a: str,
     doc_b: str,
     signal: str = "cosine",
     axes_dir: Optional[Path] = None,
 ) -> dict[str, Any]:
-    """Run the six-stage Arm G pipeline and return a result dict.
+    """Run the six-stage finder pipeline and return a result dict.
 
     Args:
         anchor_index: the built anchor index for both documents.

@@ -161,9 +161,9 @@ by this rule.
 - **Read routes are fixture projections; `analyze` and `copilot` are live.** The GET
   routes (graph, node/edge detail, review, findings, cross-links) are projections over
   `data/workstreams/`. But `create_app()` exposes injectable model seams —
-  `run_arm_g_fn`, `copilot_reply_fn`, `copilot_stream_fn` — and the `analyze` route
-  (`POST .../edges/{edge_id}/analyze`) calls `run_arm_g_fn(src_doc, tgt_doc)`, whose
-  default adapter runs the real Arm G pipeline (`engine/arm_g.py`, which calls
+  `run_finder_pipeline_fn`, `copilot_reply_fn`, `copilot_stream_fn` — and the `analyze` route
+  (`POST .../edges/{edge_id}/analyze`) calls `run_finder_pipeline_fn(src_doc, tgt_doc)`, whose
+  default adapter runs the real finder pipeline (`engine/finder_pipeline.py`, which calls
   `engine.llm.call_chat`). Since #52 it resolves a document's anchors from the
   **workstream's own** anchors (`engine.ws_anchors.build_index(workstreams_dir,
 workstream_id)`, per-node files under `data/workstreams/<ws>/anchors/`), falling back
@@ -253,3 +253,48 @@ workstream_id)`, per-node files under `data/workstreams/<ws>/anchors/`), falling
 - **Theme:** single light theme only — no dark mode, no toggle. Off-white
   page background, white cards, a royal-blue primary accent. See
   `frontend/src/index.css`'s `:root` block for the token values.
+
+<!-- gitnexus:start -->
+# GitNexus — Code Intelligence
+
+This project is indexed by GitNexus as **copa-hackathon** (7005 symbols, 13487 relationships, 277 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+
+> Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
+
+## Always Do
+
+- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `impact({target: "symbolName", direction: "upstream"})` and report the blast radius (direct callers, affected processes, risk level) to the user.
+- **MUST run `detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows. For regression review, compare against the default branch: `detect_changes({scope: "compare", base_ref: "staging"})`.
+- **MUST warn the user** if impact analysis returns HIGH or CRITICAL risk before proceeding with edits.
+- When exploring unfamiliar code, use `query({search_query: "concept"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.
+- When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `context({name: "symbolName"})`.
+- For security review, `explain({target: "fileOrSymbol"})` lists taint findings (source→sink flows; needs `analyze --pdg`).
+
+## Never Do
+
+- NEVER edit a function, class, or method without first running `impact` on it.
+- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.
+- NEVER rename symbols with find-and-replace — use `rename` which understands the call graph.
+- NEVER commit changes without running `detect_changes()` to check affected scope.
+
+## Resources
+
+| Resource | Use for |
+|----------|---------|
+| `gitnexus://repo/copa-hackathon/context` | Codebase overview, check index freshness |
+| `gitnexus://repo/copa-hackathon/clusters` | All functional areas |
+| `gitnexus://repo/copa-hackathon/processes` | All execution flows |
+| `gitnexus://repo/copa-hackathon/process/{name}` | Step-by-step execution trace |
+
+## CLI
+
+| Task | Read this skill file |
+|------|---------------------|
+| Understand architecture / "How does X work?" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |
+| Blast radius / "What breaks if I change X?" | `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |
+| Trace bugs / "Why is X failing?" | `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` |
+| Rename / extract / split / refactor | `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` |
+| Tools, resources, schema reference | `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` |
+| Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |
+
+<!-- gitnexus:end -->

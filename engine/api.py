@@ -36,8 +36,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
 from engine.anchors import AnchorIndex, segment
-from engine.arm_g import extract_axes_for_document as _default_extract_axes
-from engine.arm_g import run_arm_g as _run_arm_g
+from engine.finder_pipeline import extract_axes_for_document as _default_extract_axes
+from engine.finder_pipeline import run_finder_pipeline as _run_finder_pipeline
 from engine.clauses import load_clause_index
 from engine.connections import CONNECTION_LABELS
 from engine.connections import find_connections as _default_find_connections
@@ -554,12 +554,12 @@ def _load_workstream_graph(
     return json.loads(graph_path.read_text(encoding="utf-8"))
 
 
-def _make_default_run_arm_g(
+def _make_default_run_finder_pipeline(
     artifacts_dir: Path,
     workstreams_dir: Optional[Path] = None,
     workstream_id: Optional[str] = None,
 ) -> Any:
-    """Build the default `run_arm_g_fn` adapter for one analyze call.
+    """Build the default `run_finder_pipeline_fn` adapter for one analyze call.
 
     Signature stays `(src_doc, tgt_doc) -> {"connections", "unsupported",
     "trace"}` so every injected stub keeps working — the workstream context is
@@ -574,7 +574,7 @@ def _make_default_run_arm_g(
     rather than re-derived.
     """
 
-    def _default_run_arm_g(src_doc: str, tgt_doc: str) -> dict[str, Any]:
+    def _default_run_finder_pipeline(src_doc: str, tgt_doc: str) -> dict[str, Any]:
         anchor_index: Optional[AnchorIndex] = None
         axes_dir: Optional[Path] = None
         if workstreams_dir is not None and workstream_id is not None:
@@ -587,9 +587,9 @@ def _make_default_run_arm_g(
                 (artifacts_dir / "anchor-index.json").read_text(encoding="utf-8")
             )
             anchor_index = AnchorIndex(raw)
-        return _run_arm_g(anchor_index, src_doc, tgt_doc, axes_dir=axes_dir)
+        return _run_finder_pipeline(anchor_index, src_doc, tgt_doc, axes_dir=axes_dir)
 
-    return _default_run_arm_g
+    return _default_run_finder_pipeline
 
 
 def create_app(
@@ -597,7 +597,7 @@ def create_app(
     artifacts_dir: Union[str, Path] = REPO_ROOT / "data" / "artifacts",
     corpus_dir: Union[str, Path] = REPO_ROOT / "data" / "corpus",
     find_connections_fn: Any = _default_find_connections,
-    run_arm_g_fn: Any = None,
+    run_finder_pipeline_fn: Any = None,
     copilot_reply_fn: Any = _default_copilot_reply,
     copilot_stream_fn: Any = _default_copilot_reply_stream,
     converter: Any = None,
@@ -620,9 +620,9 @@ def create_app(
         find_connections_fn: the LEGACY single-pass finder — `(doc_a_id,
             doc_b_id, clause_index) -> {"connections": [...], "unsupported":
             [...]}`. Retained as the rollback seam; the analyze route now calls
-            `run_arm_g_fn` instead. Defaults to
+            `run_finder_pipeline_fn` instead. Defaults to
             `engine.connections.find_connections`.
-        run_arm_g_fn: the Arm G pipeline called by the `analyze` route —
+        run_finder_pipeline_fn: the finder pipeline called by the `analyze` route —
             `(src_doc_id, tgt_doc_id) -> {"connections": [...], "unsupported":
             [...], "trace": {...}}`. Injectable so tests stub the pipeline; no
             live model call happens in CI. When omitted, the analyze route builds
@@ -641,7 +641,7 @@ def create_app(
         extract_axes_fn: the axis extractor behind the `extract-concepts` route —
             `(anchor_index, document_id, axes_dir=...) -> {anchor_id: [axis]}`.
             Injectable so tests stub it; no live model call happens in CI.
-            Defaults to `engine.arm_g.extract_axes_for_document`.
+            Defaults to `engine.finder_pipeline.extract_axes_for_document`.
         converter: the document-to-markdown converter used when an add-node
             request carries a file attachment — anything with
             `.convert(path) -> result`. Injectable so tests stub ingest with no
@@ -681,7 +681,7 @@ def create_app(
     # WORKSTREAM-BOUND adapter per call (it needs the workstream_id to find that
     # workstream's anchors and axis cache). `find_connections_fn` stays wired
     # for rollback.
-    injected_run_arm_g_fn = run_arm_g_fn
+    injected_run_finder_pipeline_fn = run_finder_pipeline_fn
 
     # --- Project SELARAS — Task Screen routes (Task 1) ----------------------
     # Read-only projections over a per-workstream `graph.json` + `findings/`
@@ -1527,7 +1527,7 @@ def create_app(
 
         SYNCHRONOUS by design: the drafter waits while it runs (one small-model
         call per anchor), because a queue plus job status is machinery this demo
-        does not need. The per-anchor cache in `arm_g` makes a re-run on
+        does not need. The per-anchor cache in `finder_pipeline` makes a re-run on
         unchanged anchors a hit — no model call, same axes — so this doubles as
         a cheap pre-warm for the analyze route's stage 1.
 
@@ -1939,12 +1939,12 @@ def create_app(
                 f"there is nothing to compare.",
             )
         try:
-            # Arm G: `(src_doc, tgt_doc) -> {"connections","unsupported","trace"}`.
+            # The finder pipeline: `(src_doc, tgt_doc) -> {"connections","unsupported","trace"}`.
             # Stage 1 builds the axis cache on demand (first-run auto-population),
             # so no separate preparation step is needed. Any stage failing — incl.
             # the whole-doc coverage pass — raises here, surfacing as 502 with NO
             # partial write, since save_findings runs only after a full success.
-            analyze_fn = injected_run_arm_g_fn or _make_default_run_arm_g(
+            analyze_fn = injected_run_finder_pipeline_fn or _make_default_run_finder_pipeline(
                 artifacts_dir, workstreams_dir, workstream_id
             )
             doc_a, doc_b = (

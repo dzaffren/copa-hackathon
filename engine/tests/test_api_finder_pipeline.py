@@ -1,6 +1,6 @@
-"""Tests for the analyze route wired onto the Arm G pipeline (Story 3).
+"""Tests for the analyze route wired onto the finder pipeline (Story 3).
 
-The route now calls the injectable `run_arm_g_fn` seam — `(src_doc, tgt_doc) ->
+The route now calls the injectable `run_finder_pipeline_fn` seam — `(src_doc, tgt_doc) ->
 {"connections", "unsupported", "trace"}` — instead of the old
 `find_connections_fn`. These tests inject a stub for that seam so no anchor
 index, model, or credentials are needed; each test builds a throwaway
@@ -94,10 +94,10 @@ def _ws(tmp_path: Path) -> Path:
 
 
 def _client(tmp_path, fn):
-    return TestClient(create_app(workstreams_dir=_ws(tmp_path), run_arm_g_fn=fn))
+    return TestClient(create_app(workstreams_dir=_ws(tmp_path), run_finder_pipeline_fn=fn))
 
 
-def test_analyze_returns_findings_through_arm_g_seam(tmp_path):
+def test_analyze_returns_findings_through_finder_pipeline_seam(tmp_path):
     def fake_fn(a, b):
         assert a == "opres-v1-2025-draft" and b == "rmit-v2-2025"  # source first
         return {"connections": [CONN], "unsupported": [], "trace": {}}
@@ -115,7 +115,7 @@ def test_analyze_returns_findings_through_arm_g_seam(tmp_path):
 
 def test_route_calls_the_injected_stub_not_the_real_pipeline(tmp_path):
     # The stub returns a FIXED set of two findings for any input; the route must
-    # honour it (never reach the real Arm G pipeline / anchor index) and report
+    # honour it (never reach the real finder pipeline / anchor index) and report
     # a count that matches the stub's output.
     calls = []
 
@@ -135,7 +135,7 @@ def test_empty_connections_yield_no_linkages_found_and_write_nothing(tmp_path):
     client = TestClient(
         create_app(
             workstreams_dir=root,
-            run_arm_g_fn=lambda a, b: {
+            run_finder_pipeline_fn=lambda a, b: {
                 "connections": [],
                 "unsupported": [],
                 "trace": {},
@@ -165,7 +165,7 @@ def test_reanalyze_replaces_only_the_target_edge_findings_file(tmp_path):
     client = TestClient(
         create_app(
             workstreams_dir=root,
-            run_arm_g_fn=lambda a, b: {
+            run_finder_pipeline_fn=lambda a, b: {
                 "connections": [CONN],
                 "unsupported": [],
                 "trace": {},
@@ -198,7 +198,7 @@ def test_coverage_pass_failure_returns_502_and_writes_nothing(tmp_path):
         raise RuntimeError("coverage pass failed")
 
     root = _ws(tmp_path)
-    client = TestClient(create_app(workstreams_dir=root, run_arm_g_fn=boom))
+    client = TestClient(create_app(workstreams_dir=root, run_finder_pipeline_fn=boom))
     r = client.post("/api/workstreams/opres-v2/edges/e-live/analyze")
     assert r.status_code == 502
     assert r.json()["code"] == "ANALYZE_FAILED"

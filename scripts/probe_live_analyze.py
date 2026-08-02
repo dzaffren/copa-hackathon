@@ -1,4 +1,4 @@
-"""Evidence probe: run the REAL Arm G pipeline on the demo cross-workstream pair
+"""Evidence probe: run the REAL finder pipeline on the demo cross-workstream pair
 and report what it produces, so we can judge (with evidence, not a guess) whether
 a genuinely-live Analyze is demo-quality — before wiring a document-id alias map
 into the API.
@@ -32,7 +32,7 @@ import time
 from pathlib import Path
 
 from engine.anchors import Anchor, AnchorIndex
-from engine.arm_g import run_arm_g
+from engine.finder_pipeline import run_finder_pipeline
 from engine.config import REPO_ROOT
 
 # The demo document pairs, expressed as (label, doc_a index-id, doc_b index-id).
@@ -98,7 +98,7 @@ def main() -> None:
 
     started = time.monotonic()
     try:
-        result = run_arm_g(index, doc_a, doc_b)
+        result = run_finder_pipeline(index, doc_a, doc_b)
     except Exception as exc:  # noqa: BLE001 — surface any failure plainly
         print(f"\nPIPELINE FAILED: {type(exc).__name__}: {exc}")
         print(

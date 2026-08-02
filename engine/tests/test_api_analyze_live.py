@@ -85,9 +85,9 @@ def _ws(tmp_path: Path) -> Path:
 
 
 def _client(tmp_path, fn):
-    # The analyze route now calls the Arm G seam `run_arm_g_fn(src, tgt)`; the
+    # The analyze route now calls the finder pipeline seam `run_finder_pipeline_fn(src, tgt)`; the
     # legacy `find_connections_fn` stays wired only as the rollback path.
-    return TestClient(create_app(workstreams_dir=_ws(tmp_path), run_arm_g_fn=fn))
+    return TestClient(create_app(workstreams_dir=_ws(tmp_path), run_finder_pipeline_fn=fn))
 
 
 def test_live_analyze_saves_findings_and_returns_analysed(tmp_path):
@@ -131,7 +131,7 @@ def test_finder_failure_returns_502_and_writes_nothing(tmp_path):
         raise RuntimeError("no creds")
 
     root = _ws(tmp_path)
-    client = TestClient(create_app(workstreams_dir=root, run_arm_g_fn=boom))
+    client = TestClient(create_app(workstreams_dir=root, run_finder_pipeline_fn=boom))
     r = client.post("/api/workstreams/opres-v2/edges/e-live/analyze")
     assert r.status_code == 502
     assert r.json()["code"] == "ANALYZE_FAILED"
@@ -153,7 +153,7 @@ def test_same_document_analyze_returns_409_and_writes_nothing(tmp_path):
         raise AssertionError("must not be called for a same-doc edge")
 
     root = _ws(tmp_path)
-    client = TestClient(create_app(workstreams_dir=root, run_arm_g_fn=fake_fn))
+    client = TestClient(create_app(workstreams_dir=root, run_finder_pipeline_fn=fake_fn))
     r = client.post("/api/workstreams/opres-v2/edges/e-samedoc/analyze")
     assert r.status_code == 409
     assert r.json()["code"] == "NOT_ANALYSABLE"
@@ -167,7 +167,7 @@ def test_empty_findings_are_not_persisted(tmp_path):
     client = TestClient(
         create_app(
             workstreams_dir=root,
-            run_arm_g_fn=lambda a, b: {
+            run_finder_pipeline_fn=lambda a, b: {
                 "connections": [],
                 "unsupported": [],
                 "trace": {},
