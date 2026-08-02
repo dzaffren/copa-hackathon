@@ -426,17 +426,6 @@ export function IntroPage() {
           >
             Start where policy meets intelligence.
           </h2>
-          <p
-            className="mx-auto mt-5 max-w-sm text-base leading-relaxed motion-reduce:opacity-100"
-            style={{
-              color: "hsl(var(--muted-foreground))",
-              animation: reduceMotion
-                ? undefined
-                : "fadeSlideUp 0.5s 150ms var(--ease-out-expo) both",
-            }}
-          >
-            The Open Finance PD · 2026 workstream is loaded and ready.
-          </p>
           <button
             type="button"
             onClick={() => navigate("/")}
