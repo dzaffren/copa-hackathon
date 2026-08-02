@@ -259,7 +259,7 @@ p.deck strong{color:var(--ink-2);font-weight:700}
 
 .pipe{display:flex;align-items:stretch}
 .stage-c{
-  flex:1 1 0;min-width:0;padding:13px 14px 14px;border-radius:13px;background:#fff;
+  flex:1 1 0;min-width:0;padding:16px 16px 16px;border-radius:13px;background:#fff;
   border:1px solid var(--line);box-shadow:var(--sh-1);display:flex;flex-direction:column;
   transition:transform .2s ease,box-shadow .2s ease;
 }
@@ -267,8 +267,9 @@ p.deck strong{color:var(--ink-2);font-weight:700}
 .stage-c.det{background:#f6f8fb;border-color:#dde5ef}
 .stage-c.val{background:var(--blue-tint);border-color:#c3d7fa}
 .stage-c .sn{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.12em;color:var(--muted-2)}
-.stage-c .st{margin-top:5px;font-size:14.5px;font-weight:700;line-height:1.25;color:var(--ink)}
-.stage-c .sd{margin-top:6px;font-size:12.5px;line-height:1.45;color:var(--muted);flex:1 1 auto}
+.stage-c .st{margin-top:6px;font-size:16px;font-weight:700;line-height:1.25;color:var(--ink)}
+.stage-c .sd{margin-top:8px;font-size:13.6px;line-height:1.5;color:var(--muted);flex:1 1 auto}
+.stage-c .tier{margin-top:12px}
 .stage-c .tier{margin-top:9px}
 .pipe-arrow{flex:none;width:26px;display:grid;place-items:center;color:#c3d2e8}
 
@@ -278,7 +279,7 @@ p.deck strong{color:var(--ink-2);font-weight:700}
 .ing-arrow{flex:0 0 auto;padding:0 11px;color:#b8c6dc;display:grid;place-items:center}
 
 .novel{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.nov{padding:15px 17px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);border-left:3px solid var(--blue)}
+.nov{display:flex;flex-direction:column;justify-content:center;padding:15px 17px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);border-left:3px solid var(--blue)}
 .nov.g{border-left-color:var(--green)} .nov.a{border-left-color:var(--amber)} .nov.v{border-left-color:var(--violet)}
 .nov .nt{font-size:14.5px;font-weight:700;line-height:1.28;color:var(--ink)}
 .nov .nd{margin-top:7px;font-size:13px;line-height:1.5;color:var(--muted)}
@@ -710,123 +711,84 @@ p.deck strong{color:var(--ink-2);font-weight:700}
   <!-- ═════════════════════════ SLIDE 2 ═══════════════════════════════════ -->
   <section class="slide" data-label="Finder pipeline">
     <div class="chrome">
-      <span class="eyebrow">Specialised agent architecture &middot; 1 of 3</span>
+      <span class="eyebrow">Engine 1 of 3 &middot; answers problems 1 &amp; 2</span>
       <div class="mark"><span class="mark-glyph"></span><span class="mark-word">Selaras</span></div>
       <span class="slide-no">02 / 12</span>
     </div>
     <div class="head rise">
-      <h1 class="title">Extraction &rarr; <span class="accent">Finder pipeline</span></h1>
+      <h1 class="title">Comparing two documents, <span class="accent">clause by clause</span></h1>
       <p class="deck">
-        Naive pairwise comparison of two 80-page documents is ~400&times;400 = <strong>160,000 model calls</strong>
-        &mdash; impossible on cost and latency. One whole-document call loses the clause-level precision citation
-        demands. Six stages, two complementary passes, three model tiers matched to reasoning difficulty.
+        <strong>Problems 1 and 2 &mdash; manual overlap checks, manual benchmarking.</strong> Today a drafter reads BCBS,
+        HKMA or another department's document end to end against their own draft. Checking every clause against every clause would
+        take <strong>160,000 AI calls</strong>; reading both documents in one go is cheap but then nothing can be quoted
+        precisely. Six steps get it to <strong>9 AI calls per pair of documents</strong>.
       </p>
     </div>
 
     <div class="body rise">
       <div class="arch">
 
-        <div>
-          <div class="seclabel"><span class="t">Cross-cutting: structural citation integrity</span><span class="l"></span><span class="pill pill-blue pill-sm">Enforced in code, not requested in a prompt</span></div>
-          <div class="layer3">
-            <div class="layer">
-              <div class="lh"><span class="lt">Extraction</span><span class="pill pill-green pill-sm">Layer 1</span></div>
-              <p class="lm">Every passage is verified to be a <b>literal substring</b> of the source markdown &mdash; no paraphrase, no LLM-quoted text.</p>
-              <span class="lw">anchors.verify_substring</span>
-            </div>
-            <div class="layer">
-              <div class="lh"><span class="lt">Finding</span><span class="pill pill-green pill-sm">Layer 2</span></div>
-              <p class="lm">Every cited anchor id is resolved against the index; any unresolved citation demotes the finding to <b>unsupported</b>.</p>
-              <span class="lw">finder_pipeline &middot; Stage 6</span>
-            </div>
-            <div class="layer">
-              <div class="lh"><span class="lt">Recommendation</span><span class="pill pill-green pill-sm">Layer 3</span></div>
-              <p class="lm">Citations resolved against accepted findings; clause text is <b>copied from disk</b>, never from the model's echo.</p>
-              <span class="lw">recommendations.enforce_evidence_floor</span>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <div class="seclabel"><span class="t">Ingestion &mdash; deterministic</span><span class="l"></span></div>
-          <div class="ingest">
-            <span class="ing-node"><b>PDF / DOCX</b></span>
-            <span class="ing-arrow">&rarr;</span>
-            <span class="ing-node"><b>Azure Document Intelligence</b> &mdash; reading-order recovery</span>
-            <span class="ing-arrow">&rarr;</span>
-            <span class="ing-node"><b>Markdown</b></span>
-            <span class="ing-arrow">&rarr;</span>
-            <span class="ing-node"><b>Doc-class segmenter</b> &mdash; structured-rules | semi-structured | prose</span>
-            <span class="ing-arrow">&rarr;</span>
-            <span class="ing-node" style="background:var(--green-tint);border-color:#a7e8bf"><b>Anchors</b> &mdash; verbatim substring-verified</span>
-          </div>
-        </div>
-
-        <div>
-          <div class="seclabel"><span class="t">Finder pipeline &mdash; six stages</span><span class="l"></span><span class="pill pill-ghost pill-sm">Output: 5-label taxonomy + verbatim citations</span></div>
-          <div class="pipe">
+        <div style="flex:1.7 1 auto;display:flex;flex-direction:column;min-height:0">
+          <div class="seclabel"><span class="t">The run &mdash; six steps, nine AI calls</span><span class="l"></span><span class="pill pill-ghost pill-sm">Out: one of five plain verdicts, each quoting a real clause</span></div>
+          <div class="pipe" style="flex:1 1 auto;min-height:0">
             <div class="stage-c">
-              <div class="sn">Stage 1</div>
-              <div class="st">Axis extraction</div>
-              <p class="sd">Per-anchor topic labels. Disk-cached on text hash.</p>
-              <div class="tier"><span class="pill pill-green pill-sm">Haiku &middot; small tier</span></div>
+              <div class="sn">Step 1</div>
+              <div class="st">Tag every clause</div>
+              <p class="sd">What is this clause about? Done once per document, then remembered &mdash; a re-run costs nothing.</p>
+              <div class="tier"><span class="pill pill-green pill-sm">Small model</span></div>
             </div>
             <div class="pipe-arrow">&rarr;</div>
             <div class="stage-c det">
-              <div class="sn">Stage 2</div>
-              <div class="st">Same-topic retrieval</div>
-              <p class="sd">Cosine embeddings, BM25 fallback.</p>
-              <div class="tier"><span class="pill pill-slate pill-sm">No model</span></div>
+              <div class="sn">Step 2</div>
+              <div class="st">Pair up same topics</div>
+              <p class="sd">Match clauses about the same thing. Top 2 per clause, capped at 60 pairs.</p>
+              <div class="tier"><span class="pill pill-slate pill-sm">No AI &middot; 0 calls</span></div>
             </div>
             <div class="pipe-arrow">&rarr;</div>
             <div class="stage-c">
-              <div class="sn">Stage 3</div>
-              <div class="st">Batched finder</div>
-              <p class="sd">Batch-union membership, size 8. Three agreement labels only.</p>
-              <div class="tier"><span class="pill pill-amber pill-sm">Sonnet &middot; mid tier</span></div>
+              <div class="sn">Step 3</div>
+              <div class="st">Judge each pair</div>
+              <p class="sd">Do they agree, differ, or conflict? Eight pairs per call.</p>
+              <div class="tier"><span class="pill pill-amber pill-sm">Mid model &middot; 8 calls</span></div>
             </div>
             <div class="pipe-arrow">&rarr;</div>
             <div class="stage-c det">
-              <div class="sn">Stage 4</div>
-              <div class="st">Suppression build</div>
-              <p class="sd">Topics Stage 3 already resolved.</p>
-              <div class="tier"><span class="pill pill-slate pill-sm">No model</span></div>
+              <div class="sn">Step 4</div>
+              <div class="st">Note what's settled</div>
+              <p class="sd">List the topics step 3 answered, so the expensive read doesn't redo them.</p>
+              <div class="tier"><span class="pill pill-slate pill-sm">No AI &middot; 0 calls</span></div>
             </div>
             <div class="pipe-arrow">&rarr;</div>
             <div class="stage-c">
-              <div class="sn">Stage 5</div>
-              <div class="st">Whole-doc coverage</div>
-              <p class="sd">ONE call. <span class="mono">silent-on</span> / <span class="mono">goes-beyond</span>.</p>
-              <div class="tier"><span class="pill pill-violet pill-sm">Opus &middot; large tier</span></div>
+              <div class="sn">Step 5</div>
+              <div class="st">Read both, whole</div>
+              <p class="sd">What does their document cover that ours doesn't &mdash; and the other way round?</p>
+              <div class="tier"><span class="pill pill-violet pill-sm">Large model &middot; 1 call</span></div>
             </div>
             <div class="pipe-arrow">&rarr;</div>
             <div class="stage-c val">
-              <div class="sn">Stage 6</div>
-              <div class="st">Merge + validate</div>
-              <p class="sd">Citation reformat, evidence check.</p>
-              <div class="tier"><span class="pill pill-blue pill-sm">No model &middot; the gate</span></div>
+              <div class="sn">Step 6</div>
+              <div class="st">Check every quote</div>
+              <p class="sd">Any clause number that doesn't exist is dropped, not published.</p>
+              <div class="tier"><span class="pill pill-blue pill-sm">No AI &middot; the gate</span></div>
             </div>
           </div>
         </div>
 
-        <div>
-          <div class="seclabel"><span class="t">What is genuinely novel</span><span class="l"></span></div>
-          <div class="novel">
+        <div style="flex:1 1 auto;display:flex;flex-direction:column;min-height:0">
+          <div class="seclabel"><span class="t">Why this holds up</span><span class="l"></span></div>
+          <div class="novel" style="grid-template-columns:repeat(3,1fr);flex:1 1 auto;min-height:0">
             <div class="nov">
-              <div class="nt">Two-pass design solves a recall problem single-pass RAG cannot</div>
-              <p class="nd">Retrieval finds clauses that <b>are</b> about a topic. The highest-value regulatory finding is the <b>absence</b> of one &mdash; "HKMA governs this, we are silent." Nothing on our side exists to retrieve, so Stage 5 reads whole documents; Stage 4 suppresses settled ground so the expensive pass isn't re-litigating it.</p>
+              <div class="nt">Searching alone can never find a gap</div>
+              <p class="nd">Search finds clauses that <b>exist</b>. The finding a drafter most needs is the one that doesn't &mdash; "HKMA regulates this; we say nothing." There is nothing on our side to search for, so step 5 reads both documents whole. That is problem 2 answered.</p>
             </div>
             <div class="nov a">
-              <div class="nt">Three model tiers, matched to task difficulty</div>
-              <p class="nd">Topic-phrase extraction is not reasoning &mdash; small tier. Per-pair semantic judgment &mdash; mid tier. Only whole-document coverage inference, which needs both documents held at once, reaches the large tier. <b>Cost scales with difficulty, not uniformly.</b></p>
-            </div>
-            <div class="nov g">
-              <div class="nt">No critic loop &mdash; a result, not an assumption</div>
-              <p class="nd">The earlier finder&rarr;critic architecture was retired after ablation experiments showed the finder-only design matched it. <b>Half the model calls, same output quality.</b></p>
+              <div class="nt">Cheap work runs on a cheap model</div>
+              <p class="nd">Tagging what a clause is about isn't hard thinking &mdash; small model, and remembered. Judging a pair is &mdash; mid model. Only reading both documents at once, the hard part, uses the large model, and it runs <b>exactly once</b>.</p>
             </div>
             <div class="nov v">
-              <div class="nt">Deterministic citation repair &mdash; repair never becomes guessing</div>
-              <p class="nd">Stage 6 recovers <span class="mono">RMiT 2.2(b):</span> with trailing punctuation and logs the rewrite. But <b>no fuzzy or semantic matching</b> &mdash; an id that only partially resembles a real anchor is demoted to <span class="mono">unsupported</span>. Likewise doc-class-aware segmentation: three registered strategies, the drafter chooses, the tool never guesses.</p>
+              <div class="nt">We fix typos, we never guess</div>
+              <p class="nd">A stray colon on a clause number is stripped and the fix logged. But a number that only half-matches a real clause is <b>marked unsupported</b> &mdash; we never decide which clause was probably meant.</p>
             </div>
           </div>
         </div>
@@ -835,7 +797,7 @@ p.deck strong{color:var(--ink-2);font-weight:700}
     </div>
 
     <div class="foot">
-      <span class="fl">A model that invents a clause number gets its output <b>dropped, not published</b></span>
+      <span class="fl">Problems 1 &amp; 2 &mdash; the reading a drafter does by hand today, done in <b>9 AI calls</b>. Invent a clause number and the output is <b>dropped, not published</b></span>
       <div class="fr">
         <div class="taxo">
           <span class="t">aligns-with</span><span class="t">differs-on</span><span class="t">conflicts-with</span><span class="t">silent-on</span><span class="t">goes-beyond</span>
@@ -847,16 +809,17 @@ p.deck strong{color:var(--ink-2);font-weight:700}
   <!-- ═════════════════════════ SLIDE 3 ═══════════════════════════════════ -->
   <section class="slide" data-label="Recommendations">
     <div class="chrome">
-      <span class="eyebrow">Specialised agent architecture &middot; 2 of 3</span>
+      <span class="eyebrow">Engine 2 of 3 &middot; answers problems 3 &amp; 4</span>
       <div class="mark"><span class="mark-glyph"></span><span class="mark-word">Selaras</span></div>
       <span class="slide-no">03 / 12</span>
     </div>
     <div class="head rise">
-      <h1 class="title">Recommendations <span class="accent">engine</span></h1>
+      <h1 class="title">From findings to <span class="accent">what the draft should say</span></h1>
       <p class="deck">
-        Triage leaves the drafter holding thirty accepted comparisons &mdash; "our clause 8.4 is silent where
-        HKMA's 4.2 is not" &mdash; and no answer to <strong>what the policy document should actually say</strong>.
-        This is the step most policy-AI tools stop short of.
+        <strong>Problem 3 &mdash; time lost to routine work.</strong> Finding linkages is half the job. The drafter is
+        still left with thirty accepted comparisons &mdash; "our clause 8.4 is silent where HKMA's 4.2 is not" &mdash;
+        and every word still to write. <strong>Problem 4 &mdash; expertise stuck in one head.</strong> This engine writes
+        the first version, and writes the house rules down where the next drafter can read them.
       </p>
     </div>
 
@@ -864,20 +827,20 @@ p.deck strong{color:var(--ink-2);font-weight:700}
       <div class="rec">
 
         <div class="recflow">
-          <div class="seclabel"><span class="t">Generation and the evidence floor</span><span class="l"></span></div>
+          <div class="seclabel"><span class="t">What goes in, and what has to survive the check</span><span class="l"></span></div>
 
           <div class="inputs">
             <div class="inp">
-              <div class="it">Accepted findings</div>
-              <p class="sub">Neighbourhood scope. <span class="mono">collect_evidence</span> copies verbatim clause text straight off the finding records.</p>
+              <div class="it">Only what the drafter accepted</div>
+              <p class="sub">Findings the drafter agreed with. The clause text is taken from the finding itself &mdash; never re-asked from the AI.</p>
             </div>
             <div class="inp">
-              <div class="it">Drafter's <span class="mono">policy_requirement</span></div>
-              <p class="sub">The generation dimensions &mdash; read from the working draft's own field, which the drafter maintains.</p>
+              <div class="it">Their own list of requirements</div>
+              <p class="sub">What the draft must cover, in their words. It sets the headings. Nothing listed, or nothing accepted &rarr; <b>we stop before spending anything</b>.</p>
             </div>
             <div class="inp">
-              <div class="it">Workstream guardrails</div>
-              <p class="sub">Drafter-authored constraints, applied inside the pass.</p>
+              <div class="it">The house rules</div>
+              <p class="sub">Plain-language rules, one set per workstream. <b>Five ship by default</b>, each written from a real BNM review of nine AI-drafted recommendations.</p>
             </div>
           </div>
 
@@ -885,10 +848,10 @@ p.deck strong{color:var(--ink-2);font-weight:700}
 
           <div class="merge">
             <div>
-              <div class="mt">Single model pass</div>
-              <p class="sub">No second scoring stage. Deliberately unlike the finder pipeline.</p>
+              <div class="mt">One pass, and the house rules are inside it</div>
+              <p class="sub">No second stage that scores the first. Nothing here reaches the drafter unchecked.</p>
             </div>
-            <span class="pill pill-violet">Opus &middot; large tier</span>
+            <span class="pill pill-violet">Large model</span>
           </div>
 
           <div class="arrow" style="padding:2px 0"><svg width="18" height="16" viewBox="0 0 18 16"><path d="M9 0v11M4 8l5 6 5-6" stroke="currentColor" stroke-width="1.8" fill="none"/></svg></div>
@@ -896,47 +859,38 @@ p.deck strong{color:var(--ink-2);font-weight:700}
           <div class="floor">
             <div class="ft">
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5l6 2.6v4.6c0 3.5-2.5 6.4-6 7.3-3.5-.9-6-3.8-6-7.3V4.1l6-2.6z" stroke="currentColor" stroke-width="1.6"/><path d="M6.2 9.1l2 2 3.6-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-              enforce_evidence_floor
+              Then the check
             </div>
-            <p class="fq">Is every citation resolved against the accepted set?<br />Enforced <b>after</b> generation, not requested during it.</p>
+            <p class="fq">Does every quote point at a finding the drafter accepted?<br />Run <b>after</b> the AI answers &mdash; not asked for in advance.</p>
           </div>
 
           <div class="outs">
             <div class="fork ok" style="padding:13px 15px">
-              <div class="cond">&ge;1 resolves &rarr; persisted</div>
-              <div class="out">Citations replaced <b>wholesale</b> with our own records. Clause number and clause text are ours, copied from disk &mdash; never the model's paraphrase.</div>
+              <div class="cond">At least one holds &rarr; kept</div>
+              <div class="out">Its quotes are swapped for <b>our own records</b>. The clause number and text come from the document, not from what the AI typed.</div>
             </div>
             <div class="fork no" style="padding:13px 15px">
-              <div class="cond">None resolve &rarr; dropped</div>
-              <div class="out">Dropped <b>before anything is persisted</b>, and counted in <span class="mono">dropped_unsupported</span>.</div>
+              <div class="cond">None hold &rarr; dropped</div>
+              <div class="out">Thrown away <b>before anything is saved</b>, and counted so the drafter sees it happened. A failed run leaves the previous set untouched.</div>
             </div>
           </div>
 
-          <div class="derive">
-            <b>coverage()</b> is derived on every read &rarr; <b>"not yet reflected"</b>: the accepted findings no
-            recommendation has drawn on. Recomputed per request, never stored &mdash; a persisted figure would
-            silently drift as findings are accepted after generation.
-          </div>
         </div>
 
         <div style="display:flex;flex-direction:column;min-height:0">
-          <div class="seclabel"><span class="t">What is genuinely novel</span><span class="l"></span></div>
-          <div class="novel" style="grid-template-columns:1fr 1fr;flex:1 1 auto;min-height:0">
+          <div class="seclabel"><span class="t">Why this holds up</span><span class="l"></span></div>
+          <div class="novel" style="grid-template-columns:1fr;flex:1 1 auto;min-height:0">
             <div class="nov g">
-              <div class="nt">The evidence floor is enforced after generation, not requested during it</div>
-              <p class="nd">Every citation is resolved against the accepted-findings set. A recommendation whose citations <b>all</b> fail to resolve is dropped before anything is persisted. Surviving citations are then replaced wholesale by records built from the findings themselves.</p>
+              <div class="nt">The quoting rule is built in, not asked for</div>
+              <p class="nd">We don't ask the AI to cite honestly and hope it does. Every quote is checked against the accepted findings afterwards, and if none hold, that recommendation is <b>deleted before it is ever saved</b>.</p>
             </div>
             <div class="nov">
-              <div class="nt">Dimensions come from the drafter, never the tool</div>
-              <p class="nd">Generation axes are read from the working draft's own <span class="mono">policy_requirement</span> field. <b>No requirements recorded &rarr; generation refuses and says why.</b> A recommendation is always framed in vocabulary the drafter authored, and therefore trusts.</p>
+              <div class="nt">The headings are theirs, not ours</div>
+              <p class="nd">Recommendations are organised by the requirements the drafter wrote down. <b>Nothing written down &rarr; we stop, and say why.</b> They read back their own words, not categories a tool invented.</p>
             </div>
             <div class="nov a">
-              <div class="nt">Guardrails are constraints inside one pass, not a second scoring stage</div>
-              <p class="nd">This is also why <b>no relevance score reaches the interface</b>: there is no independent judgement to report, and a self-assigned score would invite trust it has not earned.</p>
-            </div>
-            <div class="nov v">
-              <div class="nt">Rewrite preserves the audit chain</div>
-              <p class="nd">Rewriting from the drafter's comments keeps the card's id, bookmark, dimensions and comments, and appends the superseded text to <span class="mono">revisions</span>. The evidence floor applies to the rewrite too &mdash; <b>a rewrite may never launder a card past the citation rule.</b></p>
+              <div class="nt">The house rules leave one head and go on the record</div>
+              <p class="nd">That is problem 4. Judgement built over years &mdash; how BNM cross-references, what scope a draft may claim &mdash; becomes something every future draft reads. <b>Only the drafter writes it</b>: the tool never turns its own output into a rule it then follows.</p>
             </div>
           </div>
         </div>
@@ -945,8 +899,8 @@ p.deck strong{color:var(--ink-2);font-weight:700}
     </div>
 
     <div class="foot">
-      <span class="fl">Turning triage output into <b>drafted policy language</b> &mdash; defensible because the floor drops uncited output before persistence</span>
-      <div class="fr"><span class="pill pill-blue pill-sm">Coverage derived on every read, never stored</span></div>
+      <span class="fl">Problem 3 &mdash; the routine writing done for them. Problem 4 &mdash; the judgement behind it <b>stored where the next drafter can read it</b></span>
+      <div class="fr"><span class="pill pill-blue pill-sm">Nothing is saved that can't be traced to a clause</span></div>
     </div>
   </section>
 
