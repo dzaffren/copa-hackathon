@@ -35,6 +35,36 @@ beforeAll(() => {
   Element.prototype.scrollIntoView = () => {};
 });
 
+// jsdom ships no PointerEvent, so `fireEvent.pointerDown(el, {button: 0,
+// pointerId: 1})` silently dispatches a plain Event whose `button` and
+// `pointerId` are BOTH undefined — a pointer handler that guards on either
+// (as the demo bar's drag does) then bails and the interaction looks broken
+// in tests while working fine in a browser. Subclassing MouseEvent keeps the
+// clientX/clientY plumbing jsdom already implements and adds the pointer
+// fields on top.
+class PointerEventStub extends MouseEvent {
+  pointerId: number;
+  pointerType: string;
+  isPrimary: boolean;
+
+  constructor(type: string, params: PointerEventInit = {}) {
+    super(type, params);
+    this.pointerId = params.pointerId ?? 0;
+    this.pointerType = params.pointerType ?? "mouse";
+    this.isPrimary = params.isPrimary ?? true;
+  }
+}
+globalThis.PointerEvent =
+  globalThis.PointerEvent ??
+  (PointerEventStub as unknown as typeof PointerEvent);
+
+// Pointer capture is a no-op here: jsdom has no real pointer, and the drag
+// handler calls it unconditionally on pointerdown.
+beforeAll(() => {
+  Element.prototype.setPointerCapture ??= () => {};
+  Element.prototype.releasePointerCapture ??= () => {};
+});
+
 beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
 
 afterEach(() => {
