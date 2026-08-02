@@ -437,13 +437,13 @@ p.deck strong{color:var(--ink-2);font-weight:700}
    Feasibility/Scalability — instead of a row-label matrix with asymmetric
    row heights. Every quadrant gets equal space, so type can run larger. */
 .s5-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:18px;flex:1 1 auto;min-height:0}
-.s5-card{padding:22px 26px;border-radius:16px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden}
+.s5-card{padding:16px 26px;border-radius:16px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh-1);display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden}
 .s5-card.scale{background:linear-gradient(150deg,#f7fbff,#ffffff)}
 .s5-card-head{display:flex;align-items:baseline;justify-content:space-between;flex:none}
 .s5-card-head .cat{font-family:var(--mono);font-size:15.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2)}
 .s5-card-head .dim{font-size:20.5px;font-weight:700;letter-spacing:.02em}
-.s5-claims{display:flex;flex-direction:column;gap:9px;flex:1 1 auto;min-height:0;justify-content:center}
-.s5-claim{display:flex;flex-direction:column;gap:6px}
+.s5-claims{display:flex;flex-direction:column;gap:6px;flex:1 1 auto;min-height:0;justify-content:center}
+.s5-claim{display:flex;flex-direction:column;gap:4px}
 .s5-claim .ch{font-size:20.5px;font-weight:700;line-height:1.28;color:var(--ink);display:flex;gap:9px;align-items:flex-start}
 .s5-claim .ch::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--blue);flex:none;margin-top:8px}
 .s5-claim .row{display:flex;gap:9px;align-items:flex-start;padding-left:16px}
@@ -452,12 +452,12 @@ p.deck strong{color:var(--ink-2);font-weight:700}
 .s5-claim .row .tag.ft{background:#f1f5f9;color:#475569}
 .s5-claim .row p{margin:0;font-size:18.5px;line-height:1.44;color:var(--muted)}
 .s5-claim .row p b{color:var(--ink-2);font-weight:700}
-.s5-rule{height:1px;background:var(--line-soft);border:0;margin:1px 0}
+.s5-rule{height:1px;background:var(--line-soft);border:0;margin:0}
 .s5-bignum{display:flex;align-items:baseline;gap:9px}
 .s5-bignum .n{font-size:41.5px;font-weight:700;letter-spacing:-.03em;line-height:1;color:var(--green-ink)}
 .s5-bignum .u{font-size:17px;font-weight:500;color:var(--muted)}
 .s5-lifecycle{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-left:16px}
-.s5-lc{padding:5px 12px;border-radius:8px;background:#f1f5f9;border:1px solid #e3eaf3;font-size:16.5px;font-weight:600;color:var(--ink-2)}
+.s5-lc{padding:4px 12px;border-radius:8px;background:#f1f5f9;border:1px solid #e3eaf3;font-size:16.5px;font-weight:600;color:var(--ink-2)}
 .s5-lc.last{background:var(--blue-tint);border-color:#cadcfb;color:var(--blue-ink)}
 .s5-lc-a{color:#b8c6dc;font-size:16.5px;font-weight:700}
 .s5-tiers{display:flex;gap:10px;padding-left:16px}
@@ -1131,7 +1131,7 @@ p.deck strong{color:var(--ink-2);font-weight:700}
               <span class="tag ft">Feature</span>
               <p>Node and edge analysis support the full lifecycle of policy artefacts:</p>
             </div>
-            <div class="s5-lifecycle">
+            <div class="s5-lifecycle" style="margin-top:-4px">
               <span class="s5-lc">Discussion decks</span><span class="s5-lc-a">&rarr;</span>
               <span class="s5-lc">Discussion paper</span><span class="s5-lc-a">&rarr;</span>
               <span class="s5-lc">Exposure draft</span><span class="s5-lc-a">&rarr;</span>
