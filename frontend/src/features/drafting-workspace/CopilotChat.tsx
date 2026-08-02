@@ -1,7 +1,11 @@
 import { useEffect, useReducer, useRef } from "react";
 import { RotateCcw } from "lucide-react";
 import { ChatInput } from "./ChatInput";
-import { MessageRenderer, type DeliveredTo, type MessageHandlers } from "./MessageRenderer";
+import {
+  MessageRenderer,
+  type DeliveredTo,
+  type MessageHandlers,
+} from "./MessageRenderer";
 import { WelcomeScreen } from "./WelcomeScreen";
 import { DRAFT_OUTLINE_SECTIONS } from "./copilotDraftOutline";
 import {
@@ -9,6 +13,7 @@ import {
   DRAFT_SECTIONS,
   NODE_METADATA,
   THINKING_STEPS,
+  SLASH_COMMAND_IDS,
   buildDraftOutline,
   buildFullDraft,
   isCommandUnlocked,
@@ -74,7 +79,10 @@ function reducer(state: ChatState, action: Action): ChatState {
     case "deliver":
       return { ...state, delivered: action.recipient };
     case "resolve-fields":
-      return { ...state, resolvedFields: { ...state.resolvedFields, ...action.values } };
+      return {
+        ...state,
+        resolvedFields: { ...state.resolvedFields, ...action.values },
+      };
     case "toggle-command": {
       const next = new Set(state.expandedCommands);
       if (next.has(action.id)) next.delete(action.id);
@@ -82,7 +90,10 @@ function reducer(state: ChatState, action: Action): ChatState {
       return { ...state, expandedCommands: next };
     }
     case "complete-step":
-      return { ...state, completedSteps: new Set(state.completedSteps).add(action.id) };
+      return {
+        ...state,
+        completedSteps: new Set(state.completedSteps).add(action.id),
+      };
     case "reset":
       return action.state;
     default:
@@ -325,6 +336,93 @@ export function CopilotChat({
     });
   }
 
+  // --- Demo skip -----------------------------------------------------------
+  // Every stage's terminal state, reachable without its timers, forms, or Q&A.
+  // Purely for presenting: the flow above is the real one, and each skip lands
+  // on the SAME state its scripted run ends in (same completed step, same draft
+  // written into the editor), so a skipped demo and a walked one are
+  // indistinguishable from that point on.
+
+  /** The stage the skip button acts on: the first one not yet completed. */
+  function nextIncompleteStage(): SlashCommandId | null {
+    return (
+      SLASH_COMMAND_IDS.find((id) => !state.completedSteps.has(id)) ?? null
+    );
+  }
+
+  function skipStage(id: SlashCommandId) {
+    clearAll();
+    dispatch({ type: "complete-step", id });
+    switch (id) {
+      case "/explore-task":
+        // Skips the missing-fields form, so the three null fields stay null —
+        // the honest state, not invented values (CLAUDE.md's citation rule).
+        append({
+          id: nextId(),
+          kind: "command",
+          command: "/explore-task",
+          status: "done",
+          statusLine: `${METADATA_AVAILABLE} of ${NODE_METADATA.length} fields found on the connected anchor document.`,
+          detailKind: "metadata",
+        });
+        break;
+      case "/brainstorm":
+        append({
+          id: nextId(),
+          kind: "command",
+          command: "/brainstorm",
+          status: "done",
+          statusLine: "Understanding aligned ✓",
+          detailKind: null,
+        });
+        break;
+      case "/draft":
+        replaceRef.current(buildDraftOutline());
+        append({
+          id: nextId(),
+          kind: "command",
+          command: "/draft",
+          status: "done",
+          statusLine: `Outline ready — ${DRAFT_OUTLINE_SECTIONS.length} sections.`,
+          detailKind: "outline",
+        });
+        break;
+      case "/write":
+        replaceRef.current(buildFullDraft());
+        append({
+          id: nextId(),
+          kind: "command",
+          command: "/write",
+          status: "done",
+          statusLine: `${DRAFT_SECTIONS.length} sections written into your editor.`,
+          detailKind: null,
+        });
+        break;
+      case "/deliver":
+        // Left "active" with its panel open: who the draft goes to is the
+        // drafter's own call, never a fabricated default recipient. The skip
+        // gets you to the send panel, it doesn't send.
+        deliverCmdId.current = nextId();
+        append({
+          id: deliverCmdId.current,
+          kind: "command",
+          command: "/deliver",
+          status: "active",
+          statusLine: "Ready to send for review.",
+          detailKind: "deliver",
+        });
+        break;
+    }
+  }
+
+  /** Advance one stage per click. Skipping /write is what puts the full Open
+   *  Finance PD in the editor, so a click-through of all five ends on the
+   *  delivered draft. */
+  function skipCurrentStage() {
+    const id = nextIncompleteStage();
+    if (id) skipStage(id);
+  }
+
   function runCommand(id: SlashCommandId) {
     // Enforced regardless of how the command was invoked — a welcome-screen
     // step, a suggestion chip, the slash menu, or typing the exact command
@@ -358,7 +456,9 @@ export function CopilotChat({
       return;
     }
     // clarification
-    const idx = CLARIFICATION_QUESTIONS.findIndex((q) => q.id === msg.questionId);
+    const idx = CLARIFICATION_QUESTIONS.findIndex(
+      (q) => q.id === msg.questionId,
+    );
     const next = CLARIFICATION_QUESTIONS[idx + 1];
     if (next) {
       append({
@@ -418,6 +518,8 @@ export function CopilotChat({
     onDismissBanner,
   };
 
+  const skipTarget = nextIncompleteStage();
+
   // Keep the newest message in view as the conversation grows. Guarded because
   // jsdom (test env) doesn't implement Element.scrollTo.
   useEffect(() => {
@@ -449,7 +551,9 @@ export function CopilotChat({
             {state.messages.map((msg) => (
               <div
                 key={msg.id}
-                style={{ animation: "fadeSlideUp 0.4s var(--ease-out-expo) both" }}
+                style={{
+                  animation: "fadeSlideUp 0.4s var(--ease-out-expo) both",
+                }}
               >
                 <MessageRenderer msg={msg} handlers={handlers} />
               </div>
@@ -458,7 +562,12 @@ export function CopilotChat({
         )}
       </div>
 
-      <ChatInput onRunCommand={runCommand} onSend={onSend} />
+      <ChatInput
+        onRunCommand={runCommand}
+        onSend={onSend}
+        onSkipStage={skipTarget ? skipCurrentStage : undefined}
+        skipLabel={skipTarget ?? undefined}
+      />
     </div>
   );
 }

@@ -8,10 +8,7 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderApp } from "@/test/utils";
-import {
-  makeRecommendation,
-  resetRecommendations,
-} from "@/test/msw/handlers";
+import { makeRecommendation, resetRecommendations } from "@/test/msw/handlers";
 import { DRAFT_OUTLINE_SECTIONS } from "./copilotDraftOutline";
 import {
   CLARIFICATION_QUESTIONS,
@@ -19,6 +16,7 @@ import {
   MENTIONABLE,
   MISSING_FIELDS,
   NODE_METADATA,
+  SLASH_COMMAND_IDS,
   SLASH_COMMANDS,
 } from "./copilotV2Data";
 
@@ -177,7 +175,11 @@ describe("DraftingWorkspacePage — Recommendations tab", () => {
   it("shows only the bookmarked recommendations, and counts them", async () => {
     resetRecommendations({
       nextBatch: [
-        makeRecommendation({ id: "kept", title: "Taken forward", bookmarked: true }),
+        makeRecommendation({
+          id: "kept",
+          title: "Taken forward",
+          bookmarked: true,
+        }),
         makeRecommendation({ id: "passed", title: "Passed over" }),
       ],
       generatedAt: "2026-08-02T09:14:22Z",
@@ -219,7 +221,9 @@ describe("DraftingWorkspacePage — Recommendations tab", () => {
     const card = await screen.findByTestId("draft-recommendation");
 
     expect(
-      within(card).queryByRole("button", { name: /draft this|insert|add to draft/i }),
+      within(card).queryByRole("button", {
+        name: /draft this|insert|add to draft/i,
+      }),
     ).not.toBeInTheDocument();
   });
 
@@ -253,9 +257,11 @@ describe("DraftingWorkspacePage — Recommendations tab", () => {
           left: { id: "bis-papers-168", title: "BIS Papers 168" },
           right: { id: "ed-open-finance-2025", title: "ED Open Finance 2025" },
           source_clause_number: "3.1",
-          source_clause_text: "Jurisdictions may adopt a facilitative approach.",
+          source_clause_text:
+            "Jurisdictions may adopt a facilitative approach.",
           target_clause_number: "14.2",
-          target_clause_text: "Phase one obligations take effect 1 January 2027.",
+          target_clause_text:
+            "Phase one obligations take effect 1 January 2027.",
         },
       ],
     });
@@ -298,7 +304,9 @@ describe("DraftingWorkspacePage — Playbook tab", () => {
     // Not a DISABLED textarea — none at all. A disabled field still reads as
     // something that might one day be filled in.
     expect(within(locked).queryByRole("textbox")).not.toBeInTheDocument();
-    expect(within(locked).getByTestId("explore-task-locked")).toBeInTheDocument();
+    expect(
+      within(locked).getByTestId("explore-task-locked"),
+    ).toBeInTheDocument();
     expect(
       within(locked).getByRole("link", { name: /regulatory profile/i }),
     ).toBeInTheDocument();
@@ -344,7 +352,9 @@ describe("DraftingWorkspacePage — Playbook tab", () => {
     const draftSection = screen
       .getAllByTestId("playbook-section")
       .find((s) => s.getAttribute("data-stage") === "/draft")!;
-    expect(within(draftSection).getByTestId("playbook-upload")).toBeInTheDocument();
+    expect(
+      within(draftSection).getByTestId("playbook-upload"),
+    ).toBeInTheDocument();
 
     // Deliberately inert — selecting a file must not upload or store anything.
     const input = within(draftSection).getByTestId("playbook-upload-input");
@@ -353,9 +363,9 @@ describe("DraftingWorkspacePage — Playbook tab", () => {
       new File(["x"], "house-template.docx"),
     );
 
-    expect(within(draftSection).getByTestId("playbook-upload-note")).toHaveTextContent(
-      /not wired up in this build/i,
-    );
+    expect(
+      within(draftSection).getByTestId("playbook-upload-note"),
+    ).toHaveTextContent(/not wired up in this build/i);
   });
 });
 
@@ -747,6 +757,70 @@ describe("DraftingWorkspacePage — Copilot chat", () => {
     },
     LONG_FLOW,
   );
+
+  it(
+    "skips stage by stage to the delivered draft, same end state as walking it",
+    async () => {
+      const user = userEvent.setup();
+      await openCopilot(user);
+
+      // The button names the stage it acts on, advancing one per click.
+      for (const stage of SLASH_COMMAND_IDS) {
+        const skip = await screen.findByTestId("skip-stage");
+        expect(skip).toHaveAccessibleName(`Skip ${stage}`);
+        await user.click(skip);
+      }
+
+      // Every stage completed, so the skip button retires.
+      await waitFor(() => {
+        expect(screen.queryByTestId("skip-stage")).not.toBeInTheDocument();
+      });
+
+      // The full Open Finance PD is in the editor — the same document /write
+      // produces, marked as Copilot-written text.
+      const surface = screen.getByTestId("draft-surface");
+      expect(surface).toHaveTextContent(DRAFT_OUTLINE_SECTIONS[0].title);
+      expect(surface).toHaveTextContent(
+        DRAFT_OUTLINE_SECTIONS[DRAFT_OUTLINE_SECTIONS.length - 1].title,
+      );
+      expect(surface.querySelector(".copilot-snippet")).not.toBeNull();
+
+      // Landed on /deliver's send panel, still un-sent with no fabricated
+      // recipient — skipping the flow never skips the drafter's own call.
+      const block = commandBlock("/deliver")!;
+      expect(
+        (within(block).getByLabelText("Recipient name") as HTMLInputElement)
+          .value,
+      ).toBe("");
+      expect(
+        within(block).getByRole("button", { name: "Send for Review" }),
+      ).toBeDisabled();
+    },
+    LONG_FLOW,
+  );
+
+  it("skipping /explore-task leaves unresolvable fields honestly null", async () => {
+    const user = userEvent.setup();
+    await openCopilot(user);
+
+    await user.click(await screen.findByTestId("skip-stage"));
+
+    // Nothing filled those three fields, so they must read "Not available"
+    // rather than a guessed value — the skip unblocks the flow, it never
+    // invents metadata the document does not carry.
+    const block = await waitFor(() => {
+      const el = commandBlock("/explore-task");
+      expect(el).toBeTruthy();
+      return el!;
+    }, THINKING_WAIT);
+    expect(within(block).getAllByText("Not available").length).toBe(
+      MISSING_FIELDS.length,
+    );
+    // The form is still offered, so a skipped stage can be completed properly.
+    expect(
+      within(block).getByTestId("missing-fields-form"),
+    ).toBeInTheDocument();
+  });
 
   it("nudges toward a command on free-text input", async () => {
     const user = userEvent.setup();

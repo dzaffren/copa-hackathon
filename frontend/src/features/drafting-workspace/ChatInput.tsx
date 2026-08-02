@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { Send } from "lucide-react";
+import { Send, SkipForward } from "lucide-react";
 import { AutocompleteMenu, type AutocompleteItem } from "./AutocompleteMenu";
 import {
   MENTIONABLE,
@@ -31,10 +31,17 @@ function activeMention(
 export function ChatInput({
   onRunCommand,
   onSend,
+  onSkipStage,
+  skipLabel,
   disabled,
 }: {
   onRunCommand: (id: SlashCommandId) => void;
   onSend: (text: string, mentions: MentionRef[]) => void;
+  /** Demo affordance: finish the current stage and unlock the next one without
+   *  walking its form, Q&A, or timers. Absent once every stage is complete. */
+  onSkipStage?: () => void;
+  /** The stage the skip button would act on, e.g. "/write". */
+  skipLabel?: string;
   disabled?: boolean;
 }) {
   const [value, setValue] = useState("");
@@ -58,9 +65,9 @@ export function ChatInput({
     }
     if (menuKind === "mention" && mention) {
       const q = mention.query.toLowerCase();
-      return MENTIONABLE.filter((m) =>
-        m.label.toLowerCase().includes(q),
-      ).map((m) => ({ id: m.id, label: m.label, description: m.kind }));
+      return MENTIONABLE.filter((m) => m.label.toLowerCase().includes(q)).map(
+        (m) => ({ id: m.id, label: m.label, description: m.kind }),
+      );
     }
     return [];
   }, [menuKind, value, mention]);
@@ -81,9 +88,7 @@ export function ChatInput({
     }
     if (menuKind === "mention" && mention) {
       const next =
-        value.slice(0, mention.start) +
-        `@${item.label} ` +
-        value.slice(caret);
+        value.slice(0, mention.start) + `@${item.label} ` + value.slice(caret);
       setValue(next);
       setHighlight(0);
       // Restore focus so the drafter keeps typing after inserting a mention.
@@ -186,6 +191,19 @@ export function ChatInput({
         >
           <Send className="h-3.5 w-3.5" />
         </button>
+        {onSkipStage && (
+          <button
+            type="button"
+            data-testid="skip-stage"
+            aria-label={`Skip ${skipLabel}`}
+            title={`Skip ${skipLabel} — demo shortcut`}
+            onClick={onSkipStage}
+            className="flex shrink-0 items-center gap-1 rounded-md border border-border/60 px-2 py-1.5 font-mono text-[11px] font-semibold text-muted-foreground transition hover:border-primary/60 hover:text-primary"
+          >
+            <SkipForward className="h-3.5 w-3.5" />
+            {skipLabel}
+          </button>
+        )}
       </div>
     </form>
   );
